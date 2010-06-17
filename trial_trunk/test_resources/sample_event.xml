@@ -1,0 +1,43 @@
+<Source_Model magnitude_type='Mw'>
+    <polygon>
+        <boundary>
+-20 120
+-30 120
+-30 130
+-20 130
+-20 120
+        </boundary>
+        <exclude>
+-25 124
+-28 124
+-28 126
+-25 124
+        </exclude>
+        <fault_depth distribution = "constant" mean = "10" ></fault_depth>
+        <azimuth distribution = "constant" mean = "130" ></azimuth>
+        <dip distribution = "constant" mean = "90" ></dip>
+        <magnitude distribution = "constant" mean = "6.5" ></magnitude>
+<recurrence distribution="bounded_gutenberg_richter" min_magnitude="3.3" max_magnitude="5.4" Lambda_Min="0.568" b="1" min_mag="4.5" depth="7" /> 
+
+    </polygon>
+    <polygon>
+        <boundary>
+-26 124.3
+-35 122
+-30 135
+-26 124.3
+        </boundary>
+        <exclude>
+-32 121
+-34 122
+-32 135
+-32 121
+        </exclude>
+        <fault_depth distribution = "constant" mean = "5" ></fault_depth>
+        <azimuth distribution = "constant" mean = "150" ></azimuth>
+        <dip distribution = "constant" mean = "80" ></dip>
+        <magnitude distribution = "constant" mean = "7" ></magnitude>
+<recurrence distribution="bounded_gutenberg_richter" min_magnitude="3.3" max_magnitude="5.4" Lambda_Min="0.568" b="1" min_mag="4.5" depth="7" /> 
+
+    </polygon>
+</Source_Model>

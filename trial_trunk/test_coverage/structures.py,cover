@@ -1,0 +1,310 @@
+>> """
+>>  Title: structures.py
+    
+>>   Author:  Peter Row, peter.row@ga.gov.au
+>>            Duncan Gray, duncan.gray@ga.gov.au
+              
+>>   Description: Classes and functions for holding structure information.
+    
+>>   Version: $Revision: 921 $  
+>>   ModifiedBy: $Author: dgray $
+>>   ModifiedDate: $Date: 2009-04-01 17:39:57 +1100 (Wed, 01 Apr 2009) $
+     
+>>   Copyright 2007 by Geoscience Australia
+>> """
+   
+!> from scipy import where, array, asarray
+!> from csv_interface import csv_to_arrays
+   
+!> from eqrm_code.sites import Sites
+!> from eqrm_code.building_params_from_csv import building_params_from_csv
+   
+   
+!> attribute_conversions={
+!>                        'LATITUDE':float,
+!>                        'LONGITUDE':float,
+!>                        'STRUCTURE_CLASSIFICATION':str,
+!>                        'HAZUS_STRUCTURE_CLASSIFICATION':str,
+!>                        'STRUCTURE_CATEGORY':str,
+!>                        'CONTENTS_COST_DENSITY':float,
+!>                        'BUILDING_COST_DENSITY':float,
+!>                        'FLOOR_AREA':float,
+!>                        'SURVEY_FACTOR':float,
+!>                        'FCB_USAGE':int,
+!>                        'HAZUS_USAGE':str,
+!>                        'BID':int,
+!>                        'POSTCODE':int,
+!>                        'SUBURB':str,
+!>                        'SITE_CLASS':str,
+!>                        'PRE1989':int}
+   
+!> class Structures(Sites):
+!>     def __init__(self,latitude,longitude,building_parameters,**attributes): 
+!>         """
+!>         Structures.from_csv is where this class is instanciated.
+!>         It is below.
+   
+!>         Stuctures holds structure data and does the
+!>         cost breakdown calculations.
+           
+!>         It inherits from Sites, which holds lat long data.
+   
+!>         The data manipulation of the structures info is done in;
+!>         Structures.from_csv
+!>         """
+>>         Sites.__init__(self,latitude,longitude,**attributes)
+>>         self.building_parameters=building_parameters
+   
+   
+!>     @classmethod
+!>     def from_csv(cls,
+!>                  sites_filename,
+!>                  building_parameters_table,
+!>                  main_dir,
+!>                  b_usage_type_flag=1,
+!>                  use_refined_btypes=True,
+!>                  force_btype_flag=False,
+!>                  determ_btype=None,
+!>                  determ_buse=None,
+!>                  aus_contents_flag=0):
+!>         """
+!>         Used in eqrm analysis.
+!>         Read in data from building database.
+!>         Extract strucuture parameters from building_parameters_table.
+   
+!>             - some parameters depend on structure classification (hazus or
+!>               refined hazus, depending on use_refined_btypes)
+   
+!>             - some parameters depend on usage (fcb or hazus, depending on
+!>               use_fcb_usage)
+   
+!>             - force_btype_flag will force all buildings to be of type
+!>               determ_btype, and usage determ_buse.
+   
+!>               See page 11 of the tech manual to understand the flags
+   
+!>               refined_btypes = Edwards building classification
+!>         """
+   
+   
+>>         if force_btype_flag:
+!!             raise NotImplementedError
+   
+>>         sites_dict=csv_to_arrays(sites_filename,**attribute_conversions)
+   
+>>         latitude=sites_dict.pop("LATITUDE")
+>>         longitude=sites_dict.pop("LONGITUDE")
+   
+>>         attributes={}
+>>         for attribute_name in sites_dict.keys():
+>>             attributes[attribute_name]=sites_dict[attribute_name]
+   
+           # Do we use refined_btypes or hazus btypes?
+>>         if not use_refined_btypes:
+>!             attributes['STRUCTURE_CLASSIFICATION']= \
+>!                           attributes['HAZUS_STRUCTURE_CLASSIFICATION']
+   
+   
+           # building_parameters_table has alot of info read in from
+           # varrious files in resources data.
+           # it is a dic, when the key signifies what the info is about, eg
+           # height, ductility.  The index of the data represents the structure
+           # classification, which is stored in
+           # building_parameters_table['structure_classification']
+   
+>>         building_parameters_table=building_params_from_csv(
+>>             building_parameters_table,main_dir)
+   
+           # get index that maps attributes ->
+           #    building_parameters_table (joined by 'structure_classification')
+>>         structure_classification=attributes['STRUCTURE_CLASSIFICATION']
+>>         building_parameter_index=get_index(
+>>             building_parameters_table['structure_classification'],
+>>             structure_classification)
+>>         building_parameters={}
+           # Now extract building_parameters from the table,
+           # using building_parameter_index
+>>         for key in building_parameters_table.keys():
+>>             building_parameters[key]=building_parameters_table[key][
+>>                     building_parameter_index]
+   
+           # extract usage dependent parameters
+>>         if b_usage_type_flag==1:        
+               # This should be a function. and unittested.
+               # Now seperate out residential and non_res
+>>             hazus_usage=attributes['HAZUS_USAGE']
+>>             is_residential=(array([(usage[0:4] in ['RES1','RES2','RES3']) \
+>>                                    for usage in hazus_usage]))
+>>             is_residential.shape=-1,1 # reshape so it can be broadcast
+               # This is bad.  These are the titles from the excel
+               # spreadsheet RcPerWrtBuildCHazususageEdwards.xls
+               # But they have been hardcoded in here.
+>>             usage_keys=('RES1','RES2','RES3','RES4','RES5','RES6','COM1',
+>>                         'COM2','COM3','COM4',
+>>                         'COM5','COM6','COM7',
+>>                         'COM8','COM9','COM10','IND1','IND2','IND3','IND4',
+>>                         'IND5','IND6','AGR1',
+>>                         'REL1','GOV1','GOV2','EDU1','EDU2')      
+               # get index that maps hazus_usage -> usage_keys 
+>>             usage_index=get_index(usage_keys,hazus_usage)
+>>             structure_ratio=building_parameters_table['hazus_structure_ratio'] 
+>>             nsd_d_ratio=building_parameters_table['hazus_nsd_d_ratio'] 
+>>             nsd_a_ratio=building_parameters_table['hazus_nsd_a_ratio']
+>>         elif b_usage_type_flag==2:  
+   
+               # This should be a function. and unittested.
+               # Now seperate out residential and non_res
+>>             fcb_usage=attributes['FCB_USAGE']
+               # is it residential?
+>>             is_residential=((fcb_usage<=113)+(fcb_usage==131)) 
+>>             is_residential.shape=-1,1 # reshape so it can be broadcast
+>>             usage_keys=[111,112,113,121,122,131,132,133,134,191,
+>>                         211,221,222,223,224,231,291,311,321,331,391,
+>>                         411,421,431,441,442,451,461,462,463,491]
+               # get index that maps fcb_usage -> usage_keys 
+>>             usage_index=get_index(usage_keys,fcb_usage)
+>>             structure_ratio=building_parameters_table['fcb_structure_ratio']
+>>             nsd_d_ratio=building_parameters_table['fcb_nsd_d_ratio'] 
+>>             nsd_a_ratio=building_parameters_table['fcb_nsd_a_ratio']
+!!         else:
+!!             raise ValueError(
+!!                 'b_usage_type_flat = '+str(b_usage_type_flag)+' not 1 or 2')
+   
+>>         structure_ratio=structure_ratio[building_parameter_index,usage_index]
+   
+>>         nsd_d_ratio=nsd_d_ratio[building_parameter_index,usage_index] 
+>>         nsd_a_ratio=nsd_a_ratio[building_parameter_index,usage_index]
+           # put cost ratios into dict 
+>>         building_parameters['structure_ratio']=structure_ratio
+>>         building_parameters['nsd_d_ratio']=nsd_d_ratio
+>>         building_parameters['nsd_a_ratio']=nsd_a_ratio
+   
+           # Get non-structural drift thesholds (depending on whether or not
+           # they are residential)
+   
+>>         nr=building_parameters['non_residential_drift_threshold'] 
+>>         r=building_parameters['residential_drift_threshold']
+>>         drift_threshold=r*is_residential+nr*(1-is_residential)
+>>         building_parameters['drift_threshold']=drift_threshold
+   
+>>         is_residential.shape=(-1,)
+>>         if aus_contents_flag==1:
+!!             attributes['CONTENTS_COST_DENSITY']*=(
+!!                 is_residential*0.6+(is_residential-1)*1.0) # reduce contents
+   
+>>         del building_parameters['fcb_structure_ratio']
+>>         del building_parameters['fcb_nsd_d_ratio']
+>>         del building_parameters['fcb_nsd_a_ratio']
+   
+>>         del building_parameters['hazus_structure_ratio']
+>>         del building_parameters['hazus_nsd_d_ratio']
+>>         del building_parameters['hazus_nsd_a_ratio']
+   
+           # create structures:    
+>>         structures=cls(latitude,longitude,building_parameters,
+>>                               **attributes)
+>>         return structures
+   
+!>     def cost_breakdown(self,ci=None):
+!>         """
+!>         Work-out the 3 building costs plus contents cost.
+           
+!>         attribute:
+!>           ci: regional cost index multiplier
+!>         """
+           #FIXME Most of this can be precomputed. 
+>>         floor_area=self.attributes['FLOOR_AREA']
+>>         structure_cost=self.attributes['BUILDING_COST_DENSITY']*floor_area
+>>         contents_cost=self.attributes['CONTENTS_COST_DENSITY']*floor_area
+           
+>>         structure_cost*=self.attributes['SURVEY_FACTOR']
+>>         contents_cost*=self.attributes['SURVEY_FACTOR']
+   
+>>         if ci is not None:
+>>             structure_cost*=ci
+>>             contents_cost*=ci
+>>         structure_ratio=self.building_parameters['structure_ratio']
+>>         nsd_d_ratio=self.building_parameters['nsd_d_ratio']
+>>         nsd_a_ratio=self.building_parameters['nsd_a_ratio']
+>>         total_costs=(structure_ratio*structure_cost,
+>>                      nsd_d_ratio*structure_cost,
+>>                      nsd_a_ratio*structure_cost,
+>>                      contents_cost)
+>>         return total_costs
+           
+!>     def __getitem__(self,key):
+!>         """
+!>         """
+>>         if isinstance(key,int):
+>>             key=[key]
+>>         attributes = {}
+>>         for k in self.attributes.keys():
+>>             attributes[k]=self.attributes[k][key]
+           
+>>         building_parameters = {}
+>>         for k in self.building_parameters.keys():
+>>             building_parameters[k]=self.building_parameters[k][key]
+                           
+>>         return Structures(self.latitude[key],self.longitude[key],
+>>                           building_parameters,
+>>                           **attributes)
+   
+!> def get_index(key_order,desired_keys):
+!>     """
+!>     This is used to map from a usage string/int to an index int.
+!>     eg. FCB usage of 111 is 1. 
+!>     HAZUS_USAGE of RES1 is 1.
+!>     These values are then used in tables to determine non_structural
+!>     drift ratio
+       
+!>     Input: 2 arrays, one of which contains a unique list
+!>     of keys in a canononical order:
+!>         key_order = known_pets = ['cat','dog','hamster']
+           
+!>     the other contains a list of keys in a desired_keys:
+!>         desired_keys = my_pets = ['cat','dog','cat']
+   
+!>     returns a list of indexes such that:
+!>         key_order[answer]=desired_keys
+   
+!>     Why:
+!>         If I have another array in the same order as key_order:
+!>            weight=[2,3,0.5]
+!>         then:
+!>             weight[answer]=[weight[where(key_order==key)]
+!>                             for key in desired_keys]
+   
+!>     This should offer a speedup if a lot of fields (ie weight,
+!>     food, licence number ...) are to be looked up.
+   
+!>     The other option is to ask the user to know what the
+!>     indexes will be, but this can get problematic if new keys
+!>     are added (ie new_known_pets=['cat','dog','python','hamster'])
+!>     """
+   
+       # Ceate a mapping, {name -> number}
+>>     key_to_index={}
+>>     for index,key in enumerate(key_order):
+           # check uniqueness
+>>         assert not key_to_index.has_key(key) 
+>>         key_to_index[key]=index
+       
+       # Map desired names to numbers
+>>     answer=array([key_to_index[key] for key in desired_keys])
+>>     return answer
+   
+!> def build_par_file_location(buildpars_flag,
+!>                             default_input_dir):
+       
+       # Build lookup table for building parameters
+>!     buildpars_map={
+>!         0:'building_parameters_workshop_1',
+>!         1:'building_parameters_workshop',
+>!         2:'building_parameters_hazus',
+>!         3:'building_parameters_workshop_2',
+>!         4:'building_parameters_workshop_3'}
+       
+       # create links to required building parameters
+>!     buildpars = buildpars_map[buildpars_flag]
+>!     building_parameters = default_input_dir + buildpars
+>!     return building_parameters

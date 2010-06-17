@@ -1,0 +1,194 @@
+!! def parse_in_paramaters(default_paramaters):
+       # expected_sections is a dictionary if lists of strings.
+       # ie
+       # {options1:['opt1a','opt1b'],
+       #  options2:['opt2a']}
+       
+   
+>!     expected_sections={
+>!         'Operation_Mode':'run_type',
+>!         'General':(
+>!             'inputdir, savedir, site_loc, grid_flag, small_site_flag, '+
+>!             'SiteInd, destring, rtrn_per'),
+>!         'Source':(
+>!             'azi, d_azi, dip, ntrgvector, ftype, wdth, '+
+>!             'min_mag_cutoff, nbins'),
+>!         'Event_Spawn': 'src_eps_switch, mbnd, nsamples, nsigma',
+>!         'Scenario': (
+>!             'determ_flag, determ_ntrg, determ_azi, determ_lat, '+
+>!             'determ_lon, determ_mag, determ_r_z'),
+>!         'Attenuation': (
+>!             'attenuation_flag, attn_region, var_attn_flag, '+
+>!             'var_attn_method, resp_crv_flag, Rthrsh, periods, '+
+>!             'pgacutoff, smoothed_response_flag'),
+>!         'Amplification':(
+>!             'amp_switch, var_amp_flag, var_amp_method, '+
+>!             'MaxAmpFactor, MinAmpFactor'),
+>!         'Bclasses':(
+>!             'b_usage_type_flag, hazus_btypes_flag, '+
+>!             'hazus_dampingis5_flag, buildpars_flag'),
+>!         'Bclasses2':(
+>!             'force_btype_flag, determ_btype, determ_buse'),
+>!         'CSM':(
+>!             'var_bcap_flag, bcap_var_method, stdcap, damp_flags, '+
+>!             'damp_flags, Harea_flag, SDRelTol, max_iterations'),
+>!         'Loss':'pga_mindamage, ci, aus_contents_flag',
+>!         'Save':(
+>!             'hazard_map_flag, save_ecloss_flag, save_socloss_flag, '+
+>!             'save_motion_flag, save_probdam_flag, save_deagecloss_flag'),
+>!         'Diagnostics':(
+>!             'qa_switch_ampfactors, qa_switch_attn, qa_switch_fuse, '+
+>!             'qa_switch_map, qa_switch_mke_evnts, qa_switch_watercheck, '+
+>!             'qa_switch_soc, qa_switch_vun')
+>!         }
+           
+       # note that:
+       #     'opt1, opt2 ...'.split(', ') -> ['opt1', 'opt2']
+>!     for key in expected_sections:
+>!         expected_sections[key]=expected_sections[key].split(', ')
+   
+>!     from ConfigParser import ConfigParser,NoOptionError
+>!     sections={}
+>!     for filename in [default_paramaters]:#,custom_paramaters:
+>!         config_file=ConfigParser() # create a new parser
+>!         s=config_file.read(filename) # read the file
+           #print 's',s
+           #print config_file.sections()
+           # I believe config parser can do stuff with defaults and
+           # stuff, but I want to make it a bit more transparent
+           # since it is easy to do myself
+>!         for section in expected_sections:
+               #print section
+>!             config_file.options(section)
+>!             for option in expected_sections[section]:
+                   # get the paramaters out, and convert them to 'data'
+                   # ie floats, arrays etc.
+>!                 try:
+>!                     option_value=config_file.get(section,option).replace('\n','')
+>!                     if not sections.has_key(section):
+>!                         sections[section]={}
+>!                     sections[section][option]=option_value
+!!                 except NoOptionError:
+!!                     pass
+                   
+>!     config_file=ConfigParser()           
+>!     for section in expected_sections:
+>!         config_file.add_section(section)
+>!         for option in expected_sections[section]:
+>!             try:
+>!                 option_value=sections[section][option]
+!!             except KeyError:
+!!                 print section,option,'was not populated'
+!!                 raise IOError(section+', '+option+
+!!                               ' was not populated')
+>!             config_file.set(section,option,option_value)
+       #config_file.write(open(out_file,'w'))
+   
+>!     def f_or_i(item):
+>!         item=item.lstrip(' ')
+>!         item=item.lstrip('[')
+>!         item=item.rstrip(' ')
+>!         item=item.rstrip(']')
+>!         try:
+>!             item=int(item)
+>!         except:
+>!             item=float(item)
+>!         return item
+>!     from scipy import array
+       
+>!     class my_dict(dict):
+>!         """
+>!         dictionary that uses mydict.item as mydict['item']
+>!         (from parse_in_paramaters)
+>!         """
+>!         def __init__(self,d):
+>!             for key,item in d.iteritems():
+>!                 if isinstance(item,dict):
+>!                     item=my_dict(item)
+>!                 else:
+                       # convert to something
+>!                     try:
+>!                         item=f_or_i(item) # try float
+                           #print 'floating',item
+>!                     except:
+>!                         try:
+>!                             item2=item[:] # copy, turn it into an array
+>!                             item2=item2.replace(',',' ')
+>!                             item2=item2.replace('\n',' ')
+>!                             item2=[[f_or_i(x) for x in line.split(' ') if x!='']
+>!                                   for line in item2.split(';')]
+>!                             item2=[array(i) for i in item2]
+>!                             if len(item2)==1:
+>!                                 item2=item2[0]
+                               #item2=
+>!                             item=item2
+                               #print 'asarray',item
+>!                         except:
+>!                             pass
+                       
+                   # use a loophole to set items
+                   # (as __setitem__ is banned from mydict)
+                   #     we explicitly use the __setitem__ of
+                   #     the base class to set items, rather
+                   #     than the default __setitem__ (which
+                   #     raises an error message).
+>!                 dict.__setitem__(self,key,item)
+                   
+>!         def __getattribute__(self,key):
+>!             try:
+>!                 return self[key]
+>!             except:
+>!                 for k in dict.keys(self):
+>!                     try:
+>!                         return self[k][key]
+>!                     except:
+>!                         pass
+!!                 raise KeyError(str(key)+ ' was not found')
+               
+>!         def __setattr__(self,key,value):
+>!             self[key]=value
+               # object.__setattr__(self, key, value)
+   
+>!     THE_PARAM_T=my_dict(sections)
+       
+       # catching inconsitencies in the paramaters file
+>!     if THE_PARAM_T.hazard_map_flag==1 and THE_PARAM_T.determ_flag==1:
+!!         raise ValueError(' cannot compute hazard for a deterministic scenario:'+
+!!                          'hazard_map_flag==1 and determ_flag==1 is not allowed')
+   
+>!     def isscalar(x):
+>!         if isinstance(x,int) or isinstance(x,float):
+>!             return True
+!!         else:
+!!             return not hasattr(x,'__len__')
+               
+   
+>!     def scalar2vec(x,leny):       
+>!         if isscalar(x):
+>!             xtmp = x
+>!             x=[]
+>!             for k in range(leny):
+>!                 x.append(xtmp)
+>!             x=array(x)
+>!         return x
+>!     try:
+>!         len_ntrgvector=len(THE_PARAM_T.ntrgvector)
+>!     except:
+!!         len_ntrgvector=1 # if only 1 zone
+   
+>!     if THE_PARAM_T.determ_flag ==0:
+>!         THE_PARAM_T.dip = scalar2vec(THE_PARAM_T.dip,len_ntrgvector)
+>!         THE_PARAM_T.azi = scalar2vec(THE_PARAM_T.azi,len_ntrgvector)
+>!         THE_PARAM_T.d_azi = scalar2vec(THE_PARAM_T.d_azi,len_ntrgvector)
+       
+>!     if THE_PARAM_T.save_motion_flag==1:
+>!         if THE_PARAM_T.determ_flag ==0:
+!!             raise ValueError('do not save motion for a generated event for now')
+   
+>!     if not THE_PARAM_T.savedir[-1]=='\\':
+>!         THE_PARAM_T.savedir=THE_PARAM_T.savedir+'\\'
+>!     if not THE_PARAM_T.inputdir[-1]=='\\':
+>!         THE_PARAM_T.inputdir=THE_PARAM_T.inputdir+'\\'
+           
+>!     return THE_PARAM_T            
+           
