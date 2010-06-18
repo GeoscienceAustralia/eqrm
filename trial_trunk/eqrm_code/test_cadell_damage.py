@@ -5,7 +5,7 @@ import os
 import sys
 import csv
 import unittest
-from os.path import join
+from os.path import join, exists
 
 from scipy import array, newaxis, where, allclose
 
@@ -14,13 +14,17 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model
 from eqrm_code.structures import Structures
 from eqrm_code.util import determine_eqrm_path
 
-CADELL_TEST_DIR = '../test_cadell/Cadell/'
 class Test_cadell(unittest.TestCase):    
     def test_cadel_ground_motion(self):   
         
         eqrm_dir = determine_eqrm_path()
-        cadel_dir = join(eqrm_dir, 'test_cadell', 'Cadell')
+        cadel_dir = join(eqrm_dir,'..','test_cadell', 'Cadell')
         natcadell_loc = join(cadel_dir, 'natcadell.csv')
+
+        # Silently return from the test if the data set does not exist.
+        # The data is in python_eqrm
+        if not exists(natcadell_loc):
+            return
         default_input_dir = join(eqrm_dir,'resources',
                                  'data', '')
         sites=Structures.from_csv(natcadell_loc,
