@@ -5,7 +5,10 @@ Copyright 2010 by Geoscience Australia
 """
 
 
-from eqrm_code.sites import Sites
+import copy
+
+import structures
+from eqrm_code.csv_interface import csv_to_arrays
 
 
 # We expect users to provide something like:
@@ -19,11 +22,10 @@ from eqrm_code.sites import Sites
 #                         'SITE_CLASS': str}
 
 
-class Bridges(Sites):
+class Bridges(structures.Structures):
     """An object holding bridges data.
 
     Actually get a Bridges object by: Bridges.from_csv(...)
-    This is done this way and not the traditional way for some reason!?
     """
 
     def __init__(self, latitude, longitude, **attributes): 
@@ -34,11 +36,58 @@ class Bridges(Sites):
         attributes  a dictionary of bridge attributes
         """
 
-        # latitude, longitude & attributes saved by Sites.__init__()
-        Sites.__init__(self, latitude, longitude, **attributes)
+        # latitude, longitude & attributes saved by Structures.__init__()
+        structures.Structures.__init__(self, latitude, longitude, {},
+                                       **attributes)
 
 
-    # .from_csv() and .__get_item__() inherited from Sites class
-    # .__init__() is same as in Sites class, but we must have *some* code here!
+    @classmethod
+    def from_csv(cls, file, **attribute_conversions):
+        """Construct Bridges instance from csv file.
+
+        file                   open file handle for site data
+        attribute_conversions  dictionary defining required data from file and
+                               format of the data
+        use:
+            X = Bridges.from_csv('blg_wr.csv', PEOPLE=float,
+                                 WALLS=str, ROOF_TYPE=str)
+        or:
+            d = {'PEOPLE': float, 'WALLS': str, 'ROOF_TYPE': str}
+            X = Bridges.from_csv('blg_wr.csv', **d)
+        """
+
+        # force lat & lon - required columns
+        attribute_conversions["LATITUDE"] = float
+        attribute_conversions["LONGITUDE"] = float
+
+        # read in data from file
+        bridges_dict = csv_to_arrays(file, **attribute_conversions)
+
+        # remove lat&lon from attributes dictionary
+        latitude = bridges_dict.pop("LATITUDE")
+        longitude = bridges_dict.pop("LONGITUDE")
+
+        # copy remaining attributes - don't need user changes reflected
+        attributes = copy.copy(bridges_dict)
+
+        # call class constructor
+        return cls(latitude, longitude, **attributes)
+
+
+    def __getitem__(self, key):
+        """Get single indexed entry from a Bridges object."""
+
+        # if 'key' is naked int, make a list
+        if isinstance(key, int):
+            key = [key]
+
+        # get indexed .attributes
+        attributes = {}
+        for k in self.attributes.keys():
+            attributes[k] = self.attributes[k][key]
+
+        # get final Sites object
+        return Bridges(self.latitude[key], self.longitude[key],
+                       **attributes)
 
 

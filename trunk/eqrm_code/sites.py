@@ -6,9 +6,9 @@
   Description: Create a data structure to handle site data e.g.
   latitude, longitude and other attributes.
 
-  Version: $Revision: 1700 $
+  Version: $Revision: 1716 $
   ModifiedBy: $Author: rwilson $
-  ModifiedDate: $Date: 2010-06-16 16:42:33 +1000 (Wed, 16 Jun 2010) $
+  ModifiedDate: $Date: 2010-06-18 13:58:01 +1000 (Fri, 18 Jun 2010) $
 
   Copyright 2007 by Geoscience Australia
 """
@@ -181,7 +181,7 @@ class Sites(object):
                        ^^^^^
                     common attributes
 
-        where the lon & lat vectors are just concatenated.
+        Where the lon & lat vectors are just concatenated.
         The common attributes are concatenated.
         The remaining attribute vectors are made final length with NaN in
         positions with no data.
@@ -217,19 +217,18 @@ class Sites(object):
         return Sites(new_lat, new_lon, **new_attr)
 
 
-# this sub-samples sites and is used if use_site_indexes>1
 def truncate_sites_for_test(use_site_indexes, sites, site_indexes):
+    """Sample sites (for testing).
+
+    use_site_indexes  id True, do sampling, else return unchanged sites
+    sites             is a Sites object
+    site_indexes      is an array of indexes
+
+    If 'use_site_indexes' is False, just return 'sites' unchanged.
     """
-    sitess are Site objects
-    site_indexes is an array
-    """
-    # note: sites can be sliced like an array:
-    #bad_blg=array([24, 25, 27, 29, 30, 53, 63, 77, 78, 82, 83, 85, 91, 97])-1
-    #bad_blg=array([24, 25, 26, 27])-1
-    #all_sites=all_sites[bad_blg]
+
     if use_site_indexes is True:
-        site_ind = site_indexes
-        return sites[site_ind-1] # -1 offset to match matlab
-    else:
-        return sites
+        return sites[site_indexes-1]	# -1 offset to match matlab
+
+    return sites
 
