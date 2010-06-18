@@ -73,7 +73,7 @@ def create_distribution_zip(vername, distro_dirs=None,
 
     # When using this, make sure the expo_dir is not deleted in 2 places.
     if True: 
-        s = 'svn --force export http://65.61.168.30/svn/eqrm_core/trial_trunk '\
+        s = 'svn --force export http://65.61.168.30/svn/eqrm_core/trunk '\
             + expo_dir
     
         print s
