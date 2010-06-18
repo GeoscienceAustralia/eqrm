@@ -122,7 +122,7 @@ class Xml_Interface(object):
             list_of_tuples.append(coordinate)
         """
         list_of_tuples=[t for t in list_of_tuples if len(t)>0]
-        #Chomp out the empty lines
+        # Chomp out the empty lines
         return array(list_of_tuples)
     
     attributes = property(__attributes)
