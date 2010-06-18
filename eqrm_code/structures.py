@@ -6,9 +6,9 @@
 
   Description: Classes and functions for holding structure information.
 
-  Version: $Revision: 1695 $
+  Version: $Revision: 1716 $
   ModifiedBy: $Author: rwilson $
-  ModifiedDate: $Date: 2010-06-16 10:04:18 +1000 (Wed, 16 Jun 2010) $
+  ModifiedDate: $Date: 2010-06-18 13:58:01 +1000 (Fri, 18 Jun 2010) $
 
   Copyright 2007 by Geoscience Australia
 """
@@ -16,6 +16,7 @@
 
 from os.path import join
 from scipy import where, array, asarray, allclose, sum
+import numpy as np
 import copy
 
 from eqrm_code.csv_interface import csv_to_arrays, csv2dict
@@ -214,6 +215,20 @@ class Structures(Sites):
         # create shiny new Structures object with this single structure
         return Structures(self.latitude[key], self.longitude[key],
                           building_parameters, **attributes)
+
+    def join(self, other):
+        """Join data from a Structures object with some other object.
+
+        Just call the parent join(), copying self.attributes to result.
+        We must return a Structures object to include Structures methods.
+        """
+
+        # do the vanilla data join from the parent class (Sites)
+        joined = super(Structures, self).join(other)
+
+        # return joined Structures object with .building_parameters from self
+        return Structures(joined.latitude, joined.longitude,
+                          self.building_parameters, **joined.attributes)
 
 
 def get_index(key_order, desired_keys):
