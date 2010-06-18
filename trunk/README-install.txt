@@ -24,7 +24,7 @@ require one or more of the following:
 matplotlib
 GMT
 
-Note: when *\python_eqrm\eqrm_code is used below you need to replace
+Note: when *\eqrm_core\eqrm_code is used below you need to replace
 the * with the actual place you have installed EQRM on your computer.
 
 WINDOWS INSTALL INSTRUCTIONS:
@@ -69,7 +69,7 @@ now forces weave to re-compile the required components)
 
 9. Add C:\MinGW\bin (so you can compile c extensions to python) and
    C:\Python25 (so you can call Python from a DOS prompt) to your path
-   and *\python_eqrm\ to your pythonpath:
+   and *\eqrm_core\ to your pythonpath:
 
    a) right click My Computer - go to properties - Advanced -
    Environment Variables 
@@ -82,14 +82,14 @@ now forces weave to re-compile the required components)
    (or python24) to
    Variable Value (use ";" to separate values).
    
-   d) Variable Name = PYTHONPATH, add "*\python_eqrm\;" to
+   d) Variable Name = PYTHONPATH, add "*\python_core\;" to
    Variable Value (use ";" to separate values).
 
 10. Optional: install gzip working with compressed
    output. http://gnuwin32.sourceforge.net/downlinks/gzip.php
   
 11. At the dos prompt:
-    cd *\python_eqrm\eqrm_code
+    cd *\eqrm_core\eqrm_code
     python test_all.py	
     cd ..
     python check_scenarios.py
@@ -144,10 +144,10 @@ caused problems with weave.
  Unzip the eqrm_install file (e.g.eqrm_versionX.X.svn_X.zip) to where
  ever you want it.
  
-Set the environment variable PYTHONPATH to *\python_eqrm (where the
+Set the environment variable PYTHONPATH to *\eqrm_core (where the
 EQRM software was installed.)
     
-in the *\python_eqrm\ directory;
+in the *\eqrm_core\ directory;
     python test_all.py     - to test that individual parts of the code work
     python check_scenarios.py - to run some scenarios and check the
     output

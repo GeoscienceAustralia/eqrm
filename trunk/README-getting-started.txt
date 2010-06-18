@@ -6,7 +6,7 @@ Questions and comments are welcomed. Please please join the list
 
 1. DIFFERENT RUN MODES
 
-*** Five DEMOS are provided in *\python_eqrm\demo. This section demonstrates
+*** Five DEMOS are provided in *\eqrm_core\demo. This section demonstrates
  how to use them. Note that * refers to a path - it will vary depending where
  you have installed the EQRM. 
 
@@ -17,7 +17,7 @@ Questions and comments are welcomed. Please please join the list
 1) Ground Motion Scenario (example parameter file: setdata_ScenGM.par)
 
     Run at DOS command line:
-    cd *\python_eqrm\demo
+    cd *\eqrm_core\demo
     python ..\eqrm_analysis.py setdata_ScenGM.par y
 
 
@@ -25,14 +25,14 @@ Questions and comments are welcomed. Please please join the list
    file: setdata_ScenRisk.txt)
 
     Run at DOS command line:
-    cd *\python_eqrm\demo
+    cd *\eqrm_core\demo
     python ..\eqrm_analysis.py setdata_ScenRisk.par y
 
 3) Damage Scenario with multiple attenuation models (example parameter
    file: setdata_ScenRisk2.txt)
 
     Run at DOS command line:
-    cd *\python_eqrm\demo
+    cd *\eqrm_core\demo
     python ..\eqrm_analysis.py setdata_ScenRisk2.par y
 
 
@@ -40,14 +40,14 @@ Questions and comments are welcomed. Please please join the list
    setdata_ProbHaz.txt)
 
     Run at DOS command line:
-    cd *\python_eqrm\demo
+    cd *\eqrm_core\demo
     python ..\eqrm_analysis.py setdata_ProbHaz.par y
 
 5) Probabilistic Risk Simulation (example parameter file:
    setdata_ProbRisk.txt)
 
     Run at DOS command line:
-    cd *\python_eqrm\demo
+    cd *\eqrm_core\demo
     python ..\eqrm_analysis.py setdata_ProbRisk.par y
 
 
@@ -55,7 +55,7 @@ INPUT:
 1) The first input *\demo\setdata_ProbRisk.par is a parameter file
    containing flags and other input parameters to control the type/nature
    of the simulation. Further information of individual parameters is
-   given in *\python_eqrm\Documentation\new_param_list.pdf
+   given in *\eqrm_core\Documentation\new_param_list.pdf
 2) The second input controls the random number seed (see below for further
    information.
 3) A third (optional) input can be used to force the EQRM to zip output
@@ -74,7 +74,7 @@ between using a hardwired seed value, or using time as a random
 seed.
 
 Run at DOS command line:
-    cd *\python_eqrm\demo
+    cd *\eqrm_core\demo
     python ..\eqrm_analysis.py setdata_ScenGM.par y
         ** to deterministicaly seed the random number generator
            (the run is repeatable)
@@ -105,7 +105,7 @@ simulation.
 
 To implement the zip save mode run the following at the DOS command line
 (note use of second y):
-    	cd *\python_eqrm\demo
+    	cd *\eqrm_core\demo
 	python ..\eqrm_analysis.py setdata_ProbHaz.par y y
 
 
@@ -117,7 +117,7 @@ To implement the zip save mode run the following at the DOS command line
     include setdata_ProbRisk.txt, setdata_ScenRisk2.txt, etc. An
     explanation of all parameters in the input file is provided in
     
-              *\python_eqrm\Documentation\new_param_list.pdf
+              *\eqrm_core\Documentation\new_param_list.pdf
 
 There are three variables that warrant special mention here.
 1) site_loc = 	string prefix used for all input and output files. 
@@ -128,81 +128,81 @@ There are three variables that warrant special mention here.
 		source zone files, grid files etc. (see below for more 
 		information). Local that the EQRM will search for all input
 		files in inputdir - if it can not find it there it will 
-		then search in *\python_eqrm\resources\data.
+		then search in *\eqrm_core\resources\data.
 		
 3) savedir  =  string full path for location to save output files. 
 
 *** The following lists the input files required for each of the major
     simulation types and it points to examples that ship with the eqrm
-    in the *\python_eqrm\resources\data directory:
+    in the *\eqrm_core\resources\data directory:
 
 1) Ground Motion Scenario (example parameter file: setdata_ScenGM.par)
 		
 	a) A grid of sites at which to compute motion (longitude,
 	latitude and site class)
-	e.g. *\python_eqrm\demo\input\newc_par_site.csv (if grid_flag
+	e.g. *\eqrm_core\demo\input\newc_par_site.csv (if grid_flag
 	== 1) 
 	*** use a dummy variable for site class (e.g. A) if not
 	using amplification
 
 	b) OPTIONAL: Amplification Factors are needed if using amplification
-		e.g. *\python_eqrm\demo\input\newc_par_ampfactors.xml   
+		e.g. *\eqrm_core\demo\input\newc_par_ampfactors.xml   
 
 2) Damage Scenario (example parameter file: setdata_ScenRisk.par)
 
 	a) Building database (contains building locations, properties etc.)
-	e.g. *\python_eqrm\demo\input\sitedb_newc.csv
+	e.g. *\eqrm_core\demo\input\sitedb_newc.csv
 	*** use a dummy variable for site class (e.g. A) if not using
 	 amplification
 
 	b) OPTIONAL: Amplification Factors are needed if using amplification
-	e.g. *\python_eqrm\demo\input\newc_par_ampfactors.xml   
+	e.g. *\eqrm_core\demo\input\newc_par_ampfactors.xml   
 
 
 3) Probabilistic Hazard Simulation (e.g. parameter file: setdata_ProbHaz.txt)
 		
 	a) Source zone file (boundary, G-R parameters (Lambda_Min,b),
 	Mag_min, Mag_max, area etc.
-	e.g. *\python_eqrm\demo\input\newc_source_polygon.xml *** note
+	e.g. *\eqrm_core\demo\input\newc_source_polygon.xml *** note
 	that Lambda_Min is the actual number of earthquakes of Mag >=
 	Mag_min expected per year (i.e. it is related to the G-R a
 	parameter but it is different)
 		
 	b) A grid of sites at which to compute hazard (longitude,
 	latitude and site class)
-	e.g. *\python_eqrm\demo\input\newc_par_site.csv (if grid_flag
+	e.g. *\eqrm_core\demo\input\newc_par_site.csv (if grid_flag
 	== 1) 
 	*** use a dummy variable for site class (e.g. A) if not
 	using amplification
 
 	c) OPTIONAL: Amplification Factors are needed if using amplification
-		e.g. *\python_eqrm\demo\input\newc_par_ampfactors.xml   
+		e.g. *\eqrm_core\demo\input\newc_par_ampfactors.xml   
 
 
 4) Probabilistic Risk Simulation (example parameter file: setdata_ProbRisk.txt)
 
 	a) Source zone file (boundary, G-R parameters (Lambda_Min,b),
 	Mag_min, Mag_max, area etc.
-	e.g. *\python_eqrm\demo\input\newc_source_polygon.xml 
+	e.g. *\eqrm_core\demo\input\newc_source_polygon.xml 
 	
 	*** note that Lambda_Min is the actual number of earthquakes
 	of Mag >= Mag_min expected per year (i.e. it is related to the
 	G-R a parameter but it is different)
 		
 	b) Building database (contains building locations, properties etc.)
-	e.g. *\python_eqrm\demo\input\sitedb_newc.csv
+	e.g. *\eqrm_core\demo\input\sitedb_newc.csv
 	*** use a dummy variable for site class (e.g. A) if not using
 	 amplification
 
 	c) OPTIONAL: Amplification Factors are needed if using amplification
-	e.g. *\python_eqrm\demo\input\newc_par_ampfactors.xml   
+	e.g. *\eqrm_core\demo\input\newc_par_ampfactors.xml   
 
 
 COMMENT ON RESOURCE AND LOCAL DATA FILES: When eqrm tries to open an
 input file (such as site locations, soil amplification files, etc), it
 first checks in the local input directory (specified as inputdir in
 the parameter file), then it looks in the EQRM resource directory
-(*\python_eqrm\resources\data).
+(*\eqrm_core\resources\data).
 
 
 GENERATING THE INPUT FILES: for the most part you are on your own in
@@ -215,7 +215,7 @@ to supply a polygon file containing the site class polygons in the
 correct format (e.g. perth_par_site_class_polys.xml). You can then
 generate your grid at the DOS prompt as follows.
 
-	cd  *\python_eqrm\preprocessing
+	cd  *\eqrm_core\preprocessing
 	python grid_generator.py newc ..\implementation_tests\input c:\temp\eqrmdemos 50 50
 
 	Where the inputs (in order) are:
@@ -236,7 +236,7 @@ If you are doing multiple simulations you will probably want to use a
 batch file to process all your simulations. An example of how to do
 this is provided in the demo area. To run at the DOS command prompt:
 
-    cd *\python_eqrm\demo
+    cd *\eqrm_core\demo
     python demo_batchrun.py 
 
 
@@ -275,9 +275,9 @@ EXAMPLES Follow
 	- you must modify the MATLABPATH environment variable to
 	include the following directories.  (This is done within
 	Matlab using file>Set Path):
-		1) *\python_eqrm\Matlab_utils
-		2) *\python_eqrm\preprocessing
-		3) *\python_eqrm\postprocessing
+		1) *\eqrm_core\Matlab_utils
+		2) *\eqrm_core\preprocessing
+		3) *\eqrm_core\postprocessing
 		
 	- the following instructions assume that you have not asked
         the EQRM to compress the output files. If you do have
@@ -301,7 +301,7 @@ EXAMPLES Follow
 	
 	>> demodir = 'C:\temp\demo\output\scen_risk';
 	>> cd(demodir) 
-	>> Convert_Py2Mat_Risk(demodir,'THE_PARAM_T.txt','C:\workstuff\sandpit\python_eqrm\resources\data') % convert EQRM outputs to MATLAB binary files (x2) 
+	>> Convert_Py2Mat_Risk(demodir,'THE_PARAM_T.txt','C:\workstuff\sandpit\eqrm_core\resources\data') % convert EQRM outputs to MATLAB binary files (x2) 
 	
 	*** Now the data are conveniently in MATLAB - it's time to 
 	have a look at it ***
@@ -349,7 +349,7 @@ EXAMPLES Follow
 
 	>> demodir = 'C:\temp\demo\output\prob_risk'; % use scen_gm?
 	>> cd(demodir)
-	>> Convert_Py2Mat_Risk(demodir,'THE_PARAM_T.txt','C:\workstuff\sandpit\python_eqrm\resources\data') % convert EQRM outputs to MATLAB binary files (x2) 
+	>> Convert_Py2Mat_Risk(demodir,'THE_PARAM_T.txt','C:\workstuff\sandpit\eqrm_core\resources\data') % convert EQRM outputs to MATLAB binary files (x2) 
 	
 	*** Now the data are conveniently in MATLAB - it's time to have a look at it ***
 
