@@ -134,13 +134,14 @@ class Damage_model(object):
                                                          beta_nsd_a, SA)
         self.structure_state = structure_state  # for writing to file
 
-        print('damage_model.py:136:\n'
-              'structure_state=\n%s,\n'
-              'non_structural_state=\n%s\n'
-              'acceleration_sensitive_state=\n%s'
-              % (str(structure_state), str(non_structural_state),
-                 str(acceleration_sensitive_state)))
-        print('damage_model.py:143: structure_state.shape=%s' % str(structure_state.shape))
+#        print('damage_model.py:\n'
+#              'structure_state=\n%s,\n'
+#              'non_structural_state=\n%s\n'
+#              'acceleration_sensitive_state=\n%s'
+#              % (str(structure_state), str(non_structural_state),
+#                 str(acceleration_sensitive_state)))
+#        print('damage_model.py: structure_state.shape=%s'
+#              % str(structure_state.shape))
 
         return (structure_state, non_structural_state,
                 acceleration_sensitive_state)
