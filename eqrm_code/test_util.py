@@ -197,22 +197,22 @@ class Test_Util(unittest.TestCase):
         # OK find, finds both, precise values
         SA = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
         expect = (3, 10)
-        got = find_bridge_sa(SA)
+        got = find_bridge_sa_indices(SA)
         self.failUnlessEqual(expect, got)
 
         # OK find, finds both, imprecise values
         SA = [0.0, 0.1, 0.2, 0.31, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1.1, 1.2]
         expect = (3, 10)
-        got = find_bridge_sa(SA, epsilon=0.02)
+        got = find_bridge_sa_indices(SA, epsilon=0.02)
         self.failUnlessEqual(expect, got)
 
         # BAD find, doesn't find 0.3
         SA = [0.0, 0.1, 0.2, 0.301, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
-        self.failUnlessRaises(RuntimeError, find_bridge_sa, SA)
+        self.failUnlessRaises(RuntimeError, find_bridge_sa_indices, SA)
 
         # BAD find, doesn't find 1.0
         SA = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.999, 1.1, 1.2]
-        self.failUnlessRaises(RuntimeError, find_bridge_sa, SA)
+        self.failUnlessRaises(RuntimeError, find_bridge_sa_indices, SA)
 
     def dont_test_run_call(self):
         # Too flaky for a test.

@@ -215,7 +215,7 @@ def del_files_dirs_in_dir(folder):
         shutil.rmtree(folder, ignore_errors=False, onerror=handleRemoveReadonly)
     mkdir(folder)
 
-def find_bridge_sa(SA, epsilon=1.0e-3):
+def find_bridge_sa_indices(SA, epsilon=1.0e-3):
     """Get the indices of the 0.3 and 1.0 sec accelerations in an SA array.
 
     SA       spectral acceleration 1D array
