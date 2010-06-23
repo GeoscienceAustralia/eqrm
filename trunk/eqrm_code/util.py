@@ -215,189 +215,34 @@ def del_files_dirs_in_dir(folder):
         shutil.rmtree(folder, ignore_errors=False, onerror=handleRemoveReadonly)
     mkdir(folder)
 
+def find_bridge_sa(SA, epsilon=1.0e-3):
+    """Get the indices of the 0.3 and 1.0 sec accelerations in an SA array.
 
-# def obsolete_compile_weave_functions():
-# 	"""
-# 	See if all of the weave code can compile.  If not, throw an IOError.
-#         This is to catch if the compiled weave code cannot be written.
-#         This happens if a users drive is full.
+    SA       spectral acceleration 1D array
+    epsilon  acceptable 'slop' when comparing floats
 
-#         This is a bit hacky, since when new weave code is added it has
-#         to be added here as well.  And I have to find all the current
-#         weave code...
-# 	"""
+    Return a tuple (SA0.3, SA1.0) of indices to the 0.3 & 1.0 sec accelarations.
+    """
 
-#         from ground_motion_interface import gound_motion_init
-#         from eqrm_code.regolith_amplification_model import \
-#              Regolith_amplification_model
-#         from eqrm_code.ground_motion_distribution import \
-#              Log_normal_distribution
-#         from eqrm_code.capacity_spectrum_functions import calculate_capacity, \
-#              calculate_updated_demand
+    # look for period 0.3s
+    i03 = None
+    for (i, a) in enumerate(SA):
+        if abs(a-0.3) <= epsilon:
+            i03 = i
 
-#         # ground motion interface weaves
-#         distance = array([[[8.6602540]]])
-#         mag = array([[[8.0]]])
-#         coefficient = array([1,2,3,4,5,6,5])
-#         coefficient.shape = (-1, 1, 1, 1)
-#         sigma_coefficient = coefficient
-        
-#         distribution = gound_motion_init[
-#             'Toro_1997_midcontinent'][0]        
-#         log_mean,log_sigma = distribution(
-#             mag=mag,
-#             distance=distance,
-#             coefficient=coefficient,
-#             sigma_coefficient=sigma_coefficient)
-        
-#         distribution = gound_motion_init[
-#             'Atkinson_Boore_97'][0]
-#         coefficient = array([1,2,3,4])
-#         coefficient.shape = (-1, 1, 1, 1)
-#         sigma_coefficient = array([1])
-#         sigma_coefficient.shape = (-1, 1, 1, 1)       
-#         log_mean,log_sigma = distribution(
-#             mag=mag,
-#             distance=distance,
-#             coefficient=coefficient,
-#             sigma_coefficient=sigma_coefficient)
+    # look for period 1.0s
+    i10 = None
+    for (i, a) in enumerate(SA):
+        if abs(a-1.0) <= epsilon:
+            i10 = i
 
-#         distribution = gound_motion_init[
-#             'Sadigh_97'][0]
-#         coefficient = array([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16])
-#         coefficient.shape = (-1, 1, 1, 1)
-#         sigma_coefficient = array([1,2,3])
-#         sigma_coefficient.shape = (-1, 1, 1, 1)       
-#         log_mean,log_sigma = distribution(
-#             mag=mag,
-#             distance=distance,
-#             coefficient=coefficient,
-#             sigma_coefficient=sigma_coefficient)
-        
-#         # regolith amplification model weave
-#         pga=array((0.05,0.1))
-#         moment_magnitude=array((4.5,5.5,6.5))
-#         periods=array((0.0,0.01))
+    # check we found both accelerations
+    if i03 is None or i10 is None:
+        msg = "Can't find SA periods for 0.3s and 1.0s in %s" % str(SA)
+        raise RuntimeError(msg)
 
-#         log_ampC=array((((0.36327,0.36327+1),(0.33203,0.33203+1),
-#                          (0.29231,0.29231+1)),
-#                         ((0.36298,0.36298+1),(0.34226,0.34226+1),
-#                          (0.31896,0.31896+1)))).swapaxes(0,1)
+    return (i03, i10)
 
-#         log_ampD=array((((0.74521,0.74521),(0.78958,0.78958),
-#                          (0.80831,0.80831)),
-#                         ((0.61605,0.61605),(0.66287,0.66287),
-#                          (0.69683,0.69683)))).swapaxes(0,1)
-
-#         log_stdC=array((((0.26331,0.26331),(0.25138,0.25138),
-#                          (0.23645,0.23645)),
-#                         ((0.26153,0.26153),(0.2527,0.2527),
-#                          (0.24392,0.24392)))).swapaxes(0,1)
-
-#         log_stdD=array((((0.18982,0.18982),(0.17712,0.17712),
-#                          (0.16832,0.16832)),
-#                         ((0.20337,0.20337),(0.19081,0.19081),
-#                          (0.18001,0.18001)))).swapaxes(0,1)
-
-#         log_amplifications={'CD':log_ampC,'D':log_ampD}
-#         log_stds={'CD':log_stdC,'D':log_stdD}
-        
-#         regolith_amp_distribution = Log_normal_distribution(
-#             1,
-#             1,
-#             num_psudo_events=2,
-#             num_sites_per_site_loop=5)
-        
-#         amp_model=Regolith_amplification_model(
-#             pga,moment_magnitude,periods,
-#             log_amplifications,log_stds,
-#             distribution_instance=regolith_amp_distribution)
-        
-#         log_ground_motion=log(array([[[0.05,0.1],[0.1,0.1]],
-#                                      [[0.05,0.05],[0.05,0.1]]]))
-#         # add periods dimension
-#         log_ground_motion=log_ground_motion[...,newaxis] 
-#         # 2 spawnings
-#         site_classes=array(('CD','D'))
-#         Mw=array((4.5,6.5))
-#         event_periods=array([0,0.01])
-
-#         dist= amp_model.distribution(exp(log_ground_motion),
-#                                      site_classes,
-#                                      Mw,event_periods)
-        
-#         # capacity_spectrum_functions weaves
-#         # calculate_capacity, hitting 2 weaves
-#         surface_displacement=array([0,1])        
-#         surface_displacement.shape=1,2,-1                
-        
-#         Ay,Dy,Au,Du=(0.13417,2.9975,0.26833,41.964)
-#         aa,bb,cc,kappa=(-0.3647,0.33362,0.26833,0.001)
-#         capacity_parameters=Dy,Ay,Du,Au,aa,bb,cc       
-#         capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]
-#         capacity=calculate_capacity(surface_displacement,capacity_parameters)
-        
-#         surface_displacement.shape=1,1,-1 
-#         capacity=calculate_capacity(surface_displacement,capacity_parameters)
-
-#         # calculate_updated_demand, hitting 2 weaves
-#         SA=array([0.342010,0.763370,0.653840,0.530630,0.44294,
-#                   0.38397,0.34452,0.321240,0.302940,0.276640,
-#                   0.248310,0.15958,0.11005,0.080179,0.055094,
-#                   0.039724,0.029105,0.021409,0.015748])
-#         SA.shape=1,1,-1
-
-#         SD=array([0,1.895,6.4923,11.855,17.593,23.829,
-#                   30.789,39.074,48.129,55.625,61.64,
-#                   89.128,109.27,124.4,123.09,120.8,
-#                   115.6,107.62,97.732])
-#         SD.shape=1,1,-1
-        
-#         TAV=array([[0.46795]])
-#         TVD=array([[12.589]])
-        
-#         periods=array([0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,
-#                      1.5,2,2.5,3,3.5,4,4.5,5])
-
-#         Ra = array([1.1804142])
-#         Rv = array([1.13213065])
-#         Rd = array([1.1044449])
-#         TAV=TAV*(Ra/Rv)
-#         Ra.shape=1,1,1
-#         Rv.shape=1,1,1
-#         Rd.shape=1,1,1
-        
-#         SAnew,SDnew=calculate_updated_demand(
-#             periods,SA,SD,Ra,Rv,Rd,TAV,TVD)
-
-#         # second weave
-#         periods=array([0])
-#         num_periods = len(periods)
-#         num_sites = 1
-#         num_events = 2
-#         SA = array([0.342010,0.763370])
-#         SA.shape = num_sites, num_events, num_periods
-        
-#         SD = array([0,1.895])
-#         SD.shape = num_sites, num_events, num_periods
-#         TAV = array([0.48, 0.48])
-#         TAV.shape = num_sites, num_events
-#         TVD = array([12.48, 12.48])
-#         TVD.shape = num_sites, num_events
-#         Ra = array([1.1804142,1 ])
-#         Rv = array([1.13213065, 1])
-#         Rd = array([1.1044449, 1])
-#         Ra.shape = num_sites, num_events,-1
-#         Rv.shape = num_sites, num_events,-1
-#         Rd.shape = num_sites, num_events,-1
-
-        
-#         SAnew,SDnew = calculate_updated_demand(
-#             periods,SA,SD,Ra,Rv,Rd,TAV,TVD)
-#         print "*******************************"
-#         print "fin"
-#         print "*******************************"
-        
 ################################################################################
 
 if __name__ == "__main__":
