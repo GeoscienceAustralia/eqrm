@@ -17,7 +17,6 @@
 
 import sys
 import os
-
 import time
 import shutil
 import copy
@@ -46,6 +45,7 @@ from eqrm_code.parallel import Parallel
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code.get_version import get_version
 from eqrm_code.bridges import Bridges
+import eqrm_code.util as util
 
 
 # data columns expected in a BRIDGE data file
@@ -227,6 +227,7 @@ def main(parameter_handle,
     # load all data into a 'sites' object
     sites = load_data(THE_PARAM_T)
 
+    # if required, 'thin' sites for testing
     all_sites = truncate_sites_for_test(THE_PARAM_T.use_site_indexes, sites,
                                         THE_PARAM_T.site_indexes)
 
@@ -360,6 +361,10 @@ def main(parameter_handle,
 
     log.debug('Memory: Created all data collection arrays.')
     log.resource_usage()
+
+    # get indices of SA periods 0.3 and 1.0
+    bridge_SA_indices = (3, 8)
+    #bridge_SA_indices = util.find_bridge_sa_indices(THE_PARAM_T.atten_periods)
 
     for i in range(array_size):
         msg = 'do site ' + str(i+1) + ' of ' + str(num_sites)
@@ -537,7 +542,8 @@ def main(parameter_handle,
                                 0.25*SA[:,:,2:-1])
 
             total_loss, damage = calc_total_loss(sites, SA, THE_PARAM_T,
-                                                 pseudo_event_set.Mw)
+                                                 pseudo_event_set.Mw,
+                                                 bridge_SA_indices)
             assert isfinite(total_loss[0]).all()
 
             # I think it's called total loss since it is summed over
@@ -858,6 +864,7 @@ def load_data(THE_PARAM_T):
             else:
                 sites = bridges
             del bridges
+
     elif THE_PARAM_T.run_type == "hazard":
 #        raise RuntimeError('run_type "hazard" not yet modified for Bridges')
 

@@ -238,7 +238,7 @@ def find_bridge_sa_indices(SA, epsilon=1.0e-3):
 
     # check we found both accelerations
     if i03 is None or i10 is None:
-        msg = "Can't find SA periods for 0.3s and 1.0s in %s" % str(SA)
+        msg = "Can't find SA periods for 0.3s and 1.0s in\n%s" % str(SA)
         raise RuntimeError(msg)
 
     return (i03, i10)

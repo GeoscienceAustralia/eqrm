@@ -5,7 +5,6 @@ import unittest
 import shutil
 
 from eqrm_code.util import *
-from bridge_damage import get_random_state_from_iterable
 
 
 class Dummy:
@@ -80,116 +79,6 @@ class Test_Util(unittest.TestCase):
             
         #clean up!
         os.rmdir(root_dir)       
-
-    def test_get_state_simple(self):
-        msg = 'Expected result 1, got %d'
-        spt = (0.0, 1.0)
-        state = get_random_state_from_iterable(spt)
-        self.failUnlessEqual(1, state, msg % state)
-
-        msg = 'Expected result 0, got %d'
-        spt = (1.0, 0.0)
-        state = get_random_state_from_iterable(spt)
-        self.failUnlessEqual(0, state, msg % state)
-
-        msg = 'Expected result 1, got %d'
-        spt = (0.0, 1.0, 0.0)
-        state = get_random_state_from_iterable(spt)
-        self.failUnlessEqual(1, state, msg % state)
-
-        msg = 'Expected result 2, got %d'
-        spt = (0.0, 0.0, 1.0)
-        state = get_random_state_from_iterable(spt)
-        self.failUnlessEqual(2, state, msg % state)
-
-    def test_get_state_probability(self):
-        results = {}
-        spt = (0.5, 0.5)
-
-        v = 0.3
-        msg = 'Expected result 0, got %d'
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(0, state, msg % state)
-
-        v = 0.7
-        msg = 'Expected result 1, got %d'
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(1, state, msg % state)
-
-        v = 1.0
-        msg = 'Expected result 1, got %d'
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(1, state, msg % state)
-
-    def test_get_state_probability2(self):
-        results = {}
-        spt = (0.25, 0.25, 0.25, 0.25)
-        msg = 'Expected result %d, got %d'
-
-        v = 0.0
-        expected = 0
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.000001
-        expected = 0
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.249999
-        expected = 0
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.25
-        expected = 1
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.250001
-        expected = 1
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.499999
-        expected = 1
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.5
-        expected = 2
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.500001
-        expected = 2
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.749999
-        expected = 2
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.75
-        expected = 3
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.750001
-        expected = 3
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 0.999999
-        expected = 3
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
-
-        v = 1.0
-        expected = 3
-        state = get_random_state_from_iterable(spt, v=v)
-        self.failUnlessEqual(expected, state, msg % (expected, state))
 
     def test_find_bridge_sa(self):
         """Test the find_bridge_sa() function."""
