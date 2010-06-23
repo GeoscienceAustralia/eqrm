@@ -191,6 +191,29 @@ class Test_Util(unittest.TestCase):
         state = get_random_state_from_iterable(spt, v=v)
         self.failUnlessEqual(expected, state, msg % (expected, state))
 
+    def test_find_bridge_sa(self):
+        """Test the find_bridge_sa() function."""
+
+        # OK find, finds both, precise values
+        SA = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
+        expect = (3, 10)
+        got = find_bridge_sa(SA)
+        self.failUnlessEqual(expect, got)
+
+        # OK find, finds both, imprecise values
+        SA = [0.0, 0.1, 0.2, 0.31, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1.1, 1.2]
+        expect = (3, 10)
+        got = find_bridge_sa(SA, epsilon=0.02)
+        self.failUnlessEqual(expect, got)
+
+        # BAD find, doesn't find 0.3
+        SA = [0.0, 0.1, 0.2, 0.301, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
+        self.failUnlessRaises(RuntimeError, find_bridge_sa, SA)
+
+        # BAD find, doesn't find 1.0
+        SA = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.999, 1.1, 1.2]
+        self.failUnlessRaises(RuntimeError, find_bridge_sa, SA)
+
     def dont_test_run_call(self):
         # Too flaky for a test.
         retcode = run_call('get_python_version.py', 'python')
