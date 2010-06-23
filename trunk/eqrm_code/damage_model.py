@@ -342,7 +342,6 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
 
     # decide what sort of data we have in 'sites'
     if sites.attributes['STRUCTURE_CATEGORY'] == 'BUILDING':
-        print('DOING BUILDING')
         # note: damage_model has an object called capacity_spectrum_model
         #       buried inside, which will now calculate capacity curves
         #       parameters
@@ -384,7 +383,6 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
                         ci=THE_PARAM_T.loss_regional_cost_index_multiplier,
                         loss_aus_contents=THE_PARAM_T.loss_aus_contents)
     elif sites.attributes['STRUCTURE_CATEGORY'] == 'BRIDGE':
-        print('DOING BRIDGE')
         damage_model = Bridge_damage_model(sites, THE_PARAM_T.bridge_model, SA,
                                            THE_PARAM_T.atten_periods,
                                            bridges_sa_indices)
