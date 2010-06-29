@@ -71,6 +71,9 @@ class Log_normal_distribution(object):
         
 
     def sample_for_eqrm(self):
+        """
+        FIXME needs comments
+        """
         if self.var_flag==1:
             if self.var_method==1:
                 pass           
