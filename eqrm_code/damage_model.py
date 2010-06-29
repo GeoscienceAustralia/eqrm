@@ -36,7 +36,7 @@ class Damage_model(object):
 
         structures  a Structures instance - But what is actually needed from it?
         SA          array of Spectral Acceleration, in g, with axis;
-                        site, period, return_period
+                        sites, pseudo_events, atten_periods
                     the site axis usually has a size of 1
         periods     array, 1 axis
         magnitudes  array, 1 axis

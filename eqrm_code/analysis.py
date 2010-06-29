@@ -301,7 +301,7 @@ def main(parameter_handle,
            str(array_size))
     log.debug(msg)
 
-    msg = 'Number of atten_periods=' + str(len(THE_PARAM_T.return_periods))
+    msg = 'Number of atten_periods=' + str(len(THE_PARAM_T.atten_periods))
     log.debug(msg)
 
     if THE_PARAM_T.use_amplification is True:
@@ -435,7 +435,6 @@ def main(parameter_handle,
             # chosen in parameter_handle evaluating the RSA on soil
             #soil_SA_pdf.event_activities=bedrock_activity
             (_, soil_SA, _) = soil_SA_pdf.sample_for_eqrm()
-
             # Amplification factor cutoffs
             # Applies a minimum and maxium acceptable amplification factor
             # re-scale SAsoil if Ampfactor falls ouside acceptable
