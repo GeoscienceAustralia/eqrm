@@ -1,0 +1,2 @@
+building_id, slight, moderate, extensive, complete
+3562,0.0,0.0,0.0,0.0
