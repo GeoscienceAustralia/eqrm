@@ -46,6 +46,7 @@ from eqrm_code.ANUGA_utilities import log
 from eqrm_code.get_version import get_version
 from eqrm_code.bridges import Bridges
 import eqrm_code.util as util
+import eqrm_filesystem as eq_fs
 
 
 # data columns expected in a BRIDGE data file
@@ -95,17 +96,18 @@ def main(parameter_handle,
     # Note that arrays and floating point numbers will be converted,
     # everthing else will be a string.
     try:
-        THE_PARAM_T=create_parameter_data(
-            parameter_handle
-            ,default_input_dir=os.path.join(eqrm_dir, 'resources','data','')
-            ,use_determ_seed=use_determ_seed
-            ,compress_output=compress_output
-            ,eqrm_dir=eqrm_dir
-            ,is_parallel=is_parallel
-            )
+        THE_PARAM_T=create_parameter_data(parameter_handle,
+                                          default_input_dir=
+                                              os.path.join(eqrm_dir,
+                                                   eq_fs.Resources_Data_Path),
+                                          use_determ_seed=use_determ_seed,
+                                          compress_output=compress_output,
+                                          eqrm_dir=eqrm_dir,
+                                          is_parallel=is_parallel)
     except ParameterSyntaxError, e:
         print 'File parameter error:', e
-        import sys; sys.exit(1)
+        import sys
+        sys.exit(1)
 
     del use_determ_seed
     del compress_output
@@ -176,7 +178,7 @@ def main(parameter_handle,
         # take this copy) If not found in input_dir look in defaultdir
         # Note use of site_tag as a prefix for the data file.
 
-        source_file = THE_PARAM_T.site_tag+'_source_polygon.xml'
+        source_file = THE_PARAM_T.site_tag + '_source_polygon.xml'
         fid_sourcepolys=get_local_or_default(source_file,
                                              THE_PARAM_T.default_input_dir,
                                              THE_PARAM_T.input_dir)
@@ -225,7 +227,8 @@ def main(parameter_handle,
     log.resource_usage()
 
     # load all data into a 'sites' object
-    sites = load_data(THE_PARAM_T)
+    # if we have bridge data, 'have_bridge_data' will be True
+    (sites, have_bridge_data) = load_data(THE_PARAM_T)
 
     # if required, 'thin' sites for testing
     all_sites = truncate_sites_for_test(THE_PARAM_T.use_site_indexes, sites,
@@ -305,12 +308,12 @@ def main(parameter_handle,
     log.debug(msg)
 
     if THE_PARAM_T.use_amplification is True:
-         msg = 'Number of SA_surfaces=2'
+        msg = 'Number of SA_surfaces=2'
     else:
-         msg = 'Number of SA_surfaces=1'
+        msg = 'Number of SA_surfaces=1'
     log.debug(msg)
 
-    # initilaise some matrices.  These matrices have a site dimension and
+    # initialise some matrices.  These matrices have a site dimension and
     # are filled while looping over sites.  Wether they are needed or
     # not often depends on what is being saved.
     if THE_PARAM_T.save_hazard_map is True:
@@ -362,9 +365,11 @@ def main(parameter_handle,
     log.debug('Memory: Created all data collection arrays.')
     log.resource_usage()
 
-    # get indices of SA periods 0.3 and 1.0
-    bridge_SA_indices = (3, 8)
-    #bridge_SA_indices = util.find_bridge_sa_indices(THE_PARAM_T.atten_periods)
+    # get indices of SA periods 0.3 and 1.0, if we have bridge data
+    bridge_SA_indices = None
+    if have_bridge_data:
+        bridge_SA_indices = \
+                util.find_bridge_sa_indices(THE_PARAM_T.atten_periods)
 
     for i in range(array_size):
         msg = 'do site ' + str(i+1) + ' of ' + str(num_sites)
@@ -465,8 +470,8 @@ def main(parameter_handle,
 
             # account for very small ground motions due to distances
             # greater than Rthresh
-            bedrock_SA[Haznull[0],Haznull[1],:] = 0
-            soil_SA[Haznull[0],Haznull[1],:] = 0
+            bedrock_SA[Haznull[0], Haznull[1],:] = 0
+            soil_SA[Haznull[0], Haznull[1],:] = 0
         else: 		# THE_PARAM_T.use_amplification
             #if int(THE_PARAM_T.qa_switch_ampfactors)>=1:
             #    print 'No soil amplification'
@@ -478,7 +483,7 @@ def main(parameter_handle,
 
             # account for very small ground motions due to distances
             # greater than Rthresh
-            bedrock_SA[Haznull[0],Haznull[1],:] = 0
+            bedrock_SA[Haznull[0], Haznull[1],:] = 0
         del distances
         del Haznull
 
@@ -540,9 +545,10 @@ def main(parameter_handle,
                                 0.50*SA[:,:,1:-2] +
                                 0.25*SA[:,:,2:-1])
 
-            total_loss, damage = calc_total_loss(sites, SA, THE_PARAM_T,
-                                                 pseudo_event_set.Mw,
-                                                 bridge_SA_indices)
+
+            (total_loss, damage) = calc_total_loss(sites, SA, THE_PARAM_T,
+                                                   pseudo_event_set.Mw,
+                                                   bridge_SA_indices)
             assert isfinite(total_loss[0]).all()
 
             # I think it's called total loss since it is summed over
@@ -798,9 +804,14 @@ def load_data(THE_PARAM_T):
 
     THE_PARAM_T  a reference to the global THE_PARAM_T
 
-    Returns a reference to a (possibly combined) structures+bridges
-    object.
+    Returns a tuple (data, bridge_data) where:
+        data         is a reference to a (possibly combined) structures+bridges
+                     object
+        bridge_data  is a boolean, True if bridge data was found
     """
+
+    # assume there is no bridge data
+    bridge_data = False
 
     if THE_PARAM_T.run_type == 'risk':
         # first, look for a BUILDING data file
@@ -853,11 +864,11 @@ def load_data(THE_PARAM_T):
             bridge_file = None
 
         if bridge_file:
+            bridge_data = True
             bridges = Bridges.from_csv(bridge_file, **BridgeDataColumns)
 
             if sites:
                 new_sites = sites.join(bridges)
-                new_sites.building_parameters = sites.building_parameters
                 sites = new_sites
                 del new_sites
             else:
@@ -865,7 +876,7 @@ def load_data(THE_PARAM_T):
             del bridges
 
     elif THE_PARAM_T.run_type == "hazard":
-#        raise RuntimeError('run_type "hazard" not yet modified for Bridges')
+        #raise RuntimeError('run_type "hazard" not yet modified for Bridges')
 
         # we are running hazard or ground motion scenarion (i.e. no damage)
         if THE_PARAM_T.grid_flag == 1:
@@ -900,7 +911,7 @@ def load_data(THE_PARAM_T):
         # Use the mapping to add vs30 info to add vs30 info to structures
         sites.set_vs30(site_class2vs30)
 
-    return sites
+    return (sites, bridge_data)
 
 ################################################################################
 

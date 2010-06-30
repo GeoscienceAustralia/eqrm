@@ -196,7 +196,7 @@ class Structures(Sites):
 
 
     def __getitem__(self, key):
-        """Get single indexed entry from a Strutures object."""
+        """Get single indexed entry from a Structures object."""
 
         # if 'key' is naked int, make a list
         if isinstance(key, int):
@@ -220,15 +220,25 @@ class Structures(Sites):
         """Join data from a Structures object with some other object.
 
         Just call the parent join(), copying self.attributes to result.
+        Also extend the .building_parameters dictionary elements to new length.
         We must return a Structures object to include Structures methods.
         """
 
         # do the vanilla data join from the parent class (Sites)
         joined = super(Structures, self).join(other)
 
+        # extend .building_parameters dictionary entries to new joined length
+        # this is to allow .__getitem__() above to work on the join result
+        new_building_parameters = copy.copy(self.building_parameters)
+        new_len = len(joined)
+        for k in new_building_parameters.keys():
+            new_shape = list(new_building_parameters[k].shape)
+            new_shape[0] = new_len
+            new_building_parameters[k] = np.resize(new_building_parameters[k], new_shape)
+
         # return joined Structures object with .building_parameters from self
         return Structures(joined.latitude, joined.longitude,
-                          self.building_parameters, **joined.attributes)
+                          new_building_parameters, **joined.attributes)
 
 
 def get_index(key_order, desired_keys):
