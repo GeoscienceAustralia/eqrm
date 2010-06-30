@@ -428,8 +428,8 @@ def create_parameter_data(parameters, **kwargs):
     conv_new_dic = {}
     for key in THE_PARAM_T:
         if not CONV_DIC_NEW.has_key(key):
-            raise ParameterSyntaxError(
-                "Parameter Error: Attribute "  + key + " is unknown.")
+            msg = ("Parameter Error: Attribute " + key + " is unknown.")
+            raise ParameterSyntaxError(msg)
             
     # Do attribute value fixes    
     att_value_fixes(THE_PARAM_T)
