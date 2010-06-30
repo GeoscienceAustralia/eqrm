@@ -28,7 +28,6 @@ import csv_interface as csvi
 import eqrm_filesystem
 
 
-
 # normalised composite log-normal standard deviation
 # Mander JB, Basoz N, (1999) Seismic fragility curve theory for highway bridges.
 # Optimizing Post-Earthquake Lifeline System Reliability - Proceedings of the
@@ -53,22 +52,25 @@ DataFilePath = eqrm_filesystem.Resources_Data_Path
 
 ModelLinear = 'LINEAR'
 
-
 ################################################################################
 
-def bridge_states(CLASS, sa_0_3, sa_1_0, skew, num_spans, model=ModelLinear):
+def bridge_states(CLASS, sa_0_3, sa_1_0, skew, num_spans, model=None):
     """Top-level function to calculate bridge damage states.
 
     CLASS      bridge class - a string like 'hwb1'
     sa_0_3     1D array of spectral acceleration at the bridge, T=0.3s
     sa_1_0     1D array of spectral acceleration at the bridge, T=1.0s
-    skew       bridge skew
+    skew       bridge skew (degrees)
     num_spans  number of spans in the bridge
     model      the model to use when estimating damage (string)
 
     Returns a tuple (slight, moderate, extensive, complete) of state
-    probabilities.  Each probability is in the range [0.0, 1.0].
+    probabilities.  Each element is a 1D array of probabilities in the
+    range [0.0, 1.0].
     """
+
+    if model is None:
+        model = ModelLinear
 
     model = str(model).upper()
     model_func = ModelStateFunctions.get(model, invalid_model_func)
@@ -84,13 +86,16 @@ def bridge_states_ModelLinear(model, CLASS, sa_0_3, sa_1_0, skew, num_spans):
 
     model      the model to use when estimating damage (ignored)
     CLASS      bridge class - string like 'hwb1'
-    sa_0_3     1D array of spectral acceleration at the bridge, T=0.3s
-    sa_1_0     1D array of spectral acceleration at the bridge, T=1.0s
-    skew       bridge skew
-    num_spans  number of spans in the bridge
+    sa_0_3     2D array of spectral acceleration at the bridge, T=0.3s
+                  (numsites, numevents)
+    sa_1_0     2D array of spectral acceleration at the bridge, T=1.0s
+                  (numsites, numevents)
+    skew       bridge skew (scalar)
+    num_spans  number of spans in the bridge (scalar)
 
-    Returns an array of state probabilities:
-        (slight, moderate, extensive, complete)
+    Returns an Nx4 numpy array of state probabilities:
+        [[slight, moderate, extensive, complete], ....]
+    where the N axis is the events and 4 axis is state probabilities.
     """
 
     # convert user CLASS to uppercase, just in case
@@ -132,8 +137,11 @@ def bridge_states_ModelLinear(model, CLASS, sa_0_3, sa_1_0, skew, num_spans):
     P_extensive = scipy.stats.norm.cdf(num.log(sa_1_0/A4)/Beta)
     P_complete = scipy.stats.norm.cdf(num.log(sa_1_0/A5)/Beta)
 
-    return num.array((P_slight-P_moderate, P_moderate-P_extensive,
-                      P_extensive-P_complete, P_complete))
+    result = num.array((P_slight-P_moderate, P_moderate-P_extensive,
+                        P_extensive-P_complete, P_complete))
+    result = num.transpose(result, (1, 2, 0))
+
+    return result
 
 def invalid_model_func(model, *args):
     """Function called for unrecognized model string."""
@@ -177,4 +185,11 @@ def load_bridge_data():
 
 ModelStateFunctions = {ModelLinear: bridge_states_ModelLinear,
                       }
+
+
+######
+# Load data files on module load.
+######
+
+load_bridge_data()
 

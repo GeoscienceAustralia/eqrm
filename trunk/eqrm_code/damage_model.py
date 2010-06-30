@@ -16,6 +16,7 @@
 
 from scipy.stats import norm
 from scipy import where, newaxis, array, asarray, log, shape
+import numpy as np
 
 from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
@@ -134,15 +135,6 @@ class Damage_model(object):
                                                          beta_nsd_a, SA)
         self.structure_state = structure_state  # for writing to file
 
-#        print('damage_model.py:\n'
-#              'structure_state=\n%s,\n'
-#              'non_structural_state=\n%s\n'
-#              'acceleration_sensitive_state=\n%s'
-#              % (str(structure_state), str(non_structural_state),
-#                 str(acceleration_sensitive_state)))
-#        print('damage_model.py: structure_state.shape=%s'
-#              % str(structure_state.shape))
-
         return (structure_state, non_structural_state,
                 acceleration_sensitive_state)
 
@@ -221,20 +213,30 @@ class Bridge_damage_model(object):
         self.periods = periods
         self.sa_indices = sa_indices
 
-    def get_building_states(self):
-        """Get the array of state probability tuples for this bridge."""
+    def get_states(self):
+        """Get the array of state probability tuples for this bridge.
+
+        Returns a tuple (struct_state, non_struct_state, accel_state)
+        where each element of the tuple is an array of shape (S, E, ST)
+            S  is the number of sites
+            E  is the number of events
+            ST is the number of states for the bridge (4 in this case)
+
+        For bridges, non_struct_state and accel_state are arrays full of zeros.
+        """
 
         # get SA slices for periods 0.3s and 1.0s
         (i03, i10) = self.sa_indices
-        sa_0_3 = SA[:,i03]
-        sa_1_0 = SA[:,i10]
+        sa_0_3 = self.SA[:,:,i03]
+        sa_1_0 = self.SA[:,:,i10]
 
         # go calculate bridge states for events
-        structure_state = bridge_damage.bridge_states(self.attributes['CLASS'],
-                                                      sa_0_3, sa_1_0,
-                                                      self.attributes['SKEW'],
-                                                      self.attributes['SPAN'],
-                                                      model=self.model)
+        ssa = self.structures.attributes
+        structure_state = \
+            bridge_damage.bridge_states(ssa['STRUCTURE_CLASSIFICATION'][0],
+                                        sa_0_3, sa_1_0,
+                                        ssa['SKEW'][0], ssa['SPAN'][0],
+                                        model=self.model)
 
         self.structure_state = structure_state
 
@@ -245,6 +247,19 @@ class Bridge_damage_model(object):
 
         return (structure_state, non_structural_state,
                 acceleration_sensitive_state)
+
+    def aggregated_loss(self):
+        """Don't know what this does.
+
+        Just return what the building code does, with all values zero.
+        """
+
+        # figure out what shape we need this in
+        result_shape = self.structure_state.shape[:2]	# first 2 dimensions
+        element = np.zeros(result_shape)
+
+        return (element, element, element, element)
+
 
 def state_probability(threshold, beta,value):
     """Calculate the state probabilities for a given threshold, beta and value.
@@ -319,8 +334,8 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
     Where the site is one of: Structure
                               Bridge
 
-    sites              a Structures/Bridge instance.
-    THE_PARAM_T        high level controlling object.
+    sites              a Structures/Bridge instance
+    THE_PARAM_T        high level controlling object
     SA                 array of Spectral Acceleration, in g, with axis;
                            site, period, return_period
                        the site axis usually has a size of 1
@@ -332,7 +347,7 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
 
     Returns a tuple (total_loss, damage_model) where:
       total_loss    a 4 long list of dollar loss.  The loss categories are;
-                    structure_loss, nsd_loss, accel_loss, contents_loss
+                    (structure_loss, nsd_loss, accel_loss, contents_loss)
       damage_model  an instance of the damage model.
                     used in risk.py to get damage states.
 
@@ -341,7 +356,7 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
     """
 
     # decide what sort of data we have in 'sites'
-    if sites.attributes['STRUCTURE_CATEGORY'] == 'BUILDING':
+    if sites.attributes['STRUCTURE_CATEGORY'][0] == 'BUILDING':
         # note: damage_model has an object called capacity_spectrum_model
         #       buried inside, which will now calculate capacity curves
         #       parameters
@@ -382,16 +397,17 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
             damage_model.aggregated_building_loss(
                         ci=THE_PARAM_T.loss_regional_cost_index_multiplier,
                         loss_aus_contents=THE_PARAM_T.loss_aus_contents)
-    elif sites.attributes['STRUCTURE_CATEGORY'] == 'BRIDGE':
-        damage_model = Bridge_damage_model(sites, THE_PARAM_T.bridge_model, SA,
+    elif sites.attributes['STRUCTURE_CATEGORY'][0] == 'BRIDGE':
+        # until we *have* a THE_PARAM_T.bridge_model value, pass None for model
+        #damage_model = Bridge_damage_model(sites, THE_PARAM_T.bridge_model, SA,
+        damage_model = Bridge_damage_model(sites, None, SA,
                                            THE_PARAM_T.atten_periods,
-                                           bridges_sa_indices)
-        total_loss = damage_model.aggregated_loss(
-                         ci=THE_PARAM_T.loss_regional_cost_index_multiplier,
-                         loss_aus_contents=THE_PARAM_T.loss_aus_contents)
+                                           bridge_sa_indices)
+        damage = damage_model.get_states()	# to set up self.structure_state
+        total_loss = damage_model.aggregated_loss()
     else:
         msg = ("Got bad STRUCTURE_CATEGORY: '%s'"
-               % sites.attributes['STRUCTURE_CATEGORY'])
+               % sites.attributes['STRUCTURE_CATEGORY'][0])
         raise RuntimeError(msg)
 
     return (total_loss, damage_model)
