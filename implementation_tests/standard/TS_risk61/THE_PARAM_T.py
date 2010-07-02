@@ -94,9 +94,9 @@ save_prob_structural_damage = True
 site_tag = "newc" 
 return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
 use_site_indexes = True
-site_indexes = 3541
+site_indexes = 6315
 site_db_tag = "" 
-input_dir = r".\implementation_tests\input/" 
+input_dir = r".\implementation_tests\input_bridges/" 
 output_dir = r".\implementation_tests\current\TS_risk61/" 
 
 # If this file is executed the simulation will start.
