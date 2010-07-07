@@ -221,7 +221,7 @@ def find_bridge_sa_indices(SA, epsilon=1.0e-3):
     SA       spectral acceleration 1D array
     epsilon  acceptable 'slop' when comparing floats
 
-    Return a tuple (SA0.3, SA1.0) of indices to the 0.3 & 1.0 sec accelarations.
+    Return a tuple (SA0.3, SA1.0) of indices to the 0.3 & 1.0 sec accelerations.
     """
 
     # look for period 0.3s
