@@ -69,8 +69,13 @@ def bridge_states(CLASS, sa_0_3, sa_1_0, skew, num_spans, model=None):
     range [0.0, 1.0].
     """
 
+    # assume default model if none supplied
     if model is None:
         model = ModelLinear
+
+    # load data if necessary
+    if ClassificationDamageParams is None or EQCoefficients is None:
+        load_bridge_data()
 
     model = str(model).upper()
     model_func = ModelStateFunctions.get(model, invalid_model_func)
@@ -186,10 +191,4 @@ def load_bridge_data():
 ModelStateFunctions = {ModelLinear: bridge_states_ModelLinear,
                       }
 
-
-######
-# Load data files on module load.
-######
-
-load_bridge_data()
 
