@@ -159,12 +159,12 @@ def invalid_model_func(model, *args):
 ################################################################################
 
 # strings returned from interpret_damage_state()
-StateStrings = ('none', 'slight', 'moderate', 'extensive', 'complete')
+DamageStateStrings = ('none', 'slight', 'moderate', 'extensive', 'complete')
 
 def interpret_damage_state(state):
     """Convert a damage state integer into a state string."""
 
-    return StateStrings[state]
+    return DamageStateStrings[state]
 
 
 def choose_random_state(states, rand_value=None):
@@ -192,7 +192,7 @@ def choose_random_state(states, rand_value=None):
     # handle 'none' damage state
     cols = num.where(accum >= rand_array)
     result[cols] = 0
-    accum[cols] = -10.0	# shove accum way back, never see it again
+    accum[cols] = -10.0		# shove accum way back, never see it again
 
     for i in xrange(4):
         accum = accum + states[:,i]

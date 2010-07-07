@@ -55,7 +55,12 @@ def time_to_complete(fp, state):
 
     # return integer results, clamped such that value < 1 become 1
     result = numpy.rint(result)		# integer values
-    return numpy.where(result < 1, 1, result)
+    if state == 'none':
+        # all values should be 0
+        return result
+    else:
+        # clamp days to 1 or greater
+        return numpy.where(result < 1, 1, result)
 
 
 def load_external_data():

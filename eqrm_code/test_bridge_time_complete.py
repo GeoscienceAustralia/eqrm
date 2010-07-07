@@ -29,6 +29,15 @@ class TestBridgeTimeComplete(unittest.TestCase):
         # cases from Ken's recent paper:
         #     Bridge Seismic Vulnerability Modelling
 
+        # none damage
+        state = 'none'
+        fp = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
+        expected_time = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0])
+        calc_time = btc.time_to_complete(fp, state)
+        msg = ('state=%s, fp=%s\nexpected_time=%s\ncalc_time=%s'
+               % (state, str(fp), str(expected_time), str(calc_time)))
+        self.failUnless(np.allclose(expected_time, calc_time, rtol=5.0e-2), msg)
+
         # slight damage
         state = 'slight'
         fp = np.array([70, 100])
