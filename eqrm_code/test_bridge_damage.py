@@ -1489,7 +1489,7 @@ class TestBridgeDamage(unittest.TestCase):
         Take a copy of test_HWB17() above, make all bridge parameters
         the same and pervert 'expected' to make this test pass.
 
-        Then collapse the four sequential tests into on in test_array_array()
+        Then collapse the four sequential tests into one in test_array_array()
         below.
         """
 
