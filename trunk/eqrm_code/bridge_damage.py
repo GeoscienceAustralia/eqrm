@@ -47,7 +47,7 @@ DataFilePath = eqrm_filesystem.Resources_Data_Path
 
 
 ######
-# Models recognized by this module.
+# Default model used by this module.
 ######
 
 ModelLinear = 'LINEAR'
@@ -158,6 +158,51 @@ def invalid_model_func(model, *args):
 # Utility routines
 ################################################################################
 
+# strings returned from interpret_damage_state()
+StateStrings = ('none', 'slight', 'moderate', 'extensive', 'complete')
+
+def interpret_damage_state(state):
+    """Convert a damage state integer into a state string."""
+
+    return StateStrings[state]
+
+
+def choose_random_state(states, rand_value=None):
+    """Choose a random state from a state tuple.
+
+    states      array of tuples: (slight, moderate, extensive, complete)
+                (N rows of 4 columns, N>=1)
+    rand_value  if not None, this is random value for all tuples [0.0, 1.0]
+                (TESTING *ONLY*)
+
+    Choose a random state from each tuple, return a Nx1 array of state integers.
+    """
+
+    if rand_value is not None:
+        rand_array = num.ones((states.shape[0],)) * rand_value
+    else:
+        rand_array = num.random.rand(states.shape[0])
+
+    # create result vector, fill with -1 (get error indexing if not changed)
+    result = num.ones(states.shape[0], int) * -1
+
+    # fill accum with 'none' probability
+    accum = 1.0 - num.sum(states, axis=1)
+
+    # handle 'none' damage state
+    cols = num.where(accum >= rand_array)
+    result[cols] = 0
+    accum[cols] = -10.0	# shove accum way back, never see it again
+
+    for i in xrange(4):
+        accum = accum + states[:,i]
+        cols = num.where(accum >= rand_array)
+        result[cols] = i+1
+        accum[cols] = -10.0	# shove accum way back, never see it again
+
+    return result
+
+
 def load_bridge_data():
     """Preload bridge damage data from external files."""
 
@@ -191,4 +236,24 @@ def load_bridge_data():
 ModelStateFunctions = {ModelLinear: bridge_states_ModelLinear,
                       }
 
+################################################################################
+
+if __name__ == '__main__':
+    # use equal probability state tuples
+    state = num.array([[0.2, 0.2, 0.2, 0.2],
+                       [0.2, 0.2, 0.2, 0.2],
+                       [0.2, 0.2, 0.2, 0.2],
+                       [0.2, 0.2, 0.2, 0.2],
+                       [0.2, 0.2, 0.2, 0.2],
+                       [0.2, 0.2, 0.2, 0.2],
+                       [0.2, 0.2, 0.2, 0.2],
+                       [0.2, 0.2, 0.2, 0.2]])
+    s = choose_random_state(state)
+    s_i = '[ '
+    for i in range(len(s)):
+        s_i += interpret_damage_state(s[i])
+        if i < len(s)-1:
+            s_i += ', '
+    s_i += ']'
+    print('s=%s, s_i=%s' % (s, s_i))
 
