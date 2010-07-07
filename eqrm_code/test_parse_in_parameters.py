@@ -300,6 +300,8 @@ save_socloss_flag=[1]\n")
         set.buildings_set_damping_Be_to_5_percent = False
         # has not been implemented.
         #set.building_paramters_file = "workshop_3"   # 'workshop'+(''|'_1'|'_2'|'_3')
+        # Bridges
+        set.bridges_functional_percentages = [45, 34.5]
 
         # Building capacity curve
         set.csm_use_variability = True
@@ -381,6 +383,9 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.buildings_set_damping_Be_to_5_percent == 0)
         self.failUnless(TPT.buildpars_flag == 4)
 
+        self.failUnless(allclose(TPT.bridges_functional_percentages, \
+                                 asarray([45, 34.5])))
+        
         self.failUnless(TPT.csm_use_variability is True)
         self.failUnless(TPT.csm_variability_method == 3)
         self.failUnless(TPT.csm_standard_deviation == .3)

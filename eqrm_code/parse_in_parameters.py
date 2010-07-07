@@ -4,10 +4,6 @@
            
   Description: Parse in the parameter file.
 
-  There are two parameter file formats.  The old .par format and the new .py
-  format.  Both are text files.
-
-  convert_par_to_py.py creates new-style files from old-style files.
  
   Version: $Revision: 1643 $  
   ModifiedBy: $Author: dgray $
@@ -34,6 +30,7 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
 from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING, \
      CSM_DAMPING_DO_NOT_USE_SMOOTHING
 
+# DSG-DSG this needs more comments.
 
 ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
@@ -212,6 +209,10 @@ CONV_NEW = [{'order': 10.0,
              'order': 70.02,
              'new_para': 'buildings_set_damping_Be_to_5_percent',
              'default': None},
+            {
+             'order': 75.01,
+             'new_para': 'bridges_functional_percentages',
+             'default': None},
             {'order': 80.0,
              'title': '\n# Capacity Spectrum Method\n'},
             {'old_para': 'var_bcap_flag',
@@ -369,6 +370,7 @@ PAR_STYLE_TITLES = [{'title':'\n# Operation Mode\n', 'order':10.0},
                     {'title':'\n# Attenuation\n', 'order':50.0},
                     {'title':'\n# Amplification\n', 'order':60.0},
                     {'title':'\n# Buildings\n', 'order':70.0},
+                    {'title':'\n# Bridges\n', 'order':75.0},
                     {'title':'\n# Capacity Spectrum Method\n', 'order':80.0},
                     {'title':'\n# Loss\n', 'order':90.0},
                     {'title':'\n# Save\n', 'order':100.0},
