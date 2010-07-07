@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+  <ga_license_file>
+    <metadata>
+      <author>HAZUS</author>
+    </metadata>
+    <datafile>
+      <filename>bridge_state_mean_sigma.csv</filename>
+      <checksum>699118617</checksum>
+      <publishable>Yes</publishable>
+      <accountable>Duncan Gray</accountable>
+      <source>HAZUS</source>
+      <IP_owner>HAZUS</IP_owner>
+      <IP_info>Published results</IP_info>
+    </datafile>
+
+  </ga_license_file>
