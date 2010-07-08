@@ -14,6 +14,30 @@ import unittest
 import bridge_damage as bd
 import numpy as np
 
+import eqrm_code.damage_model as dm
+import eqrm_code.bridges as bridges
+
+
+
+class DataObj(object):
+    """
+    A data object class.
+
+    Used: obj = DataObj(lon=100.2, lat=-25.3, id=1)
+          print obj.lon
+
+    The idea is to create an object with attributes with the
+    names of the keyword args on the creation call.
+    """
+
+    def __init__(self, *args, **kwargs):
+        if len(args) > 0:
+            msg = 'DataObj() must be called with keyword args ONLY!'
+            raise RuntimeError(msg)
+
+        self.__dict__ = kwargs
+
+
 
 class TestBridgeDamage(unittest.TestCase):
 
@@ -1632,12 +1656,111 @@ class TestBridgeDamage(unittest.TestCase):
             expected_str = expected[s]
             msg = 'result_str=%s, expected_str=%s' % (result_str, expected_str)
             self.failUnless(result_str == expected_str, msg)
- 
-        
 
+
+    def test_calc_total_loss(self):
+        """Test calling calc_total_loss() directly with bridge data.
+
+        Use raw data from test_array_array().
+        """
+
+        # bridge-specific data from test_array_array()
+        # SITE_CLASS can be anything
+        lat = np.array([-35.352085])
+        lon = np.array([149.236994])
+        clsf = np.array(['HWB17'])
+        cat = np.array(['BRIDGE'])
+        skew = np.array([45])
+        span = np.array([4])
+        #cls = np.array(['E'])
+        cls = np.array(['X'])
+
+        attributes = {'STRUCTURE_CLASSIFICATION': clsf,
+                      'STRUCTURE_CATEGORY': cat,
+                      'SKEW': skew,
+                      'SPAN': span,
+                      'SITE_CLASS': cls}
+
+        sites = bridges.Bridges(lat, lon, **attributes)
+
+        # indices in atten_periods that are 0.3 and 1.0
+        bridge_SA_indices = (2, 6)
+
+        # any values, except columns 2 & 6 must be from test_array_array():
+        #sa_1_0 = np.array([[0.75, 0.444, 0.11, 0.085]])
+        #sa_0_3 = np.array([[01.5, 01, 0.5, 0.25]])
+        SA = np.array([[[0.14210731, 0.29123634, 1.5, 0.13234554,
+                         0.08648546, 0.06338455, 0.75, 0.04140068,
+                         0.03497466, 0.02969136, 0.02525473, 0.02151188,
+                         0.018371, 0.01571802, 0.01344816, 0.01148438,
+                         0.00980236, 0.00836594, 0.00714065, 0.00609482],
+                        [0.2093217, 0.30976405, 1.0, 0.06989206,
+                         0.03216174, 0.01945677, 0.444, 0.00987403,
+                         0.00799221, 0.00660128, 0.00547129, 0.0045463,
+                         0.0042072, 0.00418348, 0.0041599, 0.00413222,
+                         0.00410333, 0.00407463, 0.00404614, 0.00401785],
+                        [0.01450217, 0.02750284, 0.5, 0.01127933,
+                         0.00793098, 0.00621618, 0.11, 0.00430777,
+                         0.00364714, 0.0031542, 0.00279411, 0.00247654,
+                         0.0022153, 0.001994, 0.0017948, 0.00161223,
+                         0.00144737, 0.00129929, 0.00117312, 0.00105988],
+                        [0.01450217, 0.02750284, 0.25, 0.01127933,
+                         0.00793098, 0.00621618, 0.085, 0.00430777,
+                         0.00364714, 0.0031542, 0.00279411, 0.00247654,
+                         0.0022153, 0.001994, 0.0017948, 0.00161223,
+                         0.00144737, 0.00129929, 0.00117312, 0.00105988]]])
+
+        # any data, indices (2, 6) must be 0.3 and 1.0 respectively (bridges)
+        atten_periods =  np.array([0.,      0.17544, 0.3,    0.52632, 0.70175,
+                                   0.87719, 1.0,     1.2281, 1.4035,  1.5789,
+                                   1.7544,  1.9298,  2.1053, 2.2807,  2.4561,
+                                   2.6316,  2.807,   2.9825, 3.1579,  3.3333 ])
+
+        # fudge up a THE_PARAM_T object, anything with required attributes is OK
+        # run test adding required attributes until no errors
+        THE_PARAM_T = DataObj(atten_periods=atten_periods)
+        pseudo_event_set_Mw = None		# not needed for bridges
+       
+        # now call calc_total_loss, check results 
+        (total_loss, damage) = dm.calc_total_loss(sites, SA, THE_PARAM_T,
+                                                  pseudo_event_set_Mw,
+                                                  bridge_SA_indices)
+        (structure_state, non_structural_state,
+             acceleration_sensitive_state) = damage.get_states()
+
+        # test the 'money' return, should be same as from test_array_array()
+        expected = np.array([[[0.0434824802069249, 0.0799841750577186,
+                               0.236549375430427, 0.60646402809954],
+                              [0.1212962, 0.1565718, 0.27978019, 0.273137],
+                              [0.047551, 0.02388763, 0.01246965, 0.00170067],
+                              [0.02230382, 0.00941589, 0.00397589, 0.00039163]]])
+
+        msg = ('\nexpected=\n%s\nstructure_state=\n%s'
+                % (str(expected), str(structure_state)))
+        self.failUnless(np.allclose(expected, structure_state, rtol=5.0e-3),
+                        msg)
+
+        # we expect the other return values (non_structural_state &
+        # acceleration_sensitive_state) to be same shape as structure_state
+        # and filled with zeroes
+        other_expected = np.zeros(structure_state.shape)
+        msg = ('\nother_expected=\n%s\nnon_structural_state=\n%s'
+                % (str(other_expected), str(non_structural_state)))
+        self.failUnless(np.allclose(other_expected,
+                                    non_structural_state, rtol=1.0e-6),
+                        msg)
+        msg = ('\nother_expected=\n%s\nacceleration_sensitive_state=\n%s'
+                % (str(other_expected), str(acceleration_sensitive_state)))
+        self.failUnless(np.allclose(other_expected,
+                                    acceleration_sensitive_state, rtol=1.0e-6),
+                        msg)
+        
 
 ################################################################################
 
 if __name__ == '__main__':
-    unittest.main()
+    suite = unittest.makeSuite(TestBridgeDamage,'test')
+    #suite = unittest.makeSuite(TestBridgeDamage,'test_calc_total_loss')
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
