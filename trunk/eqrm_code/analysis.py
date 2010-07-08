@@ -791,6 +791,9 @@ def cutoff_pga(ground_motion, max_pga):
     assert isfinite(ground_motion).all()
 
     too_high = ground_motion[:,:,0:1] > max_pga
+    # Doing ground_motion[:,:,0:1] gets the first values of the last dimension,
+    # but does not drop a dimension in the return value.
+    # ground_motion[:,:,1] would drop a dimension.
     scaling_factor = where(too_high, max_pga/ground_motion[:,:,0:1], 1.0)
     ground_motion *= scaling_factor
 
