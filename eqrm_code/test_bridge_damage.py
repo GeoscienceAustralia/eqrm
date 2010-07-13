@@ -1581,66 +1581,74 @@ class TestBridgeDamage(unittest.TestCase):
 
 
     def test_choose_random_state(self):
-        """Test the choose_random_state() function."""
+        """Test the choose_random_state() function.
+
+        The array input to choose_random_state() has the shape (S, E, ST)
+        where S  is the number of sites (N)
+              E  is the number of events (probably 1)
+              ST is the number of states for the bridge (4 in this case)
+        """
 
         # check that the state change values are as expected
         # that is, around the 0.2, 0.4, etc places
-        states = np.array([[0.2, 0.2, 0.2, 0.2]])
+        states = np.array([[[0.2, 0.2, 0.2, 0.2]]])
 
         rand_value = 0.0
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 0)
+        self.failUnless(state[0,0,0] == 0)
         
         rand_value = 0.1999
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 0)
+        self.failUnless(state[0,0,0] == 0)
         
         rand_value = 0.2001
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 1)
+        self.failUnless(state[0,0,0] == 1)
         
         rand_value = 0.3999
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 1)
+        self.failUnless(state[0,0,0] == 1)
         
         rand_value = 0.4001
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 2)
+        self.failUnless(state[0,0,0] == 2)
         
         rand_value = 0.5999
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 2)
+        self.failUnless(state[0,0,0] == 2)
         
         rand_value = 0.6001
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 3)
+        self.failUnless(state[0,0,0] == 3)
         
         rand_value = 0.7999
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 3)
+        self.failUnless(state[0,0,0] == 3)
         
         rand_value = 0.8001
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 4)
+        self.failUnless(state[0,0,0] == 4)
         
         rand_value = 0.9999
         state = bd.choose_random_state(states, rand_value)
-        self.failUnless(state[0] == 4)
+        self.failUnless(state[0,0,0] == 4)
 
         # now try tuples that are one state only, any random gets that state
-        states = np.array([[0.0, 0.0, 0.0, 0.0],	# none
-                           [1.0, 0.0, 0.0, 0.0],	# slight
-                           [0.0, 1.0, 0.0, 0.0],	# moderate
-                           [0.0, 0.0, 1.0, 0.0],	# extensive
-                           [0.0, 0.0, 0.0, 1.0],	# complete
-                          ])
-        expected_states = np.array([0, 1, 2, 3, 4])
+        # this is a one site example
+        states = np.array([[[0.0, 0.0, 0.0, 0.0],	# none
+                            [1.0, 0.0, 0.0, 0.0],	# slight
+                            [0.0, 1.0, 0.0, 0.0],	# moderate
+                            [0.0, 0.0, 1.0, 0.0],	# extensive
+                            [0.0, 0.0, 0.0, 1.0],	# complete
+                          ]])
+        expected_states = np.array([[[0], [1], [2], [3], [4]]])
  
         result_states = bd.choose_random_state(states)
         msg = ('expected_states=%s\nresult_states=%s'
                % (str(expected_states), str(result_states)))
         self.failUnless(np.alltrue(result_states == expected_states), msg)
-        
+
+
     def test_interpret_damage_state(self):
         """Test the interpret_damage_state() function."""
 
@@ -1689,25 +1697,25 @@ class TestBridgeDamage(unittest.TestCase):
         # any values, except columns 2 & 6 must be from test_array_array():
         #sa_1_0 = np.array([[0.75, 0.444, 0.11, 0.085]])
         #sa_0_3 = np.array([[01.5, 01, 0.5, 0.25]])
-        SA = np.array([[[0.14210731, 0.29123634, 1.5, 0.13234554,
-                         0.08648546, 0.06338455, 0.75, 0.04140068,
+        SA = np.array([[[0.14210731, 0.29123634, 1.5,        0.13234554,
+                         0.08648546, 0.06338455, 0.75,       0.04140068,
                          0.03497466, 0.02969136, 0.02525473, 0.02151188,
-                         0.018371, 0.01571802, 0.01344816, 0.01148438,
+                         0.018371,   0.01571802, 0.01344816, 0.01148438,
                          0.00980236, 0.00836594, 0.00714065, 0.00609482],
-                        [0.2093217, 0.30976405, 1.0, 0.06989206,
-                         0.03216174, 0.01945677, 0.444, 0.00987403,
+                        [0.2093217,  0.30976405, 1.0,        0.06989206,
+                         0.03216174, 0.01945677, 0.444,      0.00987403,
                          0.00799221, 0.00660128, 0.00547129, 0.0045463,
-                         0.0042072, 0.00418348, 0.0041599, 0.00413222,
+                         0.0042072,  0.00418348, 0.0041599,  0.00413222,
                          0.00410333, 0.00407463, 0.00404614, 0.00401785],
-                        [0.01450217, 0.02750284, 0.5, 0.01127933,
-                         0.00793098, 0.00621618, 0.11, 0.00430777,
-                         0.00364714, 0.0031542, 0.00279411, 0.00247654,
-                         0.0022153, 0.001994, 0.0017948, 0.00161223,
+                        [0.01450217, 0.02750284, 0.5,        0.01127933,
+                         0.00793098, 0.00621618, 0.11,       0.00430777,
+                         0.00364714, 0.0031542,  0.00279411, 0.00247654,
+                         0.0022153,  0.001994,   0.0017948,  0.00161223,
                          0.00144737, 0.00129929, 0.00117312, 0.00105988],
-                        [0.01450217, 0.02750284, 0.25, 0.01127933,
-                         0.00793098, 0.00621618, 0.085, 0.00430777,
-                         0.00364714, 0.0031542, 0.00279411, 0.00247654,
-                         0.0022153, 0.001994, 0.0017948, 0.00161223,
+                        [0.01450217, 0.02750284, 0.25,       0.01127933,
+                         0.00793098, 0.00621618, 0.085,      0.00430777,
+                         0.00364714, 0.0031542 , 0.00279411, 0.00247654,
+                         0.0022153,  0.001994,   0.0017948,  0.00161223,
                          0.00144737, 0.00129929, 0.00117312, 0.00105988]]])
 
         # any data, indices (2, 6) must be 0.3 and 1.0 respectively (bridges)
@@ -1717,14 +1725,17 @@ class TestBridgeDamage(unittest.TestCase):
                                    2.6316,  2.807,   2.9825, 3.1579,  3.3333 ])
 
         # fudge up a THE_PARAM_T object, anything with required attributes is OK
-        # run test adding required attributes until no errors
-        THE_PARAM_T = DataObj(atten_periods=atten_periods)
+        # (run test adding required attributes until no errors)
+        fp = np.array([20, 30, 40, 50, 60, 70, 80])
+        THE_PARAM_T = DataObj(atten_periods=atten_periods,
+                              functional_percentage=fp)
         pseudo_event_set_Mw = None		# not needed for bridges
        
         # now call calc_total_loss, check results 
-        (total_loss, damage) = dm.calc_total_loss(sites, SA, THE_PARAM_T,
-                                                  pseudo_event_set_Mw,
-                                                  bridge_SA_indices)
+        (total_loss, damage,
+             days_to_complete) = dm.calc_total_loss(sites, SA, THE_PARAM_T,
+                                                    pseudo_event_set_Mw,
+                                                    bridge_SA_indices)
         (structure_state, non_structural_state,
              acceleration_sensitive_state) = damage.get_states()
 
