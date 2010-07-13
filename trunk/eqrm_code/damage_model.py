@@ -22,6 +22,7 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
 from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING
 import bridge_damage
+from bridge_time_complete import time_to_complete
 
 
 class Damage_model(object):
@@ -397,19 +398,30 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
             damage_model.aggregated_building_loss(
                         ci=THE_PARAM_T.loss_regional_cost_index_multiplier,
                         loss_aus_contents=THE_PARAM_T.loss_aus_contents)
+
+        # get NaN array for 'days_to_complete'
+        dtc_shape = list(total_loss[0].shape)
+        dtc_shape.append(len(THE_PARAM_T.functional_percentage))
+        days_to_complete = np.ones(dtc_shape) * np.nan
+        #print('building: dtc_shape=%s' % str(dtc_shape))
     elif sites.attributes['STRUCTURE_CATEGORY'][0] == 'BRIDGE':
         # until we *have* a THE_PARAM_T.bridge_model value, pass None for model
         #damage_model = Bridge_damage_model(sites, THE_PARAM_T.bridge_model, SA,
         damage_model = Bridge_damage_model(sites, None, SA,
                                            THE_PARAM_T.atten_periods,
                                            bridge_sa_indices)
-        damage = damage_model.get_states()	# to set up self.structure_state
+        states = damage_model.get_states()	# to set up self.structure_state
+        state = bridge_damage.choose_random_state(states[0])
         total_loss = damage_model.aggregated_loss()
+
+        # calculate days to complete for each bridge
+        days_to_complete = time_to_complete(THE_PARAM_T.functional_percentage,
+                                            state)
     else:
         msg = ("Got bad STRUCTURE_CATEGORY: '%s'"
                % sites.attributes['STRUCTURE_CATEGORY'][0])
         raise RuntimeError(msg)
 
-    return (total_loss, damage_model)
+    return (total_loss, damage_model, days_to_complete)
 
 

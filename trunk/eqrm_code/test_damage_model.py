@@ -558,8 +558,8 @@ class Test_damage_model(unittest.TestCase):
         bridge_sa_indices = array((0,1))
 
         reset_seed(True)
-        (total_loss, _) = calc_total_loss(sites, SA, THE_PARAM_T, event_set,
-                                          bridge_sa_indices)
+        (total_loss, _, _) = calc_total_loss(sites, SA, THE_PARAM_T, event_set,
+                                             bridge_sa_indices)
 
         total_loss_windows = (array([[5.56013748, 0.00899564, 0.]]),
                               array([[4059.31954558, 1473.71938878, 0.]]),

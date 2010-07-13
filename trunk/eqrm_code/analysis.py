@@ -21,6 +21,7 @@ import time
 import shutil
 import copy
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray
+import numpy as np
 
 from eqrm_code.parse_in_parameters import  \
     ParameterSyntaxError, create_parameter_data, convert_THE_PARAM_T_to_py
@@ -362,6 +363,14 @@ def main(parameter_handle,
         # subtract all of these from 1 to get the prob of no damage.)
         total_structure_damage = zeros((array_size, 4), dtype=float)
 
+    # create result array to save 'days to complete' data
+    # need to store 'fp' days + state field
+#????
+    THE_PARAM_T.functional_percentage = np.array([25, 50, 75])
+#????
+    saved_days_to_complete = zeros((array_size, num_psudo_events,
+                                    len(THE_PARAM_T.functional_percentage)))
+
     log.debug('Memory: Created all data collection arrays.')
     log.resource_usage()
 
@@ -370,6 +379,11 @@ def main(parameter_handle,
     if have_bridge_data:
         bridge_SA_indices = \
                 util.find_bridge_sa_indices(THE_PARAM_T.atten_periods)
+
+    # check that when we have bridge data, there is only one event
+    if have_bridge_data and num_psudo_events > 1:
+        msg = 'Input data includes bridges, but number of events > 1?'
+        raise RuntimeError(msg)
 
     for i in range(array_size):
         msg = 'do site ' + str(i+1) + ' of ' + str(num_sites)
@@ -546,7 +560,8 @@ def main(parameter_handle,
                                 0.25*SA[:,:,2:-1])
 
 
-            (total_loss, damage) = calc_total_loss(sites, SA, THE_PARAM_T,
+            (total_loss, damage,
+               days_to_complete) = calc_total_loss(sites, SA, THE_PARAM_T,
                                                    pseudo_event_set.Mw,
                                                    bridge_SA_indices)
             assert isfinite(total_loss[0]).all()
@@ -577,6 +592,9 @@ def main(parameter_handle,
                     num_psudo_events == 1):
                 # This is not cumulative
                 total_structure_damage[rel_i,:] = damage.structure_state
+
+            # accumulate says to complete
+            saved_days_to_complete[rel_i,:,:] = days_to_complete
 
             #print 'ENDING building damage calculations'
         # ENDED BUILDING DAMAGE
@@ -639,7 +657,7 @@ def main(parameter_handle,
             row_files_that_parallel_splits.extend(files)
 
 
-    # Save damamge information # FIXME TYPO
+    # Save damage information
     if (THE_PARAM_T.save_prob_structural_damage is True and
             num_psudo_events == 1 and
             THE_PARAM_T.run_type == 'risk' and
@@ -744,6 +762,10 @@ def main(parameter_handle,
 #                   compress=THE_PARAM_T.compress_output,
 #                         parallel_tag=parallel.file_tag)
 #         row_files_that_parallel_splits.append(file)
+
+#???
+    # output "days to complete" data here
+#???
 
     if parallel.rank == 0:		# No site component
         # So just get one process to write these files.

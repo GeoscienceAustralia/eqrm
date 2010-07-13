@@ -168,26 +168,34 @@ def interpret_damage_state(state):
 
 
 def choose_random_state(states, rand_value=None):
-    """Choose a random state from a state tuple.
+    """Choose a random state from a state array.
 
-    states      array of tuples: (slight, moderate, extensive, complete)
-                (N rows of 4 columns, N>=1)
-    rand_value  if not None, this is random value for all tuples [0.0, 1.0]
+    states      is an array of shape (S, E, ST)
+                    S  is the number of sites (N)
+                    E  is the number of events (probably 1)
+                    ST is the number of states for the bridge (4 in this case)
+    rand_value  if not None, this is random value for all tuples ([0.0, 1.0])
                 (TESTING *ONLY*)
 
-    Choose a random state from each tuple, return a Nx1 array of state integers.
+    Choose a random state from each tuple, return an array of shape (S, E, 1),
+    ie, return an array collapsed from 4 to 1 in the last dimension.
     """
 
+    axis0 = states.shape[0]		# S
+    axis1 = states.shape[1]		# E
+    newshape = (axis0, axis1, 1)	# (S, E, 1)
+
     if rand_value is not None:
-        rand_array = num.ones((states.shape[0],)) * rand_value
+        rand_array = num.ones(newshape) * rand_value
     else:
-        rand_array = num.random.rand(states.shape[0])
+        rand_array = num.random.rand(axis0,axis1,1)	# (S, E, 1)
 
     # create result vector, fill with -1 (get error indexing if not changed)
-    result = num.ones(states.shape[0], int) * -1
+    result = num.ones(newshape, dtype=int) * -1		# (S, E, 1)
 
     # fill accum with 'none' probability
-    accum = 1.0 - num.sum(states, axis=1)
+    accum = 1.0 - num.sum(states, axis=2)
+    accum = num.reshape(accum, newshape)		# (S, E, 1)
 
     # handle 'none' damage state
     cols = num.where(accum >= rand_array)
@@ -195,9 +203,10 @@ def choose_random_state(states, rand_value=None):
     accum[cols] = -10.0		# shove accum way back, never see it again
 
     for i in xrange(4):
-        accum = accum + states[:,i]
+        delta = num.reshape(states[:,:,i], newshape)
+        accum = accum + delta
         cols = num.where(accum >= rand_array)
-        result[cols] = i+1
+        result[cols] = i + 1
         accum[cols] = -10.0	# shove accum way back, never see it again
 
     return result
@@ -236,24 +245,4 @@ def load_bridge_data():
 ModelStateFunctions = {ModelLinear: bridge_states_ModelLinear,
                       }
 
-################################################################################
-
-if __name__ == '__main__':
-    # use equal probability state tuples
-    state = num.array([[0.2, 0.2, 0.2, 0.2],
-                       [0.2, 0.2, 0.2, 0.2],
-                       [0.2, 0.2, 0.2, 0.2],
-                       [0.2, 0.2, 0.2, 0.2],
-                       [0.2, 0.2, 0.2, 0.2],
-                       [0.2, 0.2, 0.2, 0.2],
-                       [0.2, 0.2, 0.2, 0.2],
-                       [0.2, 0.2, 0.2, 0.2]])
-    s = choose_random_state(state)
-    s_i = '[ '
-    for i in range(len(s)):
-        s_i += interpret_damage_state(s[i])
-        if i < len(s)-1:
-            s_i += ', '
-    s_i += ']'
-    print('s=%s, s_i=%s' % (s, s_i))
 
