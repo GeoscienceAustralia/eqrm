@@ -195,7 +195,8 @@ class EQRM_controller:
   
 #-------------------------------------------------------------
 if __name__ == "__main__": # run_profile=True,
-    time_trial_runs(trials=['./benchmark_input/ProbNatHaz.py'])
+    time_trial_runs()
+  #  time_trial_runs(trials=['./benchmark_input/ProbNatHaz.py'])
   #   time_trial_runs(trials=['./benchmark_input/TS_haz08.par',
 #                             './benchmark_input/TS_risk56.par',
 #                             './benchmark_input/TS_risk59.par'])
