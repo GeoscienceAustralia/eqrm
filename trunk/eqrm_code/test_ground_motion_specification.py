@@ -33,7 +33,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                     dimensions (period)
 
     test_mean : the means that must be matched by verification tests
-                    dimensions (sites, mag, period)
+                    dimensions (sites, mag, period).  Units g.  Not log mean
 """
     
 test_data = {}
@@ -486,6 +486,7 @@ tmp[2,:] = [50.0, 50.0, 50.0] # distance between 3rd site and all three events
 tmp[3,:] = [100.0, 100.0, 100.0] # distance between 4th site and all three events
 test_data['Somerville_Non_Cratonic_test_distance'] = tmp
 
+# results in g.
 tmp = zeros((4,3,12))
 tmp[0,0,:] = [0.23261,0.2383,0.24951,0.28746,
 0.25858,0.15258,0.068723,0.05897,
