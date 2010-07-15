@@ -77,16 +77,6 @@ def do_tests_checks_demos_audits(eqrm_root_dir,
             stop_message()
             return False
 
-    if check_risk is True:
-        if verbose:print "Start check_risk.py"
-        chdir(join(eqrm_root_dir, 'eqrm_code'))
-        Retcode = run_call(join('eqrm_code','check_risk.py'), eqrm_root_dir,
-                           python_command=python_command)
-        if not Retcode == 0:
-            print 'ERROR: check_risk.py failed.'
-            stop_message()
-            return False
-
     if demo_batchrun is True:
         if verbose:print "Start demo_batchrun.py"
         chdir(join(eqrm_root_dir, 'demo'))
