@@ -496,6 +496,7 @@ class Test_damage_model(unittest.TestCase):
         THE_PARAM_T.csm_SDcr_tolerance_percentage = 1
         THE_PARAM_T.csm_damping_max_iterations = 7
         THE_PARAM_T.csm_hysteretic_damping = 'Error'
+        THE_PARAM_T.bridges_functional_percentages = None
         THE_PARAM_T.atten_rescale_curve_from_pga = None
         THE_PARAM_T.atten_pga_scaling_cutoff = False
         THE_PARAM_T.atten_cutoff_max_spectral_displacement = False

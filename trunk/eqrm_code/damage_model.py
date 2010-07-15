@@ -399,11 +399,13 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
                         ci=THE_PARAM_T.loss_regional_cost_index_multiplier,
                         loss_aus_contents=THE_PARAM_T.loss_aus_contents)
 
-        # get NaN array for 'days_to_complete'
-        dtc_shape = list(total_loss[0].shape)
-        dtc_shape.append(len(THE_PARAM_T.functional_percentage))
-        days_to_complete = np.ones(dtc_shape) * np.nan
-        #print('building: dtc_shape=%s' % str(dtc_shape))
+        if THE_PARAM_T.bridges_functional_percentages is not None:
+            # get NaN array for 'days_to_complete'
+            dtc_shape = list(total_loss[0].shape)
+            dtc_shape.append(len(THE_PARAM_T.bridges_functional_percentages))
+            days_to_complete = np.ones(dtc_shape) * np.nan
+        else:
+            days_to_complete = None
     elif sites.attributes['STRUCTURE_CATEGORY'][0] == 'BRIDGE':
         # until we *have* a THE_PARAM_T.bridge_model value, pass None for model
         #damage_model = Bridge_damage_model(sites, THE_PARAM_T.bridge_model, SA,
@@ -414,9 +416,13 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
         state = bridge_damage.choose_random_state(states[0])
         total_loss = damage_model.aggregated_loss()
 
-        # calculate days to complete for each bridge
-        days_to_complete = time_to_complete(THE_PARAM_T.functional_percentage,
-                                            state)
+        if THE_PARAM_T.bridges_functional_percentages is not None:
+            # calculate days to complete for each bridge
+            days_to_complete = time_to_complete(THE_PARAM_T.bridges_functional_percentages,
+                                                state)
+        else:
+            days_to_complete = None
+            
     else:
         msg = ("Got bad STRUCTURE_CATEGORY: '%s'"
                % sites.attributes['STRUCTURE_CATEGORY'][0])

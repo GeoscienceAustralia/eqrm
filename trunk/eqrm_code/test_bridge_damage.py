@@ -1728,7 +1728,7 @@ class TestBridgeDamage(unittest.TestCase):
         # (run test adding required attributes until no errors)
         fp = np.array([20, 30, 40, 50, 60, 70, 80])
         THE_PARAM_T = DataObj(atten_periods=atten_periods,
-                              functional_percentage=fp)
+                              bridges_functional_percentages=fp)
         pseudo_event_set_Mw = None		# not needed for bridges
        
         # now call calc_total_loss, check results 

@@ -365,20 +365,20 @@ def main(parameter_handle,
 
     # create result array to save 'days to complete' data
     # need to store 'fp' days + state field
-#????
-    THE_PARAM_T.functional_percentage = np.array([25, 50, 75])
-#????
-    saved_days_to_complete = zeros((array_size, num_psudo_events,
-                                    len(THE_PARAM_T.functional_percentage)))
+    
+    if THE_PARAM_T.bridges_functional_percentages is not None and have_bridge_data:
+        saved_days_to_complete = zeros((array_size, num_psudo_events,
+                                        len(THE_PARAM_T.bridges_functional_percentages)))
 
     log.debug('Memory: Created all data collection arrays.')
     log.resource_usage()
 
     # get indices of SA periods 0.3 and 1.0, if we have bridge data
-    bridge_SA_indices = None
     if have_bridge_data:
         bridge_SA_indices = \
                 util.find_bridge_sa_indices(THE_PARAM_T.atten_periods)
+    else:
+        bridge_SA_indices = None
 
     # check that when we have bridge data, there is only one event
     if have_bridge_data and num_psudo_events > 1:
@@ -593,8 +593,9 @@ def main(parameter_handle,
                 # This is not cumulative
                 total_structure_damage[rel_i,:] = damage.structure_state
 
-            # accumulate says to complete
-            saved_days_to_complete[rel_i,:,:] = days_to_complete
+            # accumulate days to complete           
+            if THE_PARAM_T.bridges_functional_percentages is not None and have_bridge_data:
+                saved_days_to_complete[rel_i,:,:] = days_to_complete
 
             #print 'ENDING building damage calculations'
         # ENDED BUILDING DAMAGE
