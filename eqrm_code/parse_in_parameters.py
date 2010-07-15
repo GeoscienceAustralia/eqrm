@@ -31,6 +31,21 @@ from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING, \
      CSM_DAMPING_DO_NOT_USE_SMOOTHING
 
 # DSG-DSG this needs more comments.
+"""
+Principals of the set_data.py file format.
+
+All attributes are specified in CONV_DIC_NEW.
+
+If an attribute is not present in the set_data.py file and the attribute has a default
+value, this value will be used in THE_PARAM_T.
+
+Setting an attribute to None is not equivaluent to removing the
+attribute from the set_data.py file, since not all attributes default
+to None.
+
+Lists are automatically converted to arrays.
+
+"""
 
 ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
