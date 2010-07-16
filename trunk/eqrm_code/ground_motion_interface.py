@@ -87,6 +87,7 @@ Description:
         Note that the 'site' dimension above is currently 1.
 """
 
+import math
 from copy import  deepcopy
 from scipy import where, sqrt, array, asarray, exp, log, newaxis, zeros, \
      log10, isfinite, weave, ones
