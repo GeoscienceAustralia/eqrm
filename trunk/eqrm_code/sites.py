@@ -27,7 +27,8 @@
 
 import copy
 from scipy import array, asarray
-import numpy as np
+#import numpy as np
+import scipy as np
 
 from eqrm_code.distances import Distances
 from eqrm_code.csv_interface import csv_to_arrays
