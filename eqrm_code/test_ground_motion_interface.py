@@ -663,15 +663,10 @@ class Test_ground_motion_interface(unittest.TestCase):
         # good enough overall to trust the spreadsheet implementation, given
         # that the estimate of SA values from the graphs was difficult.
         # 
+        # The spreadsheet is in 'Liang_2008.xls'.
+        # 
         # This test compares the python implementation against the spreadsheet
         # results.  The match is expected to be much tighter.
-
-# these are the expected shapes inside Liang_2008_distribution()
-#    mag.shape = (site, events, 1)
-#    distance.shape = (site, events, 1)
-#    coefficient.shape = (num_coefficients, 1, 1, num_periods)
-#    sigmacoefficient.shape = (num_sigmacoefficients, 1, 1, num_periods)
-#    depth.shape = (site, events, 1)
 
         model_name = 'Liang_2008'
         model = Ground_motion_specification(model_name)
@@ -736,6 +731,7 @@ class Test_ground_motion_interface(unittest.TestCase):
              log_sigma) = model.distribution(coefficient=coeffs,
                                              sigma_coefficient=sigma_coeffs,
                                              mag=ML, distance=R)
+
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
@@ -770,6 +766,7 @@ class Test_ground_motion_interface(unittest.TestCase):
              log_sigma) = model.distribution(coefficient=coeffs,
                                              sigma_coefficient=sigma_coeffs,
                                              mag=ML, distance=R)
+
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
@@ -807,16 +804,79 @@ class Test_ground_motion_interface(unittest.TestCase):
                  log_sigma) = model.distribution(coefficient=coeffs,
                                                  sigma_coefficient=sigma_coeffs,
                                                  mag=ML, distance=R)
+
             msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                    % (period, ML, R, str(log_mean), str(log_mean_expected)))
             self.failUnless(allclose(asarray(log_mean), log_mean_expected,
                                              rtol=1.0e-3, atol=1.0e-3),
                                      msg)
 
+    def Xtest_Atkinson06_hardrock(self):
+        """Test the Atkinson06_hardrock model."""
+
+        # The data here is from a spreadsheet that implemented the algorithm
+        # in the paper and compared the results against values taken from the
+        # graphs in figure 6.  The match there was sometimes broad, but 
+        # good enough overall to trust the spreadsheet implementation, given
+        # that the estimate of SA values from the graphs was difficult.
+        # 
+        # This test compares the python implementation against the spreadsheet
+        # results.  The match is expected to be much tighter.
+
+        model_name = 'Atkinson06_hardrock'
+        model = Ground_motion_specification(model_name)
+
+        # conversion factor: cm/s2 -> g
+        g_factor = 6.8882309129676953
+        # conversion factor: log10 -> loge
+        ln_factor = 0.43429448190325182
+
+        ######
+        # period = 1.0s, ML=5.5, R=100.0
+        ######
+
+        period = 1.0
+        ML = numpy.array([[[5.5]]])
+        R = numpy.array([[[100.0]]])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[-5.27e+0]]],[[[2.26e+0]]],[[[-1.48e-1]]],
+                              [[[-2.07e+0]]],[[[1.50e-1]]],[[[-8.13e-1]]],
+                              [[[ 4.67e-2]]],[[[8.26e-1]]],[[[-1.62e-1]]],
+                              [[[-4.86e-4]]]])
+
+        # sigma coefficients - these are static
+        sigma = 0.30/ln_factor
+        sigma_coeffs = numpy.array([[[[sigma]]],[[[sigma]]]])
+
+        # expected values from paper, corrected for result in g, not mm/s2
+        log_mean_expected = 0.34/ln_factor - g_factor
+        log_sigma_expected = Atkinson06_hardrock_sigma_coefficient[0][0]/ln_factor - g_factor
+
+        print('Atkinson06_hardrock_sigma_coefficient=%s'
+              % str(Atkinson06_hardrock_sigma_coefficient))
+
+        (log_mean,
+             log_sigma) = model.distribution(coefficient=coeffs,
+                                             sigma_coefficient=sigma_coeffs,
+                                             mag=ML, distance=R)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
 ################################################################################
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_interface,'test')
-    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Liang_2008')
+    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Atkinson06_hardrock')
     runner = unittest.TextTestRunner()
     runner.run(suite)
