@@ -5,6 +5,7 @@ import unittest
 from scipy import array, exp, log, allclose, sqrt, resize, e
 from eqrm_code.ground_motion_specification import Ground_motion_specification
 from eqrm_code.ground_motion_interface import *
+import numpy
 
 
 class Test_ground_motion_interface(unittest.TestCase):
@@ -651,10 +652,171 @@ class Test_ground_motion_interface(unittest.TestCase):
             sigma_coefficient=sigma_coefficient)
         self.assert_(allclose(log_mean_actual, log_mean[0][0][0]))
         self.assert_(allclose(sigtu, log_sigma[0][0][0]))
-#-------------------------------------------------------------
+
+
+    def test_Liang_2008(self):
+        """Test the Liang_2008 model by calling Liang_2008() directly."""
+
+        # The data here is from a spreadsheet that implemented the algorithm
+        # in the paper and compared the results against values taken from the
+        # graphs in figure 15.  The match there was sometimes broad, but 
+        # good enough overall to trust the spreadsheet implementation, given
+        # that the estimate of SA values from the graphs was difficult.
+        # 
+        # This test compares the python implementation against the spreadsheet
+        # results.  The match is expected to be much tighter.
+
+# these are the expected shapes inside Liang_2008_distribution()
+#    mag.shape = (site, events, 1)
+#    distance.shape = (site, events, 1)
+#    coefficient.shape = (num_coefficients, 1, 1, num_periods)
+#    sigmacoefficient.shape = (num_sigmacoefficients, 1, 1, num_periods)
+#    depth.shape = (site, events, 1)
+
+        model_name = 'Liang_2008'
+        model = Ground_motion_specification(model_name)
+
+        # conversion factor: mm/s2 -> g
+        g_factor = 9.1908160059617412
+
+        ######
+        # period = 10.0s, ML=4.0, R=50.0
+        ######
+
+        period = 10.0
+        ML = numpy.array([[[4.0]]])
+        R = numpy.array([[[50.0]]])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[-10.565]]],[[[2.380]]],[[[-0.019]]],[[[-0.395]]],[[[0.044]]]])
+
+        # sigma coefficients - these are static
+        sigma_coeffs = numpy.array([[[[1.166]]],[[[1.166]]]])
+
+
+        # expected values from paper, corrected for result in g, not mm/s2
+        log_mean_expected = -2.852 - g_factor
+        log_sigma_expected = Liang_2008_sigma_coefficient[0][0]
+
+        (log_mean,
+             log_sigma) = model.distribution(coefficient=coeffs,
+                                             sigma_coefficient=sigma_coeffs,
+                                             mag=ML, distance=R)
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+        ######
+        # period = 1.0s, ML=5.0, R=100.0
+        ######
+
+        period = 1.0
+        ML = numpy.array([[[5.0]]])
+        R = numpy.array([[[100.0]]])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[-3.901]]],[[[1.892]]],[[[-0.019]]],[[[0.134]]],[[[-0.070]]]])
+
+        # sigma coefficients - these are static
+        sigma_coeffs = numpy.array([[[[1.166]]],[[[1.166]]]])
+
+        # expected values from paper, corrected for result in g, not mm/s2
+        log_mean_expected = 2.664 - g_factor
+        log_sigma_expected = Liang_2008_sigma_coefficient[0][0]
+
+        (log_mean,
+             log_sigma) = model.distribution(coefficient=coeffs,
+                                             sigma_coefficient=sigma_coeffs,
+                                             mag=ML, distance=R)
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+        ######
+        # period = 0.1s, ML=7.0, R=200.0
+        ######
+
+        period = 0.1
+        ML = numpy.array([[[7.0]]])
+        R = numpy.array([[[200.0]]])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[1.598]]],[[[1.312]]],[[[-0.010]]],[[[-0.507]]],[[[-0.028]]]])
+
+        # sigma coefficients - these are static
+        sigma_coeffs = numpy.array([[[[1.166]]],[[[1.166]]]])
+
+        # expected values from paper, corrected for result in g, not mm/s2
+        log_mean_expected = 5.057 - g_factor
+        log_sigma_expected = Liang_2008_sigma_coefficient[0][0]
+
+        (log_mean,
+             log_sigma) = model.distribution(coefficient=coeffs,
+                                             sigma_coefficient=sigma_coeffs,
+                                             mag=ML, distance=R)
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+        ######
+        # periods = 0.1s/1.0s/10.0s, ML=0.0, R=1.0
+        # a contrived case to return ln(y) = a + c (according to algorithm)
+        # just check returned log_mean, sigma checked above
+        ######
+
+        ML = numpy.array([[[0.0]]])
+        R = numpy.array([[[1.0]]])
+
+        for period in [0.1, 1.0, 10.0]:
+            # get index for the given period, then get coeffs from code module
+            period_index = Liang_2008_coefficient_period.index(period)
+            cfs = Liang_2008_coefficient[:,period_index]
+            coeffs = numpy.array([[[[cfs[0]]]],[[[cfs[1]]]],[[[cfs[2]]]],[[[cfs[3]]]],[[[cfs[4]]]]])
+
+            # sigma coefficients - these are static
+            sigma_coeffs = numpy.array([[[[1.166]]],[[[1.166]]]])
+
+            # expected values from paper, corrected for result in g, not mm/s2
+            log_mean_expected = (cfs[0] + cfs[2]) - g_factor
+
+            (log_mean,
+                 log_sigma) = model.distribution(coefficient=coeffs,
+                                                 sigma_coefficient=sigma_coeffs,
+                                                 mag=ML, distance=R)
+            msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+                   % (period, ML, R, str(log_mean), str(log_mean_expected)))
+            self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                             rtol=1.0e-3, atol=1.0e-3),
+                                     msg)
+
+################################################################################
+
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_interface,'test')
-    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Boore_08_distribution3')
-    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Boore_08_distribution_subfunctions2')
+    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Liang_2008')
     runner = unittest.TextTestRunner()
     runner.run(suite)
