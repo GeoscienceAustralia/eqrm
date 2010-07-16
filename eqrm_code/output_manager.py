@@ -18,7 +18,9 @@ from gzip import GzipFile
 from os import listdir
 
 from scipy import isfinite, array, allclose, asarray, swapaxes, transpose, \
-     newaxis, reshape
+     newaxis, reshape, nan, isnan
+import numpy as np
+
 from csv_interface import csv2dict
 
 EXTENSION = '.txt'
@@ -416,20 +418,35 @@ def save_structures(THE_PARAM_T,structures,compress=False,
                        'HAZUS_STRUCTURE_CLASSIFICATION BID FCB_USAGE ' +
                        'HAZUS_USAGE\n')
     for i in range(len(structures.latitude)):
+        maybe_nan = {'SUBURB':None, 'SURVEY_FACTOR':None,
+                     'HAZUS_STRUCTURE_CLASSIFICATION':None, 'HAZUS_USAGE':None}
+        nan_values = ['1.#QNAN'] #,'nan','1.#QNB']
+        for title_string in maybe_nan:
+            string_value = structures.attributes[title_string][i]
+            if isnan(string_value) and (string_value in nan_values or \
+                                        not isinstance(string_value,str)):
+                # This is a bit of a hack
+                # It will set the survey factor of bridges to 1.
+                if title_string == 'SURVEY_FACTOR':
+                    maybe_nan[title_string] = 1
+                else:
+                    maybe_nan[title_string] = 'nan'                    
+            else:
+                maybe_nan[title_string] = structures.attributes[title_string][i]
+                
         loc_file.write('%.6g %.6g %i %i %s %s %.5g %s %s %i %i %s\n'%
                        (structures.latitude[i],
                         structures.longitude[i],
                         structures.attributes['PRE1989'][i],
                         structures.attributes['POSTCODE'][i],
                         structures.attributes['SITE_CLASS'][i],
-                        structures.attributes['SUBURB'][i].replace(' ','_'),
-                        structures.attributes['SURVEY_FACTOR'][i],
+                        maybe_nan['SUBURB'].replace(' ','_'),
+                        maybe_nan['SURVEY_FACTOR'],
                         structures.attributes['STRUCTURE_CLASSIFICATION'][i],
-                        structures.attributes[
-            'HAZUS_STRUCTURE_CLASSIFICATION'][i],
+                        maybe_nan['HAZUS_STRUCTURE_CLASSIFICATION'],
                         structures.attributes['BID'][i],
                         structures.attributes['FCB_USAGE'][i],
-                        structures.attributes['HAZUS_USAGE'][i]))
+                        maybe_nan['HAZUS_USAGE']))
     loc_file.close()
     return base_name
 
@@ -701,13 +718,18 @@ def save_val(THE_PARAM_T, val, file_tag, compress=False, parallel_tag=None):
         open = file
     if parallel_tag is None:
         parallel_tag = ''
+
     base_name =  get_val_file_name(THE_PARAM_T.site_tag,
                                    file_tag)
     base_name = os.path.join(THE_PARAM_T.output_dir, base_name)
     name = base_name + parallel_tag
     f=open(name,'w')
-    f.write('\n'.join(['%.10g'%(bv) for bv in val]))
-    f.write('\n')
+    for value in val:
+        # Fix for nans printing differently in windows and Linux.
+        if isnan(value):
+            f.write('nan\n')
+        else:
+            f.write('%.10g\n'%(value))
     f.close()
     return base_name
 
