@@ -2146,7 +2146,7 @@ tmp = array([[  1.776, 1.253, -0.016, -0.294, -0.028],
              [-12.462, 2.477, -0.018, -0.334,  0.031],
              [-13.499, 2.527, -0.018, -0.195,  0.009]])
 # convert to dim = (#coefficients, #periods)
-Liang_2008_coefficient = Liang_2008_coefficient.transpose()
+Liang_2008_coefficient = tmp.transpose()
 
 # dim = (period,)
 Liang_2008_coefficient_period = [0.05, 0.10, 0.15,  0.20,  0.25,
@@ -2178,10 +2178,10 @@ gound_motion_init['Liang_2008'] = Liang_2008_args
 
 #***************  End of Liang_2008 model   ************
 
-#***************  Start of Atkinson06 model   ************
+#***************  Start of Atkinson06_hardrock model   ************
 
-def Atkinson06_distribution(**kwargs):
-    """The Atkinson06 model function.
+def Atkinson06_hardrock_distribution(**kwargs):
+    """The Atkinson06_hardrock model function.
 
     kwargs  dictionary os parameters, expect:
                 mag, distance, coefficient, sigma_coefficient
@@ -2193,121 +2193,137 @@ def Atkinson06_distribution(**kwargs):
         Seismological Society of america, Vol. 96, pp 2181-2205
     """
 
-    # conversion factor: ln(mm/s2) -> ln(g)
-    #g_factor = math.log(9.80665e+3)
-    g_factor = 9.1908160059617412
+    # conversion factor: ln(cm/s2) - g_factor -> ln(g)
+    g_factor = math.log(9.80665e+2)    # ln(9.80665m/s2 * 100)
+
+    # conversion factor: log10/ln_factor -> ln
+    # ln(X) = log10(X)/log10(e)
+    ln_factor = math.log10(math.e)
 
     # get args
-    mag = kwargs['mag']
-    distance = kwargs['distance']
+    M = kwargs['mag']
+    Rcd = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
-#    print('mag.shape=%s' % str(mag.shape))
-#    print('distance.shape=%s' % str(distance.shape))
-#    print('coefficient.shape=%s' % str(coefficient.shape))
-#    print('sigma_coefficient.shape=%s' % str(sigma_coefficient.shape))
-
-# these are the expected shapes
-#    mag.shape = (site, events, 1)
-#    distance.shape = (site, events, 1)
-#    coefficient.shape = (num_coefficients, 1, 1, num_periods)
-#    sigmacoefficient.shape = (num_sigmacoefficients, 1, 1, num_periods)
-#    depth.shape = (site, events, 1)
-
     # check some shapes
     num_periods = coefficient.shape[3]
-    assert coefficient.shape == (5, 1, 1, num_periods)
+    assert coefficient.shape == (10, 1, 1, num_periods)
     assert sigma_coefficient.shape == (2, 1, 1, num_periods)
 
-    # calculate result in ln(mm/s/s)
-    (a, b, c, d, e) = coefficient
-    log_mean = a + b*mag + c*distance + d*log(distance) + e*mag*log(distance)
-    log_sigma = sigma_coefficient
+    # hardrock algorithm, soil amplification S is 0
+    S = 0
 
-    # return mean as ln(g)
-    return (log_mean - g_factor, log_sigma)
+    # other constants (these are scale distances?)
+    R0 = 10.0
+    R1 = 70.0
+    R2 = 140.0
+
+    # intermediate calculated coefficients
+# Can be optimised, calculate log10R0, log10Rcd, etc, beforehand?
+    tmp1 = log10(R0/Rcd)
+    f0 = where(tmp1 < 0, 0, tmp1)
+    tmp1 = log10(Rcd)
+    tmp2 = log10(R1)
+    f1 = where(tmp1 < tmp2, tmp1, tmp2)
+    tmp1 = log10(Rcd/R2)
+    f2 = where(log10(Rcd/R2) < 0, 0, tmp1)
+
+    # calculate result in log10(cm/s/s)
+    (c1, c2, c3, c4, c5, c6, c7, c8, c9, c10) = coefficient
+    log10RSA = c1 + c2*M + c3*M*M + (c4 + c5*M)*f1 + (c6 + c7*M)*f2 + (c8 + c9*M)*f0 + c10*Rcd + S
+    log_sigma = sigma_coefficient/ln_factor - g_factor
+
+    # convert to g and natural log
+    log_mean = log10RSA/ln_factor - g_factor
+
+    return (log_mean, log_sigma)
+
+Atkinson06_hardrock_magnitude_type = 'Mw'
+Atkinson06_hardrock_distance_type = 'Rupture'
 
 # dimension = (#periods, #coefficients)
-#                    c1        c2         c3         c4        c5      
-#                        c6        c7         c8         c9         c10
-Atkinson06_coefficient = array(
-                 [[-5.41E+00, 1.71E+00, -9.01E-02, -2.54E+00, 2.27E-01,
-                       -1.27E+00, 1.16E-01,  9.79E-01, -1.77E-01, -1.76E-04],
-                  [-5.79E+00, 1.92E+00, -1.07E-01, -2.44E+00, 2.11E-01,
-                       -1.16E+00, 1.02E-01,  1.01E+00, -1.82E-01, -2.01E-04],
-                  [-6.04E+00, 2.08E+00, -1.22E-01, -2.37E+00, 2.00E-01,
-                       -1.07E+00, 8.95E-02,  1.00E+00, -1.80E-01, -2.31E-04],
-                  [-6.17E+00, 2.21E+00, -1.35E-01, -2.30E+00, 1.90E-01,
-                       -9.86E-01, 7.86E-02,  9.68E-01, -1.77E-01, -2.82E-04],
-                  [-6.18E+00, 2.30E+00, -1.44E-01, -2.22E+00, 1.77E-01,
-                       -9.37E-01, 7.07E-02,  9.52E-01, -1.77E-01, -3.22E-04],
-                  [-6.04E+00, 2.34E+00, -1.50E-01, -2.16E+00, 1.66E-01,
-                       -8.70E-01, 6.05E-02,  9.21E-01, -1.73E-01, -3.75E-04],
-                  [-5.72E+00, 2.32E+00, -1.51E-01, -2.10E+00, 1.57E-01,
-                       -8.20E-01, 5.19E-02,  8.56E-01, -1.66E-01, -4.33E-04],
-                  [-5.27E+00, 2.26E+00, -1.48E-01, -2.07E+00, 1.50E-01,
-                       -8.13E-01, 4.67E-02,  8.26E-01, -1.62E-01, -4.86E-04],
-                  [-4.60E+00, 2.13E+00, -1.41E-01, -2.06E+00, 1.47E-01,
-                       -7.97E-01, 4.35E-02,  7.75E-01, -1.56E-01, -5.79E-04],
-                  [-3.92E+00, 1.99E+00, -1.31E-01, -2.05E+00, 1.42E-01,
-                       -7.82E-01, 4.30E-02,  7.88E-01, -1.59E-01, -6.95E-04],
-                  [-3.22E+00, 1.83E+00, -1.20E-01, -2.02E+00, 1.34E-01,
-                       -8.13E-01, 4.44E-02,  8.84E-01, -1.75E-01, -7.70E-04],
-                  [-2.44E+00, 1.65E+00, -1.08E-01, -2.05E+00, 1.36E-01,
-                       -8.43E-01, 4.48E-02,  7.39E-01, -1.56E-01, -8.51E-04],
-                  [-1.72E+00, 1.48E+00, -9.74E-02, -2.08E+00, 1.38E-01,
-                       -8.89E-01, 4.87E-02,  6.10E-01, -1.39E-01, -9.54E-04],
-                  [-1.12E+00, 1.34E+00, -8.72E-02, -2.08E+00, 1.35E-01,
-                       -9.71E-01, 5.63E-02,  6.14E-01, -1.43E-01, -1.06E-03],
-                  [-6.15E-01, 1.23E+00, -7.89E-02, -2.09E+00, 1.31E-01,
-                       -1.12E+00, 6.79E-02,  6.06E-01, -1.46E-01, -1.13E-03],
-                  [-1.46E-01, 1.12E+00, -7.14E-02, -2.12E+00, 1.30E-01,
-                       -1.30E+00, 8.31E-02,  5.62E-01, -1.44E-01, -1.18E-03],
-                  [ 2.14E-01, 1.05E+00, -6.66E-02, -2.15E+00, 1.30E-01,
-                       -1.61E+00, 1.05E-01,  4.27E-01, -1.30E-01, -1.15E-03],
-                  [ 4.80E-01, 1.02E+00, -6.40E-02, -2.20E+00, 1.27E-01,
-                       -2.01E+00, 1.33E-01,  3.37E-01, -1.27E-01, -1.05E-03],
-                  [ 6.91E-01, 9.97E-01, -6.28E-02, -2.26E+00, 1.25E-01,
-                       -2.49E+00, 1.64E-01,  2.14E-01, -1.21E-01, -8.47E-04],
-                  [ 9.11E-01, 9.80E-01, -6.21E-02, -2.36E+00, 1.26E-01,
-                       -2.97E+00, 1.91E-01,  1.07E-01, -1.17E-01, -5.79E-04],
-                  [ 1.11E+00, 9.72E-01, -6.20E-02, -2.47E+00, 1.28E-01,
-                       -3.39E+00, 2.14E-01, -1.39E-01, -9.84E-02, -3.17E-04],
-                  [ 1.26E+00, 9.68E-01, -6.23E-02, -2.58E+00, 1.32E-01,
-                       -3.64E+00, 2.28E-01, -3.51E-01, -8.13E-02, -1.23E-04],
-                  [ 1.44E+00, 9.59E-01, -6.28E-02, -2.71E+00, 1.40E-01,
-                       -3.73E+00, 2.34E-01, -5.43E-01, -6.45E-02, -3.23E-05],
-                  [ 1.52E+00, 9.60E-01, -6.35E-02, -2.81E+00, 1.46E-01,
-                       -3.65E+00, 2.36E-01, -6.54E-01, -5.50E-02, -4.85E-05],
-                  [ 9.07E-01, 9.83E-01, -6.60E-02, -2.70E+00, 1.59E-01,
-                       -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04]])
+#               c1        c2         c3         c4        c5      
+#                   c6        c7         c8         c9         c10
+tmp = array([[-5.41E+00, 1.71E+00, -9.01E-02, -2.54E+00, 2.27E-01,
+                  -1.27E+00, 1.16E-01,  9.79E-01, -1.77E-01, -1.76E-04],
+             [-5.79E+00, 1.92E+00, -1.07E-01, -2.44E+00, 2.11E-01,
+                  -1.16E+00, 1.02E-01,  1.01E+00, -1.82E-01, -2.01E-04],
+             [-6.04E+00, 2.08E+00, -1.22E-01, -2.37E+00, 2.00E-01,
+                  -1.07E+00, 8.95E-02,  1.00E+00, -1.80E-01, -2.31E-04],
+             [-6.17E+00, 2.21E+00, -1.35E-01, -2.30E+00, 1.90E-01,
+                  -9.86E-01, 7.86E-02,  9.68E-01, -1.77E-01, -2.82E-04],
+             [-6.18E+00, 2.30E+00, -1.44E-01, -2.22E+00, 1.77E-01,
+                  -9.37E-01, 7.07E-02,  9.52E-01, -1.77E-01, -3.22E-04],
+             [-6.04E+00, 2.34E+00, -1.50E-01, -2.16E+00, 1.66E-01,
+                  -8.70E-01, 6.05E-02,  9.21E-01, -1.73E-01, -3.75E-04],
+             [-5.72E+00, 2.32E+00, -1.51E-01, -2.10E+00, 1.57E-01,
+                  -8.20E-01, 5.19E-02,  8.56E-01, -1.66E-01, -4.33E-04],
+             [-5.27E+00, 2.26E+00, -1.48E-01, -2.07E+00, 1.50E-01,
+                  -8.13E-01, 4.67E-02,  8.26E-01, -1.62E-01, -4.86E-04],
+             [-4.60E+00, 2.13E+00, -1.41E-01, -2.06E+00, 1.47E-01,
+                  -7.97E-01, 4.35E-02,  7.75E-01, -1.56E-01, -5.79E-04],
+             [-3.92E+00, 1.99E+00, -1.31E-01, -2.05E+00, 1.42E-01,
+                  -7.82E-01, 4.30E-02,  7.88E-01, -1.59E-01, -6.95E-04],
+             [-3.22E+00, 1.83E+00, -1.20E-01, -2.02E+00, 1.34E-01,
+                  -8.13E-01, 4.44E-02,  8.84E-01, -1.75E-01, -7.70E-04],
+             [-2.44E+00, 1.65E+00, -1.08E-01, -2.05E+00, 1.36E-01,
+                  -8.43E-01, 4.48E-02,  7.39E-01, -1.56E-01, -8.51E-04],
+             [-1.72E+00, 1.48E+00, -9.74E-02, -2.08E+00, 1.38E-01,
+                  -8.89E-01, 4.87E-02,  6.10E-01, -1.39E-01, -9.54E-04],
+             [-1.12E+00, 1.34E+00, -8.72E-02, -2.08E+00, 1.35E-01,
+                  -9.71E-01, 5.63E-02,  6.14E-01, -1.43E-01, -1.06E-03],
+             [-6.15E-01, 1.23E+00, -7.89E-02, -2.09E+00, 1.31E-01,
+                  -1.12E+00, 6.79E-02,  6.06E-01, -1.46E-01, -1.13E-03],
+             [-1.46E-01, 1.12E+00, -7.14E-02, -2.12E+00, 1.30E-01,
+                  -1.30E+00, 8.31E-02,  5.62E-01, -1.44E-01, -1.18E-03],
+             [ 2.14E-01, 1.05E+00, -6.66E-02, -2.15E+00, 1.30E-01,
+                  -1.61E+00, 1.05E-01,  4.27E-01, -1.30E-01, -1.15E-03],
+             [ 4.80E-01, 1.02E+00, -6.40E-02, -2.20E+00, 1.27E-01,
+                  -2.01E+00, 1.33E-01,  3.37E-01, -1.27E-01, -1.05E-03],
+             [ 6.91E-01, 9.97E-01, -6.28E-02, -2.26E+00, 1.25E-01,
+                  -2.49E+00, 1.64E-01,  2.14E-01, -1.21E-01, -8.47E-04],
+             [ 9.11E-01, 9.80E-01, -6.21E-02, -2.36E+00, 1.26E-01,
+                  -2.97E+00, 1.91E-01,  1.07E-01, -1.17E-01, -5.79E-04],
+             [ 1.11E+00, 9.72E-01, -6.20E-02, -2.47E+00, 1.28E-01,
+                  -3.39E+00, 2.14E-01, -1.39E-01, -9.84E-02, -3.17E-04],
+             [ 1.26E+00, 9.68E-01, -6.23E-02, -2.58E+00, 1.32E-01,
+                  -3.64E+00, 2.28E-01, -3.51E-01, -8.13E-02, -1.23E-04],
+             [ 1.44E+00, 9.59E-01, -6.28E-02, -2.71E+00, 1.40E-01,
+                  -3.73E+00, 2.34E-01, -5.43E-01, -6.45E-02, -3.23E-05],
+             [ 1.52E+00, 9.60E-01, -6.35E-02, -2.81E+00, 1.46E-01,
+                  -3.65E+00, 2.36E-01, -6.54E-01, -5.50E-02, -4.85E-05],
+             [ 9.07E-01, 9.83E-01, -6.60E-02, -2.70E+00, 1.59E-01,
+                  -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04]])
+# convert to dim = (#coefficients, #periods)
+Atkinson06_hardrock_coefficient = tmp.transpose()
 
 # dim = (period,)
-Atkinson06_coefficient_period = [5.000, 4.000, 3.130, 2.500, 2.000,
-                                 1.590, 1.250, 1.000, 0.794, 0.629,
-                                 0.500, 0.397, 0.315, 0.251, 0.199,
-                                 0.158, 0.125, 0.100, 0.079, 0.063,
-                                 0.050, 0.040, 0.031, 0.025, 0.000]
+Atkinson06_hardrock_coefficient_period = [5.000, 4.000, 3.130, 2.500, 2.000,
+                                          1.590, 1.250, 1.000, 0.794, 0.629,
+                                          0.500, 0.397, 0.315, 0.251, 0.199,
+                                          0.158, 0.125, 0.100, 0.079, 0.063,
+                                          0.050, 0.040, 0.031, 0.025, 0.000]
+
+Atkinson06_hardrock_interpolation = linear_interpolation
 
 # dim = (period,)
-sigma = 1.166
-Atkinson06_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
-Atkinson06_sigma_coefficient_period = [0.0, 1.0]
+g_factor = 6.8882309129676953
+ln_factor = 0.43429448190325182
+sigma = (0.30 - g_factor)/ln_factor
+Atkinson06_hardrock_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
+Atkinson06_hardrock_sigma_coefficient_period = [0.0, 1.0]
 
-Atkinson06_magnitude_type='Mw'
-Atkinson06_distance_type='Rupture'
-Atkinson06_interpolation = linear_interpolation
+gound_motion_init['Atkinson06_hardrock'] = \
+                        [Atkinson06_hardrock_distribution,
+                         Atkinson06_hardrock_magnitude_type,
+                         Atkinson06_hardrock_distance_type,
+                         Atkinson06_hardrock_coefficient,
+                         Atkinson06_hardrock_coefficient_period,
+                         Atkinson06_hardrock_interpolation,
+                         Atkinson06_hardrock_sigma_coefficient,
+                         Atkinson06_hardrock_sigma_coefficient_period,
+                         Atkinson06_hardrock_interpolation]
 
-gound_motion_init['Atkinson06'] = [Atkinson06_distribution,
-                                   Atkinson06_magnitude_type,
-                                   Atkinson06_distance_type,
-                                   Atkinson06_coefficient,
-                                   Atkinson06_coefficient_period,
-                                   Atkinson06_interpolation,
-                                   Atkinson06_sigma_coefficient,
-                                   Atkinson06_sigma_coefficient_period,
-                                   Atkinson06_interpolation]
-
-#***************  End of Atkinson06 model   ************
+#***************  End of Atkinson06_hardrock model   ************
 
