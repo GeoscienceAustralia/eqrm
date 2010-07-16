@@ -13,11 +13,12 @@ from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
 
 classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA', 
                           'Toro_1997_midcontinent',
-                           'Sadigh_97', 'Youngs_97_interface',
-                           'Youngs_97_intraslab',
+                          'Sadigh_97', 'Youngs_97_interface',
+                          'Youngs_97_intraslab',
                           'Combo_Sadigh_Youngs_M8',
-                           'Boore_08', 'Somerville_Yilgarn',
-                          'Somerville_Non_Cratonic')
+                          'Boore_08', 'Somerville_Yilgarn',
+                          'Somerville_Non_Cratonic',
+                          'Liang_2008')
 
 # Atkinson_Boore_97 is out.  It has no test data. 
 
@@ -528,10 +529,42 @@ test_data['Somerville_Non_Cratonic_test_mean'] = tmp
 
 test_data['Somerville_Non_Cratonic_test_magnitude'] = [5.5, 6.4, 6.5]
 
-# ***********************************************************
+################################################################################
+# Liang_2008 Test
 
+test_data['Liang_2008_test_period'] = [0.1, 1.0, 10.0]
 
+tmp = zeros((4,4)) # initialise an array: 4 events/mags and distance to 4 sites
+tmp[0,:] = [ 50.0,  50.0,  50.0,  50.0] # distance - 1st site and all 4 events
+tmp[1,:] = [100.0, 100.0, 100.0, 100.0] # distance - 2nd site and all 4 events
+tmp[2,:] = [150.0, 150.0, 150.0, 150.0] # distance - 3rd site and all 4 events
+tmp[3,:] = [200.0, 200.0, 200.0, 200.0] # distance - 4th site and all 4 events
+test_data['Liang_2008_test_distance'] = tmp
 
+# result values, in 'g'
+tmp = zeros((4,4,3))		# distance, magnitude, period
+# period:     0.1       1.0       10.0
+tmp[0,0,:] = [5.16E-03, 8.72E-04, 5.89E-06]	# R= 50.0, ML=4.0
+tmp[0,1,:] = [1.72E-02, 4.40E-03, 7.56E-05]	# R= 50.0, ML=5.0
+tmp[0,2,:] = [5.72E-02, 2.22E-02, 9.70E-04]	# R= 50.0, ML=6.0
+tmp[0,3,:] = [1.90E-01, 1.12E-01, 1.24E-02]	# R= 50.0, ML=7.0
+tmp[1,0,:] = [2.04E-03, 3.05E-04, 1.96E-06]	# R=100.0, ML=4.0
+tmp[1,1,:] = [6.66E-03, 1.46E-03, 2.59E-05]	# R=100.0, ML=5.0
+tmp[1,2,:] = [2.17E-02, 7.03E-03, 3.43E-04]	# R=100.0, ML=6.0
+tmp[1,3,:] = [7.09E-02, 3.38E-02, 4.53E-03]	# R=100.0, ML=7.0
+tmp[2,0,:] = [9.62E-04, 1.11E-04, 6.92E-07]	# R=150.0, ML=4.0
+tmp[2,1,:] = [3.11E-03, 5.19E-04, 9.33E-06]	# R=150.0, ML=5.0
+tmp[2,2,:] = [1.00E-02, 2.42E-03, 1.26E-04]	# R=150.0, ML=6.0
+tmp[2,3,:] = [3.23E-02, 1.13E-02, 1.69E-03]	# R=150.0, ML=7.0
+tmp[3,0,:] = [4.88E-04, 4.12E-05, 2.51E-07]	# R=200.0, ML=4.0
+tmp[3,1,:] = [1.56E-03, 1.89E-04, 3.43E-06]	# R=200.0, ML=5.0
+tmp[3,2,:] = [5.01E-03, 8.63E-04, 4.68E-05]	# R=200.0, ML=6.0
+tmp[3,3,:] = [1.60E-02, 3.95E-03, 6.38E-04]	# R=200.0, ML=7.0
+test_data['Liang_2008_test_mean'] = tmp
+
+test_data['Liang_2008_test_magnitude'] = [4.0, 5.0, 6.0, 7.0]
+
+################################################################################
 
 class Distance_stub(object):
     def __init__(self,dist):
