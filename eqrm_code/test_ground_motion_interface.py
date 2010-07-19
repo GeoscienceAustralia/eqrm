@@ -811,28 +811,22 @@ class Test_ground_motion_interface(unittest.TestCase):
                                              rtol=1.0e-3, atol=1.0e-3),
                                      msg)
 
-    def Xtest_Atkinson06_hardrock(self):
-        """Test the Atkinson06_hardrock model."""
+    def test_Atkinson06_basic(self):
+        """Test the Atkinson06_basic function."""
 
         # The data here is from a spreadsheet that implemented the algorithm
         # in the paper and compared the results against values taken from the
-        # graphs in figure 6.  The match there was sometimes broad, but 
-        # good enough overall to trust the spreadsheet implementation, given
-        # that the estimate of SA values from the graphs was difficult.
+        # graphs in figure 6.
         # 
-        # This test compares the python implementation against the spreadsheet
-        # results.  The match is expected to be much tighter.
-
-        model_name = 'Atkinson06_hardrock'
-        model = Ground_motion_specification(model_name)
-
-        # conversion factor: cm/s2 -> g
-        g_factor = 6.8882309129676953
-        # conversion factor: log10 -> loge
-        ln_factor = 0.43429448190325182
+        # This test compares the Atkinson06_basic python implementation against
+        # the spreadsheet results. 
+        #
+        # Note that the Atkinson06_basic() function returns log10 values with
+        # units mm/s/s.
 
         ######
-        # period = 1.0s, ML=5.5, R=100.0
+        # period = 1.0s, ML=5.5, R=100.0 - call Atkinson06_basic(),
+        #     returns log10 cm/s/s
         ######
 
         period = 1.0
@@ -846,25 +840,127 @@ class Test_ground_motion_interface(unittest.TestCase):
                               [[[-4.86e-4]]]])
 
         # sigma coefficients - these are static
-        sigma = 0.30/ln_factor
+        sigma = 0.30
         sigma_coeffs = numpy.array([[[[sigma]]],[[[sigma]]]])
 
-        # expected values from paper, corrected for result in g, not mm/s2
-        log_mean_expected = 0.34/ln_factor - g_factor
-        log_sigma_expected = Atkinson06_hardrock_sigma_coefficient[0][0]/ln_factor - g_factor
+        # expected values from paper (log10 mm/s/s)
+        log_mean_expected = numpy.array([[[0.33]]])
+        log_sigma_expected = Atkinson06_sigma_coefficient[0][0]
 
-        print('Atkinson06_hardrock_sigma_coefficient=%s'
-              % str(Atkinson06_hardrock_sigma_coefficient))
-
-        (log_mean,
-             log_sigma) = model.distribution(coefficient=coeffs,
-                                             sigma_coefficient=sigma_coeffs,
-                                             mag=ML, distance=R)
+        (log_mean, log_sigma) = Atkinson06_basic(coefficient=coeffs,
+                                                 sigma_coefficient=sigma_coeffs,
+                                                 mag=ML, distance=R, S=0.0)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-2, atol=1.0e-2),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
                                          rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+
+    def test_Atkinson06_hardrock(self):
+        """Test the Atkinson06_hardrock function."""
+
+        # This is a repeat of test_Atkinson06_basic() above, except that we
+        # go through model.distribution() and get results converted to ln g.
+
+        model_name = 'Atkinson06_hardrock'
+        model = Ground_motion_specification(model_name)
+
+        # conversion factor: mm/s2 -g_factor -> g
+        g_factor = math.log(9.80665e+2)
+        # conversion factor: log10/ln_factor -> loge
+        ln_factor = math.log10(math.e)
+
+        ######
+        # period = 1.0s, ML=5.5, R=100.0 - call Atkinson06_hardrock(),
+        #     returns ln g
+        ######
+
+        period = 1.0
+        ML = numpy.array([[[5.5]]])
+        R = numpy.array([[[100.0]]])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[-5.27e+0]]],[[[2.26e+0]]],[[[-1.48e-1]]],
+                              [[[-2.07e+0]]],[[[1.50e-1]]],[[[-8.13e-1]]],
+                              [[[ 4.67e-2]]],[[[8.26e-1]]],[[[-1.62e-1]]],
+                              [[[-4.86e-4]]]])
+
+        # sigma coefficients - these are static
+        sigma = 0.30
+        sigma_coeffs = numpy.array([[[[sigma]]],[[[sigma]]]])
+
+        # expected values from paper (converted to ln g)
+        log_mean_expected = numpy.array([[[0.33]]])/ln_factor - g_factor
+        log_sigma_expected = Atkinson06_sigma_coefficient[0][0]/ln_factor - \
+                                 g_factor
+
+        (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
+                                                   sigma_coefficient=\
+                                                       sigma_coeffs,
+                                                   mag=ML, distance=R)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-2, atol=1.0e-2),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+    def Xtest_Atkinson06_soil(self):
+        """Test the Atkinson06_soil function."""
+
+        # This is a repeat of test_Atkinson06_basic() above, except that we
+        # get results converted to ln g.
+
+        # conversion factor: mm/s2 -> g
+        g_factor = math.log(9.80665e+2)
+        # conversion factor: log10 -> loge
+        ln_factor = math.log10(math.e)
+
+        ######
+        # period = 1.0s, ML=5.5, R=100.0 - call Atkinson06_hardrock(),
+        #     returns ln g
+        ######
+
+        period = 1.0
+        ML = numpy.array([[[5.5]]])
+        R = numpy.array([[[100.0]]])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[-5.27e+0]]],[[[2.26e+0]]],[[[-1.48e-1]]],
+                              [[[-2.07e+0]]],[[[1.50e-1]]],[[[-8.13e-1]]],
+                              [[[ 4.67e-2]]],[[[8.26e-1]]],[[[-1.62e-1]]],
+                              [[[-4.86e-4]]]])
+
+        # sigma coefficients - these are static
+        sigma = 0.30
+        sigma_coeffs = numpy.array([[[[sigma]]],[[[sigma]]]])
+
+        # expected values from paper (converted to ln g)
+        log_mean_expected = numpy.array([[[0.33]]])/ln_factor - g_factor
+        log_sigma_expected = Atkinson06_sigma_coefficient[0][0]/ln_factor - g_factor
+
+        (log_mean, log_sigma) = Atkinson06_basic(coefficient=coeffs,
+                                                 sigma_coefficient=sigma_coeffs,
+                                                 mag=ML, distance=R, S=0.0)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-2, atol=1.0e-2),
                                  msg)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
@@ -877,6 +973,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_interface,'test')
-    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Atkinson06_hardrock')
+    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Atkinson06_basic')
     runner = unittest.TextTestRunner()
     runner.run(suite)
+

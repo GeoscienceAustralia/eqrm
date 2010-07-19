@@ -565,6 +565,45 @@ test_data['Liang_2008_test_mean'] = tmp
 test_data['Liang_2008_test_magnitude'] = [4.0, 5.0, 6.0, 7.0]
 
 ################################################################################
+# Atkinson06_hardrock Test
+
+test_data['Atkinson06_hardrock_test_period'] = [0.0, 0.2, 1.0, 2.0]
+
+# dim (sites, events)
+tmp = zeros((4,4)) # initialise an array: distance to 4 sites and 4 events
+tmp[0,:] = [  2.0,   2.0,   2.0,   2.0] # distance - 1st site and all 4 events
+tmp[1,:] = [ 10.0,  10.0,  10.0,  10.0] # distance - 1st site and all 4 events
+tmp[2,:] = [100.0, 100.0, 100.0, 100.0] # distance - 2nd site and all 4 events
+tmp[3,:] = [300.0, 300.0, 300.0, 300.0] # distance - 3rd site and all 4 events
+test_data['Atkinson06_hardrock_test_distance'] = tmp
+
+# result values, in 'g'
+tmp = zeros((4,2,4))		# distance, magnitude, period
+# period:      0.0       0.2       1.0       2.0
+#tmp[0,0,:] = [ 3.30e+0,  3.20e+0,  2.29e+0,  1.72e+0]	# R=  2.0, ML=5.5
+#tmp[0,1,:] = [ 3.54e+0,  3.48e+0,  2.83e+0,  2.45e+0]	# R=  2.0, ML=7.5
+#tmp[1,0,:] = [ 2.49e+0,  2.37e+0,  1.45e+0,  0.87e+0]	# R= 10.0, ML=5.5
+#tmp[1,1,:] = [ 3.08e+0,  3.05e+0,  2.41e+0,  2.09e+0]	# R= 10.0, ML=7.5
+#tmp[2,0,:] = [ 0.89e+0,  1.10e+0,  0.33E+0, -0.22e+0]	# R=100.0, ML=5.5
+#tmp[2,1,:] = [ 1.75e+0,  2.00e+0,  1.56e+0,  1.30e+0]	# R=100.0, ML=7.5
+#tmp[3,0,:] = [ 0.29e+0,  0.63e+0,  0.04e+0, -0.50e+0]	# R=300.0, ML=5.5
+#tmp[3,1,:] = [ 1.29e+0,  1.55e+0,  1.32e+0,  1.08e+0]	# R=300.0, ML=7.5
+
+# values above are log10 cmm/s/s, converted programmatically to ln g:
+tmp[0,0,:] = [ 0.71029989,  0.48004138, -1.61531105, -2.92778455]
+tmp[0,1,:] = [ 1.26292032,  1.12476521, -0.37191510, -1.24689744]
+tmp[1,0,:] = [-1.15479403, -1.43110424, -3.54948253, -4.88498188]
+tmp[1,1,:] = [ 0.20373117,  0.13465362, -1.33900084, -2.07582807]
+tmp[2,0,:] = [-4.83893018, -4.35538731, -6.12837783, -7.39479963]
+tmp[2,1,:] = [-2.85870700, -2.28306073, -3.29619817, -3.89487029]
+tmp[3,0,:] = [-6.22048124, -5.43760230, -6.79612751, -8.03952346]
+tmp[3,1,:] = [-3.91789614, -3.31922402, -3.84881859, -4.40143901]
+
+test_data['Atkinson06_hardrock_test_mean'] = tmp
+
+test_data['Atkinson06_hardrock_test_magnitude'] = [5.5, 7.5]
+
+################################################################################
 
 class Distance_stub(object):
     def __init__(self,dist):
