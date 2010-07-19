@@ -2074,6 +2074,10 @@ gound_motion_init['Somerville_Non_Cratonic'] = Somerville_Non_Cratonic_args
 
 #***************  Start of Liang_2008 model   ************
 
+# conversion factor: ln mm/s/s -> ln g
+LnMmss2Lng = math.log(9.80665e+3)
+
+
 def Liang_2008_distribution(**kwargs):
     """The Liang_2008 model function.
 
@@ -2088,17 +2092,13 @@ def Liang_2008_distribution(**kwargs):
         Journal of Earthquake Engineering, 12:3, 382-405
     """
 
-    # conversion factor: ln(mm/s2) -> ln(g)
-    #g_factor = math.log(9.80665e+3)
-    g_factor = 9.1908160059617412
-
     # get args
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
-    # check some shapes
+    # check some shapes (num_periods should be 1 below)
     num_periods = coefficient.shape[3]
     assert coefficient.shape == (5, 1, 1, num_periods)
     assert sigma_coefficient.shape == (2, 1, 1, num_periods)
@@ -2106,10 +2106,10 @@ def Liang_2008_distribution(**kwargs):
     # calculate result in ln(mm/s/s)
     (a, b, c, d, e) = coefficient
     log_mean = a + b*mag + c*distance + d*log(distance) + e*mag*log(distance)
-    log_sigma = sigma_coefficient
+    log_sigma = sigma_coefficient[0]
 
     # return mean as ln(g)
-    return (log_mean - g_factor, log_sigma)
+    return (log_mean - LnMmss2Lng, log_sigma)
 
 Liang_2008_magnitude_type='ML'
 Liang_2008_distance_type='Epicentral'
@@ -2148,6 +2148,7 @@ tmp = array([[  1.776, 1.253, -0.016, -0.294, -0.028],
              [-13.499, 2.527, -0.018, -0.195,  0.009]])
 # convert to dim = (#coefficients, #periods)
 Liang_2008_coefficient = tmp.transpose()
+del tmp
 
 # dim = (period,)
 Liang_2008_coefficient_period = [0.05, 0.10, 0.15,  0.20,  0.25,
@@ -2179,69 +2180,113 @@ gound_motion_init['Liang_2008'] = Liang_2008_args
 
 #***************  End of Liang_2008 model   ************
 
-#***************  Start of Atkinson06_hardrock model   ************
+#################  Start of Atkinson06 hardrock & soil models  #################
 
-def Atkinson06_hardrock_distribution(**kwargs):
-    """The Atkinson06_hardrock model function.
+# conversion factor: ln cm/s/s -> ln g
+LnCmss2Lng = math.log(9.80665e+2)    # ln(9.80665m/s2 * 100)
 
-    kwargs  dictionary os parameters, expect:
-                mag, distance, coefficient, sigma_coefficient
+# conversion factor: log10 -> ln
+Log102Ln = math.log10(math.e)
 
-    The algorithm here is taken from [1], page 2191.
+# other constants (these are scale distances?)
+Atkinson06_R0 = 10.0
+Atkinson06_R1 = 70.0
+Atkinson06_R2 = 140.0
+
+def Atkinson06_basic(**kwargs):
+    """The basic Atkinson06 model function.
+
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient, sigma_coefficient, S
+
+    The algorithm here is taken from [1], page 2191 and returns results
+    that are log10 cm/s/s.
+
+    This algorithm does not compute the S parameter but takes it from outside.
 
     [1] Atkinson, G.M., and Boore, D.M. [2006] "Earthquake Ground-Motion
         Prediction Equations for Eastern North America", Bulletin of the
         Seismological Society of america, Vol. 96, pp 2181-2205
     """
 
-    # conversion factor: ln(cm/s2) - g_factor -> ln(g)
-    g_factor = math.log(9.80665e+2)    # ln(9.80665m/s2 * 100)
-
-    # conversion factor: log10/ln_factor -> ln
-    # ln(X) = log10(X)/log10(e)
-    ln_factor = math.log10(math.e)
-
     # get args
-    M = kwargs['mag']
-    Rcd = kwargs['distance']
-    coefficient = kwargs['coefficient']
-    sigma_coefficient = kwargs['sigma_coefficient']
+    try:
+        M = kwargs['mag']
+        Rcd = kwargs['distance']
+        coefficient = kwargs['coefficient']
+        sigma_coefficient = kwargs['sigma_coefficient']
+        S = kwargs['S']
+    except KeyError, e:
+        print('kwargs dictionary to Atkinson06_basic() '
+              'is missing a parameter: %s' % e)
+        raise
 
-    # check some shapes
+    # check we have the right shapes
     num_periods = coefficient.shape[3]
     assert coefficient.shape == (10, 1, 1, num_periods)
     assert sigma_coefficient.shape == (2, 1, 1, num_periods)
 
-    # hardrock algorithm, soil amplification S is 0
-    S = 0
-
-    # other constants (these are scale distances?)
-    R0 = 10.0
-    R1 = 70.0
-    R2 = 140.0
-
     # intermediate calculated coefficients
-# Can be optimised, calculate log10R0, log10Rcd, etc, beforehand?
-    tmp1 = log10(R0/Rcd)
+    tmp1 = log10(Atkinson06_R0/Rcd)
     f0 = where(tmp1 < 0, 0, tmp1)
     tmp1 = log10(Rcd)
-    tmp2 = log10(R1)
+    tmp2 = log10(Atkinson06_R1)
     f1 = where(tmp1 < tmp2, tmp1, tmp2)
-    tmp1 = log10(Rcd/R2)
-    f2 = where(log10(Rcd/R2) < 0, 0, tmp1)
+    tmp1 = log10(Rcd/Atkinson06_R2)
+    f2 = where(tmp1 < 0, 0, tmp1)
+    del tmp1, tmp2
 
     # calculate result in log10(cm/s/s)
     (c1, c2, c3, c4, c5, c6, c7, c8, c9, c10) = coefficient
-    log10RSA = c1 + c2*M + c3*M*M + (c4 + c5*M)*f1 + (c6 + c7*M)*f2 + (c8 + c9*M)*f0 + c10*Rcd + S
-    log_sigma = sigma_coefficient/ln_factor - g_factor
-
-    # convert to g and natural log
-    log_mean = log10RSA/ln_factor - g_factor
+    log_mean = c1 + c2*M + c3*M*M + (c4 + c5*M)*f1 + (c6 + c7*M)*f2 + \
+                   (c8 + c9*M)*f0 + c10*Rcd + S
+    log_sigma = sigma_coefficient[0]
 
     return (log_mean, log_sigma)
 
-Atkinson06_hardrock_magnitude_type = 'Mw'
-Atkinson06_hardrock_distance_type = 'Rupture'
+def Atkinson06_hardrock_distribution(**kwargs):
+    """The Atkinson06_hardrock model function.
+
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient, sigma_coefficient
+
+    This function just calls Atkinson06_basic() with S=0 (bedrock algorithm)
+    and converts the result to ln g.
+    """
+
+    # get result in log10(cm/s/s)
+    (log_mean, log_sigma) = Atkinson06_basic(S=0.0, **kwargs)
+
+    # convert to g and natural log
+    log_mean = log_mean/Log102Ln - LnCmss2Lng
+    log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+
+    return (log_mean, log_sigma)
+
+def Atkinson06_soil_distribution(**kwargs):
+    """The Atkinson06_soil model function.
+
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient, sigma_coefficient
+
+    This function just calls Atkinson06_basic() with a computed S value
+    and converts the result to ln g.
+    """
+
+    # compute S parameter
+    S = 0		# for now
+
+    # get result in log10(cm/s/s)
+    (log_mean, log_sigma) = Atkinson06_basic(S=S, **kwargs)
+
+    # convert to g and natural log
+    log_mean = log_mean/Log102Ln - LnCmss2Lng
+    log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+
+    return (log_mean, log_sigma)
+
+Atkinson06_magnitude_type = 'Mw'
+Atkinson06_distance_type = 'Rupture'
 
 # dimension = (#periods, #coefficients)
 #               c1        c2         c3         c4        c5      
@@ -2297,34 +2342,42 @@ tmp = array([[-5.41E+00, 1.71E+00, -9.01E-02, -2.54E+00, 2.27E-01,
              [ 9.07E-01, 9.83E-01, -6.60E-02, -2.70E+00, 1.59E-01,
                   -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04]])
 # convert to dim = (#coefficients, #periods)
-Atkinson06_hardrock_coefficient = tmp.transpose()
+Atkinson06_coefficient = tmp.transpose()
+del tmp
 
 # dim = (period,)
-Atkinson06_hardrock_coefficient_period = [5.000, 4.000, 3.130, 2.500, 2.000,
-                                          1.590, 1.250, 1.000, 0.794, 0.629,
-                                          0.500, 0.397, 0.315, 0.251, 0.199,
-                                          0.158, 0.125, 0.100, 0.079, 0.063,
-                                          0.050, 0.040, 0.031, 0.025, 0.000]
+Atkinson06_coefficient_period = [5.000, 4.000, 3.130, 2.500, 2.000,
+                                 1.590, 1.250, 1.000, 0.794, 0.629,
+                                 0.500, 0.397, 0.315, 0.251, 0.199,
+                                 0.158, 0.125, 0.100, 0.079, 0.063,
+                                 0.050, 0.040, 0.031, 0.025, 0.000]
 
-Atkinson06_hardrock_interpolation = linear_interpolation
+Atkinson06_interpolation = linear_interpolation
 
 # dim = (period,)
-g_factor = 6.8882309129676953
-ln_factor = 0.43429448190325182
-sigma = (0.30 - g_factor)/ln_factor
-Atkinson06_hardrock_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
-Atkinson06_hardrock_sigma_coefficient_period = [0.0, 1.0]
+sigma = 0.30
+Atkinson06_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
+Atkinson06_sigma_coefficient_period = [0.0, 1.0]
 
-gound_motion_init['Atkinson06_hardrock'] = \
-                        [Atkinson06_hardrock_distribution,
-                         Atkinson06_hardrock_magnitude_type,
-                         Atkinson06_hardrock_distance_type,
-                         Atkinson06_hardrock_coefficient,
-                         Atkinson06_hardrock_coefficient_period,
-                         Atkinson06_hardrock_interpolation,
-                         Atkinson06_hardrock_sigma_coefficient,
-                         Atkinson06_hardrock_sigma_coefficient_period,
-                         Atkinson06_hardrock_interpolation]
+gound_motion_init['Atkinson06_hardrock'] = [Atkinson06_hardrock_distribution,
+                                            Atkinson06_magnitude_type,
+                                            Atkinson06_distance_type,
+                                            Atkinson06_coefficient,
+                                            Atkinson06_coefficient_period,
+                                            Atkinson06_interpolation,
+                                            Atkinson06_sigma_coefficient,
+                                            Atkinson06_sigma_coefficient_period,
+                                            Atkinson06_interpolation]
 
-#***************  End of Atkinson06_hardrock model   ************
+gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
+                                        Atkinson06_magnitude_type,
+                                        Atkinson06_distance_type,
+                                        Atkinson06_coefficient,
+                                        Atkinson06_coefficient_period,
+                                        Atkinson06_interpolation,
+                                        Atkinson06_sigma_coefficient,
+                                        Atkinson06_sigma_coefficient_period,
+                                        Atkinson06_interpolation]
+
+#*********************  End of Atkinson06_hardrock model  *********************
 
