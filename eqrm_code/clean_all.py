@@ -6,6 +6,7 @@
    *.so
    *.dll
    *.aux
+   *.ps
 
 Note: Recompile ANUGA after running this script
 """
