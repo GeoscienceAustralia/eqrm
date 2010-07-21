@@ -46,12 +46,12 @@ in the \texttt{Documentation} directory.
 
 \begin{supertabular}{lp{0.6\textwidth}}
 \typepar{determ\_azimth}{}{}  &   Azimuth of the deterministic event.   \\
-\typepar{det}{erm}{\_latitude}  &  Latitude of rupture centroid \\
-\typepar{det}{erm}{\_longitude}  &  Longitude of rupture centroid    \\
-\typepar{det}{erm}{\_magnitude}  &  Moment magnitude of event    \\
-\typepar{det}{erm}{\_depth}  &  Depth to event     \\
-\typepar{det}{erm}{\_dip} &    Dip of event.  \\
-\typepar{det}{erm}{\_number\_of\_events} & The desired number of
+\typepar{determ\_latitude}{}{}  &  Latitude of rupture centroid \\
+\typepar{determ\_longitude}{}{}  &  Longitude of rupture centroid    \\
+\typepar{determ\_magnitude}{}{}  &  Moment magnitude of event    \\
+\typepar{determ\_depth}{}{}  &  Depth to event     \\
+\typepar{determ\_dip}{}{} &    Dip of event.  \\
+\typepar{determ\_number\_of\_events}{}{} & The desired number of
 copies of the event to be generated. \\
  \end{supertabular}
 
@@ -59,13 +59,13 @@ copies of the event to be generated. \\
 \vspace{2em} \noindent \textbf{Probabilistic input:}
 
 \begin{supertabular}{lp{0.6\textwidth}}
-\typepar{prob}{\_azimuth}{\_in\_zones} &     Predominant azimuth of events. Note that this can be a single value (used in all source zones) or a vector with different elements for each source zone.\\
-\typepar{prob}{\_delta\_azimuth}{\_in\_zones}   &   Azimuth range for events (i.e. \texttt{azimuth} $\pm$ \typepar{delta}{\_a}{zimuth}). Note that this can be a single value (used in all source zones) or a list with different elements for each source zone.  \\
-\typepar{prob}{\_number\_of\_events}{\_in\_zones}  &  List whose elements represent the desired number of simulated evens for each generation zone.\\
+\typepar{prob\_azimuth\_in\_zones}{}{} &     Predominant azimuth of events. Note that this can be a single value (used in all source zones) or a vector with different elements for each source zone.\\
+\typepar{prob\_delta\_azimuth\_in\_zones}{}{}   &   Azimuth range for events (i.e. \texttt{azimuth} $\pm$ \typepar{delta\_azimuth}{}{}). Note that this can be a single value (used in all source zones) or a list with different elements for each source zone.  \\
+\typepar{prob\_number\_of\_events\_in\_zones}{}{}  &  List whose elements represent the desired number of simulated evens for each generation zone.\\
 
-\typepar{prob}{\_dip}{\_in\_zones} &    Dip of virtual faults.  Note that this can be a single value (used in all source zones) or a list with different dips for each source zone.  \\
+\typepar{prob\_dip\_in\_zones}{}{} &    Dip of virtual faults.  Note that this can be a single value (used in all source zones) or a list with different dips for each source zone.  \\
 \typepar{prob\_max\_width}{}{} & Maximum width along virtual fault i.e. synthetic rupture width can not exceed \typepar{prob\_max\_width}{}{}\\
-\typepar{prob\_min}{\_mag}{\_cutoff}  &  Minimum magnitude below which hazard is not considered.     \\
+\typepar{prob\_min\_mag\_cutoff}{}{}  &  Minimum magnitude below which hazard is not considered.     \\
 \typepar{prob\_number\_of\_mag\_sample\_bins}{}{}   &   Number of magnitude bins used to sample
 event magnitudes. \\
  \end{supertabular}
@@ -115,9 +115,9 @@ scale $S_a$ to Australian standard; \\
 \typepar{atten\_pga\_scaling\_cutoff}{}{}   & The PGA cutoff for re-scaling $S_a$.      \\
 \typepar{atten\_smooth\_spectral\_acceleration}{}{}  & Set to
 \texttt{True} to  smooth $S_a$: \\
- \typepar{atten\_log}{\_sigma}{\_eq}{\_weight} &  The fraction of
+ \typepar{atten\_log\_sigma\_eq\_weight}{}{} &  The fraction of
  $\sigma$ (log sigma) assocaited with the earthquake. (1 -
- \typepar{atten\_log}{\_sigma}{\_eq}{\_weight}) is the fraction of $\sigma$
+ \typepar{atten\_log\_sigma\_eq\_weight}){}{} is the fraction of $\sigma$
  assocaited with the earthquake/site pair.  This variable defaults to
  0 if not set.  Use a value between 0 and 1.\\
  \end{supertabular}
@@ -156,7 +156,7 @@ variability method described below. \\
 \begin{supertabular}{lp{0.6\textwidth}}
 \typepar{csm\_use\_variability}{}{}   & If \texttt{True} use the
 variability method described below.   \\
-\typepar{csm}{\_variability}{\_method} & Method used to incorporate variability in capacity curve\index{capacity curve}: \\
+\typepar{csm\_variability\_method}{}{} & Method used to incorporate variability in capacity curve\index{capacity curve}: \\
  & \hspace{0.5em} 1 $\Rightarrow$ Random sampling used to adjust the \\
 & \hspace{2.8em} vertical position of the yield and \\
 & \hspace{2.8em} ultimate points; \\
@@ -195,7 +195,7 @@ hysteretic damping described below.   \\
 \begin{supertabular}{lp{0.6\textwidth}}
  \typepar{loss\_min\_pga}{}{}   &  minimum PGA(g) below which financial loss is assigned to zero. \\
  \typepar{loss\_regional\_cost\_index\_multiplier}{}{} & Regional cost index multiplier to convert dollar values in building database\index{building database} to desired regional and temporal (i.e. inflation) values.\\
-\typepar{loss\_aus}{\_contents}{}   &  Contents value for residential buildings and salvageability after complete building damage:   \\
+\typepar{loss\_aus\_contents}{}{}   &  Contents value for residential buildings and salvageability after complete building damage:   \\
 & \hspace{0.5em} 0 $\Rightarrow$ contents value as defined in building \\
 & \hspace{2.8em} database\index{building database} and salvageability of $50\%$;\\
 & \hspace{0.5em} 1 $\Rightarrow$ $60\%$ contents value as defined in \\
@@ -213,7 +213,7 @@ used to save the file.
  \typepar{save\_total\_financial\_loss}{}{}  & Save total financial loss. \\
  \typepar{save\_building\_loss}{}{}  & Save building loss. \\
  \typepar{save\_contents\_loss}{}{}  & Save contents loss. \\
- \typepar{save}{\_motion}{}   &  Save RSA motion. \\
+ \typepar{save\_motion}{}{}   &  Save RSA motion. \\
  \typepar{save\_prob\_strucutural\_damage}{}{}   & Save structural
 non-cumulative probability of being in each
 damage state.  Note this is only allowed when there is one event. \\
@@ -221,18 +221,18 @@ damage state.  Note this is only allowed when there is one event. \\
 
 \vspace{2em} \noindent \textbf{General Input:}\\
 \begin{supertabular}{lp{0.6\textwidth}}
- \typepar{site}{\_}{tag}    &   String used in input and output file
+ \typepar{site\_tag}{}{}    &   String used in input and output file
  names. This is usually used to define the city of interest.\\
-\typepar{use}{\_site}{\_indexes} & If \texttt{True} sample sites with
+\typepar{use\_site\_indexes}{}{} & If \texttt{True} sample sites with
 indices in \typepar{site\_indexes}{}{}.  Only use to test
 simulations. \\
 \typepar{site\_indexes}{}{} & List whose elements represent the site
  indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
  index of the first row of data is 1.\\
- \typepar{site}{\_db\_}{tag}    &   String used specify the structure
+ \typepar{site\_db\_tag}{}{}    &   String used specify the structure
  data base.  The file name is \texttt{sitedb\_[site\_tag][site\_db\_tag].csv}\\
 \typepar{return\_periods}{}{}  &   List whose elements represent the return periods to be considered for hazard. \\
-  \typepar{inp}{ut}{\_dir} &  Directory containing any local input files.\\
+  \typepar{input\_dir}{}{} &  Directory containing any local input files.\\
  \typepar{output\_dir}{}{} &   Directory for output files.    \\
  \end{supertabular}
 
