@@ -135,160 +135,160 @@ class Test_Event_Set(unittest.TestCase):
         handle.close()
         os.remove(file_name)
 
-    def test_deterministic_event(self):
+    def test_scenario_event(self):
         
         THE_PARAM_T = Dummy()
-        THE_PARAM_T.determ_latitude = -32.95
-        THE_PARAM_T.determ_longitude = 151.61
-        THE_PARAM_T.determ_azimith = 340
+        THE_PARAM_T.scenario_latitude = -32.95
+        THE_PARAM_T.scenario_longitude = 151.61
+        THE_PARAM_T.scenario_azimith = 340
         THE_PARAM_T.dip = 35
-        THE_PARAM_T.determ_magnitude = 8
+        THE_PARAM_T.scenario_magnitude = 8
         THE_PARAM_T.max_width = 15
-        THE_PARAM_T.determ_depth = 11.5
-        THE_PARAM_T.determ_number_of_events = 1
+        THE_PARAM_T.scenario_depth = 11.5
+        THE_PARAM_T.scenario_number_of_events = 1
         
         event_set = Event_Set.create(
-            rupture_centroid_lat=[THE_PARAM_T.determ_latitude],
-            rupture_centroid_lon=[THE_PARAM_T.determ_longitude],
-            azimuth=[THE_PARAM_T.determ_azimith],
+            rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
+            rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
+            azimuth=[THE_PARAM_T.scenario_azimith],
             dip=[THE_PARAM_T.dip],
-            Mw=[THE_PARAM_T.determ_magnitude],
+            Mw=[THE_PARAM_T.scenario_magnitude],
             fault_width=THE_PARAM_T.max_width,
-            depth=[THE_PARAM_T.determ_depth],
-            determ_number_of_events=THE_PARAM_T.determ_number_of_events)
+            depth=[THE_PARAM_T.scenario_depth],
+            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
 
         #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
-        answer = array(THE_PARAM_T.determ_latitude)
+        answer = array(THE_PARAM_T.scenario_latitude)
         self.assert_ (allclose(event_set.rupture_centroid_lat, answer))
         
-        answer = array(THE_PARAM_T.determ_longitude)
+        answer = array(THE_PARAM_T.scenario_longitude)
         self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array(THE_PARAM_T.determ_azimith)
+        answer = array(THE_PARAM_T.scenario_azimith)
         self.assert_ (allclose(event_set.azimuth, answer))
         
         answer = array(THE_PARAM_T.dip)
         self.assert_ (allclose(event_set.dip, answer))
         
-        answer = array(THE_PARAM_T.determ_magnitude)
+        answer = array(THE_PARAM_T.scenario_magnitude)
         self.assert_ (allclose(event_set.Mw, answer))
         
         answer = array(THE_PARAM_T.max_width)
         self.assert_ (allclose(event_set.fault_width, answer))
         
-        answer = array(THE_PARAM_T.determ_depth)
+        answer = array(THE_PARAM_T.scenario_depth)
         self.assert_ (allclose(event_set.depth, answer))
         
-        self.assert_ (THE_PARAM_T.determ_number_of_events, len(event_set.Mw))
+        self.assert_ (THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
 
         area = array(conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.determ_magnitude))
+            THE_PARAM_T.scenario_magnitude))
         self.assert_ (allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.determ_magnitude, area, THE_PARAM_T.max_width ))
+            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
         self.assert_ (allclose(event_set.length, answer))
   
-    def test_deterministic_event_II(self):
+    def test_scenario_event_II(self):
         
         THE_PARAM_T = Dummy()
-        THE_PARAM_T.determ_latitude = [-30., -32.]
-        THE_PARAM_T.determ_longitude = [150., -151.]
-        THE_PARAM_T.determ_azimith = [340, 330]
+        THE_PARAM_T.scenario_latitude = [-30., -32.]
+        THE_PARAM_T.scenario_longitude = [150., -151.]
+        THE_PARAM_T.scenario_azimith = [340, 330]
         THE_PARAM_T.dip = [37, 30]
-        THE_PARAM_T.determ_magnitude = [8, 7.5]
+        THE_PARAM_T.scenario_magnitude = [8, 7.5]
         THE_PARAM_T.max_width = [15, 7]
-        THE_PARAM_T.determ_depth = [11.5, 11.0]
-        THE_PARAM_T.determ_number_of_events = 1 # If this is 2 it fails
+        THE_PARAM_T.scenario_depth = [11.5, 11.0]
+        THE_PARAM_T.scenario_number_of_events = 1 # If this is 2 it fails
         
         event_set = Event_Set.create(
-            rupture_centroid_lat=THE_PARAM_T.determ_latitude,
-            rupture_centroid_lon=THE_PARAM_T.determ_longitude,
-            azimuth=THE_PARAM_T.determ_azimith,
+            rupture_centroid_lat=THE_PARAM_T.scenario_latitude,
+            rupture_centroid_lon=THE_PARAM_T.scenario_longitude,
+            azimuth=THE_PARAM_T.scenario_azimith,
             dip=THE_PARAM_T.dip,
-            Mw=THE_PARAM_T.determ_magnitude,
+            Mw=THE_PARAM_T.scenario_magnitude,
             fault_width=THE_PARAM_T.max_width,
-            depth=THE_PARAM_T.determ_depth,
-            determ_number_of_events=THE_PARAM_T.determ_number_of_events)
+            depth=THE_PARAM_T.scenario_depth,
+            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
 
     
         #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
-        answer = array(THE_PARAM_T.determ_latitude)
+        answer = array(THE_PARAM_T.scenario_latitude)
         self.assert_ (allclose(event_set.rupture_centroid_lat, answer))
         
-        answer = array(THE_PARAM_T.determ_longitude)
+        answer = array(THE_PARAM_T.scenario_longitude)
         self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array(THE_PARAM_T.determ_azimith)
+        answer = array(THE_PARAM_T.scenario_azimith)
         self.assert_ (allclose(event_set.azimuth, answer))
         
         answer = array(THE_PARAM_T.dip)
         self.assert_ (allclose(event_set.dip, answer))
         
-        answer = array(THE_PARAM_T.determ_magnitude)
+        answer = array(THE_PARAM_T.scenario_magnitude)
         self.assert_ (allclose(event_set.Mw, answer))
         
         answer = array(THE_PARAM_T.max_width)
         self.assert_ (allclose(event_set.fault_width, answer))
         
-        answer = array(THE_PARAM_T.determ_depth)
+        answer = array(THE_PARAM_T.scenario_depth)
         self.assert_ (allclose(event_set.depth, answer))
         
-        self.assert_ (THE_PARAM_T.determ_number_of_events, len(event_set.Mw))
+        self.assert_ (THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
 
         area = array((conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.determ_magnitude[0]),
+            THE_PARAM_T.scenario_magnitude[0]),
             conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.determ_magnitude[1])))
+            THE_PARAM_T.scenario_magnitude[1])))
         self.assert_ (allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.determ_magnitude, area, THE_PARAM_T.max_width ))
+            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
         self.assert_ (allclose(event_set.length, answer))
 
-    def test_deterministic_event_III(self):
+    def test_scenario_event_III(self):
         
         THE_PARAM_T = Dummy()
-        THE_PARAM_T.determ_latitude = -32.95
-        THE_PARAM_T.determ_longitude = 151.61
-        THE_PARAM_T.determ_azimith = 340
+        THE_PARAM_T.scenario_latitude = -32.95
+        THE_PARAM_T.scenario_longitude = 151.61
+        THE_PARAM_T.scenario_azimith = 340
         THE_PARAM_T.dip = 35
-        THE_PARAM_T.determ_magnitude = 8
+        THE_PARAM_T.scenario_magnitude = 8
         THE_PARAM_T.max_width = 15
-        THE_PARAM_T.determ_depth = 11.5
-        THE_PARAM_T.determ_number_of_events = 2
+        THE_PARAM_T.scenario_depth = 11.5
+        THE_PARAM_T.scenario_number_of_events = 2
         
         event_set = Event_Set.create(
-            rupture_centroid_lat=[THE_PARAM_T.determ_latitude],
-            rupture_centroid_lon=[THE_PARAM_T.determ_longitude],
-            azimuth=[THE_PARAM_T.determ_azimith],
+            rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
+            rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
+            azimuth=[THE_PARAM_T.scenario_azimith],
             dip=[THE_PARAM_T.dip],
-            Mw=[THE_PARAM_T.determ_magnitude],
+            Mw=[THE_PARAM_T.scenario_magnitude],
             fault_width=THE_PARAM_T.max_width,
-            depth=[THE_PARAM_T.determ_depth],
-            determ_number_of_events=THE_PARAM_T.determ_number_of_events)
+            depth=[THE_PARAM_T.scenario_depth],
+            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
 
         #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
-        answer = array((THE_PARAM_T.determ_latitude, THE_PARAM_T.determ_latitude))
+        answer = array((THE_PARAM_T.scenario_latitude, THE_PARAM_T.scenario_latitude))
         self.assert_ (allclose(event_set.rupture_centroid_lat, answer))
         
-        answer = array((THE_PARAM_T.determ_longitude, THE_PARAM_T.determ_longitude))
+        answer = array((THE_PARAM_T.scenario_longitude, THE_PARAM_T.scenario_longitude))
         self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array([THE_PARAM_T.determ_azimith, THE_PARAM_T.determ_azimith])
+        answer = array([THE_PARAM_T.scenario_azimith, THE_PARAM_T.scenario_azimith])
         self.assert_ (allclose(event_set.azimuth, answer))
         
         answer = array([THE_PARAM_T.dip, THE_PARAM_T.dip])
         ###print "event_set.dip", event_set.dip
         self.assert_ (allclose(event_set.dip, answer))
         
-        answer = array(THE_PARAM_T.determ_magnitude)
+        answer = array(THE_PARAM_T.scenario_magnitude)
         #print "answer", answer
         #print "event_set.Mw", event_set.Mw
         # in allclose [8 8] == 8
@@ -297,58 +297,58 @@ class Test_Event_Set(unittest.TestCase):
         answer = array(THE_PARAM_T.max_width)
         self.assert_ (allclose(event_set.fault_width, answer))
         
-        answer = array(THE_PARAM_T.determ_depth)
+        answer = array(THE_PARAM_T.scenario_depth)
         self.assert_ (allclose(event_set.depth, answer))
         
-        self.assert_ (THE_PARAM_T.determ_number_of_events, len(event_set.Mw))
+        self.assert_ (THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
 
         area = array(conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.determ_magnitude))
+            THE_PARAM_T.scenario_magnitude))
         self.assert_ (allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.determ_magnitude, area, THE_PARAM_T.max_width ))
+            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
         self.assert_ (allclose(event_set.length, answer))
 
 
-        self.assert_ (len(event_set.length)==THE_PARAM_T.determ_number_of_events)
+        self.assert_ (len(event_set.length)==THE_PARAM_T.scenario_number_of_events)
         
-    def test_deterministic_event_4(self):
+    def test_scenario_event_4(self):
         
         THE_PARAM_T = Dummy()
-        THE_PARAM_T.determ_latitude = [-30.]
-        THE_PARAM_T.determ_longitude = [150.]
-        THE_PARAM_T.determ_azimith = [0]
+        THE_PARAM_T.scenario_latitude = [-30.]
+        THE_PARAM_T.scenario_longitude = [150.]
+        THE_PARAM_T.scenario_azimith = [0]
         THE_PARAM_T.dip = [45]
-        THE_PARAM_T.determ_magnitude = [6.02]
+        THE_PARAM_T.scenario_magnitude = [6.02]
         THE_PARAM_T.max_width = [5]
-        THE_PARAM_T.determ_depth = [7]
-        THE_PARAM_T.determ_number_of_events = 1 # If this is 2 it fails
+        THE_PARAM_T.scenario_depth = [7]
+        THE_PARAM_T.scenario_number_of_events = 1 # If this is 2 it fails
         
         event_set = Event_Set.create(
-            rupture_centroid_lat=THE_PARAM_T.determ_latitude,
-            rupture_centroid_lon=THE_PARAM_T.determ_longitude,
-            azimuth=THE_PARAM_T.determ_azimith,
+            rupture_centroid_lat=THE_PARAM_T.scenario_latitude,
+            rupture_centroid_lon=THE_PARAM_T.scenario_longitude,
+            azimuth=THE_PARAM_T.scenario_azimith,
             dip=THE_PARAM_T.dip,
-            Mw=THE_PARAM_T.determ_magnitude,
+            Mw=THE_PARAM_T.scenario_magnitude,
             fault_width=THE_PARAM_T.max_width,
-            depth=THE_PARAM_T.determ_depth,
-            determ_number_of_events=THE_PARAM_T.determ_number_of_events)
+            depth=THE_PARAM_T.scenario_depth,
+            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
 
     
         answer = array(THE_PARAM_T.max_width)
         self.assert_ (allclose(event_set.width, answer))
         
         area = array((conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.determ_magnitude[0])))
+            THE_PARAM_T.scenario_magnitude[0])))
         self.assert_ (allclose(100., area))
         self.assert_ (allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.determ_magnitude, area, THE_PARAM_T.max_width ))
+            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
         self.assert_ (allclose(5., width))
         self.assert_ (allclose(event_set.width, width))
         
@@ -394,11 +394,11 @@ class Test_Event_Set(unittest.TestCase):
         results = repr_list[1].split(':')
         self.assert_ (int(results[1]) == 1)
         results = repr_list[2].split(':')
-        self.assert_ (float(results[1].strip('[]')) == THE_PARAM_T.determ_latitude[0])
+        self.assert_ (float(results[1].strip('[]')) == THE_PARAM_T.scenario_latitude[0])
         results = repr_list[3].split(':')
-        self.assert_ (float(results[1].strip('[]')) == THE_PARAM_T.determ_longitude[0])
+        self.assert_ (float(results[1].strip('[]')) == THE_PARAM_T.scenario_longitude[0])
         results = repr_list[4].split(':')
-        self.assert_ (float(results[1].strip('[]')) == THE_PARAM_T.determ_magnitude [0])
+        self.assert_ (float(results[1].strip('[]')) == THE_PARAM_T.scenario_magnitude [0])
         self.assert_ (len(event_set) == 1)
         
     def test_generate_synthetic_events(self):

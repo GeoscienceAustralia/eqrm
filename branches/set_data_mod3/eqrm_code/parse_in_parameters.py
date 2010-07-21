@@ -65,39 +65,39 @@ CONV_NEW = [{'order': 10.0,
                         1: True,
                         0: False},
              'order': 10.02,
-             'new_para': 'is_deterministic'},
+             'new_para': 'is_scenario'},
             {'old_para': 'wdth',
              'order': 10.03,
              'new_para': 'max_width',
              'default': None},
             {'order': 30.0,
-             'title': '\n# Deterministic input\n'},
+             'title': '\n# Scenario input\n'},
             {'old_para': 'determ_azi',
              'order': 30.02,
-             'new_para': 'determ_azimith',
+             'new_para': 'scenario_azimith',
              'default': None},
             {'old_para': 'determ_r_z',
              'order': 30.03,
-             'new_para': 'determ_depth',
+             'new_para': 'scenario_depth',
              'default': None},
             {'old_para': 'determ_lat',
              'order': 30.04,
-             'new_para': 'determ_latitude',
+             'new_para': 'scenario_latitude',
              'default': None},
             {'old_para': 'determ_lon',
              'order': 30.05,
-             'new_para': 'determ_longitude',
+             'new_para': 'scenario_longitude',
              'default': None},
             {'old_para': 'determ_mag',
              'order': 30.06,
-             'new_para': 'determ_magnitude',
+             'new_para': 'scenario_magnitude',
              'default': None},
             {'order': 30.07,
-             'new_para': 'determ_dip',
+             'new_para': 'scenario_dip',
              'default': None},
             {'old_para': 'determ_ntrg',
              'order': 30.08,
-             'new_para': 'determ_number_of_events',
+             'new_para': 'scenario_number_of_events',
              'default': None},
             {'order': 40.0,
              'title': '\n# Probabilistic input\n'},
@@ -380,7 +380,7 @@ CONV_DIC_NEW.update(OLD_STYLE_PARAS_HARD_WIRED)
 
 
 PAR_STYLE_TITLES = [{'title':'\n# Operation Mode\n', 'order':10.0},
-                    {'title':'\n# Deterministic input\n', 'order':30.0},
+                    {'title':'\n# Scenario input\n', 'order':30.0},
                     {'title':'\n# Probabilistic input\n', 'order':40.0},
                     {'title':'\n# Attenuation\n', 'order':50.0},
                     {'title':'\n# Amplification\n', 'order':60.0},
@@ -503,7 +503,7 @@ def att_value_fixes(THE_PARAM_T):
     except:
         len_prob_number_of_events_in_zones=1 # if only 1 zone
     
-    if THE_PARAM_T.is_deterministic ==0:
+    if THE_PARAM_T.is_scenario ==0:
         THE_PARAM_T['prob_dip_in_zones'] = scalar2vec(
             THE_PARAM_T.prob_dip_in_zones,len_prob_number_of_events_in_zones)
         THE_PARAM_T['prob_azimuth_in_zones'] = scalar2vec(
@@ -513,7 +513,7 @@ def att_value_fixes(THE_PARAM_T):
             THE_PARAM_T.prob_delta_azimuth_in_zones,
             len_prob_number_of_events_in_zones)
     
-    if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_deterministic == 0:
+    if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_scenario == 0:
             raise ValueError('do not save motion for a generated event')
 
     weights = THE_PARAM_T.atten_model_weights    
@@ -612,10 +612,10 @@ def verify_THE_PARAM_T(THE_PARAM_T):
                 "When using BA09 attenuation model" +
                 " do not use amplification.")
                 
-    if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_deterministic == 1 \
-            and THE_PARAM_T.determ_number_of_events > 1:
+    if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_scenario == 1 \
+            and THE_PARAM_T.scenario_number_of_events > 1:
       raise ParameterSyntaxError(
-      'cannot save motion for a deterministic scenario' + 
+      'cannot save motion for a scenario scenario' + 
                        ' with more than one event.')
     
     # FIXME This needs to be done, and be updated.

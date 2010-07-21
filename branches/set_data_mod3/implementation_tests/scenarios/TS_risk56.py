@@ -19,17 +19,17 @@ from os.path import join
 
 # Operation Mode
 run_type = "risk" 
-is_deterministic = False
+is_scenario = False
 max_width = 15
 
-# Deterministic input
-determ_azimith = 340
-determ_depth = 11.5
-determ_latitude = -32.95
-determ_longitude = 151.61
-determ_magnitude = 5.6
-determ_dip = 35
-determ_number_of_events = 166
+# Scenario input
+scenario_azimith = 340
+scenario_depth = 11.5
+scenario_latitude = -32.95
+scenario_longitude = 151.61
+scenario_magnitude = 5.6
+scenario_dip = 35
+scenario_number_of_events = 166
 
 # Probabilistic input
 prob_azimuth_in_zones = [180, 180, 180, 180, 180, 180]

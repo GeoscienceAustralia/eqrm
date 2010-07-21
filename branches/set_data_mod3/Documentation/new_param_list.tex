@@ -33,25 +33,25 @@ in the \texttt{Documentation} directory.
 \typepar{run\_type}{}{} & Defines the operation mode of the EQRM: \\
   & \hspace{0.5em} 'hazard' $\Rightarrow$ Scenario RSA and Hazard; \\
   & \hspace{0.5em} 'risk' $\Rightarrow$ Scenario Loss and Risk; \\
-  \typepar{is\_deterministic}{}{} &  Event simulation type: \\
- & \hspace{0.5em} True $\Rightarrow$ a specific deterministic event;\\
- & \hspace{2.8em} (Use Deterministic input) \\
+  \typepar{is\_scenario}{}{} &  Event simulation type: \\
+ & \hspace{0.5em} True $\Rightarrow$ a specific scenario event;\\
+ & \hspace{2.8em} (Use Scenario input) \\
  & \hspace{0.5em} False $\Rightarrow$ standard probabilistic simulation. \\
  & \hspace{2.8em} (Use Probabilistic input) \\
 \typepar{max\_width}{}{} & Maximum width along virtual fault i.e. synthetic rupture width can not exceed \typepar{max\_width}{}{}\\
 \end{supertabular}
 
 
-\vspace{2em} \noindent \textbf{Deterministic Input:}
+\vspace{2em} \noindent \textbf{Scenario Input:}
 
 \begin{supertabular}{lp{0.6\textwidth}}
-\typepar{determ\_azimth}{}{}  &   Azimuth of the deterministic event.   \\
-\typepar{determ\_latitude}{}{}  &  Latitude of rupture centroid \\
-\typepar{determ\_longitude}{}{}  &  Longitude of rupture centroid    \\
-\typepar{determ\_magnitude}{}{}  &  Moment magnitude of event    \\
-\typepar{determ\_depth}{}{}  &  Depth to event     \\
-\typepar{determ\_dip}{}{} &    Dip of event.  \\
-\typepar{determ\_number\_of\_events}{}{} & The desired number of
+\typepar{scenario\_azimth}{}{}  &   Azimuth of the scenario event.   \\
+\typepar{scenario\_latitude}{}{}  &  Latitude of rupture centroid \\
+\typepar{scenario\_longitude}{}{}  &  Longitude of rupture centroid    \\
+\typepar{scenario\_magnitude}{}{}  &  Moment magnitude of event    \\
+\typepar{scenario\_depth}{}{}  &  Depth to event     \\
+\typepar{scenario\_dip}{}{} &    Dip of event.  \\
+\typepar{scenario\_number\_of\_events}{}{} & The desired number of
 copies of the event to be generated. \\
  \end{supertabular}
 
@@ -106,13 +106,14 @@ ascend. \\
 
 \typepar{atten\_use\_rescale\_curve\_from\_pga}{}{}  &  Set to
 \texttt{True} to use PGA from the attenuation model to rescale the $S_a$. \\
-\typepar{atten\_rescale\_curve\_from\_pga}{}{}  &  \\
+\typepar{atten\_override\_RSA\_shape}{}{}  &  \\
  & \hspace{0.5em} \texttt{'Aust\_standard\_Sa'} $\Rightarrow$
 scale $S_a$ to Australian standard; \\
  & \hspace{0.5em} \texttt{'HAZUS\_Sa'}  $\Rightarrow$ scale $S_a$ to HAZUS;\\
 \typepar{atten\_cutoff\_max\_spectral\_displacement}{}{}  &  Set to
 \texttt{True} to cutoff maximum spectral displacement. \\
-\typepar{atten\_pga\_scaling\_cutoff}{}{}   & The PGA cutoff for re-scaling $S_a$.      \\
+\typepar{atten\_pga\_scaling\_cutoff}{}{}   & The maximum acceptable
+PGA in units g. $S_a$ at all periods re-scaled accordingly.      \\
 \typepar{atten\_smooth\_spectral\_acceleration}{}{}  & Set to
 \texttt{True} to  smooth $S_a$: \\
  \typepar{atten\_log\_sigma\_eq\_weight}{}{} &  The fraction of

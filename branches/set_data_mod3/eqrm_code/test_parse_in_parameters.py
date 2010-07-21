@@ -57,13 +57,13 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\n\
 [Scenario]\n\
-determ_azimith=[340]\n\
-determ_depth=[11.5]\n\
-determ_latitude=[-32.95]\n\
-determ_magnitude=[5.6]\n\
-determ_number_of_events=[167]\n\
-determ_longitude=[151.61]\n\
-is_deterministic=[0]\n\n\
+scenario_azimith=[340]\n\
+scenario_depth=[11.5]\n\
+scenario_latitude=[-32.95]\n\
+scenario_magnitude=[5.6]\n\
+scenario_number_of_events=[167]\n\
+scenario_longitude=[151.61]\n\
+is_scenario=[0]\n\n\
 [Attenuation]\n\
 atten_smooth_spectral_acceleration=[0]\n\
 atten_pga_scaling_cutoff=[2]\n\
@@ -160,13 +160,13 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\n\
 [Scenario]\n\
-determ_azimith=[340]\n\
-determ_depth=[11.5]\n\
-determ_latitude=[-32.95]\n\
-determ_magnitude=[5.6]\n\
-determ_number_of_events=[167]\n\
-determ_longitude=[151.61]\n\
-is_deterministic=[0]\n\n\
+scenario_azimith=[340]\n\
+scenario_depth=[11.5]\n\
+scenario_latitude=[-32.95]\n\
+scenario_magnitude=[5.6]\n\
+scenario_number_of_events=[167]\n\
+scenario_longitude=[151.61]\n\
+is_scenario=[0]\n\n\
 [Attenuation]\n\
 atten_smooth_spectral_acceleration=[0]\n\
 atten_pga_scaling_cutoff=[2]\n\
@@ -244,7 +244,7 @@ save_socloss_flag=[1]\n")
         set = Dummy()
         # Operation_Mode
         set.run_type = 'risk'
-        set.is_deterministic = True    # If False, probabilistic input used
+        set.is_scenario = True    # If False, probabilistic input used
 
         # General
         set.use_site_indexes = True
@@ -255,14 +255,14 @@ save_socloss_flag=[1]\n")
         set.output_dir = 'c:/out/'
         set.return_periods = [22,11]
         
-        # Deterministic input 
-        set.determ_azimith = 20
-        set.determ_depth = 11.5
-        set.determ_latitude = 32.
-        set.determ_longitude = 151.
-        set.determ_magnitude = 5.
-        set.determ_dip= 35  
-        set.determ_number_of_events = 1
+        # Scenario input 
+        set.scenario_azimith = 20
+        set.scenario_depth = 11.5
+        set.scenario_latitude = 32.
+        set.scenario_longitude = 151.
+        set.scenario_magnitude = 5.
+        set.scenario_dip= 35  
+        set.scenario_number_of_events = 1
 
         # Probabilistic input
         set.prob_azimuth_in_zones = [10,30]
@@ -343,13 +343,13 @@ save_socloss_flag=[1]\n")
         
         self.failUnless(TPT.use_site_indexes == 1)
         
-        self.failUnless(TPT.is_deterministic == True)
-        self.failUnless(TPT.determ_azimith == 20)
-        self.failUnless(TPT.determ_depth == 11.5)
-        self.failUnless(TPT.determ_latitude == 32.)
-        self.failUnless(TPT.determ_longitude == 151.)
-        self.failUnless(TPT.determ_magnitude == 5.)
-        self.failUnless(TPT.determ_number_of_events == 1.)
+        self.failUnless(TPT.is_scenario == True)
+        self.failUnless(TPT.scenario_azimith == 20)
+        self.failUnless(TPT.scenario_depth == 11.5)
+        self.failUnless(TPT.scenario_latitude == 32.)
+        self.failUnless(TPT.scenario_longitude == 151.)
+        self.failUnless(TPT.scenario_magnitude == 5.)
+        self.failUnless(TPT.scenario_number_of_events == 1.)
         
         self.failUnless(allclose(TPT.prob_azimuth_in_zones, asarray([10,30])))
         self.failUnless(TPT.prob_min_mag_cutoff == 4.5)
@@ -439,7 +439,7 @@ save_socloss_flag=[1]\n")
         set = Dummy()
         # Operation_Mode
         set.run_type = 'risk'
-        set.is_deterministic = True    # If False, probabilistic input used
+        set.is_scenario = True    # If False, probabilistic input used
 
         # General
         set.use_site_indexes = True
@@ -450,14 +450,14 @@ save_socloss_flag=[1]\n")
         set.output_dir = 'read out'
         set.return_periods = [22,11]
         
-        # Deterministic input 
-        set.determ_azimith = 20
-        set.determ_depth = 11.5
-        set.determ_latitude = 32.
-        set.determ_longitude = 151.
-        set.determ_magnitude = 5.
-        set.determ_dip= 35  
-        set.determ_number_of_events = 1
+        # Scenario input 
+        set.scenario_azimith = 20
+        set.scenario_depth = 11.5
+        set.scenario_latitude = 32.
+        set.scenario_longitude = 151.
+        set.scenario_magnitude = 5.
+        set.scenario_dip= 35  
+        set.scenario_number_of_events = 1
 
         # Probabilistic input
         set.prob_azimuth_in_zones = [10,30]
@@ -556,13 +556,13 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\
 [Scenario]\n\
-determ_azimith=[340]\n\
-determ_depth=[11.5]\n\
-determ_latitude=[-32.95]\n\
-determ_magnitude=[5.6]\n\
-determ_number_of_events=[167]\n\
-determ_longitude=[151.61]\n\
-is_deterministic=[1]\n\
+scenario_azimith=[340]\n\
+scenario_depth=[11.5]\n\
+scenario_latitude=[-32.95]\n\
+scenario_magnitude=[5.6]\n\
+scenario_number_of_events=[167]\n\
+scenario_longitude=[151.61]\n\
+is_scenario=[1]\n\
 [Attenuation]\n\
 atten_smooth_spectral_acceleration=[1]\n\
 atten_pga_scaling_cutoff=[2]\n\
@@ -639,15 +639,15 @@ save_socloss_flag=[0]\n")
         set.output_dir = join(set.eqrm_home(), 'demo', 'output','prob_haz')
         set.return_periods = [10,50,100,200]
         
-        # Deterministic input   (single event input, with event_azimuth ect.)
-        set.is_deterministic = True   # If False, probabilistic input used
-        set.determ_azimith = 340
-        set.determ_depth = 11.5
-        set.determ_latitude = -32.95
-        set.determ_longitude = 151.61
-        set.determ_magnitude = 5.6
-        set.determ_dip= 35  
-        set.determ_number_of_events = 167
+        # Scenario input   (single event input, with event_azimuth ect.)
+        set.is_scenario = True   # If False, probabilistic input used
+        set.scenario_azimith = 340
+        set.scenario_depth = 11.5
+        set.scenario_latitude = -32.95
+        set.scenario_longitude = 151.61
+        set.scenario_magnitude = 5.6
+        set.scenario_dip= 35  
+        set.scenario_number_of_events = 167
         
         
         set.prob_azimuth_in_zones = [10,30,70,100,150,15]
@@ -774,13 +774,13 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\
 [Scenario]\n\
-determ_azimith=[340]\n\
-determ_depth=[11.5]\n\
-determ_latitude=[-32.95]\n\
-determ_magnitude=[5.6]\n\
-determ_number_of_events=[167]\n\
-determ_longitude=[151.61]\n\
-is_deterministic=[0]\n\
+scenario_azimith=[340]\n\
+scenario_depth=[11.5]\n\
+scenario_latitude=[-32.95]\n\
+scenario_magnitude=[5.6]\n\
+scenario_number_of_events=[167]\n\
+scenario_longitude=[151.61]\n\
+is_scenario=[0]\n\
 [Attenuation]\n\
 atten_smooth_spectral_acceleration=[1]\n\
 atten_pga_scaling_cutoff=[2]\n\
@@ -897,7 +897,7 @@ save_socloss_flag=[0]\n")
         set.atten_model_weights = [1.]
         set.atten_aggregate_Sa_of_atten_models = False
         set.save_motion = False
-        set.is_deterministic = True    # If False, probabilistic input used
+        set.is_scenario = True    # If False, probabilistic input used
         set.input_dir = '.'
         set.output_dir = '.'
 
@@ -937,7 +937,7 @@ save_socloss_flag=[0]\n")
         set.atten_models = ['Gaull_1990_WA']
         set.atten_model_weights = [1.]
         set.save_motion = False
-        set.is_deterministic = True    # If False, probabilistic input used
+        set.is_scenario = True    # If False, probabilistic input used
         set.input_dir = '.'
         set.output_dir = '.'        
         try:
@@ -1000,13 +1000,13 @@ save_socloss_flag=[0]\n")
             'Loss': {'loss_regional_cost_index_multiplier': 1.45,
                      'loss_min_pga': 0.05,
                      'loss_aus_contents': 0},
-            'Scenario': {'determ_azimith': 340,
-                         'determ_depth': 11.5,
-                         'determ_latitude': -32.,
-                         'determ_magnitude': 6.0,
-                         'determ_number_of_events': 2,
-                         'determ_longitude': 151.,
-                         'is_deterministic': 0},
+            'Scenario': {'scenario_azimith': 340,
+                         'scenario_depth': 11.5,
+                         'scenario_latitude': -32.,
+                         'scenario_magnitude': 6.0,
+                         'scenario_number_of_events': 2,
+                         'scenario_longitude': 151.,
+                         'is_scenario': 0},
             'attenuation_flag': (array([1]), array([1])),
             'output_dir': 'EQRM_output',
             'Diagnostics': {'qa_switch_watercheck': 0,

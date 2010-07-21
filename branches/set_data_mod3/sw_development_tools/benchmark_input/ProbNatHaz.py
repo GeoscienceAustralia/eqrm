@@ -20,16 +20,16 @@ sdp = Parameter_data()
 
 # Operation Mode
 sdp.run_type = "hazard" 
-sdp.is_deterministic = False
+sdp.is_scenario = False
 sdp.max_width = 15
 
-# Deterministic input
-sdp.determ_azimith = 340
-sdp.determ_depth = 11.5
-sdp.determ_latitude = -32.95
-sdp.determ_longitude = 151.61
-sdp.determ_magnitude = 5.6
-sdp.determ_number_of_events = 167
+# Scenario input
+sdp.scenario_azimith = 340
+sdp.scenario_depth = 11.5
+sdp.scenario_latitude = -32.95
+sdp.scenario_longitude = 151.61
+sdp.scenario_magnitude = 5.6
+sdp.scenario_number_of_events = 167
 
 # Probabilistic input
 sdp.prob_azimuth_in_zones = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
