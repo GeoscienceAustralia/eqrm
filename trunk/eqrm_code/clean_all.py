@@ -5,7 +5,7 @@
    *.o   
    *.so
    *.dll
-   .aux
+   *.aux
 
 Note: Recompile ANUGA after running this script
 """
