@@ -988,6 +988,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_interface,'test')
     #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Atkinson06_soil')
+    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Atkinson06_bedrock')
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
