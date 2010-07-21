@@ -90,7 +90,7 @@ Description:
 import math
 from copy import  deepcopy
 from scipy import where, sqrt, array, asarray, exp, log, newaxis, zeros, \
-     log10, isfinite, weave, ones, shape
+     log10, isfinite, weave, ones, shape, reshape
  
 from eqrm_code.ground_motion_misc import linear_interpolation, \
      Australian_standard_model, Australian_standard_model_interpolation
@@ -2115,7 +2115,7 @@ Liang_2008_magnitude_type='ML'
 Liang_2008_distance_type='Epicentral'
 
 # data here has dim = (#periods, #coefficients)
-tmp = array([[  3.688, 0.832, -0.016, -1.374, +0.147],
+tmp = array([[  3.688, 0.832, -0.016, -1.374, +0.147], # period=0.0, from eqn 22
              [  1.776, 1.253, -0.016, -0.294, -0.028],
              [  1.598, 1.312, -0.010, -0.507, -0.028],
              [  1.939, 1.279, -0.005, -0.706, -0.018],
@@ -2183,14 +2183,11 @@ gound_motion_init['Liang_2008'] = Liang_2008_args
 
 #################  Start of Atkinson06 bedrock & soil models  ##################
 
-# pgaBC value hardcoded for now (this value is cm/s/s)
-# NOTE: This must match the value used in Atkinson06_soil_check.py
-pgaBC = 70.0
-
 # conversion factor: ln cm/s/s -> ln g
 LnCmss2Lng = math.log(9.80665*100)
 
-# conversion factor: log10 -> ln    # divide by this factor
+# conversion factor: log10 -> ln
+# use this so: ln(x) = log10(X) / log10(e)
 Log102Ln = math.log10(math.e)
 
 # other constants (these are scale distances?)
@@ -2219,16 +2216,11 @@ def Atkinson06_basic(**kwargs):
     """
 
     # get args
-    try:
-        M = kwargs['mag']
-        Rcd = kwargs['distance']
-        coefficient = kwargs['coefficient']
-        sigma_coefficient = kwargs['sigma_coefficient']
-        S = kwargs['S']
-    except KeyError, e:
-        msg = ('kwargs dictionary to Atkinson06_basic() '
-               'is missing a parameter: %s' % e)
-        raise RuntimeError(msg)
+    M = kwargs['mag']
+    Rcd = kwargs['distance']
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
+    S = kwargs['S']
 
     # check we have the right shapes
     num_periods = coefficient.shape[3]
@@ -2262,6 +2254,17 @@ def Atkinson06_bedrock_distribution(**kwargs):
     and converts the result to ln g.
     """
 
+    # get args
+    try:
+        M = kwargs['mag']
+        Rcd = kwargs['distance']
+        coefficient = kwargs['coefficient']
+        sigma_coefficient = kwargs['sigma_coefficient']
+    except KeyError, e:
+        msg = ('kwargs dictionary to Atkinson06_basic() '
+               'is missing a parameter: %s' % e)
+        raise RuntimeError(msg)
+
     # get result in log10(cm/s/s)
     (log_mean, log_sigma) = Atkinson06_basic(S=0.0, **kwargs)
 
@@ -2283,25 +2286,16 @@ def Atkinson06_calcS(pgaBC, **kwargs):
 
     pgaBC   the pgaBC value to use
     kwargs  dictionary of parameters, expect:
-                mag, distance, coefficient, sigma_coefficient
+                coefficient, v30
     """
 
     # get args
-    try:
-        coefficient = kwargs['coefficient']
-        v30 = kwargs['v30']
-    except KeyError, e:
-        print('kwargs dictionary to Atkinson06_calcS() '
-              'is missing a parameter: %s' % e)
-        raise
+    coefficient = kwargs['coefficient']
+    v30 = kwargs['v30']
 
     # check we have the right shapes
     num_periods = coefficient.shape[3]
     assert coefficient.shape == (13, 1, 1, num_periods)
-    assert shape(pgaBC) == () or pgaBC.shape == v30.shape
-
-    # build a coefficient array (period 0.0) for the basic() call
-#    pgaBC = Atkin
 
     # get the Blin, B1 and B2 coefficients.
     (Blin, B1, B2) = coefficient[-3:]
@@ -2322,28 +2316,53 @@ def Atkinson06_calcS(pgaBC, **kwargs):
     # limit element-wise pgaBC values to be >= 60
     pgaBC = where(pgaBC < 60.0, 60.0, pgaBC)
 
-    # return the S vector
+    # return the S value
     return log10(exp(Blin*log(v30/Atkinson06_Vref) + Bnl*log(pgaBC/100)))
 
 def Atkinson06_soil_distribution(**kwargs):
     """The Atkinson06_soil model function.
 
     kwargs  dictionary of parameters, expect:
-                mag, distance, coefficient, sigma_coefficient
+                mag, distance, coefficient, sigma_coefficient, v30
 
     This function just calls Atkinson06_basic() with a computed S value
     and converts the result to ln g.
     """
 
-    # check that pgaBC has the right shape
-    #assert pgaBC.shape = (???,)
+    # get required kwarg values, check shapes
+    try:
+        mag = kwargs['mag']
+        distance = kwargs['distance']
+        coefficient = kwargs['coefficient']
+        sigma_coefficient = kwargs['sigma_coefficient']
+        v30 = kwargs['v30']
+    except KeyError, e:
+        print('kwargs dictionary to Atkinson06_soil_distribution() '
+              'is missing a parameter: %s' % e)
+        raise
 
-    # override coefficients with those for period 0.00
-    #my_kwargs = copy.copy(kwargs)
-    #my_kwargs['coefficients']
+    num_periods = coefficient.shape[3]
+    assert coefficient.shape == (13, 1, 1, num_periods)
+    assert sigma_coefficient.shape == (2, 1, 1, num_periods)
+    assert distance.shape == (1, 1, num_periods)
+    assert v30.shape == (1, 1, num_periods)
+
+    # calculate pgaBC here
+    # use period=0.0 coefficients
+    pga_coeffs = Atkinson06_coefficient[:,-1]
+    dim = Atkinson06_coefficient.shape[0]
+    pga_coeffs = reshape(pga_coeffs, (dim, 1, 1, 1))
+    (pgaBC, _) = Atkinson06_basic(mag=kwargs['mag'],
+                                  distance=kwargs['distance'],
+                                  coefficient=pga_coeffs,
+                                  sigma_coefficient=kwargs['sigma_coefficient'],
+                                  S=0.0)
+
+    # check that pgaBC has the right shape
+    assert pgaBC.shape == distance.shape
 
     # compute S parameter
-    S = Atkinson06_calcS(pgaBC, **kwargs)	# for now
+    S = Atkinson06_calcS(pgaBC, **kwargs)
 
     # get result in log10(cm/s/s)
     (log_mean, log_sigma) = Atkinson06_basic(S=S, **kwargs)
