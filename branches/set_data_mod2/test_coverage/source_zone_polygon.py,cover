@@ -1,0 +1,83 @@
+   
+   
+!> from polygon_class import polygon_object,indent_string,empty_polygon
+!> from scipy import zeros,r_,asarray
+   
+   
+!> class Source_Zone_Polygon(polygon_object):
+!>     def __init__(self,boundary,exclude,
+!>                  min_magnitude,max_magnitude,
+!>                  min_mag_cutoff,
+!>                  Lambda_Min,b):
+!>         """
+!>         boundary is a list of points that forms a polygon
+!>         exclude is a list of polygons (so a list of a list of points)
+!>         min_magnitude,max_magnitude,  min_mag_cutoff,Lambda_Min,b are floats
+           
+           #FIXME(DSG-EQRM) This class needs comments.  What is min_mag_cutoff?
+   
+!>         And where are it's methods? recurrence_functions might have 1.
+!>         """
+>>         polygon_object.__init__(self,boundary,exclude)
+>>         self.min_magnitude=min_magnitude
+>>         self.max_magnitude=max_magnitude
+>>         self.min_mag_cutoff=min_mag_cutoff
+>>         self.Lambda_Min=Lambda_Min
+>>         self.b=b
+   
+           
+!>     def intersection_obsolete(self,polygon2):
+!!         intersection = source_zone_polygon_intersection(self,polygon2)
+!!         if intersection.area == 0: return empty_polygon
+!!         if intersection.area == self.area: return self
+!!         else:
+!!             intersection.min_magnitude=self.min_magnitude
+!!             intersection.max_magnitude=self.max_magnitude
+!!             intersection.min_mag_cutoff=self.min_mag_cutoff
+!!             intersection.Lambda_Min=(self.Lambda_Min*intersection.get_area/
+!!                                      self.get_area())
+!!             intersection.b=self.b
+!!             return intersection
+           
+   ############################################################################
+!> class compound_source_zone_polygon_obsolete(Source_Zone_Polygon):
+!>     def __init__(self,polygon1,polygon2):        
+!!         self.polygon1 = polygon1
+!!         self.polygon2 = polygon2
+           
+!!         self.min_magnitude=None
+!!         self.max_magnitude=None
+!!         self.min_mag_cutoff=None
+!!         self.Lambda_Min=None
+!!         self.b=None
+           
+!>     def __str__(self):
+!!         p1str = str(self.polygon1)
+!!         p1str = indent_string(p1str)
+!!         p2str = str(self.polygon2)
+!!         p2str = indent_string(p2str)
+!!         sep = self.sep
+!!         sep = indent_string(self.sep)
+!!         return 'Compound Polygon:\n'+p1str+sep+p2str
+       
+   ######################################################################
+!> class source_zone_polygon_intersection_obsolete(compound_source_zone_polygon_obsolete):
+!>     def __init__(self,polygon1,polygon2):
+!!         compound_source_zone_polygon.__init__(self,polygon1,polygon2)
+!!         self.sep = 'AND'
+   
+!!         geos_polygon1 = polygon1.geos_polygon
+!!         geos_polygon2 = polygon2.geos_polygon
+!!         self.geos_polygon = geos_polygon1.intersection(geos_polygon2)
+           # Geos *may* crash here from numerical bugs (in geos).
+           # Try to slightly perturb the polygon if this happens (or
+           # upgrade geos).
+   
+!>     def contains_point(self,point):
+!>         """
+!>         """
+!!         point=tuple(point)
+!!         if not self.polygon1.contains_point(point): return False
+!!         if not self.polygon2.contains_point(point): return False
+!!         return True
+   ######################################################################

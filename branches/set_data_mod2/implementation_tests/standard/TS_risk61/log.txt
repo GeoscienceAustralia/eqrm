@@ -1,0 +1,56 @@
+2010-06-30 12:20:13,069 INFO     Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Logfile is './implementation_tests/current/TS_risk61/log.txt' with logging level of DEBUG, console logging level is INFO
+2010-06-30 12:20:13,072 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |host name: tornado.agso.gov.au
+2010-06-30 12:20:18,419 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |SVN version: 19
+2010-06-30 12:20:18,422 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |SVN date: None
+2010-06-30 12:20:18,425 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |SVN modified: None
+2010-06-30 12:20:18,427 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: Initial
+2010-06-30 12:20:18,430 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=390.5MB resident=26.5MB stacksize=0.2MB
+2010-06-30 12:20:18,459 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: source_mods created
+2010-06-30 12:20:18,462 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.1MB stacksize=0.2MB
+2010-06-30 12:20:18,467 INFO     Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |generating events
+2010-06-30 12:20:18,484 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: populate_fault_width created
+2010-06-30 12:20:18,488 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,491 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: populate_fault_depth created
+2010-06-30 12:20:18,495 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,498 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: populate_azimuth created
+2010-06-30 12:20:18,502 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,505 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: populate_dip created
+2010-06-30 12:20:18,509 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,512 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: populate_magnitude created
+2010-06-30 12:20:18,516 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,520 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: lat,lon created
+2010-06-30 12:20:18,524 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,527 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: event set lists have been combined
+2010-06-30 12:20:18,531 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,539 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: finished generating events
+2010-06-30 12:20:18,543 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,546 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: events created
+2010-06-30 12:20:18,549 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,556 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: event_activity_matrix weight_matrix created
+2010-06-30 12:20:18,561 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,569 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: Out of the event_activity loop
+2010-06-30 12:20:18,574 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,576 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: event activity has been calculated
+2010-06-30 12:20:18,579 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:18,582 INFO     Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Event set created. Number of events=1
+2010-06-30 12:20:18,584 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: Event Set created
+2010-06-30 12:20:18,587 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=393.2MB resident=27.2MB stacksize=0.2MB
+2010-06-30 12:20:19,456 INFO     Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Sites set created. Number of sites=1
+2010-06-30 12:20:19,458 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: Sites created
+2010-06-30 12:20:19,461 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=397.3MB resident=31.4MB stacksize=0.2MB
+2010-06-30 12:20:19,465 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Pseudo event set created. Number of pseudo_events=1
+2010-06-30 12:20:19,467 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: Pseudo Event Set created
+2010-06-30 12:20:19,470 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=397.3MB resident=31.4MB stacksize=0.2MB
+2010-06-30 12:20:19,604 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |blocking over sites if running in parallel. block_size=1
+2010-06-30 12:20:19,605 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Number of atten_periods=11
+2010-06-30 12:20:19,606 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Number of SA_surfaces=2
+2010-06-30 12:20:19,608 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: Created all data collection arrays.
+2010-06-30 12:20:19,609 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=397.3MB resident=31.4MB stacksize=0.2MB
+2010-06-30 12:20:19,610 INFO     Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |do site 1 of 1
+2010-06-30 12:20:19,699 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: Ended looping over sites
+2010-06-30 12:20:19,700 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=411.6MB resident=32.0MB stacksize=0.2MB
+2010-06-30 12:20:19,701 INFO     Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |time_pre_site_loop_fraction 0.96992481203
+2010-06-30 12:20:19,702 INFO     Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |loop_time (excluding file saving) 1.33
+2010-06-30 12:20:19,762 INFO     Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |On node 0, tornado.agso.gov.au time_taken_overall 1.330000
+2010-06-30 12:20:19,763 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Memory: End
+2010-06-30 12:20:19,764 DEBUG    Y:\eqrm_core\eqrm_code\ANUGA_utilities\log:154 |Resource usage: memory=411.6MB resident=32.0MB stacksize=0.2MB
