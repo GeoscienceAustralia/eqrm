@@ -1,0 +1,240 @@
+% Use pdflatex to compile.
+\documentclass[a4paper, 12pt]{report}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{supertabular}
+
+\begin{document}
+
+\newcommand{\indexfunc}[1]{\index{#1@\texttt{#1}}\index{function!#1@\texttt{#1}}}
+\newcommand{\typepar}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}}
+\newcommand{\typeself}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\index{#1#2#3@\texttt{#1#2#3}}}
+\newcommand{\indexpar}[1]{\index{#1@\texttt{#1}}\index{setdata parameter@ \texttt{setdata} parameter!#1@\texttt{#1}}}
+\newcommand{\typefunc}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexfunc{#1#2#3}}
+
+\newcommand{\manual}[1]{Manual: #1}
+
+\noindent \textbf{The \texttt{setdata} python file}
+
+The \texttt{setdata} python file is used to control EQRM scenarios. It
+contains a series of input parameters that define the
+manner in which the EQRM is operated. For example; there is parameter to
+control whether the EQRM models hazard or risk. Other parameters can be
+used to define which attenuation model is selected or whether site
+amplification is considered. A description of all of the parameters in the
+ \texttt{setdata} python file is given below. There is an example
+\texttt{setdata} file, called \texttt{set\_data\_master.py}
+in the \texttt{Documentation} directory.
+
+\vspace{2em} \noindent \textbf{Operation Input:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{run\_type}{}{} & Defines the operation mode of the EQRM: \\
+  & \hspace{0.5em} 'hazard' $\Rightarrow$ Scenario RSA and Hazard; \\
+  & \hspace{0.5em} 'risk' $\Rightarrow$ Scenario Loss and Risk; \\
+  \typepar{is\_deterministic}{}{} &  Event simulation type: \\
+ & \hspace{0.5em} True $\Rightarrow$ a specific deterministic event;\\
+ & \hspace{2.8em} (Use Deterministic input) \\
+ & \hspace{0.5em} False $\Rightarrow$ standard probabilistic simulation. \\
+ & \hspace{2.8em} (Use Probabilistic input) \\
+\typepar{max\_width}{}{} & Maximum width along virtual fault i.e. synthetic rupture width can not exceed \typepar{max\_width}{}{}\\
+\end{supertabular}
+
+
+\vspace{2em} \noindent \textbf{Deterministic Input:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{determ\_azimth}{}{}  &   Azimuth of the deterministic event.   \\
+\typepar{determ\_latitude}{}{}  &  Latitude of rupture centroid \\
+\typepar{determ\_longitude}{}{}  &  Longitude of rupture centroid    \\
+\typepar{determ\_magnitude}{}{}  &  Moment magnitude of event    \\
+\typepar{determ\_depth}{}{}  &  Depth to event     \\
+\typepar{determ\_dip}{}{} &    Dip of event.  \\
+\typepar{determ\_number\_of\_events}{}{} & The desired number of
+copies of the event to be generated. \\
+ \end{supertabular}
+
+
+\vspace{2em} \noindent \textbf{Probabilistic input:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{prob\_azimuth\_in\_zones}{}{} &     Predominant azimuth of events. Note that this can be a single value (used in all source zones) or a vector with different elements for each source zone.\\
+\typepar{prob\_delta\_azimuth\_in\_zones}{}{}   &   Azimuth range for events (i.e. \texttt{azimuth} $\pm$ \typepar{delta\_azimuth}{}{}). Note that this can be a single value (used in all source zones) or a list with different elements for each source zone.  \\
+\typepar{prob\_number\_of\_events\_in\_zones}{}{}  &  List whose elements represent the desired number of simulated evens for each generation zone.\\
+
+\typepar{prob\_dip\_in\_zones}{}{} &    Dip of virtual faults.  Note that this can be a single value (used in all source zones) or a list with different dips for each source zone.  \\
+\typepar{prob\_max\_width}{}{} & Maximum width along virtual fault i.e. synthetic rupture width can not exceed \typepar{prob\_max\_width}{}{}\\
+\typepar{prob\_min\_mag\_cutoff}{}{}  &  Minimum magnitude below which hazard is not considered.     \\
+\typepar{prob\_number\_of\_mag\_sample\_bins}{}{}   &   Number of magnitude bins used to sample
+event magnitudes. \\
+ \end{supertabular}
+
+\vspace{2em} \noindent \textbf{Ground Motion Input:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{atten\_models}{}{}    &  A list of the ground motion models
+to be used. Current choices are; \\
+ & \hspace{0.5em} \texttt{'Gaull\_1990\_WA'} $\Rightarrow$ Gaull \textit{et al.} (1990); \\
+ & \hspace{0.5em}  \texttt{'Toro\_1997\_midcontinent'}  $\Rightarrow$ Toro \textit{et al.} (1997); \\
+ & \hspace{0.5em}  \texttt{'Atkinson\_Boore\_97'}  $\Rightarrow$ Atkinson \textit{et al.} (1997); \\
+ & \hspace{0.5em}  \texttt{'Sadigh\_97'}  $\Rightarrow$ Sadigh \textit{et al.} (1997); \\
+ & \hspace{0.5em}  \texttt{'Youngs\_97\_interface'}  $\Rightarrow$ Youngs \textit{et al.} (1997) interface ($Z_T$=0); \\
+ & \hspace{0.5em}  \texttt{'Youngs\_97\_intraslab'}  $\Rightarrow$ Youngs \textit{et al.} (1997) intraslab ($Z_T$=1); \\
+ & \hspace{0.5em}  \texttt{'Combo\_Sadigh\_Youngs\_M8'}  $\Rightarrow$ combined Youngs \textit{et al.} (1997) and Sadigh \textit{et al.} (1997); \\
+ & \hspace{0.5em}  \texttt{'Boore\_08'}  $\Rightarrow$ Boore \textit{et al.} (2008); \\
+ & \hspace{0.5em} \texttt{Sommerville\_Yilgarn'} $\Rightarrow$ Sommerville (2009) Yilgarn Craton; \\
+  & \hspace{0.5em} \texttt{Sommerville\_Non\_Cratonic'} $\Rightarrow$ Sommerville (2009) Average Non Cratonic model; \\
+\typepar{atten\_model\_weights}{}{}    &  A list of the weight to
+apply to each of the attenuation model specified in
+\texttt{atten\_models}.  Note, $\sum  atten\_model\_weights=1$. \\
+\typepar{atten\_aggregate\_Sa\_of\_atten\_models}{}{}   &
+Set to \texttt{True} to aggregate the surface acceleration's when
+multiple attenuation models are used.\\
+\typepar{atten\_use\_variability}{}{}   &   If \texttt{True} use the
+variability method described below.\\
+\typepar{atten\_variability\_method}{}{} & Technique used to
+incorporate attenuation aleatory uncertainty: \\
+ & \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
+ & \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
+ & \hspace{0.5em} 4 $\Rightarrow$ $+\sigma$; \\
+ & \hspace{0.5em} 5 $\Rightarrow$ $-\sigma$; \\
+ & \hspace{0.5em} 6 $\Rightarrow$ $-2\sigma$.\\
+\typepar{atten\_periods}{}{} &  Periods for $S_a$. Values must
+ascend. \\
+\typepar{atten\_threshold\_distance}{}{}  &  Threshold distance beyond which motion is assigned to zero. \\
+
+\typepar{atten\_use\_rescale\_curve\_from\_pga}{}{}  &  Set to
+\texttt{True} to use PGA from the attenuation model to rescale the $S_a$. \\
+\typepar{atten\_rescale\_curve\_from\_pga}{}{}  &  \\
+ & \hspace{0.5em} \texttt{'Aust\_standard\_Sa'} $\Rightarrow$
+scale $S_a$ to Australian standard; \\
+ & \hspace{0.5em} \texttt{'HAZUS\_Sa'}  $\Rightarrow$ scale $S_a$ to HAZUS;\\
+\typepar{atten\_cutoff\_max\_spectral\_displacement}{}{}  &  Set to
+\texttt{True} to cutoff maximum spectral displacement. \\
+\typepar{atten\_pga\_scaling\_cutoff}{}{}   & The PGA cutoff for re-scaling $S_a$.      \\
+\typepar{atten\_smooth\_spectral\_acceleration}{}{}  & Set to
+\texttt{True} to  smooth $S_a$: \\
+ \typepar{atten\_log\_sigma\_eq\_weight}{}{} &  The fraction of
+ $\sigma$ (log sigma) assocaited with the earthquake. (1 -
+ \typepar{atten\_log\_sigma\_eq\_weight}){}{} is the fraction of $\sigma$
+ assocaited with the earthquake/site pair.  This variable defaults to
+ 0 if not set.  Use a value between 0 and 1.\\
+ \end{supertabular}
+
+
+\vspace{2em} \noindent \textbf{Amplification Input:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{use\_amplification}{}{}  &  If set to
+\texttt{True} use amplification associated with the local regolith: \\
+\typepar{amp\_use\_variability}{}{}    &  If \texttt{True} use the
+variability method described below. \\
+\typepar{amp\_variability\_method}{}{}  & Technique used to incorporate amplification aleatory uncertainty: \\
+ & \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
+ & \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
+ & \hspace{0.5em} 4 $\Rightarrow$ $+\sigma$; \\
+ & \hspace{0.5em} 5 $\Rightarrow$ $-\sigma$; \\
+ & \hspace{0.5em} 6 $\Rightarrow$ $-2\sigma$.\\
+ & \hspace{0.5em} 7 $\Rightarrow$ $-2\sigma$.\\
+ \typepar{amp\_min\_factor}{}{}    &   Minimum accepted value for amplification factor.    \\
+\typepar{amp\_max\_factor}{}{}    &   Maximum accepted value for amplification factor.   \\
+ \end{supertabular}
+
+
+\vspace{2em} \noindent \textbf{Building classes Input:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{buildings\_usage\_classification}{}{} & Building usage classification system: \\
+ & \texttt{'HAZUS'} or \texttt{'FCB'} \\
+\texttt{buildings\_set\_damping\_Be\_to\_5\_percent}   &   If
+\texttt{True} use a damping $B_e$ of $5\%$ for all building structures.\\
+ \end{supertabular}
+
+\vspace{2em} \noindent \textbf{Capacity Spectrum Method Input:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{csm\_use\_variability}{}{}   & If \texttt{True} use the
+variability method described below.   \\
+\typepar{csm\_variability\_method}{}{} & Method used to incorporate variability in capacity curve\index{capacity curve}: \\
+ & \hspace{0.5em} 1 $\Rightarrow$ Random sampling used to adjust the \\
+& \hspace{2.8em} vertical position of the yield and \\
+& \hspace{2.8em} ultimate points; \\
+ & \hspace{0.5em} 3 $\Rightarrow$ \small{PREFERRED}: Random sampling \\
+& \hspace{2.8em} applied to ultimate point only and yield \\
+& \hspace{2.8em}  point re-calculated to satisfy capacity \\
+& \hspace{2.8em}  curve\index{capacity curve} `shape' constraint. \\
+\typepar{csm\_standard\_deviation}{}{}  & Standard deviation for capacity curve\index{capacity curve} log--normal PDF.      \\
+
+\typepar{csm\_damping\_regimes}{}{}  & Damping multiplicative formula to
+be
+used - \manual{Section 7.2.2}: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ \small{PREFERRED}: use $R_a$, $R_v$, and $R_d$; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ use $R_a$, $R_v$ and assign $R_d= R_v$; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ use $R_v$ only and assign $R_a=R_d=R_v$. \\
+\typepar{csm\_damping\_modify\_Tav}{}{}  & Modify transition building period i.e. corner period $T_{av}$: \\
+ & \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: modify as in HAZUS; \\
+ & \hspace{0.5em}  \texttt{False} $\Rightarrow$ do NOT modify. \\
+\typepar{csm\_damping\_use\_smoothing}{}{}  & Smoothing of damped curve: \\
+ & \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: apply smoothing; \\
+ & \hspace{0.5em} \texttt{False} $\Rightarrow$ NO smoothing.\\
+ \typepar{csm\_use\_hysteretic\_damping}{}{}   & If \texttt{True} use the
+hysteretic damping described below.   \\
+\typepar{csm\_hysteretic\_damping}{}{}  & Technique for Hysteretic  damping: \\
+ & \hspace{0.5em} \texttt{'trapezoidal'} $\Rightarrow$ Hysteretic  damping via  \\
+ & \hspace{2.8em} trapezoidal approximation; \\
+ & \hspace{0.5em} \texttt{'curve'} $\Rightarrow$ \small{PREFERRED}: Hysteretic  damping  \\
+ & \hspace{2.8em} via curve fitting. \\
+\typepar{csm\_SDcr\_tolerance\_percentage}{}{}    &    Tolerance as a percentage for SDcr, in nonlinear damping calculations.   \\
+\typepar{csm\_damping\_max\_iterations}{}{} & Maximum iterations for nonlinear damping calculations.\\
+ \end{supertabular}
+
+
+\vspace{2em} \noindent \textbf{Loss Input:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+ \typepar{loss\_min\_pga}{}{}   &  minimum PGA(g) below which financial loss is assigned to zero. \\
+ \typepar{loss\_regional\_cost\_index\_multiplier}{}{} & Regional cost index multiplier to convert dollar values in building database\index{building database} to desired regional and temporal (i.e. inflation) values.\\
+\typepar{loss\_aus\_contents}{}{}   &  Contents value for residential buildings and salvageability after complete building damage:   \\
+& \hspace{0.5em} 0 $\Rightarrow$ contents value as defined in building \\
+& \hspace{2.8em} database\index{building database} and salvageability of $50\%$;\\
+& \hspace{0.5em} 1 $\Rightarrow$ $60\%$ contents value as defined in \\
+& \hspace{2.8em} building database\index{building database} and
+salvageability of \\
+& \hspace{2.8em}zero.\\
+ \end{supertabular}
+
+\vspace{2em} \noindent \textbf{Save Input:}\\
+
+For all of the \texttt{Save} parameters a value of \texttt{True} is
+used to save the file.
+\begin{supertabular}{lp{0.6\textwidth}}
+ \typepar{save\_hazard\_map}{}{} & Save data for hazard maps. \\
+ \typepar{save\_total\_financial\_loss}{}{}  & Save total financial loss. \\
+ \typepar{save\_building\_loss}{}{}  & Save building loss. \\
+ \typepar{save\_contents\_loss}{}{}  & Save contents loss. \\
+ \typepar{save\_motion}{}{}   &  Save RSA motion. \\
+ \typepar{save\_prob\_strucutural\_damage}{}{}   & Save structural
+non-cumulative probability of being in each
+damage state.  Note this is only allowed when there is one event. \\
+ \end{supertabular}
+
+\vspace{2em} \noindent \textbf{General Input:}\\
+\begin{supertabular}{lp{0.6\textwidth}}
+ \typepar{site\_tag}{}{}    &   String used in input and output file
+ names. This is usually used to define the city of interest.\\
+\typepar{use\_site\_indexes}{}{} & If \texttt{True} sample sites with
+indices in \typepar{site\_indexes}{}{}.  Only use to test
+simulations. \\
+\typepar{site\_indexes}{}{} & List whose elements represent the site
+ indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
+ index of the first row of data is 1.\\
+ \typepar{site\_db\_tag}{}{}    &   String used specify the structure
+ data base.  The file name is \texttt{sitedb\_[site\_tag][site\_db\_tag].csv}\\
+\typepar{return\_periods}{}{}  &   List whose elements represent the return periods to be considered for hazard. \\
+  \typepar{input\_dir}{}{} &  Directory containing any local input files.\\
+ \typepar{output\_dir}{}{} &   Directory for output files.    \\
+ \end{supertabular}
+
+
+\end{document}
