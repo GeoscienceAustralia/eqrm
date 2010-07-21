@@ -941,7 +941,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ln_factor = math.log10(math.e)
 
         ######
-        # period = 1.0s, ML=7.5, R=100.0, v30=200.0 - call Atkinson06_soil(),
+        # period = 1.0s, ML=7.5, R=100.0, v30=400.0 - call Atkinson06_soil(),
         #     returns ln g
         ######
 
