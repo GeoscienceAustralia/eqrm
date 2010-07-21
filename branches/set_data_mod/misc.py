@@ -5,7 +5,7 @@
 
   CreationDate:  2008-05-02 
 
-  Description: Scripts to do things that may only need to be done once.
+  Description: Scripts to do actions that may only need to be done once.
   
   Version: $Revision: 920 $  
   ModifiedBy: $Author: dgray $
