@@ -565,21 +565,21 @@ test_data['Liang_2008_test_mean'] = tmp
 test_data['Liang_2008_test_magnitude'] = [4.0, 5.0, 6.0, 7.0]
 
 ################################################################################
-# Atkinson06_hardrock Test
+# Atkinson06_bedrock Test
 
-test_data['Atkinson06_hardrock_test_period'] = [0.0, 0.2, 1.0, 2.0]
+test_data['Atkinson06_bedrock_test_period'] = [0.0, 0.2, 1.0, 2.0]
 
 # dim (sites, events)
 tmp = zeros((4,4)) # initialise an array: distance to 4 sites and 4 events
 tmp[0,:] = [  2.0,   2.0,   2.0,   2.0] # distance - 1st site and all 4 events
-tmp[1,:] = [ 10.0,  10.0,  10.0,  10.0] # distance - 1st site and all 4 events
-tmp[2,:] = [100.0, 100.0, 100.0, 100.0] # distance - 2nd site and all 4 events
-tmp[3,:] = [300.0, 300.0, 300.0, 300.0] # distance - 3rd site and all 4 events
-test_data['Atkinson06_hardrock_test_distance'] = tmp
+tmp[1,:] = [ 10.0,  10.0,  10.0,  10.0] # distance - 2nd site and all 4 events
+tmp[2,:] = [100.0, 100.0, 100.0, 100.0] # distance - 3rd site and all 4 events
+tmp[3,:] = [300.0, 300.0, 300.0, 300.0] # distance - 4th site and all 4 events
+test_data['Atkinson06_bedrock_test_distance'] = tmp
 
 # result values, in 'g'
 tmp = zeros((4,2,4))		# distance, magnitude, period
-# period:      0.0       0.2       1.0       2.0
+# period:       0.0       0.2       1.0       2.0
 #tmp[0,0,:] = [ 3.30e+0,  3.20e+0,  2.29e+0,  1.72e+0]	# R=  2.0, ML=5.5
 #tmp[0,1,:] = [ 3.54e+0,  3.48e+0,  2.83e+0,  2.45e+0]	# R=  2.0, ML=7.5
 #tmp[1,0,:] = [ 2.49e+0,  2.37e+0,  1.45e+0,  0.87e+0]	# R= 10.0, ML=5.5
@@ -599,9 +599,44 @@ tmp[2,1,:] = [-2.85870700, -2.28306073, -3.29619817, -3.89487029]
 tmp[3,0,:] = [-6.22048124, -5.43760230, -6.79612751, -8.03952346]
 tmp[3,1,:] = [-3.91789614, -3.31922402, -3.84881859, -4.40143901]
 
-test_data['Atkinson06_hardrock_test_mean'] = tmp
+test_data['Atkinson06_bedrock_test_mean'] = tmp
 
-test_data['Atkinson06_hardrock_test_magnitude'] = [5.5, 7.5]
+test_data['Atkinson06_bedrock_test_magnitude'] = [5.5, 7.5]
+
+################################################################################
+# Atkinson06_soil Test
+# These tests assume V30 is 400.0 in ground_motion_interface.py
+
+test_data['Atkinson06_soil_test_period'] = [0.2, 1.0, 2.0]
+
+# dim (sites, events)
+tmp = zeros((3,2)) # initialise an array: distance to 3 sites and 2 events
+tmp[0,:] = [  2.0,   2.0] # distance - 1st site and all 2 events
+tmp[1,:] = [ 10.0,  10.0] # distance - 2nd site and all 2 events
+tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
+test_data['Atkinson06_soil_test_distance'] = tmp
+
+# result values, in 'g'
+tmp = zeros((3,2,3))		# distance, magnitude, period
+# values below are from Atkinson06_soil_check.py
+# period:       0.2       1.0       2.0
+#tmp[0,0,:] = [ 3.316144,  2.456940,  1.926584]	# R=  2.0, ML=5.5
+#tmp[0,1,:] = [ 3.599514,  2.992783,  2.641714]	# R=  2.0, ML=7.5
+#tmp[1,0,:] = [ 2.487561,  1.628268,  1.067770]	# R= 10.0, ML=5.5
+#tmp[1,1,:] = [ 3.158161,  2.600268,  2.277770]	# R= 10.0, ML=7.5
+#tmp[2,0,:] = [ 1.228500,  0.532380, -0.014625]	# R=100.0, ML=5.5
+#tmp[2,1,:] = [ 2.120515,  1.757910,  1.494540]	# R=100.0, ML=7.5
+
+# values above are log10 cmm/s/s, converted programmatically to ln g:
+tmp[0,0,:] = [7.47472828e-01, -1.23091749e+00, -2.45210731e+00]
+tmp[0,1,:] = [1.39995637e+00,  2.90660940e-03, -8.05459637e-01]
+tmp[1,0,:] = [1.16041004e+00, -3.13900529e+00, -4.42959963e+00]
+tmp[1,1,:] = [3.83703527e-01, -9.00892578e-01, -1.64347167e+00]
+tmp[2,0,:] = [4.05950513e+00, -5.66238066e+00, -6.92190622e+00]
+tmp[2,1,:] = [2.00556468e+00, -2.84049355e+00, -3.44692539e+00]
+test_data['Atkinson06_soil_test_mean'] = tmp
+
+test_data['Atkinson06_soil_test_magnitude'] = [5.5, 7.5]
 
 ################################################################################
 

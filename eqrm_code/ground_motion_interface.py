@@ -90,7 +90,7 @@ Description:
 import math
 from copy import  deepcopy
 from scipy import where, sqrt, array, asarray, exp, log, newaxis, zeros, \
-     log10, isfinite, weave, ones
+     log10, isfinite, weave, ones, shape
  
 from eqrm_code.ground_motion_misc import linear_interpolation, \
      Australian_standard_model, Australian_standard_model_interpolation
@@ -2072,10 +2072,10 @@ Somerville_Non_Cratonic_args=[
 gound_motion_init['Somerville_Non_Cratonic'] = Somerville_Non_Cratonic_args
 #***************  End of Somerville_Non_Cratonic MODEL   ************
 
-#***************  Start of Liang_2008 model   ************
+#########################  Start of Liang_2008 model  ##########################
 
-# conversion factor: ln mm/s/s -> ln g
-LnMmss2Lng = math.log(9.80665e+3)
+# conversion factor: ln mm/s/s -> ln g (log(9.80665 * 1000)
+LnMmss2Lng = math.log(9.80665*1000)
 
 
 def Liang_2008_distribution(**kwargs):
@@ -2109,13 +2109,14 @@ def Liang_2008_distribution(**kwargs):
     log_sigma = sigma_coefficient[0]
 
     # return mean as ln(g)
-    return (log_mean - LnMmss2Lng, log_sigma)
+    return (log_mean - LnMmss2Lng, log_sigma - LnMmss2Lng)
 
 Liang_2008_magnitude_type='ML'
 Liang_2008_distance_type='Epicentral'
 
 # data here has dim = (#periods, #coefficients)
-tmp = array([[  1.776, 1.253, -0.016, -0.294, -0.028],
+tmp = array([[  3.688, 0.832, -0.016, -1.374, +0.147],
+             [  1.776, 1.253, -0.016, -0.294, -0.028],
              [  1.598, 1.312, -0.010, -0.507, -0.028],
              [  1.939, 1.279, -0.005, -0.706, -0.018],
              [  1.570, 1.243, -0.008, -0.571, -0.014],
@@ -2151,13 +2152,13 @@ Liang_2008_coefficient = tmp.transpose()
 del tmp
 
 # dim = (period,)
-Liang_2008_coefficient_period = [0.05, 0.10, 0.15,  0.20,  0.25,
-                                 0.30, 0.35, 0.40,  0.45,  0.50,
-                                 0.55, 0.60, 0.65,  0.70,  0.75,
-                                 0.80, 0.85, 0.90,  0.95,  1.00,
-                                 2.00, 3.00, 4.00,  5.00,  6.00,
-                                 7.00, 8.00, 9.00, 10.00, 20.00,
-                                 30.00]
+Liang_2008_coefficient_period = [0.00, 0.05, 0.10, 0.15, 0.20,
+                                 0.25, 0.30, 0.35, 0.40, 0.45,
+                                 0.50, 0.55, 0.60, 0.65, 0.70,
+                                 0.75, 0.80, 0.85, 0.90, 0.95,
+                                 1.00, 2.00, 3.00, 4.00, 5.00,
+                                 6.00, 7.00, 8.00, 9.00, 10.00,
+                                 20.00,30.00]
 
 # dim = (sigmacoefficient, period)
 sigma = 1.166
@@ -2178,20 +2179,28 @@ Liang_2008_args = [Liang_2008_distribution,
 
 gound_motion_init['Liang_2008'] = Liang_2008_args
 
-#***************  End of Liang_2008 model   ************
+##########################  End of Liang_2008 model  ###########################
 
-#################  Start of Atkinson06 hardrock & soil models  #################
+#################  Start of Atkinson06 bedrock & soil models  ##################
+
+# pgaBC value hardcoded for now (this value is cm/s/s)
+# NOTE: This must match the value used in Atkinson06_soil_check.py
+pgaBC = 70.0
 
 # conversion factor: ln cm/s/s -> ln g
-LnCmss2Lng = math.log(9.80665e+2)    # ln(9.80665m/s2 * 100)
+LnCmss2Lng = math.log(9.80665*100)
 
-# conversion factor: log10 -> ln
+# conversion factor: log10 -> ln    # divide by this factor
 Log102Ln = math.log10(math.e)
 
 # other constants (these are scale distances?)
 Atkinson06_R0 = 10.0
 Atkinson06_R1 = 70.0
 Atkinson06_R2 = 140.0
+
+# computed constants
+Log10Atkinson06_R1 = math.log10(Atkinson06_R1)
+
 
 def Atkinson06_basic(**kwargs):
     """The basic Atkinson06 model function.
@@ -2217,35 +2226,34 @@ def Atkinson06_basic(**kwargs):
         sigma_coefficient = kwargs['sigma_coefficient']
         S = kwargs['S']
     except KeyError, e:
-        print('kwargs dictionary to Atkinson06_basic() '
-              'is missing a parameter: %s' % e)
-        raise
+        msg = ('kwargs dictionary to Atkinson06_basic() '
+               'is missing a parameter: %s' % e)
+        raise RuntimeError(msg)
 
     # check we have the right shapes
     num_periods = coefficient.shape[3]
-    assert coefficient.shape == (10, 1, 1, num_periods)
+    assert coefficient.shape == (13, 1, 1, num_periods)
     assert sigma_coefficient.shape == (2, 1, 1, num_periods)
 
     # intermediate calculated coefficients
-    tmp1 = log10(Atkinson06_R0/Rcd)
-    f0 = where(tmp1 < 0, 0, tmp1)
-    tmp1 = log10(Rcd)
-    tmp2 = log10(Atkinson06_R1)
-    f1 = where(tmp1 < tmp2, tmp1, tmp2)
-    tmp1 = log10(Rcd/Atkinson06_R2)
-    f2 = where(tmp1 < 0, 0, tmp1)
-    del tmp1, tmp2
+    tmp = log10(Atkinson06_R0/Rcd)
+    f0 = where(tmp < 0, 0, tmp)
+    tmp = log10(Rcd)
+    f1 = where(tmp < Log10Atkinson06_R1, tmp, Log10Atkinson06_R1)
+    tmp = log10(Rcd/Atkinson06_R2)
+    f2 = where(tmp < 0, 0, tmp)
+    del tmp
 
     # calculate result in log10(cm/s/s)
-    (c1, c2, c3, c4, c5, c6, c7, c8, c9, c10) = coefficient
+    (c1, c2, c3, c4, c5, c6, c7, c8, c9, c10) = coefficient[:10]
     log_mean = c1 + c2*M + c3*M*M + (c4 + c5*M)*f1 + (c6 + c7*M)*f2 + \
                    (c8 + c9*M)*f0 + c10*Rcd + S
     log_sigma = sigma_coefficient[0]
 
     return (log_mean, log_sigma)
 
-def Atkinson06_hardrock_distribution(**kwargs):
-    """The Atkinson06_hardrock model function.
+def Atkinson06_bedrock_distribution(**kwargs):
+    """The Atkinson06_bedrock model function.
 
     kwargs  dictionary of parameters, expect:
                 mag, distance, coefficient, sigma_coefficient
@@ -2263,6 +2271,60 @@ def Atkinson06_hardrock_distribution(**kwargs):
 
     return (log_mean, log_sigma)
 
+# constants for S calculations
+Atkinson06_Vref = 760.0
+Atkinson06_V2 = 300.0
+Atkinson06_V1 = 180.0
+Atkinson06_logV1divV2 = math.log(Atkinson06_V1 / Atkinson06_V2)
+Atkinson06_logV2divVref = math.log(Atkinson06_V2 / Atkinson06_Vref)
+
+def Atkinson06_calcS(pgaBC, **kwargs):
+    """Calculate the S parameter for soil.
+
+    pgaBC   the pgaBC value to use
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient, sigma_coefficient
+    """
+
+    # get args
+    try:
+        coefficient = kwargs['coefficient']
+        v30 = kwargs['v30']
+    except KeyError, e:
+        print('kwargs dictionary to Atkinson06_calcS() '
+              'is missing a parameter: %s' % e)
+        raise
+
+    # check we have the right shapes
+    num_periods = coefficient.shape[3]
+    assert coefficient.shape == (13, 1, 1, num_periods)
+    assert shape(pgaBC) == () or pgaBC.shape == v30.shape
+
+    # build a coefficient array (period 0.0) for the basic() call
+#    pgaBC = Atkin
+
+    # get the Blin, B1 and B2 coefficients.
+    (Blin, B1, B2) = coefficient[-3:]
+
+    # get the Bnl array from eqns 8A, 8B, 8C, 8D, page 2200.
+    # we do this by calculating 4 arrays for each of 8A, 8b, 8C and 8D
+    # and then filling appropriate elements of resultant Bnl.
+    BnlA = ones(v30.shape) * B1
+    BnlB = (B1 - B2) * log(v30/Atkinson06_V2) / Atkinson06_logV1divV2 + B2
+    BnlC = B2 * log(v30/Atkinson06_Vref) / Atkinson06_logV2divVref
+    Bnl = zeros(v30.shape)
+
+    # TODO: TEST IF where(x < A <= y, ?, ??) FASTER
+    Bnl = where(v30 <= Atkinson06_Vref, BnlC, Bnl)
+    Bnl = where(v30 <= Atkinson06_V2, BnlB, Bnl)
+    Bnl = where(v30 <= Atkinson06_V1, BnlA, Bnl)
+
+    # limit element-wise pgaBC values to be >= 60
+    pgaBC = where(pgaBC < 60.0, 60.0, pgaBC)
+
+    # return the S vector
+    return log10(exp(Blin*log(v30/Atkinson06_Vref) + Bnl*log(pgaBC/100)))
+
 def Atkinson06_soil_distribution(**kwargs):
     """The Atkinson06_soil model function.
 
@@ -2273,8 +2335,15 @@ def Atkinson06_soil_distribution(**kwargs):
     and converts the result to ln g.
     """
 
+    # check that pgaBC has the right shape
+    #assert pgaBC.shape = (???,)
+
+    # override coefficients with those for period 0.00
+    #my_kwargs = copy.copy(kwargs)
+    #my_kwargs['coefficients']
+
     # compute S parameter
-    S = 0		# for now
+    S = Atkinson06_calcS(pgaBC, **kwargs)	# for now
 
     # get result in log10(cm/s/s)
     (log_mean, log_sigma) = Atkinson06_basic(S=S, **kwargs)
@@ -2285,64 +2354,93 @@ def Atkinson06_soil_distribution(**kwargs):
 
     return (log_mean, log_sigma)
 
+
 Atkinson06_magnitude_type = 'Mw'
 Atkinson06_distance_type = 'Rupture'
 
 # dimension = (#periods, #coefficients)
+# data from tables 6 and 8, last three columns from table 8
 #               c1        c2         c3         c4        c5      
 #                   c6        c7         c8         c9         c10
+#                        Blin     B1       B2
 tmp = array([[-5.41E+00, 1.71E+00, -9.01E-02, -2.54E+00, 2.27E-01,
-                  -1.27E+00, 1.16E-01,  9.79E-01, -1.77E-01, -1.76E-04],
+                  -1.27E+00, 1.16E-01,  9.79E-01, -1.77E-01, -1.76E-04,
+                       -0.752,  -0.300,   0.000],	#5.00
              [-5.79E+00, 1.92E+00, -1.07E-01, -2.44E+00, 2.11E-01,
-                  -1.16E+00, 1.02E-01,  1.01E+00, -1.82E-01, -2.01E-04],
+                  -1.16E+00, 1.02E-01,  1.01E+00, -1.82E-01, -2.01E-04,
+                       -0.745,  -0.310,   0.000],	#4.00
              [-6.04E+00, 2.08E+00, -1.22E-01, -2.37E+00, 2.00E-01,
-                  -1.07E+00, 8.95E-02,  1.00E+00, -1.80E-01, -2.31E-04],
+                  -1.07E+00, 8.95E-02,  1.00E+00, -1.80E-01, -2.31E-04,
+                       -0.740,  -0.330,   0.000],	#3.13
              [-6.17E+00, 2.21E+00, -1.35E-01, -2.30E+00, 1.90E-01,
-                  -9.86E-01, 7.86E-02,  9.68E-01, -1.77E-01, -2.82E-04],
+                  -9.86E-01, 7.86E-02,  9.68E-01, -1.77E-01, -2.82E-04,
+                       -0.736,  -0.350,   0.000],	#2.50
              [-6.18E+00, 2.30E+00, -1.44E-01, -2.22E+00, 1.77E-01,
-                  -9.37E-01, 7.07E-02,  9.52E-01, -1.77E-01, -3.22E-04],
+                  -9.37E-01, 7.07E-02,  9.52E-01, -1.77E-01, -3.22E-04,
+                       -0.730,  -0.375,   0.000],	#2.00
              [-6.04E+00, 2.34E+00, -1.50E-01, -2.16E+00, 1.66E-01,
-                  -8.70E-01, 6.05E-02,  9.21E-01, -1.73E-01, -3.75E-04],
+                  -8.70E-01, 6.05E-02,  9.21E-01, -1.73E-01, -3.75E-04,
+                       -0.726,  -0.395,   0.000],	#1.60
              [-5.72E+00, 2.32E+00, -1.51E-01, -2.10E+00, 1.57E-01,
-                  -8.20E-01, 5.19E-02,  8.56E-01, -1.66E-01, -4.33E-04],
+                  -8.20E-01, 5.19E-02,  8.56E-01, -1.66E-01, -4.33E-04,
+                       -0.714,  -0.397,   0.000],	#1.25
              [-5.27E+00, 2.26E+00, -1.48E-01, -2.07E+00, 1.50E-01,
-                  -8.13E-01, 4.67E-02,  8.26E-01, -1.62E-01, -4.86E-04],
+                  -8.13E-01, 4.67E-02,  8.26E-01, -1.62E-01, -4.86E-04,
+                       -0.700,  -0.440,   0.000],	#1.00
              [-4.60E+00, 2.13E+00, -1.41E-01, -2.06E+00, 1.47E-01,
-                  -7.97E-01, 4.35E-02,  7.75E-01, -1.56E-01, -5.79E-04],
+                  -7.97E-01, 4.35E-02,  7.75E-01, -1.56E-01, -5.79E-04,
+                       -0.690,  -0.465,  -0.002],	#0.794
              [-3.92E+00, 1.99E+00, -1.31E-01, -2.05E+00, 1.42E-01,
-                  -7.82E-01, 4.30E-02,  7.88E-01, -1.59E-01, -6.95E-04],
+                  -7.82E-01, 4.30E-02,  7.88E-01, -1.59E-01, -6.95E-04,
+                       -0.670,  -0.480,  -0.031],	#0.629
              [-3.22E+00, 1.83E+00, -1.20E-01, -2.02E+00, 1.34E-01,
-                  -8.13E-01, 4.44E-02,  8.84E-01, -1.75E-01, -7.70E-04],
+                  -8.13E-01, 4.44E-02,  8.84E-01, -1.75E-01, -7.70E-04,
+                       -0.600,  -0.495,  -0.060],	#0.500
              [-2.44E+00, 1.65E+00, -1.08E-01, -2.05E+00, 1.36E-01,
-                  -8.43E-01, 4.48E-02,  7.39E-01, -1.56E-01, -8.51E-04],
+                  -8.43E-01, 4.48E-02,  7.39E-01, -1.56E-01, -8.51E-04,
+                       -0.500,  -0.508,  -0.095],	#0.397
              [-1.72E+00, 1.48E+00, -9.74E-02, -2.08E+00, 1.38E-01,
-                  -8.89E-01, 4.87E-02,  6.10E-01, -1.39E-01, -9.54E-04],
+                  -8.89E-01, 4.87E-02,  6.10E-01, -1.39E-01, -9.54E-04,
+                       -0.445,  -0.513,  -0.130],	#0.315
              [-1.12E+00, 1.34E+00, -8.72E-02, -2.08E+00, 1.35E-01,
-                  -9.71E-01, 5.63E-02,  6.14E-01, -1.43E-01, -1.06E-03],
+                  -9.71E-01, 5.63E-02,  6.14E-01, -1.43E-01, -1.06E-03,
+                       -0.390,  -0.518,  -0.160],	#0.251
              [-6.15E-01, 1.23E+00, -7.89E-02, -2.09E+00, 1.31E-01,
-                  -1.12E+00, 6.79E-02,  6.06E-01, -1.46E-01, -1.13E-03],
+                  -1.12E+00, 6.79E-02,  6.06E-01, -1.46E-01, -1.13E-03,
+                       -0.306,  -0.521,  -0.185],	#0.199
              [-1.46E-01, 1.12E+00, -7.14E-02, -2.12E+00, 1.30E-01,
-                  -1.30E+00, 8.31E-02,  5.62E-01, -1.44E-01, -1.18E-03],
+                  -1.30E+00, 8.31E-02,  5.62E-01, -1.44E-01, -1.18E-03,
+                       -0.280,  -0.528,  -0.185],	#0.158
              [ 2.14E-01, 1.05E+00, -6.66E-02, -2.15E+00, 1.30E-01,
-                  -1.61E+00, 1.05E-01,  4.27E-01, -1.30E-01, -1.15E-03],
+                  -1.61E+00, 1.05E-01,  4.27E-01, -1.30E-01, -1.15E-03,
+                       -0.260,  -0.560,  -0.140],	#0.125
              [ 4.80E-01, 1.02E+00, -6.40E-02, -2.20E+00, 1.27E-01,
-                  -2.01E+00, 1.33E-01,  3.37E-01, -1.27E-01, -1.05E-03],
+                  -2.01E+00, 1.33E-01,  3.37E-01, -1.27E-01, -1.05E-03,
+                       -0.250,  -0.595,  -0.132],	#0.100
              [ 6.91E-01, 9.97E-01, -6.28E-02, -2.26E+00, 1.25E-01,
-                  -2.49E+00, 1.64E-01,  2.14E-01, -1.21E-01, -8.47E-04],
+                  -2.49E+00, 1.64E-01,  2.14E-01, -1.21E-01, -8.47E-04,
+                       -0.232,  -0.637,  -0.117],	#0.079
              [ 9.11E-01, 9.80E-01, -6.21E-02, -2.36E+00, 1.26E-01,
-                  -2.97E+00, 1.91E-01,  1.07E-01, -1.17E-01, -5.79E-04],
+                  -2.97E+00, 1.91E-01,  1.07E-01, -1.17E-01, -5.79E-04,
+                       -0.249,  -0.642,  -0.105],	#0.063
              [ 1.11E+00, 9.72E-01, -6.20E-02, -2.47E+00, 1.28E-01,
-                  -3.39E+00, 2.14E-01, -1.39E-01, -9.84E-02, -3.17E-04],
+                  -3.39E+00, 2.14E-01, -1.39E-01, -9.84E-02, -3.17E-04,
+                       -0.286,  -0.643,  -0.105],	#0.050
              [ 1.26E+00, 9.68E-01, -6.23E-02, -2.58E+00, 1.32E-01,
-                  -3.64E+00, 2.28E-01, -3.51E-01, -8.13E-02, -1.23E-04],
+                  -3.64E+00, 2.28E-01, -3.51E-01, -8.13E-02, -1.23E-04,
+                       -0.314,  -0.609,  -0.105],	#0.040
              [ 1.44E+00, 9.59E-01, -6.28E-02, -2.71E+00, 1.40E-01,
-                  -3.73E+00, 2.34E-01, -5.43E-01, -6.45E-02, -3.23E-05],
+                  -3.73E+00, 2.34E-01, -5.43E-01, -6.45E-02, -3.23E-05,
+                       -0.322,  -0.618,  -0.108],	#0.031
              [ 1.52E+00, 9.60E-01, -6.35E-02, -2.81E+00, 1.46E-01,
-                  -3.65E+00, 2.36E-01, -6.54E-01, -5.50E-02, -4.85E-05],
+                  -3.65E+00, 2.36E-01, -6.54E-01, -5.50E-02, -4.85E-05,
+                       -0.330,  -0.624,  -0.115],	#0.025
              [ 9.07E-01, 9.83E-01, -6.60E-02, -2.70E+00, 1.59E-01,
-                  -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04],
+                  -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04,
+                       -0.361,  -0.641,  -0.144],	#0.010
              [ 9.07E-01, 9.83E-01, -6.60E-02, -2.70E+00, 1.59E-01,
-                  -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04]])
+                  -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04,
+                       -0.361,  -0.641,  -0.144]])	#0.000
 # convert to dim = (#coefficients, #periods)
 Atkinson06_coefficient = tmp.transpose()
 del tmp
@@ -2362,7 +2460,7 @@ sigma = 0.30
 Atkinson06_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
 Atkinson06_sigma_coefficient_period = [0.0, 1.0]
 
-gound_motion_init['Atkinson06_hardrock'] = [Atkinson06_hardrock_distribution,
+gound_motion_init['Atkinson06_bedrock'] = [Atkinson06_bedrock_distribution,
                                             Atkinson06_magnitude_type,
                                             Atkinson06_distance_type,
                                             Atkinson06_coefficient,
@@ -2382,5 +2480,5 @@ gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
                                         Atkinson06_sigma_coefficient_period,
                                         Atkinson06_interpolation]
 
-#*********************  End of Atkinson06_hardrock model  *********************
+##################  End of Atkinson06 bedrock & soil models  ###################
 
