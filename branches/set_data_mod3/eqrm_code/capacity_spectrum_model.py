@@ -33,7 +33,7 @@ class Capacity_spectrum_model(object):
                  periods=None,
                  magnitudes=None,
                  building_parameters=None,
-                 atten_rescale_curve_from_pga=None,
+                 atten_override_RSA_shape=None,
                  atten_cutoff_max_spectral_displacement=False,
                  loss_min_pga=0.0,
                  csm_damping_regimes=CSM_DAMPING_REGIMES_USE_ALL,
@@ -86,7 +86,7 @@ should NOT be set after initialization - read __init__ for reasons.
         self.csm_use_variability=csm_use_variability
         self.csm_variability_method=csm_variability_method
 
-        self.atten_rescale_curve_from_pga=atten_rescale_curve_from_pga
+        self.atten_override_RSA_shape=atten_override_RSA_shape
         self.atten_cutoff_max_spectral_displacement=atten_cutoff_max_spectral_displacement
         self.loss_min_pga=loss_min_pga
 
@@ -116,7 +116,7 @@ should NOT be set after initialization - read __init__ for reasons.
             # TODO: Allow cutoff after max.
             SA,surface_displacement=undamped_response(
                 SA,periods,
-                self.atten_rescale_curve_from_pga,
+                self.atten_override_RSA_shape,
                 self.atten_cutoff_max_spectral_displacement,
                 self.loss_min_pga,
                 magnitude=magnitudes)

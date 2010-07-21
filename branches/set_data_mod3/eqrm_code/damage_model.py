@@ -67,7 +67,7 @@ class Damage_model(object):
                           'csm_use_variability': False,
                           'csm_variability_method': 0,
                           'csm_hysteretic_damping': 'Error',
-                          'atten_rescale_curve_from_pga': None,
+                          'atten_override_RSA_shape': None,
                           'atten_cutoff_max_spectral_displacement': False,
                           'loss_min_pga': 0.0}
 
@@ -380,8 +380,8 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
                           THE_PARAM_T.csm_variability_method,
                       'csm_hysteretic_damping':
                           THE_PARAM_T.csm_hysteretic_damping,
-                      'atten_rescale_curve_from_pga':
-                          THE_PARAM_T.atten_rescale_curve_from_pga,
+                      'atten_override_RSA_shape':
+                          THE_PARAM_T.atten_override_RSA_shape,
                       'atten_cutoff_max_spectral_displacement':
                           THE_PARAM_T.atten_cutoff_max_spectral_displacement,
                       'loss_min_pga': THE_PARAM_T.loss_min_pga}

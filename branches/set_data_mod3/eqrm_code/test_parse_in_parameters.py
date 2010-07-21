@@ -71,7 +71,7 @@ attenuation_flag=[1,2,8;-0.33333,-0.33333,-0.33333]\n\
 atten_use_variability=[1]\n\
 atten_variability_method=[2]\n\
 atten_periods=[0,0.17544,0.35088,0.52632,0.70175,0.87719,1.0526,1.2281,1.4035,1.5789,1.7544,1.9298,2.1053,2.2807,2.4561,2.6316,2.807,2.9825,3.1579,3.3333]\n\
-atten_rescale_curve_from_pga=[0]\n\
+atten_override_RSA_shape=[0]\n\
 atten_threshold_distance=[400]\n\
 atten_log_sigma_eq_weight=[0]\n\n\
 [Amplification]\n\
@@ -174,7 +174,7 @@ attenuation_flag=[8;-1]\n\
 atten_use_variability=[1]\n\
 atten_variability_method=[2]\n\
 atten_periods=[0,0.17544,0.35088,0.52632,0.70175,0.87719,1.0526,1.2281,1.4035,1.5789,1.7544,1.9298,2.1053,2.2807,2.4561,2.6316,2.807,2.9825,3.1579,3.3333]\n\
-atten_rescale_curve_from_pga=[0]\n\
+atten_override_RSA_shape=[0]\n\
 atten_threshold_distance=[400]\n\
 atten_log_sigma_eq_weight=[0]\n\n\
 [Amplification]\n\
@@ -284,7 +284,7 @@ save_socloss_flag=[1]\n")
         set.atten_cutoff_max_spectral_displacement  = True
         set.atten_pga_scaling_cutoff = 4.3  # None or a value
         set.atten_use_rescale_curve_from_pga = True
-        set.atten_rescale_curve_from_pga = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
+        set.atten_override_RSA_shape = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
         set.atten_smooth_spectral_acceleration = True
         set.atten_log_sigma_eq_weight = 1.0
 
@@ -365,7 +365,7 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.atten_threshold_distance == 400)
         self.failUnless(TPT.atten_pga_scaling_cutoff ==  4.3)
         self.failUnless(TPT.atten_use_rescale_curve_from_pga == True)
-        self.failUnless(TPT.atten_rescale_curve_from_pga == 'HAZUS_Sa')
+        self.failUnless(TPT.atten_override_RSA_shape == 'HAZUS_Sa')
         self.failUnless(TPT.atten_cutoff_max_spectral_displacement == True)
         self.failUnless(TPT.atten_use_variability == True)
         self.failUnless(TPT.atten_variability_method == 2)
@@ -479,7 +479,7 @@ save_socloss_flag=[1]\n")
         set.atten_cutoff_max_spectral_displacement  = True
         set.atten_pga_scaling_cutoff = 4.3  # None or a value
         set.atten_use_rescale_curve_from_pga = True
-        set.atten_rescale_curve_from_pga = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
+        set.atten_override_RSA_shape = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
         set.atten_smooth_spectral_acceleration = True
         set.atten_log_sigma_eq_weight = 1.0
 
@@ -571,7 +571,7 @@ attn_region=[1]\n\
 atten_use_variability=[1]\n\
 atten_variability_method=[2]\n\
 atten_periods=[0,0.30303,1]\n\
-atten_rescale_curve_from_pga=[5]\n\
+atten_override_RSA_shape=[5]\n\
 atten_threshold_distance=[400]\n\
 atten_log_sigma_eq_weight=[1.0]\n\
 [Amplification]    \n\
@@ -667,7 +667,7 @@ save_socloss_flag=[0]\n")
         set.atten_periods = [0,0.30303,1]
         set.atten_threshold_distance = 400
         set.atten_use_rescale_curve_from_pga = False
-        set.atten_rescale_curve_from_pga = 'HAZUS_Sa' 
+        set.atten_override_RSA_shape = 'HAZUS_Sa' 
         set.atten_cutoff_max_spectral_displacement = True 
         set.atten_pga_scaling_cutoff = 2.0  # Float
         set.atten_smooth_spectral_acceleration = True
@@ -724,7 +724,7 @@ save_socloss_flag=[0]\n")
         for key in para_new:
             # skip the string values.
             if key in ['run_type', 'atten_cutoff_max_spectral_displacement',
-                       'atten_rescale_curve_from_pga',
+                       'atten_override_RSA_shape',
                        'csm_hysteretic_damping',
                        'buildings_usage_classification']:
                 continue
@@ -789,7 +789,7 @@ attn_region=[1]\n\
 atten_use_variability=[1]\n\
 atten_variability_method=[2]\n\
 atten_periods=[0,0.30303,1]\n\
-atten_rescale_curve_from_pga=[0]\n\
+atten_override_RSA_shape=[0]\n\
 atten_threshold_distance=[400]\n\
 atten_log_sigma_eq_weight=[1.0]\n\
 [Amplification]    \n\
@@ -872,7 +872,7 @@ save_socloss_flag=[0]\n")
     def small_set_data(self):
         set = Parameter_data()
         set.atten_use_rescale_curve_from_pga = False
-        set.atten_rescale_curve_from_pga = None
+        set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False
         set.use_amplification = False
         set.site_tag = 'test_convert_py_2_THE'
@@ -907,7 +907,7 @@ save_socloss_flag=[0]\n")
     def test_convert_py_2_THE(self):
         set = self.small_set_data()
         para_new = create_parameter_data(set)
-        self.assert_(para_new.atten_rescale_curve_from_pga == None)
+        self.assert_(para_new.atten_override_RSA_shape == None)
 
 
     def test_fail_on_bad_att(self):
@@ -915,7 +915,7 @@ save_socloss_flag=[0]\n")
         set = Parameter_data()
         set.run_type = 'hazard'
         set.atten_use_rescale_curve_from_pga = False
-        set.atten_rescale_curve_from_pga = None
+        set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False
         set.cooked_and_ready = False
 
@@ -979,7 +979,7 @@ save_socloss_flag=[0]\n")
                             'atten_periods': array([ 0.     ,  1.     ]),
                             'atten_variability_method': 2,
                             'atten_threshold_distance': 400,
-                            'atten_rescale_curve_from_pga': 0,
+                            'atten_override_RSA_shape': 0,
                             'atten_use_variability': 0,
                             'atten_log_sigma_eq_weight':0.0},
             'Bclasses2': {'determ_buse': -9999,

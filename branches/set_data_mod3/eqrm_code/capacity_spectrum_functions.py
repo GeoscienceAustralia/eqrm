@@ -533,19 +533,19 @@ def calculate_corner_periods(periods,ground_motion,magnitude):
     assert len(velocity_dependent.shape)==2
     return acceleration_dependent,velocity_dependent
         
-def undamped_response(SA,periods,atten_rescale_curve_from_pga=None,
+def undamped_response(SA,periods,atten_override_RSA_shape=None,
                       atten_cutoff_max_spectral_displacement=False,
                       loss_min_pga=0.0,
                       magnitude=None):
     """
     Calculate SD from SA
     """    
-    if atten_rescale_curve_from_pga is None:
+    if atten_override_RSA_shape is None:
         pass
-    elif atten_rescale_curve_from_pga == 'Aust_standard_Sa':
+    elif atten_override_RSA_shape == 'Aust_standard_Sa':
         from eqrm_code.ground_motion_misc import Australian_standard_model
         SA=SA[:,:,0:1]*Australian_standard_model(periods[newaxis,newaxis,:])
-    elif atten_rescale_curve_from_pga == 'HAZUS_Sa':
+    elif atten_override_RSA_shape == 'HAZUS_Sa':
         #reference_periods = 0.3,1.0
         S03=interp(array(0.3),SA,periods,axis=-1)
         S10=interp(array(1.0),SA,periods,axis=-1)
@@ -574,8 +574,8 @@ def undamped_response(SA,periods,atten_rescale_curve_from_pga=None,
         SA[where(bD)]=((S10M*TvdM)/(Tm**2))[where(bD)]
         #SA = (S03M*bA) + (S10M/Tm)*bV + ((S10M*TvdM)/(Tm**2))*bD
     else:
-        print 'atten_rescale_curve_from_pga = ',atten_rescale_curve_from_pga
-        raise NotImplementedError('atten_rescale_curve_from_pga = '+str(atten_rescale_curve_from_pga))
+        print 'atten_override_RSA_shape = ',atten_override_RSA_shape
+        raise NotImplementedError('atten_override_RSA_shape = '+str(atten_override_RSA_shape))
 
     too_low=SA[:,:,0:1]<loss_min_pga
     scaling_factor=where(too_low,0,1)
