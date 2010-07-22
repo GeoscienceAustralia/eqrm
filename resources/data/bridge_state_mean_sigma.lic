@@ -6,7 +6,7 @@
     </metadata>
     <datafile>
       <filename>bridge_state_mean_sigma.csv</filename>
-      <checksum>699118617</checksum>
+      <checksum>1755201135</checksum>
       <publishable>Yes</publishable>
       <accountable>Duncan Gray</accountable>
       <source>HAZUS</source>
