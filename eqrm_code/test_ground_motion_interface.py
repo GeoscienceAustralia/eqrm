@@ -892,7 +892,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ML = numpy.array([[[5.5]]])
         R = numpy.array([[[100.0]]])
 
-        # get coeffs for this period (includes 3 additional table 8 values)
+        # get coeffs for this period (includes 3 unused table 8 values)
         coeffs = numpy.array([[[[-5.27e+0]]],[[[2.26e+0]]],[[[-1.48e-1]]],
                               [[[-2.07e+0]]],[[[1.50e-1]]],[[[-8.13e-1]]],
                               [[[ 4.67e-2]]],[[[8.26e-1]]],[[[-1.62e-1]]],
@@ -926,11 +926,51 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-3, atol=1.0e-3),
                                  msg)
 
+        ######
+        # period = 2.0s, ML=7.5, R=300.0 - call Atkinson06_bedrock(),
+        #     returns ln g
+        ######
+
+        period = 2.0
+        ML = numpy.array([[[7.5]]])
+        R = numpy.array([[[300.0]]])
+
+        # get coeffs for this period (includes 3 unused table 8 values)
+        coeffs = numpy.array([[[[-6.18e+0]]],[[[2.30e+0]]],[[[-1.44e-1]]],
+                              [[[-2.22e+0]]],[[[1.77e-1]]],[[[-9.37e-1]]],
+                              [[[ 7.07e-2]]],[[[9.52e-1]]],[[[-1.77e-1]]],
+                              [[[-3.22e-4]]],[[[0]]],[[[0]]],[[[0]]]])
+
+        # sigma coefficients - these are static
+        sigma = 0.30
+        sigma_coeffs = numpy.array([[[[sigma]]],[[[sigma]]]])
+
+        # expected values from paper (converted to ln g)
+        log_mean_expected = numpy.array([[[1.08]]])/ln_factor - g_factor
+        log_sigma_expected = 0.30/ln_factor - g_factor
+
+        (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
+                                                   sigma_coefficient=\
+                                                       sigma_coeffs,
+                                                   mag=ML, distance=R)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-2, atol=1.0e-2),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
     def test_Atkinson06_soil(self):
         """Test the Atkinson06_soil function."""
 
         # Run one scenario from Atkinson06_soil_check.py - scenario 4.
-        # period=1.0, distance=100.0, magnitude=7.5, v30=400.0, logPSA=1.757910
+        # period=1.0, distance=100.0, magnitude=7.5, vs30=400.0, logPSA=1.757910
 
         model_name = 'Atkinson06_soil'
         model = Ground_motion_specification(model_name)
@@ -941,14 +981,14 @@ class Test_ground_motion_interface(unittest.TestCase):
         ln_factor = math.log10(math.e)
 
         ######
-        # period = 1.0s, ML=7.5, R=100.0, v30=400.0 - call Atkinson06_soil(),
+        # period = 1.0s, ML=7.5, R=100.0, vs30=400.0 - call Atkinson06_soil(),
         #     returns ln g
         ######
 
         period = 1.0
         ML = numpy.array([[[7.5]]])
         R = numpy.array([[[100.0]]])
-        v30 = numpy.array([[[400.0]]])
+        vs30 = numpy.array([[[400.0]]])
 
         # get coeffs for this period
         coeffs = numpy.array([[[[-5.27e+0]]],[[[2.26e+0]]],[[[-1.48e-1]]],
@@ -963,13 +1003,14 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         # expected values from Atkinson06_soil_check.py (converted to ln g)
         log_mean_expected = numpy.array([[[1.757910]]])/ln_factor - g_factor
-        log_sigma_expected = Atkinson06_sigma_coefficient[0][0]/ln_factor - g_factor
+        log_sigma_expected = Atkinson06_sigma_coefficient[0][0]/ln_factor - \
+                                 g_factor
 
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
                                                        sigma_coeffs,
                                                    mag=ML, distance=R,
-                                                   v30=v30)
+                                                   vs30=vs30)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
@@ -987,9 +1028,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_interface,'test')
-    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Atkinson06_soil')
     #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Atkinson06_bedrock')
     runner = unittest.TextTestRunner()
     runner.run(suite)
-
 
