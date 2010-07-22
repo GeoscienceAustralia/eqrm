@@ -2212,7 +2212,7 @@ def Atkinson06_basic(**kwargs):
 
     [1] Atkinson, G.M., and Boore, D.M. [2006] "Earthquake Ground-Motion
         Prediction Equations for Eastern North America", Bulletin of the
-        Seismological Society of america, Vol. 96, pp 2181-2205
+        Seismological Society of America, Vol. 96, pp 2181-2205
     """
 
     # get args
@@ -2224,20 +2224,24 @@ def Atkinson06_basic(**kwargs):
 
     # check we have the right shapes
     num_periods = coefficient.shape[3]
-    assert coefficient.shape == (13, 1, 1, num_periods)
-    assert sigma_coefficient.shape == (2, 1, 1, num_periods)
+    msg = ('Expected coefficient.shape %s, got %s'
+           % (str((13, 1, 1, num_periods)), str(coefficient.shape)))
+    assert coefficient.shape == (13, 1, 1, num_periods), msg
 
     # intermediate calculated coefficients
     tmp = log10(Atkinson06_R0/Rcd)
     f0 = where(tmp < 0, 0, tmp)
+
     tmp = log10(Rcd)
     f1 = where(tmp < Log10Atkinson06_R1, tmp, Log10Atkinson06_R1)
+
     tmp = log10(Rcd/Atkinson06_R2)
     f2 = where(tmp < 0, 0, tmp)
     del tmp
-
+    
     # calculate result in log10(cm/s/s)
-    (c1, c2, c3, c4, c5, c6, c7, c8, c9, c10) = coefficient[:10]
+    (c1, c2, c3, c4, c5, c6, c7, c8, c9, c10) = coefficient[:10,...]
+
     log_mean = c1 + c2*M + c3*M*M + (c4 + c5*M)*f1 + (c6 + c7*M)*f2 + \
                    (c8 + c9*M)*f0 + c10*Rcd + S
     log_sigma = sigma_coefficient[0]
@@ -2286,12 +2290,12 @@ def Atkinson06_calcS(pgaBC, **kwargs):
 
     pgaBC   the pgaBC value to use
     kwargs  dictionary of parameters, expect:
-                coefficient, v30
+                coefficient, vs30
     """
 
     # get args
     coefficient = kwargs['coefficient']
-    v30 = kwargs['v30']
+    vs30 = kwargs['vs30']
 
     # check we have the right shapes
     num_periods = coefficient.shape[3]
@@ -2303,27 +2307,27 @@ def Atkinson06_calcS(pgaBC, **kwargs):
     # get the Bnl array from eqns 8A, 8B, 8C, 8D, page 2200.
     # we do this by calculating 4 arrays for each of 8A, 8b, 8C and 8D
     # and then filling appropriate elements of resultant Bnl.
-    BnlA = ones(v30.shape) * B1
-    BnlB = (B1 - B2) * log(v30/Atkinson06_V2) / Atkinson06_logV1divV2 + B2
-    BnlC = B2 * log(v30/Atkinson06_Vref) / Atkinson06_logV2divVref
-    Bnl = zeros(v30.shape)
+    BnlA = B1
+    BnlB = (B1 - B2) * log(vs30/Atkinson06_V2) / Atkinson06_logV1divV2 + B2
+    BnlC = B2 * log(vs30/Atkinson06_Vref) / Atkinson06_logV2divVref
+    Bnl = 0.0
 
     # TODO: TEST IF where(x < A <= y, ?, ??) FASTER
-    Bnl = where(v30 <= Atkinson06_Vref, BnlC, Bnl)
-    Bnl = where(v30 <= Atkinson06_V2, BnlB, Bnl)
-    Bnl = where(v30 <= Atkinson06_V1, BnlA, Bnl)
+    Bnl = where(vs30 <= Atkinson06_Vref, BnlC, Bnl)
+    Bnl = where(vs30 <= Atkinson06_V2, BnlB, Bnl)
+    Bnl = where(vs30 <= Atkinson06_V1, BnlA, Bnl)
 
     # limit element-wise pgaBC values to be >= 60
     pgaBC = where(pgaBC < 60.0, 60.0, pgaBC)
 
     # return the S value
-    return log10(exp(Blin*log(v30/Atkinson06_Vref) + Bnl*log(pgaBC/100)))
+    return log10(exp(Blin*log(vs30/Atkinson06_Vref) + Bnl*log(pgaBC/100)))
 
 def Atkinson06_soil_distribution(**kwargs):
     """The Atkinson06_soil model function.
 
     kwargs  dictionary of parameters, expect:
-                mag, distance, coefficient, sigma_coefficient, v30
+                mag, distance, coefficient, sigma_coefficient, vs30
 
     This function just calls Atkinson06_basic() with a computed S value
     and converts the result to ln g.
@@ -2335,7 +2339,7 @@ def Atkinson06_soil_distribution(**kwargs):
         distance = kwargs['distance']
         coefficient = kwargs['coefficient']
         sigma_coefficient = kwargs['sigma_coefficient']
-        v30 = kwargs['v30']
+        vs30 = kwargs['vs30']
     except KeyError, e:
         print('kwargs dictionary to Atkinson06_soil_distribution() '
               'is missing a parameter: %s' % e)
@@ -2344,17 +2348,11 @@ def Atkinson06_soil_distribution(**kwargs):
     num_periods = coefficient.shape[3]
     assert coefficient.shape == (13, 1, 1, num_periods)
     assert sigma_coefficient.shape == (2, 1, 1, num_periods)
-    assert distance.shape == (1, 1, num_periods)
-    assert v30.shape == (1, 1, num_periods)
 
-    # calculate pgaBC here
-    # use period=0.0 coefficients
-    pga_coeffs = Atkinson06_coefficient[:,-1]
-    dim = Atkinson06_coefficient.shape[0]
-    pga_coeffs = reshape(pga_coeffs, (dim, 1, 1, 1))
+    # calculate pgaBC here, use PGA (period=0.0) coefficients
     (pgaBC, _) = Atkinson06_basic(mag=kwargs['mag'],
                                   distance=kwargs['distance'],
-                                  coefficient=pga_coeffs,
+                                  coefficient=Atkinson06_coefficient_pga,
                                   sigma_coefficient=kwargs['sigma_coefficient'],
                                   S=0.0)
 
@@ -2462,6 +2460,7 @@ tmp = array([[-5.41E+00, 1.71E+00, -9.01E-02, -2.54E+00, 2.27E-01,
                        -0.361,  -0.641,  -0.144]])	#0.000
 # convert to dim = (#coefficients, #periods)
 Atkinson06_coefficient = tmp.transpose()
+Atkinson06_coefficient_pga = reshape(Atkinson06_coefficient[:,-1], (-1,1,1,1))
 del tmp
 
 # dim = (period,)
@@ -2480,14 +2479,14 @@ Atkinson06_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
 Atkinson06_sigma_coefficient_period = [0.0, 1.0]
 
 gound_motion_init['Atkinson06_bedrock'] = [Atkinson06_bedrock_distribution,
-                                            Atkinson06_magnitude_type,
-                                            Atkinson06_distance_type,
-                                            Atkinson06_coefficient,
-                                            Atkinson06_coefficient_period,
-                                            Atkinson06_interpolation,
-                                            Atkinson06_sigma_coefficient,
-                                            Atkinson06_sigma_coefficient_period,
-                                            Atkinson06_interpolation]
+                                           Atkinson06_magnitude_type,
+                                           Atkinson06_distance_type,
+                                           Atkinson06_coefficient,
+                                           Atkinson06_coefficient_period,
+                                           Atkinson06_interpolation,
+                                           Atkinson06_sigma_coefficient,
+                                           Atkinson06_sigma_coefficient_period,
+                                           Atkinson06_interpolation]
 
 gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
                                         Atkinson06_magnitude_type,
