@@ -873,13 +873,13 @@ class Test_ground_motion_interface(unittest.TestCase):
                                  msg)
 
 
-    def test_Atkinson06_bedrock(self):
-        """Test the Atkinson06_bedrock function."""
+    def test_Atkinson06_hard_bedrock(self):
+        """Test the Atkinson06_hard_bedrock function."""
 
         # This is a repeat of test_Atkinson06_basic() above, except that we
         # go through model.distribution() and get results converted to ln g.
 
-        model_name = 'Atkinson06_bedrock'
+        model_name = 'Atkinson06_hard_bedrock'
         model = Ground_motion_specification(model_name)
 
         # conversion factor: mm/s2 -g_factor -> g
@@ -888,7 +888,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ln_factor = math.log10(math.e)
 
         ######
-        # period = 1.0s, ML=5.5, R=100.0 - call Atkinson06_bedrock(),
+        # period = 1.0s, ML=5.5, R=100.0 - call Atkinson06_hard_bedrock(),
         #     returns ln g
         ######
 
@@ -931,7 +931,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                  msg)
 
         ######
-        # period = 2.0s, ML=7.5, R=300.0 - call Atkinson06_bedrock(),
+        # period = 2.0s, ML=7.5, R=300.0 - call Atkinson06_hard_bedrock(),
         #     returns ln g
         ######
 
@@ -1032,7 +1032,6 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_interface,'test')
-    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Atkinson06_bedrock')
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -18,7 +18,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Combo_Sadigh_Youngs_M8',
                           'Boore_08', 'Somerville_Yilgarn',
                           'Somerville_Non_Cratonic',
-                          'Liang_2008', 'Atkinson06_bedrock',
+                          'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil')
 
 # Atkinson_Boore_97 is out.  It has no test data. 
@@ -566,13 +566,13 @@ test_data['Liang_2008_test_mean'] = tmp
 test_data['Liang_2008_test_magnitude'] = [4.0, 5.0, 6.0, 7.0]
 
 ################################################################################
-# Atkinson06_bedrock Test
+# Atkinson06_hard_bedrock Test
 
 # num_events = 2
-test_data['Atkinson06_bedrock_test_magnitude'] = [5.5, 7.5]
+test_data['Atkinson06_hard_bedrock_test_magnitude'] = [5.5, 7.5]
 
 # num_periods = 4
-test_data['Atkinson06_bedrock_test_period'] = [0.0, 0.2, 1.0, 2.0]
+test_data['Atkinson06_hard_bedrock_test_period'] = [0.0, 0.2, 1.0, 2.0]
 
 # num_sites = 4
 tmp = zeros((4,2)) # initialise an array: (num_sites, num_events)
@@ -580,7 +580,7 @@ tmp[0,:] = [  2.0,   2.0,] # distance - 1st site and all 2 events
 tmp[1,:] = [ 10.0,  10.0,] # distance - 2nd site and all 2 events
 tmp[2,:] = [100.0, 100.0,] # distance - 3rd site and all 2 events
 tmp[3,:] = [300.0, 300.0,] # distance - 4th site and all 2 events
-test_data['Atkinson06_bedrock_test_distance'] = tmp
+test_data['Atkinson06_hard_bedrock_test_distance'] = tmp
 
 # result values, in 'g'
 tmp = zeros((4,2,4))		# num_sites, num_events, num_periods
@@ -603,7 +603,7 @@ tmp[2,0,:] = [8.17435180e-03, 1.35485346e-02, 2.21682967e-03, 6.17112473e-04]
 tmp[2,1,:] = [5.61299072e-02, 1.05659445e-01, 3.72615850e-02, 1.99310108e-02]
 tmp[3,0,:] = [1.91430143e-03, 4.55815747e-03, 1.15997953e-03, 3.50372752e-04]
 tmp[3,1,:] = [1.81590165e-02, 3.94234225e-02, 2.09360296e-02, 1.26037078e-02]
-test_data['Atkinson06_bedrock_test_mean'] = tmp
+test_data['Atkinson06_hard_bedrock_test_mean'] = tmp
 
 ################################################################################
 # Atkinson06_soil Test
