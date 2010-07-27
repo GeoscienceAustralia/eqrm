@@ -2188,7 +2188,7 @@ gound_motion_init['Liang_2008'] = Liang_2008_args
 
 ##########################  End of Liang_2008 model  ###########################
 
-#################  Start of Atkinson06 bedrock & soil models  ##################
+##############  Start of Atkinson06 hard_bedrock & soil models  ################
 
 # conversion factor: ln cm/s/s -> ln g
 LnCmss2Lng = math.log(9.80665*100)
@@ -2255,8 +2255,8 @@ def Atkinson06_basic(**kwargs):
 
     return (log_mean, log_sigma)
 
-def Atkinson06_bedrock_distribution(**kwargs):
-    """The Atkinson06_bedrock model function.
+def Atkinson06_hard_bedrock_distribution(**kwargs):
+    """The Atkinson06_hard_bedrock model function.
 
     kwargs  dictionary of parameters, expect:
                 mag, distance, coefficient, sigma_coefficient
@@ -2485,15 +2485,16 @@ sigma = 0.30
 Atkinson06_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
 Atkinson06_sigma_coefficient_period = [0.0, 1.0]
 
-gound_motion_init['Atkinson06_bedrock'] = [Atkinson06_bedrock_distribution,
-                                           Atkinson06_magnitude_type,
-                                           Atkinson06_distance_type,
-                                           Atkinson06_coefficient,
-                                           Atkinson06_coefficient_period,
-                                           Atkinson06_interpolation,
-                                           Atkinson06_sigma_coefficient,
-                                           Atkinson06_sigma_coefficient_period,
-                                           Atkinson06_interpolation]
+gound_motion_init['Atkinson06_hard_bedrock'] = \
+                        [Atkinson06_hard_bedrock_distribution,
+                         Atkinson06_magnitude_type,
+                         Atkinson06_distance_type,
+                         Atkinson06_coefficient,
+                         Atkinson06_coefficient_period,
+                         Atkinson06_interpolation,
+                         Atkinson06_sigma_coefficient,
+                         Atkinson06_sigma_coefficient_period,
+                         Atkinson06_interpolation]
 
 gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
                                         Atkinson06_magnitude_type,
@@ -2505,5 +2506,5 @@ gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
                                         Atkinson06_sigma_coefficient_period,
                                         Atkinson06_interpolation]
 
-##################  End of Atkinson06 bedrock & soil models  ###################
+###############  End of Atkinson06 hard_bedrock & soil models  #################
 
