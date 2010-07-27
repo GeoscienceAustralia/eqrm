@@ -703,13 +703,13 @@ class Test_ground_motion_interface(unittest.TestCase):
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
                                          rtol=1.0e-3, atol=1.0e-3),
-                                 msg)
+                        msg)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
                % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
                                          rtol=1.0e-3, atol=1.0e-3),
-                                 msg)
+                        msg)
 
         ######
         # period = 1.0s, ML=5.0, R=100.0
@@ -739,13 +739,13 @@ class Test_ground_motion_interface(unittest.TestCase):
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
                                          rtol=1.0e-3, atol=1.0e-3),
-                                 msg)
+                        msg)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
                % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
                                          rtol=1.0e-3, atol=1.0e-3),
-                                 msg)
+                        msg)
 
         ######
         # period = 0.1s, ML=7.0, R=200.0
@@ -775,46 +775,50 @@ class Test_ground_motion_interface(unittest.TestCase):
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
                                          rtol=1.0e-3, atol=1.0e-3),
-                                 msg)
+                        msg)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
                % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
                                          rtol=1.0e-3, atol=1.0e-3),
-                                 msg)
+                        msg)
 
         ######
-        # periods = 0.1s/1.0s/10.0s, ML=0.0, R=1.0
-        # a contrived case to return ln(y) = a + c (according to algorithm)
-        # just check returned log_mean, sigma checked above
+        # check that results for a scenario with distance=1.0 km are same
+        # as for distance=10.0 km.  we limit minimum distance to 10.0 km.
         ######
 
-        ML = numpy.array([[[0.0]]])
+        period = 1.0
+        ML = numpy.array([[[7.0]]])
+        R = numpy.array([[[10.0]]])
+
+        # get coeffs for this period
+        period_index = Liang_2008_coefficient_period.index(period)
+        coeffs = Liang_2008_coefficient[:,period_index]
+        coeffs = reshape(coeffs, (5, 1, 1, 1))
+
+        # sigma coefficients - these are static
+        sigma_coeffs = numpy.array([[[[1.166]]],[[[1.166]]]])
+
+        # get results for R=10.0 km
+        (log_mean_10, _) = model.distribution(coefficient=coeffs,
+                                              sigma_coefficient=sigma_coeffs,
+                                              mag=ML, distance=R)
+
+        # then get results for R=1.0 km
         R = numpy.array([[[1.0]]])
+        (log_mean_1, _) = model.distribution(coefficient=coeffs,
+                                             sigma_coefficient=sigma_coeffs,
+                                             mag=ML, distance=R)
 
-        for period in [0.1, 1.0, 10.0]:
-            # get index for the given period, then get coeffs from code module
-            period_index = Liang_2008_coefficient_period.index(period)
-            cfs = Liang_2008_coefficient[:,period_index]
-            coeffs = numpy.array([[[[cfs[0]]]],[[[cfs[1]]]],[[[cfs[2]]]],
-                                  [[[cfs[3]]]],[[[cfs[4]]]]])
+        # check results are same
+        msg = ("Results for T=%.1f, ML=%.1f, R=%.1f:\n%s\n"
+               "don't equal those for R=%.1f:\n%s"
+               % (period, ML, 10.0, str(log_mean_10), 1.0, str(log_mean_1)))
+        self.failUnless(allclose(log_mean_10, log_mean_1, rtol=1.0e-4,
+                                 atol=1.0e-4),
+                        msg)
 
-            # sigma coefficients - these are static
-            sigma_coeffs = numpy.array([[[[1.166]]],[[[1.166]]]])
-
-            # expected values from paper, corrected for result in g, not mm/s2
-            log_mean_expected = (cfs[0] + cfs[2]) - g_factor
-
-            (log_mean,
-                 log_sigma) = model.distribution(coefficient=coeffs,
-                                                 sigma_coefficient=sigma_coeffs,
-                                                 mag=ML, distance=R)
-
-            msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
-                   % (period, ML, R, str(log_mean), str(log_mean_expected)))
-            self.failUnless(allclose(asarray(log_mean), log_mean_expected,
-                                             rtol=1.0e-3, atol=1.0e-3),
-                                     msg)
 
     def test_Atkinson06_basic(self):
         """Test the Atkinson06_basic function."""
