@@ -2086,6 +2086,9 @@ def Liang_2008_distribution(**kwargs):
 
     The algorithm here is taken from [1], page 399.
 
+    Due to the equation diverging at distance == 0, we assume any distance
+    less than 10km is 10km.
+
     [1] Liang, J.Z., Hao, H., Gaull, B.A., and Sinadinovskic, C. [2008]
         "Estimation of Strong Ground Motions in Southwest Western Australia
         with a Combined Green's Function and Stochastic Approach",
@@ -2102,6 +2105,10 @@ def Liang_2008_distribution(**kwargs):
     num_periods = coefficient.shape[3]
     assert coefficient.shape == (5, 1, 1, num_periods)
     assert sigma_coefficient.shape == (2, 1, 1, num_periods)
+
+    # Force a lower limit for distance of 10km
+    # eg, if distance is 5km, assume 10km
+    distance = where(distance < 10.0, 10.0, distance)
 
     # calculate result in ln(mm/s/s)
     (a, b, c, d, e) = coefficient
