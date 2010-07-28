@@ -19,7 +19,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Boore_08', 'Somerville_Yilgarn',
                           'Somerville_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
-                          'Atkinson06_soil')
+                          'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock')
 
 # Atkinson_Boore_97 is out.  It has no test data. 
 
@@ -641,6 +641,43 @@ tmp[1,1,:] = [1.05945697e+00, 2.13889431e-01, 9.90269321e-02]
 tmp[2,0,:] = [1.24572255e-02, 1.82936904e-03, 5.05077852e-04]
 tmp[2,1,:] = [9.71487740e-02, 3.07490232e-02, 1.63126052e-02]
 test_data['Atkinson06_soil_test_mean'] = tmp
+
+################################################################################
+# Atkinson06_bc_boundary_bedrock Test
+
+# num_events = 2
+test_data['Atkinson06_bc_boundary_bedrock_test_magnitude'] = [5.5, 7.5]
+
+# num_periods = 2
+test_data['Atkinson06_bc_boundary_bedrock_test_period'] = [0.2, 1.0]
+
+# num_sites = 3
+tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
+tmp[0,:] = [ 10.0,  10.0] # distance - 1st site and all 2 events
+tmp[1,:] = [100.0, 100.0] # distance - 2nd site and all 2 events
+tmp[2,:] = [300.0, 300.0] # distance - 3rd site and all 2 events
+test_data['Atkinson06_bc_boundary_bedrock_test_distance'] = tmp
+
+# result values, in 'g'
+tmp = zeros((3,2,2))		# num_sites, num_events, num_periods
+# period:      0.2       1.0
+#tmp[0,0,:] = [2.512575, 1.559360]	# R= 10.0, ML=5.5
+#tmp[0,1,:] = [3.201975, 2.531360]	# R= 10.0, ML=7.5
+#tmp[1,0,:] = [1.253036, 0.455175]	# R=100.0, ML=5.5
+#tmp[1,1,:] = [2.148640, 1.665492]	# R=100.0, ML=7.5
+#tmp[2,0,:] = [0.778744, 0.166573]	# R=300.0, ML=5.5
+#tmp[2,1,:] = [2.148640, 1.412705]	# R=300.0, ML=7.5
+
+# values above are log10 cmm/s/s, converted programmatically to ln g, then g:
+# period:      0.2       1.0
+tmp[0,0,:] = [0.331936, 0.036969]	# R= 10.0, ML=5.5
+tmp[0,1,:] = [1.623508, 0.346609]	# R= 10.0, ML=7.5
+tmp[1,0,:] = [0.018261, 0.002908]	# R=100.0, ML=5.5
+tmp[1,1,:] = [0.143588, 0.047203]	# R=100.0, ML=7.5
+tmp[2,0,:] = [0.006127, 0.001496]	# R=300.0, ML=5.5
+tmp[2,1,:] = [0.053912, 0.026374]	# R=300.0, ML=7.5
+test_data['Atkinson06_bc_boundary_bedrock_test_mean'] = tmp
+del tmp
 
 ################################################################################
 
