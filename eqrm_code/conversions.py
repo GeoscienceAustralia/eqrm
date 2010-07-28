@@ -51,7 +51,10 @@ modified_Wells_and_Coppersmith_94_width = vectorize(
     modified_Wells_and_Coppersmith_94_width)
 
 def depth(fault_depth,dip,Mw,fault_width=None):
-
+    """
+    fault_depth - depth to the top of the seismmogenic region, km.
+    dip: dip of the seismmogenic region, degrees
+    """
     if fault_width is None:
         fault_width = 15
     rad=pi/180
