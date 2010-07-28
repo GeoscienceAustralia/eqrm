@@ -65,7 +65,7 @@ class Event_Set(object):
               range : [0:360)
       dip : dips  - scalar or n-vector
               range : (0:90) #TODO ask Trev or Trev - maybe [0,90], or (0,90]??
-      depth : depths - scalar or n-vector
+      depth : depths - scalar or n-vector, depth to event , km
             range (0:large]
             ie [5,5,10,...]        
       Mw : moment magnitudes - scalar or n-vector
@@ -147,7 +147,7 @@ class Event_Set(object):
           ML or Mw: earthquake magnitude. analysis only uses Mw.
           depth: depth to event, km
           fault_width: Maximum width along virtual fault, km
-          fault_depth:  ??
+          fault_depth: depth to the top of the seismmogenic region, km.
           determ_number_of_events: Number of events
           
           Note, if you supply either ML or Mw, the other will be
