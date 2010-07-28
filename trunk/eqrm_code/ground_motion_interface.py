@@ -1274,7 +1274,12 @@ Youngs_97_sigma_coefficient_period=[
 Youngs_97_sigma_coefficient_interpolation=linear_interpolation
 
 def Youngs_97_distribution_python(**kwargs):
-
+    """
+    
+    Youngs, R.R. & s.J. Chiou, Strong Ground Motion Attenuation
+    Relationships for Subduction Zone Earthquakes, 1997
+    
+    """
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  vs30
@@ -1283,7 +1288,11 @@ def Youngs_97_distribution_python(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     depth = kwargs['depth']
-  
+
+    # The depth that is passed in is depth to centroid.
+    # The actual depth required is focal depth,
+    # but we are assuming depth to centroid is close enough.
+    
     c1,c2,c3,Z_t=coefficient
 
     # Z_t=0.0 for interface earthquakes
@@ -1889,7 +1898,6 @@ def Somerville_distribution(**kwargs):
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    depth = kwargs['depth']
     
     # An expensive way of showing what the dimensions must be?
     num_sites,num_events=distance.shape[0:2]
