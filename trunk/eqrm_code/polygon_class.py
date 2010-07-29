@@ -548,7 +548,7 @@ def indent_string(string,n=4):
 ###############################################################################
 empty_polygon = Empty_polygon()
 ###############################################################################
-def get_independent_polygons(polygon_objects):
+def get_independent_polygons_obsolete(polygon_objects):
     """
     Returns a list of independent polygons made from polygon_objects.
 

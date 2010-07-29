@@ -73,7 +73,8 @@ class Source_Models(object):
         one independent polygon.
         """
         if independent_polygons is None:
-            from polygon_class import get_independent_polygons as independent
+            from polygon_class import get_independent_polygons_obsolete \
+                 as independent
             independent_polygons = independent(self.generation_polygons)
             if not len(independent_polygons) == len(self.generation_polygons):
                 logging.info( \
