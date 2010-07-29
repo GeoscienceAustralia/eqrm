@@ -96,7 +96,9 @@ class Test_Geos_Interface(unittest.TestCase):
         geos_poly1 = polygon_to_geos_polygon(small_square)
         geos_poly2 = polygon_to_geos_polygon(large_square)
         geos_poly = geos_poly1.difference(geos_poly2)
-        assert list_multipolygon(geos_poly)==[[]]
+        # [[]] older version of shapely 1.0.7
+        # [] newer version of shapely 1.2.1
+        assert list_multipolygon(geos_poly)==[[]] or list_multipolygon(geos_poly)==[]
         
         
     def test_wkt_to_multipolygon_list_simple_polygon(self):
