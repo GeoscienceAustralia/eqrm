@@ -425,6 +425,7 @@ def create_parameter_data(parameters, **kwargs):
     """
     if isinstance(parameters, str) and parameters[-3:] == ".py":
         parameters = from_file_get_params(parameters)
+        #print "parameters", parameters
     elif isinstance(parameters, dict):
         parameters = get_no_instance_params(parameters)
     else:
@@ -571,9 +572,9 @@ def change_slashes(path):
             
 def from_file_get_params(path_file):
     head, tail = os.path.split(os.path.abspath(path_file))
-        
+    # FIXME, don't use tail as the name, use a unique name.
     tail = tail[:-3] # remove .py
-    para_imp = imp.load_source(head, path_file)
+    para_imp = imp.load_source(tail, path_file)
     # FIXME big hack.  The Parameter_data instance name is hard-wired
     # Have it parse the 'sdp = Parameter_data()' line for the name
     try:
@@ -665,6 +666,8 @@ def introspect_attribute_values(instance):
     """
     Puts all the attribite values of the instance into a dictionary
     """
+    #for att in dir(instance):
+     #   print "att", att
     attributes = [att for att in dir(instance) if not callable(
         getattr(instance, att)) and not att[-2:] == '__']
     att_values = {}

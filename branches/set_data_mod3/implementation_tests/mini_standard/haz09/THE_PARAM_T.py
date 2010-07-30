@@ -43,7 +43,7 @@ atten_models = ['Toro_1997_midcontinent']
 atten_model_weights = [1]
 atten_aggregate_Sa_of_atten_models = True
 atten_use_variability = False
-atten_variability_method = 2
+atten_variability_method = None
 atten_periods = [0.0, 0.30303000000000002, 1.0]
 atten_threshold_distance = 400
 atten_use_rescale_curve_from_pga = False
@@ -55,7 +55,7 @@ atten_smooth_spectral_acceleration = None
 # Amplification
 use_amplification = True
 amp_use_variability = False
-amp_variability_method = 2
+amp_variability_method = None
 amp_min_factor = 0.6
 amp_max_factor = 10000
 

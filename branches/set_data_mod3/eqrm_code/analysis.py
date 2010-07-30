@@ -114,7 +114,7 @@ def main(parameter_handle,
     del compress_output
     del eqrm_dir
     del is_parallel
-
+    
      # Reset random seeds if required
     # If use_determ_seed is True, then use a hardwired seed.
     # If use_determ_seed is False, set random seeds based on time.

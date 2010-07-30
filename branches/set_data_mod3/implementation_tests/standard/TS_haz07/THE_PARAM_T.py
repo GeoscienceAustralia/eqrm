@@ -56,7 +56,7 @@ atten_log_sigma_eq_weight = 0
 # Amplification
 use_amplification = True
 amp_use_variability = False
-amp_variability_method = 2
+amp_variability_method = None
 amp_min_factor = 0.6
 amp_max_factor = 10000
 

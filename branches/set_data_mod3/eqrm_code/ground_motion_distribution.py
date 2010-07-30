@@ -32,9 +32,14 @@ class Log_normal_distribution(object):
                 
         self.min_cutoff=None
         self.max_cutoff=None
-        
-        self.var_flag=int(var_flag)
-        self.var_method=var_method        
+
+        if var_method is None:
+            var_method = 1
+        if var_flag is False:
+            print "var_method", var_method
+            assert var_method == 1
+        self.var_flag = int(var_flag)
+        self.var_method = var_method        
         self.rvs=norm.rvs # function from scipy.stats
         self.pdf=norm.pdf # function from scipy.stats
         self.num_psudo_events = num_psudo_events
