@@ -145,7 +145,7 @@ class Event_Set(object):
           azimuth: azimuth of event, degrees
           dip: dip of virtual faults, degrees
           ML or Mw: earthquake magnitude. analysis only uses Mw.
-          depth: depth to event, km
+          depth: depth to event centroid, km
           fault_width: Maximum width along virtual fault, km
           fault_depth: depth to the top of the seismmogenic region, km.
           determ_number_of_events: Number of events
@@ -246,6 +246,10 @@ class Event_Set(object):
             depth = conversions.depth(
                 fault_depth,dip,Mw,fault_width)
             
+        # ROSS calc depth_to_top
+
+        # Add function conversions
+        
         length = area/width
 
         # Calculate the distance of the origin from the centroid
