@@ -456,13 +456,13 @@ def main(parameter_handle,
             # Applies a minimum and maxium acceptable amplification factor
             # re-scale SAsoil if Ampfactor falls ouside acceptable
             # ampfactor bounds
-            if THE_PARAM_T.amp_use_variability is True:
-                if not THE_PARAM_T.amp_min_factor is None:
+            if THE_PARAM_T.amp_variability_method is not None:
+                if THE_PARAM_T.amp_min_factor is not None:
                     too_low = (soil_SA/bedrock_SA) < THE_PARAM_T.amp_min_factor
                     soil_SA[where(too_low)] = (THE_PARAM_T.amp_min_factor *
                                                bedrock_SA[where(too_low)])
                     del too_low
-                if not THE_PARAM_T.amp_max_factor is None:
+                if THE_PARAM_T.amp_max_factor is not None:
                     too_high = (soil_SA/bedrock_SA) > THE_PARAM_T.amp_max_factor
                     soil_SA[where(too_high)] = (THE_PARAM_T.amp_max_factor*
                                                 bedrock_SA[where(too_high)])

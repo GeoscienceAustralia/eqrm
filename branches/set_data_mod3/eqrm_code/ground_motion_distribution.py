@@ -99,7 +99,8 @@ class Log_normal_distribution(object):
             elif self.var_method == 7:
                 # corrected mean
                 sample_values = self.corrected_mean
-                
+
+            # min_cutoff and max_cutoff are obsolete
             if self.min_cutoff is not None:
                 sample_values=where(sample_values>self.min_cutoff,
                                     sample_values,self.min_cutoff)
