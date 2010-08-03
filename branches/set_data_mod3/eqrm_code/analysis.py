@@ -255,8 +255,7 @@ def main(parameter_handle,
     log.resource_usage()
 
     ground_motion_distribution = \
-        Log_normal_distribution(THE_PARAM_T.atten_use_variability,
-                                THE_PARAM_T.atten_variability_method,
+        Log_normal_distribution(THE_PARAM_T.atten_variability_method,
                                 num_psudo_events,
                                 num_sites_per_site_loop=NUM_SITES_PER_SITE_LOOP)
 
@@ -276,8 +275,7 @@ def main(parameter_handle,
     # searches input_dir then defaultdir
     if THE_PARAM_T.use_amplification is True:
         regolith_amp_distribution = \
-            Log_normal_distribution(THE_PARAM_T.amp_use_variability,
-                                    THE_PARAM_T.amp_variability_method,
+            Log_normal_distribution(THE_PARAM_T.amp_variability_method,
                                     num_psudo_events=num_psudo_events,
                                     num_sites_per_site_loop= \
                                         NUM_SITES_PER_SITE_LOOP)

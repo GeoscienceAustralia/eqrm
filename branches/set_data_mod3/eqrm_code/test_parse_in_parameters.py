@@ -277,7 +277,6 @@ save_socloss_flag=[1]\n")
         set.atten_models = ['my_attenuation_model','Gaull_1990_WA']
         set.atten_model_weights = [0.3,0.7]
         set.atten_aggregate_Sa_of_atten_models = False 
-        set.atten_use_variability = True
         set.atten_variability_method = 2 
         set.atten_periods = [0,0.30303,1]
         set.atten_threshold_distance = 400
@@ -290,7 +289,6 @@ save_socloss_flag=[1]\n")
 
         #  Amplification  
         set.use_amplification = True  
-        set.amp_use_variability = True
         set.amp_variability_method = 2 
         set.amp_min_factor = 0.6
         set.amp_max_factor = 2
@@ -367,12 +365,10 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.atten_use_rescale_curve_from_pga == True)
         self.failUnless(TPT.atten_override_RSA_shape == 'HAZUS_Sa')
         self.failUnless(TPT.atten_cutoff_max_spectral_displacement == True)
-        self.failUnless(TPT.atten_use_variability == True)
         self.failUnless(TPT.atten_variability_method == 2)
         self.failUnless(TPT.atten_smooth_spectral_acceleration == 1)
         self.failUnless(TPT.atten_log_sigma_eq_weight == 1.0)
         self.failUnless(TPT.use_amplification == 1)
-        self.failUnless(TPT.amp_use_variability == 1)
         self.failUnless(TPT.amp_variability_method == 2)
         self.failUnless(TPT.amp_min_factor == 0.6)
         self.failUnless(TPT.amp_max_factor == 2)
@@ -418,6 +414,16 @@ save_socloss_flag=[1]\n")
         set = self.build_instance_to_THE_PARAM_T()
         TPT = create_parameter_data(set)
         self.check_THE_PARAM_T(TPT)
+
+
+    def test_instance_to_THE_PARAM_T_depreciated_atts(self):
+        set = self.build_instance_to_THE_PARAM_T()
+        set.atten_use_variability = False
+        set.amp_use_variability = False
+        TPT = create_parameter_data(set)
+        self.failUnless(TPT.atten_variability_method == None)
+        self.failUnless(TPT.amp_variability_method == None)
+
 
     def test_convert_THE_PARAM_T_to_py(self):
         set = self.build_instance_to_THE_PARAM_T()
@@ -1095,7 +1101,7 @@ save_socloss_flag=[0]\n")
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Parse_in_parameters,'test')
     
-    #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_old_set_data_py_2_new_set_data_py')
+    #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_instance_to_THE_PARAM_T')
     #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_convert_par_to_py')
     runner = unittest.TextTestRunner() #verbosity=2)
     runner.run(suite)

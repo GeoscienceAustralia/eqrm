@@ -29,6 +29,7 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_MODIFY_TAV, CSM_DAMPING_DO_NOT_MODIFY_TAV
 from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING, \
      CSM_DAMPING_DO_NOT_USE_SMOOTHING
+from eqrm_code.ANUGA_utilities import log
 
 # DSG-DSG this needs more comments.
 """
@@ -135,13 +136,6 @@ CONV_NEW = [{'order': 10.0,
             {'order': 50.03,
              'new_para': 'atten_aggregate_Sa_of_atten_models',
              'default': True},
-            {'old_para': 'var_attn_flag',
-             'values': {None: None,
-                        1: True,
-                        0: False},
-             'order': 50.04,
-             'new_para': 'atten_use_variability',
-             'default': False},
             {'old_para': 'var_attn_method',
              'order': 50.05,
              'new_para': 'atten_variability_method',
@@ -189,13 +183,6 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 60.01,
              'new_para': 'use_amplification'},
-            {'old_para': 'var_amp_flag',
-             'values': {None: None,
-                        1: True,
-                        0: False},
-             'order': 60.02,
-             'new_para': 'amp_use_variability',
-             'default': False},
             {'old_para': 'var_amp_method',
              'order': 60.03,
              'new_para': 'amp_variability_method',
@@ -370,6 +357,15 @@ KNOWN_KWARGS = {'use_determ_seed':None,
                      'is_parallel':None,
                      'default_input_dir':None}
 
+DEPRECIATED_PARAS = {'atten_use_variability':
+                     {True:None,
+                      False:('atten_variability_method', None)},
+                     'amp_use_variability':
+                     {True:None,
+                      False:('amp_variability_method', None)},
+                     #'atten_use_rescale_curve_from_pga':('atten_override_RSA_shape', None)
+                     }
+
 # This has all allowable set_data variables
 CONV_DIC_NEW = {}
 for item in CONV_NEW:
@@ -390,7 +386,6 @@ PAR_STYLE_TITLES = [{'title':'\n# Operation Mode\n', 'order':10.0},
                     {'title':'\n# Loss\n', 'order':90.0},
                     {'title':'\n# Save\n', 'order':100.0},
                     {'title':'\n# General\n', 'order':110.0}]
-
 
 
 class Error(Exception):
@@ -439,8 +434,12 @@ def create_parameter_data(parameters, **kwargs):
     # Add Hard-wired results  
     THE_PARAM_T.update(OLD_STYLE_PARAS_HARD_WIRED)
 
+    #print "THE_PARAM_T", THE_PARAM_T
     # Add default values
     att_default_values(THE_PARAM_T)
+
+    # Remove depreciated attributes
+    depreciated_attributes(THE_PARAM_T)
    
     # Check att names
     conv_new_dic = {}
@@ -479,7 +478,25 @@ def att_default_values(THE_PARAM_T):
                 raise ParameterSyntaxError(
                 "Parameter Error: Attribute "  + item['new_para']
                 + " must be defined.")
+
+def depreciated_attributes(THE_PARAM_T):
+    """Remove depreciated attributes
+    """
+        
+    for item in DEPRECIATED_PARAS:
+        if THE_PARAM_T.has_key(item):
+            logic_dic = DEPRECIATED_PARAS[item]
+            what_to_do = logic_dic[THE_PARAM_T[item]]
+            if what_to_do is not None:
+                # The value is a tuple.
+                # the first value is the att name
+                # the second value is the att value
+                THE_PARAM_T[what_to_do[0]] = what_to_do[1]
                 
+            msg = 'WARNING: ' + item + \
+                  ' term in set data files is depreciated.' 
+            log.info(msg)
+            del THE_PARAM_T[item]
 
 def att_value_fixes(THE_PARAM_T):
     """
@@ -569,12 +586,14 @@ def change_slashes(path):
             path = apply(join, split_path)
     return path
 
-            
+
+unique_load_source_int = 0            
 def from_file_get_params(path_file):
+    global unique_load_source_int
     head, tail = os.path.split(os.path.abspath(path_file))
-    # FIXME, don't use tail as the name, use a unique name.
-    tail = tail[:-3] # remove .py
-    para_imp = imp.load_source(tail, path_file)
+    name = 'name_' + str(unique_load_source_int)
+    unique_load_source_int += 1
+    para_imp = imp.load_source(name, path_file)
     # FIXME big hack.  The Parameter_data instance name is hard-wired
     # Have it parse the 'sdp = Parameter_data()' line for the name
     try:
