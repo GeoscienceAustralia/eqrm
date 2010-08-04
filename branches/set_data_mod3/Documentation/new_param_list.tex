@@ -91,10 +91,10 @@ apply to each of the attenuation model specified in
 \typepar{atten\_aggregate\_Sa\_of\_atten\_models}{}{}   &
 Set to \texttt{True} to aggregate the surface acceleration's when
 multiple attenuation models are used.\\
-\typepar{atten\_use\_variability}{}{}   &   If \texttt{True} use the
-variability method described below.\\
+
 \typepar{atten\_variability\_method}{}{} & Technique used to
 incorporate attenuation aleatory uncertainty: \\
+ & \hspace{0.5em} None $\Rightarrow$ No sampling; \\
  & \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
  & \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
  & \hspace{0.5em} 4 $\Rightarrow$ $+\sigma$; \\
@@ -129,9 +129,8 @@ PGA in units g. $S_a$ at all periods re-scaled accordingly.      \\
 \begin{supertabular}{lp{0.6\textwidth}}
 \typepar{use\_amplification}{}{}  &  If set to
 \texttt{True} use amplification associated with the local regolith: \\
-\typepar{amp\_use\_variability}{}{}    &  If \texttt{True} use the
-variability method described below. \\
 \typepar{amp\_variability\_method}{}{}  & Technique used to incorporate amplification aleatory uncertainty: \\
+ & \hspace{0.5em} None $\Rightarrow$ No sampling; \\
  & \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
  & \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
  & \hspace{0.5em} 4 $\Rightarrow$ $+\sigma$; \\
