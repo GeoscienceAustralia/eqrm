@@ -65,7 +65,7 @@ class Damage_model(object):
                           'csm_damping_max_iterations': 7,
                           'sdtcap': 0.3,
                           'csm_use_variability': False,
-                          'csm_variability_method': 0,
+                          'csm_variability_method': None,
                           'csm_hysteretic_damping': 'Error',
                           'atten_override_RSA_shape': None,
                           'atten_cutoff_max_spectral_displacement': False,
@@ -125,6 +125,8 @@ class Damage_model(object):
         assert len(SA.shape) == 3
         assert len(SD.shape) == 3
         structure_state = state_probability(threshold, beta_th_sd, SD)
+        # The above could be a typo.  Is this what we want?
+        # It will change scenario results.
 
         threshold = building_parameters['drift_threshold']
         threshold = threshold[:,newaxis,:]

@@ -172,7 +172,8 @@ def calculate_kappa(magnitude,damping_s,damping_m,damping_l):
     
 def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u,sdtcap=None,
                                   number_events=None,
-                                  csm_use_variability=False,csm_variability_method=0):
+                                  csm_use_variability=False,
+                                  csm_variability_method=None):
     """
     Use building parameters to calculate capacity parameters
     
@@ -202,6 +203,7 @@ def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u,sdtcap=None,
     Au=Lambda*Ay        
     Du=Lambda*u*Dy
 
+    #if csm_variability_method is not None:
     if csm_use_variability:
         if csm_variability_method == 3:
             variate=stats.norm.rvs(size=(Au.size*number_events))

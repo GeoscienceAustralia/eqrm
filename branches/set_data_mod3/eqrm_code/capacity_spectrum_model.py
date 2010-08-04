@@ -44,7 +44,7 @@ class Capacity_spectrum_model(object):
                  csm_damping_max_iterations=7,
                  sdtcap=.3,
                  csm_use_variability=False,
-                 csm_variability_method=1):
+                 csm_variability_method=None):
         """
 Usage:
 
