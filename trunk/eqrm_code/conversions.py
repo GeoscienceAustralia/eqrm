@@ -15,6 +15,7 @@
 """
 
 from scipy import vectorize, sqrt, sin, minimum, pi, where
+import math
 
 def Johnston_01_ML(Mw):
     """
@@ -67,6 +68,42 @@ def depth(fault_depth,dip,Mw,fault_width=None):
     depth2=fault_depth+fault_width*sin(dip*rad)-0.5*Mw*sin(dip*rad)
     depth=where(depth1<depth2,depth1,depth2)
     return depth
+
+def calc_depth_to_top(depth, width, delta):
+    """Given a fault details, get depth to rupture top.
+
+    depth  depth to fault centroid (km)
+    width  width of rupture (km)
+    delta  fault dip angle (degrees)
+
+    All three parameters are expected to be numpy arrays.
+
+    Returns Rtor, depth to top of rupture (km)
+    Rtor = depth - (width/2)*sin(delta)
+    """
+
+    # check dimensions of all three params the same
+    try:
+        msg = ('Expected depth.shape == width.shape, %s != %s' 
+               % (str(depth.shape), str(width.shape)))
+    except AttributeError:
+        raise AssertionError('calc_depth_to_top: expect numpy.array params')
+    assert depth.shape == width.shape, msg
+
+    try:
+        msg = ('Expected depth.shape == delta.shape, %s != %s' 
+               % (str(depth.shape), str(delta.shape)))
+    except AttributeError:
+        raise AssertionError('calc_depth_to_top: expect numpy.array params')
+    assert depth.shape == delta.shape, msg
+
+    # convert dip angle in degrees to radians
+    delta_rad = (delta*2*math.pi) / 360.0
+
+    # get and return Rtor
+    return depth - (width/2)*sin(delta_rad)
+
+
 ###################
 # END OF FUNCTIONS#
 ###################
