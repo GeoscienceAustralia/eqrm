@@ -1,6 +1,5 @@
 """
   EQRM parameter file
-
   All input files are first searched for in the input_dir, then in the
   resources/data directory, which is part of EQRM.
 
@@ -42,7 +41,6 @@ prob_dip_in_zones = [35, 35, 35, 35, 35, 35]
 atten_models = ['Toro_1997_midcontinent']
 atten_model_weights = [1]
 atten_aggregate_Sa_of_atten_models = True
-atten_use_variability = True
 atten_variability_method = 2
 atten_periods = [0.0, 0.30303000000000002, 1.0]
 atten_threshold_distance = 400
@@ -55,7 +53,6 @@ atten_log_sigma_eq_weight = 0
 
 # Amplification
 use_amplification = True
-amp_use_variability = True
 amp_variability_method = 2
 amp_min_factor = 0.6
 amp_max_factor = 10000

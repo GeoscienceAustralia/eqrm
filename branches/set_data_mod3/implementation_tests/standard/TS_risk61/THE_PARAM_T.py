@@ -1,6 +1,5 @@
 """
   EQRM parameter file
-
   All input files are first searched for in the input_dir, then in the
   resources/data directory, which is part of EQRM.
 
@@ -43,9 +42,8 @@ prob_dip_in_zones = [35, 35, 35, 35, 35, 35]
 atten_models = ['Toro_1997_midcontinent']
 atten_model_weights = [1.0]
 atten_aggregate_Sa_of_atten_models = False
-atten_use_variability = True
 atten_variability_method = 2
-atten_periods = [0.0, 0.175, 0.3, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.1, 3.4]
+atten_periods = [0.0, 0.17499999999999999, 0.29999999999999999, 0.80000000000000004, 1.0, 1.2, 1.3999999999999999, 1.6000000000000001, 1.8, 2.1000000000000001, 3.3999999999999999]
 atten_threshold_distance = 400
 atten_use_rescale_curve_from_pga = False
 atten_override_RSA_shape = None
@@ -56,7 +54,6 @@ atten_log_sigma_eq_weight = 0
 
 # Amplification
 use_amplification = True
-amp_use_variability = True
 amp_variability_method = 2
 amp_min_factor = 0.6
 amp_max_factor = 10000
@@ -64,8 +61,6 @@ amp_max_factor = 10000
 # Buildings
 buildings_usage_classification = "HAZUS" 
 buildings_set_damping_Be_to_5_percent = False
-
-# Bridges
 bridges_functional_percentages = [25, 50, 75]
 
 # Capacity Spectrum Method

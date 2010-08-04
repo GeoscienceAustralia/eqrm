@@ -50,7 +50,7 @@ Lists are automatically converted to arrays.
 
 ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
-SECOND_LINE = '  EQRM parameter file\n'
+SECOND_LINE = '  EQRM parameter file'
 
 
 CONV_NEW = [{'order': 10.0,
@@ -660,15 +660,15 @@ def find_set_data_py_files(path=None):
                 f = open(file_path_name,'r')
                 _ = f.readline()
                 snd_line = f.readline()
-                if SECOND_LINE == snd_line:
-                    set_data_files.append(file_path_name)        
+                if SECOND_LINE in snd_line:
+                    set_data_files.append(file_path_name)  
                 f.close()
     return set_data_files
 
 def old_set_data_py_2_new_set_data_py(file_name_path,
                                       new_file_name_path=None):
     """Open a set data .py file and then save it again,
-    using the CONV_NEW rules.
+    using the CONV_NEW rules and depreciation rules.
 
     Used to move attributes position around for all of the
     set_data.py files in the sandpit
@@ -678,6 +678,8 @@ def old_set_data_py_2_new_set_data_py(file_name_path,
     if new_file_name_path is None:
         new_file_name_path = file_name_path
     parameters = from_file_get_params(file_name_path)
+    # Remove depreciated attributes
+    depreciated_attributes(parameters)
     convert_attribute_dic_to_set_data_py(new_file_name_path, parameters)
     
     
@@ -799,9 +801,9 @@ class Parameter_data(object):
         return "_".join((time, user))
         
 def convert_attribute_dic_to_set_data_py(py_file_name, attribute_dic):
-    """
-    Given THE_PARAM_T convert it to a set data .py file.
-    set data .py files describe the EQRM parameters.
+    """ Given a dictionary of the set data attribute values convert it
+    to a set data .py file.  set data .py files describe the EQRM
+    parameters.
 
     py_file_name: Name of the new file.
 

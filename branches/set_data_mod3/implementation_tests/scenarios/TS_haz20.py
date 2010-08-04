@@ -1,6 +1,5 @@
 """
   EQRM parameter file
-
   All input files are first searched for in the input_dir, then in the
   resources/data directory, which is part of EQRM.
 
@@ -31,12 +30,13 @@ scenario_magnitude = 5.6
 scenario_dip = 35
 scenario_number_of_events = 1
 
+# Probabilistic input
 
 # Attenuation
 atten_models = ['Toro_1997_midcontinent']
 atten_model_weights = [1]
 atten_aggregate_Sa_of_atten_models = True
-atten_use_variability = False
+atten_variability_method = None
 atten_periods = [0.0, 0.17544000000000001, 0.35088000000000003, 0.52632000000000001, 0.70174999999999998, 0.87719000000000003, 1.0526, 1.2281, 1.4035, 1.5789, 1.7544, 1.9298, 2.1053000000000002, 2.2806999999999999, 2.4561000000000002, 2.6316000000000002, 2.8069999999999999, 2.9824999999999999, 3.1579000000000002, 3.3332999999999999]
 atten_use_rescale_curve_from_pga = False
 atten_cutoff_max_spectral_displacement = False
@@ -45,7 +45,13 @@ atten_smooth_spectral_acceleration = None
 
 # Amplification
 use_amplification = True
-amp_use_variability = False
+amp_variability_method = None
+
+# Buildings
+
+# Capacity Spectrum Method
+
+# Loss
 
 # Save
 save_hazard_map = False

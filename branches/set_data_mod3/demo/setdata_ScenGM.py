@@ -1,6 +1,5 @@
 """
   EQRM parameter file
-
   All input files are first searched for in the input_dir, then in the
   resources/data directory, which is part of EQRM.
 
@@ -43,7 +42,6 @@ prob_dip_in_zones = 35
 atten_models = ['Youngs_97_interface']
 atten_model_weights = [1]
 atten_aggregate_Sa_of_atten_models = True
-atten_use_variability = True
 atten_variability_method = 4
 atten_periods = [0.0, 0.029999999999999999, 0.074999999999999997, 0.10000000000000001, 0.20000000000000001, 0.29999999999999999, 0.40000000000000002, 0.5, 0.75, 1.0, 2.0, 3.0, 4.0]
 atten_threshold_distance = 400
@@ -56,8 +54,7 @@ atten_log_sigma_eq_weight = 0
 
 # Amplification
 use_amplification = True
-amp_use_variability = False
-amp_variability_method = 2
+amp_variability_method = None
 amp_min_factor = 0.6
 amp_max_factor = 10000
 
