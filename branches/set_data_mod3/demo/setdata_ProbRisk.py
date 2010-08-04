@@ -67,7 +67,6 @@ csm_standard_deviation = 0.3
 csm_damping_regimes = 0
 csm_damping_modify_Tav = True
 csm_damping_use_smoothing = True
-csm_use_hysteretic_damping = True
 csm_hysteretic_damping = "Error" 
 csm_SDcr_tolerance_percentage = 1
 csm_damping_max_iterations = 7

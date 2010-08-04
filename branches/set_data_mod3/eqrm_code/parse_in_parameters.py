@@ -238,9 +238,6 @@ CONV_NEW = [{'order': 10.0,
             {'order': 80.06,
              'new_para': 'csm_damping_use_smoothing',
              'default': None},
-            {'order': 80.07,
-             'new_para': 'csm_use_hysteretic_damping',
-             'default': None},
             {'old_para': 'Harea_flag',
              'values': {None: None,
                         1: 'Error',
@@ -363,6 +360,9 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'atten_use_rescale_curve_from_pga':
                      {True:None, # None means do nothing
                       False:('atten_override_RSA_shape', None)},
+                     'csm_use_hysteretic_damping':
+                     {True:None, # None means do nothing
+                      False:('csm_hysteretic_damping', None)},
 #                      'csm_use_variability':
 #                      {True:None, # None means do nothing
 #                       None:('csm_variability_method', None), 

@@ -163,40 +163,29 @@ should NOT be set after initialization - read __init__ for reasons.
             print displacement
             raise ValueError
         non_linear_damping=self._non_linear_damping(displacement)
-        SA,SD,SAcap=self._damped_response(non_linear_damping)
-        if self.csm_hysteretic_damping==0: # Not used. Check logic.
-            print "!!!!!!!!!!!!!!!!!!!!!!!!"
-            import sys
-            sys.exit()
-            exit_flag=True
-        else:
-            exit_flag= not (non_linear_damping>0).any()
+        SA,SD,SAcap = self._damped_response(non_linear_damping)
+        exit_flag = not (non_linear_damping>0).any()
         return SA,SD,SAcap,exit_flag
 
     def _non_linear_damping(self,displacement):
-        if self.csm_hysteretic_damping==0:  # Not used. Check logic.
-            print "!!!!!!!!!!!!!!!!!!!!!!!!"
-            import sys
-            sys.exit()
-            return 0.0
+        
+        # Calculate the acceleration of the intersect point.
+        displacement=displacement[:,:,newaxis]
+        acceleration=calculate_capacity(displacement,
+                                        self.capacity_parameters)
+        assert acceleration.shape[-1]==1 # should not have periods
+        # Get the right damping function.
+        if self.csm_hysteretic_damping is 'trapeziodal':
+            damping_function=trapazoid_damp   
         else:
-            # Calculate the acceleration of the intersect point.
-            displacement=displacement[:,:,newaxis]
-            acceleration=calculate_capacity(displacement,
-                                            self.capacity_parameters)
-            assert acceleration.shape[-1]==1 # should not have periods
-            # Get the right damping function.
-            if self.csm_hysteretic_damping is 'trapeziodal':
-                damping_function=trapazoid_damp   
-            else:
-                damping_function=nonlin_damp
-                
-            SA,SD=acceleration,displacement
-            # calculate damping
-            damping=damping_function(self.capacity_parameters,
-                                     self.kappa,SA,SD,self.csm_hysteretic_damping)
-            damping[where(SA<0.00000000001)]=0
-            return damping
+            damping_function=nonlin_damp
+            
+        SA,SD=acceleration,displacement
+        # calculate damping
+        damping=damping_function(self.capacity_parameters,
+                                 self.kappa,SA,SD,self.csm_hysteretic_damping)
+        damping[where(SA<0.00000000001)]=0
+        return damping
     
     def _damped_response(self,non_linear_damping=0.0):        
         SA0,SD0=self.undamped_response # retrieve undamped response

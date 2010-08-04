@@ -307,7 +307,6 @@ save_socloss_flag=[1]\n")
         set.csm_damping_regimes = 0       # (0|1|2) See manual for this
         set.csm_damping_modify_Tav = True 
         set.csm_damping_use_smoothing = True
-        set.csm_use_hysteretic_damping = True
         set.csm_hysteretic_damping = 'curve'    # ('curve'|'trapezoidal'|None)
         set.csm_SDcr_tolerance_percentage = 2
         set.csm_damping_max_iterations = 7
@@ -386,7 +385,6 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.csm_damping_regimes == 0)
         self.failUnless(TPT.csm_damping_modify_Tav == True)
         self.failUnless(TPT.csm_damping_use_smoothing == True)
-        self.failUnless(TPT.csm_use_hysteretic_damping == True)
         self.failUnless(TPT.csm_hysteretic_damping == 'curve')
         self.failUnless(TPT.csm_SDcr_tolerance_percentage == 2.)
         self.failUnless(TPT.csm_damping_max_iterations == 7)
@@ -692,7 +690,6 @@ save_socloss_flag=[0]\n")
         set.csm_damping_regimes = 0   
         set.csm_damping_modify_Tav = True 
         set.csm_damping_use_smoothing = True
-        set.csm_use_hysteretic_damping = True 
         set.csm_hysteretic_damping = 'curve'
         set.csm_SDcr_tolerance_percentage = 2
         set.csm_damping_max_iterations = 7
