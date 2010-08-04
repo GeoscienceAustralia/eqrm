@@ -45,7 +45,6 @@ atten_aggregate_Sa_of_atten_models = False
 atten_variability_method = 2
 atten_periods = [0.0, 0.17499999999999999, 0.29999999999999999, 0.80000000000000004, 1.0, 1.2, 1.3999999999999999, 1.6000000000000001, 1.8, 2.1000000000000001, 3.3999999999999999]
 atten_threshold_distance = 400
-atten_use_rescale_curve_from_pga = False
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
 atten_pga_scaling_cutoff = 2

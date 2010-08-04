@@ -65,7 +65,7 @@ class Event_Set(object):
               range : [0:360)
       dip : dips  - scalar or n-vector
               range : (0:90) #TODO ask Trev or Trev - maybe [0,90], or (0,90]??
-      depth : depths - scalar or n-vector
+      depth : depths - scalar or n-vector, km
             range (0:large]
             ie [5,5,10,...]        
       Mw : moment magnitudes - scalar or n-vector

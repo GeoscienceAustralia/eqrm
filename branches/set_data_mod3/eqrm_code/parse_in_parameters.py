@@ -147,9 +147,6 @@ CONV_NEW = [{'order': 10.0,
              'order': 50.07,
              'new_para': 'atten_threshold_distance',
              'default': 400},
-            {'order': 50.08,
-             'new_para': 'atten_use_rescale_curve_from_pga',
-             'default': False},
             {'old_para': 'resp_crv_flag',
              'values': {0: None,
                         2: 'Aust_standard_Sa',
@@ -363,7 +360,9 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'amp_use_variability':
                      {True:None,
                       False:('amp_variability_method', None)},
-                     #'atten_use_rescale_curve_from_pga':('atten_override_RSA_shape', None)
+                     'atten_use_rescale_curve_from_pga':
+                     {True:None, # None means do nothing
+                      False:('atten_override_RSA_shape', None)},
                      }
 
 # This has all allowable set_data variables
