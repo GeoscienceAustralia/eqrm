@@ -87,7 +87,8 @@ save_prob_structural_damage = None
 # General
 site_tag = "newc" 
 return_periods = [7500, 10000]
-site_indexes = None
+use_site_indexes = False
+site_indexes = 2255
 site_db_tag = "" 
 input_dir = r".\input/" 
 output_dir = r".\output\plot_prob_haz/" 

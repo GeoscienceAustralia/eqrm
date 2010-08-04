@@ -321,6 +321,13 @@ CONV_NEW = [{'order': 10.0,
             {'old_para': 'rtrn_per',
              'order': 110.05,
              'new_para': 'return_periods'},
+            {'old_para': 'small_site_flag',
+             'values': {None: None,
+                        1: True,
+                        0: False},
+             'order': 110.06,
+             'new_para': 'use_site_indexes',
+             'default': False},
             {'old_para': 'SiteInd',
              'order': 110.07,
              'new_para': 'site_indexes',
@@ -356,9 +363,6 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'csm_use_hysteretic_damping':
                      {True:None, # None means do nothing
                       False:('csm_hysteretic_damping', None)},
-                     'use_site_indexes':
-                     {True:None, # None means do nothing
-                      False:('site_indexes', None)},
 #                      'csm_use_variability':
 #                      {True:None, # None means do nothing
 #                       None:('csm_variability_method', None), 

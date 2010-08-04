@@ -218,17 +218,17 @@ class Sites(object):
         return Sites(new_lat, new_lon, **new_attr)
 
 
-def truncate_sites_for_test(sites, site_indexes):
+def truncate_sites_for_test(use_site_indexes, sites, site_indexes):
     """Sample sites (for testing).
 
     use_site_indexes  id True, do sampling, else return unchanged sites
     sites             is a Sites object
     site_indexes      is an array of indexes
 
-    If site_indexes is None, return 'sites' unchanged.
+    If 'use_site_indexes' is False, just return 'sites' unchanged.
     """
 
-    if site_indexes is not None:
+    if use_site_indexes is True:
         return sites[site_indexes-1]	# -1 offset to match matlab
 
     return sites

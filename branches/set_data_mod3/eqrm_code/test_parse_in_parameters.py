@@ -247,6 +247,7 @@ save_socloss_flag=[1]\n")
         set.is_scenario = True    # If False, probabilistic input used
 
         # General
+        set.use_site_indexes = True
         set.site_tag= 'newc'
         set.site_db_tag = 'fish'
         set.site_indexes = [2255,11511]
@@ -335,7 +336,9 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.output_dir == 'c:/out/')        
         self.failUnless(TPT.return_periods == [22,11])        
         self.failUnless(TPT.grid_flag == 1)
-                
+        
+        self.failUnless(TPT.use_site_indexes == 1)
+        
         self.failUnless(TPT.is_scenario == True)
         self.failUnless(TPT.scenario_azimith == 20)
         self.failUnless(TPT.scenario_depth == 11.5)
@@ -441,6 +444,7 @@ save_socloss_flag=[1]\n")
         set.is_scenario = True    # If False, probabilistic input used
 
         # General
+        set.use_site_indexes = True
         set.site_tag= 'newc'
         set.site_db_tag = 'fish'
         set.site_indexes = [2255,11511]
@@ -628,6 +632,7 @@ save_socloss_flag=[0]\n")
         set.run_type = 'hazard'   # ('risk'|'hazard')
         
         # General
+        set.use_site_indexes = True # Only use this for testing
         set.site_tag = 'newc'
         set.site_indexes = [2255,11511,10963]
         set.site_db_tag = "" # file nam is sitedb_[site_tag][site_db_tag].csv
@@ -1013,6 +1018,7 @@ save_socloss_flag=[0]\n")
                                                   180, 180, 180]),
             'prob_azimuth_in_zones': array([180, 180, 180, 180, 180, 180]),
             'General': {'destring': 'no description sring set',
+                        'use_site_indexes': 1,
                         'site_tag': 'newc',
                         'site_indexes': array([ 2255, 11511, 10963,
                                                 686,  1026]),

@@ -232,7 +232,7 @@ def main(parameter_handle,
     (sites, have_bridge_data) = load_data(THE_PARAM_T)
 
     # if required, 'thin' sites for testing
-    all_sites = truncate_sites_for_test(sites,
+    all_sites = truncate_sites_for_test(THE_PARAM_T.use_site_indexes, sites,
                                         THE_PARAM_T.site_indexes)
 
     del sites

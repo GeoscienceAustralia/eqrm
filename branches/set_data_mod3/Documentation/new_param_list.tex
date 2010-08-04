@@ -219,9 +219,12 @@ damage state.  Note this is only allowed when there is one event. \\
 \begin{supertabular}{lp{0.6\textwidth}}
  \typepar{site\_tag}{}{}    &   String used in input and output file
  names. This is usually used to define the city of interest.\\
+\typepar{use\_site\_indexes}{}{} & If \texttt{True} sample sites with
+indices in \typepar{site\_indexes}{}{}.  Only use to test
+simulations. \\
 \typepar{site\_indexes}{}{} & List whose elements represent the site
- indices to be used. The
- index of the first row of data is 1. Set to \texttt{None} to use all sites.\\
+ indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
+ index of the first row of data is 1.\\
  \typepar{site\_db\_tag}{}{}    &   String used specify the structure
  data base.  The file name is \texttt{sitedb\_[site\_tag][site\_db\_tag].csv}\\
 \typepar{return\_periods}{}{}  &   List whose elements represent the return periods to be considered for hazard. \\
