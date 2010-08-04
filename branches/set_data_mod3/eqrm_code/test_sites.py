@@ -129,15 +129,13 @@ class Test_Sites(unittest.TestCase):
         latitude = [10, 20]
         longitude = [1, 2]
         sites = Sites(latitude, longitude, **attributes)
-        use_site_indexes = False
-        site_indexes = array([2])
-        new_sites = truncate_sites_for_test(use_site_indexes, sites,
+        site_indexes = None
+        new_sites = truncate_sites_for_test( sites,
                                             site_indexes)
         self.failUnless(allclose(array([1, 2]), new_sites.attributes['id']))
 
-        use_site_indexes = True
         site_indexes = array([2])
-        new_sites = truncate_sites_for_test(use_site_indexes,sites,
+        new_sites = truncate_sites_for_test(sites,
                                             site_indexes)
         self.failUnlessEqual(site_indexes, new_sites.attributes['id'])
 
