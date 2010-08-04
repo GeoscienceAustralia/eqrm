@@ -363,6 +363,10 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'atten_use_rescale_curve_from_pga':
                      {True:None, # None means do nothing
                       False:('atten_override_RSA_shape', None)},
+#                      'csm_use_variability':
+#                      {True:None, # None means do nothing
+#                       None:('csm_variability_method', None), 
+#                       False:('csm_variability_method', None)},
                      }
 
 # This has all allowable set_data variables

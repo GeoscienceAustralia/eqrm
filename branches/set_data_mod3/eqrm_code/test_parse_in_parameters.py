@@ -282,7 +282,6 @@ save_socloss_flag=[1]\n")
         set.atten_threshold_distance = 400
         set.atten_cutoff_max_spectral_displacement  = True
         set.atten_pga_scaling_cutoff = 4.3  # None or a value
-        set.atten_use_rescale_curve_from_pga = True
         set.atten_override_RSA_shape = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
         set.atten_smooth_spectral_acceleration = True
         set.atten_log_sigma_eq_weight = 1.0
@@ -362,7 +361,6 @@ save_socloss_flag=[1]\n")
         self.failUnless(allclose(TPT.atten_periods, asarray([0,0.30303,1])))
         self.failUnless(TPT.atten_threshold_distance == 400)
         self.failUnless(TPT.atten_pga_scaling_cutoff ==  4.3)
-        self.failUnless(TPT.atten_use_rescale_curve_from_pga == True)
         self.failUnless(TPT.atten_override_RSA_shape == 'HAZUS_Sa')
         self.failUnless(TPT.atten_cutoff_max_spectral_displacement == True)
         self.failUnless(TPT.atten_variability_method == 2)
@@ -484,7 +482,6 @@ save_socloss_flag=[1]\n")
         set.atten_threshold_distance = 400
         set.atten_cutoff_max_spectral_displacement  = True
         set.atten_pga_scaling_cutoff = 4.3  # None or a value
-        set.atten_use_rescale_curve_from_pga = True
         set.atten_override_RSA_shape = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
         set.atten_smooth_spectral_acceleration = True
         set.atten_log_sigma_eq_weight = 1.0
@@ -672,8 +669,6 @@ save_socloss_flag=[0]\n")
         set.atten_variability_method = 2 
         set.atten_periods = [0,0.30303,1]
         set.atten_threshold_distance = 400
-        set.atten_use_rescale_curve_from_pga = False
-        set.atten_override_RSA_shape = 'HAZUS_Sa' 
         set.atten_cutoff_max_spectral_displacement = True 
         set.atten_pga_scaling_cutoff = 2.0  # Float
         set.atten_smooth_spectral_acceleration = True
@@ -877,7 +872,6 @@ save_socloss_flag=[0]\n")
    
     def small_set_data(self):
         set = Parameter_data()
-        set.atten_use_rescale_curve_from_pga = False
         set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False
         set.use_amplification = False
@@ -920,7 +914,6 @@ save_socloss_flag=[0]\n")
         #
         set = Parameter_data()
         set.run_type = 'hazard'
-        set.atten_use_rescale_curve_from_pga = False
         set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False
         set.cooked_and_ready = False
@@ -1085,8 +1078,6 @@ save_socloss_flag=[0]\n")
         convert_THE_PARAM_T_to_py(file_name, set)
         old_set_data_py_2_new_set_data_py(file_name)
         new_set = create_parameter_data(file_name)
-        self.failUnlessEqual(set.atten_use_rescale_curve_from_pga,
-                             new_set.atten_use_rescale_curve_from_pga)
         self.failUnlessEqual(set.csm_damping_regimes,
                              new_set.csm_damping_regimes)
         self.failUnlessEqual(set.csm_damping_use_smoothing,
