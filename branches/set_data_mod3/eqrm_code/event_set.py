@@ -27,6 +27,17 @@ from eqrm_code.projections import azimuthal_orthographic_ll_to_xy as ll_to_xy
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 
+
+######
+# Define the mapping from fault type NAME to integer INDEX
+# This is used in the Chiou08 model
+######
+
+FaultingTypeDictionary = {'reverse': 0,
+                          'normal': 1,
+                          'strikeslip': 2}
+
+
 class Event_Set(object):
     def __init__(self,
                  azimuth,
@@ -65,7 +76,8 @@ class Event_Set(object):
               range : [0:360)
       dip : dips  - scalar or n-vector
               range : (0:90) #TODO ask Trev or Trev - maybe [0,90], or (0,90]??
-      depth : depths - scalar or n-vector, km
+
+      depth : depths - scalar or n-vector, depth to event , km
             range (0:large]
             ie [5,5,10,...]        
       Mw : moment magnitudes - scalar or n-vector
@@ -122,7 +134,10 @@ class Event_Set(object):
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
         self.event_num = r_[0:len(self.depth)] # gives every event an id
-        
+
+#        # will be passed in, but for now...
+#        self.faulting_type = 'reverse'
+
         self.check_arguments() 
 
 
@@ -145,9 +160,9 @@ class Event_Set(object):
           azimuth: azimuth of event, degrees
           dip: dip of virtual faults, degrees
           ML or Mw: earthquake magnitude. analysis only uses Mw.
-          depth: depth to event, km
+          depth: depth to event centroid, km
           fault_width: Maximum width along virtual fault, km
-          fault_depth:  ??
+          fault_depth: depth to the top of the seismmogenic region, km.
           scenario_number_of_events: Number of events
           
           Note, if you supply either ML or Mw, the other will be
@@ -246,6 +261,10 @@ class Event_Set(object):
             depth = conversions.depth(
                 fault_depth,dip,Mw,fault_width)
             
+        # ROSS calc depth_to_top
+
+        # Add function conversions
+        
         length = area/width
 
         # Calculate the distance of the origin from the centroid
@@ -467,7 +486,6 @@ class Event_Set(object):
         eqrmlog.debug('Memory: finished generating events')
         eqrmlog.resource_usage()
         return event
-
 
     def scenario_setup(self):
         """
@@ -798,6 +816,15 @@ class Pseudo_Event_Set(Event_Set):
                            attenuation_weights)
         
         return pseudo_event
+
+
+def get_faulting_types():
+    """Get the fault type string to index mapping dictionary."""
+
+    return FaultingTypeDictionary
+
+
+################################################################################
 
 # this will run if this is called from DOS prompt or double clicked
 if __name__ == '__main__':

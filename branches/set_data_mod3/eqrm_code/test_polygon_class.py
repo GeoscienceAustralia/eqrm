@@ -8,8 +8,8 @@ from os.path import join
 from scipy import allclose
 
 from eqrm_code import polygon_class
-from eqrm_code.polygon_class import get_independent_polygons, Empty_polygon, \
-     polygon_object
+from eqrm_code.polygon_class import get_independent_polygons_obsolete, \
+     Empty_polygon, polygon_object
 from eqrm_code.util import determine_eqrm_path
 #from geos_interface import Empty_polygon
 
@@ -147,7 +147,7 @@ class Test_Polygon_Class(unittest.TestCase):
             assert allclose(poly.area,large_square_area*3/5-small_square_area/2)
         print 'Time to run 1000 polygon diffs: '+str(time()-t0)
 
-    def test_get_independent_polygons(self):
+    def _test_get_independent_polygons(self):
         from eqrm_code.generation_polygon import polygons_from_xml
         eqrm_dir = determine_eqrm_path()
         #print "eqrm_dir", eqrm_dir
@@ -160,7 +160,7 @@ class Test_Polygon_Class(unittest.TestCase):
                       fault_width=15,
                       prob_min_mag_cutoff=4.5,
                       override_xml=True)
-        independent_polygons=get_independent_polygons(polygons)
+        independent_polygons=get_independent_polygons_obsolete(polygons)
         assert len(independent_polygons)==3
         
         #conformance tests, could change if I change the way area works
@@ -196,7 +196,7 @@ class Test_Polygon_Class(unittest.TestCase):
         from eqrm_code.generation_polygon import polygons_from_xml
         polygons,mag_type = polygons_from_xml(join('..','test_resources',
                                                    'sample_event.xml'))
-        independent_polygons=get_independent_polygons(polygons)
+        independent_polygons=get_independent_polygons_obsolete(polygons)
 
         super_poly = independent_polygons[0]
         area = 0

@@ -90,12 +90,13 @@ Description:
 import math
 from copy import  deepcopy
 from scipy import where, sqrt, array, asarray, exp, log, newaxis, zeros, \
-     log10, isfinite, weave, ones, shape
+     log10, isfinite, weave, ones, shape, reshape, concatenate, \
+     cosh, power
  
 from eqrm_code.ground_motion_misc import linear_interpolation, \
      Australian_standard_model, Australian_standard_model_interpolation
-
 from eqrm_code import util 
+import event_set
 
 
 LOG10E = 0.43429448190325182
@@ -1274,7 +1275,12 @@ Youngs_97_sigma_coefficient_period=[
 Youngs_97_sigma_coefficient_interpolation=linear_interpolation
 
 def Youngs_97_distribution_python(**kwargs):
-
+    """
+    
+    Youngs, R.R. & s.J. Chiou, Strong Ground Motion Attenuation
+    Relationships for Subduction Zone Earthquakes, 1997
+    
+    """
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  vs30
@@ -1283,7 +1289,11 @@ def Youngs_97_distribution_python(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     depth = kwargs['depth']
-  
+
+    # The depth that is passed in is depth to centroid.
+    # The actual depth required is focal depth,
+    # but we are assuming depth to centroid is close enough.
+    
     c1,c2,c3,Z_t=coefficient
 
     # Z_t=0.0 for interface earthquakes
@@ -1889,7 +1899,6 @@ def Somerville_distribution(**kwargs):
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    depth = kwargs['depth']
     
     # An expensive way of showing what the dimensions must be?
     num_sites,num_events=distance.shape[0:2]
@@ -2086,9 +2095,12 @@ def Liang_2008_distribution(**kwargs):
 
     The algorithm here is taken from [1], page 399.
 
+    Due to the equation diverging at distance == 0, we assume any distance
+    less than 10km is 10km.
+
     [1] Liang, J.Z., Hao, H., Gaull, B.A., and Sinadinovskic, C. [2008]
         "Estimation of Strong Ground Motions in Southwest Western Australia
-        with a Combined Green's Function and Stochastic Approach",
+        with a Combined Greens Function and Stochastic Approach",
         Journal of Earthquake Engineering, 12:3, 382-405
     """
 
@@ -2103,6 +2115,10 @@ def Liang_2008_distribution(**kwargs):
     assert coefficient.shape == (5, 1, 1, num_periods)
     assert sigma_coefficient.shape == (2, 1, 1, num_periods)
 
+    # Force a lower limit for distance of 10km
+    # eg, if distance is 5km, assume 10km
+    distance = where(distance < 10.0, 10.0, distance)
+
     # calculate result in ln(mm/s/s)
     (a, b, c, d, e) = coefficient
     log_mean = a + b*mag + c*distance + d*log(distance) + e*mag*log(distance)
@@ -2115,7 +2131,7 @@ Liang_2008_magnitude_type='ML'
 Liang_2008_distance_type='Epicentral'
 
 # data here has dim = (#periods, #coefficients)
-tmp = array([[  3.688, 0.832, -0.016, -1.374, +0.147],
+tmp = array([[  3.688, 0.832, -0.016, -1.374, +0.147], # period=0.0, from eqn 22
              [  1.776, 1.253, -0.016, -0.294, -0.028],
              [  1.598, 1.312, -0.010, -0.507, -0.028],
              [  1.939, 1.279, -0.005, -0.706, -0.018],
@@ -2181,16 +2197,13 @@ gound_motion_init['Liang_2008'] = Liang_2008_args
 
 ##########################  End of Liang_2008 model  ###########################
 
-#################  Start of Atkinson06 bedrock & soil models  ##################
-
-# pgaBC value hardcoded for now (this value is cm/s/s)
-# NOTE: This must match the value used in Atkinson06_soil_check.py
-pgaBC = 70.0
+############################  Start of Atkinson06  #############################
 
 # conversion factor: ln cm/s/s -> ln g
 LnCmss2Lng = math.log(9.80665*100)
 
-# conversion factor: log10 -> ln    # divide by this factor
+# conversion factor: log10 -> ln
+# use this so: ln(x) = log10(X) / log10(e)
 Log102Ln = math.log10(math.e)
 
 # other constants (these are scale distances?)
@@ -2215,7 +2228,50 @@ def Atkinson06_basic(**kwargs):
 
     [1] Atkinson, G.M., and Boore, D.M. [2006] "Earthquake Ground-Motion
         Prediction Equations for Eastern North America", Bulletin of the
-        Seismological Society of america, Vol. 96, pp 2181-2205
+        Seismological Society of America, Vol. 96, pp 2181-2205
+    """
+
+    # get args
+    M = kwargs['mag']
+    Rcd = kwargs['distance']
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
+    S = kwargs['S']
+
+    # check we have the right shapes
+    num_periods = coefficient.shape[3]
+    msg = ('Expected coefficient.shape %s, got %s'
+           % (str((13, 1, 1, num_periods)), str(coefficient.shape)))
+    assert coefficient.shape == (13, 1, 1, num_periods), msg
+
+    # intermediate calculated coefficients
+    tmp = log10(Atkinson06_R0/Rcd)
+    f0 = where(tmp < 0, 0, tmp)
+
+    tmp = log10(Rcd)
+    f1 = where(tmp < Log10Atkinson06_R1, tmp, Log10Atkinson06_R1)
+
+    tmp = log10(Rcd/Atkinson06_R2)
+    f2 = where(tmp < 0, 0, tmp)
+    del tmp
+    
+    # calculate result in log10(cm/s/s)
+    (c1, c2, c3, c4, c5, c6, c7, c8, c9, c10) = coefficient[:10,...]
+
+    log_mean = (c1 + c2*M + c3*M*M + (c4 + c5*M)*f1 + (c6 + c7*M)*f2 +
+                   (c8 + c9*M)*f0 + c10*Rcd + S)
+    log_sigma = sigma_coefficient[0]
+
+    return (log_mean, log_sigma)
+
+def Atkinson06_hard_bedrock_distribution(**kwargs):
+    """The Atkinson06_hard_bedrock model function.
+
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient, sigma_coefficient
+
+    This function just calls Atkinson06_basic() with S=0 (bedrock algorithm)
+    and converts the result to ln g.
     """
 
     # get args
@@ -2224,43 +2280,10 @@ def Atkinson06_basic(**kwargs):
         Rcd = kwargs['distance']
         coefficient = kwargs['coefficient']
         sigma_coefficient = kwargs['sigma_coefficient']
-        S = kwargs['S']
     except KeyError, e:
         msg = ('kwargs dictionary to Atkinson06_basic() '
                'is missing a parameter: %s' % e)
         raise RuntimeError(msg)
-
-    # check we have the right shapes
-    num_periods = coefficient.shape[3]
-    assert coefficient.shape == (13, 1, 1, num_periods)
-    assert sigma_coefficient.shape == (2, 1, 1, num_periods)
-
-    # intermediate calculated coefficients
-    tmp = log10(Atkinson06_R0/Rcd)
-    f0 = where(tmp < 0, 0, tmp)
-    tmp = log10(Rcd)
-    f1 = where(tmp < Log10Atkinson06_R1, tmp, Log10Atkinson06_R1)
-    tmp = log10(Rcd/Atkinson06_R2)
-    f2 = where(tmp < 0, 0, tmp)
-    del tmp
-
-    # calculate result in log10(cm/s/s)
-    (c1, c2, c3, c4, c5, c6, c7, c8, c9, c10) = coefficient[:10]
-    log_mean = c1 + c2*M + c3*M*M + (c4 + c5*M)*f1 + (c6 + c7*M)*f2 + \
-                   (c8 + c9*M)*f0 + c10*Rcd + S
-    log_sigma = sigma_coefficient[0]
-
-    return (log_mean, log_sigma)
-
-def Atkinson06_bedrock_distribution(**kwargs):
-    """The Atkinson06_bedrock model function.
-
-    kwargs  dictionary of parameters, expect:
-                mag, distance, coefficient, sigma_coefficient
-
-    This function just calls Atkinson06_basic() with S=0 (bedrock algorithm)
-    and converts the result to ln g.
-    """
 
     # get result in log10(cm/s/s)
     (log_mean, log_sigma) = Atkinson06_basic(S=0.0, **kwargs)
@@ -2283,25 +2306,16 @@ def Atkinson06_calcS(pgaBC, **kwargs):
 
     pgaBC   the pgaBC value to use
     kwargs  dictionary of parameters, expect:
-                mag, distance, coefficient, sigma_coefficient
+                coefficient, vs30
     """
 
     # get args
-    try:
-        coefficient = kwargs['coefficient']
-        v30 = kwargs['v30']
-    except KeyError, e:
-        print('kwargs dictionary to Atkinson06_calcS() '
-              'is missing a parameter: %s' % e)
-        raise
+    coefficient = kwargs['coefficient']
+    vs30 = kwargs['vs30']
 
     # check we have the right shapes
     num_periods = coefficient.shape[3]
     assert coefficient.shape == (13, 1, 1, num_periods)
-    assert shape(pgaBC) == () or pgaBC.shape == v30.shape
-
-    # build a coefficient array (period 0.0) for the basic() call
-#    pgaBC = Atkin
 
     # get the Blin, B1 and B2 coefficients.
     (Blin, B1, B2) = coefficient[-3:]
@@ -2309,44 +2323,96 @@ def Atkinson06_calcS(pgaBC, **kwargs):
     # get the Bnl array from eqns 8A, 8B, 8C, 8D, page 2200.
     # we do this by calculating 4 arrays for each of 8A, 8b, 8C and 8D
     # and then filling appropriate elements of resultant Bnl.
-    BnlA = ones(v30.shape) * B1
-    BnlB = (B1 - B2) * log(v30/Atkinson06_V2) / Atkinson06_logV1divV2 + B2
-    BnlC = B2 * log(v30/Atkinson06_Vref) / Atkinson06_logV2divVref
-    Bnl = zeros(v30.shape)
+    BnlA = B1
+    BnlB = (B1 - B2) * log(vs30/Atkinson06_V2) / Atkinson06_logV1divV2 + B2
+    BnlC = B2 * log(vs30/Atkinson06_Vref) / Atkinson06_logV2divVref
+    Bnl = 0.0
 
     # TODO: TEST IF where(x < A <= y, ?, ??) FASTER
-    Bnl = where(v30 <= Atkinson06_Vref, BnlC, Bnl)
-    Bnl = where(v30 <= Atkinson06_V2, BnlB, Bnl)
-    Bnl = where(v30 <= Atkinson06_V1, BnlA, Bnl)
+    Bnl = where(vs30 <= Atkinson06_Vref, BnlC, Bnl)
+    Bnl = where(vs30 <= Atkinson06_V2, BnlB, Bnl)
+    Bnl = where(vs30 <= Atkinson06_V1, BnlA, Bnl)
 
     # limit element-wise pgaBC values to be >= 60
     pgaBC = where(pgaBC < 60.0, 60.0, pgaBC)
 
-    # return the S vector
-    return log10(exp(Blin*log(v30/Atkinson06_Vref) + Bnl*log(pgaBC/100)))
+    # return the S value
+    return log10(exp(Blin*log(vs30/Atkinson06_Vref) + Bnl*log(pgaBC/100)))
 
 def Atkinson06_soil_distribution(**kwargs):
     """The Atkinson06_soil model function.
 
     kwargs  dictionary of parameters, expect:
-                mag, distance, coefficient, sigma_coefficient
+                mag, distance, coefficient, sigma_coefficient, vs30
 
     This function just calls Atkinson06_basic() with a computed S value
     and converts the result to ln g.
     """
 
-    # check that pgaBC has the right shape
-    #assert pgaBC.shape = (???,)
+    # get required kwarg values, check shapes
+    try:
+        mag = kwargs['mag']
+        distance = kwargs['distance']
+        coefficient = kwargs['coefficient']
+        sigma_coefficient = kwargs['sigma_coefficient']
+        vs30 = kwargs['vs30']
+    except KeyError, e:
+        print('kwargs dictionary to Atkinson06_soil_distribution() '
+              'is missing a parameter: %s' % e)
+        raise
 
-    # override coefficients with those for period 0.00
-    #my_kwargs = copy.copy(kwargs)
-    #my_kwargs['coefficients']
+    num_periods = coefficient.shape[3]
+    assert coefficient.shape == (13, 1, 1, num_periods)
+    assert sigma_coefficient.shape == (2, 1, 1, num_periods)
+
+    # calculate pgaBC here, use PGA (period=0.0) coefficients
+    (pgaBC, _) = Atkinson06_basic(mag=kwargs['mag'],
+                                  distance=kwargs['distance'],
+                                  coefficient=Atkinson06_coefficient_pga,
+                                  sigma_coefficient=kwargs['sigma_coefficient'],
+                                  S=0.0)
+
+    # check that pgaBC has the right shape
+    assert pgaBC.shape == distance.shape
 
     # compute S parameter
-    S = Atkinson06_calcS(pgaBC, **kwargs)	# for now
+    S = Atkinson06_calcS(pgaBC, **kwargs)
 
     # get result in log10(cm/s/s)
     (log_mean, log_sigma) = Atkinson06_basic(S=S, **kwargs)
+
+    # convert to g and natural log
+    log_mean = log_mean/Log102Ln - LnCmss2Lng
+    log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+
+    return (log_mean, log_sigma)
+
+def Atkinson06_bc_boundary_bedrock(**kwargs):
+    """The Atkinson06_bc_boundary_bedrock model function.
+
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient, sigma_coefficient
+
+    This function just calls Atkinson06_basic() with S=0 (bedrock algorithm)
+    and converts the result to ln g.
+
+    This appears identical to the Atkinson06_hard_bedrock_distribution()
+    function but gets passed coefficients from tables 9 and 8 (not 6 and 8).
+    """
+
+    # get args
+    try:
+        M = kwargs['mag']
+        Rcd = kwargs['distance']
+        coefficient = kwargs['coefficient']
+        sigma_coefficient = kwargs['sigma_coefficient']
+    except KeyError, e:
+        msg = ('kwargs dictionary to Atkinson06_basic() '
+               'is missing a parameter: %s' % e)
+        raise RuntimeError(msg)
+
+    # get result in log10(cm/s/s)
+    (log_mean, log_sigma) = Atkinson06_basic(S=0.0, **kwargs)
 
     # convert to g and natural log
     log_mean = log_mean/Log102Ln - LnCmss2Lng
@@ -2359,91 +2425,102 @@ Atkinson06_magnitude_type = 'Mw'
 Atkinson06_distance_type = 'Rupture'
 
 # dimension = (#periods, #coefficients)
-# data from tables 6 and 8, last three columns from table 8
-#               c1        c2         c3         c4        c5      
-#                   c6        c7         c8         c9         c10
-#                        Blin     B1       B2
-tmp = array([[-5.41E+00, 1.71E+00, -9.01E-02, -2.54E+00, 2.27E-01,
-                  -1.27E+00, 1.16E-01,  9.79E-01, -1.77E-01, -1.76E-04,
-                       -0.752,  -0.300,   0.000],	#5.00
-             [-5.79E+00, 1.92E+00, -1.07E-01, -2.44E+00, 2.11E-01,
-                  -1.16E+00, 1.02E-01,  1.01E+00, -1.82E-01, -2.01E-04,
-                       -0.745,  -0.310,   0.000],	#4.00
-             [-6.04E+00, 2.08E+00, -1.22E-01, -2.37E+00, 2.00E-01,
-                  -1.07E+00, 8.95E-02,  1.00E+00, -1.80E-01, -2.31E-04,
-                       -0.740,  -0.330,   0.000],	#3.13
-             [-6.17E+00, 2.21E+00, -1.35E-01, -2.30E+00, 1.90E-01,
-                  -9.86E-01, 7.86E-02,  9.68E-01, -1.77E-01, -2.82E-04,
-                       -0.736,  -0.350,   0.000],	#2.50
-             [-6.18E+00, 2.30E+00, -1.44E-01, -2.22E+00, 1.77E-01,
-                  -9.37E-01, 7.07E-02,  9.52E-01, -1.77E-01, -3.22E-04,
-                       -0.730,  -0.375,   0.000],	#2.00
-             [-6.04E+00, 2.34E+00, -1.50E-01, -2.16E+00, 1.66E-01,
-                  -8.70E-01, 6.05E-02,  9.21E-01, -1.73E-01, -3.75E-04,
-                       -0.726,  -0.395,   0.000],	#1.60
-             [-5.72E+00, 2.32E+00, -1.51E-01, -2.10E+00, 1.57E-01,
-                  -8.20E-01, 5.19E-02,  8.56E-01, -1.66E-01, -4.33E-04,
-                       -0.714,  -0.397,   0.000],	#1.25
-             [-5.27E+00, 2.26E+00, -1.48E-01, -2.07E+00, 1.50E-01,
-                  -8.13E-01, 4.67E-02,  8.26E-01, -1.62E-01, -4.86E-04,
-                       -0.700,  -0.440,   0.000],	#1.00
-             [-4.60E+00, 2.13E+00, -1.41E-01, -2.06E+00, 1.47E-01,
-                  -7.97E-01, 4.35E-02,  7.75E-01, -1.56E-01, -5.79E-04,
-                       -0.690,  -0.465,  -0.002],	#0.794
-             [-3.92E+00, 1.99E+00, -1.31E-01, -2.05E+00, 1.42E-01,
-                  -7.82E-01, 4.30E-02,  7.88E-01, -1.59E-01, -6.95E-04,
-                       -0.670,  -0.480,  -0.031],	#0.629
-             [-3.22E+00, 1.83E+00, -1.20E-01, -2.02E+00, 1.34E-01,
-                  -8.13E-01, 4.44E-02,  8.84E-01, -1.75E-01, -7.70E-04,
-                       -0.600,  -0.495,  -0.060],	#0.500
-             [-2.44E+00, 1.65E+00, -1.08E-01, -2.05E+00, 1.36E-01,
-                  -8.43E-01, 4.48E-02,  7.39E-01, -1.56E-01, -8.51E-04,
-                       -0.500,  -0.508,  -0.095],	#0.397
-             [-1.72E+00, 1.48E+00, -9.74E-02, -2.08E+00, 1.38E-01,
-                  -8.89E-01, 4.87E-02,  6.10E-01, -1.39E-01, -9.54E-04,
-                       -0.445,  -0.513,  -0.130],	#0.315
-             [-1.12E+00, 1.34E+00, -8.72E-02, -2.08E+00, 1.35E-01,
-                  -9.71E-01, 5.63E-02,  6.14E-01, -1.43E-01, -1.06E-03,
-                       -0.390,  -0.518,  -0.160],	#0.251
-             [-6.15E-01, 1.23E+00, -7.89E-02, -2.09E+00, 1.31E-01,
-                  -1.12E+00, 6.79E-02,  6.06E-01, -1.46E-01, -1.13E-03,
-                       -0.306,  -0.521,  -0.185],	#0.199
-             [-1.46E-01, 1.12E+00, -7.14E-02, -2.12E+00, 1.30E-01,
-                  -1.30E+00, 8.31E-02,  5.62E-01, -1.44E-01, -1.18E-03,
-                       -0.280,  -0.528,  -0.185],	#0.158
-             [ 2.14E-01, 1.05E+00, -6.66E-02, -2.15E+00, 1.30E-01,
-                  -1.61E+00, 1.05E-01,  4.27E-01, -1.30E-01, -1.15E-03,
-                       -0.260,  -0.560,  -0.140],	#0.125
-             [ 4.80E-01, 1.02E+00, -6.40E-02, -2.20E+00, 1.27E-01,
-                  -2.01E+00, 1.33E-01,  3.37E-01, -1.27E-01, -1.05E-03,
-                       -0.250,  -0.595,  -0.132],	#0.100
-             [ 6.91E-01, 9.97E-01, -6.28E-02, -2.26E+00, 1.25E-01,
-                  -2.49E+00, 1.64E-01,  2.14E-01, -1.21E-01, -8.47E-04,
-                       -0.232,  -0.637,  -0.117],	#0.079
-             [ 9.11E-01, 9.80E-01, -6.21E-02, -2.36E+00, 1.26E-01,
-                  -2.97E+00, 1.91E-01,  1.07E-01, -1.17E-01, -5.79E-04,
-                       -0.249,  -0.642,  -0.105],	#0.063
-             [ 1.11E+00, 9.72E-01, -6.20E-02, -2.47E+00, 1.28E-01,
-                  -3.39E+00, 2.14E-01, -1.39E-01, -9.84E-02, -3.17E-04,
-                       -0.286,  -0.643,  -0.105],	#0.050
-             [ 1.26E+00, 9.68E-01, -6.23E-02, -2.58E+00, 1.32E-01,
-                  -3.64E+00, 2.28E-01, -3.51E-01, -8.13E-02, -1.23E-04,
-                       -0.314,  -0.609,  -0.105],	#0.040
-             [ 1.44E+00, 9.59E-01, -6.28E-02, -2.71E+00, 1.40E-01,
-                  -3.73E+00, 2.34E-01, -5.43E-01, -6.45E-02, -3.23E-05,
-                       -0.322,  -0.618,  -0.108],	#0.031
-             [ 1.52E+00, 9.60E-01, -6.35E-02, -2.81E+00, 1.46E-01,
-                  -3.65E+00, 2.36E-01, -6.54E-01, -5.50E-02, -4.85E-05,
-                       -0.330,  -0.624,  -0.115],	#0.025
-             [ 9.07E-01, 9.83E-01, -6.60E-02, -2.70E+00, 1.59E-01,
-                  -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04,
-                       -0.361,  -0.641,  -0.144],	#0.010
-             [ 9.07E-01, 9.83E-01, -6.60E-02, -2.70E+00, 1.59E-01,
-                  -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04,
-                       -0.361,  -0.641,  -0.144]])	#0.000
-# convert to dim = (#coefficients, #periods)
-Atkinson06_coefficient = tmp.transpose()
-del tmp
+Atkinson06_Table6 = array([
+#  c1        c2         c3         c4        c5         c6        c7         c8         c9         c10
+[-5.41E+00, 1.71E+00, -9.01E-02, -2.54E+00, 2.27E-01, -1.27E+00, 1.16E-01,  9.79E-01, -1.77E-01, -1.76E-04],  # 5.00
+[-5.79E+00, 1.92E+00, -1.07E-01, -2.44E+00, 2.11E-01, -1.16E+00, 1.02E-01,  1.01E+00, -1.82E-01, -2.01E-04],  # 4.00
+[-6.04E+00, 2.08E+00, -1.22E-01, -2.37E+00, 2.00E-01, -1.07E+00, 8.95E-02,  1.00E+00, -1.80E-01, -2.31E-04],  # 3.13
+[-6.17E+00, 2.21E+00, -1.35E-01, -2.30E+00, 1.90E-01, -9.86E-01, 7.86E-02,  9.68E-01, -1.77E-01, -2.82E-04],  # 2.50
+[-6.18E+00, 2.30E+00, -1.44E-01, -2.22E+00, 1.77E-01, -9.37E-01, 7.07E-02,  9.52E-01, -1.77E-01, -3.22E-04],  # 2.00
+[-6.04E+00, 2.34E+00, -1.50E-01, -2.16E+00, 1.66E-01, -8.70E-01, 6.05E-02,  9.21E-01, -1.73E-01, -3.75E-04],  # 1.59
+[-5.72E+00, 2.32E+00, -1.51E-01, -2.10E+00, 1.57E-01, -8.20E-01, 5.19E-02,  8.56E-01, -1.66E-01, -4.33E-04],  # 1.25
+[-5.27E+00, 2.26E+00, -1.48E-01, -2.07E+00, 1.50E-01, -8.13E-01, 4.67E-02,  8.26E-01, -1.62E-01, -4.86E-04],  # 1.00
+[-4.60E+00, 2.13E+00, -1.41E-01, -2.06E+00, 1.47E-01, -7.97E-01, 4.35E-02,  7.75E-01, -1.56E-01, -5.79E-04],  # 0.794
+[-3.92E+00, 1.99E+00, -1.31E-01, -2.05E+00, 1.42E-01, -7.82E-01, 4.30E-02,  7.88E-01, -1.59E-01, -6.95E-04],  # 0.629
+[-3.22E+00, 1.83E+00, -1.20E-01, -2.02E+00, 1.34E-01, -8.13E-01, 4.44E-02,  8.84E-01, -1.75E-01, -7.70E-04],  # 0.500
+[-2.44E+00, 1.65E+00, -1.08E-01, -2.05E+00, 1.36E-01, -8.43E-01, 4.48E-02,  7.39E-01, -1.56E-01, -8.51E-04],  # 0.397
+[-1.72E+00, 1.48E+00, -9.74E-02, -2.08E+00, 1.38E-01, -8.89E-01, 4.87E-02,  6.10E-01, -1.39E-01, -9.54E-04],  # 0.315
+[-1.12E+00, 1.34E+00, -8.72E-02, -2.08E+00, 1.35E-01, -9.71E-01, 5.63E-02,  6.14E-01, -1.43E-01, -1.06E-03],  # 0.251
+[-6.15E-01, 1.23E+00, -7.89E-02, -2.09E+00, 1.31E-01, -1.12E+00, 6.79E-02,  6.06E-01, -1.46E-01, -1.13E-03],  # 0.199
+[-1.46E-01, 1.12E+00, -7.14E-02, -2.12E+00, 1.30E-01, -1.30E+00, 8.31E-02,  5.62E-01, -1.44E-01, -1.18E-03],  # 0.158
+[ 2.14E-01, 1.05E+00, -6.66E-02, -2.15E+00, 1.30E-01, -1.61E+00, 1.05E-01,  4.27E-01, -1.30E-01, -1.15E-03],  # 0.125
+[ 4.80E-01, 1.02E+00, -6.40E-02, -2.20E+00, 1.27E-01, -2.01E+00, 1.33E-01,  3.37E-01, -1.27E-01, -1.05E-03],  # 0.100
+[ 6.91E-01, 9.97E-01, -6.28E-02, -2.26E+00, 1.25E-01, -2.49E+00, 1.64E-01,  2.14E-01, -1.21E-01, -8.47E-04],  # 0.079
+[ 9.11E-01, 9.80E-01, -6.21E-02, -2.36E+00, 1.26E-01, -2.97E+00, 1.91E-01,  1.07E-01, -1.17E-01, -5.79E-04],  # 0.063
+[ 1.11E+00, 9.72E-01, -6.20E-02, -2.47E+00, 1.28E-01, -3.39E+00, 2.14E-01, -1.39E-01, -9.84E-02, -3.17E-04],  # 0.050
+[ 1.26E+00, 9.68E-01, -6.23E-02, -2.58E+00, 1.32E-01, -3.64E+00, 2.28E-01, -3.51E-01, -8.13E-02, -1.23E-04],  # 0.040
+[ 1.44E+00, 9.59E-01, -6.28E-02, -2.71E+00, 1.40E-01, -3.73E+00, 2.34E-01, -5.43E-01, -6.45E-02, -3.23E-05],  # 0.031
+[ 1.52E+00, 9.60E-01, -6.35E-02, -2.81E+00, 1.46E-01, -3.65E+00, 2.36E-01, -6.54E-01, -5.50E-02, -4.85E-05],  # 0.025
+[ 9.07E-01, 9.83E-01, -6.60E-02, -2.70E+00, 1.59E-01, -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04],  # 0.010 (PGA)
+[ 9.07E-01, 9.83E-01, -6.60E-02, -2.70E+00, 1.59E-01, -2.80E+00, 2.12E-01, -3.01E-01, -6.53E-02, -4.48E-04]]) # 0.000 (PGA)
+
+# dimension = (#periods, #coefficients)
+#                             Blin    B1      B2
+Atkinson06_Table8 = array([[-0.752, -0.300,  0.000],  # 5.00
+                           [-0.745, -0.310,  0.000],  # 4.00
+                           [-0.740, -0.330,  0.000],  # 3.13
+                           [-0.736, -0.350,  0.000],  # 2.50
+                           [-0.730, -0.375,  0.000],  # 2.00
+                           [-0.726, -0.395,  0.000],  # 1.59
+                           [-0.714, -0.397,  0.000],  # 1.25
+                           [-0.700, -0.440,  0.000],  # 1.00
+                           [-0.690, -0.465, -0.002],  # 0.794
+                           [-0.670, -0.480, -0.031],  # 0.629
+                           [-0.600, -0.495, -0.060],  # 0.500
+                           [-0.500, -0.508, -0.095],  # 0.397
+                           [-0.445, -0.513, -0.130],  # 0.315
+                           [-0.390, -0.518, -0.160],  # 0.251
+                           [-0.306, -0.521, -0.185],  # 0.199
+                           [-0.280, -0.528, -0.185],  # 0.158
+                           [-0.260, -0.560, -0.140],  # 0.125
+                           [-0.250, -0.595, -0.132],  # 0.100
+                           [-0.232, -0.637, -0.117],  # 0.079
+                           [-0.249, -0.642, -0.105],  # 0.063
+                           [-0.286, -0.643, -0.105],  # 0.050
+                           [-0.314, -0.609, -0.105],  # 0.040
+                           [-0.322, -0.618, -0.108],  # 0.031
+                           [-0.330, -0.624, -0.115],  # 0.025
+                           [-0.361, -0.641, -0.144],  # 0.010 (PGA)
+                           [-0.361, -0.641, -0.144]]) # 0.000 (PGA)
+
+Atkinson06_Table9 = array([
+[-4.85E+00, 1.58E+00, -8.07E-02, -2.53E+00, 2.22E-01, -1.43E+00, 1.36E-01,  6.34E-01, -1.41E-01, -1.61E-04],  # 5.00
+[-5.26E+00, 1.79E+00, -9.79E-02, -2.44E+00, 2.07E-01, -1.31E+00, 1.21E-01,  7.34E-01, -1.56E-01, -1.96E-04],  # 4.00
+[-5.59E+00, 1.97E+00, -1.14E-01, -2.33E+00, 1.91E-01, -1.20E+00, 1.10E-01,  8.45E-01, -1.72E-01, -2.45E-04],  # 3.13
+[-5.80E+00, 2.13E+00, -1.28E-01, -2.26E+00, 1.79E-01, -1.12E+00, 9.54E-02,  8.91E-01, -1.80E-01, -2.60E-04],  # 2.50
+[-5.85E+00, 2.23E+00, -1.39E-01, -2.20E+00, 1.69E-01, -1.04E+00, 8.00E-02,  8.67E-01, -1.79E-01, -2.86E-04],  # 2.00
+[-5.75E+00, 2.29E+00, -1.45E-01, -2.13E+00, 1.58E-01, -9.57E-01, 6.76E-02,  8.67E-01, -1.79E-01, -3.43E-04],  # 1.59
+[-5.49E+00, 2.29E+00, -1.48E-01, -2.08E+00, 1.50E-01, -9.00E-01, 5.79E-02,  8.21E-01, -1.72E-01, -4.07E-04],  # 1.25
+[-5.06E+00, 2.23E+00, -1.45E-01, -2.03E+00, 1.41E-01, -8.74E-01, 5.41E-02,  7.92E-01, -1.70E-01, -4.89E-04],  # 1.00
+[-4.45E+00, 2.12E+00, -1.39E-01, -2.01E+00, 1.36E-01, -8.58E-01, 4.98E-02,  7.08E-01, -1.59E-01, -5.75E-04],  # 0.794
+[-3.75E+00, 1.97E+00, -1.29E-01, -2.00E+00, 1.31E-01, -8.42E-01, 4.82E-02,  6.77E-01, -1.56E-01, -6.76E-04],  # 0.629
+[-3.01E+00, 1.80E+00, -1.18E-01, -1.98E+00, 1.27E-01, -8.47E-01, 4.70E-02,  6.67E-01, -1.55E-01, -7.68E-04],  # 0.500
+[-2.28E+00, 1.63E+00, -1.05E-01, -1.97E+00, 1.23E-01, -8.88E-01, 5.03E-02,  6.84E-01, -1.58E-01, -8.59E-04],  # 0.397
+[-1.56E+00, 1.46E+00, -9.31E-02, -1.98E+00, 1.21E-01, -9.47E-01, 5.58E-02,  6.50E-01, -1.56E-01, -9.55E-04],  # 0.315
+[-8.76E-01, 1.29E+00, -8.19E-02, -2.01E+00, 1.23E-01, -1.03E+00, 6.34E-02,  5.81E-01, -1.49E-01, -1.05E-03],  # 0.251
+[-3.06E-01, 1.16E+00, -7.21E-02, -2.04E+00, 1.22E-01, -1.15E+00, 7.38E-02,  5.08E-01, -1.43E-01, -1.14E-03],  # 0.199
+[ 1.19E-01, 1.06E+00, -6.47E-02, -2.05E+00, 1.19E-01, -1.36E+00, 9.16E-02,  5.16E-01, -1.50E-01, -1.18E-03],  # 0.158
+[ 5.36E-01, 9.65E-01, -5.84E-02, -2.11E+00, 1.21E-01, -1.67E+00, 1.16E-01,  3.43E-01, -1.32E-01, -1.13E-03],  # 0.125
+[ 7.82E-01, 9.24E-01, -5.56E-02, -2.17E+00, 1.19E-01, -2.10E+00, 1.48E-01,  2.85E-01, -1.32E-01, -9.90E-04],  # 0.100
+[ 9.67E-01, 9.03E-01, -5.48E-02, -2.25E+00, 1.22E-01, -2.53E+00, 1.78E-01,  1.00E-01, -1.15E-01, -7.72E-04],  # 0.079
+[ 1.11E+00, 8.88E-01, -5.39E-02, -2.33E+00, 1.23E-01, -2.88E+00, 2.01E-01, -3.19E-02, -1.07E-01, -5.48E-04],  # 0.063
+[ 1.21E+00, 8.83E-01, -5.44E-02, -2.44E+00, 1.30E-01, -3.04E+00, 2.13E-01, -2.10E-01, -9.00E-02, -4.15E-04],  # 0.050
+[ 1.26E+00, 8.79E-01, -5.52E-02, -2.54E+00, 1.39E-01, -2.99E+00, 2.16E-01, -3.91E-01, -6.75E-02, -3.88E-04],  # 0.040
+[ 1.19E+00, 8.88E-01, -5.64E-02, -2.58E+00, 1.45E-01, -2.84E+00, 2.12E-01, -4.37E-01, -5.87E-02, -4.33E-04],  # 0.031
+[ 1.05E+00, 9.03E-01, -5.77E-02, -2.57E+00, 1.48E-01, -2.65E+00, 2.07E-01, -4.08E-01, -5.77E-02, -5.12E-04],  # 0.025
+[ 5.23E-01, 9.69E-01, -6.20E-02, -2.44E+00, 1.47E-01, -2.34E+00, 1.91E-01, -8.70E-02, -8.29E-02, -6.30E-04],  # 0.010, (PGA)
+[ 5.23E-01, 9.69E-01, -6.20E-02, -2.44E+00, 1.47E-01, -2.34E+00, 1.91E-01, -8.70E-02, -8.29E-02, -6.30E-04]]) # 0.000, (PGA)
+
+# join tables 6 and 8, convert to dim = (#coefficients, #periods)
+Atkinson06_coefficient68 = concatenate((Atkinson06_Table6, Atkinson06_Table8), axis=1)
+Atkinson06_coefficient68 = Atkinson06_coefficient68.transpose()
+
+# join tables 9 and 8, convert to dim = (#coefficients, #periods)
+Atkinson06_coefficient98 = concatenate((Atkinson06_Table9, Atkinson06_Table8), axis=1)
+Atkinson06_coefficient98 = Atkinson06_coefficient98.transpose()	# used for bc_boundary_bedrock
+
+# get tables 6+8 PGA row (ie, end row) for soil calculations
+Atkinson06_coefficient_pga = reshape(Atkinson06_coefficient68[:,-1], (-1,1,1,1))
 
 # dim = (period,)
 Atkinson06_coefficient_period = [5.000, 4.000, 3.130, 2.500, 2.000,
@@ -2460,25 +2537,250 @@ sigma = 0.30
 Atkinson06_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
 Atkinson06_sigma_coefficient_period = [0.0, 1.0]
 
-gound_motion_init['Atkinson06_bedrock'] = [Atkinson06_bedrock_distribution,
-                                            Atkinson06_magnitude_type,
-                                            Atkinson06_distance_type,
-                                            Atkinson06_coefficient,
-                                            Atkinson06_coefficient_period,
-                                            Atkinson06_interpolation,
-                                            Atkinson06_sigma_coefficient,
-                                            Atkinson06_sigma_coefficient_period,
-                                            Atkinson06_interpolation]
+gound_motion_init['Atkinson06_hard_bedrock'] = \
+                        [Atkinson06_hard_bedrock_distribution,
+                         Atkinson06_magnitude_type,
+                         Atkinson06_distance_type,
+                         Atkinson06_coefficient68,
+                         Atkinson06_coefficient_period,
+                         Atkinson06_interpolation,
+                         Atkinson06_sigma_coefficient,
+                         Atkinson06_sigma_coefficient_period,
+                         Atkinson06_interpolation]
 
 gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
                                         Atkinson06_magnitude_type,
                                         Atkinson06_distance_type,
-                                        Atkinson06_coefficient,
+                                        Atkinson06_coefficient68,
                                         Atkinson06_coefficient_period,
                                         Atkinson06_interpolation,
                                         Atkinson06_sigma_coefficient,
                                         Atkinson06_sigma_coefficient_period,
                                         Atkinson06_interpolation]
 
-##################  End of Atkinson06 bedrock & soil models  ###################
+gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
+                        [Atkinson06_bc_boundary_bedrock,
+                         Atkinson06_magnitude_type,
+                         Atkinson06_distance_type,
+                         Atkinson06_coefficient98,
+                         Atkinson06_coefficient_period,
+                         Atkinson06_interpolation,
+                         Atkinson06_sigma_coefficient,
+                         Atkinson06_sigma_coefficient_period,
+                         Atkinson06_interpolation]
+
+#############################  End of Atkinson06  ##############################
+
+##########################  Start of Chiou08 model  ############################
+
+"""Code here is based on Chiou [1].
+
+    [1] Chiou.B.S.-J., Youngs R.R., 2008 An NGA Model for the Average Horizontal
+        Component of Peak Ground Motion and Response Spectra,
+        Earthquake Spectra 24, 173-215.
+"""
+
+
+# constants from Chiou [1] table 1
+Chiou_C2 = 1.06
+Chiou_C3 = -2.1
+Chiou_C4 = -0.4
+Chiuo_Crb = 50.0
+Chiou_Chm = 3.0
+Chiou_Cgamma3 = 4.0
+
+# precalculate constant expressions
+Chiou_C2_minus_C3 = Chiou_C2-Chiou_C3
+Chiuo_Crb_square = Chiuo_Crb * Chiuo_Crb
+Chiou_1130_minus_360 = 1130 - 360.0
+Chiou_378_7_pow_8 = math.pow(378.7, 8)
+Chiou_3_82_div_8 = 3.82/8.0
+
+######
+# Set up a numpy array to convert a 'faulting_type' flag to an array slice
+# that encodes the Frv/Fnm flags.
+######
+
+# faulting type flag encodings
+#                       'type': (Frv, Fnm)
+Chiou_faulting_flags = {'reverse': (1, 0),
+                        'normal': (0, 1),
+                        'strikeslip': (0, 0)}
+
+# generate 'Chiou_faulting_type' from the dictionary above and event_set data
+tmp = []
+for (k, v) in Chiou_faulting_flags.iteritems():
+    index = event_set.get_faulting_types()[k]
+    tmp.append((index, v))
+
+tmp2 = []
+tmp.sort()
+for (_, flags) in tmp:
+    tmp2.append(flags)
+
+Chiou_faulting_type = array(tmp2)
+del tmp, tmp2
+
+######
+# Start building the coefficient array
+######
+
+def Chiou08_distribution(**kwargs):
+    """The Chiou08 model.
+
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient, sigma_coefficient, S
+
+    The algorithm here is taken from [1], pages 193 and 194  and returns results
+    that are log10 cm/s/s.  Local simplifications are applied:
+        AS = 0, results in some terms of model equation being simplified
+        Z1 value calculated from Vs30
+        eta and sigma random values assumed to be 0
+        the last term equation 13a (page 193) starting C9*Fhw... is ignored since
+            Fhw is 0 (no hanging-wall)
+        the last line in equation 13b (page 194) is ignored since ...
+    """
+
+    # get args
+    M = kwargs['mag']				# event-specific
+    Rrup = kwargs['distance']			# event-site-specific
+    fault_type = kwargs['faulting_type']	# event-specific
+    Ztor = kwargs['depth_to_top']		# event-specific
+    Vs30 = kwargs['Vs30']			# site-specific
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']	# actual log_sigma
+
+    # check we have the right shapes
+    num_periods = coefficient.shape[3]
+    msg = ('Expected coefficient.shape %s, got %s'
+           % (str((13, 1, 1, num_periods)), str(coefficient.shape)))
+    assert coefficient.shape == (13, 1, 1, num_periods), msg
+
+    # unpack coefficients
+    (C1, C1a, C1b, Cn, CM, C5, C6, C7, C7a, C9, C9a, C10, Cgamma1, Cgamma2,
+         phi1, phi2, phi3, phi4, phi5, phi6, phi7, phi8) = coefficient
+
+    # get flag values from 'faulting_type'
+    
+
+    # convert delta degrees to radians
+    delta_rad = (delta*2*math.pi) / 360.0
+
+    # precalculate some common expressions
+    M_minus_Chiou_Chm = M - Chiou_Chm
+    M_minus_Chiou_Cgamma3 = M - Chiou_Cgamma3
+
+    lnyref = (C1 + (C1a*Frv + C1b*Fnm + C7*(Ztor-4)) +
+              Chiou_C2*(M-6) + (Chiou_C2_minus_C3/Cn)*log(1 + exp(Cn*(CM-M))) +
+              Chiou_C4*log(Rrup + C5*cosh(C6*where(M_minus_Chiou_Chm < 0, 0, M_minus_Chiou_Chm))) +
+              (C4a-Chiou_C4)*log(sqrt(Rrup*Rrup + Chiuo_Crb_square)) +
+              (Cgamma1 + Cgamma2/cosh(where(M_minus_Chiou_Cgamma3 < 0, 0, M_minus_Chiou_Cgamma3)))*Rrup)
+
+    Yref = exp(lnYref)
+    Z1 = exp(28.5 - Chiou_3_82_div_8*log(power(Vs30, 8) + Chiou_378_7_pow_8))
+
+    # precalculate some common sub-expressions
+    log_Vs30_div_1130 = log(Vs30/1130.0)
+    Z1_minus_phi7 = Z1 - phi7
+    Z1_minus_15 = Z1 - 15.0
+
+    log_mean = (lnYref + phi1*where(log_Vs30_div_1130 > 0, 0, log_Vs30_div_1130) +
+                phi2*(exp(phi3*min(Vs30, 1130)-360.0)-exp(phi3*Chiou_1130_minus_360))*
+                    log((Yref+phi4)/phi4) +
+                phi5*(1-1/(cosh(phi6*where(Z1_minus_phi7 < 0, 0, Z1_minus_phi7)))) + 
+                    phi8/cosh(0.15*where(Z1_minus_15 < 0, 0, Z1_minus_15)))
+
+    log_sigma = sigma_coefficient[0]
+
+    return (log_mean, log_sigma)
+
+Chiou08_magnitude_type = 'Mw'
+Chiou08_distance_type = 'Rupture'
+
+# dimension = (#periods, #coefficients)
+Chiou08_Table2 = array([
+#  C1       C1a      C1b     Cn     CM      C5      C6      C7   C7a   C9   C9a   C10   Cgamma1   Cgamma2
+[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # pga
+[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # 0.01
+[-1.2515,  0.1,    -0.2550, 3.292, 4.1879, 6.1580, 0.4892, 0.0512, 0.0860, 0.8129, 1.5028, -0.3323, -0.00811, -0.00792],   # 0.02
+[-1.1744,  0.1,    -0.2550, 3.514, 4.1556, 6.1550, 0.4890, 0.0511, 0.0860, 0.8439, 1.5071, -0.3394, -0.00839, -0.00819],   # 0.03
+[-1.0671,  0.1,    -0.2550, 3.563, 4.1226, 6.1508, 0.4888, 0.0508, 0.0860, 0.8740, 1.5138, -0.3453, -0.00875, -0.00855],   # 0.04
+[-0.9464,  0.1,    -0.2550, 3.547, 4.1011, 6.1441, 0.4884, 0.0504, 0.0860, 0.8996, 1.5230, -0.3502, -0.00912, -0.00891],   # 0.05
+[-0.7051,  0.1,    -0.2540, 3.448, 4.0860, 6.1200, 0.4872, 0.0495, 0.0860, 0.9442, 1.5597, -0.3579, -0.00973, -0.00950],   # 0.075
+[-0.5747,  0.1,    -0.2530, 3.312, 4.1030, 6.0850, 0.4854, 0.0489, 0.0860, 0.9677, 1.6104, -0.3604, -0.00975, -0.00952],   # 0.1
+[-0.5309,  0.1,    -0.2500, 3.044, 4.1717, 5.9871, 0.4808, 0.0479, 0.0860, 0.9660, 1.7549, -0.3565, -0.00883, -0.00862],   # 0.15
+[-0.6352,  0.1,    -0.2449, 2.831, 4.2476, 5.8699, 0.4755, 0.0471, 0.0860, 0.9334, 1.9157, -0.3470, -0.00778, -0.00759],   # 0.2
+[-0.7766,  0.1,    -0.2382, 2.658, 4.3184, 5.7547, 0.4706, 0.0464, 0.0860, 0.8946, 2.0709, -0.3379, -0.00688, -0.00671],   # 0.25
+[-0.9278,  0.0999, -0.2313, 2.505, 4.3844, 5.6527, 0.4665, 0.0458, 0.0860, 0.8590, 2.2005, -0.3314, -0.00612, -0.00598],   # 0.3
+[-1.2176,  0.0997, -0.2146, 2.261, 4.4979, 5.4997, 0.4607, 0.0445, 0.0850, 0.8019, 2.3886, -0.3256, -0.00498, -0.00486],   # 0.4
+[-1.4695,  0.0991, -0.1972, 2.087, 4.5881, 5.4029, 0.4571, 0.0429, 0.0830, 0.7578, 2.5000, -0.3189, -0.00420, -0.00410],   # 0.5
+[-1.9278,  0.0936, -0.1620, 1.812, 4.7571, 5.2900, 0.4531, 0.0387, 0.0690, 0.6788, 2.6224, -0.2702, -0.00308, -0.00301],   # 0.75
+[-2.2453,  0.0766, -0.1400, 1.648, 4.8820, 5.2480, 0.4517, 0.0350, 0.0450, 0.6196, 2.6690, -0.2059, -0.00246, -0.00241],   # 1.0
+[-2.7307,  0.0022, -0.1184, 1.511, 5.0697, 5.2194, 0.4507, 0.0280, 0.0134, 0.5101, 2.6985, -0.0852, -0.00180, -0.00176],   # 1.5
+[-3.1413, -0.0591, -0.1100, 1.470, 5.2173, 5.2099, 0.4504, 0.0213, 0.0040, 0.3917, 2.7085,  0.0160, -0.00147, -0.00143],   # 2.0
+[-3.7413, -0.0931, -0.1040, 1.456, 5.4385, 5.2040, 0.4501, 0.0106, 0.0010, 0.1244, 2.7145,  0.1876, -0.00117, -0.00115],   # 3.0
+[-4.1814, -0.0982, -0.1020, 1.465, 5.5977, 5.2020, 0.4501, 0.0041, 0,      0.0086, 2.7164,  0.3378, -0.00107, -0.00104],   # 4.0
+[-4.5187, -0.0994, -0.1010, 1.478, 5.7276, 5.2010, 0.4500, 0.0010, 0,      0,      2.7172,  0.4579, -0.00102, -0.00099],   # 5.0
+[-5.1224, -0.0999, -0.1010, 1.498, 5.9891, 5.2000, 0.4500, 0,      0,      0,      2.7177,  0.7514, -0.00096, -0.00094],   # 7.5
+[-5.5872, -0.1,    -0.1000, 1.502, 6.1930, 5.2000, 0.4500, 0,      0,      0,      2.7180,  1.1856, -0.00094, -0.00091]])  # 10.0
+
+# dimension = (#periods, #coefficients)
+Chiou08_Table3 = array([
+# phi1     phi2     phi3      phi4      phi5    phi6      phi7    phi8
+[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # pga
+[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # 0.01
+[-0.4340, -0.1364, -0.007279, 0.108360, 0.2289, 0.014996, 580.0,  0.0699],  # 0.02
+[-0.4177, -0.1403, -0.007354, 0.119888, 0.2289, 0.014996, 580.0,  0.0701],  # 0.03
+[-0.4000, -0.1591, -0.006977, 0.133641, 0.2289, 0.014996, 579.9,  0.0702],  # 0.04
+[-0.3903, -0.1862, -0.006467, 0.148927, 0.2290, 0.014996, 579.9,  0.0701],  # 0.05
+[-0.4040, -0.2538, -0.005734, 0.190596, 0.2292, 0.014996, 579.6,  0.0686],  # 0.075
+[-0.4423, -0.2943, -0.005604, 0.230662, 0.2297, 0.014996, 579.2,  0.0646],  # 0.1
+[-0.5162, -0.3113, -0.005845, 0.266468, 0.2326, 0.014988, 577.2,  0.0494],  # 0.15
+[-0.5697, -0.2927, -0.006141, 0.255253, 0.2386, 0.014964, 573.9, -0.0019],  # 0.2
+[-0.6109, -0.2662, -0.006439, 0.231541, 0.2497, 0.014881, 568.5, -0.0479],  # 0.25
+[-0.6444, -0.2405, -0.006704, 0.207277, 0.2674, 0.014639, 560.5, -0.0756],  # 0.3
+[-0.6931, -0.1975, -0.007125, 0.165464, 0.3120, 0.013493, 540.0, -0.0960],  # 0.4
+[-0.7246, -0.1633, -0.007435, 0.133828, 0.3610, 0.011133, 512.9, -0.0998],  # 0.5
+[-0.7708, -0.1028, -0.008120, 0.085153, 0.4353, 0.006739, 441.9, -0.0765],  # 0.75
+[-0.7990, -0.0699, -0.008444, 0.058595, 0.4629, 0.005749, 391.8, -0.0412],  # 1.0
+[-0.8382, -0.0425, -0.007707, 0.031787, 0.4756, 0.005544, 348.1,  0.0140],  # 1.5
+[-0.8663, -0.0302, -0.004792, 0.019716, 0.4785, 0.005521, 332.5,  0.0544],  # 2.0
+[-0.9032, -0.0129, -0.001828, 0.009643, 0.4796, 0.005517, 324.1,  0.1232],  # 3.0
+[-0.9231, -0.0016, -0.001523, 0.005379, 0.4799, 0.005517, 321.7,  0.1859],  # 4.0
+[-0.9222,  0.0000, -0.001440, 0.003223, 0.4799, 0.005517, 320.9,  0.2295],  # 5.0
+[-0.8346,  0.0000, -0.001369, 0.001134, 0.4800, 0.005517, 320.3,  0.2660],  # 7.5
+[-0.7332,  0.0000, -0.001361, 0.000515, 0.4800, 0.005517, 320.1,  0.2682]]) # 10.0
+
+# join tables 2 and 3, convert to dim = (#coefficients, #periods)
+Chiou08_coefficient = concatenate((Chiou08_Table2, Chiou08_Table3), axis=1)
+Chiou08_coefficient = Chiou08_coefficient.transpose()
+
+# dim = (period,)
+Chiou08_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.040,
+                              0.050, 0.075, 0.100, 0.150, 0.200,
+                              0.250, 0.300, 0.400, 0.500, 0.750,
+                              1.000, 1.500, 2.000, 3.000, 4.000,
+                              5.000, 7.500, 10.00]
+
+# dim = (period,)
+# we want to say sigma (error) is 0, but log(0) == -infinity,
+# so we use a very small value
+sigma = math.log(1.0e-20)
+Chiou08_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
+Chiou08_sigma_coefficient_period = [0.0, 1.0]
+
+Chiou08_interpolation = linear_interpolation
+
+gound_motion_init['Chiou08_distribution'] = \
+                        [Chiou08_distribution,
+                         Chiou08_magnitude_type,
+                         Chiou08_distance_type,
+                         Chiou08_coefficient,
+                         Chiou08_coefficient_period,
+                         Chiou08_interpolation,
+                         Chiou08_sigma_coefficient,
+                         Chiou08_sigma_coefficient_period,
+                         Chiou08_interpolation]
+
+###########################  End of Chiou08 model  #############################
 

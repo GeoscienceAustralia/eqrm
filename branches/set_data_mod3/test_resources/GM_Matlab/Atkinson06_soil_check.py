@@ -9,54 +9,64 @@ import math
 # global values
 ######    
 
-pgaBC = 70.0
+# coeffs for calculating pga_BC (ie, period 0.0)
+pga_c1 = 9.07E-01
+pga_c2 = 9.83E-01
+pga_c3 = -6.60E-02
+pga_c4 = -2.70E+00
+pga_c5 = 1.59E-01
+pga_c6 = -2.80E+00
+pga_c7 = 2.12E-01
+pga_c8 = -3.01E-01
+pga_c9 = -6.53E-02
+pga_c10 = -4.48E-04
 
 V1 = 180.0
 V2 = 300.0
 Vref = 760.0
 
+ln_factor = math.log10(math.e)
+g_factor = math.log(9.80665*100)
+
 ######
 # various equations from the Atkinson paper
 ######
 
-def eqn_8a(B1, B2, V30, V1, V2):
+def eqn_8a(B1, B2, vs30, V1, V2):
     return B1
 
-def eqn_8b(B1, B2, V30, V1, V2):
-    return (B1-B2)*math.log(V30/V2)/math.log(V1/V2) + B2
+def eqn_8b(B1, B2, vs30, V1, V2):
+    return (B1-B2)*math.log(vs30/V2)/math.log(V1/V2) + B2
 
-def eqn_8c(B1, B2, V30, V1, V2):
-    return B2 * math.log(V30/Vref)/math.log(V2/Vref)
+def eqn_8c(B1, B2, vs30, V1, V2):
+    return B2 * math.log(vs30/Vref)/math.log(V2/Vref)
 
-def eqn_8d(B1, B2, V30, V1, V2):
+def eqn_8d(B1, B2, vs30, V1, V2):
     return 0.0
 
-def eqn_8(B1, B2, V30, V1, V2):
-    if V30 <= V1:
-        Bnl = eqn_8a(B1, B2, V30, V1, V2)
-    elif V1 < V30 <= V2:
-        Bnl = eqn_8b(B1, B2, V30, V1, V2)
-    elif V2 < V30 < Vref:
-        Bnl = eqn_8c(B1, B2, V30, V1, V2)
-    elif V30 > Vref:
-        Bnl = eqn_8d(B1, B2, V30, V1, V2)
+def eqn_8(B1, B2, vs30, V1, V2):
+    if vs30 <= V1:
+        Bnl = eqn_8a(B1, B2, vs30, V1, V2)
+    elif V1 < vs30 <= V2:
+        Bnl = eqn_8b(B1, B2, vs30, V1, V2)
+    elif V2 < vs30 <= Vref:
+        Bnl = eqn_8c(B1, B2, vs30, V1, V2)
     else:
-        msg = 'Error in eqn_8()'
-        raise RuntimeError(msg)
+        Bnl = eqn_8d(B1, B2, vs30, V1, V2)
 
     return Bnl
 
-def eqn_7a(Blin, V30, Vref, Bnl, pgaBC):
-    return math.log10(math.exp(Blin*math.log(V30/Vref) + Bnl*math.log(60.0/100.0)))
+def eqn_7a(Blin, vs30, Vref, Bnl, pgaBC):
+    return math.log10(math.exp(Blin*math.log(vs30/Vref) + Bnl*math.log(60.0/100.0)))
 
-def eqn_7b(Blin, V30, Vref, Bnl, pgaBC):
-    return math.log10(math.exp(Blin*math.log(V30/Vref) + Bnl*math.log(pgaBC/100.0)))
+def eqn_7b(Blin, vs30, Vref, Bnl, pgaBC):
+    return math.log10(math.exp(Blin*math.log(vs30/Vref) + Bnl*math.log(pgaBC/100.0)))
 
-def eqn_7(Blin, V30, Vref, Bnl, pgaBC):
+def eqn_7(Blin, vs30, Vref, Bnl, pgaBC):
     if pgaBC <= 60.0:
-        return eqn_7a(Blin, V30, Vref, Bnl, pgaBC)
+        return eqn_7a(Blin, vs30, Vref, Bnl, pgaBC)
     else:
-        return eqn_7b(Blin, V30, Vref, Bnl, pgaBC)
+        return eqn_7b(Blin, vs30, Vref, Bnl, pgaBC)
 
 def eqn_5(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, M, Rcd, S):
     R0 = 10.0
@@ -66,6 +76,19 @@ def eqn_5(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, M, Rcd, S):
     F0 = max(math.log10(R0/Rcd), 0.0)
     F1 = min(math.log10(Rcd), math.log10(R1))
     F2 = max(math.log10(Rcd/R2), 0.0)
+
+    print('c1=%f' % c1)
+    tmp = c2*M; print('c2*M=%f' % tmp)
+    tmp = c3*M*M; print('c3*M*M=%f' % tmp)
+    tmp = (c4 + c5*M)*F1; print('(c4 + c5*M)*F1=%f' % tmp)
+    tmp = (c6 + c7*M)*F2; print('(c6 + c7*M)*F2=%f' % tmp)
+    tmp = (c8 + c9*M)*F0; print('(c8 + c9*M)*F0=%f' % tmp)
+    tmp = c10*Rcd; print('c10*Rcd=%f' % tmp)
+    print('S=%f' % S)
+
+    print('log_mean=%f'
+          % (c1 + c2*M + c3*M*M + (c4 + c5*M)*F1 + (c6 + c7*M)*F2 + 
+               (c8 + c9*M)*F0 + c10*Rcd + S))
 
     return c1 + c2*M + c3*M*M + (c4 + c5*M)*F1 + (c6 + c7*M)*F2 + \
                (c8 + c9*M)*F0 + c10*Rcd + S
@@ -81,26 +104,32 @@ def same(prefix, value, expected, rtol=0.01):
 
 def check_scenario(period, distance, magnitude, expected_logPSA,
                    c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2):
-    """Run base bedrock known case and soil for various V30"""
+    """Run base bedrock known case and soil for various vs30"""
 
     # run known bedrock case, compare with expected_logPSA
     S = 0.0
     logPSA = eqn_5(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10,
                    magnitude, distance, S)
 
+    print('logPSA=%f' % logPSA)
+
     same('bedrock, logPSA (period=%.1f, distance=%.1f, M=%.1f)'
          % (period, distance, magnitude),
          logPSA, expected_logPSA, rtol=3.0e-2)
 
-    # do 3 V30 values in [200, 800]
-    for V30 in (200.0, 400.0, 800.0):
-        Bnl = eqn_8(B1, B2, V30, V1, V2)
-        S = eqn_7(Blin, V30, Vref, Bnl, pgaBC)
+    # do 3 vs30 values in [200, 1000]
+    for vs30 in (200.0, 400.0, 1000.0):
+        pgaBC = eqn_5(pga_c1, pga_c2, pga_c3, pga_c4, pga_c5,
+                      pga_c6, pga_c7, pga_c8, pga_c9, pga_c10,
+                      magnitude, distance, 0.0)
+        Bnl = eqn_8(B1, B2, vs30, V1, V2)
+        S = eqn_7(Blin, vs30, Vref, Bnl, pgaBC)
         logPSA = eqn_5(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, magnitude, distance, S)
-        print('scenario, V30=%.1f, S=%f, logPSA=%f' % (V30, S, logPSA))
+        print('scenario, vs30=%.1f, S=%f, logPSA=%f, result=%f'
+             % (vs30, S, logPSA, logPSA/ln_factor-g_factor))
 
 ######
-# case 1: period = 0.2, distance = 100.0, magnitude = 7.5
+# period = 0.2, distance = 100.0, magnitude = 7.5
 ######
 
 period = 0.2
@@ -128,7 +157,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 2: period = 0.2, distance = 10.0, magnitude = 7.5
+# period = 0.2, distance = 10.0, magnitude = 7.5
 ######
 
 period = 0.2
@@ -156,7 +185,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 3: period = 0.2, distance = 2.0, magnitude = 7.5
+# period = 0.2, distance = 2.0, magnitude = 7.5
 ######
 
 period = 0.2
@@ -184,7 +213,91 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 4: period = 1.0, distance = 100.0, magnitude = 7.5
+# period = 0.2, distance = 100.0, magnitude = 7.5
+######
+
+period = 0.2
+distance = 100.0
+magnitude = 7.5
+
+c1 = -6.15e-1
+c2 = 1.23e+0
+c3 = -7.89e-2
+c4 = -2.09e+0
+c5 = 1.31e-1
+c6 = -1.12e+0
+c7 = 6.79e-2
+c8 = 6.06e-1
+c9 = -1.46e-1
+c10 = -1.13e-3
+
+Blin = -0.306
+B1 = -0.521
+B2 = -0.185
+
+expected_logPSA = 2.00e+0	# bedrock result
+
+check_scenario(period, distance, magnitude, expected_logPSA,
+               c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
+
+######
+# period = 0.2, distance = 10.0, magnitude = 7.5
+######
+
+period = 0.2
+distance = 10.0
+magnitude = 7.5
+
+c1 = -6.15e-1
+c2 = 1.23e+0
+c3 = -7.89e-2
+c4 = -2.09e+0
+c5 = 1.31e-1
+c6 = -1.12e+0
+c7 = 6.79e-2
+c8 = 6.06e-1
+c9 = -1.46e-1
+c10 = -1.13e-3
+
+Blin = -0.306
+B1 = -0.521
+B2 = -0.185
+
+expected_logPSA = 3.05e+0		# bedrock result
+
+check_scenario(period, distance, magnitude, expected_logPSA,
+               c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
+
+######
+# period = 0.2, distance = 2.0, magnitude = 7.5
+######
+
+period = 0.2
+distance = 2.0
+magnitude = 7.5
+
+c1 = -6.15e-1
+c2 = 1.23e+0
+c3 = -7.89e-2
+c4 = -2.09e+0
+c5 = 1.31e-1
+c6 = -1.12e+0
+c7 = 6.79e-2
+c8 = 6.06e-1
+c9 = -1.46e-1
+c10 = -1.13e-3
+
+Blin = -0.306
+B1 = -0.521
+B2 = -0.185
+
+expected_logPSA = 3.48e+0		# bedrock result
+
+check_scenario(period, distance, magnitude, expected_logPSA,
+               c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
+
+######
+# period = 1.0, distance = 100.0, magnitude = 7.5
 ######
 
 period = 1.0
@@ -212,7 +325,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 5: period = 1.0, distance = 10.0, magnitude = 7.5
+# period = 1.0, distance = 10.0, magnitude = 7.5
 ######
 
 period = 1.0
@@ -240,7 +353,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 6: period = 1.0, distance = 2.0, magnitude = 7.5
+# period = 1.0, distance = 2.0, magnitude = 7.5
 ######
 
 period = 1.0
@@ -268,7 +381,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 7: period = 2.0, distance = 100.0, magnitude = 7.5
+# period = 2.0, distance = 100.0, magnitude = 7.5
 ######
 
 period = 2.0
@@ -296,7 +409,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 8: period = 2.0, distance = 10.0, magnitude = 7.5
+# period = 2.0, distance = 10.0, magnitude = 7.5
 ######
 
 period = 2.0
@@ -324,7 +437,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 9: period = 2.0, distance = 2.0, magnitude = 7.5
+# period = 2.0, distance = 2.0, magnitude = 7.5
 ######
 
 period = 2.0
@@ -352,7 +465,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 10: period = 0.2, distance = 100.0, magnitude = 5.5
+# period = 0.2, distance = 100.0, magnitude = 5.5
 ######
 
 period = 0.2
@@ -380,7 +493,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 11: period = 0.2, distance = 10.0, magnitude = 5.5
+# period = 0.2, distance = 10.0, magnitude = 5.5
 ######
 
 period = 0.2
@@ -408,7 +521,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 12: period = 0.2, distance = 2.0, magnitude = 5.5
+# period = 0.2, distance = 2.0, magnitude = 5.5
 ######
 
 period = 0.2
@@ -436,7 +549,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 13: period = 1.0, distance = 100.0, magnitude = 5.5
+# period = 1.0, distance = 100.0, magnitude = 5.5
 ######
 
 period = 1.0
@@ -464,7 +577,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 14: period = 1.0, distance = 10.0, magnitude = 5.5
+# period = 1.0, distance = 10.0, magnitude = 5.5
 ######
 
 period = 1.0
@@ -492,7 +605,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 15: period = 1.0, distance = 2.0, magnitude = 5.5
+# period = 1.0, distance = 2.0, magnitude = 5.5
 ######
 
 period = 1.0
@@ -520,7 +633,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 16: period = 2.0, distance = 100.0, magnitude = 5.5
+# period = 2.0, distance = 100.0, magnitude = 5.5
 ######
 
 period = 2.0
@@ -548,7 +661,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 17: period = 2.0, distance = 10.0, magnitude = 5.5
+# period = 2.0, distance = 10.0, magnitude = 5.5
 ######
 
 period = 2.0
@@ -576,7 +689,7 @@ check_scenario(period, distance, magnitude, expected_logPSA,
                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2)
 
 ######
-# case 18: period = 2.0, distance = 2.0, magnitude = 5.5
+# period = 2.0, distance = 2.0, magnitude = 5.5
 ######
 
 period = 2.0
