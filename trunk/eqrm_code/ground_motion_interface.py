@@ -90,12 +90,13 @@ Description:
 import math
 from copy import  deepcopy
 from scipy import where, sqrt, array, asarray, exp, log, newaxis, zeros, \
-     log10, isfinite, weave, ones, shape, reshape, concatenate
+     log10, isfinite, weave, ones, shape, reshape, concatenate, \
+     cosh, power
  
 from eqrm_code.ground_motion_misc import linear_interpolation, \
      Australian_standard_model, Australian_standard_model_interpolation
-
 from eqrm_code import util 
+import event_set
 
 
 LOG10E = 0.43429448190325182
@@ -2099,7 +2100,7 @@ def Liang_2008_distribution(**kwargs):
 
     [1] Liang, J.Z., Hao, H., Gaull, B.A., and Sinadinovskic, C. [2008]
         "Estimation of Strong Ground Motions in Southwest Western Australia
-        with a Combined Green's Function and Stochastic Approach",
+        with a Combined Greens Function and Stochastic Approach",
         Journal of Earthquake Engineering, 12:3, 382-405
     """
 
@@ -2569,4 +2570,217 @@ gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
                          Atkinson06_interpolation]
 
 #############################  End of Atkinson06  ##############################
+
+##########################  Start of Chiou08 model  ############################
+
+"""Code here is based on Chiou [1].
+
+    [1] Chiou.B.S.-J., Youngs R.R., 2008 An NGA Model for the Average Horizontal
+        Component of Peak Ground Motion and Response Spectra,
+        Earthquake Spectra 24, 173-215.
+"""
+
+
+# constants from Chiou [1] table 1
+Chiou_C2 = 1.06
+Chiou_C3 = -2.1
+Chiou_C4 = -0.4
+Chiuo_Crb = 50.0
+Chiou_Chm = 3.0
+Chiou_Cgamma3 = 4.0
+
+# precalculate constant expressions
+Chiou_C2_minus_C3 = Chiou_C2-Chiou_C3
+Chiuo_Crb_square = Chiuo_Crb * Chiuo_Crb
+Chiou_1130_minus_360 = 1130 - 360.0
+Chiou_378_7_pow_8 = math.pow(378.7, 8)
+Chiou_3_82_div_8 = 3.82/8.0
+
+######
+# Set up a numpy array to convert a 'faulting_type' flag to an array slice
+# that encodes the Frv/Fnm flags.
+######
+
+# faulting type flag encodings
+#                       'type': (Frv, Fnm)
+Chiou_faulting_flags = {'reverse': (1, 0),
+                        'normal': (0, 1),
+                        'strikeslip': (0, 0)}
+
+# generate 'Chiou_faulting_type' from the dictionary above and event_set data
+tmp = []
+for (k, v) in Chiou_faulting_flags.iteritems():
+    index = event_set.get_faulting_types()[k]
+    tmp.append((index, v))
+
+tmp2 = []
+tmp.sort()
+for (_, flags) in tmp:
+    tmp2.append(flags)
+
+Chiou_faulting_type = array(tmp2)
+del tmp, tmp2
+
+######
+# Start building the coefficient array
+######
+
+def Chiou08_distribution(**kwargs):
+    """The Chiou08 model.
+
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient, sigma_coefficient, S
+
+    The algorithm here is taken from [1], pages 193 and 194  and returns results
+    that are log10 cm/s/s.  Local simplifications are applied:
+        AS = 0, results in some terms of model equation being simplified
+        Z1 value calculated from Vs30
+        eta and sigma random values assumed to be 0
+        the last term equation 13a (page 193) starting C9*Fhw... is ignored since
+            Fhw is 0 (no hanging-wall)
+        the last line in equation 13b (page 194) is ignored since ...
+    """
+
+    # get args
+    M = kwargs['mag']				# event-specific
+    Rrup = kwargs['distance']			# event-site-specific
+    fault_type = kwargs['faulting_type']	# event-specific
+    Ztor = kwargs['depth_to_top']		# event-specific
+    Vs30 = kwargs['Vs30']			# site-specific
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']	# actual log_sigma
+
+    # check we have the right shapes
+    num_periods = coefficient.shape[3]
+    msg = ('Expected coefficient.shape %s, got %s'
+           % (str((13, 1, 1, num_periods)), str(coefficient.shape)))
+    assert coefficient.shape == (13, 1, 1, num_periods), msg
+
+    # unpack coefficients
+    (C1, C1a, C1b, Cn, CM, C5, C6, C7, C7a, C9, C9a, C10, Cgamma1, Cgamma2,
+         phi1, phi2, phi3, phi4, phi5, phi6, phi7, phi8) = coefficient
+
+    # get flag values from 'faulting_type'
+    
+
+    # convert delta degrees to radians
+    delta_rad = (delta*2*math.pi) / 360.0
+
+    # precalculate some common expressions
+    M_minus_Chiou_Chm = M - Chiou_Chm
+    M_minus_Chiou_Cgamma3 = M - Chiou_Cgamma3
+
+    lnyref = (C1 + (C1a*Frv + C1b*Fnm + C7*(Ztor-4)) +
+              Chiou_C2*(M-6) + (Chiou_C2_minus_C3/Cn)*log(1 + exp(Cn*(CM-M))) +
+              Chiou_C4*log(Rrup + C5*cosh(C6*where(M_minus_Chiou_Chm < 0, 0, M_minus_Chiou_Chm))) +
+              (C4a-Chiou_C4)*log(sqrt(Rrup*Rrup + Chiuo_Crb_square)) +
+              (Cgamma1 + Cgamma2/cosh(where(M_minus_Chiou_Cgamma3 < 0, 0, M_minus_Chiou_Cgamma3)))*Rrup)
+
+    Yref = exp(lnYref)
+    Z1 = exp(28.5 - Chiou_3_82_div_8*log(power(Vs30, 8) + Chiou_378_7_pow_8))
+
+    # precalculate some common sub-expressions
+    log_Vs30_div_1130 = log(Vs30/1130.0)
+    Z1_minus_phi7 = Z1 - phi7
+    Z1_minus_15 = Z1 - 15.0
+
+    log_mean = (lnYref + phi1*where(log_Vs30_div_1130 > 0, 0, log_Vs30_div_1130) +
+                phi2*(exp(phi3*min(Vs30, 1130)-360.0)-exp(phi3*Chiou_1130_minus_360))*
+                    log((Yref+phi4)/phi4) +
+                phi5*(1-1/(cosh(phi6*where(Z1_minus_phi7 < 0, 0, Z1_minus_phi7)))) + 
+                    phi8/cosh(0.15*where(Z1_minus_15 < 0, 0, Z1_minus_15)))
+
+    log_sigma = sigma_coefficient[0]
+
+    return (log_mean, log_sigma)
+
+Chiou08_magnitude_type = 'Mw'
+Chiou08_distance_type = 'Rupture'
+
+# dimension = (#periods, #coefficients)
+Chiou08_Table2 = array([
+#  C1       C1a      C1b     Cn     CM      C5      C6      C7   C7a   C9   C9a   C10   Cgamma1   Cgamma2
+[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # pga
+[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # 0.01
+[-1.2515,  0.1,    -0.2550, 3.292, 4.1879, 6.1580, 0.4892, 0.0512, 0.0860, 0.8129, 1.5028, -0.3323, -0.00811, -0.00792],   # 0.02
+[-1.1744,  0.1,    -0.2550, 3.514, 4.1556, 6.1550, 0.4890, 0.0511, 0.0860, 0.8439, 1.5071, -0.3394, -0.00839, -0.00819],   # 0.03
+[-1.0671,  0.1,    -0.2550, 3.563, 4.1226, 6.1508, 0.4888, 0.0508, 0.0860, 0.8740, 1.5138, -0.3453, -0.00875, -0.00855],   # 0.04
+[-0.9464,  0.1,    -0.2550, 3.547, 4.1011, 6.1441, 0.4884, 0.0504, 0.0860, 0.8996, 1.5230, -0.3502, -0.00912, -0.00891],   # 0.05
+[-0.7051,  0.1,    -0.2540, 3.448, 4.0860, 6.1200, 0.4872, 0.0495, 0.0860, 0.9442, 1.5597, -0.3579, -0.00973, -0.00950],   # 0.075
+[-0.5747,  0.1,    -0.2530, 3.312, 4.1030, 6.0850, 0.4854, 0.0489, 0.0860, 0.9677, 1.6104, -0.3604, -0.00975, -0.00952],   # 0.1
+[-0.5309,  0.1,    -0.2500, 3.044, 4.1717, 5.9871, 0.4808, 0.0479, 0.0860, 0.9660, 1.7549, -0.3565, -0.00883, -0.00862],   # 0.15
+[-0.6352,  0.1,    -0.2449, 2.831, 4.2476, 5.8699, 0.4755, 0.0471, 0.0860, 0.9334, 1.9157, -0.3470, -0.00778, -0.00759],   # 0.2
+[-0.7766,  0.1,    -0.2382, 2.658, 4.3184, 5.7547, 0.4706, 0.0464, 0.0860, 0.8946, 2.0709, -0.3379, -0.00688, -0.00671],   # 0.25
+[-0.9278,  0.0999, -0.2313, 2.505, 4.3844, 5.6527, 0.4665, 0.0458, 0.0860, 0.8590, 2.2005, -0.3314, -0.00612, -0.00598],   # 0.3
+[-1.2176,  0.0997, -0.2146, 2.261, 4.4979, 5.4997, 0.4607, 0.0445, 0.0850, 0.8019, 2.3886, -0.3256, -0.00498, -0.00486],   # 0.4
+[-1.4695,  0.0991, -0.1972, 2.087, 4.5881, 5.4029, 0.4571, 0.0429, 0.0830, 0.7578, 2.5000, -0.3189, -0.00420, -0.00410],   # 0.5
+[-1.9278,  0.0936, -0.1620, 1.812, 4.7571, 5.2900, 0.4531, 0.0387, 0.0690, 0.6788, 2.6224, -0.2702, -0.00308, -0.00301],   # 0.75
+[-2.2453,  0.0766, -0.1400, 1.648, 4.8820, 5.2480, 0.4517, 0.0350, 0.0450, 0.6196, 2.6690, -0.2059, -0.00246, -0.00241],   # 1.0
+[-2.7307,  0.0022, -0.1184, 1.511, 5.0697, 5.2194, 0.4507, 0.0280, 0.0134, 0.5101, 2.6985, -0.0852, -0.00180, -0.00176],   # 1.5
+[-3.1413, -0.0591, -0.1100, 1.470, 5.2173, 5.2099, 0.4504, 0.0213, 0.0040, 0.3917, 2.7085,  0.0160, -0.00147, -0.00143],   # 2.0
+[-3.7413, -0.0931, -0.1040, 1.456, 5.4385, 5.2040, 0.4501, 0.0106, 0.0010, 0.1244, 2.7145,  0.1876, -0.00117, -0.00115],   # 3.0
+[-4.1814, -0.0982, -0.1020, 1.465, 5.5977, 5.2020, 0.4501, 0.0041, 0,      0.0086, 2.7164,  0.3378, -0.00107, -0.00104],   # 4.0
+[-4.5187, -0.0994, -0.1010, 1.478, 5.7276, 5.2010, 0.4500, 0.0010, 0,      0,      2.7172,  0.4579, -0.00102, -0.00099],   # 5.0
+[-5.1224, -0.0999, -0.1010, 1.498, 5.9891, 5.2000, 0.4500, 0,      0,      0,      2.7177,  0.7514, -0.00096, -0.00094],   # 7.5
+[-5.5872, -0.1,    -0.1000, 1.502, 6.1930, 5.2000, 0.4500, 0,      0,      0,      2.7180,  1.1856, -0.00094, -0.00091]])  # 10.0
+
+# dimension = (#periods, #coefficients)
+Chiou08_Table3 = array([
+# phi1     phi2     phi3      phi4      phi5    phi6      phi7    phi8
+[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # pga
+[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # 0.01
+[-0.4340, -0.1364, -0.007279, 0.108360, 0.2289, 0.014996, 580.0,  0.0699],  # 0.02
+[-0.4177, -0.1403, -0.007354, 0.119888, 0.2289, 0.014996, 580.0,  0.0701],  # 0.03
+[-0.4000, -0.1591, -0.006977, 0.133641, 0.2289, 0.014996, 579.9,  0.0702],  # 0.04
+[-0.3903, -0.1862, -0.006467, 0.148927, 0.2290, 0.014996, 579.9,  0.0701],  # 0.05
+[-0.4040, -0.2538, -0.005734, 0.190596, 0.2292, 0.014996, 579.6,  0.0686],  # 0.075
+[-0.4423, -0.2943, -0.005604, 0.230662, 0.2297, 0.014996, 579.2,  0.0646],  # 0.1
+[-0.5162, -0.3113, -0.005845, 0.266468, 0.2326, 0.014988, 577.2,  0.0494],  # 0.15
+[-0.5697, -0.2927, -0.006141, 0.255253, 0.2386, 0.014964, 573.9, -0.0019],  # 0.2
+[-0.6109, -0.2662, -0.006439, 0.231541, 0.2497, 0.014881, 568.5, -0.0479],  # 0.25
+[-0.6444, -0.2405, -0.006704, 0.207277, 0.2674, 0.014639, 560.5, -0.0756],  # 0.3
+[-0.6931, -0.1975, -0.007125, 0.165464, 0.3120, 0.013493, 540.0, -0.0960],  # 0.4
+[-0.7246, -0.1633, -0.007435, 0.133828, 0.3610, 0.011133, 512.9, -0.0998],  # 0.5
+[-0.7708, -0.1028, -0.008120, 0.085153, 0.4353, 0.006739, 441.9, -0.0765],  # 0.75
+[-0.7990, -0.0699, -0.008444, 0.058595, 0.4629, 0.005749, 391.8, -0.0412],  # 1.0
+[-0.8382, -0.0425, -0.007707, 0.031787, 0.4756, 0.005544, 348.1,  0.0140],  # 1.5
+[-0.8663, -0.0302, -0.004792, 0.019716, 0.4785, 0.005521, 332.5,  0.0544],  # 2.0
+[-0.9032, -0.0129, -0.001828, 0.009643, 0.4796, 0.005517, 324.1,  0.1232],  # 3.0
+[-0.9231, -0.0016, -0.001523, 0.005379, 0.4799, 0.005517, 321.7,  0.1859],  # 4.0
+[-0.9222,  0.0000, -0.001440, 0.003223, 0.4799, 0.005517, 320.9,  0.2295],  # 5.0
+[-0.8346,  0.0000, -0.001369, 0.001134, 0.4800, 0.005517, 320.3,  0.2660],  # 7.5
+[-0.7332,  0.0000, -0.001361, 0.000515, 0.4800, 0.005517, 320.1,  0.2682]]) # 10.0
+
+# join tables 2 and 3, convert to dim = (#coefficients, #periods)
+Chiou08_coefficient = concatenate((Chiou08_Table2, Chiou08_Table3), axis=1)
+Chiou08_coefficient = Chiou08_coefficient.transpose()
+
+# dim = (period,)
+Chiou08_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.040,
+                              0.050, 0.075, 0.100, 0.150, 0.200,
+                              0.250, 0.300, 0.400, 0.500, 0.750,
+                              1.000, 1.500, 2.000, 3.000, 4.000,
+                              5.000, 7.500, 10.00]
+
+# dim = (period,)
+# we want to say sigma (error) is 0, but log(0) == -infinity,
+# so we use a very small value
+sigma = math.log(1.0e-20)
+Chiou08_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
+Chiou08_sigma_coefficient_period = [0.0, 1.0]
+
+Chiou08_interpolation = linear_interpolation
+
+gound_motion_init['Chiou08_distribution'] = \
+                        [Chiou08_distribution,
+                         Chiou08_magnitude_type,
+                         Chiou08_distance_type,
+                         Chiou08_coefficient,
+                         Chiou08_coefficient_period,
+                         Chiou08_interpolation,
+                         Chiou08_sigma_coefficient,
+                         Chiou08_sigma_coefficient_period,
+                         Chiou08_interpolation]
+
+###########################  End of Chiou08 model  #############################
 

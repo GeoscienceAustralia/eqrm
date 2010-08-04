@@ -27,6 +27,17 @@ from eqrm_code.projections import azimuthal_orthographic_ll_to_xy as ll_to_xy
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 
+
+######
+# Define the mapping from fault type NAME to integer INDEX
+# This is used in the Chiou08 model
+######
+
+FaultingTypeDictionary = {'reverse': 0,
+                          'normal': 1,
+                          'strikeslip': 2}
+
+
 class Event_Set(object):
     def __init__(self,
                  azimuth,
@@ -122,7 +133,10 @@ class Event_Set(object):
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
         self.event_num = r_[0:len(self.depth)] # gives every event an id
-        
+
+#        # will be passed in, but for now...
+#        self.faulting_type = 'reverse'
+
         self.check_arguments() 
 
 
@@ -472,7 +486,6 @@ class Event_Set(object):
         eqrmlog.resource_usage()
         return event
 
-
     def deterministic_setup(self):
         """
         make the event activity a vector
@@ -802,6 +815,15 @@ class Pseudo_Event_Set(Event_Set):
                            attenuation_weights)
         
         return pseudo_event
+
+
+def get_faulting_types():
+    """Get the fault type string to index mapping dictionary."""
+
+    return FaultingTypeDictionary
+
+
+################################################################################
 
 # this will run if this is called from DOS prompt or double clicked
 if __name__ == '__main__':
