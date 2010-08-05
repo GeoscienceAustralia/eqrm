@@ -1,3 +1,6 @@
+
+Introduction
+	
 The EQRM builds on existing open source packages and it uses multiple
 languages (C and Python) to obtain an optimal trade-off between
 useability and speed. For these two reasons the installation process
@@ -7,7 +10,8 @@ Currently EQRM can be installed on the Windows and Linux operating
 system. Installation on the Mac has not been tested.
 
 For any help, please post to eqrm-user@lists.sourceforge.net
-(https://sourceforge.net/mail/?group_id=198293) .
+(https://sourceforge.net/mail/?group_id=198293). Also, to
+keep up to date with EQRM, join the list.
 
 We would also like to hear from you if you
 are not able to install the software. 
