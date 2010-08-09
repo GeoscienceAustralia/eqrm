@@ -83,18 +83,21 @@ Description:
             coefficient.shape = (num_coefficients, 1, 1, num_periods)
             sigmacoefficient.shape = (num_sigmacoefficients, 1, 1, num_periods)
             depth.shape = (site, events, 1)
+            depth_to_top.shape = (site, events, 1)
+            faulting_type.shape = (site, events, 1)
 
         Note that the 'site' dimension above is currently 1.
 """
 
 import math
 from copy import  deepcopy
-from scipy import where, sqrt, array, asarray, exp, log, newaxis, zeros, \
-     log10, isfinite, weave, ones, shape, reshape, concatenate, \
-     cosh, power
+from scipy import (where, sqrt, array, asarray, exp, log, newaxis, zeros,
+                   log10, isfinite, weave, ones, shape, reshape, concatenate,
+                   cosh, power, shape)
  
-from eqrm_code.ground_motion_misc import linear_interpolation, \
-     Australian_standard_model, Australian_standard_model_interpolation
+from eqrm_code.ground_motion_misc import (linear_interpolation,
+                                          Australian_standard_model,
+                                          Australian_standard_model_interpolation)
 from eqrm_code import util 
 import event_set
 
@@ -2583,8 +2586,9 @@ gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
 
 # constants from Chiou [1] table 1
 Chiou_C2 = 1.06
-Chiou_C3 = -2.1
-Chiou_C4 = -0.4
+Chiou_C3 = 3.45
+Chiou_C4 = -2.1
+Chiou_C4a = -0.5
 Chiuo_Crb = 50.0
 Chiou_Chm = 3.0
 Chiou_Cgamma3 = 4.0
@@ -2602,34 +2606,35 @@ Chiou_3_82_div_8 = 3.82/8.0
 ######
 
 # faulting type flag encodings
-#                       'type': (Frv, Fnm)
-Chiou_faulting_flags = {'reverse': (1, 0),
-                        'normal': (0, 1),
+#                       'type':     (Frv, Fnm)
+Chiou_faulting_flags = {'reverse':    (1, 0),
+                        'normal':     (0, 1),
                         'strikeslip': (0, 0)}
 
 # generate 'Chiou_faulting_type' from the dictionary above and event_set data
 tmp = []
 for (k, v) in Chiou_faulting_flags.iteritems():
-    index = event_set.get_faulting_types()[k]
+    index = event_set.FaultingTypeDictionary[k]
     tmp.append((index, v))
 
+# sort and make array in correct index order
 tmp2 = []
 tmp.sort()
 for (_, flags) in tmp:
     tmp2.append(flags)
-
 Chiou_faulting_type = array(tmp2)
 del tmp, tmp2
 
 ######
-# Start building the coefficient array
+# The model function.
 ######
 
 def Chiou08_distribution(**kwargs):
     """The Chiou08 model.
 
     kwargs  dictionary of parameters, expect:
-                mag, distance, coefficient, sigma_coefficient, S
+                mag, distance, faulting_type, depth_to_top, vs30, dip,
+                coefficient, sigma_coefficient
 
     The algorithm here is taken from [1], pages 193 and 194  and returns results
     that are log10 cm/s/s.  Local simplifications are applied:
@@ -2638,42 +2643,42 @@ def Chiou08_distribution(**kwargs):
         eta and sigma random values assumed to be 0
         the last term equation 13a (page 193) starting C9*Fhw... is ignored since
             Fhw is 0 (no hanging-wall)
-        the last line in equation 13b (page 194) is ignored since ...
     """
 
     # get args
     M = kwargs['mag']				# event-specific
     Rrup = kwargs['distance']			# event-site-specific
-    fault_type = kwargs['faulting_type']	# event-specific
+    faulting_type = kwargs['faulting_type']	# event-specific
     Ztor = kwargs['depth_to_top']		# event-specific
-    Vs30 = kwargs['Vs30']			# site-specific
+    Vs30 = kwargs['vs30']			# site-specific
     coefficient = kwargs['coefficient']
-    sigma_coefficient = kwargs['sigma_coefficient']	# actual log_sigma
+    sigma_coefficient = kwargs['sigma_coefficient']
 
     # check we have the right shapes
     num_periods = coefficient.shape[3]
     msg = ('Expected coefficient.shape %s, got %s'
-           % (str((13, 1, 1, num_periods)), str(coefficient.shape)))
-    assert coefficient.shape == (13, 1, 1, num_periods), msg
+           % (str((22, 1, 1, num_periods)), str(coefficient.shape)))
+    assert coefficient.shape == (22, 1, 1, num_periods), msg
+    msg = ('Expected sigma_coefficient.shape %s, got %s'
+           % (str((2, 1, 1, num_periods)), str(sigma_coefficient.shape)))
+    assert sigma_coefficient.shape == (2, 1, 1, num_periods), msg
 
     # unpack coefficients
     (C1, C1a, C1b, Cn, CM, C5, C6, C7, C7a, C9, C9a, C10, Cgamma1, Cgamma2,
          phi1, phi2, phi3, phi4, phi5, phi6, phi7, phi8) = coefficient
 
     # get flag values from 'faulting_type'
-    
-
-    # convert delta degrees to radians
-    delta_rad = (delta*2*math.pi) / 360.0
+    Frv = Chiou_faulting_type[:,0][faulting_type]
+    Fnm = Chiou_faulting_type[:,1][faulting_type]
 
     # precalculate some common expressions
     M_minus_Chiou_Chm = M - Chiou_Chm
     M_minus_Chiou_Cgamma3 = M - Chiou_Cgamma3
 
-    lnyref = (C1 + (C1a*Frv + C1b*Fnm + C7*(Ztor-4)) +
+    lnYref = (C1 + (C1a*Frv + C1b*Fnm + C7*(Ztor-4)) +
               Chiou_C2*(M-6) + (Chiou_C2_minus_C3/Cn)*log(1 + exp(Cn*(CM-M))) +
               Chiou_C4*log(Rrup + C5*cosh(C6*where(M_minus_Chiou_Chm < 0, 0, M_minus_Chiou_Chm))) +
-              (C4a-Chiou_C4)*log(sqrt(Rrup*Rrup + Chiuo_Crb_square)) +
+              (Chiou_C4a-Chiou_C4)*log(sqrt(Rrup*Rrup + Chiuo_Crb_square)) +
               (Cgamma1 + Cgamma2/cosh(where(M_minus_Chiou_Cgamma3 < 0, 0, M_minus_Chiou_Cgamma3)))*Rrup)
 
     Yref = exp(lnYref)
@@ -2697,9 +2702,13 @@ def Chiou08_distribution(**kwargs):
 Chiou08_magnitude_type = 'Mw'
 Chiou08_distance_type = 'Rupture'
 
+######
+# Start building the coefficient array
+######
+
 # dimension = (#periods, #coefficients)
 Chiou08_Table2 = array([
-#  C1       C1a      C1b     Cn     CM      C5      C6      C7   C7a   C9   C9a   C10   Cgamma1   Cgamma2
+#  C1       C1a      C1b     Cn     CM      C5      C6      C7      C7a     C9      C9a      C10     Cgamma1   Cgamma2
 [-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # pga
 [-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # 0.01
 [-1.2515,  0.1,    -0.2550, 3.292, 4.1879, 6.1580, 0.4892, 0.0512, 0.0860, 0.8129, 1.5028, -0.3323, -0.00811, -0.00792],   # 0.02
@@ -2771,16 +2780,15 @@ Chiou08_sigma_coefficient_period = [0.0, 1.0]
 
 Chiou08_interpolation = linear_interpolation
 
-gound_motion_init['Chiou08_distribution'] = \
-                        [Chiou08_distribution,
-                         Chiou08_magnitude_type,
-                         Chiou08_distance_type,
-                         Chiou08_coefficient,
-                         Chiou08_coefficient_period,
-                         Chiou08_interpolation,
-                         Chiou08_sigma_coefficient,
-                         Chiou08_sigma_coefficient_period,
-                         Chiou08_interpolation]
+gound_motion_init['Chiou08'] = [Chiou08_distribution,
+                                Chiou08_magnitude_type,
+                                Chiou08_distance_type,
+                                Chiou08_coefficient,
+                                Chiou08_coefficient_period,
+                                Chiou08_interpolation,
+                                Chiou08_sigma_coefficient,
+                                Chiou08_sigma_coefficient_period,
+                                Chiou08_interpolation]
 
 ###########################  End of Chiou08 model  #############################
 
