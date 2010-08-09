@@ -14,7 +14,7 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import vectorize, sqrt, sin, minimum, pi, where
+from scipy import vectorize, sqrt, sin, minimum, pi, where, asarray
 import math
 
 def Johnston_01_ML(Mw):
@@ -98,7 +98,7 @@ def calc_depth_to_top(depth, width, delta):
     assert depth.shape == delta.shape, msg
 
     # convert dip angle in degrees to radians
-    delta_rad = (delta*2*math.pi) / 360.0
+    delta_rad = delta*math.pi/180.0
 
     # get and return Rtor
     return depth - (width/2)*sin(delta_rad)

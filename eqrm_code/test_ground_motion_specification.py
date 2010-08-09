@@ -1,5 +1,3 @@
-
-
 import unittest
 
 from scipy import array, exp, log, allclose, newaxis, asarray, zeros
@@ -19,7 +17,8 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Boore_08', 'Somerville_Yilgarn',
                           'Somerville_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
-                          'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock')
+                          'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
+                          'Chiou08')
 
 # Atkinson_Boore_97 is out.  It has no test data. 
 
@@ -36,6 +35,9 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
 
     test_mean : the means that must be matched by verification tests
                     dimensions (sites, mag, period).  Units g.  Not log mean
+
+    test_vs30: the shear wave velocity at a depth of 30.0 meters
+               (if not defined, will be assumed to be 1000m/s)
 """
     
 test_data = {}
@@ -420,6 +422,8 @@ test_data['Boore_08_test_mean'] = \
                                   [:,newaxis,:]
 test_data['Boore_08_test_magnitude'] = [5.4]
 
+test_data['Boore_08_test_vs30'] = 1000.0
+
 
 # ***********************************************************
 # Somerville_Yilgarn Test
@@ -608,6 +612,7 @@ test_data['Atkinson06_hard_bedrock_test_mean'] = tmp
 ################################################################################
 # Atkinson06_soil Test
 # These tests set vs30 is 1000.0 in test code below
+# That value wil be assumed if we don't define vs30 values here.
 
 # num_events = 2
 test_data['Atkinson06_soil_test_magnitude'] = [5.5, 7.5]
@@ -680,6 +685,47 @@ test_data['Atkinson06_bc_boundary_bedrock_test_mean'] = tmp
 del tmp
 
 ################################################################################
+# Chiou08 Tests - Rock and Soil
+
+# vs30 value
+test_data['Chiou08_test_vs30'] = array([520.0])
+
+# num_events = 1
+test_data['Chiou08_test_magnitude'] = array([5.5, 7.5])
+
+# num_events = 2
+test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
+
+# num_events = 2
+test_data['Chiou08_test_depth_to_top'] = array([0.0, 0.0])
+
+# num_events = 2
+# 'reverse' fault type index is 0
+test_data['Chiou08_test_faulting_type'] = [0, 0]
+
+# num_periods = 4
+test_data['Chiou08_test_period'] = [0.01, 0.20, 1.00, 3.00]
+
+# num_sites = 3
+tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
+tmp[0,:] = [  5.0,   5.0] # distance - 1st site and all 2 events
+tmp[1,:] = [ 20.0,  20.0] # distance - 2nd site and all 2 events
+tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
+test_data['Chiou08_test_distance'] = tmp
+
+# result values, in 'g'
+tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+# period:     0.01      0.20      1.00      3.00
+tmp[0,0,:] = [0.290604, 0.683566, 0.141898, 0.017741] # R=  5.0, ML=5.5
+tmp[0,1,:] = [0.565677, 1.456633, 0.519718, 0.114929] # R=  5.0, ML=7.5
+tmp[1,0,:] = [0.069823, 0.156298, 0.032510, 0.004138] # R= 20.0, ML=5.5
+tmp[1,1,:] = [0.254070, 0.616861, 0.210525, 0.046961] # R= 20.0, ML=7.5
+tmp[2,0,:] = [0.006321, 0.013978, 0.004900, 0.000717] # R=100.0, ML=5.5
+tmp[2,1,:] = [0.053000, 0.120987, 0.055474, 0.013626] # R=100.0, ML=7.5
+test_data['Chiou08_test_mean'] = tmp
+del tmp
+
+################################################################################
 
 class Distance_stub(object):
     def __init__(self,dist):
@@ -697,41 +743,51 @@ def mag2dict(mag):
             'Mw':mag}
    
 def data2atts(model_name):
-    distances = Distance_stub(test_data[model_name + '_test_distance'])
-    magnitudes = mag2dict(test_data[model_name + '_test_magnitude'])
-    test_mean = test_data[model_name + '_test_mean']
-    periods = test_data[model_name + '_test_period']
-    try:
-        depths = test_data[model_name + '_test_depth'] 
-    except KeyError:
-        depths = None
-    return distances, magnitudes, test_mean, periods, depths
+    """Get attributes for a model from the test_data dictionary.
+
+    The vs30 value is defaulted to 1000 if not defined in test_data.
+    """
+
+    # get params that exist for every model
+    distances = Distance_stub(test_data[model_name+'_test_distance'])
+    magnitudes = mag2dict(test_data[model_name+'_test_magnitude'])
+    test_mean = test_data[model_name+'_test_mean']
+    periods = test_data[model_name+'_test_period']
+
+    # not there for every model
+    depths = test_data.get(model_name+'_test_depth', None)
+    depth_to_top = test_data.get(model_name+'_test_depth_to_top', None)
+    faulting_type = test_data.get(model_name+'_test_faulting_type', None)
+    vs30 = test_data.get(model_name+'_test_vs30', 1000.0)
+
+    return (distances, magnitudes, test_mean, periods, depths, vs30,
+            depth_to_top, faulting_type)
     
 def ground_motion_interface_conformance(GM_class, model_name):
     """
     This checks that for the given test_distance and test_magnitudes,
     the calculated ground motion is the same as the test_ground_motion
-
-    Note the VS30 is hard-wired to 1000.
     """
-    distances, magnitudes, test_mean, periods, depths = data2atts(
-        model_name)
+
+    (distances, magnitudes, test_mean, periods,
+         depths, vs30, depth_to_top, faulting_type) = data2atts(model_name)
 
     if GM_class is Ground_motion_calculator:
         gm = GM_class(model_name, periods)
-        log_mean,log_sigma=gm.distribution_function(distances,
-                                                    magnitudes,
-                                                    depth=depths,
-                                                    vs30=1000)
+        (log_mean, log_sigma) = \
+            gm.distribution_function(distances, magnitudes, depth=depths,
+                                     vs30=vs30, depth_to_top=depth_to_top,
+                                     faulting_type=faulting_type)
     elif GM_class is Multiple_ground_motion_calculator:
         model_weights = [1]
         gm = GM_class([model_name], periods, model_weights)
         # ignoring event_activity, event_id
-        log_mean,log_sigma, _, _ =gm._distribution_function(distances,
-                                                            magnitudes,
-                                                            depth=depths,
-                                                            vs30=1000)
-    return exp(log_mean), test_mean
+        (log_mean, log_sigma, _, _) = \
+            gm._distribution_function(distances, magnitudes, depth=depths,
+                                      vs30=vs30, depth_to_top=depth_to_top,
+                                      faulting_type=faulting_type)
+
+    return (exp(log_mean), test_mean)
 
 
 class Test_ground_motion_specification(unittest.TestCase):
@@ -782,7 +838,7 @@ class Test_ground_motion_specification(unittest.TestCase):
               
 #-------------------------------------------------------------
 if __name__ == "__main__":
-    suite = unittest.makeSuite(Test_ground_motion_specification,'test')
+    suite = unittest.makeSuite(Test_ground_motion_specification, 'test')
     #suite = unittest.makeSuite(Test_ground_motion_specification,
      #                          'test_all_ground_motion_interfaces')
     #suite = unittest.makeSuite(Test_ground_motion_specification,

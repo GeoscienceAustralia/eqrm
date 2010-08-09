@@ -79,7 +79,8 @@ class Test_Conversions(unittest.TestCase):
         #                  |     |     +- 30 degrees, Ztor=depth-width/4
         #                  |     |     |     +- vertical, Ztor=depth-width/2
         #                  |     |     |     |            (negative depth)
-        #                  V     V     V     V
+        #                  |     |     |     |     +- 45 fault -> .707 sin()
+        #                  V     V     V     V     V
         depth =    array([20.0, 20.0, 20.0, 10.0, 20.0])
         width =    array([10.0, 10.0, 10.0, 30.0, 10.0])
         delta =    array([ 0.0, 90.0, 30.0, 90.0, 45.0])
@@ -89,7 +90,6 @@ class Test_Conversions(unittest.TestCase):
         self.failUnless(allclose(Ztor, expected), msg)
         
 
-        
 ################################################################################
 
 if __name__ == "__main__":
