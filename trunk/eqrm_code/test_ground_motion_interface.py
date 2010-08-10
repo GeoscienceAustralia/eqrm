@@ -1195,6 +1195,54 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-3, atol=1.0e-3),
                                  msg)
 
+    def test_Campbell03(self):
+        """Test the Campbell03 model."""
+
+        model_name = 'Campbell03'
+        model = Ground_motion_specification(model_name)
+
+        ######
+        # period = 0.2, ML=7.0, R=10.0,
+        # expect lnY=0.0663, sigma=0.4904 (from Campbell03_check.py)
+        ######
+
+        period = 0.2
+        ML = numpy.array([[[7.0]]])
+        R = numpy.array([[[10.0]]])
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[-0.432800]]], [[[ 0.617000]]], [[[-0.058600]]],
+                              [[[-1.320000]]], [[[-0.004600]]], [[[ 0.000337]]],
+                              [[[ 0.399000]]], [[[ 0.493000]]], [[[ 1.250000]]],
+                              [[[-0.928000]]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[1.077]]], [[[-0.0838]]], [[[0.478]]]])
+
+
+        # expected values from Campbell03_check.py
+        log_mean_expected = numpy.array([[[0.0663]]])
+        log_sigma_expected = numpy.array([[[0.4904]]])
+
+        (log_mean, log_sigma) = model.distribution(mag=ML, distance=R,
+                                                   coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+
+        # tests for equality should be quite tight as we check against
+        # Campbell03_check.py
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
 ################################################################################
 
 if __name__ == "__main__":
