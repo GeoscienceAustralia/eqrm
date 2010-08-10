@@ -169,7 +169,7 @@ def Allen_distribution(**kwargs):
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    
+
     num_periods=coefficient.shape[3]
     assert coefficient.shape==(6,1,1,num_periods)
     assert sigma_coefficient.shape==(2,1,1,num_periods)
@@ -816,7 +816,7 @@ def Atkinson_Boore_97_distribution(**kwargs):
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    
+   
     num_sites,num_events=distance.shape[0:2]
     num_periods=coefficient.shape[3]
     assert coefficient.shape==(4,1,1,num_periods)
@@ -2585,20 +2585,20 @@ gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
 
 
 # constants from Chiou [1] table 1
-Chiou_C2 = 1.06
-Chiou_C3 = 3.45
-Chiou_C4 = -2.1
-Chiou_C4a = -0.5
-Chiuo_Crb = 50.0
-Chiou_Chm = 3.0
-Chiou_Cgamma3 = 4.0
+Ch_C2 = 1.06
+Ch_C3 = 3.45
+Ch_C4 = -2.1
+Ch_C4a = -0.5
+Ch_Crb = 50.0
+Ch_Chm = 3.0
+Ch_Cgamma3 = 4.0
 
 # precalculate constant expressions
-Chiou_C2_minus_C3 = Chiou_C2-Chiou_C3
-Chiuo_Crb_square = Chiuo_Crb * Chiuo_Crb
-Chiou_1130_minus_360 = 1130 - 360.0
-Chiou_378_7_pow_8 = math.pow(378.7, 8)
-Chiou_3_82_div_8 = 3.82/8.0
+Ch_C2_minus_C3 = Ch_C2-Ch_C3
+Ch_Crb_square = Ch_Crb * Ch_Crb
+Ch_1130_min_360 = 1130 - 360.0
+Ch_378_7_pow_8 = math.pow(378.7, 8)
+Ch_3_82_div_8 = 3.82/8.0
 
 ######
 # Set up a numpy array to convert a 'faulting_type' flag to an array slice
@@ -2606,14 +2606,14 @@ Chiou_3_82_div_8 = 3.82/8.0
 ######
 
 # faulting type flag encodings
-#                       'type':     (Frv, Fnm)
-Chiou_faulting_flags = {'reverse':    (1, 0),
-                        'normal':     (0, 1),
-                        'strikeslip': (0, 0)}
+#                    'type':     (Frv, Fnm)
+Ch_faulting_flags = {'reverse':    (1, 0),
+                     'normal':     (0, 1),
+                     'strikeslip': (0, 0)}
 
-# generate 'Chiou_faulting_type' from the dictionary above and event_set data
+# generate 'Ch_faulting_type' from the dictionary above and event_set data
 tmp = []
-for (k, v) in Chiou_faulting_flags.iteritems():
+for (k, v) in Ch_faulting_flags.iteritems():
     index = event_set.FaultingTypeDictionary[k]
     tmp.append((index, v))
 
@@ -2622,7 +2622,7 @@ tmp2 = []
 tmp.sort()
 for (_, flags) in tmp:
     tmp2.append(flags)
-Chiou_faulting_type = array(tmp2)
+Ch_faulting_type = array(tmp2)
 del tmp, tmp2
 
 ######
@@ -2638,8 +2638,8 @@ def Chiou08_distribution(**kwargs):
 
     The algorithm here is taken from [1], pages 193 and 194  and returns results
     that are log10 cm/s/s.  Local simplifications are applied:
-        AS = 0, results in some terms of model equation being simplified
         Z1 value calculated from Vs30
+        AS = 0, results in some terms of model equation being simplified
         eta and sigma random values assumed to be 0
         the last term equation 13a (page 193) starting C9*Fhw... is ignored since
             Fhw is 0 (no hanging-wall)
@@ -2668,32 +2668,34 @@ def Chiou08_distribution(**kwargs):
          phi1, phi2, phi3, phi4, phi5, phi6, phi7, phi8) = coefficient
 
     # get flag values from 'faulting_type'
-    Frv = Chiou_faulting_type[:,0][faulting_type]
-    Fnm = Chiou_faulting_type[:,1][faulting_type]
+    Frv = Ch_faulting_type[:,0][faulting_type]
+    Fnm = Ch_faulting_type[:,1][faulting_type]
 
     # precalculate some common expressions
-    M_minus_Chiou_Chm = M - Chiou_Chm
-    M_minus_Chiou_Cgamma3 = M - Chiou_Cgamma3
+    M_min_Ch_Chm = M - Ch_Chm
+    M_min_Ch_Cgamma3 = M - Ch_Cgamma3
 
     lnYref = (C1 + (C1a*Frv + C1b*Fnm + C7*(Ztor-4)) +
-              Chiou_C2*(M-6) + (Chiou_C2_minus_C3/Cn)*log(1 + exp(Cn*(CM-M))) +
-              Chiou_C4*log(Rrup + C5*cosh(C6*where(M_minus_Chiou_Chm < 0, 0, M_minus_Chiou_Chm))) +
-              (Chiou_C4a-Chiou_C4)*log(sqrt(Rrup*Rrup + Chiuo_Crb_square)) +
-              (Cgamma1 + Cgamma2/cosh(where(M_minus_Chiou_Cgamma3 < 0, 0, M_minus_Chiou_Cgamma3)))*Rrup)
+              Ch_C2*(M-6) + (Ch_C2_minus_C3/Cn)*log(1 + exp(Cn*(CM-M))) +
+              Ch_C4*log(Rrup +
+                  C5*cosh(C6*where(M_min_Ch_Chm<0,0,M_min_Ch_Chm))) +
+              (Ch_C4a-Ch_C4)*log(sqrt(Rrup*Rrup + Ch_Crb_square)) +
+              (Cgamma1 + Cgamma2/
+                   cosh(where(M_min_Ch_Cgamma3<0,0,M_min_Ch_Cgamma3)))*Rrup)
 
     Yref = exp(lnYref)
-    Z1 = exp(28.5 - Chiou_3_82_div_8*log(power(Vs30, 8) + Chiou_378_7_pow_8))
+    Z1 = exp(28.5 - Ch_3_82_div_8*log(power(Vs30, 8) + Ch_378_7_pow_8))
 
     # precalculate some common sub-expressions
     log_Vs30_div_1130 = log(Vs30/1130.0)
-    Z1_minus_phi7 = Z1 - phi7
-    Z1_minus_15 = Z1 - 15.0
+    Z1_min_phi7 = Z1 - phi7
+    Z1_min_15 = Z1 - 15.0
 
     log_mean = (lnYref + phi1*where(log_Vs30_div_1130 > 0, 0, log_Vs30_div_1130) +
-                phi2*(exp(phi3*min(Vs30, 1130)-360.0)-exp(phi3*Chiou_1130_minus_360))*
+                phi2*(exp(phi3*min(Vs30,1130)-360.0)-exp(phi3*Ch_1130_min_360))*
                     log((Yref+phi4)/phi4) +
-                phi5*(1-1/(cosh(phi6*where(Z1_minus_phi7 < 0, 0, Z1_minus_phi7)))) + 
-                    phi8/cosh(0.15*where(Z1_minus_15 < 0, 0, Z1_minus_15)))
+                phi5*(1-1/(cosh(phi6*where(Z1_min_phi7 < 0, 0, Z1_min_phi7)))) + 
+                    phi8/cosh(0.15*where(Z1_min_15 < 0, 0, Z1_min_15)))
 
     log_sigma = sigma_coefficient[0]
 
@@ -2791,4 +2793,140 @@ gound_motion_init['Chiou08'] = [Chiou08_distribution,
                                 Chiou08_interpolation]
 
 ###########################  End of Chiou08 model  #############################
+
+########################  Start of Campbell03 model  ###########################
+
+"""Code here is based on Campbell [1].
+
+    [1] Campbell K.W., 2003 Prediction of Strong Ground Motion Using the Hybrid
+        Empirical Method and Its Use in the Development of Ground-Motion
+        (Attenuation) Relations in Eastern North America,
+        Bulletin of the Seismological Society of America, Vol. 93, No. 3,
+        pp 1012-1033.
+"""
+
+######
+# Globals - constants from [1] page 1021
+######
+
+Ca_R1 = 70.0
+Ca_R2 = 130.0
+
+Ca_M1 = 7.16
+
+######
+# The model function, from [1] page 1021.
+######
+
+def Campbell03_distribution(**kwargs):
+    """The Campbell03 model.
+
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient
+
+    The algorithm here is taken from [1], page 1021  and returns results
+    that are log g.
+    """
+
+    # get args
+    Mw = kwargs['mag']				# event-specific
+    Rrup = kwargs['distance']			# event-site-specific
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
+
+    # check we have the right shapes
+    num_periods = coefficient.shape[3]
+    msg = ('Expected coefficient.shape %s, got %s'
+           % (str((10, 1, 1, num_periods)), str(coefficient.shape)))
+    assert coefficient.shape == (10, 1, 1, num_periods), msg
+    msg = ('Expected sigma_coefficient.shape %s, got %s'
+           % (str((3, 1, 1, num_periods)), str(sigma_coefficient.shape)))
+    assert sigma_coefficient.shape == (3, 1, 1, num_periods), msg
+
+    # unpack coefficients
+    (C1, C2, C3, C4, C5, C6, C7, C8, C9, C10) = coefficient
+    (C11, C12, C13) = sigma_coefficient
+
+    # equation 33 first
+    tmp = C7*exp(C8*Mw)
+    R = sqrt(Rrup*Rrup + tmp*tmp)
+
+    # then equations 31, 32 and 33
+    tmp = 8.5 - Mw
+    F1 = C2*Mw + C3*tmp*tmp
+    F2 = C4*log(R) + (C5 + C6*Mw)*Rrup
+    F3 = zeros(Rrup.shape)
+    F3 = where(Rrup > Ca_R1, C9*(log(Rrup)-log(Ca_R1)), F3)
+    F3 = where(Rrup > Ca_R2,
+               C9*(log(Rrup)-log(Ca_R1))+C10*(log(Rrup)-log(Ca_R2)), F3)
+    del tmp
+
+    log_mean = C1 + F1 + F2 + F3
+
+    # calculate sigma values
+    log_sigma = where(Mw < Ca_M1, C11+C12*Mw, C13)
+
+    return (log_mean, log_sigma)
+
+Campbell03_magnitude_type = 'Mw'
+Campbell03_distance_type = 'Rupture'
+
+######
+# Start building the coefficient array
+######
+
+# dimension = (#periods, #coefficients)
+Campbell03_Table6 = array([
+# c1      c2      c3       c4      c5       c6        c7     c8     c9      c10    c11     c12     c13
+[ 0.0305, 0.633, -0.0427, -1.591, -0.00428, 0.000483, 0.683, 0.416, 1.140, -0.873, 1.030, -0.0860, 0.414],  # PGA
+[ 0.0305, 0.633, -0.0427, -1.591, -0.00428, 0.000483, 0.683, 0.416, 1.140, -0.873, 1.030, -0.0860, 0.414],  # 0.01
+[ 1.3535, 0.630, -0.0404, -1.787, -0.00388, 0.000497, 1.020, 0.363, 0.851, -0.715, 1.030, -0.0860, 0.414],  # 0.02
+[ 1.1860, 0.622, -0.0362, -1.691, -0.00367, 0.000501, 0.922, 0.376, 0.759, -0.922, 1.030, -0.0860, 0.414],  # 0.03
+[ 0.3736, 0.616, -0.0353, -1.469, -0.00378, 0.000500, 0.630, 0.423, 0.771, -1.239, 1.042, -0.0838, 0.443],  # 0.05
+[-0.0395, 0.615, -0.0353, -1.383, -0.00421, 0.000486, 0.491, 0.463, 0.955, -1.349, 1.052, -0.0838, 0.453],  # 0.075
+[-0.1475, 0.613, -0.0353, -1.369, -0.00454, 0.000460, 0.484, 0.467, 1.096, -1.284, 1.059, -0.0838, 0.460],  # 0.10
+[-0.1901, 0.616, -0.0478, -1.368, -0.00473, 0.000393, 0.461, 0.478, 1.239, -1.079, 1.068, -0.0838, 0.469],  # 0.15
+[-0.4328, 0.617, -0.0586, -1.320, -0.00460, 0.000337, 0.399, 0.493, 1.250, -0.928, 1.077, -0.0838, 0.478],  # 0.20
+[-0.6906, 0.609, -0.0786, -1.280, -0.00414, 0.000263, 0.349, 0.502, 1.241, -0.753, 1.081, -0.0838, 0.482],  # 0.30
+[-0.5907, 0.534, -0.1379, -1.216, -0.00341, 0.000194, 0.318, 0.503, 1.166, -0.606, 1.098, -0.0824, 0.508],  # 0.50
+[-0.5429, 0.480, -0.1806, -1.184, -0.00288, 0.000160, 0.304, 0.504, 1.110, -0.526, 1.105, -0.0806, 0.528],  # 0.75
+[-0.6104, 0.451, -0.2090, -1.158, -0.00255, 0.000141, 0.299, 0.503, 1.067, -0.482, 1.110, -0.0793, 0.543],  # 1.0
+[-0.9666, 0.441, -0.2405, -1.135, -0.00213, 0.000119, 0.304, 0.500, 1.029, -0.438, 1.099, -0.0771, 0.547],  # 1.5
+[-1.4306, 0.459, -0.2552, -1.124, -0.00187, 0.000103, 0.310, 0.499, 1.015, -0.417, 1.093, -0.0758, 0.551],  # 2.0
+[-2.2331, 0.492, -0.2646, -1.121, -0.00154, 0.000084, 0.310, 0.499, 1.014, -0.393, 1.090, -0.0737, 0.562],  # 3.0
+[-2.7975, 0.507, -0.2738, -1.119, -0.00135, 0.000074, 0.294, 0.506, 1.018, -0.386, 1.092, -0.0722, 0.575]]) # 4.0
+
+# convert to dim = (#coefficients, #periods)
+Campbell03_coefficient = Campbell03_Table6[:,0:10].transpose()
+
+# dim = (period,)
+Campbell03_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
+                                 0.075, 0.100, 0.150, 0.200, 0.300,
+                                 0.500, 0.750, 1.000, 1.500, 2.000,
+                                 3.000, 4.000]
+
+# dim = (period,)
+# we want to say sigma (error) is 0, but log(0) == -infinity,
+# so we use a very small value
+Campbell03_sigma_coefficient = Campbell03_Table6[:,10:].transpose()
+Campbell03_sigma_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
+                                       0.075, 0.100, 0.150, 0.200, 0.300,
+                                       0.500, 0.750, 1.000, 1.500, 2.000,
+                                       3.000, 4.000]
+
+Campbell03_interpolation = linear_interpolation
+
+gound_motion_init['Campbell03'] = [Campbell03_distribution,
+                                   Campbell03_magnitude_type,
+                                   Campbell03_distance_type,
+                                   Campbell03_coefficient,
+                                   Campbell03_coefficient_period,
+                                   Campbell03_interpolation,
+                                   Campbell03_sigma_coefficient,
+                                   Campbell03_sigma_coefficient_period,
+                                   Campbell03_interpolation]
+
+del Campbell03_Table6
+
+#########################  End of Campbell03 model  ############################
 
