@@ -2688,14 +2688,18 @@ def Chiou08_distribution(**kwargs):
 
     # precalculate some common sub-expressions
     log_Vs30_div_1130 = log(Vs30/1130.0)
+    min_log_Vs30_div_1130_zero = where(log_Vs30_div_1130>0,0,log_Vs30_div_1130)
+    min_Vs30_1130_min_360 = where(Vs30 > 1130.0, 1130.0, Vs30) - 360.0
     Z1_min_phi7 = Z1 - phi7
+    max_zero_Z1_min_phi7 = where(Z1_min_phi7 < 0, 0, Z1_min_phi7)
     Z1_min_15 = Z1 - 15.0
+    max_zero_Z1_min_15 = where(Z1_min_15 < 0, 0, Z1_min_15)
 
-    log_mean = (lnYref + phi1*where(log_Vs30_div_1130 > 0, 0, log_Vs30_div_1130) +
-                phi2*(exp(phi3*min(Vs30,1130)-360.0)-exp(phi3*Ch_1130_min_360))*
+    log_mean = (lnYref + phi1*min_log_Vs30_div_1130_zero +
+                phi2*(exp(phi3*min_Vs30_1130_min_360)-exp(phi3*Ch_1130_min_360))*
                     log((Yref+phi4)/phi4) +
-                phi5*(1-1/(cosh(phi6*where(Z1_min_phi7 < 0, 0, Z1_min_phi7)))) + 
-                    phi8/cosh(0.15*where(Z1_min_15 < 0, 0, Z1_min_15)))
+                phi5*(1.0-1.0/(cosh(phi6*max_zero_Z1_min_phi7))) + 
+                    phi8/cosh(0.15*max_zero_Z1_min_15))
 
     log_sigma = sigma_coefficient[0]
 

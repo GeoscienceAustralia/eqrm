@@ -684,11 +684,49 @@ tmp[2,1,:] = [0.053912, 0.026374]	# R=300.0, ML=7.5
 test_data['Atkinson06_bc_boundary_bedrock_test_mean'] = tmp
 del tmp
 
+#################################################################################
+## Chiou08 Tests - Rock - compare code against 'hand' code results
+#
+## vs30 value
+#test_data['Chiou08_test_vs30'] = 520.0
+#
+## num_events = 2
+#test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
+#
+## num_events = 2
+#test_data['Chiou08_test_depth_to_top'] = [0.0, 0.0]
+#
+## num_events = 2
+## 'reverse' fault type index is 0
+#test_data['Chiou08_test_faulting_type'] = [0, 0]
+#
+## num_periods = 4
+#test_data['Chiou08_test_period'] = [0.01, 0.20, 1.00, 3.00]
+#
+## num_sites = 3
+#tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
+#tmp[0,:] = [  5.0,   5.0] # distance - 1st site and all 2 events
+#tmp[1,:] = [ 20.0,  20.0] # distance - 2nd site and all 2 events
+#tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
+#test_data['Chiou08_test_distance'] = tmp
+#
+## result values, in 'g'
+#tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+## period:     0.01      0.20      1.00      3.00
+#tmp[0,0,:] = [0.276160, 0.612666, 0.139772, 0.017631] # R=  5.0, ML=5.5
+#tmp[0,1,:] = [0.525535, 1.230800, 0.503488, 0.112815] # R=  5.0, ML=7.5
+#tmp[1,0,:] = [0.068560, 0.150721, 0.032357, 0.004130] # R= 20.0, ML=5.5
+#tmp[1,1,:] = [0.242421, 0.585651, 0.206465, 0.046410] # R= 20.0, ML=7.5
+#tmp[2,0,:] = [0.006308, 0.013925, 0.004896, 0.000717] # R=100.0, ML=5.5
+#tmp[2,1,:] = [0.052239, 0.117515, 0.055062, 0.013557] # R=100.0, ML=7.5
+#test_data['Chiou08_test_mean'] = tmp
+#del tmp
+#
 ################################################################################
-# Chiou08 Tests - Rock *only*
+# Chiou08 Tests - Soil - compare code against 'hand' code results
 
 # vs30 value
-test_data['Chiou08_test_vs30'] = 520.0
+test_data['Chiou08_test_vs30'] = 310.0
 
 # num_events = 2
 test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
@@ -713,12 +751,12 @@ test_data['Chiou08_test_distance'] = tmp
 # result values, in 'g'
 tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
 # period:     0.01      0.20      1.00      3.00
-tmp[0,0,:] = [0.290604, 0.683566, 0.141898, 0.017741] # R=  5.0, ML=5.5
-tmp[0,1,:] = [0.565677, 1.456633, 0.519718, 0.114929] # R=  5.0, ML=7.5
-tmp[1,0,:] = [0.069823, 0.156298, 0.032510, 0.004138] # R= 20.0, ML=5.5
-tmp[1,1,:] = [0.254070, 0.616861, 0.210525, 0.046961] # R= 20.0, ML=7.5
-tmp[2,0,:] = [0.006321, 0.013978, 0.004900, 0.000717] # R=100.0, ML=5.5
-tmp[2,1,:] = [0.053000, 0.120987, 0.055474, 0.013626] # R=100.0, ML=7.5
+tmp[0,0,:] = [0.292430, 0.616686, 0.196268, 0.028048] # R=  5.0, ML=5.5
+tmp[0,1,:] = [0.515783, 1.060834, 0.651781, 0.178439] # R=  5.0, ML=7.5
+tmp[1,0,:] = [0.081035, 0.183922, 0.047799, 0.006584] # R= 20.0, ML=5.5
+tmp[1,1,:] = [0.260221, 0.570758, 0.283779, 0.073640] # R= 20.0, ML=7.5
+tmp[2,0,:] = [0.007875, 0.018511, 0.007373, 0.001144] # R=100.0, ML=5.5
+tmp[2,1,:] = [0.062533, 0.146149, 0.080264, 0.021578] # R=100.0, ML=7.5
 test_data['Chiou08_test_mean'] = tmp
 del tmp
 
