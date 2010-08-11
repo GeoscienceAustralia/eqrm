@@ -1,4 +1,8 @@
 
+"""
+Script to automatically run another script for a list of revisions of the EQRM code.  Currently broken.
+"""
+
 import os
 revisions = [4204, 4106, 4182, 4175, 4174, 4160, 4130 ]
 for revision in revisions:
