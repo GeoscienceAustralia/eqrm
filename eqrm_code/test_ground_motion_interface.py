@@ -1088,7 +1088,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         # graphs in figure 19 (rock).  The match there was good(ish).
         # The program is test_resources/GM_Matlab/Chiou08_check.py.
         # 
-        # This test compares the python implementation against the program
+        # This test compares the python implementation against the check program
         # results.
 
         ######
@@ -1117,7 +1117,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 
         # expected values from paper (sigma can be anything, make it very small)
-        log_mean_expected = numpy.array([[[-1.370145]]])
+        log_mean_expected = numpy.array([[[-1.417078]]])
         log_sigma_expected = numpy.array([[[-25.0]]])
 
         (log_mean,
@@ -1173,7 +1173,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 
         # expected values from paper (sigma can be anything, make it very small)
-        log_mean_expected = numpy.array([[[-1.370145]]])
+        log_mean_expected = numpy.array([[[-1.417078]]])
         log_sigma_expected = numpy.array([[[-25.0]]])
 
         (log_mean,
