@@ -13,7 +13,7 @@ from xml_interface import Xml_Interface
 from source_model import source_model_from_xml
 import conversions
 
-from event_set import Event_Set, Pseudo_Event_Set
+from eqrm_code.event_set import Event_Set, Pseudo_Event_Set
 
 
 class Dummy:
@@ -411,7 +411,7 @@ class Test_Event_Set(unittest.TestCase):
         fault_dip = array([35.0])
         prob_min_mag_cutoff = 1.0
         override_xml = True
-        prob_number_of_events_in_zones = 1    # changing this doesn't seem to do anything. 
+        prob_number_of_events_in_zones = 1
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
@@ -420,7 +420,6 @@ class Test_Event_Set(unittest.TestCase):
         # But I added it so the tests would pass
         # Another example file at
         # Q:\python_eqrm\implementation_tests\input\newc_source_polygon.xml
-
         #  polygon is a small square
 
         
@@ -438,14 +437,15 @@ class Test_Event_Set(unittest.TestCase):
         #file_name = os.path.join('..','implementation_tests','input','newc_source_polygon.xml')
         #return
         # need to fix
-        events = Event_Set.generate_synthetic_events(file_name,
-                                                     fault_width,
-                                                     azi,
-                                                     dazi,
-                                                     fault_dip,
-                                                     prob_min_mag_cutoff,
-                                                     override_xml,
-                                                     prob_number_of_events_in_zones=None)
+        events = Event_Set.generate_synthetic_events(
+            file_name,
+            fault_width,
+            azi,
+            dazi,
+            fault_dip,
+            prob_min_mag_cutoff,
+            override_xml,
+            prob_number_of_events_in_zones)
 #         print "events.trace_start_lat", events.trace_start_lat
 #         print " events.trace_start_lon", events.trace_start_lon
 #         print "events.trace_end_lat", events.trace_end_lat
@@ -462,7 +462,6 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(events.rupture_centroid_lon >= 151.0)
         os.remove(file_name)
 
-        #os.remove(fid_genpoly)
         
     def test_event_set_subsetting(self):
         rupture_centroid_lat = [-33.351170370959323, -32.763381339789468]

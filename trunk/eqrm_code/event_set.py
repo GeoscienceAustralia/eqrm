@@ -17,8 +17,8 @@
 from eqrm_code.ANUGA_utilities import log
 import xml.dom.minidom
 
-from scipy import (asarray, transpose, array, r_, concatenate, sin, cos, pi,
-                   ndarray, absolute, allclose, zeros, ones)
+from scipy import (asarray, transpose, array, r_, concatenate, sin, cos, pi, 
+     ndarray, absolute, allclose, zeros, ones, float32, int32, float64, int64)
 
 from eqrm_code import conversions
 from eqrm_code.projections import projections
@@ -28,11 +28,15 @@ from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 
 
+# This specifies the dtypes used in  event set.
+# This is used ot save memory
+EVENT_FLOAT = float64 #float32
+EVENT_INT = int64 #int32
+
 ######
 # Define the mapping from fault type NAME to integer INDEX.
 # This is used in the Chiou08 model.
 ######
-
 FaultingTypeDictionary = {'reverse': 0,
                           'normal': 1,
                           'strikeslip': 2}
@@ -375,16 +379,16 @@ class Event_Set(object):
         
         #initialise new attributes
         num_events = sum(prob_number_of_events_in_zones)
-        
-        rupture_centroid_lat = zeros((num_events))
-        rupture_centroid_lon = zeros((num_events))
-        fault_depth = zeros((num_events))
-        fault_width = zeros((num_events))
-        azimuth = zeros((num_events))
-        dip = zeros((num_events))
-        magnitude = zeros((num_events))
-        source_zone_id = zeros((num_events))
+        rupture_centroid_lat = zeros((num_events), dtype=EVENT_FLOAT)
+        rupture_centroid_lon = zeros((num_events), dtype=EVENT_FLOAT)
+        fault_depth = zeros((num_events), dtype=EVENT_FLOAT)
+        fault_width = zeros((num_events), dtype=EVENT_FLOAT)
+        azimuth = zeros((num_events), dtype=EVENT_FLOAT)
+        dip = zeros((num_events), dtype=EVENT_FLOAT)
+        magnitude = zeros((num_events), dtype=EVENT_FLOAT)
+        source_zone_id = zeros((num_events), dtype=EVENT_INT)
 
+        #print "magnitude.dtype.name", magnitude.dtype.name
         start = 0
         for i in range(num_polygons):
             gp = generation_polygons[i]
@@ -428,6 +432,7 @@ class Event_Set(object):
             dip[start:end] = polygon_dip
             magnitude[start:end] = polygon_magnitude
             
+            #print "magnitude.dtype.name", magnitude.dtype.name
             eqrmlog.debug('Memory: event set lists have been combined')
             eqrmlog.resource_usage()
             
@@ -447,7 +452,10 @@ class Event_Set(object):
         
         event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
                                  rupture_centroid_lon=rupture_centroid_lon,
-                                 azimuth=azimuth, dip=dip, ML=new_ML, Mw=new_Mw,
+                                 azimuth=azimuth,
+                                 dip=dip,
+                                 ML=new_ML,
+                                 Mw=new_Mw,
                                  fault_width=fault_width,
                                  fault_depth=fault_depth)
         event.source_zone_id = asarray(source_zone_id)
@@ -764,7 +772,7 @@ class Pseudo_Event_Set(Event_Set):
 
 # this will run if this is called from DOS prompt or double clicked
 if __name__ == '__main__':
-    event_num = 10000000
+    event_num = 10  #00*1000
     eqrmlog.debug('Memory: before creating ' + str(event_num) + ' events')
     eqrmlog.resource_usage()
     event = Event_Set.create(
