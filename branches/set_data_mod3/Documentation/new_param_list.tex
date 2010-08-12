@@ -17,30 +17,51 @@
 
 \noindent \textbf{The \texttt{setdata} python file}
 
-The \texttt{setdata} python file is used to control EQRM scenarios. It
-contains a series of input parameters that define the
-manner in which the EQRM is operated. For example; there is parameter to
-control whether the EQRM models hazard or risk. Other parameters can be
-used to define which attenuation model is selected or whether site
-amplification is considered. A description of all of the parameters in the
- \texttt{setdata} python file is given below. There is an example
+The \texttt{setdata} python file is used to control EQRM
+simulations. It contains a series of input parameters that define
+the manner in which the EQRM is operated. For example; there is a
+parameter to control whether the EQRM models hazard or risk. Other
+parameters can be used to define which ground motion model is used
+and whether site amplification is considered. A description of all
+of the parameters in the
+ \texttt{setdata} python file is given below. Default values are set by the
+EQRM for a several parameters. These are also indicated below when
+applicable.
+ There is an example
 \texttt{setdata} file, called \texttt{set\_data\_master.py}
 in the \texttt{Documentation} directory.
 
-\vspace{2em} \noindent \textbf{Operation Input:}
+Acronyms: \\
+PSHA is probabilistic seismic hazard analysis \\
+PSRA is probabilistic seismic risk analysis  \\
+
+\vspace{2em} \noindent \textbf{General Input:}
 
 \begin{supertabular}{lp{0.6\textwidth}}
 \typepar{run\_type}{}{} & Defines the operation mode of the EQRM: \\
-  & \hspace{0.5em} 'hazard' $\Rightarrow$ Scenario RSA and Hazard; \\
-  & \hspace{0.5em} 'risk' $\Rightarrow$ Scenario Loss and Risk; \\
+  & \hspace{0.5em} 'hazard' $\Rightarrow$ Scenario RSA and PSHA (probabilistic hazard); \\
+  & \hspace{0.5em} 'risk' $\Rightarrow$ Scenario Loss and PSRA (probabilistic risk); \\
   \typepar{is\_scenario}{}{} &  Event simulation type: \\
  & \hspace{0.5em} True $\Rightarrow$ a specific scenario event;\\
  & \hspace{2.8em} (Use Scenario input) \\
- & \hspace{0.5em} False $\Rightarrow$ standard probabilistic simulation. \\
+ & \hspace{0.5em} False $\Rightarrow$ probabilistic simulation (PSHA or PSRA). \\
  & \hspace{2.8em} (Use Probabilistic input) \\
-\typepar{max\_width}{}{} & Maximum width along virtual fault i.e. synthetic rupture width can not exceed \typepar{max\_width}{}{}\\
-\end{supertabular}
-
+\typepar{max\_width}{}{} & Maximum width along virtual faults i.e. synthetic rupture width can
+not exceed \typepar{max\_width}{}{},km\\
+ \typepar{site\_tag}{}{}    &   String used in input and output file
+ names. This is usually used to define the city or study of interest.\\
+\typepar{use\_site\_indexes}{}{} & If \texttt{True} sample sites
+with indices in \typepar{site\_indexes}{}{}.  Only use to test
+simulations. \\
+\typepar{site\_indexes}{}{} & List whose elements represent the site
+ indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
+ index of the first row of data is 1.\\
+ \typepar{site\_db\_tag}{}{}    &   String used to specify the
+ exposure or building data base.  The file name is \texttt{sitedb\_[site\_tag][site\_db\_tag].csv}\\
+\typepar{return\_periods}{}{}  &   List whose elements represent the return periods to be considered for PSHA. \\
+  \typepar{input\_dir}{}{} &  Directory containing any local input files.\\
+ \typepar{output\_dir}{}{} &   Directory for output files.    \\
+ \end{supertabular}
 
 \vspace{2em} \noindent \textbf{Scenario Input:}
 
@@ -50,7 +71,7 @@ in the \texttt{Documentation} directory.
 \typepar{scenario\_longitude}{}{}  &  Longitude of rupture centroid.    \\
 \typepar{scenario\_magnitude}{}{}  &  Moment magnitude of event.    \\
 \typepar{scenario\_depth}{}{}  &  Depth to event centroid, km.    \\
-\typepar{scenario\_dip}{}{} &    Dip of event, degrees.  \\
+\typepar{scenario\_dip}{}{} &    Dip of rupture plane, degrees.  \\
 \typepar{scenario\_number\_of\_events}{}{} & The desired number of
 copies of the event to be generated. \\
  \end{supertabular}
@@ -214,23 +235,6 @@ used to save the file.
  \typepar{save\_prob\_strucutural\_damage}{}{}   & Save structural
 non-cumulative probability of being in each
 damage state.  Note this is only allowed when there is one event. \\
- \end{supertabular}
-
-\vspace{2em} \noindent \textbf{General Input:}\\
-\begin{supertabular}{lp{0.6\textwidth}}
- \typepar{site\_tag}{}{}    &   String used in input and output file
- names. This is usually used to define the city of interest.\\
-\typepar{use\_site\_indexes}{}{} & If \texttt{True} sample sites with
-indices in \typepar{site\_indexes}{}{}.  Only use to test
-simulations. \\
-\typepar{site\_indexes}{}{} & List whose elements represent the site
- indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
- index of the first row of data is 1.\\
- \typepar{site\_db\_tag}{}{}    &   String used specify the structure
- data base.  The file name is \texttt{sitedb\_[site\_tag][site\_db\_tag].csv}\\
-\typepar{return\_periods}{}{}  &   List whose elements represent the return periods to be considered for hazard. \\
-  \typepar{input\_dir}{}{} &  Directory containing any local input files.\\
- \typepar{output\_dir}{}{} &   Directory for output files.    \\
  \end{supertabular}
 
 
