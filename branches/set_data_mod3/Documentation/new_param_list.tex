@@ -15,25 +15,36 @@
 
 \newcommand{\manual}[1]{Manual: #1}
 
-\noindent \textbf{The \texttt{setdata} python file}
+\LARGE \noindent \textbf{The \texttt{setdata} python file}
 
-The \texttt{setdata} python file is used to control EQRM
-simulations. It contains a series of input parameters that define
-the manner in which the EQRM is operated. For example; there is a
-parameter to control whether the EQRM models hazard or risk. Other
-parameters can be used to define which ground motion model is used
-and whether site amplification is considered. A description of all
-of the parameters in the
+\vspace{1em}
+\normalsize The \texttt{setdata} python file is used to
+control EQRM simulations. It contains a series of input parameters
+that define the manner in which the EQRM is operated. For example;
+there is a parameter to control whether the EQRM models hazard or
+risk. Other parameters can be used to define which ground motion
+model is used and whether site amplification is considered. A
+description of all of the parameters in the
  \texttt{setdata} python file is given below. Default values are set by the
-EQRM for a several parameters. These are also indicated below when
+EQRM for several parameters. These are also indicated below when
 applicable.
  There is an example
 \texttt{setdata} file, called \texttt{set\_data\_master.py}
 in the \texttt{Documentation} directory.
 
-Acronyms: \\
+\vspace{2em}
+
+\begin{tabular}{l}
+\hline
+\textbf{Acronyms}: \\
+\hline
 PSHA is probabilistic seismic hazard analysis \\
 PSRA is probabilistic seismic risk analysis  \\
+GMPE is ground motion prediction equation \\
+PGA is peak ground acceleration (usually in units of g) \\
+RSA is response spectral acceleration (usually in units of g) \\
+\hline
+\end{tabular}
 
 \vspace{2em} \noindent \textbf{General Input:}
 
@@ -80,22 +91,25 @@ copies of the event to be generated. \\
 \vspace{2em} \noindent \textbf{Probabilistic input:}
 
 \begin{supertabular}{lp{0.6\textwidth}}
-\typepar{prob\_azimuth\_in\_zones}{}{} &     Predominant azimuth of events. Note that this can be a single value (used in all source zones) or a vector with different elements for each source zone.\\
-\typepar{prob\_delta\_azimuth\_in\_zones}{}{}   &   Azimuth range for events (i.e. \texttt{azimuth} $\pm$ \typepar{delta\_azimuth}{}{}). Note that this can be a single value (used in all source zones) or a list with different elements for each source zone.  \\
-\typepar{prob\_number\_of\_events\_in\_zones}{}{}  &  List whose elements represent the desired number of simulated evens for each generation zone.\\
-
-\typepar{prob\_dip\_in\_zones}{}{} &    Dip of virtual faults.  Note that this can be a single value (used in all source zones) or a list with different dips for each source zone.  \\
-\typepar{prob\_max\_width}{}{} & Maximum width along virtual fault i.e. synthetic rupture width can not exceed \typepar{prob\_max\_width}{}{}\\
+\typepar{prob\_azimuth\_in\_zones}{}{} &     Predominant azimuth of events. Note that this can be
+a single value (used in all source zones) or a vector with different elements for each source zone.\\
+\typepar{prob\_delta\_azimuth\_in\_zones}{}{}   &   Azimuth range for events (i.e. \texttt{azimuth}
+$\pm$ \typepar{delta\_azimuth}{}{}). Note that this can be a single value (used in all source zones) or
+a list with different elements for each source zone.  \\
+\typepar{prob\_number\_of\_events\_in\_zones}{}{}  &  List whose elements represent the
+desired number of simulated evens for each generation zone.\\
+\typepar{prob\_dip\_in\_zones}{}{} &    Dip of virtual faults.  Note that this can be a single
+ value (used in all source zones) or a list with different dips for each source zone.  \\
 \typepar{prob\_min\_mag\_cutoff}{}{}  &  Minimum magnitude below which hazard is not considered.     \\
 \typepar{prob\_number\_of\_mag\_sample\_bins}{}{}   &   Number of magnitude bins used to sample
-event magnitudes. \\
+the magnitude recurence probability density function. \\
  \end{supertabular}
 
 \vspace{2em} \noindent \textbf{Ground Motion Input:}
 
 \begin{supertabular}{lp{0.6\textwidth}}
 \typepar{atten\_models}{}{}    &  A list of the ground motion models
-to be used. Current choices are; \\
+(or GMPEs) to be used. Current choices are; \\
  & \hspace{0.5em} \texttt{'Gaull\_1990\_WA'} $\Rightarrow$ Gaull \textit{et al.} (1990); \\
  & \hspace{0.5em}  \texttt{'Toro\_1997\_midcontinent'}  $\Rightarrow$ Toro \textit{et al.} (1997); \\
  & \hspace{0.5em}  \texttt{'Atkinson\_Boore\_97'}  $\Rightarrow$ Atkinson \textit{et al.} (1997); \\
@@ -106,15 +120,14 @@ to be used. Current choices are; \\
  & \hspace{0.5em}  \texttt{'Boore\_08'}  $\Rightarrow$ Boore \textit{et al.} (2008); \\
  & \hspace{0.5em} \texttt{Sommerville\_Yilgarn'} $\Rightarrow$ Sommerville (2009) Yilgarn Craton; \\
   & \hspace{0.5em} \texttt{Sommerville\_Non\_Cratonic'} $\Rightarrow$ Sommerville (2009) Average Non Cratonic model; \\
-\typepar{atten\_model\_weights}{}{}    &  A list of the weight to
-apply to each of the attenuation model specified in
+\typepar{atten\_model\_weights}{}{}    &  A list of the weights to
+be applied to each of the GMPEs in
 \texttt{atten\_models}.  Note, $\sum  atten\_model\_weights=1$. \\
-\typepar{atten\_aggregate\_Sa\_of\_atten\_models}{}{}   &
-Set to \texttt{True} to aggregate the surface acceleration's when
-multiple attenuation models are used.\\
-
+\typepar{atten\_aggregate\_Sa\_of\_atten\_models}{}{}   & Set to
+\texttt{True} to collapse the surface acceleration's when
+multiple GMPEs are used.\\
 \typepar{atten\_variability\_method}{}{} & Technique used to
-incorporate attenuation aleatory uncertainty: \\
+incorporate GMPE aleatory uncertainty: \\
  & \hspace{0.5em} None $\Rightarrow$ No sampling; \\
  & \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
  & \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
@@ -124,22 +137,23 @@ incorporate attenuation aleatory uncertainty: \\
 \typepar{atten\_periods}{}{} &  Periods for $S_a$. Values must
 ascend. \\
 \typepar{atten\_threshold\_distance}{}{}  &  Threshold distance beyond which motion is assigned to zero. \\
-
-\typepar{atten\_use\_rescale\_curve\_from\_pga}{}{}  &  Set to
-\texttt{True} to use PGA from the attenuation model to rescale the $S_a$. \\
-\typepar{atten\_override\_RSA\_shape}{}{}  &  \\
+\typepar{atten\_override\_RSA\_shape}{}{}  &   Use GMPE for PGA only and change shape of RSA as follows\\
  & \hspace{0.5em} \texttt{'Aust\_standard\_Sa'} $\Rightarrow$
-scale $S_a$ to Australian standard; \\
- & \hspace{0.5em} \texttt{'HAZUS\_Sa'}  $\Rightarrow$ scale $S_a$ to HAZUS;\\
+use RSA shape from Australian earthquake loading standard; \\
+ & \hspace{0.5em} \texttt{'HAZUS\_Sa'}  $\Rightarrow$ use shape defined by HAZUS;\\
 \typepar{atten\_cutoff\_max\_spectral\_displacement}{}{}  &  Set to
 \texttt{True} to cutoff maximum spectral displacement. \\
 \typepar{atten\_pga\_scaling\_cutoff}{}{}   & The maximum acceptable
 PGA in units g. $S_a$ at all periods re-scaled accordingly.      \\
 \typepar{atten\_smooth\_spectral\_acceleration}{}{}  & Set to
 \texttt{True} to  smooth $S_a$: \\
- \typepar{atten\_log\_sigma\_eq\_weight}{}{} &  The fraction of
- $\sigma$ (log sigma) assocaited with the earthquake. (1 -
- \typepar{atten\_log\_sigma\_eq\_weight}){}{} is the fraction of $\sigma$
+ \typepar{atten\_log\_sigma\_eq\_weight}{}{} &  Used to separate the
+ total GMPE aleatory uncertainty or $\sigma_{total}$  into intra-
+ $\sigma_{intra}$  and inter-  $\sigma_{inter}$ event components.
+ More specifically, \typepar{atten\_log\_sigma\_eq\_weight}{}{}
+ represents the fraction of $\sigma_{total}$ associated with
+ intra-event aleatory uncertainty. Similarly, 1 -
+ \typepar{atten\_log\_sigma\_eq\_weight}{}{} is the fraction of $\sigma_{total}$
  assocaited with the earthquake/site pair.  This variable defaults to
  0 if not set.  Use a value between 0 and 1.\\
  \end{supertabular}
