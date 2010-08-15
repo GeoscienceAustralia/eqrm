@@ -20,6 +20,13 @@ from os.path import join
 run_type = "risk" 
 is_scenario = True
 max_width = 15
+site_tag = "newc" 
+return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
+use_site_indexes = True
+site_indexes = [1684, 4006, 4135, 1676, 3674, 3875, 17, 6267, 5360, 6268, 6240, 3228, 2383, 468, 71, 2317, 2183, 2694, 5237, 665, 401, 659, 3472, 4126, 2653, 1446, 3845, 1902, 6294, 567, 2222, 4659, 4951, 291, 2372]
+site_db_tag = "" 
+input_dir = r".\implementation_tests\input/" 
+output_dir = r".\implementation_tests\current\TS_risk50/" 
 
 # Scenario input
 scenario_azimith = 340
@@ -84,15 +91,6 @@ save_building_loss = False
 save_contents_loss = False
 save_motion = False
 save_prob_structural_damage = False
-
-# General
-site_tag = "newc" 
-return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
-use_site_indexes = True
-site_indexes = [1684, 4006, 4135, 1676, 3674, 3875, 17, 6267, 5360, 6268, 6240, 3228, 2383, 468, 71, 2317, 2183, 2694, 5237, 665, 401, 659, 3472, 4126, 2653, 1446, 3845, 1902, 6294, 567, 2222, 4659, 4951, 291, 2372]
-site_db_tag = "" 
-input_dir = r".\implementation_tests\input/" 
-output_dir = r".\implementation_tests\current\TS_risk50/" 
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 

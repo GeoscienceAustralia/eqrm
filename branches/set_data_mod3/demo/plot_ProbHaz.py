@@ -20,6 +20,13 @@ from os.path import join
 run_type = "hazard" 
 is_scenario = False
 max_width = 15
+site_tag = "newc" 
+return_periods = [7500, 10000]
+use_site_indexes = False
+site_indexes = 2255
+site_db_tag = "" 
+input_dir = r".\input/" 
+output_dir = r".\output\plot_prob_haz/" 
 
 # Scenario input
 scenario_azimith = 340
@@ -83,15 +90,6 @@ save_building_loss = False
 save_contents_loss = False
 save_motion = False
 save_prob_structural_damage = None
-
-# General
-site_tag = "newc" 
-return_periods = [7500, 10000]
-use_site_indexes = False
-site_indexes = 2255
-site_db_tag = "" 
-input_dir = r".\input/" 
-output_dir = r".\output\plot_prob_haz/" 
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 

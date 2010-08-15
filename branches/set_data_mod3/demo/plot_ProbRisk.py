@@ -20,6 +20,13 @@ from os.path import join
 run_type = "risk" 
 is_scenario = False
 max_width = 15
+site_tag = "newc" 
+return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9099999999999, 2500, 5000, 7500, 10000]
+use_site_indexes = False
+site_indexes = [2997, 2657, 3004, 3500]
+site_db_tag = "" 
+input_dir = r".\input/" 
+output_dir = r".\output\plot_prob_risk/" 
 
 # Scenario input
 scenario_azimith = 340
@@ -83,15 +90,6 @@ save_building_loss = False
 save_contents_loss = False
 save_motion = False
 save_prob_structural_damage = False
-
-# General
-site_tag = "newc" 
-return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9099999999999, 2500, 5000, 7500, 10000]
-use_site_indexes = False
-site_indexes = [2997, 2657, 3004, 3500]
-site_db_tag = "" 
-input_dir = r".\input/" 
-output_dir = r".\output\plot_prob_risk/" 
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 

@@ -20,6 +20,13 @@ from os.path import join
 run_type = "hazard" 
 is_scenario = False
 max_width = 15
+site_tag = "newc" 
+return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
+use_site_indexes = True
+site_indexes = [2255, 11511, 10963, 686, 1026, 6597, 12382, 314, 2040, 3318, 9934, 12225, 10506, 9934, 2841, 10420, 10314, 10612, 10316, 10313, 11863, 11523, 9736, 11702, 11862, 2562, 5963, 4550, 6737, 5214]
+site_db_tag = "" 
+input_dir = r".\implementation_tests\input/" 
+output_dir = r".\implementation_tests\current\TS_haz05/" 
 
 # Scenario input
 scenario_azimith = 340
@@ -83,15 +90,6 @@ save_building_loss = False
 save_contents_loss = False
 save_motion = False
 save_prob_structural_damage = None
-
-# General
-site_tag = "newc" 
-return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
-use_site_indexes = True
-site_indexes = [2255, 11511, 10963, 686, 1026, 6597, 12382, 314, 2040, 3318, 9934, 12225, 10506, 9934, 2841, 10420, 10314, 10612, 10316, 10313, 11863, 11523, 9736, 11702, 11862, 2562, 5963, 4550, 6737, 5214]
-site_db_tag = "" 
-input_dir = r".\implementation_tests\input/" 
-output_dir = r".\implementation_tests\current\TS_haz05/" 
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 
