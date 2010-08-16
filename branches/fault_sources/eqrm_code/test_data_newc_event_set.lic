@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+  <ga_license_file>
+    <metadata>
+      <author>Ross Wilson</author>
+    </metadata>
+    <datafile>
+      <filename>test_data_newc_event_set.txt</filename>
+      <checksum>-1515178224</checksum>
+      <publishable>Yes</publishable>
+      <accountable>Duncan Gray</accountable>
+       <source> Based on results from running EQRM demos.</source>
+      <IP_owner>Geoscience Australia</IP_owner>
+      <IP_info>For use with EQRM examples</IP_info>
+    </datafile>
+
+  </ga_license_file>
