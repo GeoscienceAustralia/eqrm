@@ -24,40 +24,36 @@
 
 \LARGE \noindent \textbf{The \texttt{setdata} python file}
 
-\vspace{1em}
-\normalsize The \texttt{setdata} python file is used to
+\vspace{1em} \normalsize The \texttt{setdata} python file is used to
 control EQRM simulations. It contains a series of input parameters
-that define the manner in which the EQRM is operated. For example;
+that define the manner in which the EQRM is operated. For example,
 there is a parameter to control whether the EQRM models hazard or
 risk. Other parameters can be used to define which ground motion
 model is used and whether site amplification is considered. A
 description of all of the parameters in the
  \texttt{setdata} python file is given below.
- There is an example
-\texttt{setdata} file, called \texttt{set\_data\_master.py}
-in the \texttt{Documentation} directory. 
+
+\vspace{1em} Note that it not essential to supply all parameters for
+each simulation. For example, if amplification is not being used
+(i.e. \texttt{use\_amplification} $=$ \texttt{False}) it is not
+necessary to supply the remaining amplification parameters.
+Furthermore, default values are set by the EQRM for several
+parameters. These are indicated in the following when applicable.
+Omission of these input parameters in the \texttt{setdata} file will
+lead to use of the default values. For example, the default value
+for \texttt{atten\_threshold\_distance} is 400\,km.
+
+\vspace{1em} The following also provides suggested values for
+several parameters. Users are free to change these values as
+desired. The developers are merely suggesting the value they would
+use in most circumstances. For example, the suggested value for
+\texttt{loss\_min\_pga} is 0.05.
 
 \vspace{1em}
-Note that it not essential to supply all parameters for each simulation. 
-For example, if amplification is not being used (i.e. \texttt{use\_amplification} $=$ \texttt{False}) 
-it is not essential to supply the remaining amplification parameters. 
-Furthermore, default values are set by the
-EQRM for several parameters. These are indicated in the following when
-applicable. Omission of these input parameters in the 
-\texttt{setdata} file will lead to use of the default values. For example, 
-the default value for \texttt{atten\_threshold\_distance} is 400\,km.
-
-\vspace{1em}
-The following also provides recommended or suggested values for several parameters. 
-Users are free to change these values as desired. The developers are merely suggesting 
-the value they would use in most circumstances. For example, the suggested value for 
-\texttt{loss\_min\_pga} is ...... 
-
-\vspace{1em}
-Finally, the term preferred is used to indicate those parameters that the developers believe to 
+Finally, the term preferred is used to indicate those parameters that the developers believe to
 be the most appropriate. For example, the preferred value for \typepar{csm\_}{hysteretic\_}{damping}
-is \texttt{curve}. In this case the alternative choices of \texttt{None} and \texttt{curve} 
-would typically only be used for experimental purposes. 
+is \texttt{curve}. In this case the alternative choices of \texttt{None} and \texttt{curve}
+would typically only be used for experimental purposes.
 
 
 \vspace{2em}
@@ -100,23 +96,12 @@ not exceed \typepar{max\_width}{}{} (km).\\
 \hline \vspace{0.1em} \texttt{site\_tag}: \\
 String used in input and
 output file
- names. Typically used to define the city or study of interest.\\
-%---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{use\_site\_indexes}: \\
-DEFAULT = \texttt{False} \\
- \hspace{0.5em} True $\Rightarrow$ sample sites with indices in
-\typepar{site\_indexes}{}{} (for testing simulations);  \\
- \hspace{0.5em} \texttt{False} $\Rightarrow$ No sub-sampling. \\
-%---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{site\_indexes}: \\
-List whose elements
-represent the site
- indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
- index of the first row of data (i.e. first data row in file) is 1.\\
+ names. Typically used to define the city or study of interest (e.g.
+ \texttt{newc} is used in the demos).\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{site\_db\_tag}: \\
-String used to
-specify the
+DEFAULT = `' \\
+ String used to specify the
  exposure or building data base.  The file name is \texttt{sitedb\_[site\_tag][site\_db\_tag].csv}\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{return\_periods}: \\
@@ -129,7 +114,18 @@ Directory containing any local input files.\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{output\_dir}: \\
 Directory for output files.    \\
-    \hline
+%---------------------------------------------------------
+    \hline \vspace{0.1em} \texttt{use\_site\_indexes}: \\
+DEFAULT = \texttt{False} \\
+ \hspace{0.5em} True $\Rightarrow$ sample sites with indices in
+\typepar{site\_indexes}{}{} (for testing simulations);  \\
+ \hspace{0.5em} \texttt{False} $\Rightarrow$ No sub-sampling. \\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{site\_indexes}: \\
+List whose elements represent the site
+ indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
+ index of the first row of data (i.e. first data row in file) is 1.\\
+ \hline
  \end{tabular}
 
 \vspace{2em}
@@ -158,9 +154,9 @@ Dip of rupture plane (degrees from horizontal).  \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{scenario\_number\_of\_events}: \\
  The desired number of
-copies of the event to be generated. Typically copies are taken 
-if random sampling is used to incorporate aleatory uncertainty 
-in GMPE (i.e. \typepar{atten\_}{variability\_}{method}$=2$), 
+copies of the event to be generated. Typically copies are taken
+if random sampling is used to incorporate aleatory uncertainty
+in GMPE (i.e. \typepar{atten\_}{variability\_}{method}$=2$),
 amplification (i.e. \typepar{amp\_}{variability\_}{method}$=2$)
 or the CSM (\typepar{csm\_}{variability\_}{method}$=3$)\\
 \hline
@@ -212,17 +208,17 @@ the magnitude recurrence probability density function. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_models}: \\
 A list of the ground motion models (or GMPEs) to be used. Current choices are; \\
- \hspace{0.5em} \texttt{'Gaull\_1990\_WA'} $\Rightarrow$ Gaull \textit{et al.} (1990); \\
- \hspace{0.5em}  \texttt{'Toro\_1997\_midcontinent'}  $\Rightarrow$ Toro \textit{et al.} (1997); \\
- \hspace{0.5em}  \texttt{'Atkinson\_Boore\_97'}  $\Rightarrow$ Atkinson \textit{et al.} (1997); \\
- \hspace{0.5em}  \texttt{'Sadigh\_97'}  $\Rightarrow$ Sadigh \textit{et al.} (1997); \\
- \hspace{0.5em}  \texttt{'Youngs\_97\_interface'}  $\Rightarrow$ Youngs \textit{et al.} (1997) interface ($Z_T$=0); \\
- \hspace{0.5em}  \texttt{'Youngs\_97\_intraslab'}  $\Rightarrow$ Youngs \textit{et al.} (1997) intraslab ($Z_T$=1); \\
- \hspace{0.5em}  \texttt{'Combo\_Sadigh\_Youngs\_M8'}  $\Rightarrow$ combined Youngs \textit{et al.} (1997) and Sadigh \\
+ \hspace{0.5em} \texttt{`Gaull\_1990\_WA'} $\Rightarrow$ Gaull \textit{et al.} (1990); \\
+ \hspace{0.5em}  \texttt{`Toro\_1997\_midcontinent'}  $\Rightarrow$ Toro \textit{et al.} (1997); \\
+ \hspace{0.5em}  \texttt{`Atkinson\_Boore\_97'}  $\Rightarrow$ Atkinson \textit{et al.} (1997); \\
+ \hspace{0.5em}  \texttt{`Sadigh\_97'}  $\Rightarrow$ Sadigh \textit{et al.} (1997); \\
+ \hspace{0.5em}  \texttt{`Youngs\_97\_interface'}  $\Rightarrow$ Youngs \textit{et al.} (1997) interface ($Z_T$=0); \\
+ \hspace{0.5em}  \texttt{`Youngs\_97\_intraslab'}  $\Rightarrow$ Youngs \textit{et al.} (1997) intraslab ($Z_T$=1); \\
+ \hspace{0.5em}  \texttt{`Combo\_Sadigh\_Youngs\_M8'}  $\Rightarrow$ combined Youngs \textit{et al.} (1997) and Sadigh \\
  \hspace{14.5em} \textit{et al.} (1997); \\
- \hspace{0.5em}  \texttt{'Boore\_08'}  $\Rightarrow$ Boore \textit{et al.} (2008); \\
- \hspace{0.5em} \texttt{Sommerville\_Yilgarn'} $\Rightarrow$ Sommerville (2009) Yilgarn Craton; \\
-  \hspace{0.5em} \texttt{Sommerville\_Non\_Cratonic'} $\Rightarrow$ Sommerville (2009) Average Non Cratonic \\
+ \hspace{0.5em}  \texttt{`Boore\_08'}  $\Rightarrow$ Boore \textit{et al.} (2008); \\
+ \hspace{0.5em} \texttt{`Sommerville\_Yilgarn'} $\Rightarrow$ Sommerville (2009) Yilgarn Craton; \\
+  \hspace{0.5em} \texttt{`Sommerville\_Non\_Cratonic'} $\Rightarrow$ Sommerville (2009) Average Non Cratonic \\
   \hspace{14.5em}  model. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_model\_weights}: \\
@@ -237,8 +233,7 @@ Set to \texttt{True} to collapse the surface acceleration's when
 multiple GMPEs are used.\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_variability\_method}: \\
-DEFAULT $=$ \texttt{None} \\
-SUGGESTED = 2 \\
+DEFAULT  = 2 \\
  Technique used to
 incorporate GMPE aleatory uncertainty: \\
  \hspace{0.5em} None $\Rightarrow$ No sampling; \\
@@ -256,12 +251,12 @@ DEFAULT $=$ 400 \\
 Threshold distance beyond which motion is assigned to zero (km). \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_override\_RSA\_shape}: \\
-DEFAULT = \texttt{False} \\
+DEFAULT = \texttt{None} \\
 Use GMPE for PGA only and change shape of RSA as follows\\
- \hspace{0.5em} \texttt{'Aust\_standard\_Sa'} $\Rightarrow$
+ \hspace{0.5em} \texttt{`Aust\_standard\_Sa'} $\Rightarrow$
 use RSA shape from Australian earthquake loading \\
 \hspace{11em} standard; \\
- \hspace{0.5em} \texttt{'HAZUS\_Sa'}  $\Rightarrow$ use RSA shape defined by HAZUS;\\
+ \hspace{0.5em} \texttt{`HAZUS\_Sa'}  $\Rightarrow$ use RSA shape defined by HAZUS;\\
 \hline
 %---------------------------------------------------------
 \end{tabular}
@@ -270,9 +265,7 @@ use RSA shape from Australian earthquake loading \\
 \hline \vspace{0.1em}
 \texttt{atten\_cutoff\_max\_spectral\_displacement}: \\
 DEFAULT = \texttt{False} \\
-\hspace{0.5em} \texttt{True} $\Rightarrow$ Use computed spectral
-displacement until its maximum value, thereafter use the maximum value
-(i.e., flat). \\
+\hspace{0.5em} \texttt{True} $\Rightarrow$ cutoff maximum spectral displacement. \\
 \hspace{0.5em} \texttt{False} $\Rightarrow$ no cutoff applied to spectral displacement. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_pga\_scaling\_cutoff}: \\
@@ -282,7 +275,7 @@ The maximum acceptable PGA in units g. $S_a$ at all periods re-scaled accordingl
 \hline \vspace{0.1em}
 \texttt{atten\_smooth\_spectral\_acceleration}: \\
 DEFAULT = \texttt{False} \\
-\hspace{0.5em} \texttt{True} $\Rightarrow$  Smooth RSA; 
+\hspace{0.5em} \texttt{True} $\Rightarrow$  Smooth RSA; \\
 \hspace{0.5em} \texttt{False} $\Rightarrow$  No smoothing applied to RSA. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_log\_sigma\_eq\_weight}: \\
@@ -305,12 +298,10 @@ $\sigma_{inter}$ event components.
 \hline
 \vspace{0.3em} \noindent \Large \textbf{Amplification Input:} \normalsize \\
 \hline \vspace{0.1em} \texttt{use\_amplification}: \\
-DEFAULT = \texttt{False} \\
 If set to \texttt{True} use amplification associated with the local regolith: \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{amp\_variability\_method}: \\
-DEFAULT = \texttt{None} \\
-SUGGESTED = 2 \\
+DEFAULT = 2 \\
 Technique used to incorporate amplification aleatory uncertainty: \\
  \hspace{0.5em} None $\Rightarrow$ No sampling; \\
  \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
@@ -342,10 +333,8 @@ Building usage classification system - \texttt{'HAZUS'} or \texttt{'FCB'} \\
 %---------------------------------------------------------
 \hline \vspace{0.1em}
 \texttt{buildings\_set\_damping\_Be\_to\_5\_percent}: \\
- \hspace{0.5em} \texttt{True} $\Rightarrow$ use a damping $B_e$ of
- $5\%$ for all building structures.\\
- \hspace{0.5em} \texttt{False} $\Rightarrow$ use  damping $B_e$ from
- engineering parameter file (i.e., varies with building type).\\
+SUGGESTED = \texttt{False} \\
+If \texttt{True} use a damping $B_e$ of $5\%$ for all building structures.\\
 \hline
 %---------------------------------------------------------
  \end{tabular}
@@ -357,13 +346,12 @@ Building usage classification system - \texttt{'HAZUS'} or \texttt{'FCB'} \\
 \vspace{0.3em} \noindent \Large \textbf{Capacity Spectrum Method Input:} \normalsize \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_use\_variability}: \\
-DEFAULT = \texttt{True} ?????\\
+SUGGESTED = \texttt{True} \\
 \hspace{0.5em} \texttt{True} $\Rightarrow$ use the variability method described by
 \texttt{csm\_variability\_method};    \\
 \hspace{0.5em} \texttt{False} $\Rightarrow$ no aleatory variability applied.  \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_variability\_method}: \\
-DEFAULT = \texttt{None} \\
 SUGGESTED = 3 \\
 Method used to incorporate variability in capacity curve\index{capacity curve}: \\
  \hspace{0.5em} None $\Rightarrow$ No sampling; \\
@@ -384,13 +372,13 @@ used - \manual{Section 7.2.2}: \\
  \hspace{0.5em} 2 $\Rightarrow$ use $R_v$ only and assign $R_a=R_d=R_v$. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_modify\_Tav}: \\
-DEFAULT = \texttt{True} \\
+SUGGESTED = \texttt{True} \\
 Modify transition building period i.e. corner period $T_{av}$: \\
  \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: modify as in HAZUS; \\
  \hspace{0.5em}  \texttt{False} $\Rightarrow$ do NOT modify. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_use\_smoothing}: \\
-DEFAULT = \texttt{True} \\
+SUGGESTED = \texttt{True} \\
 Smoothing of damped curve: \\
  \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: apply smoothing; \\
  \hspace{0.5em} \texttt{False} $\Rightarrow$ NO smoothing.\\
@@ -401,7 +389,7 @@ Smoothing of damped curve: \\
 \begin{tabular}{|p{\textwidth}|}
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_hysteretic\_damping}: \\
-DEFAULT = \texttt{`curve'} \\
+SUGGESTED = \texttt{`curve'} \\
 Technique for Hysteretic  damping: \\
  \hspace{0.5em} \texttt{None} $\Rightarrow$ no hysteretic  damping \\
  \hspace{0.5em} \texttt{`trapezoidal'} $\Rightarrow$ Hysteretic  damping via trapezoidal approximation; \\
@@ -409,7 +397,8 @@ Technique for Hysteretic  damping: \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_SDcr\_tolerance\_percentage}: \\
 SUGGESTED = 1.0 \\
-Tolerance as a percentage for SDcr, in nonlinear damping calculations.   \\
+Convergence tolerance as a percentage for critical spectral
+displacement in nonlinear damping calculations. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_max\_iterations}: \\
 SUGGESTED = 7 \\
@@ -453,23 +442,29 @@ building database and salvageability \\
 \hline
 \vspace{0.3em} \noindent \Large \textbf{Save Input:} \normalsize \\
 \hline \vspace{0.1em} \texttt{save\_hazard\_map}: \\
+DEFAULT = \texttt{False} \\
 \texttt{True} $\Rightarrow$ Save data for hazard maps (Use for saving PSHA results). \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{save\_total\_financial\_loss}: \\
+DEFAULT = \texttt{False} \\
 \texttt{True} $\Rightarrow$ Save total financial loss. \\
 %---------------------------------------------------------
  \hline
 \vspace{0.1em} \texttt{save\_building\_loss}: \\
+DEFAULT = \texttt{False} \\
 \texttt{True} $\Rightarrow$ Save building loss. \\
 %---------------------------------------------------------
  \hline
 \vspace{0.1em} \texttt{save\_contents\_loss}: \\
+DEFAULT = \texttt{False} \\
  \texttt{True} $\Rightarrow$ Save contents loss. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{save\_motion}: \\
+DEFAULT = \texttt{False} \\
 \texttt{True} $\Rightarrow$ Save RSA motion (use for saving scenario ground motion results). \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{save\_prob\_strucutural\_damage}: \\
+DEFAULT = \texttt{False} \\
 \texttt{True} $\Rightarrow$ Save structural non-cumulative
 probability of being in each
 damage state.  Note this is only allowed when there is one event. \\
