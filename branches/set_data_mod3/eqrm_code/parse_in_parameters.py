@@ -44,6 +44,9 @@ Setting an attribute to None is not equivaluent to removing the
 attribute from the set_data.py file, since not all attributes default
 to None.
 
+If an attribute does not have to be defined it is given a default
+value of None.  An attribute without a default has to be defined.
+
 Lists are automatically converted to arrays.
 
 """
@@ -82,28 +85,28 @@ CONV_NEW = [{'order': 10.0,
             {'old_para': 'site_loc',
              'order': 10.07,
              'new_para': 'site_tag'},
+            {'old_para': 'site_db_tag',
+             'order': 10.075,
+             'new_para': 'site_db_tag',
+             'default': ""},
             {'old_para': 'rtrn_per',
              'order': 10.08,
              'new_para': 'return_periods'},
-            {'old_para': 'small_site_flag',
-             'values': {None: None,
-                        1: True,
-                        0: False},
-             'order': 10.09,
-             'new_para': 'use_site_indexes',
-             'default': False},
-            {'old_para': 'site_db_tag',
-             'order': 10.10,
-             'new_para': 'site_db_tag',
-             'default': ""},
             {'old_para': 'inputdir',
              'order': 10.11,
              'new_para': 'input_dir'},
             {'old_para': 'savedir',
              'order': 10.12,
              'new_para': 'output_dir'},
-            {'old_para': 'SiteInd',
+            {'old_para': 'small_site_flag',
+             'values': {None: None,
+                        1: True,
+                        0: False},
              'order': 10.13,
+             'new_para': 'use_site_indexes',
+             'default': False},
+            {'old_para': 'SiteInd',
+             'order': 10.14,
              'new_para': 'site_indexes',
              'default': None},
             {'order': 30.0,
