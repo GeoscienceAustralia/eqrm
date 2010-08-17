@@ -1038,7 +1038,8 @@ save_socloss_flag=[0]\n")
             'prob_dip_in_zones': array([35, 35, 35, 35, 35, 35]),
             'Operation_Mode': {'run_type': 1}})
         eqrm_dir = determine_eqrm_path()
-        output_base_name = join(eqrm_dir, 'Documentation', 'set_data_example')
+        output_base_name = join(eqrm_dir, 'Documentation',
+                                'set_data_example.py')
         convert_THE_PARAM_T_to_py(output_base_name, para_old)
 
    
