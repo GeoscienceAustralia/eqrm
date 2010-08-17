@@ -1,20 +1,21 @@
 """Relations between various earthquake parameters - Mw to length, etc.
  Title: conversions.py
-  
-  Author:  Peter Row, peter.row@ga.gov.au 
+
+  Author:  Peter Row, peter.row@ga.gov.au
 
   Description: Relations between various earthquake parameters - Mw to length,
   ML to Mw, etc.
-  
 
-  Version: $Revision: 995 $  
+
+  Version: $Revision: 995 $
   ModifiedBy: $Author: dgray $
   ModifiedDate: $Date: 2009-06-30 11:51:34 +1000 (Tue, 30 Jun 2009) $
-  
+
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import vectorize, sqrt, sin, minimum, pi, where, asarray
+from scipy import (vectorize, sqrt, sin, minimum, pi, where, asarray,
+                   exp, log, power)
 import math
 
 def Johnston_01_ML(Mw):
@@ -31,7 +32,7 @@ def Johnston_01_ML(Mw):
 def Johnston_89_Mw(ML):
     return 3.45-0.473*ML+0.145*(ML**2)
 
-def Wells_and_Coppersmith_94_length(Mw): 
+def Wells_and_Coppersmith_94_length(Mw):
     return 10.**(0.69*Mw - 3.22)
 
 def modified_Wells_and_Coppersmith_94_area(Mw):
@@ -59,7 +60,7 @@ def depth(fault_depth,dip,Mw,fault_width=None):
     if fault_width is None:
         fault_width = 15
     rad=pi/180
-    
+
     f2=1+((Mw-4.0)/2)
     f2=where(f2<1,1,f2)
     f2=where(f2>2,2,f2)
@@ -84,14 +85,14 @@ def calc_depth_to_top(depth, width, delta):
 
     # check dimensions of all three params the same
     try:
-        msg = ('Expected depth.shape == width.shape, %s != %s' 
+        msg = ('Expected depth.shape == width.shape, %s != %s'
                % (str(depth.shape), str(width.shape)))
     except AttributeError:
         raise AssertionError('calc_depth_to_top: expect numpy.array params')
     assert depth.shape == width.shape, msg
 
     try:
-        msg = ('Expected depth.shape == delta.shape, %s != %s' 
+        msg = ('Expected depth.shape == delta.shape, %s != %s'
                % (str(depth.shape), str(delta.shape)))
     except AttributeError:
         raise AssertionError('calc_depth_to_top: expect numpy.array params')
@@ -102,6 +103,38 @@ def calc_depth_to_top(depth, width, delta):
 
     # get and return Rtor
     return depth - (width/2)*sin(delta_rad)
+
+
+# precalculate constants for convert_Vs30_to_Z10()
+Ch_378_7_pow_8 = math.pow(378.7, 8)
+Ch_3_82_div_8 = 3.82/8.0
+
+def convert_Vs30_to_Z10(Vs30):
+    """Convert a Vs30 value to an estimated V1.0 value.
+
+    This function will handle both scalar and scipy array values of Z10.
+
+    Formula taken from equation (1) of:
+    Chiou.B.S.-J., Youngs R.R., 2008 An NGA Model for the Average Horizontal
+    Component of Peak Ground Motion and Response Spectra,
+    Earthquake Spectra 24, 173-215.
+    """
+
+    return exp(28.5 - Ch_3_82_div_8*log(power(Vs30, 8) + Ch_378_7_pow_8))
+
+
+def convert_Z10_to_Z25(Z10):
+    """Convert a Z1.0 value to a Z2.5 value.
+
+    This function will handle both scalar and scipy array values of Z10.
+
+    Formula taken from equation (6.3) of:
+    Campbell-Bozorgnia NGA Ground Motion Relations for the Geometric Mean
+    Horizontal Component of Peak and Spectral Ground Motion Parameters.
+    Kenneth W. Campbell and Yousef Bozorgnia, PEER 2007/02.
+    """
+
+    return 0.519 + 3.595*Z10
 
 
 ###################
@@ -115,7 +148,7 @@ __local_functions = locals().copy() #all the functions in the local namespace
 conversion_functions = {}
 for function_name in __local_functions.keys():
     #for all functions in the local namespace
-    
+
     if not function_name.startswith('__'): #If it's not private
         function = __local_functions[function_name]
         conversion_functions[function_name]=function
