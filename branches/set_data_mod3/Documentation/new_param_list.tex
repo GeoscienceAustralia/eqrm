@@ -340,7 +340,10 @@ Building usage classification system - \texttt{'HAZUS'} or \texttt{'FCB'} \\
 %---------------------------------------------------------
 \hline \vspace{0.1em}
 \texttt{buildings\_set\_damping\_Be\_to\_5\_percent}: \\
-If \texttt{True} use a damping $B_e$ of $5\%$ for all building structures.\\
+ \hspace{0.5em} \texttt{True} $\Rightarrow$ use a damping $B_e$ of
+ $5\%$ for all building structures.\\
+ \hspace{0.5em} \texttt{False} $\Rightarrow$ use  damping $B_e$ from
+ engineering parameter file (i.e., varies with building type).\\
 \hline
 %---------------------------------------------------------
  \end{tabular}
