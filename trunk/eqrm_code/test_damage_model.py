@@ -377,7 +377,7 @@ class Test_damage_model(unittest.TestCase):
 
 
     def test_building_response(self):
-        """Test that building response is the same as matlab"""
+        #Test that building response is the same as matlab
 
         periods=array([0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
                        0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7,
@@ -497,7 +497,7 @@ class Test_damage_model(unittest.TestCase):
         THE_PARAM_T.csm_damping_max_iterations = 7
         THE_PARAM_T.csm_hysteretic_damping = 'Error'
         THE_PARAM_T.bridges_functional_percentages = None
-        THE_PARAM_T.atten_rescale_curve_from_pga = None
+        THE_PARAM_T.atten_override_RSA_shape = None
         THE_PARAM_T.atten_pga_scaling_cutoff = False
         THE_PARAM_T.atten_cutoff_max_spectral_displacement = False
         THE_PARAM_T.loss_min_pga = 0.05

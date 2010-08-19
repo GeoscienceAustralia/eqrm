@@ -42,8 +42,7 @@ class Test_Regolith_Amplification_Model(unittest.TestCase):
         log_stds={'CD':log_stdC,'D':log_stdD}
         
         regolith_amp_distribution = Log_normal_distribution(
-            1,
-            1,
+            None,
             num_psudo_events=2,
             num_sites_per_site_loop=5)
         

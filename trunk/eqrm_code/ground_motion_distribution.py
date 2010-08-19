@@ -24,24 +24,28 @@ class Log_normal_distribution(object):
     of this class will cause check_scenario to fail.
 
     """
-    def __init__(self,var_flag, var_method,
+    def __init__(self,
+                 var_method,
                  num_psudo_events=None,
                  num_sites_per_site_loop=1, 
                  atten_log_sigma_eq_weight=0,
                  variate_eq=None):
+        # var_flag is not used.
                 
         self.min_cutoff=None
         self.max_cutoff=None
+
+        #if var_method is None:
+        #    var_method = 1
         
-        self.var_flag=int(var_flag)
-        self.var_method=var_method        
+        self.var_method = var_method        
         self.rvs=norm.rvs # function from scipy.stats
         self.pdf=norm.pdf # function from scipy.stats
         self.num_psudo_events = num_psudo_events
         self.atten_log_sigma_eq_weight = atten_log_sigma_eq_weight
 
         # Randomness that is the same for each site  
-        if self.var_flag == 1 and self.var_method == 2:
+        if self.var_method == 2:
             if variate_eq is None:
             
                 self.variate_eq=self.rvs(size=(
@@ -74,38 +78,36 @@ class Log_normal_distribution(object):
         """
         FIXME needs comments
         """
-        if self.var_flag==1:
-            if self.var_method==1:
-                pass           
-            if self.var_method==2:
+        if True:
+            if self.var_method == None:
+                sample_values=exp(self.log_mean)           
+            elif self.var_method == 2:
                 # monte carlo
-                sample_values= self._monte_carlo_intra_inter()
-            else:
-                if self.var_method==3:
-                    # + 2 sigma
-                    sample_values=exp(self.log_mean+2*self.log_sigma)  
-                elif self.var_method==4:
-                    # + 1 sigma
-                    sample_values=exp(self.log_mean+1*self.log_sigma)
-                elif self.var_method==5:
-                    # - 1 sigma
-                    sample_values=exp(self.log_mean-1*self.log_sigma)
-                elif self.var_method==6:
-                    # - 2 sigma
-                    sample_values=exp(self.log_mean-2*self.log_sigma)
-                elif self.var_method==7:
-                    # corrected mean
-                    sample_values=self.corrected_mean
-                    
+                sample_values = self._monte_carlo_intra_inter()
+            elif self.var_method == 3:
+                # + 2 sigma
+                sample_values = exp(self.log_mean+2*self.log_sigma)  
+            elif self.var_method == 4:
+                # + 1 sigma
+                sample_values = exp(self.log_mean+1*self.log_sigma)
+            elif self.var_method == 5:
+                # - 1 sigma
+                sample_values = exp(self.log_mean-1*self.log_sigma)
+            elif self.var_method == 6:
+                # - 2 sigma
+                sample_values = exp(self.log_mean-2*self.log_sigma)
+            elif self.var_method == 7:
+                # corrected mean
+                sample_values = self.corrected_mean
+
+            # min_cutoff and max_cutoff are obsolete
             if self.min_cutoff is not None:
                 sample_values=where(sample_values>self.min_cutoff,
                                     sample_values,self.min_cutoff)
             if self.max_cutoff is not None:
                 sample_values=where(sample_values<self.max_cutoff,
                                     sample_values,self.max_cutoff)
-        else:
-            assert self.var_flag==0
-            sample_values=exp(self.log_mean)          
+                
         return self.event_id, sample_values, self.event_activity
     
 

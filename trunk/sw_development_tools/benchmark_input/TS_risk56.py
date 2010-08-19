@@ -19,17 +19,17 @@ from os.path import join
 
 # Operation Mode
 run_type = "risk" 
-is_deterministic = False
+is_scenario = False
 max_width = 15
 
-# Deterministic input
-determ_azimith = 340
-determ_depth = 11.5
-determ_latitude = -32.95
-determ_longitude = 151.61
-determ_magnitude = 5.6
-determ_dip = 35
-determ_number_of_events = 166
+# Scenario input
+scenario_azimuth = 340
+scenario_depth = 11.5
+scenario_latitude = -32.95
+scenario_longitude = 151.61
+scenario_magnitude = 5.6
+scenario_dip = 35
+scenario_number_of_events = 166
 
 # Probabilistic input
 prob_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
@@ -42,13 +42,13 @@ prob_dip_in_zones = [35, 35, 35, 35, 35, 35]
 # Attenuation
 atten_models = ['Toro_1997_midcontinent', 'Atkinson_Boore_97', 'Sadigh_97']
 atten_model_weights = [0.33333333333333331, 0.33333333333333331, 0.33333333333333331]
-atten_aggregate_Sa_of_atten_models = False
+atten_collapse_Sa_of_atten_models = False
 atten_use_variability = True
 atten_variability_method = 2
 atten_periods = [0.0, 0.17544000000000001, 0.35088000000000003, 0.52632000000000001, 0.70174999999999998, 0.87719000000000003, 1.0526, 1.2281, 1.4035, 1.5789, 1.7544, 1.9298, 2.1053000000000002, 2.2806999999999999, 2.4561000000000002, 2.6316000000000002, 2.8069999999999999, 2.9824999999999999, 3.1579000000000002, 3.3332999999999999]
 atten_threshold_distance = 400
 atten_use_rescale_curve_from_pga = False
-atten_rescale_curve_from_pga = None
+atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
 atten_pga_scaling_cutoff = 2
 atten_smooth_spectral_acceleration = False
