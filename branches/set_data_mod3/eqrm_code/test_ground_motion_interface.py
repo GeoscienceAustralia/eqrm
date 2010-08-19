@@ -908,10 +908,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         # expected values from paper (converted to ln g)
         log_mean_expected = numpy.array([[[0.33]]])/ln_factor - g_factor
-        #log_sigma_expected = Atkinson06_sigma_coefficient[0][0]/ln_factor - \
-        #                         g_factor
-        log_sigma_expected = 0.30/ln_factor - \
-                                 g_factor
+        log_sigma_expected = 0.30/ln_factor - g_factor
 
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
@@ -1081,6 +1078,169 @@ class Test_ground_motion_interface(unittest.TestCase):
                % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
                                          rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+    def test_Chiou08_basic(self):
+        """Test the Chiou08 model by calling Chiou08_distribution() directly."""
+
+        # The data here is from a program that implemented the algorithm
+        # in the paper and compared the results against values taken from the
+        # graphs in figure 19 (rock).  The match there was good(ish).
+        # The program is test_resources/GM_Matlab/Chiou08_check.py.
+        # 
+        # This test compares the python implementation against the check program
+        # results.
+
+        ######
+        # period = 0.01s, ML=7.5, R=20.0, etc (see figure 19)
+        ######
+
+        period = 0.01
+        ML = numpy.array([[[7.5]]])
+        R = numpy.array([[[20.0]]])
+        vs30 = numpy.array([[[520.0]]])
+        faulting_type = numpy.array([[[0]]], dtype=int)
+        Ztor = numpy.array([[[0.0]]])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[-1.2678]]],[[[0.1]]],[[[-0.2550]]],
+                              [[[2.996]]], [[[4.1840]]], [[[6.1600]]],
+                              [[[0.4893]]], [[[0.0512]]], [[[0.0860]]],
+                              [[[0.7900]]], [[[1.5505]]], [[[-0.3218]]],
+                              [[[-0.00804]]], [[[-0.00785]]],
+                              [[[-0.4417]]], [[[-0.1417]]], [[[-0.007010]]],
+                              [[[0.102151]]], [[[0.2289]]], [[[0.14996]]],
+                              [[[580.0]]], [[[0.0700]]]])
+
+        # sigma coefficients - these are static
+        sigma_coeffs = numpy.array([[[[-25.0]]],[[[-25.0]]]])
+
+
+        # expected values from paper (sigma can be anything, make it very small)
+        log_mean_expected = numpy.array([[[-1.417078]]])
+        log_sigma_expected = numpy.array([[[-25.0]]])
+
+        (log_mean,
+             log_sigma) = Chiou08_distribution(mag=ML, distance=R,
+                                               faulting_type=faulting_type,
+                                               depth_to_top=Ztor, vs30=vs30,
+                                               coefficient=coeffs,
+                                               sigma_coefficient=sigma_coeffs)
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, log_mean_expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                        msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, log_sigma_expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                        msg)
+
+    def test_Chiou08(self):
+        """Test the Chiou8 model."""
+
+        # This is a repeat of test_Chiou08_basic() above, except that we
+        # go through model.distribution() and get results in ln g.
+
+        model_name = 'Chiou08'
+        model = Ground_motion_specification(model_name)
+
+        ######
+        # period = 0.01s, ML=7.5, R=20.0, etc (see figure 19)
+        ######
+
+        period = 0.01
+        ML = numpy.array([[[7.5]]])
+        R = numpy.array([[[20.0]]])
+        vs30 = numpy.array([[[520.0]]])
+        faulting_type = numpy.array([[[0]]], dtype=int)
+        Ztor = numpy.array([[[0.0]]])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[-1.2678]]],[[[0.1]]],[[[-0.2550]]],
+                              [[[2.996]]], [[[4.1840]]], [[[6.1600]]],
+                              [[[0.4893]]], [[[0.0512]]], [[[0.0860]]],
+                              [[[0.7900]]], [[[1.5505]]], [[[-0.3218]]],
+                              [[[-0.00804]]], [[[-0.00785]]],
+                              [[[-0.4417]]], [[[-0.1417]]], [[[-0.007010]]],
+                              [[[0.102151]]], [[[0.2289]]], [[[0.14996]]],
+                              [[[580.0]]], [[[0.0700]]]])
+
+        # sigma coefficients - these are static
+        sigma_coeffs = numpy.array([[[[-25.0]]],[[[-25.0]]]])
+
+
+        # expected values from paper (sigma can be anything, make it very small)
+        log_mean_expected = numpy.array([[[-1.417078]]])
+        log_sigma_expected = numpy.array([[[-25.0]]])
+
+        (log_mean,
+             log_sigma) = model.distribution(mag=ML, distance=R,
+                                             faulting_type=faulting_type,
+                                             depth_to_top=Ztor, vs30=vs30,
+                                             coefficient=coeffs,
+                                             sigma_coefficient=sigma_coeffs)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-3, atol=1.0e-3),
+                                 msg)
+
+    def test_Campbell03(self):
+        """Test the Campbell03 model."""
+
+        model_name = 'Campbell03'
+        model = Ground_motion_specification(model_name)
+
+        ######
+        # period = 0.2, ML=7.0, R=10.0,
+        # expect lnY=0.0663, sigma=0.4904 (from Campbell03_check.py)
+        ######
+
+        period = 0.2
+        ML = numpy.array([[[7.0]]])
+        R = numpy.array([[[10.0]]])
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[-0.432800]]], [[[ 0.617000]]], [[[-0.058600]]],
+                              [[[-1.320000]]], [[[-0.004600]]], [[[ 0.000337]]],
+                              [[[ 0.399000]]], [[[ 0.493000]]], [[[ 1.250000]]],
+                              [[[-0.928000]]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[1.077]]], [[[-0.0838]]], [[[0.478]]]])
+
+
+        # expected values from Campbell03_check.py
+        log_mean_expected = numpy.array([[[0.0663]]])
+        log_sigma_expected = numpy.array([[[0.4904]]])
+
+        (log_mean, log_sigma) = model.distribution(mag=ML, distance=R,
+                                                   coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+
+        # tests for equality should be quite tight as we check against
+        # Campbell03_check.py
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
 ################################################################################

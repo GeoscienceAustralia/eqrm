@@ -1,5 +1,3 @@
-
-
 import unittest
 
 from scipy import array, exp, log, allclose, newaxis, asarray, zeros
@@ -19,7 +17,8 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Boore_08', 'Somerville_Yilgarn',
                           'Somerville_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
-                          'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock')
+                          'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
+                          'Chiou08', 'Campbell03')
 
 # Atkinson_Boore_97 is out.  It has no test data. 
 
@@ -36,6 +35,9 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
 
     test_mean : the means that must be matched by verification tests
                     dimensions (sites, mag, period).  Units g.  Not log mean
+
+    test_vs30: the shear wave velocity at a depth of 30.0 meters
+               (if not defined, will be assumed to be 1000m/s)
 """
     
 test_data = {}
@@ -420,6 +422,8 @@ test_data['Boore_08_test_mean'] = \
                                   [:,newaxis,:]
 test_data['Boore_08_test_magnitude'] = [5.4]
 
+test_data['Boore_08_test_vs30'] = 1000.0
+
 
 # ***********************************************************
 # Somerville_Yilgarn Test
@@ -608,6 +612,7 @@ test_data['Atkinson06_hard_bedrock_test_mean'] = tmp
 ################################################################################
 # Atkinson06_soil Test
 # These tests set vs30 is 1000.0 in test code below
+# That value wil be assumed if we don't define vs30 values here.
 
 # num_events = 2
 test_data['Atkinson06_soil_test_magnitude'] = [5.5, 7.5]
@@ -679,6 +684,113 @@ tmp[2,1,:] = [0.053912, 0.026374]	# R=300.0, ML=7.5
 test_data['Atkinson06_bc_boundary_bedrock_test_mean'] = tmp
 del tmp
 
+#################################################################################
+## Chiou08 Tests - Rock - compare code against 'hand' code results
+#
+## vs30 value
+#test_data['Chiou08_test_vs30'] = 520.0
+#
+## num_events = 2
+#test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
+#
+## num_events = 2
+#test_data['Chiou08_test_depth_to_top'] = [0.0, 0.0]
+#
+## num_events = 2
+## 'reverse' fault type index is 0
+#test_data['Chiou08_test_faulting_type'] = [0, 0]
+#
+## num_periods = 4
+#test_data['Chiou08_test_period'] = [0.01, 0.20, 1.00, 3.00]
+#
+## num_sites = 3
+#tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
+#tmp[0,:] = [  5.0,   5.0] # distance - 1st site and all 2 events
+#tmp[1,:] = [ 20.0,  20.0] # distance - 2nd site and all 2 events
+#tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
+#test_data['Chiou08_test_distance'] = tmp
+#
+## result values, in 'g'
+#tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+## period:     0.01      0.20      1.00      3.00
+#tmp[0,0,:] = [0.276160, 0.612666, 0.139772, 0.017631] # R=  5.0, ML=5.5
+#tmp[0,1,:] = [0.525535, 1.230800, 0.503488, 0.112815] # R=  5.0, ML=7.5
+#tmp[1,0,:] = [0.068560, 0.150721, 0.032357, 0.004130] # R= 20.0, ML=5.5
+#tmp[1,1,:] = [0.242421, 0.585651, 0.206465, 0.046410] # R= 20.0, ML=7.5
+#tmp[2,0,:] = [0.006308, 0.013925, 0.004896, 0.000717] # R=100.0, ML=5.5
+#tmp[2,1,:] = [0.052239, 0.117515, 0.055062, 0.013557] # R=100.0, ML=7.5
+#test_data['Chiou08_test_mean'] = tmp
+#del tmp
+#
+################################################################################
+# Chiou08 Tests - Soil - compare code against 'hand' code results
+
+# vs30 value
+test_data['Chiou08_test_vs30'] = 310.0
+
+# num_events = 2
+test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
+
+# num_events = 2
+test_data['Chiou08_test_depth_to_top'] = [0.0, 0.0]
+
+# num_events = 2
+# 'reverse' fault type index is 0
+test_data['Chiou08_test_faulting_type'] = [0, 0]
+
+# num_periods = 4
+test_data['Chiou08_test_period'] = [0.01, 0.20, 1.00, 3.00]
+
+# num_sites = 3
+tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
+tmp[0,:] = [  5.0,   5.0] # distance - 1st site and all 2 events
+tmp[1,:] = [ 20.0,  20.0] # distance - 2nd site and all 2 events
+tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
+test_data['Chiou08_test_distance'] = tmp
+
+# result values, in 'g'
+tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+# period:     0.01      0.20      1.00      3.00
+tmp[0,0,:] = [0.292430, 0.616686, 0.196268, 0.028048] # R=  5.0, ML=5.5
+tmp[0,1,:] = [0.515783, 1.060834, 0.651781, 0.178439] # R=  5.0, ML=7.5
+tmp[1,0,:] = [0.081035, 0.183922, 0.047799, 0.006584] # R= 20.0, ML=5.5
+tmp[1,1,:] = [0.260221, 0.570758, 0.283779, 0.073640] # R= 20.0, ML=7.5
+tmp[2,0,:] = [0.007875, 0.018511, 0.007373, 0.001144] # R=100.0, ML=5.5
+tmp[2,1,:] = [0.062533, 0.146149, 0.080264, 0.021578] # R=100.0, ML=7.5
+test_data['Chiou08_test_mean'] = tmp
+del tmp
+
+################################################################################
+# Campbell03 Tests - data values from Campbell03_check.py
+
+# num_events = 2
+test_data['Campbell03_test_magnitude'] = [5.0, 7.0]
+
+# num_periods = 4
+test_data['Campbell03_test_period'] = [0.01, 0.20, 1.00, 3.00]
+
+# num_sites = 4
+tmp = zeros((4,2)) # initialise an array: (num_sites, num_events)
+tmp[0,:] = [   1.0,    1.0] # distance - 1st site and all 2 events
+tmp[1,:] = [  10.0,   10.0] # distance - 2nd site and all 2 events
+tmp[2,:] = [ 100.0,  100.0] # distance - 3rd site and all 2 events
+tmp[3,:] = [1000.0, 1000.0] # distance - 4th site and all 2 events
+test_data['Campbell03_test_distance'] = tmp
+
+# result values, in 'g'
+tmp = zeros((4,2,4))		# num_sites, num_events, num_periods
+# period:     0.01     0.20     1.00     3.00
+tmp[0,0,:] = [0.94335, 0.87035, 0.08436, 0.01070] # R=   1.0, ML=5.0
+tmp[0,1,:] = [1.39528, 1.49996, 0.54330, 0.13621] # R=   1.0, ML=7.0
+tmp[1,0,:] = [0.29592, 0.28207, 0.02536, 0.00341] # R=  10.0, ML=5.0
+tmp[1,1,:] = [0.94139, 1.06850, 0.36296, 0.09306] # R=  10.0, ML=7.0
+tmp[2,0,:] = [0.01184, 0.01847, 0.00235, 0.00036] # R= 100.0, ML=5.0
+tmp[2,1,:] = [0.07015, 0.12086, 0.04793, 0.01376] # R= 100.0, ML=7.0
+tmp[3,0,:] = [0.00013, 0.00017, 0.00014, 0.00005] # R=1000.0, ML=5.0
+tmp[3,1,:] = [0.00189, 0.00208, 0.00358, 0.00206] # R=1000.0, ML=7.0
+test_data['Campbell03_test_mean'] = tmp
+del tmp
+
 ################################################################################
 
 class Distance_stub(object):
@@ -692,46 +804,56 @@ def mag2dict(mag):
     # when using multiple_g_m_calc the mag_type is determined from
     # the g_m_interface, so it could be ML or Mw.
     mag = asarray(mag)
-    return {None:mag,
-            'ML':mag,
-            'Mw':mag}
+    return {None: mag,
+            'ML': mag,
+            'Mw': mag}
    
 def data2atts(model_name):
-    distances = Distance_stub(test_data[model_name + '_test_distance'])
-    magnitudes = mag2dict(test_data[model_name + '_test_magnitude'])
-    test_mean = test_data[model_name + '_test_mean']
-    periods = test_data[model_name + '_test_period']
-    try:
-        depths = test_data[model_name + '_test_depth'] 
-    except KeyError:
-        depths = None
-    return distances, magnitudes, test_mean, periods, depths
+    """Get attributes for a model from the test_data dictionary.
+
+    The vs30 value is defaulted to 1000 if not defined in test_data.
+    """
+
+    # get params that exist for every model
+    distances = Distance_stub(test_data[model_name+'_test_distance'])
+    magnitudes = mag2dict(test_data[model_name+'_test_magnitude'])
+    test_mean = test_data[model_name+'_test_mean']
+    periods = test_data[model_name+'_test_period']
+
+    # params not there for every model (usually return None if not there)
+    depths = test_data.get(model_name+'_test_depth', None)
+    depth_to_top = test_data.get(model_name+'_test_depth_to_top', None)
+    faulting_type = test_data.get(model_name+'_test_faulting_type', None)
+    vs30 = test_data.get(model_name+'_test_vs30', 1000.0)
+
+    return (distances, magnitudes, test_mean, periods, depths, vs30,
+            depth_to_top, faulting_type)
     
 def ground_motion_interface_conformance(GM_class, model_name):
     """
     This checks that for the given test_distance and test_magnitudes,
     the calculated ground motion is the same as the test_ground_motion
-
-    Note the VS30 is hard-wired to 1000.
     """
-    distances, magnitudes, test_mean, periods, depths = data2atts(
-        model_name)
+
+    (distances, magnitudes, test_mean, periods,
+         depths, vs30, depth_to_top, faulting_type) = data2atts(model_name)
 
     if GM_class is Ground_motion_calculator:
         gm = GM_class(model_name, periods)
-        log_mean,log_sigma=gm.distribution_function(distances,
-                                                    magnitudes,
-                                                    depth=depths,
-                                                    vs30=1000)
+        (log_mean, log_sigma) = \
+            gm.distribution_function(distances, magnitudes, depth=depths,
+                                     vs30=vs30, depth_to_top=depth_to_top,
+                                     faulting_type=faulting_type)
     elif GM_class is Multiple_ground_motion_calculator:
         model_weights = [1]
         gm = GM_class([model_name], periods, model_weights)
         # ignoring event_activity, event_id
-        log_mean,log_sigma, _, _ =gm._distribution_function(distances,
-                                                            magnitudes,
-                                                            depth=depths,
-                                                            vs30=1000)
-    return exp(log_mean), test_mean
+        (log_mean, log_sigma, _, _) = \
+            gm._distribution_function(distances, magnitudes, depth=depths,
+                                      vs30=vs30, depth_to_top=depth_to_top,
+                                      faulting_type=faulting_type)
+
+    return (exp(log_mean), test_mean)
 
 
 class Test_ground_motion_specification(unittest.TestCase):
@@ -742,12 +864,12 @@ class Test_ground_motion_specification(unittest.TestCase):
         pass
 
     def ground_motion_interface_conformance(self, GM_class, model_name):
-        median, test_mean = ground_motion_interface_conformance(
-            GM_class, model_name)
+        (median, test_mean) = ground_motion_interface_conformance(GM_class,
+                                                                  model_name)
 
    
-        msg = ('median=\n%s\ntest_mean=\n%s' % (str(median), str(test_mean))) 
-        self.assert_(allclose(median, test_mean, rtol=0.05),
+        msg = 'median=\n%s\ntest_mean=\n%s' % (str(median), str(test_mean))
+        self.assert_(allclose(median, test_mean, rtol=0.05, atol=1.0e-5),
                      "%s did not pass assert:\n%s" % (model_name, msg))
         
     
@@ -759,15 +881,16 @@ class Test_ground_motion_specification(unittest.TestCase):
     def test_all_multi_ground_motion_interfaces(self):
         for name in classes_with_test_data:
             self.ground_motion_interface_conformance(
-                Multiple_ground_motion_calculator, name)
+                                       Multiple_ground_motion_calculator,
+                                       name)
      
     def test_Ground_motion_specification_init_(self):
         model_name = 'Gaull_1990_WA'
         model = Ground_motion_specification(model_name)
 
         # Comparing against the variables in attenuation_models.py
-        # A circular sort of test, since attenuation_models is being
-        # used as a data holder
+        # A circular sort of test, since attenuation_models is being used
+        #  as a data holder
         imported = gound_motion_init[model_name]
         self.failUnless(model.magnitude_type==imported[1],
                         'Model attributes incorrect.')       
@@ -782,7 +905,7 @@ class Test_ground_motion_specification(unittest.TestCase):
               
 #-------------------------------------------------------------
 if __name__ == "__main__":
-    suite = unittest.makeSuite(Test_ground_motion_specification,'test')
+    suite = unittest.makeSuite(Test_ground_motion_specification, 'test')
     #suite = unittest.makeSuite(Test_ground_motion_specification,
      #                          'test_all_ground_motion_interfaces')
     #suite = unittest.makeSuite(Test_ground_motion_specification,

@@ -13,7 +13,7 @@ from xml_interface import Xml_Interface
 from source_model import source_model_from_xml
 import conversions
 
-from event_set import Event_Set, Pseudo_Event_Set
+from eqrm_code.event_set import Event_Set, Pseudo_Event_Set
 
 
 class Dummy:
@@ -21,74 +21,76 @@ class Dummy:
         pass
     
 def event_from_csv_long():
-    # Values tightly couped with event_from_csv_short
-    trace_start_lat=-38.15
-    trace_start_lon=146.5
+    # Values tightly coupled with event_from_csv_short
+    trace_start_lat = -38.15
+    trace_start_lon = 146.5
    
-    azimuth=217
-    dip=60
-    weight=18
-    event_activity=0
-    recurrence=weight*event_activity
+    azimuth = 217
+    dip = array([60.0])
+    weight = 18
+    event_activity = 0
+    recurrence = weight*event_activity
     
-    Mw=6.9
-    lat0=-38.31
-    lon0=146.3
+    Mw = 6.9
+    lat0 = -38.31
+    lon0 = 146.3
     
-    depth=array([6.5]) #FIXME it should not have to be an array
-    rx=25.3
-    ry=3.8
+    depth = array([6.5]) #FIXME it should not have to be an array
+    rx = 25.3
+    ry = 3.8
     
-    length=50.6
-    width=15
+    length = 50.6
+    width = 15
 
-    event_set=Event_Set.create(depth=depth,rupture_centroid_lat=lat0,
-                        rupture_centroid_lon=lon0,azimuth=azimuth,
-                        dip=dip,ML=None,Mw=Mw,fault_width=15.0)
+    event_set=Event_Set.create(depth=depth, rupture_centroid_lat=lat0,
+                               rupture_centroid_lon=lon0, azimuth=azimuth,
+                               dip=dip, ML=None, Mw=Mw, fault_width=15.0)
 
-    event_set.trace_start_x=-rx
-    event_set.trace_start_y=-ry
-    event_set.trace_start_lat=trace_start_lat
-    event_set.trace_start_lon=trace_start_lon
-    event_set.recurrence=recurrence
-    event_set.length=length
-    event_set.width=width
+    event_set.trace_start_x = -rx
+    event_set.trace_start_y = -ry
+    event_set.trace_start_lat = trace_start_lat
+    event_set.trace_start_lon = trace_start_lon
+    event_set.recurrence = recurrence
+    event_set.length = length
+    event_set.width = width
 
     return event_set
 
 def event_from_csv_short():
-    # Values tightly couped with event_from_csv_long
-    azimuth=217
-    dip=60
-    weight=18
-    event_activity=0
-    recurrence=weight*event_activity
+    # Values tightly coupled with event_from_csv_long
+    azimuth = 217
+    dip = array([60.])
+    weight = 18
+    event_activity = 0
+    recurrence = weight*event_activity
     
-    Mw=6.9
-    lat0=-38.31
-    lon0=146.3
+    Mw = 6.9
+    lat0 = -38.31
+    lon0 = 146.3
     
-    depth=array([6.5])
+    depth = array([6.5])
     
-    event_set=Event_Set.create(depth=depth,rupture_centroid_lat=lat0,
-                        rupture_centroid_lon=lon0,fault_width=15.0,
-                        azimuth=azimuth,dip=dip,ML=None,Mw=Mw)
-    event_set.recurrence=recurrence
+    event_set = Event_Set.create(depth=depth, rupture_centroid_lat=lat0,
+                                 rupture_centroid_lon=lon0, fault_width=15.0,
+                                 azimuth=azimuth, dip=dip, ML=None, Mw=Mw)
+    event_set.recurrence = recurrence
 
     return event_set
 
 def csv_to_array(csv_file):
-    csv_file=open(csv_file)
-    csv_array=array([[float(s) for s in line.split(',')] for line in csv_file])
+    csv_file = open(csv_file)
+    csv_array = array([[float(s) for s in line.split(',')]
+                      for line in csv_file])
     csv_file.close()
+
     return csv_array
 
 class Test_Event_Set(unittest.TestCase):
 
     def test_event_set_conformance(self):
-        event_csv_name="../test_resources/unit_test_event.csv"
-        event_set1=event_from_csv_long()
-        event_set2=event_from_csv_short()
+        event_csv_name = "../test_resources/unit_test_event.csv"
+        event_set1 = event_from_csv_long()
+        event_set2 = event_from_csv_short()
 
         # Checking that event_set1.depth is not the same object
         # as event_set2.depth (as opposed to whether they are numerically
@@ -112,10 +114,9 @@ class Test_Event_Set(unittest.TestCase):
         assert allclose(event_set1.trace_start_lon,event_set2.trace_start_lon,
                         atol=0.01) 
         assert allclose(event_set1.dip,event_set2.dip)
-        
 
     def not_finished_test_event_from_file(self):
-        handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
         
@@ -131,12 +132,12 @@ class Test_Event_Set(unittest.TestCase):
 
 </Source_Model>
 """
+
         handle.write(sample)
         handle.close()
         os.remove(file_name)
 
     def test_scenario_event(self):
-        
         THE_PARAM_T = Dummy()
         THE_PARAM_T.scenario_latitude = -32.95
         THE_PARAM_T.scenario_longitude = 151.61
@@ -159,41 +160,40 @@ class Test_Event_Set(unittest.TestCase):
 
         #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
         answer = array(THE_PARAM_T.scenario_latitude)
-        self.assert_ (allclose(event_set.rupture_centroid_lat, answer))
+        self.assert_(allclose(event_set.rupture_centroid_lat, answer))
         
         answer = array(THE_PARAM_T.scenario_longitude)
-        self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
+        self.assert_(allclose(event_set.rupture_centroid_lon, answer))
         
         answer = array(THE_PARAM_T.scenario_azimuth)
-        self.assert_ (allclose(event_set.azimuth, answer))
+        self.assert_(allclose(event_set.azimuth, answer))
         
         answer = array(THE_PARAM_T.dip)
-        self.assert_ (allclose(event_set.dip, answer))
+        self.assert_(allclose(event_set.dip, answer))
         
         answer = array(THE_PARAM_T.scenario_magnitude)
-        self.assert_ (allclose(event_set.Mw, answer))
+        self.assert_(allclose(event_set.Mw, answer))
         
         answer = array(THE_PARAM_T.max_width)
-        self.assert_ (allclose(event_set.fault_width, answer))
+        self.assert_(allclose(event_set.fault_width, answer))
         
         answer = array(THE_PARAM_T.scenario_depth)
-        self.assert_ (allclose(event_set.depth, answer))
+        self.assert_(allclose(event_set.depth, answer))
         
-        self.assert_ (THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
+        self.assert_(THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
 
         area = array(conversions.modified_Wells_and_Coppersmith_94_area(
             THE_PARAM_T.scenario_magnitude))
-        self.assert_ (allclose(event_set.area, area))
+        self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
-        self.assert_ (allclose(event_set.length, answer))
+        self.assert_(allclose(event_set.length, answer))
   
     def test_scenario_event_II(self):
-        
         THE_PARAM_T = Dummy()
         THE_PARAM_T.scenario_latitude = [-30., -32.]
         THE_PARAM_T.scenario_longitude = [150., -151.]
@@ -213,44 +213,43 @@ class Test_Event_Set(unittest.TestCase):
             fault_width=THE_PARAM_T.max_width,
             depth=THE_PARAM_T.scenario_depth,
             scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
-
     
         #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
         answer = array(THE_PARAM_T.scenario_latitude)
-        self.assert_ (allclose(event_set.rupture_centroid_lat, answer))
+        self.assert_(allclose(event_set.rupture_centroid_lat, answer))
         
         answer = array(THE_PARAM_T.scenario_longitude)
-        self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
+        self.assert_(allclose(event_set.rupture_centroid_lon, answer))
         
         answer = array(THE_PARAM_T.scenario_azimuth)
-        self.assert_ (allclose(event_set.azimuth, answer))
+        self.assert_(allclose(event_set.azimuth, answer))
         
         answer = array(THE_PARAM_T.dip)
-        self.assert_ (allclose(event_set.dip, answer))
+        self.assert_(allclose(event_set.dip, answer))
         
         answer = array(THE_PARAM_T.scenario_magnitude)
-        self.assert_ (allclose(event_set.Mw, answer))
+        self.assert_(allclose(event_set.Mw, answer))
         
         answer = array(THE_PARAM_T.max_width)
-        self.assert_ (allclose(event_set.fault_width, answer))
+        self.assert_(allclose(event_set.fault_width, answer))
         
         answer = array(THE_PARAM_T.scenario_depth)
-        self.assert_ (allclose(event_set.depth, answer))
+        self.assert_(allclose(event_set.depth, answer))
         
-        self.assert_ (THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
+        self.assert_(THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
 
         area = array((conversions.modified_Wells_and_Coppersmith_94_area(
             THE_PARAM_T.scenario_magnitude[0]),
             conversions.modified_Wells_and_Coppersmith_94_area(
             THE_PARAM_T.scenario_magnitude[1])))
-        self.assert_ (allclose(event_set.area, area))
+        self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
-        self.assert_ (allclose(event_set.width, width))
+        self.assert_(allclose(event_set.width, width))
         
         answer = area/width 
-        self.assert_ (allclose(event_set.length, answer))
+        self.assert_(allclose(event_set.length, answer))
 
     def test_scenario_event_III(self):
         
@@ -410,7 +409,7 @@ class Test_Event_Set(unittest.TestCase):
         fault_dip = array([35.0])
         prob_min_mag_cutoff = 1.0
         override_xml = True
-        prob_number_of_events_in_zones = 1    # changing this doesn't seem to do anything. 
+        prob_number_of_events_in_zones = 1
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
@@ -419,7 +418,6 @@ class Test_Event_Set(unittest.TestCase):
         # But I added it so the tests would pass
         # Another example file at
         # Q:\python_eqrm\implementation_tests\input\newc_source_polygon.xml
-
         #  polygon is a small square
 
         
@@ -437,14 +435,15 @@ class Test_Event_Set(unittest.TestCase):
         #file_name = os.path.join('..','implementation_tests','input','newc_source_polygon.xml')
         #return
         # need to fix
-        events = Event_Set.generate_synthetic_events(file_name,
-                                                     fault_width,
-                                                     azi,
-                                                     dazi,
-                                                     fault_dip,
-                                                     prob_min_mag_cutoff,
-                                                     override_xml,
-                                                     prob_number_of_events_in_zones=None)
+        events = Event_Set.generate_synthetic_events(
+            file_name,
+            fault_width,
+            azi,
+            dazi,
+            fault_dip,
+            prob_min_mag_cutoff,
+            override_xml,
+            prob_number_of_events_in_zones)
 #         print "events.trace_start_lat", events.trace_start_lat
 #         print " events.trace_start_lon", events.trace_start_lon
 #         print "events.trace_end_lat", events.trace_end_lat
@@ -461,7 +460,6 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(events.rupture_centroid_lon >= 151.0)
         os.remove(file_name)
 
-        #os.remove(fid_genpoly)
         
     def test_event_set_subsetting(self):
         rupture_centroid_lat = [-33.351170370959323, -32.763381339789468]
