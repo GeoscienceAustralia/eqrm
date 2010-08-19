@@ -133,8 +133,8 @@ class Event_Set(object):
     def create(cls, rupture_centroid_lat, rupture_centroid_lon, azimuth,
                dip=None, ML=None, Mw=None, depth=None, fault_width=None,
                fault_depth=None, # Need for generate synthetic events
-               determ_number_of_events=1):
-        """generate a deterministic event set or a synthetic event set.
+               scenario_number_of_events=1):
+        """generate a scenario event set or a synthetic event set.
         Args:
           rupture_centroid_lat: Latitude of rupture centriod
           rupture_centroid_lon: Longitude of rupture centriod
@@ -144,7 +144,7 @@ class Event_Set(object):
           depth: depth to event centroid, km
           fault_width: Maximum width along virtual fault, km
           fault_depth: depth to the top of the seismmogenic region, km.
-          determ_number_of_events: Number of events
+          scenario_number_of_events: Number of events
           
           Note, if you supply either ML or Mw, the other will be
           calculated. If you supply both, it is up to you to ensure that
@@ -156,10 +156,10 @@ class Event_Set(object):
         Returns:
           An event set instance.
          
-    FIXME DSG-EQRM determ_number_of_events is actually how many times
-    the deterministic
+    FIXME DSG-EQRM scenario_number_of_events is actually how many times
+    the scenario
     parameters will be repeated.  But __init__ fails if the parameters
-    represent more than 1 event and determ_number_of_events > 1.
+    represent more than 1 event and scenario_number_of_events > 1.
 
     Should accept a fault type and use that instead of hardcoded 'reverse'.
         """
@@ -171,35 +171,35 @@ class Event_Set(object):
 #         print "fault_width", fault_width
 #         print "fault_depth", fault_depth
         # concatenate vectors to match matlab's treatment of
-        # determ_number_of_events
+        # scenario_number_of_events
         __len__ = '__len__'
-        if determ_number_of_events > 1:
+        if scenario_number_of_events > 1:
             if hasattr(rupture_centroid_lat, __len__):
                 rupture_centroid_lat = \
                     concatenate([rupture_centroid_lat for i in
-                                 range(determ_number_of_events)])
+                                 range(scenario_number_of_events)])
             if hasattr(rupture_centroid_lon, __len__):
                 rupture_centroid_lon = \
                     concatenate([rupture_centroid_lon for i in
-                                 range(determ_number_of_events)])
+                                 range(scenario_number_of_events)])
             if hasattr(azimuth, __len__):
                 azimuth = concatenate([azimuth for i in
-                                       range(determ_number_of_events)])
+                                       range(scenario_number_of_events)])
             if hasattr(dip, __len__):
-                dip = concatenate([dip for i in range(determ_number_of_events)])
+                dip = concatenate([dip for i in range(scenario_number_of_events)])
             if hasattr(depth, __len__):
                 depth = concatenate([depth for i in
-                                     range(determ_number_of_events)])
+                                     range(scenario_number_of_events)])
             if hasattr(ML, __len__):
-                ML = concatenate([ML for i in range(determ_number_of_events)])
+                ML = concatenate([ML for i in range(scenario_number_of_events)])
             if hasattr(Mw, __len__):
-                Mw = concatenate([Mw for i in range(determ_number_of_events)])
+                Mw = concatenate([Mw for i in range(scenario_number_of_events)])
             if fault_width is not None:
                 fault_width = concatenate([[fault_width] for i in 
-                                           range(determ_number_of_events)])
+                                           range(scenario_number_of_events)])
             if fault_depth is not None:
                 fault_depth = concatenate([[fault_depth] for i in
-                                           range(determ_number_of_events)])
+                                           range(scenario_number_of_events)])
 
         # There is a diff between width and fault width.
         # Width is rupture width.
@@ -465,10 +465,10 @@ class Event_Set(object):
 
         return event
 
-    def deterministic_setup(self):
+    def scenario_setup(self):
         """make the event activity a vector
         
-        setup event ids (for deterministic simulations each id
+        setup event ids (for scenario simulations each id
         points to a new copy of the same event.
         These copies are necessary if Monte-Carlo techniques are used
         for things like ground motion and amplification etc.

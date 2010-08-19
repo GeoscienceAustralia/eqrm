@@ -29,6 +29,7 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_MODIFY_TAV, CSM_DAMPING_DO_NOT_MODIFY_TAV
 from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING, \
      CSM_DAMPING_DO_NOT_USE_SMOOTHING
+from eqrm_code.ANUGA_utilities import log
 
 # DSG-DSG this needs more comments.
 """
@@ -43,13 +44,16 @@ Setting an attribute to None is not equivaluent to removing the
 attribute from the set_data.py file, since not all attributes default
 to None.
 
+If an attribute does not have to be defined it is given a default
+value of None.  An attribute without a default has to be defined.
+
 Lists are automatically converted to arrays.
 
 """
 
 ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
-SECOND_LINE = '  EQRM parameter file\n'
+SECOND_LINE = '  EQRM parameter file'
 
 
 CONV_NEW = [{'order': 10.0,
@@ -65,39 +69,74 @@ CONV_NEW = [{'order': 10.0,
                         1: True,
                         0: False},
              'order': 10.02,
-             'new_para': 'is_deterministic'},
+             'new_para': 'is_scenario'},
             {'old_para': 'wdth',
              'order': 10.03,
              'new_para': 'max_width',
              'default': None},
+            {'old_para': 'reset_seed_using_time',
+             'order': 10.05,
+             'new_para': 'reset_seed_using_time',
+             'default': True},
+            {'old_para': 'compress_output',
+             'order': 10.06,
+             'new_para': 'compress_output',
+             'default': False},
+            {'old_para': 'site_loc',
+             'order': 10.07,
+             'new_para': 'site_tag'},
+            {'old_para': 'site_db_tag',
+             'order': 10.075,
+             'new_para': 'site_db_tag',
+             'default': ""},
+            {'old_para': 'rtrn_per',
+             'order': 10.08,
+             'new_para': 'return_periods'},
+            {'old_para': 'inputdir',
+             'order': 10.11,
+             'new_para': 'input_dir'},
+            {'old_para': 'savedir',
+             'order': 10.12,
+             'new_para': 'output_dir'},
+            {'old_para': 'small_site_flag',
+             'values': {None: None,
+                        1: True,
+                        0: False},
+             'order': 10.13,
+             'new_para': 'use_site_indexes',
+             'default': False},
+            {'old_para': 'SiteInd',
+             'order': 10.14,
+             'new_para': 'site_indexes',
+             'default': None},
             {'order': 30.0,
-             'title': '\n# Deterministic input\n'},
+             'title': '\n# Scenario input\n'},
             {'old_para': 'determ_azi',
              'order': 30.02,
-             'new_para': 'determ_azimith',
+             'new_para': 'scenario_azimuth',
              'default': None},
             {'old_para': 'determ_r_z',
              'order': 30.03,
-             'new_para': 'determ_depth',
+             'new_para': 'scenario_depth',
              'default': None},
             {'old_para': 'determ_lat',
              'order': 30.04,
-             'new_para': 'determ_latitude',
+             'new_para': 'scenario_latitude',
              'default': None},
             {'old_para': 'determ_lon',
              'order': 30.05,
-             'new_para': 'determ_longitude',
+             'new_para': 'scenario_longitude',
              'default': None},
             {'old_para': 'determ_mag',
              'order': 30.06,
-             'new_para': 'determ_magnitude',
+             'new_para': 'scenario_magnitude',
              'default': None},
             {'order': 30.07,
-             'new_para': 'determ_dip',
+             'new_para': 'scenario_dip',
              'default': None},
             {'old_para': 'determ_ntrg',
              'order': 30.08,
-             'new_para': 'determ_number_of_events',
+             'new_para': 'scenario_number_of_events',
              'default': None},
             {'order': 40.0,
              'title': '\n# Probabilistic input\n'},
@@ -133,19 +172,12 @@ CONV_NEW = [{'order': 10.0,
              'new_para': 'atten_model_weights',
              'default': [1]},
             {'order': 50.03,
-             'new_para': 'atten_aggregate_Sa_of_atten_models',
-             'default': True},
-            {'old_para': 'var_attn_flag',
-             'values': {None: None,
-                        1: True,
-                        0: False},
-             'order': 50.04,
-             'new_para': 'atten_use_variability',
+             'new_para': 'atten_collapse_Sa_of_atten_models',
              'default': False},
             {'old_para': 'var_attn_method',
              'order': 50.05,
              'new_para': 'atten_variability_method',
-             'default': None},
+             'default': 2},
             {'old_para': 'periods',
              'order': 50.06,
              'new_para': 'atten_periods'},
@@ -153,15 +185,12 @@ CONV_NEW = [{'order': 10.0,
              'order': 50.07,
              'new_para': 'atten_threshold_distance',
              'default': 400},
-            {'order': 50.08,
-             'new_para': 'atten_use_rescale_curve_from_pga',
-             'default': False},
             {'old_para': 'resp_crv_flag',
              'values': {0: None,
                         2: 'Aust_standard_Sa',
                         4: 'HAZUS_Sa'},
              'order': 50.09,
-             'new_para': 'atten_rescale_curve_from_pga',
+             'new_para': 'atten_override_RSA_shape',
              'default': None},
             {'order': 50.10,
              'new_para': 'atten_cutoff_max_spectral_displacement',
@@ -189,17 +218,10 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 60.01,
              'new_para': 'use_amplification'},
-            {'old_para': 'var_amp_flag',
-             'values': {None: None,
-                        1: True,
-                        0: False},
-             'order': 60.02,
-             'new_para': 'amp_use_variability',
-             'default': False},
             {'old_para': 'var_amp_method',
              'order': 60.03,
              'new_para': 'amp_variability_method',
-             'default': None},
+             'default': 2},
             {'old_para': 'MinAmpFactor',
              'order': 60.04,
              'new_para': 'amp_min_factor',
@@ -240,7 +262,7 @@ CONV_NEW = [{'order': 10.0,
             {'old_para': 'bcap_var_method',
              'order': 80.02,
              'new_para': 'csm_variability_method',
-             'default': None},
+             'default': 3},
             {'old_para': 'stdcap',
              'order': 80.03,
              'new_para': 'csm_standard_deviation',
@@ -253,9 +275,6 @@ CONV_NEW = [{'order': 10.0,
              'default': None},
             {'order': 80.06,
              'new_para': 'csm_damping_use_smoothing',
-             'default': None},
-            {'order': 80.07,
-             'new_para': 'csm_use_hysteretic_damping',
              'default': None},
             {'old_para': 'Harea_flag',
              'values': {None: None,
@@ -297,11 +316,11 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 100.01,
              'new_para': 'save_hazard_map',
-             'default': None},
+             'default': False},
             {'old_para': 'save_total_financial_loss',
              'order': 100.02,
              'new_para': 'save_total_financial_loss',
-             'default': None},
+             'default': False},
             {'old_para': 'save_building_loss',
              'order': 100.03,
              'new_para': 'save_building_loss',
@@ -323,44 +342,8 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 100.06,
              'new_para': 'save_prob_structural_damage',
-             'default': False},
-            {'order': 110.0,
-             'title': '\n# General\n'},
-            {'old_para': 'reset_seed_using_time',
-             'order': 110.02,
-             'new_para': 'reset_seed_using_time',
-             'default': True},
-            {'old_para': 'compress_output',
-             'order': 110.03,
-             'new_para': 'compress_output',
-             'default': False},
-            {'old_para': 'site_loc',
-             'order': 110.04,
-             'new_para': 'site_tag'},
-            {'old_para': 'rtrn_per',
-             'order': 110.05,
-             'new_para': 'return_periods'},
-            {'old_para': 'small_site_flag',
-             'values': {None: None,
-                        1: True,
-                        0: False},
-             'order': 110.06,
-             'new_para': 'use_site_indexes',
-             'default': False},
-            {'old_para': 'SiteInd',
-             'order': 110.07,
-             'new_para': 'site_indexes',
-             'default': None},
-            {'old_para': 'site_db_tag',
-             'order': 110.09,
-             'new_para': 'site_db_tag',
-             'default': ""},
-            {'old_para': 'inputdir',
-             'order': 110.10,
-             'new_para': 'input_dir'},
-            {'old_para': 'savedir',
-             'order': 110.11,
-             'new_para': 'output_dir'}]
+             'default': False}
+            ]
 
 OLD_STYLE_PARAS_HARD_WIRED = {'hazus_btypes_flag':0, 'force_btype_flag':0,
                               'buildpars_flag':4, 'grid_flag':1}
@@ -369,6 +352,24 @@ KNOWN_KWARGS = {'use_determ_seed':None,
                      'eqrm_dir':None,
                      'is_parallel':None,
                      'default_input_dir':None}
+
+DEPRECIATED_PARAS = {'atten_use_variability':
+                     {True:None,
+                      False:('atten_variability_method', None)},
+                     'amp_use_variability':
+                     {True:None,
+                      False:('amp_variability_method', None)},
+                     'atten_use_rescale_curve_from_pga':
+                     {True:None, # None means do nothing
+                      False:('atten_override_RSA_shape', None)},
+                     'csm_use_hysteretic_damping':
+                     {True:None, # None means do nothing
+                      False:('csm_hysteretic_damping', None)},
+#                      'csm_use_variability':
+#                      {True:None, # None means do nothing
+#                       None:('csm_variability_method', None), 
+#                       False:('csm_variability_method', None)},
+                     }
 
 # This has all allowable set_data variables
 CONV_DIC_NEW = {}
@@ -380,7 +381,7 @@ CONV_DIC_NEW.update(OLD_STYLE_PARAS_HARD_WIRED)
 
 
 PAR_STYLE_TITLES = [{'title':'\n# Operation Mode\n', 'order':10.0},
-                    {'title':'\n# Deterministic input\n', 'order':30.0},
+                    {'title':'\n# Scenario input\n', 'order':30.0},
                     {'title':'\n# Probabilistic input\n', 'order':40.0},
                     {'title':'\n# Attenuation\n', 'order':50.0},
                     {'title':'\n# Amplification\n', 'order':60.0},
@@ -390,7 +391,6 @@ PAR_STYLE_TITLES = [{'title':'\n# Operation Mode\n', 'order':10.0},
                     {'title':'\n# Loss\n', 'order':90.0},
                     {'title':'\n# Save\n', 'order':100.0},
                     {'title':'\n# General\n', 'order':110.0}]
-
 
 
 class Error(Exception):
@@ -425,6 +425,7 @@ def create_parameter_data(parameters, **kwargs):
     """
     if isinstance(parameters, str) and parameters[-3:] == ".py":
         parameters = from_file_get_params(parameters)
+        #print "parameters", parameters
     elif isinstance(parameters, dict):
         parameters = get_no_instance_params(parameters)
     else:
@@ -438,8 +439,12 @@ def create_parameter_data(parameters, **kwargs):
     # Add Hard-wired results  
     THE_PARAM_T.update(OLD_STYLE_PARAS_HARD_WIRED)
 
+    #print "THE_PARAM_T", THE_PARAM_T
     # Add default values
     att_default_values(THE_PARAM_T)
+
+    # Remove depreciated attributes
+    depreciated_attributes(THE_PARAM_T)
    
     # Check att names
     conv_new_dic = {}
@@ -478,7 +483,25 @@ def att_default_values(THE_PARAM_T):
                 raise ParameterSyntaxError(
                 "Parameter Error: Attribute "  + item['new_para']
                 + " must be defined.")
+
+def depreciated_attributes(THE_PARAM_T):
+    """Remove depreciated attributes
+    """
+        
+    for item in DEPRECIATED_PARAS:
+        if THE_PARAM_T.has_key(item):
+            logic_dic = DEPRECIATED_PARAS[item]
+            what_to_do = logic_dic[THE_PARAM_T[item]]
+            if what_to_do is not None:
+                # The value is a tuple.
+                # the first value is the att name
+                # the second value is the att value
+                THE_PARAM_T[what_to_do[0]] = what_to_do[1]
                 
+            msg = 'WARNING: ' + item + \
+                  ' term in set data files is depreciated.' 
+            log.info(msg)
+            del THE_PARAM_T[item]
 
 def att_value_fixes(THE_PARAM_T):
     """
@@ -503,7 +526,7 @@ def att_value_fixes(THE_PARAM_T):
     except:
         len_prob_number_of_events_in_zones=1 # if only 1 zone
     
-    if THE_PARAM_T.is_deterministic ==0:
+    if THE_PARAM_T.is_scenario ==0:
         THE_PARAM_T['prob_dip_in_zones'] = scalar2vec(
             THE_PARAM_T.prob_dip_in_zones,len_prob_number_of_events_in_zones)
         THE_PARAM_T['prob_azimuth_in_zones'] = scalar2vec(
@@ -513,7 +536,7 @@ def att_value_fixes(THE_PARAM_T):
             THE_PARAM_T.prob_delta_azimuth_in_zones,
             len_prob_number_of_events_in_zones)
     
-    if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_deterministic == 0:
+    if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_scenario == 0:
             raise ValueError('do not save motion for a generated event')
 
     weights = THE_PARAM_T.atten_model_weights    
@@ -568,12 +591,14 @@ def change_slashes(path):
             path = apply(join, split_path)
     return path
 
-            
+
+unique_load_source_int = 0            
 def from_file_get_params(path_file):
+    global unique_load_source_int
     head, tail = os.path.split(os.path.abspath(path_file))
-        
-    tail = tail[:-3] # remove .py
-    para_imp = imp.load_source(head, path_file)
+    name = 'name_' + str(unique_load_source_int)
+    unique_load_source_int += 1
+    para_imp = imp.load_source(name, path_file)
     # FIXME big hack.  The Parameter_data instance name is hard-wired
     # Have it parse the 'sdp = Parameter_data()' line for the name
     try:
@@ -612,10 +637,10 @@ def verify_THE_PARAM_T(THE_PARAM_T):
                 "When using BA09 attenuation model" +
                 " do not use amplification.")
                 
-    if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_deterministic == 1 \
-            and THE_PARAM_T.determ_number_of_events > 1:
+    if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_scenario == 1 \
+            and THE_PARAM_T.scenario_number_of_events > 1:
       raise ParameterSyntaxError(
-      'cannot save motion for a deterministic scenario' + 
+      'cannot save motion for a scenario scenario' + 
                        ' with more than one event.')
     
     # FIXME This needs to be done, and be updated.
@@ -640,15 +665,15 @@ def find_set_data_py_files(path=None):
                 f = open(file_path_name,'r')
                 _ = f.readline()
                 snd_line = f.readline()
-                if SECOND_LINE == snd_line:
-                    set_data_files.append(file_path_name)        
+                if SECOND_LINE in snd_line:
+                    set_data_files.append(file_path_name)  
                 f.close()
     return set_data_files
 
 def old_set_data_py_2_new_set_data_py(file_name_path,
                                       new_file_name_path=None):
     """Open a set data .py file and then save it again,
-    using the CONV_NEW rules.
+    using the CONV_NEW rules and depreciation rules.
 
     Used to move attributes position around for all of the
     set_data.py files in the sandpit
@@ -658,6 +683,8 @@ def old_set_data_py_2_new_set_data_py(file_name_path,
     if new_file_name_path is None:
         new_file_name_path = file_name_path
     parameters = from_file_get_params(file_name_path)
+    # Remove depreciated attributes
+    depreciated_attributes(parameters)
     convert_attribute_dic_to_set_data_py(new_file_name_path, parameters)
     
     
@@ -665,6 +692,8 @@ def introspect_attribute_values(instance):
     """
     Puts all the attribite values of the instance into a dictionary
     """
+    #for att in dir(instance):
+     #   print "att", att
     attributes = [att for att in dir(instance) if not callable(
         getattr(instance, att)) and not att[-2:] == '__']
     att_values = {}
@@ -777,9 +806,9 @@ class Parameter_data(object):
         return "_".join((time, user))
         
 def convert_attribute_dic_to_set_data_py(py_file_name, attribute_dic):
-    """
-    Given THE_PARAM_T convert it to a set data .py file.
-    set data .py files describe the EQRM parameters.
+    """ Given a dictionary of the set data attribute values convert it
+    to a set data .py file.  set data .py files describe the EQRM
+    parameters.
 
     py_file_name: Name of the new file.
 
