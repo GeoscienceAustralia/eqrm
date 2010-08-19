@@ -140,7 +140,7 @@ class Test_Event_Set(unittest.TestCase):
         THE_PARAM_T = Dummy()
         THE_PARAM_T.scenario_latitude = -32.95
         THE_PARAM_T.scenario_longitude = 151.61
-        THE_PARAM_T.scenario_azimith = 340
+        THE_PARAM_T.scenario_azimuth = 340
         THE_PARAM_T.dip = 35
         THE_PARAM_T.scenario_magnitude = 8
         THE_PARAM_T.max_width = 15
@@ -150,7 +150,7 @@ class Test_Event_Set(unittest.TestCase):
         event_set = Event_Set.create(
             rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
             rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
-            azimuth=[THE_PARAM_T.scenario_azimith],
+            azimuth=[THE_PARAM_T.scenario_azimuth],
             dip=[THE_PARAM_T.dip],
             Mw=[THE_PARAM_T.scenario_magnitude],
             fault_width=THE_PARAM_T.max_width,
@@ -164,7 +164,7 @@ class Test_Event_Set(unittest.TestCase):
         answer = array(THE_PARAM_T.scenario_longitude)
         self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array(THE_PARAM_T.scenario_azimith)
+        answer = array(THE_PARAM_T.scenario_azimuth)
         self.assert_ (allclose(event_set.azimuth, answer))
         
         answer = array(THE_PARAM_T.dip)
@@ -197,7 +197,7 @@ class Test_Event_Set(unittest.TestCase):
         THE_PARAM_T = Dummy()
         THE_PARAM_T.scenario_latitude = [-30., -32.]
         THE_PARAM_T.scenario_longitude = [150., -151.]
-        THE_PARAM_T.scenario_azimith = [340, 330]
+        THE_PARAM_T.scenario_azimuth = [340, 330]
         THE_PARAM_T.dip = [37, 30]
         THE_PARAM_T.scenario_magnitude = [8, 7.5]
         THE_PARAM_T.max_width = [15, 7]
@@ -207,7 +207,7 @@ class Test_Event_Set(unittest.TestCase):
         event_set = Event_Set.create(
             rupture_centroid_lat=THE_PARAM_T.scenario_latitude,
             rupture_centroid_lon=THE_PARAM_T.scenario_longitude,
-            azimuth=THE_PARAM_T.scenario_azimith,
+            azimuth=THE_PARAM_T.scenario_azimuth,
             dip=THE_PARAM_T.dip,
             Mw=THE_PARAM_T.scenario_magnitude,
             fault_width=THE_PARAM_T.max_width,
@@ -222,7 +222,7 @@ class Test_Event_Set(unittest.TestCase):
         answer = array(THE_PARAM_T.scenario_longitude)
         self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array(THE_PARAM_T.scenario_azimith)
+        answer = array(THE_PARAM_T.scenario_azimuth)
         self.assert_ (allclose(event_set.azimuth, answer))
         
         answer = array(THE_PARAM_T.dip)
@@ -257,7 +257,7 @@ class Test_Event_Set(unittest.TestCase):
         THE_PARAM_T = Dummy()
         THE_PARAM_T.scenario_latitude = -32.95
         THE_PARAM_T.scenario_longitude = 151.61
-        THE_PARAM_T.scenario_azimith = 340
+        THE_PARAM_T.scenario_azimuth = 340
         THE_PARAM_T.dip = 35
         THE_PARAM_T.scenario_magnitude = 8
         THE_PARAM_T.max_width = 15
@@ -267,7 +267,7 @@ class Test_Event_Set(unittest.TestCase):
         event_set = Event_Set.create(
             rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
             rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
-            azimuth=[THE_PARAM_T.scenario_azimith],
+            azimuth=[THE_PARAM_T.scenario_azimuth],
             dip=[THE_PARAM_T.dip],
             Mw=[THE_PARAM_T.scenario_magnitude],
             fault_width=THE_PARAM_T.max_width,
@@ -281,7 +281,7 @@ class Test_Event_Set(unittest.TestCase):
         answer = array((THE_PARAM_T.scenario_longitude, THE_PARAM_T.scenario_longitude))
         self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array([THE_PARAM_T.scenario_azimith, THE_PARAM_T.scenario_azimith])
+        answer = array([THE_PARAM_T.scenario_azimuth, THE_PARAM_T.scenario_azimuth])
         self.assert_ (allclose(event_set.azimuth, answer))
         
         answer = array([THE_PARAM_T.dip, THE_PARAM_T.dip])
@@ -321,7 +321,7 @@ class Test_Event_Set(unittest.TestCase):
         THE_PARAM_T = Dummy()
         THE_PARAM_T.scenario_latitude = [-30.]
         THE_PARAM_T.scenario_longitude = [150.]
-        THE_PARAM_T.scenario_azimith = [0]
+        THE_PARAM_T.scenario_azimuth = [0]
         THE_PARAM_T.dip = [45]
         THE_PARAM_T.scenario_magnitude = [6.02]
         THE_PARAM_T.max_width = [5]
@@ -331,7 +331,7 @@ class Test_Event_Set(unittest.TestCase):
         event_set = Event_Set.create(
             rupture_centroid_lat=THE_PARAM_T.scenario_latitude,
             rupture_centroid_lon=THE_PARAM_T.scenario_longitude,
-            azimuth=THE_PARAM_T.scenario_azimith,
+            azimuth=THE_PARAM_T.scenario_azimuth,
             dip=THE_PARAM_T.dip,
             Mw=THE_PARAM_T.scenario_magnitude,
             fault_width=THE_PARAM_T.max_width,

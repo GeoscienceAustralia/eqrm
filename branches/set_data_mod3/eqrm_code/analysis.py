@@ -158,7 +158,7 @@ def main(parameter_handle,
         event_set = Event_Set.create(
             rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
             rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
-            azimuth=[THE_PARAM_T.scenario_azimith],
+            azimuth=[THE_PARAM_T.scenario_azimuth],
             dip=[THE_PARAM_T.scenario_dip],
             Mw=[THE_PARAM_T.scenario_magnitude],
             depth=[THE_PARAM_T.scenario_depth],

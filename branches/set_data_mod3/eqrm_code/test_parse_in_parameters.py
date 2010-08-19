@@ -57,7 +57,7 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\n\
 [Scenario]\n\
-scenario_azimith=[340]\n\
+scenario_azimuth=[340]\n\
 scenario_depth=[11.5]\n\
 scenario_latitude=[-32.95]\n\
 scenario_magnitude=[5.6]\n\
@@ -160,7 +160,7 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\n\
 [Scenario]\n\
-scenario_azimith=[340]\n\
+scenario_azimuth=[340]\n\
 scenario_depth=[11.5]\n\
 scenario_latitude=[-32.95]\n\
 scenario_magnitude=[5.6]\n\
@@ -256,7 +256,7 @@ save_socloss_flag=[1]\n")
         set.return_periods = [22,11]
         
         # Scenario input 
-        set.scenario_azimith = 20
+        set.scenario_azimuth = 20
         set.scenario_depth = 11.5
         set.scenario_latitude = 32.
         set.scenario_longitude = 151.
@@ -276,7 +276,7 @@ save_socloss_flag=[1]\n")
         #  Attenuation   
         set.atten_models = ['my_attenuation_model','Gaull_1990_WA']
         set.atten_model_weights = [0.3,0.7]
-        set.atten_aggregate_Sa_of_atten_models = False 
+        set.atten_collapse_Sa_of_atten_models = False 
         set.atten_variability_method = 2 
         set.atten_periods = [0,0.30303,1]
         set.atten_threshold_distance = 400
@@ -340,7 +340,7 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.use_site_indexes == 1)
         
         self.failUnless(TPT.is_scenario == True)
-        self.failUnless(TPT.scenario_azimith == 20)
+        self.failUnless(TPT.scenario_azimuth == 20)
         self.failUnless(TPT.scenario_depth == 11.5)
         self.failUnless(TPT.scenario_latitude == 32.)
         self.failUnless(TPT.scenario_longitude == 151.)
@@ -453,7 +453,7 @@ save_socloss_flag=[1]\n")
         set.return_periods = [22,11]
         
         # Scenario input 
-        set.scenario_azimith = 20
+        set.scenario_azimuth = 20
         set.scenario_depth = 11.5
         set.scenario_latitude = 32.
         set.scenario_longitude = 151.
@@ -473,7 +473,7 @@ save_socloss_flag=[1]\n")
         #  Attenuation   
         set.atten_models = ['my_attenuation_model','Gaull_1990_WA']
         set.atten_model_weights = [0.3,0.7]
-        set.atten_aggregate_Sa_of_atten_models = False 
+        set.atten_collapse_Sa_of_atten_models = False 
         set.atten_use_variability = True
         set.atten_variability_method = 2 
         set.atten_periods = [0,0.30303,1]
@@ -557,7 +557,7 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\
 [Scenario]\n\
-scenario_azimith=[340]\n\
+scenario_azimuth=[340]\n\
 scenario_depth=[11.5]\n\
 scenario_latitude=[-32.95]\n\
 scenario_magnitude=[5.6]\n\
@@ -642,7 +642,7 @@ save_socloss_flag=[0]\n")
         
         # Scenario input   (single event input, with event_azimuth ect.)
         set.is_scenario = True   # If False, probabilistic input used
-        set.scenario_azimith = 340
+        set.scenario_azimuth = 340
         set.scenario_depth = 11.5
         set.scenario_latitude = -32.95
         set.scenario_longitude = 151.61
@@ -662,7 +662,7 @@ save_socloss_flag=[0]\n")
         #  Attenuation   
         set.atten_models = [3]
         set.atten_model_weights = [1]
-        set.atten_aggregate_Sa_of_atten_models = True
+        set.atten_collapse_Sa_of_atten_models = True
         set.atten_use_variability = True
         set.atten_variability_method = 2 
         set.atten_periods = [0,0.30303,1]
@@ -772,7 +772,7 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\
 [Scenario]\n\
-scenario_azimith=[340]\n\
+scenario_azimuth=[340]\n\
 scenario_depth=[11.5]\n\
 scenario_latitude=[-32.95]\n\
 scenario_magnitude=[5.6]\n\
@@ -892,7 +892,7 @@ save_socloss_flag=[0]\n")
         set.atten_periods = [0,0.30303,1]
         set.atten_models = ['Gaull_1990_WA']
         set.atten_model_weights = [1.]
-        set.atten_aggregate_Sa_of_atten_models = False
+        set.atten_collapse_Sa_of_atten_models = False
         set.save_motion = False
         set.is_scenario = True    # If False, probabilistic input used
         set.input_dir = '.'
@@ -996,7 +996,7 @@ save_socloss_flag=[0]\n")
             'Loss': {'loss_regional_cost_index_multiplier': 1.45,
                      'loss_min_pga': 0.05,
                      'loss_aus_contents': 0},
-            'Scenario': {'scenario_azimith': 340,
+            'Scenario': {'scenario_azimuth': 340,
                          'scenario_depth': 11.5,
                          'scenario_latitude': -32.,
                          'scenario_magnitude': 6.0,

@@ -24,7 +24,7 @@ sdp.is_scenario = False
 sdp.max_width = 15
 
 # Scenario input
-sdp.scenario_azimith = 340
+sdp.scenario_azimuth = 340
 sdp.scenario_depth = 11.5
 sdp.scenario_latitude = -32.95
 sdp.scenario_longitude = 151.61
@@ -43,7 +43,7 @@ sdp.prob_dip_in_zones = [35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35,
 # Attenuation
 sdp.atten_models = ['Boore_08']
 sdp.atten_model_weights = [1]
-sdp.atten_aggregate_Sa_of_atten_models = True
+sdp.atten_collapse_Sa_of_atten_models = True
 sdp.atten_use_variability = True
 sdp.atten_variability_method = 2
 sdp.atten_periods = [0.0, 0.30303, 1.0]

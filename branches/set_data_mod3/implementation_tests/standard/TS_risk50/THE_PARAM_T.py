@@ -29,7 +29,7 @@ use_site_indexes = True
 site_indexes = [1684, 4006, 4135, 1676, 3674, 3875, 17, 6267, 5360, 6268, 6240, 3228, 2383, 468, 71, 2317, 2183, 2694, 5237, 665, 401, 659, 3472, 4126, 2653, 1446, 3845, 1902, 6294, 567, 2222, 4659, 4951, 291, 2372]
 
 # Scenario input
-scenario_azimith = 340
+scenario_azimuth = 340
 scenario_depth = 11.5
 scenario_latitude = -32.95
 scenario_longitude = 151.61
