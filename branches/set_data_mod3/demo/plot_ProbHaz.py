@@ -29,7 +29,7 @@ use_site_indexes = False
 site_indexes = 2255
 
 # Scenario input
-scenario_azimith = 340
+scenario_azumith = 340
 scenario_depth = 11.5
 scenario_latitude = -32.95
 scenario_longitude = 151.61
