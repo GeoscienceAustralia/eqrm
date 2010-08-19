@@ -48,7 +48,7 @@ prob_dip_in_zones = [35, 35, 35, 35, 35, 35]
 # Attenuation
 atten_models = ['Toro_1997_midcontinent']
 atten_model_weights = [1.0]
-atten_aggregate_Sa_of_atten_models = False
+atten_collapse_Sa_of_atten_models = False
 atten_variability_method = 2
 atten_periods = [0.0, 0.17499999999999999, 0.29999999999999999, 0.80000000000000004, 1.0, 1.2, 1.3999999999999999, 1.6000000000000001, 1.8, 2.1000000000000001, 3.3999999999999999]
 atten_threshold_distance = 400
