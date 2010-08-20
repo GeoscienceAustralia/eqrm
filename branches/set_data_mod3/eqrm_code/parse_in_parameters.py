@@ -514,7 +514,6 @@ def depreciated_attributes(THE_PARAM_T):
     Remove/fix depreciated attributes.
     Give a warning.
     """
-    print "p in p shining" 
     for item in DEPRECIATED_PARAS:
         if THE_PARAM_T.has_key(item):
             handle_logic = DEPRECIATED_PARAS[item]
