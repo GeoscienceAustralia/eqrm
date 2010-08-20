@@ -30,8 +30,8 @@ from eqrm_code.ANUGA_utilities import log as eqrmlog
 
 # This specifies the dtypes used in  event set.
 # This is used ot save memory
-EVENT_FLOAT = float64 #float32
-EVENT_INT = int64 #int32
+EVENT_FLOAT = float64 #float32 #f
+EVENT_INT = int64 # int32 # 
 
 ######
 # Define the mapping from fault type NAME to integer INDEX.
@@ -635,7 +635,7 @@ def _calc_attenuation_logic_split(GM_models, model_weights,
                                   event_activity, event_num):
     """event_activity has to be an array"""
 
-    model_weights = absolute(array(model_weights))
+    model_weights = array(model_weights)
 
     new_event_num = []
     new_event_activity = []
