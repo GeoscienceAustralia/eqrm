@@ -1,2 +1,0 @@
-% Joyner_Boore distance. Columns are sites, rows are events
-82.3
