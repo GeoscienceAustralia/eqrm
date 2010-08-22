@@ -114,7 +114,100 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         self.failUnless(source_model._magnitude_type=='Mw','Failed!')
 
+    
+    def test_source_model_from_xml_horspool(self):
         
+        handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
+        print "file_name", file_name
+        os.close(handle)
+        handle = open(file_name,'w')
+        
+        sample = """<source_model_zone magnitude_type="Mw">
+  <zone 
+  area = "5054.035" 
+  name = "bad zone">
+    
+    <geometry 
+       azimuth= "6" 
+       delta_azimuth= "2" 
+       dip= "15"
+       delta_dip = "5"
+       depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "30">
+      <boundary>
+	  151.1500 -32.4000  
+	  152.1700 -32.7500
+	  151.4300 -33.4500  
+	  151.1500 -32.4000
+      </boundary>
+      <excludes>
+	  151.1500 -32.4000    
+	  152.1700 -32.7500   
+	  151.4300 -33.4500 
+      </excludes>
+    </geometry>
+    
+    <recurrence_model
+      distribution = "bounded_gutenberg_richter"
+      recurrence_min_mag = "3.3" 
+      recurrence_max_mag = "5.4" 
+      lambda_min= "0.568" 
+      b = "1">
+      <event_generation 
+      generation_min_mag = "3.3"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "1000" />
+    </recurrence_model>
+    
+    <ground_motion_models 
+       faulting_type = "normal" 
+       ground_motion_selection = "crustal fault" />   
+  </zone>
+</source_model_zone>
+"""
+        handle.write(sample)
+        handle.close()
+
+
+        prob_min_mag_cutoff = 1.0
+        source_model = source_model_from_xml(file_name,
+                                             prob_min_mag_cutoff)
+        os.remove(file_name)
+        boundary = [(151.1500, -32.4000), 
+                    (152.1700, -32.7500),
+                    (151.4300, -33.4500),
+                    (151.1500, -32.4000)]
+        exclude = None # This is not tested
+                       #[(151.1500, -32.4000),
+                       #(152.1700, -32.7500),
+                       #(151.4300, -33.4500)]
+        min_magnitude = 3.3
+        max_magnitude = 5.4
+        b = 1
+        Lambda_Min = 0.568
+        szp = Source_Zone_Polygon(boundary,exclude,
+                                  min_magnitude,max_magnitude,
+                                  prob_min_mag_cutoff,
+                                  Lambda_Min,b)
+        #print "source_zone_polygon.polygon_object", szp._linestring
+        result = source_model._source_zone_polygons[0]
+        self.failUnless( result._linestring==szp._linestring,
+            'Failed!')
+        self.failUnless( result.min_magnitude==szp.min_magnitude,
+            'Failed!')
+        self.failUnless( result.max_magnitude==szp.max_magnitude,
+            'Failed!')
+        self.failUnless( result.b==szp.b,
+            'Failed!')
+        self.failUnless( result.Lambda_Min==szp.Lambda_Min,
+            'Failed!')
+        self.failUnless( result.prob_min_mag_cutoff==
+                         szp.prob_min_mag_cutoff,
+            'Failed!')
+        self.failUnless(source_model._magnitude_type==
+                        'Mw','Failed!')
+
+    
     def test_Source_Zone_Polygon(self):
         prob_min_mag_cutoff = 1.0
         boundary = [(0, 0.0), (100., 0.0), (100., 100.0), (0., 100.0) ]
@@ -193,6 +286,7 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         # this fails using self.__contains_point_geo(point)
         self.assert_ (allclose(array(actual),event_activity))
+
         
 #-------------------------------------------------------------
 if __name__ == "__main__":
