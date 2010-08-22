@@ -57,13 +57,13 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\n\
 [Scenario]\n\
-determ_azimith=[340]\n\
-determ_depth=[11.5]\n\
-determ_latitude=[-32.95]\n\
-determ_magnitude=[5.6]\n\
-determ_number_of_events=[167]\n\
-determ_longitude=[151.61]\n\
-is_deterministic=[0]\n\n\
+scenario_azimuth=[340]\n\
+scenario_depth=[11.5]\n\
+scenario_latitude=[-32.95]\n\
+scenario_magnitude=[5.6]\n\
+scenario_number_of_events=[167]\n\
+scenario_longitude=[151.61]\n\
+is_scenario=[0]\n\n\
 [Attenuation]\n\
 atten_smooth_spectral_acceleration=[0]\n\
 atten_pga_scaling_cutoff=[2]\n\
@@ -71,7 +71,7 @@ attenuation_flag=[1,2,8;-0.33333,-0.33333,-0.33333]\n\
 atten_use_variability=[1]\n\
 atten_variability_method=[2]\n\
 atten_periods=[0,0.17544,0.35088,0.52632,0.70175,0.87719,1.0526,1.2281,1.4035,1.5789,1.7544,1.9298,2.1053,2.2807,2.4561,2.6316,2.807,2.9825,3.1579,3.3333]\n\
-atten_rescale_curve_from_pga=[0]\n\
+atten_override_RSA_shape=[0]\n\
 atten_threshold_distance=[400]\n\
 atten_log_sigma_eq_weight=[0]\n\n\
 [Amplification]\n\
@@ -160,13 +160,13 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\n\
 [Scenario]\n\
-determ_azimith=[340]\n\
-determ_depth=[11.5]\n\
-determ_latitude=[-32.95]\n\
-determ_magnitude=[5.6]\n\
-determ_number_of_events=[167]\n\
-determ_longitude=[151.61]\n\
-is_deterministic=[0]\n\n\
+scenario_azimuth=[340]\n\
+scenario_depth=[11.5]\n\
+scenario_latitude=[-32.95]\n\
+scenario_magnitude=[5.6]\n\
+scenario_number_of_events=[167]\n\
+scenario_longitude=[151.61]\n\
+is_scenario=[0]\n\n\
 [Attenuation]\n\
 atten_smooth_spectral_acceleration=[0]\n\
 atten_pga_scaling_cutoff=[2]\n\
@@ -174,7 +174,7 @@ attenuation_flag=[8;-1]\n\
 atten_use_variability=[1]\n\
 atten_variability_method=[2]\n\
 atten_periods=[0,0.17544,0.35088,0.52632,0.70175,0.87719,1.0526,1.2281,1.4035,1.5789,1.7544,1.9298,2.1053,2.2807,2.4561,2.6316,2.807,2.9825,3.1579,3.3333]\n\
-atten_rescale_curve_from_pga=[0]\n\
+atten_override_RSA_shape=[0]\n\
 atten_threshold_distance=[400]\n\
 atten_log_sigma_eq_weight=[0]\n\n\
 [Amplification]\n\
@@ -244,7 +244,7 @@ save_socloss_flag=[1]\n")
         set = Dummy()
         # Operation_Mode
         set.run_type = 'risk'
-        set.is_deterministic = True    # If False, probabilistic input used
+        set.is_scenario = True    # If False, probabilistic input used
 
         # General
         set.use_site_indexes = True
@@ -255,14 +255,14 @@ save_socloss_flag=[1]\n")
         set.output_dir = 'c:/out/'
         set.return_periods = [22,11]
         
-        # Deterministic input 
-        set.determ_azimith = 20
-        set.determ_depth = 11.5
-        set.determ_latitude = 32.
-        set.determ_longitude = 151.
-        set.determ_magnitude = 5.
-        set.determ_dip= 35  
-        set.determ_number_of_events = 1
+        # Scenario input 
+        set.scenario_azimuth = 20
+        set.scenario_depth = 11.5
+        set.scenario_latitude = 32.
+        set.scenario_longitude = 151.
+        set.scenario_magnitude = 5.
+        set.scenario_dip= 35  
+        set.scenario_number_of_events = 1
 
         # Probabilistic input
         set.prob_azimuth_in_zones = [10,30]
@@ -276,21 +276,18 @@ save_socloss_flag=[1]\n")
         #  Attenuation   
         set.atten_models = ['my_attenuation_model','Gaull_1990_WA']
         set.atten_model_weights = [0.3,0.7]
-        set.atten_aggregate_Sa_of_atten_models = False 
-        set.atten_use_variability = True
+        set.atten_collapse_Sa_of_atten_models = False 
         set.atten_variability_method = 2 
         set.atten_periods = [0,0.30303,1]
         set.atten_threshold_distance = 400
         set.atten_cutoff_max_spectral_displacement  = True
         set.atten_pga_scaling_cutoff = 4.3  # None or a value
-        set.atten_use_rescale_curve_from_pga = True
-        set.atten_rescale_curve_from_pga = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
+        set.atten_override_RSA_shape = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
         set.atten_smooth_spectral_acceleration = True
         set.atten_log_sigma_eq_weight = 1.0
 
         #  Amplification  
         set.use_amplification = True  
-        set.amp_use_variability = True
         set.amp_variability_method = 2 
         set.amp_min_factor = 0.6
         set.amp_max_factor = 2
@@ -310,7 +307,6 @@ save_socloss_flag=[1]\n")
         set.csm_damping_regimes = 0       # (0|1|2) See manual for this
         set.csm_damping_modify_Tav = True 
         set.csm_damping_use_smoothing = True
-        set.csm_use_hysteretic_damping = True
         set.csm_hysteretic_damping = 'curve'    # ('curve'|'trapezoidal'|None)
         set.csm_SDcr_tolerance_percentage = 2
         set.csm_damping_max_iterations = 7
@@ -343,13 +339,13 @@ save_socloss_flag=[1]\n")
         
         self.failUnless(TPT.use_site_indexes == 1)
         
-        self.failUnless(TPT.is_deterministic == True)
-        self.failUnless(TPT.determ_azimith == 20)
-        self.failUnless(TPT.determ_depth == 11.5)
-        self.failUnless(TPT.determ_latitude == 32.)
-        self.failUnless(TPT.determ_longitude == 151.)
-        self.failUnless(TPT.determ_magnitude == 5.)
-        self.failUnless(TPT.determ_number_of_events == 1.)
+        self.failUnless(TPT.is_scenario == True)
+        self.failUnless(TPT.scenario_azimuth == 20)
+        self.failUnless(TPT.scenario_depth == 11.5)
+        self.failUnless(TPT.scenario_latitude == 32.)
+        self.failUnless(TPT.scenario_longitude == 151.)
+        self.failUnless(TPT.scenario_magnitude == 5.)
+        self.failUnless(TPT.scenario_number_of_events == 1.)
         
         self.failUnless(allclose(TPT.prob_azimuth_in_zones, asarray([10,30])))
         self.failUnless(TPT.prob_min_mag_cutoff == 4.5)
@@ -364,15 +360,12 @@ save_socloss_flag=[1]\n")
         self.failUnless(allclose(TPT.atten_periods, asarray([0,0.30303,1])))
         self.failUnless(TPT.atten_threshold_distance == 400)
         self.failUnless(TPT.atten_pga_scaling_cutoff ==  4.3)
-        self.failUnless(TPT.atten_use_rescale_curve_from_pga == True)
-        self.failUnless(TPT.atten_rescale_curve_from_pga == 'HAZUS_Sa')
+        self.failUnless(TPT.atten_override_RSA_shape == 'HAZUS_Sa')
         self.failUnless(TPT.atten_cutoff_max_spectral_displacement == True)
-        self.failUnless(TPT.atten_use_variability == True)
         self.failUnless(TPT.atten_variability_method == 2)
         self.failUnless(TPT.atten_smooth_spectral_acceleration == 1)
         self.failUnless(TPT.atten_log_sigma_eq_weight == 1.0)
         self.failUnless(TPT.use_amplification == 1)
-        self.failUnless(TPT.amp_use_variability == 1)
         self.failUnless(TPT.amp_variability_method == 2)
         self.failUnless(TPT.amp_min_factor == 0.6)
         self.failUnless(TPT.amp_max_factor == 2)
@@ -392,7 +385,6 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.csm_damping_regimes == 0)
         self.failUnless(TPT.csm_damping_modify_Tav == True)
         self.failUnless(TPT.csm_damping_use_smoothing == True)
-        self.failUnless(TPT.csm_use_hysteretic_damping == True)
         self.failUnless(TPT.csm_hysteretic_damping == 'curve')
         self.failUnless(TPT.csm_SDcr_tolerance_percentage == 2.)
         self.failUnless(TPT.csm_damping_max_iterations == 7)
@@ -419,6 +411,16 @@ save_socloss_flag=[1]\n")
         TPT = create_parameter_data(set)
         self.check_THE_PARAM_T(TPT)
 
+
+    def test_instance_to_THE_PARAM_T_depreciated_atts(self):
+        set = self.build_instance_to_THE_PARAM_T()
+        set.atten_use_variability = False
+        set.amp_use_variability = False
+        TPT = create_parameter_data(set)
+        self.failUnless(TPT.atten_variability_method == None)
+        self.failUnless(TPT.amp_variability_method == None)
+
+
     def test_convert_THE_PARAM_T_to_py(self):
         set = self.build_instance_to_THE_PARAM_T()
         TPT = create_parameter_data(set)
@@ -439,7 +441,7 @@ save_socloss_flag=[1]\n")
         set = Dummy()
         # Operation_Mode
         set.run_type = 'risk'
-        set.is_deterministic = True    # If False, probabilistic input used
+        set.is_scenario = True    # If False, probabilistic input used
 
         # General
         set.use_site_indexes = True
@@ -450,14 +452,14 @@ save_socloss_flag=[1]\n")
         set.output_dir = 'read out'
         set.return_periods = [22,11]
         
-        # Deterministic input 
-        set.determ_azimith = 20
-        set.determ_depth = 11.5
-        set.determ_latitude = 32.
-        set.determ_longitude = 151.
-        set.determ_magnitude = 5.
-        set.determ_dip= 35  
-        set.determ_number_of_events = 1
+        # Scenario input 
+        set.scenario_azimuth = 20
+        set.scenario_depth = 11.5
+        set.scenario_latitude = 32.
+        set.scenario_longitude = 151.
+        set.scenario_magnitude = 5.
+        set.scenario_dip= 35  
+        set.scenario_number_of_events = 1
 
         # Probabilistic input
         set.prob_azimuth_in_zones = [10,30]
@@ -471,15 +473,14 @@ save_socloss_flag=[1]\n")
         #  Attenuation   
         set.atten_models = ['my_attenuation_model','Gaull_1990_WA']
         set.atten_model_weights = [0.3,0.7]
-        set.atten_aggregate_Sa_of_atten_models = False 
+        set.atten_collapse_Sa_of_atten_models = False 
         set.atten_use_variability = True
         set.atten_variability_method = 2 
         set.atten_periods = [0,0.30303,1]
         set.atten_threshold_distance = 400
         set.atten_cutoff_max_spectral_displacement  = True
         set.atten_pga_scaling_cutoff = 4.3  # None or a value
-        set.atten_use_rescale_curve_from_pga = True
-        set.atten_rescale_curve_from_pga = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
+        set.atten_override_RSA_shape = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
         set.atten_smooth_spectral_acceleration = True
         set.atten_log_sigma_eq_weight = 1.0
 
@@ -556,13 +557,13 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\
 [Scenario]\n\
-determ_azimith=[340]\n\
-determ_depth=[11.5]\n\
-determ_latitude=[-32.95]\n\
-determ_magnitude=[5.6]\n\
-determ_number_of_events=[167]\n\
-determ_longitude=[151.61]\n\
-is_deterministic=[1]\n\
+scenario_azimuth=[340]\n\
+scenario_depth=[11.5]\n\
+scenario_latitude=[-32.95]\n\
+scenario_magnitude=[5.6]\n\
+scenario_number_of_events=[167]\n\
+scenario_longitude=[151.61]\n\
+is_scenario=[1]\n\
 [Attenuation]\n\
 atten_smooth_spectral_acceleration=[1]\n\
 atten_pga_scaling_cutoff=[2]\n\
@@ -571,7 +572,7 @@ attn_region=[1]\n\
 atten_use_variability=[1]\n\
 atten_variability_method=[2]\n\
 atten_periods=[0,0.30303,1]\n\
-atten_rescale_curve_from_pga=[5]\n\
+atten_override_RSA_shape=[5]\n\
 atten_threshold_distance=[400]\n\
 atten_log_sigma_eq_weight=[1.0]\n\
 [Amplification]    \n\
@@ -639,15 +640,15 @@ save_socloss_flag=[0]\n")
         set.output_dir = join(set.eqrm_home(), 'demo', 'output','prob_haz')
         set.return_periods = [10,50,100,200]
         
-        # Deterministic input   (single event input, with event_azimuth ect.)
-        set.is_deterministic = True   # If False, probabilistic input used
-        set.determ_azimith = 340
-        set.determ_depth = 11.5
-        set.determ_latitude = -32.95
-        set.determ_longitude = 151.61
-        set.determ_magnitude = 5.6
-        set.determ_dip= 35  
-        set.determ_number_of_events = 167
+        # Scenario input   (single event input, with event_azimuth ect.)
+        set.is_scenario = True   # If False, probabilistic input used
+        set.scenario_azimuth = 340
+        set.scenario_depth = 11.5
+        set.scenario_latitude = -32.95
+        set.scenario_longitude = 151.61
+        set.scenario_magnitude = 5.6
+        set.scenario_dip= 35  
+        set.scenario_number_of_events = 167
         
         
         set.prob_azimuth_in_zones = [10,30,70,100,150,15]
@@ -661,13 +662,11 @@ save_socloss_flag=[0]\n")
         #  Attenuation   
         set.atten_models = [3]
         set.atten_model_weights = [1]
-        set.atten_aggregate_Sa_of_atten_models = True
+        set.atten_collapse_Sa_of_atten_models = True
         set.atten_use_variability = True
         set.atten_variability_method = 2 
         set.atten_periods = [0,0.30303,1]
         set.atten_threshold_distance = 400
-        set.atten_use_rescale_curve_from_pga = False
-        set.atten_rescale_curve_from_pga = 'HAZUS_Sa' 
         set.atten_cutoff_max_spectral_displacement = True 
         set.atten_pga_scaling_cutoff = 2.0  # Float
         set.atten_smooth_spectral_acceleration = True
@@ -691,7 +690,6 @@ save_socloss_flag=[0]\n")
         set.csm_damping_regimes = 0   
         set.csm_damping_modify_Tav = True 
         set.csm_damping_use_smoothing = True
-        set.csm_use_hysteretic_damping = True 
         set.csm_hysteretic_damping = 'curve'
         set.csm_SDcr_tolerance_percentage = 2
         set.csm_damping_max_iterations = 7
@@ -724,7 +722,7 @@ save_socloss_flag=[0]\n")
         for key in para_new:
             # skip the string values.
             if key in ['run_type', 'atten_cutoff_max_spectral_displacement',
-                       'atten_rescale_curve_from_pga',
+                       'atten_override_RSA_shape',
                        'csm_hysteretic_damping',
                        'buildings_usage_classification']:
                 continue
@@ -774,13 +772,13 @@ mbnd=[4]\n\
 nsigma=[2.5]\n\
 nsamples=[5]\n\
 [Scenario]\n\
-determ_azimith=[340]\n\
-determ_depth=[11.5]\n\
-determ_latitude=[-32.95]\n\
-determ_magnitude=[5.6]\n\
-determ_number_of_events=[167]\n\
-determ_longitude=[151.61]\n\
-is_deterministic=[0]\n\
+scenario_azimuth=[340]\n\
+scenario_depth=[11.5]\n\
+scenario_latitude=[-32.95]\n\
+scenario_magnitude=[5.6]\n\
+scenario_number_of_events=[167]\n\
+scenario_longitude=[151.61]\n\
+is_scenario=[0]\n\
 [Attenuation]\n\
 atten_smooth_spectral_acceleration=[1]\n\
 atten_pga_scaling_cutoff=[2]\n\
@@ -789,7 +787,7 @@ attn_region=[1]\n\
 atten_use_variability=[1]\n\
 atten_variability_method=[2]\n\
 atten_periods=[0,0.30303,1]\n\
-atten_rescale_curve_from_pga=[0]\n\
+atten_override_RSA_shape=[0]\n\
 atten_threshold_distance=[400]\n\
 atten_log_sigma_eq_weight=[1.0]\n\
 [Amplification]    \n\
@@ -871,8 +869,7 @@ save_socloss_flag=[0]\n")
    
     def small_set_data(self):
         set = Parameter_data()
-        set.atten_use_rescale_curve_from_pga = False
-        set.atten_rescale_curve_from_pga = None
+        set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False
         set.use_amplification = False
         set.site_tag = 'test_convert_py_2_THE'
@@ -895,9 +892,9 @@ save_socloss_flag=[0]\n")
         set.atten_periods = [0,0.30303,1]
         set.atten_models = ['Gaull_1990_WA']
         set.atten_model_weights = [1.]
-        set.atten_aggregate_Sa_of_atten_models = False
+        set.atten_collapse_Sa_of_atten_models = False
         set.save_motion = False
-        set.is_deterministic = True    # If False, probabilistic input used
+        set.is_scenario = True    # If False, probabilistic input used
         set.input_dir = '.'
         set.output_dir = '.'
 
@@ -907,15 +904,14 @@ save_socloss_flag=[0]\n")
     def test_convert_py_2_THE(self):
         set = self.small_set_data()
         para_new = create_parameter_data(set)
-        self.assert_(para_new.atten_rescale_curve_from_pga == None)
+        self.assert_(para_new.atten_override_RSA_shape == None)
 
 
     def test_fail_on_bad_att(self):
         #
         set = Parameter_data()
         set.run_type = 'hazard'
-        set.atten_use_rescale_curve_from_pga = False
-        set.atten_rescale_curve_from_pga = None
+        set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False
         set.cooked_and_ready = False
 
@@ -937,7 +933,7 @@ save_socloss_flag=[0]\n")
         set.atten_models = ['Gaull_1990_WA']
         set.atten_model_weights = [1.]
         set.save_motion = False
-        set.is_deterministic = True    # If False, probabilistic input used
+        set.is_scenario = True    # If False, probabilistic input used
         set.input_dir = '.'
         set.output_dir = '.'        
         try:
@@ -979,7 +975,7 @@ save_socloss_flag=[0]\n")
                             'atten_periods': array([ 0.     ,  1.     ]),
                             'atten_variability_method': 2,
                             'atten_threshold_distance': 400,
-                            'atten_rescale_curve_from_pga': 0,
+                            'atten_override_RSA_shape': 0,
                             'atten_use_variability': 0,
                             'atten_log_sigma_eq_weight':0.0},
             'Bclasses2': {'determ_buse': -9999,
@@ -1000,13 +996,13 @@ save_socloss_flag=[0]\n")
             'Loss': {'loss_regional_cost_index_multiplier': 1.45,
                      'loss_min_pga': 0.05,
                      'loss_aus_contents': 0},
-            'Scenario': {'determ_azimith': 340,
-                         'determ_depth': 11.5,
-                         'determ_latitude': -32.,
-                         'determ_magnitude': 6.0,
-                         'determ_number_of_events': 2,
-                         'determ_longitude': 151.,
-                         'is_deterministic': 0},
+            'Scenario': {'scenario_azimuth': 340,
+                         'scenario_depth': 11.5,
+                         'scenario_latitude': -32.,
+                         'scenario_magnitude': 6.0,
+                         'scenario_number_of_events': 2,
+                         'scenario_longitude': 151.,
+                         'is_scenario': 0},
             'attenuation_flag': (array([1]), array([1])),
             'output_dir': 'EQRM_output',
             'Diagnostics': {'qa_switch_watercheck': 0,
@@ -1042,7 +1038,8 @@ save_socloss_flag=[0]\n")
             'prob_dip_in_zones': array([35, 35, 35, 35, 35, 35]),
             'Operation_Mode': {'run_type': 1}})
         eqrm_dir = determine_eqrm_path()
-        output_base_name = join(eqrm_dir, 'Documentation', 'set_data_example')
+        output_base_name = join(eqrm_dir, 'Documentation',
+                                'set_data_example.py')
         convert_THE_PARAM_T_to_py(output_base_name, para_old)
 
    
@@ -1079,8 +1076,6 @@ save_socloss_flag=[0]\n")
         convert_THE_PARAM_T_to_py(file_name, set)
         old_set_data_py_2_new_set_data_py(file_name)
         new_set = create_parameter_data(file_name)
-        self.failUnlessEqual(set.atten_use_rescale_curve_from_pga,
-                             new_set.atten_use_rescale_curve_from_pga)
         self.failUnlessEqual(set.csm_damping_regimes,
                              new_set.csm_damping_regimes)
         self.failUnlessEqual(set.csm_damping_use_smoothing,
@@ -1095,7 +1090,7 @@ save_socloss_flag=[0]\n")
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Parse_in_parameters,'test')
     
-    #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_old_set_data_py_2_new_set_data_py')
+    #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_instance_to_THE_PARAM_T')
     #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_convert_par_to_py')
     runner = unittest.TextTestRunner() #verbosity=2)
     runner.run(suite)

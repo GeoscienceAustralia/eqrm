@@ -566,7 +566,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         csm_use_variability=False
         csm_variability_method=3
         csm_variability_method=3
-        atten_rescale_curve_from_pga=0
+        atten_override_RSA_shape=0
         capacity_spectrum_model=Capacity_spectrum_model(
                  periods,
                  magnitudes,
@@ -579,7 +579,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                  csm_damping_max_iterations=csm_damping_max_iterations,
                  sdtcap=sdtcap,
                  csm_use_variability=csm_use_variability,
-                 atten_rescale_curve_from_pga=atten_rescale_curve_from_pga,
+                 atten_override_RSA_shape=atten_override_RSA_shape,
                  csm_variability_method=csm_variability_method)
         SAcr,SDcr=capacity_spectrum_model.building_response(SA)
         #print SDcr

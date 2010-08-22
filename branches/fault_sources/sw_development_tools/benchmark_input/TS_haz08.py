@@ -19,16 +19,16 @@ from os.path import join
 
 # Operation Mode
 run_type = "hazard" 
-is_deterministic = False
+is_scenario = False
 max_width = 15
 
-# Deterministic input
-determ_azimith = 340
-determ_depth = 11.5
-determ_latitude = -32.95
-determ_longitude = 151.61
-determ_magnitude = 5.6
-determ_number_of_events = 2
+# Scenario input
+scenario_azimuth = 340
+scenario_depth = 11.5
+scenario_latitude = -32.95
+scenario_longitude = 151.61
+scenario_magnitude = 5.6
+scenario_number_of_events = 2
 
 # Probabilistic input
 prob_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
@@ -41,13 +41,13 @@ prob_dip_in_zones = [35, 35, 35, 35, 35, 35]
 # Attenuation
 atten_models = ['Toro_1997_midcontinent']
 atten_model_weights = [1]
-atten_aggregate_Sa_of_atten_models = True
+atten_collapse_Sa_of_atten_models = True
 atten_use_variability = True
 atten_variability_method = 2
 atten_periods = [0.0, 0.30303000000000002, 1.0]
 atten_threshold_distance = 400
 atten_use_rescale_curve_from_pga = False
-atten_rescale_curve_from_pga = None
+atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
 atten_pga_scaling_cutoff = 2
 atten_smooth_spectral_acceleration = None

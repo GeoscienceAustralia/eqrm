@@ -27,7 +27,7 @@ def do_collapse_logic_tree(data, event_num, weights,
     # if there is only one attenuation model.
     no_attn_collapse=(
         (len(THE_PARAM_T.atten_models)==1) or
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models is False)
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models is False)
     
     if no_attn_collapse:        
         new_data=data 

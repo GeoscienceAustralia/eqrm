@@ -27,7 +27,7 @@ class Test_Exceedance(unittest.TestCase):
                                    'Atkinson_Boore_97','Sadigh_97']
         THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models = False
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models = False
         THE_PARAM_T.src_eps_switch = 1
         THE_PARAM_T.atten_use_variability = True  
         THE_PARAM_T.atten_variability_method = 2 
@@ -86,7 +86,7 @@ class Test_Exceedance(unittest.TestCase):
                                    'Atkinson_Boore_97','Sadigh_97']
         THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models = True
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
         THE_PARAM_T.src_eps_switch = 0
         THE_PARAM_T.atten_use_variability = True  
         THE_PARAM_T.atten_variability_method = 2 
@@ -155,7 +155,7 @@ class Test_Exceedance(unittest.TestCase):
                                    'Atkinson_Boore_97']
         THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models = True
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
         THE_PARAM_T.src_eps_switch = 0
         THE_PARAM_T.atten_use_variability = True  
         THE_PARAM_T.atten_variability_method = 2 
@@ -200,7 +200,7 @@ class Test_Exceedance(unittest.TestCase):
                                    'Atkinson_Boore_97','Sadigh_97']
         THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models = True
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
         THE_PARAM_T.src_eps_switch = 0
         THE_PARAM_T.atten_use_variability = True  
         THE_PARAM_T.atten_variability_method = 2 
@@ -234,7 +234,7 @@ class Test_Exceedance(unittest.TestCase):
                                    'Atkinson_Boore_97','Sadigh_97']
         THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models = True
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
         THE_PARAM_T.src_eps_switch = 0
         THE_PARAM_T.atten_use_variability = True  
         THE_PARAM_T.atten_variability_method = 2 
@@ -268,7 +268,7 @@ class Test_Exceedance(unittest.TestCase):
                                    'Atkinson_Boore_97']
         THE_PARAM_T.atten_model_weights = [10., 1.,
                                                0.1]
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models = True
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
         THE_PARAM_T.src_eps_switch = 0
         THE_PARAM_T.atten_use_variability = True  
         THE_PARAM_T.atten_variability_method = 2 
@@ -285,7 +285,7 @@ class Test_Exceedance(unittest.TestCase):
         
     def test_exceedance_curve7(self):
         # Treating it as a black box and working out what it does
-        # Showing how if the atten_aggregate_Sa_of_atten_models is False
+        # Showing how if the atten_collapse_Sa_of_atten_models is False
         # output = input.
         soil_SA = array([[[ 1],
                           [ 100],
@@ -298,7 +298,7 @@ class Test_Exceedance(unittest.TestCase):
 
         THE_PARAM_T = Dummy()
         THE_PARAM_T.atten_model_weights = [1., 0., 0.1]
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models = False
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models = False
         
         THE_PARAM_T.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
@@ -336,7 +336,7 @@ class Test_Exceedance(unittest.TestCase):
                                    'Atkinson_Boore_97','Sadigh_97']
         THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models = True
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
         
         #  don't collapse.
         THE_PARAM_T.src_eps_switch = 0
@@ -400,7 +400,7 @@ class Test_Exceedance(unittest.TestCase):
                                    'Atkinson_Boore_97','Sadigh_97']
         THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_aggregate_Sa_of_atten_models = True
+        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
         THE_PARAM_T.src_eps_switch = 0
         THE_PARAM_T.atten_use_variability = True  
         THE_PARAM_T.atten_variability_method = 2 

@@ -20,16 +20,16 @@ sdp = Parameter_data()
 
 # Operation Mode
 sdp.run_type = "hazard" 
-sdp.is_deterministic = False
+sdp.is_scenario = False
 sdp.max_width = 15
 
-# Deterministic input
-sdp.determ_azimith = 340
-sdp.determ_depth = 11.5
-sdp.determ_latitude = -32.95
-sdp.determ_longitude = 151.61
-sdp.determ_magnitude = 5.6
-sdp.determ_number_of_events = 167
+# Scenario input
+sdp.scenario_azimuth = 340
+sdp.scenario_depth = 11.5
+sdp.scenario_latitude = -32.95
+sdp.scenario_longitude = 151.61
+sdp.scenario_magnitude = 5.6
+sdp.scenario_number_of_events = 167
 
 # Probabilistic input
 sdp.prob_azimuth_in_zones = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -43,13 +43,13 @@ sdp.prob_dip_in_zones = [35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35,
 # Attenuation
 sdp.atten_models = ['Boore_08']
 sdp.atten_model_weights = [1]
-sdp.atten_aggregate_Sa_of_atten_models = True
+sdp.atten_collapse_Sa_of_atten_models = True
 sdp.atten_use_variability = True
 sdp.atten_variability_method = 2
 sdp.atten_periods = [0.0, 0.30303, 1.0]
 sdp.atten_threshold_distance = 400
 sdp.atten_use_rescale_curve_from_pga = False
-sdp.atten_rescale_curve_from_pga = None
+sdp.atten_override_RSA_shape = None
 sdp.atten_cutoff_max_spectral_displacement = False
 sdp.atten_pga_scaling_cutoff = 2
 sdp.atten_smooth_spectral_acceleration = None

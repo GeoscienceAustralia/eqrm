@@ -104,6 +104,7 @@ def par_files(path='.', extension=".py"):
             print "WARNING: Running in parallel mode"
             print "Only scenarios with no randomness will be executed"
     #par_files = ['TS_haz20.py']
+    #par_files = ['TS_risk60.py',''TS_haz20.py']
     #print "par_files", par_files
     return par_files
 

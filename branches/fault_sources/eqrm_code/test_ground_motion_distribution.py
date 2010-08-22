@@ -15,10 +15,8 @@ class Test_Log_normal_distribution(unittest.TestCase):
         variate_eq=array([[20,5,4],[.5,.2,.1],[19,4,5]])[...,newaxis]
         atten_log_sigma_eq_weight=0.3
 
-        var_flag = 1
         var_method = 2
-        dist=Log_normal_distribution(
-            var_flag, var_method, 
+        dist=Log_normal_distribution(var_method, 
             num_psudo_events=log_mean.shape[1],
             variate_eq=variate_eq,
             atten_log_sigma_eq_weight=atten_log_sigma_eq_weight)
@@ -44,11 +42,9 @@ class Test_Log_normal_distribution(unittest.TestCase):
         log_sigma=array([[1.,1.5,4],[1,1,1],[2,3,4]])[...,newaxis]
         variate_eq=array([[20,5,4],[.5,.2,.1],[19,4,5]])[...,newaxis]
 
-        var_flag = 1
         var_method = 2
         atten_log_sigma_eq_weight = 1
-        dist=Log_normal_distribution(
-            var_flag, var_method, \
+        dist=Log_normal_distribution(var_method, \
             num_psudo_events=log_mean.shape[1],
             variate_eq=variate_eq,
             atten_log_sigma_eq_weight=atten_log_sigma_eq_weight)
@@ -67,10 +63,8 @@ class Test_Log_normal_distribution(unittest.TestCase):
         log_sigma=array([[1.,1.5,4],[1,1,1],[2,3,4]])[...,newaxis]
         atten_log_sigma_eq_weight=0.0
 
-        var_flag = 1
         var_method = 2
-        dist=Log_normal_distribution(
-            var_flag, var_method, 
+        dist=Log_normal_distribution(var_method, 
             num_psudo_events=log_mean.shape[1],
             atten_log_sigma_eq_weight=atten_log_sigma_eq_weight)
         dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
@@ -79,7 +73,83 @@ class Test_Log_normal_distribution(unittest.TestCase):
         sample_values = dist._monte_carlo_intra_inter(
             variate_site=variate_site)
         actual = exp(log_mean + (1-atten_log_sigma_eq_weight)*variate_site*log_sigma)
-        assert allclose(sample_values,actual)           
+        assert allclose(sample_values,actual)
+        
+    def test_no_variability(self):
+        log_mean=array([[1.,2,3],[5,6,7],[9,11,13]])[...,newaxis]
+        log_sigma=array([[1.,1.5,4],[1,1,1],[2,3,4]])[...,newaxis]
+        atten_log_sigma_eq_weight=0.0
+
+        var_method = None
+        dist=Log_normal_distribution(var_method, 
+            num_psudo_events=log_mean.shape[1],
+            atten_log_sigma_eq_weight=atten_log_sigma_eq_weight)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+
+        (_, sample_values, _) = dist.sample_for_eqrm()
+        actual = exp(log_mean )
+        assert allclose(sample_values,actual)
+        
+    def test_plus_2_sigma(self):
+        log_mean=array([[1.,2,3],[5,6,7],[9,11,13]])[...,newaxis]
+        log_sigma=array([[1.,1.5,4],[1,1,1],[2,3,4]])[...,newaxis]
+        atten_log_sigma_eq_weight=0.0
+
+        var_method = 3
+        dist=Log_normal_distribution(var_method, 
+            num_psudo_events=log_mean.shape[1],
+            atten_log_sigma_eq_weight=atten_log_sigma_eq_weight)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+
+        (_, sample_values, _) = dist.sample_for_eqrm()
+        actual = exp(log_mean + 2*log_sigma)
+        assert allclose(sample_values,actual)
+
+        
+    def test_plus_sigma(self):
+        log_mean=array([[1.,2,3],[5,6,7],[9,11,13]])[...,newaxis]
+        log_sigma=array([[1.,1.5,4],[1,1,1],[2,3,4]])[...,newaxis]
+        atten_log_sigma_eq_weight=0.0
+
+        var_method = 4
+        dist=Log_normal_distribution(var_method, 
+            num_psudo_events=log_mean.shape[1],
+            atten_log_sigma_eq_weight=atten_log_sigma_eq_weight)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+
+        (_, sample_values, _) = dist.sample_for_eqrm()
+        actual = exp(log_mean + log_sigma)
+        assert allclose(sample_values,actual)
+
+    def test_neg_sigma(self):
+        log_mean=array([[1.,2,3],[5,6,7],[9,11,13]])[...,newaxis]
+        log_sigma=array([[1.,1.5,4],[1,1,1],[2,3,4]])[...,newaxis]
+        atten_log_sigma_eq_weight=0.0
+
+        var_method = 5
+        dist=Log_normal_distribution(var_method, 
+            num_psudo_events=log_mean.shape[1],
+            atten_log_sigma_eq_weight=atten_log_sigma_eq_weight)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+
+        (_, sample_values, _) = dist.sample_for_eqrm()
+        actual = exp(log_mean - log_sigma)
+        assert allclose(sample_values,actual)
+        
+    def test_neg_2_sigma(self):
+        log_mean=array([[1.,2,3],[5,6,7],[9,11,13]])[...,newaxis]
+        log_sigma=array([[1.,1.5,4],[1,1,1],[2,3,4]])[...,newaxis]
+        atten_log_sigma_eq_weight=0.0
+
+        var_method = 6
+        dist=Log_normal_distribution(var_method, 
+            num_psudo_events=log_mean.shape[1],
+            atten_log_sigma_eq_weight=atten_log_sigma_eq_weight)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+
+        (_, sample_values, _) = dist.sample_for_eqrm()
+        actual = exp(log_mean - 2*log_sigma)
+        assert allclose(sample_values,actual)
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Log_normal_distribution,'test')

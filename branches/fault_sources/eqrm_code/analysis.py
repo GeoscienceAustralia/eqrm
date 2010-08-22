@@ -114,7 +114,7 @@ def main(parameter_handle,
     del compress_output
     del eqrm_dir
     del is_parallel
-
+    
      # Reset random seeds if required
     # If use_determ_seed is True, then use a hardwired seed.
     # If use_determ_seed is False, set random seeds based on time.
@@ -153,25 +153,25 @@ def main(parameter_handle,
     log.debug('Memory: Initial')
     log.resource_usage()
 
-    if THE_PARAM_T.is_deterministic is True:
-        # generate a deterministic event set
+    if THE_PARAM_T.is_scenario is True:
+        # generate a scenario event set
         event_set = Event_Set.create(
-            rupture_centroid_lat=[THE_PARAM_T.determ_latitude],
-            rupture_centroid_lon=[THE_PARAM_T.determ_longitude],
-            azimuth=[THE_PARAM_T.determ_azimith],
-            dip=[THE_PARAM_T.determ_dip],
-            Mw=[THE_PARAM_T.determ_magnitude],
-            depth=[THE_PARAM_T.determ_depth],
+            rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
+            rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
+            azimuth=[THE_PARAM_T.scenario_azimuth],
+            dip=[THE_PARAM_T.scenario_dip],
+            Mw=[THE_PARAM_T.scenario_magnitude],
+            depth=[THE_PARAM_T.scenario_depth],
             fault_width=THE_PARAM_T.max_width,
-            determ_number_of_events=THE_PARAM_T.determ_number_of_events)
+            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
         # Other rupture parameters are calculated by event_set object.
         # trace start is calculated from centroid and azimuth.
         # Rupture area, length, and width are calculated from Mw
         # using Wells and Coppersmith 94 (modified so rupture
         # width is less than fault_width).
-        event_set.deterministic_setup()
+        event_set.scenario_setup()
     else:
-        # (i.e. is_deterministic is False) generate a probablistic event set
+        # (i.e. is_scenario is False) generate a probablistic event set
         # (using THE_PARAM_T.source_filename)
 
         # Get name of xml file containing source polygons and GR type
@@ -255,8 +255,7 @@ def main(parameter_handle,
     log.resource_usage()
 
     ground_motion_distribution = \
-        Log_normal_distribution(THE_PARAM_T.atten_use_variability,
-                                THE_PARAM_T.atten_variability_method,
+        Log_normal_distribution(THE_PARAM_T.atten_variability_method,
                                 num_psudo_events,
                                 num_sites_per_site_loop=NUM_SITES_PER_SITE_LOOP)
 
@@ -276,8 +275,7 @@ def main(parameter_handle,
     # searches input_dir then defaultdir
     if THE_PARAM_T.use_amplification is True:
         regolith_amp_distribution = \
-            Log_normal_distribution(THE_PARAM_T.amp_use_variability,
-                                    THE_PARAM_T.amp_variability_method,
+            Log_normal_distribution(THE_PARAM_T.amp_variability_method,
                                     num_psudo_events=num_psudo_events,
                                     num_sites_per_site_loop= \
                                         NUM_SITES_PER_SITE_LOOP)
@@ -458,13 +456,13 @@ def main(parameter_handle,
             # Applies a minimum and maxium acceptable amplification factor
             # re-scale SAsoil if Ampfactor falls ouside acceptable
             # ampfactor bounds
-            if THE_PARAM_T.amp_use_variability is True:
-                if not THE_PARAM_T.amp_min_factor is None:
+            if THE_PARAM_T.amp_variability_method is not None:
+                if THE_PARAM_T.amp_min_factor is not None:
                     too_low = (soil_SA/bedrock_SA) < THE_PARAM_T.amp_min_factor
                     soil_SA[where(too_low)] = (THE_PARAM_T.amp_min_factor *
                                                bedrock_SA[where(too_low)])
                     del too_low
-                if not THE_PARAM_T.amp_max_factor is None:
+                if THE_PARAM_T.amp_max_factor is not None:
                     too_high = (soil_SA/bedrock_SA) > THE_PARAM_T.amp_max_factor
                     soil_SA[where(too_high)] = (THE_PARAM_T.amp_max_factor*
                                                 bedrock_SA[where(too_high)])

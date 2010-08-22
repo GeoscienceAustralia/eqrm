@@ -3,8 +3,9 @@ import os
 import sys
 import unittest
 
-from scipy import allclose,asarray
-        
+from scipy import allclose,asarray     
+from xml.etree import ElementTree as ET #, getiterator
+
 from eqrm_code.xml_interface import Xml_Interface
 
 from eqrm_code.ANUGA_utilities import log
@@ -50,15 +51,16 @@ class Test_Xml_Interface(unittest.TestCase):
     def test_attributes(self):
         xml = build_xml()
         assert xml['Event'][0].attributes['magnitude_type']=='Mw'
+        #print "xml['Event']", xml['Event']
         xml.unlink()
         
     def test_getting_polygons(self):
         xml = build_xml()
         assert  len(xml['polygon'])==2
         xml.unlink()
-        log.log("YEAH$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        log.log("IF YOU ARE GETTING THIS MESSAGE")
-        log.log("THE console_logging_level IS TOO LOW.")
+        #log.log("YEAH$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        #log.log("IF YOU ARE GETTING THIS MESSAGE")
+        #log.log("THE console_logging_level IS TOO LOW.")
 
 
     def test_getting_excludes(self):
@@ -75,14 +77,10 @@ class Test_Xml_Interface(unittest.TestCase):
         assert allclose(asarray(exclude_array),asarray(expected_exclude_array))
         xml.unlink()
 
+    def Xtest_build_zone_xml(self):
+        # Looking into something different
+        root = build_xml()
 
-    
-        
-        
-        
-        
-        
- 
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Xml_Interface,'test')

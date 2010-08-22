@@ -79,7 +79,7 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
               1.0526 ,  1.2281 ,  1.4035 ,  1.5789 ,  1.7544 ,  1.9298 ,
               2.1053 ,  2.2807 ,  2.4561 ,  2.6316 ,  2.807  ,  2.9825 ,
               3.1579 ,  3.3333 ]),
-            'atten_rescale_curve_from_pga': None,
+            'atten_override_RSA_shape': None,
             'atten_cutoff_max_spectral_displacement': False,
             'csm_damping_max_iterations': 7}
         
@@ -142,7 +142,7 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
               1.0526 ,  1.2281 ,  1.4035 ,  1.5789 ,  1.7544 ,  1.9298 ,
               2.1053 ,  2.2807 ,  2.4561 ,  2.6316 ,  2.807  ,  2.9825 ,
               3.1579 ,  3.3333 ]),
-            'atten_rescale_curve_from_pga': None,
+            'atten_override_RSA_shape': None,
             'atten_cutoff_max_spectral_displacement': False,
             'csm_damping_max_iterations': 7}
         

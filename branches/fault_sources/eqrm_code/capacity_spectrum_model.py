@@ -33,7 +33,7 @@ class Capacity_spectrum_model(object):
                  periods=None,
                  magnitudes=None,
                  building_parameters=None,
-                 atten_rescale_curve_from_pga=None,
+                 atten_override_RSA_shape=None,
                  atten_cutoff_max_spectral_displacement=False,
                  loss_min_pga=0.0,
                  csm_damping_regimes=CSM_DAMPING_REGIMES_USE_ALL,
@@ -44,7 +44,7 @@ class Capacity_spectrum_model(object):
                  csm_damping_max_iterations=7,
                  sdtcap=.3,
                  csm_use_variability=False,
-                 csm_variability_method=1):
+                 csm_variability_method=None):
         """
 Usage:
 
@@ -86,7 +86,7 @@ should NOT be set after initialization - read __init__ for reasons.
         self.csm_use_variability=csm_use_variability
         self.csm_variability_method=csm_variability_method
 
-        self.atten_rescale_curve_from_pga=atten_rescale_curve_from_pga
+        self.atten_override_RSA_shape=atten_override_RSA_shape
         self.atten_cutoff_max_spectral_displacement=atten_cutoff_max_spectral_displacement
         self.loss_min_pga=loss_min_pga
 
@@ -116,7 +116,7 @@ should NOT be set after initialization - read __init__ for reasons.
             # TODO: Allow cutoff after max.
             SA,surface_displacement=undamped_response(
                 SA,periods,
-                self.atten_rescale_curve_from_pga,
+                self.atten_override_RSA_shape,
                 self.atten_cutoff_max_spectral_displacement,
                 self.loss_min_pga,
                 magnitude=magnitudes)
@@ -163,40 +163,29 @@ should NOT be set after initialization - read __init__ for reasons.
             print displacement
             raise ValueError
         non_linear_damping=self._non_linear_damping(displacement)
-        SA,SD,SAcap=self._damped_response(non_linear_damping)
-        if self.csm_hysteretic_damping==0: # Not used. Check logic.
-            print "!!!!!!!!!!!!!!!!!!!!!!!!"
-            import sys
-            sys.exit()
-            exit_flag=True
-        else:
-            exit_flag= not (non_linear_damping>0).any()
+        SA,SD,SAcap = self._damped_response(non_linear_damping)
+        exit_flag = not (non_linear_damping>0).any()
         return SA,SD,SAcap,exit_flag
 
     def _non_linear_damping(self,displacement):
-        if self.csm_hysteretic_damping==0:  # Not used. Check logic.
-            print "!!!!!!!!!!!!!!!!!!!!!!!!"
-            import sys
-            sys.exit()
-            return 0.0
+        
+        # Calculate the acceleration of the intersect point.
+        displacement=displacement[:,:,newaxis]
+        acceleration=calculate_capacity(displacement,
+                                        self.capacity_parameters)
+        assert acceleration.shape[-1]==1 # should not have periods
+        # Get the right damping function.
+        if self.csm_hysteretic_damping is 'trapeziodal':
+            damping_function=trapazoid_damp   
         else:
-            # Calculate the acceleration of the intersect point.
-            displacement=displacement[:,:,newaxis]
-            acceleration=calculate_capacity(displacement,
-                                            self.capacity_parameters)
-            assert acceleration.shape[-1]==1 # should not have periods
-            # Get the right damping function.
-            if self.csm_hysteretic_damping is 'trapeziodal':
-                damping_function=trapazoid_damp   
-            else:
-                damping_function=nonlin_damp
-                
-            SA,SD=acceleration,displacement
-            # calculate damping
-            damping=damping_function(self.capacity_parameters,
-                                     self.kappa,SA,SD,self.csm_hysteretic_damping)
-            damping[where(SA<0.00000000001)]=0
-            return damping
+            damping_function=nonlin_damp
+            
+        SA,SD=acceleration,displacement
+        # calculate damping
+        damping=damping_function(self.capacity_parameters,
+                                 self.kappa,SA,SD,self.csm_hysteretic_damping)
+        damping[where(SA<0.00000000001)]=0
+        return damping
     
     def _damped_response(self,non_linear_damping=0.0):        
         SA0,SD0=self.undamped_response # retrieve undamped response
