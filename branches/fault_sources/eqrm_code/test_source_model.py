@@ -118,7 +118,6 @@ class Test_Source_model(unittest.TestCase):
     def test_source_model_from_xml_horspool(self):
         
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
-        print "file_name", file_name
         os.close(handle)
         handle = open(file_name,'w')
         

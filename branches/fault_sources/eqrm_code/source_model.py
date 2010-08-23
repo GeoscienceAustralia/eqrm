@@ -147,9 +147,11 @@ class Source_Zone_Polygon(polygon_object):
 def source_model_from_xml(filename,prob_min_mag_cutoff):
     doc=Xml_Interface(filename=filename)
     if not doc['Source_Model'] == []:
-        source_model = source_model_from_xml_row(doc, prob_min_mag_cutoff)
+        source_model = source_model_from_xml_row(
+            doc, prob_min_mag_cutoff)
     else:
-        source_model = source_model_from_xml_horspool(doc, prob_min_mag_cutoff)
+        source_model = source_model_from_xml_horspool(
+            doc, prob_min_mag_cutoff)
     return source_model
 
 
