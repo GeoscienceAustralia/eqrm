@@ -63,7 +63,7 @@ class Test_Generation_polygon(unittest.TestCase):
     
     <recurrence_model
       distribution = "bounded_gutenberg_richter"
-      recurrence_min_mag = "3.3" 
+      recurrence_min_mag = "3.4" 
       recurrence_max_mag = "5.4" 
       lambda_min= "0.568" 
       b = "1">
@@ -107,7 +107,7 @@ class Test_Generation_polygon(unittest.TestCase):
                        #(152.1700, -32.7500),
                        #(151.4300, -33.4500)]
         fault_depth_dist = {'distribution':'constant',
-                            'mean':7}
+                            'mean':'7'}
         fault_width_dist = {'distribution':'constant',
                             'mean':fault_width}
         azimuth = {'distribution':'uniform',
@@ -115,8 +115,8 @@ class Test_Generation_polygon(unittest.TestCase):
                        'maximum': float(azi[0])+float(dazi[0])}
         dip = {'distribution':'constant','mean':float(fault_dip[0])}
         magnitude = {'distribution':'uniform',
-                         'minimum':3.3,
-                         'maximum': 5.4}
+                         'minimum':3.4,
+                         'maximum': '5.4'}
         actual_gp = Generation_Polygon(
             boundary,
             fault_depth_dist,
