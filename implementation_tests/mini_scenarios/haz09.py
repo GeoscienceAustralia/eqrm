@@ -28,6 +28,8 @@ output_dir = r".\implementation_tests\mini_current\haz09/"
 use_site_indexes = True
 site_indexes = [2255, 11511, 10963, 686, 1026]
 
+# Scenario input
+
 # Probabilistic input
 prob_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
 prob_delta_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
@@ -53,6 +55,12 @@ use_amplification = True
 amp_variability_method = None
 amp_min_factor = 0.6
 amp_max_factor = 10000
+
+# Buildings
+
+# Capacity Spectrum Method
+
+# Loss
 
 # Save
 save_hazard_map = True
