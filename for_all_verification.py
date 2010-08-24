@@ -14,7 +14,7 @@ def do_tests_checks_demos_audits(eqrm_root_dir,
                                  test_all=True,
                                  check_scenarios=True,
                                  mini_check_scenarios=True,
-                                 check_risk=True,
+                                 check_risk=False,
                                  demo_batchrun=True,
                                  verbose=False,
                                  python_command='python'):

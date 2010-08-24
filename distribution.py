@@ -222,7 +222,7 @@ def create_distribution_zip(vername, distro_dirs=None,
         test_all=True,
         check_scenarios=True,
         mini_check_scenarios=False,
-        check_risk=True,
+        check_risk=False,
         demo_batchrun=True,
         verbose=True)
     if results_passed is False:
