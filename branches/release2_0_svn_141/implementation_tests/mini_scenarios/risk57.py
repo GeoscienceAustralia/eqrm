@@ -28,6 +28,8 @@ output_dir = r".\implementation_tests\mini_current\risk57/"
 use_site_indexes = True
 site_indexes = 3541
 
+# Scenario input
+
 # Probabilistic input
 prob_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
 prob_delta_azimuth_in_zones = [180, 180, 180, 180, 180, 180]

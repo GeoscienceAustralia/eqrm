@@ -38,12 +38,6 @@ scenario_dip = 35
 scenario_number_of_events = 1
 
 # Probabilistic input
-prob_azimuth_in_zones = 180
-prob_delta_azimuth_in_zones = 180
-prob_min_mag_cutoff = 4.5
-prob_number_of_mag_sample_bins = 15
-prob_number_of_events_in_zones = [500, 100, 100, 300, 100, 100]
-prob_dip_in_zones = 35
 
 # Attenuation
 atten_models = ['Toro_1997_midcontinent']
@@ -65,24 +59,10 @@ amp_min_factor = 0.6
 amp_max_factor = 10000
 
 # Buildings
-buildings_usage_classification = None
-buildings_set_damping_Be_to_5_percent = None
 
 # Capacity Spectrum Method
-csm_use_variability = None
-csm_variability_method = None
-csm_standard_deviation = None
-csm_damping_regimes = None
-csm_damping_modify_Tav = True
-csm_damping_use_smoothing = True
-csm_hysteretic_damping = None
-csm_SDcr_tolerance_percentage = None
-csm_damping_max_iterations = None
 
 # Loss
-loss_min_pga = None
-loss_regional_cost_index_multiplier = None
-loss_aus_contents = None
 
 # Save
 save_hazard_map = False

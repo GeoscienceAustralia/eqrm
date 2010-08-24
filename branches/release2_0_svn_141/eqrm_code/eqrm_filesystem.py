@@ -30,6 +30,9 @@ Demo_Path = os.path.join(eqrm_path, 'demo')
 
 Implementation_Path = os.path.join(eqrm_path, 'implementation_tests')
 
+mini_scenario_Path = os.path.join(eqrm_path, 'implementation_tests',
+                                  'mini_scenarios')
+
 Demo_Output_ProbRisk_Path = os.path.join(eqrm_path,
                                          'demo', 'output', 'prob_risk')
 

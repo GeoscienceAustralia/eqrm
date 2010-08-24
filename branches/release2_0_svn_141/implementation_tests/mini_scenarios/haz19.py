@@ -37,6 +37,8 @@ scenario_magnitude = 7.2
 scenario_dip = 35
 scenario_number_of_events = 1
 
+# Probabilistic input
+
 # Attenuation
 atten_models = ['Gaull_1990_WA']
 atten_model_weights = [1]

@@ -6,7 +6,8 @@ Do this by loading up and overwriting all of the set data .py files.
 
 """
 
-from eqrm_code.eqrm_filesystem import eqrm_path, Demo_Path, Implementation_Path
+from eqrm_code.eqrm_filesystem import eqrm_path, Demo_Path, \
+     Implementation_Path, mini_scenario_Path
 from eqrm_code.parse_in_parameters import find_set_data_py_files, \
      old_set_data_py_2_new_set_data_py
 
@@ -36,3 +37,4 @@ def rewrite_set_data_py(path=None):
 if __name__ == "__main__":
     rewrite_set_data_py(path=Demo_Path)
     rewrite_set_data_py(path=Implementation_Path)
+    #rewrite_set_data_py(path=mini_scenario_Path)
