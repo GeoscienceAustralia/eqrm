@@ -3,7 +3,8 @@ Distribution files
 When distribution.py is executed the resulting .zip file is placed
 here.
 
-They are stored at \georisk\downloads\eqrm.
+They are stored at \georisk\downloads\eqrm. (manually move them to
+this location)
 
 ______________________________________
 
@@ -13,7 +14,7 @@ Password:[uni password]
 
 develop >project admin > feature settings > file manager
 click on the gear next to the eqrm dir, select
-upload file (uploaded the new distribution)
+upload here (uploaded the new distribution)
 
 
 This bit does not happen anymore;
