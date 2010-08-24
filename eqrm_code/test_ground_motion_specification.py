@@ -5,11 +5,11 @@ from scipy import array, exp, log, allclose, newaxis, asarray, zeros
 from eqrm_code.ground_motion_specification import *
 from eqrm_code.ground_motion_interface import gound_motion_init
 from eqrm_code.ground_motion_misc import \
-     Australian_standard_model_interpolation 
+     Australian_standard_model_interpolation
 from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
      Multiple_ground_motion_calculator
 
-classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA', 
+classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Toro_1997_midcontinent',
                           'Sadigh_97', 'Youngs_97_interface',
                           'Youngs_97_intraslab',
@@ -18,12 +18,12 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Somerville_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-                          'Chiou08', 'Campbell03')
+                          'Chiou08', 'Campbell03', 'Campbell08')
 
-# Atkinson_Boore_97 is out.  It has no test data. 
+# Atkinson_Boore_97 is out.  It has no test data.
 
 
-"""                                      
+"""
     test_distance : the set of distances used by verification tests
                     dimensions (site, mag)
 
@@ -39,7 +39,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
     test_vs30: the shear wave velocity at a depth of 30.0 meters
                (if not defined, will be assumed to be 1000m/s)
 """
-    
+
 test_data = {}
 
 # ***********************************************************
@@ -129,7 +129,7 @@ test_data['Sadigh_97_test_period'] = (
 
 test_data['Sadigh_97_test_distance'] = (
     array([[10.0,25.0,50.0],[50.0,25.0,10.0]]))
-      
+
 test_data['Sadigh_97_test_mean'] = [
     [[2.6847E-01,4.4170E-01,5.4026E-01,5.9924E-01,
             5.0643E-01,4.0426E-01,3.1130E-01,1.9711E-01,
@@ -158,7 +158,7 @@ test_data['Sadigh_97_test_magnitude'] = [6.0,6.0,7.0]
 test_data['Youngs_97_interface_test_period'] = [
     0.0000E+00,7.5000E-02,1.0000E-01,2.0000E-01,
     3.0000E-01,4.0000E-01,5.0000E-01,7.5000E-01,
-    1.0000E-00,1.5000E-00,2.0000E-00,3.0000E-00]          
+    1.0000E-00,1.5000E-00,2.0000E-00,3.0000E-00]
 
 test_data['Youngs_97_interface_test_distance'] = [10.0,25.0,50.0]
 
@@ -172,7 +172,7 @@ test_data['Youngs_97_interface_test_mean'] = array([
     [7.2680E-02,1.2462E-01,1.3948E-01,1.4934E-01,
      1.2684E-01,1.1034E-01,9.8668E-02,6.3782E-02,
      4.4050E-02,2.4533E-02,1.5297E-02,6.4070E-03]])
-            
+
 test_data['Youngs_97_interface_test_mean'] = \
                                  test_data['Youngs_97_interface_test_mean'][:,newaxis,:]
 test_data['Youngs_97_interface_test_magnitude'] = [6.5]
@@ -183,7 +183,7 @@ test_data['Youngs_97_interface_test_depth'] = [10.0]
 
 test_data['Youngs_97_intraslab_test_period'] = [
     0, 0.02, 0.15, 0.25, 0.35, 0.5,
-    0.7, 0.85, 1.0, 1.42, 2.1, 2.5]      
+    0.7, 0.85, 1.0, 1.42, 2.1, 2.5]
 
 tmp = zeros((4,9)) # initialise an array: 3 mags, 3 depths (9 events) and distance to 4 sites
 tmp[0,:] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0] # distance between 1st site and all 9 events - Note that this minimum distance is 10 km, so will be evaluated at 10 km.
@@ -303,7 +303,7 @@ tmp[3,8,:] = [0.25099,0.27948,0.51745,0.56508,
 0.52935,0.48376,0.36936,0.30647,
 0.25629,0.17035,0.097862,0.071884]
 test_data['Youngs_97_intraslab_test_mean'] = tmp
-           
+
 test_data['Youngs_97_intraslab_test_magnitude'] = [6.1, 6.1, 6.1, 7.2, 7.2, 7.2, 8.3, 8.3, 8.3]
 
 test_data['Youngs_97_intraslab_test_depth'] = [10.0,50.0,100.0,10.0,50.0,100.0,10.0,50.0,100.0]
@@ -320,16 +320,16 @@ tmp[0,:] = [10.0,25.0,50.0] # distance between 1st site and all three events
 tmp[1,:] = [50.0,25.0,10.0] # distance between 2nd site and all three events
 test_data['Combo_Sadigh_Youngs_M8_test_distance'] = tmp
 
-tmp = zeros((2,3,12)) # 2 sites - 3 events and 12 RSA periods    
+tmp = zeros((2,3,12)) # 2 sites - 3 events and 12 RSA periods
 tmp[0,0,:] = [2.6847E-01,4.4170E-01,5.4026E-01,5.9924E-01,  # meanRSA for site1 - event1
       5.0643E-01,4.0426E-01,3.1130E-01,1.9711E-01,
-      1.4119E-01,8.1022E-02,5.3910E-02,2.7935E-02] 
+      1.4119E-01,8.1022E-02,5.3910E-02,2.7935E-02]
 tmp[0,1,:] = [1.0433E-01,1.5859E-01,1.9874E-01,2.3497E-01, # meanRSA for site1 - event2
       2.0328E-01,1.6507E-01,1.2971E-01,8.5142E-02,
-      6.2797E-02,3.7274E-02,2.5423E-02,1.3534E-02] 
+      6.2797E-02,3.7274E-02,2.5423E-02,1.3534E-02]
 tmp[0,2,:] = [1.8915E-01,2.7467E-01,3.4619E-01,4.4380E-01, # meanRSA for site1 - event3
       4.1809E-01,3.9259E-01,3.7183E-01,2.6660E-01,
-      1.9858E-01,1.2267E-01,8.2564E-02,3.8355E-02] 
+      1.9858E-01,1.2267E-01,8.2564E-02,3.8355E-02]
 tmp[1,0,:] = [3.8676E-02,5.4983E-02,7.0113E-02,8.7934E-02, # meanRSA for site2 - event1
       7.7967E-02,6.4458E-02,5.1740E-02,3.5270E-02,
       2.6825E-02,1.6497E-02,1.1548E-02,6.3250E-03]
@@ -341,7 +341,7 @@ tmp[1,2,:] = [2.7888E-01,4.1400E-01,5.1850E-01,6.5197E-01, # meanRSA for site2 -
       2.7896E-01,1.7040E-01,1.1377E-01,5.2258E-02]
 test_data['Combo_Sadigh_Youngs_M8_test_mean'] = tmp
 
-   
+
 test_data['Combo_Sadigh_Youngs_M8_test_magnitude'] = [6.0,6.0,8.8]
 test_data['Combo_Sadigh_Youngs_M8_test_depth'] = [10.0]
 
@@ -349,10 +349,10 @@ test_data['Combo_Sadigh_Youngs_M8_test_depth'] = [10.0]
 test_data['Combo_Sadigh_Youngs_M8_trimmed_test_period'] = [
     0.0000E+00,7.5000E-02,1.0000E-01,2.0000E-01,
     3.0000E-01,4.0000E-01,5.0000E-01,7.5000E-01,
-    1.0000E-00,1.5000E-00,2.0000E-00,3.0000E-00]                    
+    1.0000E-00,1.5000E-00,2.0000E-00,3.0000E-00]
 
 test_data['Combo_Sadigh_Youngs_M8_trimmed_test_distance'] = [10.0,25.0,50.0]
-      
+
 # This data was creating by running the GM model in EQRM
 test_data['Combo_Sadigh_Youngs_M8_trimmed_test_mean'] = [
     [[ 0.37461483, 0.62035523, 0.73219532, 0.85177058,  0.76364145, 0.64050752,
@@ -361,7 +361,7 @@ test_data['Combo_Sadigh_Youngs_M8_trimmed_test_mean'] = [
     0.2291531, 0.15755411, 0.11908253, 0.07401914, 0.05170881, 0.02880416]],
  [[ 0.05957871, 0.08608274, 0.105141,  0.13785849, 0.12935183, 0.11216472,
     0.094854, 0.06762632, 0.05264243, 0.03385347, 0.02424689, 0.01387918]]]
-    
+
 test_data['Combo_Sadigh_Youngs_M8_trimmed_test_magnitude'] = [6.5]
 test_data['Combo_Sadigh_Youngs_M8_trimmed_test_depth'] = [10.0]
 
@@ -792,12 +792,62 @@ test_data['Campbell03_test_mean'] = tmp
 del tmp
 
 ################################################################################
+# Campbell08 Tests - test against data values from Campbell08_check.py
+
+# num_events = 2
+test_data['Campbell08_test_magnitude'] = [5.0, 7.0]
+
+# num_events = 2
+test_data['Campbell08_test_dip'] = [90.0, 90.0]
+
+# num_events = 2
+test_data['Campbell08_test_depth_to_top'] = [0.0, 0.0]
+
+# num_events = 2
+# 'reverse' fault type index is 0
+test_data['Campbell08_test_faulting_type'] = [0, 0]
+
+# num_periods = 5
+test_data['Campbell08_test_period'] = [0.01, 0.20, 1.00, 3.00, 10.00]
+
+# Z25 override - num_sites = 3
+test_data['Campbell08_test_Z25'] = [2.0, 2.0, 2.0]
+
+# Vs30 override - num_sites = 3
+test_data['Campbell08_test_vs30'] = [760.0, 760.0, 760.0]
+
+# num_sites = 3
+tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
+tmp[0,:] = [ 2.0,  2.0] # distance - 1st site and all 2 events
+tmp[1,:] = [10.0, 10.0] # distance - 2nd site and all 2 events
+tmp[2,:] = [50.0, 50.0] # distance - 3rd site and all 2 events
+test_data['Campbell08_test_distance'] = tmp
+
+# result values, in 'g'
+tmp = zeros((3,2,5))		# num_sites, num_events, num_periods
+# period:     0.01     0.20     1.00     3.00     10.00
+tmp[0,0,:] = [0.23435, 0.44193, 0.07274, 0.00819, 0.00065] # R= 2.0, ML=5.0
+tmp[0,1,:] = [0.45559, 1.01648, 0.35536, 0.10045, 0.01940] # R= 2.0, ML=7.0
+tmp[1,0,:] = [0.10306, 0.23247, 0.02647, 0.00298, 0.00024] # R=10.0, ML=5.0
+tmp[1,1,:] = [0.25133, 0.62711, 0.17438, 0.04929, 0.00952] # R=10.0, ML=7.0
+tmp[2,0,:] = [0.01591, 0.03448, 0.00451, 0.00051, 0.00004] # R=50.0, ML=5.0
+tmp[2,1,:] = [0.06465, 0.14937, 0.05015, 0.01418, 0.00274] # R=50.0, ML=7.0
+test_data['Campbell08_test_mean'] = tmp
+del tmp
+
+################################################################################
 
 class Distance_stub(object):
     def __init__(self,dist):
         self.dist = asarray(dist)
 
     def distance(self, dummy):
+        return self.dist
+
+    def Rupture(self):
+        return self.dist
+
+    def Joyner_Boore(self):
         return self.dist
 
 def mag2dict(mag):
@@ -807,7 +857,7 @@ def mag2dict(mag):
     return {None: mag,
             'ML': mag,
             'Mw': mag}
-   
+
 def data2atts(model_name):
     """Get attributes for a model from the test_data dictionary.
 
@@ -815,35 +865,39 @@ def data2atts(model_name):
     """
 
     # get params that exist for every model
+    # default Vs30 to 1000.0 if not supplied
     distances = Distance_stub(test_data[model_name+'_test_distance'])
     magnitudes = mag2dict(test_data[model_name+'_test_magnitude'])
     test_mean = test_data[model_name+'_test_mean']
     periods = test_data[model_name+'_test_period']
+    vs30 = test_data.get(model_name+'_test_vs30', 1000.0)
 
     # params not there for every model (usually return None if not there)
     depths = test_data.get(model_name+'_test_depth', None)
     depth_to_top = test_data.get(model_name+'_test_depth_to_top', None)
     faulting_type = test_data.get(model_name+'_test_faulting_type', None)
-    vs30 = test_data.get(model_name+'_test_vs30', 1000.0)
+    dip = array(test_data.get(model_name+'_test_dip', None))
+    Z25 = array(test_data.get(model_name+'_test_Z25', None))
 
     return (distances, magnitudes, test_mean, periods, depths, vs30,
-            depth_to_top, faulting_type)
-    
+            depth_to_top, faulting_type, Z25, dip)
+
 def ground_motion_interface_conformance(GM_class, model_name):
     """
     This checks that for the given test_distance and test_magnitudes,
     the calculated ground motion is the same as the test_ground_motion
     """
 
-    (distances, magnitudes, test_mean, periods,
-         depths, vs30, depth_to_top, faulting_type) = data2atts(model_name)
+    (distances, magnitudes, test_mean, periods, depths, vs30,
+     depth_to_top, faulting_type, Z25, dip) = data2atts(model_name)
 
     if GM_class is Ground_motion_calculator:
         gm = GM_class(model_name, periods)
         (log_mean, log_sigma) = \
             gm.distribution_function(distances, magnitudes, depth=depths,
                                      vs30=vs30, depth_to_top=depth_to_top,
-                                     faulting_type=faulting_type)
+                                     faulting_type=faulting_type, Z25=Z25,
+                                     dip=dip)
     elif GM_class is Multiple_ground_motion_calculator:
         model_weights = [1]
         gm = GM_class([model_name], periods, model_weights)
@@ -851,7 +905,8 @@ def ground_motion_interface_conformance(GM_class, model_name):
         (log_mean, log_sigma, _, _) = \
             gm._distribution_function(distances, magnitudes, depth=depths,
                                       vs30=vs30, depth_to_top=depth_to_top,
-                                      faulting_type=faulting_type)
+                                      faulting_type=faulting_type, Z25=Z25,
+                                      dip=dip)
 
     return (exp(log_mean), test_mean)
 
@@ -867,23 +922,23 @@ class Test_ground_motion_specification(unittest.TestCase):
         (median, test_mean) = ground_motion_interface_conformance(GM_class,
                                                                   model_name)
 
-   
+
         msg = 'median=\n%s\ntest_mean=\n%s' % (str(median), str(test_mean))
         self.assert_(allclose(median, test_mean, rtol=0.05, atol=1.0e-5),
                      "%s did not pass assert:\n%s" % (model_name, msg))
-        
-    
+
+
     def test_all_ground_motion_interfaces(self):
         for name in classes_with_test_data:
             self.ground_motion_interface_conformance(Ground_motion_calculator,
                                                      name)
-    
+
     def test_all_multi_ground_motion_interfaces(self):
         for name in classes_with_test_data:
             self.ground_motion_interface_conformance(
                                        Multiple_ground_motion_calculator,
                                        name)
-     
+
     def test_Ground_motion_specification_init_(self):
         model_name = 'Gaull_1990_WA'
         model = Ground_motion_specification(model_name)
@@ -893,16 +948,16 @@ class Test_ground_motion_specification(unittest.TestCase):
         #  as a data holder
         imported = gound_motion_init[model_name]
         self.failUnless(model.magnitude_type==imported[1],
-                        'Model attributes incorrect.')       
+                        'Model attributes incorrect.')
         self.failUnless(model.distance_type==imported[2],
-                        'Model attributes incorrect.')       
-        self.assert_(allclose(model.coefficient, imported[3]))       
+                        'Model attributes incorrect.')
+        self.assert_(allclose(model.coefficient, imported[3]))
         self.failUnless(model.coefficient_period==imported[4],
-                        'Model attributes incorrect.')       
-        self.assert_(allclose(model.sigma_coefficient, imported[6]))    
+                        'Model attributes incorrect.')
+        self.assert_(allclose(model.sigma_coefficient, imported[6]))
         self.assert_(allclose(model.sigma_coefficient_period, imported[7]))
-        
-              
+
+
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_specification, 'test')
