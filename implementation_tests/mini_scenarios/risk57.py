@@ -28,15 +28,6 @@ output_dir = r".\implementation_tests\mini_current\risk57/"
 use_site_indexes = True
 site_indexes = 3541
 
-# Scenario input
-scenario_azimuth = 340
-scenario_depth = 11.5
-scenario_latitude = -32.95
-scenario_longitude = 151.61
-scenario_magnitude = 5.6
-scenario_dip = 35
-scenario_number_of_events = 166
-
 # Probabilistic input
 prob_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
 prob_delta_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
@@ -85,12 +76,7 @@ loss_regional_cost_index_multiplier = 1.4516
 loss_aus_contents = 0
 
 # Save
-save_hazard_map = False
 save_total_financial_loss = True
-save_building_loss = False
-save_contents_loss = False
-save_motion = False
-save_prob_structural_damage = False
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 

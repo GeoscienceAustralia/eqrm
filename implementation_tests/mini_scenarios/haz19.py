@@ -37,14 +37,6 @@ scenario_magnitude = 7.2
 scenario_dip = 35
 scenario_number_of_events = 1
 
-# Probabilistic input
-prob_azimuth_in_zones = 180
-prob_delta_azimuth_in_zones = 180
-prob_min_mag_cutoff = 4.5
-prob_number_of_mag_sample_bins = 15
-prob_number_of_events_in_zones = [500, 100, 100, 300, 100, 100]
-prob_dip_in_zones = 35
-
 # Attenuation
 atten_models = ['Gaull_1990_WA']
 atten_model_weights = [1]
@@ -85,12 +77,7 @@ loss_regional_cost_index_multiplier = None
 loss_aus_contents = None
 
 # Save
-save_hazard_map = False
-save_total_financial_loss = False
-save_building_loss = False
-save_contents_loss = False
 save_motion = True
-save_prob_structural_damage = None
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 
