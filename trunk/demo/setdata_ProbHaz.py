@@ -29,12 +29,6 @@ use_site_indexes = True
 site_indexes = [2255, 11511, 10963, 686, 1026, 6597, 12382, 314, 2040, 3318, 9934, 12225, 10506, 9934, 2841, 10420, 10314, 10612, 10316, 10313, 11863, 11523, 9736, 11702, 11862, 2562, 5963, 4550, 6737, 5214]
 
 # Scenario input
-scenario_azimuth = 340
-scenario_depth = 11.5
-scenario_latitude = -32.95
-scenario_longitude = 151.61
-scenario_magnitude = 5.6
-scenario_number_of_events = 167
 
 # Probabilistic input
 prob_azimuth_in_zones = [10, 30, 70, 100, 150, 15]
@@ -64,24 +58,10 @@ amp_min_factor = 0.6
 amp_max_factor = 10000
 
 # Buildings
-buildings_usage_classification = None
-buildings_set_damping_Be_to_5_percent = None
 
 # Capacity Spectrum Method
-csm_use_variability = None
-csm_variability_method = None
-csm_standard_deviation = None
-csm_damping_regimes = None
-csm_damping_modify_Tav = True
-csm_damping_use_smoothing = True
-csm_hysteretic_damping = None
-csm_SDcr_tolerance_percentage = None
-csm_damping_max_iterations = None
 
 # Loss
-loss_min_pga = None
-loss_regional_cost_index_multiplier = None
-loss_aus_contents = None
 
 # Save
 save_hazard_map = True
