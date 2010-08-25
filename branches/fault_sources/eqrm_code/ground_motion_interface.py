@@ -74,6 +74,8 @@ Description:
             coefficient        an array of model coefficients
             sigmacoefficient   an array of model sigma coefficients
             depth              depth of the event
+            depth_to_top       depth to top of rupture
+            faulting_type      type of fault
 
         Most of these parameters will be numpy arrays.
 
@@ -100,8 +102,9 @@ from eqrm_code.ground_motion_misc import (linear_interpolation,
                                           Australian_standard_model_interpolation)
 from eqrm_code import util 
 import event_set
+import conversions
 
-
+# might be better as: LOG10E = math.log10(math.e)
 LOG10E = 0.43429448190325182
 
 # A dictionary of all the info specified bellow.
@@ -2684,7 +2687,7 @@ def Chiou08_distribution(**kwargs):
                    cosh(where(M_min_Ch_Cgamma3<0,0,M_min_Ch_Cgamma3)))*Rrup)
 
     Yref = exp(lnYref)
-    Z1 = exp(28.5 - Ch_3_82_div_8*log(power(Vs30, 8) + Ch_378_7_pow_8))
+    Z1 = conversions.convert_Vs30_to_Z10(Vs30)
 
     # precalculate some common sub-expressions
     log_Vs30_div_1130 = log(Vs30/1130.0)
@@ -2933,4 +2936,372 @@ gound_motion_init['Campbell03'] = [Campbell03_distribution,
 del Campbell03_Table6
 
 #########################  End of Campbell03 model  ############################
+
+########################  Start of Campbell08 model  ###########################
+
+"""Code here is based on Campbell [1].
+
+    [1] Campbell K.W., Bozorgnia Y.,2008 NGA Ground Motion Model for the
+        Geometric Mean Horizontal Component of PGA, PGV, PGD and 5% Damped
+        Linear Elastic Response Spectra for Periods Ranging from 0.01 to 10s
+        Earthquake Spectra, Volume 24, No. 1, pp 139-171.
+"""
+
+######
+# Globals - constants
+######
+
+C = 1.88		# from note at foot of table on page 148
+N = 1.18
+
+ElnAF = 0.3		# paper, page 150
+ElnPGA = 0.478		# table 3, page 149, sigmalnY for PGA value
+
+######
+# Set up a numpy array to convert a 'faulting_type' flag to an array slice
+# that encodes the Frv/Fnm flags.
+######
+
+# faulting type flag encodings
+#                            'type':     (Frv, Fnm)
+Campbell08_faulting_flags = {'reverse':    (1, 0),
+                             'normal':     (0, 1),
+                             'strikeslip': (0, 0)}
+
+# generate 'Campbell08_faulting_type' from the dictionary above and event_set data
+tmp = []
+for (k, v) in Campbell08_faulting_flags.iteritems():
+    index = event_set.FaultingTypeDictionary[k]
+    tmp.append((index, v))
+
+# sort and make array in correct index order
+tmp2 = []
+tmp.sort()
+for (_, flags) in tmp:
+    tmp2.append(flags)
+Campbell08_faulting_type = array(tmp2)
+del tmp, tmp2
+
+######
+# The model function, from [1] page 1021.
+######
+
+def Campbell08_A1100(num_periods, M, Rrup, Rjb, Ztor, Z25, delta, Frv, Fnm):
+    """The Campbell08 model calculation of A1100.
+
+    num_periods  number of periods to use - used to reshape coefficients
+    M            magnitude
+    Rrup         rupture distance
+    Rjb          Joyner_Boore distance
+    Ztor         depth to top of rupture
+    Z25          Z2.5 value(s)
+    delta        fault dip
+    Frv          reverse fault flag
+    Fnm          normal fault flag
+
+    Returns the A1100 value calculated from equation 1 with a PGA set of
+    coefficients and Vs30 set to 1100.
+
+    The algorithm here is taken from [1], pp 144-146  with simplifications.
+    """
+
+    # get default arg values
+    Vs30 = 1100.0				# ignore, use 1100.0
+    coefficient = Campbell08_PGA_coefficient	# ignore, use PGA
+
+    # resize coefficients to (X, 1, 1, num_periods) shape
+    num_coeffs = coefficient.shape[0]
+    tmp = ones((num_periods, num_coeffs))
+
+    coefficient = (coefficient*tmp).transpose()[:,newaxis,newaxis,:]
+
+    # unpack coefficients
+    (C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,K1,K2,K3) = coefficient
+
+    # calculate some common repeated sub-expressions
+    Rjb2 = Rjb * Rjb
+    exp_min_075 = math.exp(-0.75)
+
+    # calculate Fmag from equation 2
+    # precalculate some terms so we don't do repeatedly
+    term2 = C2*(M-5.5)
+    term3 = C3*(M-6.5)
+    Fmag = C0 + C1*M				# M <= 5.5
+    Fmag = where(M > 5.5, Fmag+term2, Fmag)	# 5.5 < M <= 6.5
+    Fmag = where(M > 6.5, Fmag+term3, Fmag)	# M > 6.5
+    del term2, term3
+
+    # calculate Fdis from equation 3
+    Fdis = (C4 + C5*M)*log(sqrt(Rrup*Rrup + C6*C6))
+
+    # calculate Fflt from equations 4 and 5
+    # eqn 5 is simply Ffltz = min(Ztor, 1)
+    Fflt = C7*Frv*where(Ztor < 1, Ztor, 1.0) + C8*Fnm
+
+    # calculate hanging wall distance sub-term - eqn 7
+    Fhngr = ones(Rrup.shape)			# Rjb == 0 case
+    sqrt_Rjb2_plus_1 = sqrt(Rjb2+1.0)
+    max_1 = where(Rrup > sqrt_Rjb2_plus_1-Rjb, Rrup, sqrt_Rjb2_plus_1-Rjb)
+    max_2 = where(Rrup > sqrt_Rjb2_plus_1, Rrup, sqrt_Rjb2_plus_1)
+    Fhngr = where(Ztor < 1.0, max_1/max_2, Fhngr)
+    Fhngr = where(Ztor >= 1.0, (Rrup-Rjb)/Rrup, Fhngr)
+   
+    # hanging wall magnitude sub-term - eqn 8 
+    Fhngm = zeros(M.shape)			# M <= 6.0
+    Fhngm = where(M > 6.0, 2*(M-6.0), Fhngm)	# 6.0 < M < 6.5
+    Fhngm = where(M >= 6.5, 1.0, Fhngm)		# M >= 6.5
+
+    # hanging wall Ztor sub-term - eqn 9
+    Fhngz = zeros(Ztor.shape)
+    Fhngz = where(Ztor < 20.0, (20.0-Ztor)/20.0, 0.0)
+
+    # hanging wall dip sub-term - eqn 10
+    Fhngd = ones(delta.shape)
+    Fhngd = where(delta > 70.0, (90.0-delta)/20.0, Fhngd)
+    Fhngd = Fhngd[newaxis,:,newaxis]
+
+    # calculate total hanging wall sub-term - equation 6
+    Fhng = C9*Fhngr*Fhngm*Fhngz*Fhngd
+
+    # calculate Fsite from equation 11
+    Fsite = ones(Rrup.shape) * (C10+K2*N)*log(1100.0/K1)
+
+    # calculate Fsed from equation 12
+    Fsed = zeros(Z25.shape)
+    Fsed = where(Z25 < 1, C11*(Z25-1.0), Fsed)
+    Fsed = where(Z25 > 3, C12*K3*exp_min_075*(1 - exp(-0.25*(Z25-3))), Fsed)
+
+    # equation 1 gives final log_mean value (lnYhat in Campbell08-speak)
+    lnYhat = Fmag + Fdis + Fflt + Fhng + Fsite + Fsed
+
+    return lnYhat
+
+def Campbell08_distribution(**kwargs):
+    """The Campbell08 model.
+
+    kwargs  dictionary of parameters, expect:
+                mag, distance, coefficient
+
+    The algorithm here is taken from [1], pp 144-146  and returns results
+    that are natural log g.
+    """
+
+    # get args
+    M = kwargs['mag']				# event-specific
+    dist_object = kwargs['dist_object']		# distance object
+    Ztor = kwargs['depth_to_top']		# event-specific
+    Vs30 = kwargs['vs30']			# site-specific
+    delta = kwargs['dip']			# event-specific
+    faulting_type = kwargs['faulting_type']	# event-specific
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
+
+    # check we have the right shapes
+    num_periods = coefficient.shape[3]
+    msg = ('Expected coefficient.shape %s, got %s'
+           % (str((16, 1, 1, num_periods)), str(coefficient.shape)))
+    assert coefficient.shape == (16, 1, 1, num_periods), msg
+    msg = ('Expected sigma_coefficient.shape %s, got %s'
+           % (str((6, 1, 1, num_periods)), str(sigma_coefficient.shape)))
+    assert sigma_coefficient.shape == (6, 1, 1, num_periods), msg
+
+    # if user passed us Z25, use it, else calculate from Vs30
+    # (we should only pass in Z25 during testing)
+    Z25 = kwargs.get('Z25', None)
+    if Z25 is None:
+        tmp = conversions.convert_Vs30_to_Z10(Vs30)
+        Z25 = conversions.convert_Z10_to_Z25(tmp)
+        del tmp
+    Z25 = Z25[:,newaxis,newaxis]
+
+    # get required distance arrays
+    Rrup = dist_object.Rupture()
+    Rjb = dist_object.Joyner_Boore()
+
+    # get flag values from 'faulting_type'
+    Frv = Campbell08_faulting_type[:,0][faulting_type]
+    Fnm = Campbell08_faulting_type[:,1][faulting_type]
+
+    # unpack coefficients, massage dimensions
+    (C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,K1,K2,K3) = coefficient
+    (ElnY, TlnY, Ec, Et, Earb, rho) = sigma_coefficient
+
+    Rrup = Rrup[:,:,newaxis]
+    Rjb = Rjb[:,:,newaxis]
+
+    Vs30 = array(Vs30)
+    Vs30 = Vs30[:,newaxis,newaxis]
+
+    # calculate some common repeated sub-expressions
+    Rjb2 = Rjb * Rjb
+    Vs30_div_K1 = Vs30 / K1
+    exp_min_075 = math.exp(-0.75)
+
+    # calculate Fmag from equation 2
+    # precalculate some terms so we don't do repeatedly
+    term2 = C2*(M-5.5)
+    term3 = C3*(M-6.5)
+    Fmag = C0 + C1*M				# M <= 5.5
+    Fmag = where(M > 5.5, Fmag+term2, Fmag)	# 5.5 < M <= 6.5
+    Fmag = where(M > 6.5, Fmag+term3, Fmag)	# M > 6.5
+    del term2, term3
+
+    # calculate Fdis from equation 3
+    Fdis = (C4 + C5*M)*log(sqrt(Rrup*Rrup + C6*C6))
+
+    # calculate Fflt from equations 4 and 5
+    # eqn 5 is simply Ffltz = min(Ztor, 1)
+    Fflt = C7*Frv*where(Ztor < 1, Ztor, 1.0) + C8*Fnm
+
+    # calculate hanging wall distance sub-term from eqn 7
+    Fhngr = ones(Rrup.shape)			# Rjb == 0 case
+    sqrt_Rjb2_plus_1 = sqrt(Rjb2+1.0)
+    max_1 = where(Rrup > sqrt_Rjb2_plus_1-Rjb, Rrup, sqrt_Rjb2_plus_1-Rjb)
+    max_2 = where(Rrup > sqrt_Rjb2_plus_1, Rrup, sqrt_Rjb2_plus_1)
+    Fhngr = where(Ztor < 1.0, max_1/max_2, Fhngr)
+    Fhngr = where(Ztor >= 1.0, (Rrup-Rjb)/Rrup, Fhngr)
+   
+    # hanging wall magnitude sub-term - eqn 8 
+    Fhngm = zeros(M.shape)			# M <= 6.0 case
+    Fhngm = where(M > 6.0, 2*(M-6.0), Fhngm)	# 6.0 < M < 6.5
+    Fhngm = where(M >= 6.5, 1.0, Fhngm)		# M >= 6.5
+
+    # hanging wall Ztor sub-term - eqn 9
+    Fhngz = zeros(Ztor.shape)
+    Fhngz = where(Ztor < 20.0, (20.0-Ztor)/20.0, 0.0)
+
+    # hanging wall dip sub-term - eqn 10
+    Fhngd = ones(delta.shape)
+    Fhngd = where(delta > 70.0, (90.0-delta)/20.0, Fhngd)
+    Fhngd = Fhngd[newaxis,:,newaxis]
+
+    # calculate total hanging wall sub-term - eqn 6
+    Fhng = C9*Fhngr*Fhngm*Fhngz*Fhngd
+
+    # get the A1100 value - PGA for Vs30=1100
+    A1100 = exp(Campbell08_A1100(num_periods, M, Rrup, Rjb, Ztor, Z25, delta, Frv, Fnm))
+
+    # calculate Fsite from equation 11
+    Fsite = ones(Rrup.shape) * (C10+K2*N)*log(1100.0/K1)
+    less_1100 = (C10+K2*N)*log(Vs30_div_K1)
+    Fsite = where(Vs30 < 1100.0, less_1100, Fsite)
+    less_K1 = C10*log(Vs30_div_K1)+K2*(log(A1100+C*power(Vs30_div_K1,N))-log(A1100+C))
+    Fsite = where(Vs30 < K1, less_K1, Fsite)
+
+    # calculate Fsed from equation 12
+    Fsed = zeros(Z25.shape)
+    Fsed = where(Z25 < 1, C11*(Z25 - 1), Fsed)
+    Fsed = where(Z25 > 3, C12*K3*exp_min_075*(1 - exp(-0.25*(Z25-3))), Fsed)
+
+    # equation 1 gives final log_mean value (lnYhat in Campbell08-speak)
+    lnYhat = Fmag + Fdis + Fflt + Fhng + Fsite + Fsed
+
+    # calculate sigma values
+    (ElnY, TlnY, Ec, Et, Earb, rho) = sigma_coefficient
+
+    ElnYb = sqrt(ElnY*ElnY - ElnAF*ElnAF)		# page 147
+    ElnAB = sqrt(ElnPGA*ElnPGA - ElnAF*ElnAF)	# page 147
+
+    alpha = K2*A1100*(1/(A1100+C*pow(Vs30_div_K1, N)) - 1/(A1100 + C))
+    alpha = where(Vs30 >= K1, 0.0, alpha)
+
+    sigma = sqrt(ElnYb*ElnYb + ElnAF*ElnAF + alpha*alpha*ElnAB + 2*alpha*rho*ElnYb*ElnAB)
+    sigmaT = sqrt(sigma*sigma + TlnY*TlnY)		# eqn 16
+    log_sigma = log(sigmaT)
+
+    return (lnYhat, log_sigma)
+
+Campbell08_magnitude_type = 'Mw'
+Campbell08_distance_type = 'Rupture'
+
+######
+# Build the coefficient arrays
+######
+
+# dimension = (#periods, #coefficients)
+Campbell08_Table2 = array([
+#  C0     C1      C2      C3      C4     C5     C6    C7      C8     C9      C10    C11    C12     K1    K2     K3
+[ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839],  # PGA
+[ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839],  # 0.010
+[ -1.680, 0.500, -0.530, -0.262, -2.123, 0.170, 5.60, 0.280, -0.120, 0.490,  1.102, 0.040, 0.610,  865, -1.219, 1.840],  # 0.020
+[ -1.552, 0.500, -0.530, -0.262, -2.145, 0.170, 5.60, 0.280, -0.120, 0.490,  1.174, 0.040, 0.610,  908, -1.273, 1.841],  # 0.030
+[ -1.209, 0.500, -0.530, -0.267, -2.199, 0.170, 5.74, 0.280, -0.120, 0.490,  1.272, 0.040, 0.610, 1054, -1.346, 1.843],  # 0.050
+[ -0.657, 0.500, -0.530, -0.302, -2.277, 0.170, 7.09, 0.280, -0.120, 0.490,  1.438, 0.040, 0.610, 1086, -1.471, 1.845],  # 0.075
+[ -0.314, 0.500, -0.530, -0.324, -2.318, 0.170, 8.05, 0.280, -0.099, 0.490,  1.604, 0.040, 0.610, 1032, -1.624, 1.847],  # 0.10
+[ -0.133, 0.500, -0.530, -0.339, -2.309, 0.170, 8.79, 0.280, -0.048, 0.490,  1.928, 0.040, 0.610,  878, -1.931, 1.852],  # 0.15
+[ -0.486, 0.500, -0.446, -0.398, -2.220, 0.170, 7.60, 0.280, -0.012, 0.490,  2.194, 0.040, 0.610,  748, -2.188, 1.856],  # 0.20
+[ -0.890, 0.500, -0.362, -0.458, -2.146, 0.170, 6.58, 0.280,  0.000, 0.490,  2.351, 0.040, 0.700,  654, -2.381, 1.861],  # 0.25
+[ -1.171, 0.500, -0.294, -0.511, -2.095, 0.170, 6.04, 0.280,  0.000, 0.490,  2.460, 0.040, 0.750,  587, -2.518, 1.865],  # 0.30
+[ -1.466, 0.500, -0.186, -0.592, -2.066, 0.170, 5.30, 0.280,  0.000, 0.490,  2.587, 0.040, 0.850,  503, -2.657, 1.874],  # 0.40
+[ -2.569, 0.656, -0.304, -0.536, -2.041, 0.170, 4.73, 0.280,  0.000, 0.490,  2.544, 0.040, 0.883,  457, -2.669, 1.883],  # 0.50
+[ -4.844, 0.972, -0.578, -0.406, -2.000, 0.170, 4.00, 0.280,  0.000, 0.490,  2.133, 0.077, 1.000,  410, -2.401, 1.906],  # 0.75
+[ -6.406, 1.196, -0.772, -0.314, -2.000, 0.170, 4.00, 0.255,  0.000, 0.490,  1.571, 0.150, 1.000,  400, -1.955, 1.929],  # 1.0
+[ -8.692, 1.513, -1.046, -0.185, -2.000, 0.170, 4.00, 0.161,  0.000, 0.490,  0.406, 0.253, 1.000,  400, -1.025, 1.974],  # 1.5
+[ -9.701, 1.600, -0.978, -0.236, -2.000, 0.170, 4.00, 0.094,  0.000, 0.371, -0.456, 0.300, 1.000,  400, -0.299, 2.019],  # 2.0
+[-10.556, 1.600, -0.638, -0.491, -2.000, 0.170, 4.00, 0.000,  0.000, 0.154, -0.820, 0.300, 1.000,  400,  0.000, 2.110],  # 3.0
+[-11.212, 1.600, -0.316, -0.770, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.200],  # 4.0
+[-11.684, 1.600, -0.070, -0.986, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.291],  # 5.0
+[-12.505, 1.600, -0.070, -0.656, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.517],  # 7.5
+[-13.087, 1.600, -0.070, -0.422, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.744]]) # 10.0
+
+Campbell08_Table3 = array([
+#ElnY   TlnY   Ec     Et     Earb   rho
+[0.478, 0.219, 0.166, 0.526, 0.551, 1.000],  # PGA
+[0.478, 0.219, 0.166, 0.526, 0.551, 1.000],  # 0.010
+[0.480, 0.219, 0.166, 0.528, 0.553, 0.999],  # 0.020
+[0.489, 0.235, 0.165, 0.543, 0.567, 0.989],  # 0.030
+[0.510, 0.258, 0.162, 0.572, 0.594, 0.963],  # 0.050
+[0.520, 0.292, 0.158, 0.596, 0.617, 0.922],  # 0.075
+[0.531, 0.286, 0.170, 0.603, 0.627, 0.898],  # 0.10
+[0.532, 0.280, 0.180, 0.601, 0.628, 0.890],  # 0.15
+[0.534, 0.249, 0.186, 0.589, 0.618, 0.871],  # 0.20
+[0.534, 0.240, 0.191, 0.585, 0.616, 0.852],  # 0.25
+[0.544, 0.215, 0.198, 0.585, 0.618, 0.831],  # 0.30
+[0.541, 0.217, 0.206, 0.583, 0.618, 0.785],  # 0.40
+[0.550, 0.214, 0.208, 0.590, 0.626, 0.735],  # 0.50
+[0.568, 0.227, 0.221, 0.612, 0.650, 0.628],  # 0.75
+[0.568, 0.255, 0.225, 0.623, 0.662, 0.534],  # 1.0
+[0.564, 0.296, 0.222, 0.637, 0.675, 0.411],  # 1.5
+[0.571, 0.296, 0.226, 0.643, 0.682, 0.331],  # 2.0
+[0.558, 0.326, 0.229, 0.646, 0.686, 0.289],  # 3.0
+[0.576, 0.297, 0.237, 0.648, 0.690, 0.261],  # 4.0
+[0.601, 0.359, 0.237, 0.700, 0.739, 0.200],  # 5.0
+[0.628, 0.428, 0.271, 0.760, 0.807, 0.174],  # 7.5
+[0.667, 0.485, 0.290, 0.825, 0.874, 0.174]]) # 10.0
+
+# convert to dim = (#coefficients, #periods)
+Campbell08_coefficient = Campbell08_Table2.transpose()
+Campbell08_PGA_coefficient = Campbell08_coefficient[:,0]
+
+# dim = (period,)
+Campbell08_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
+                                 0.075, 0.10,  0.15,  0.20,  0.25,
+                                 0.30,  0.40,  0.50,  0.75,  1.0,
+                                 1.5,   2.0,   3.0,   4.0,   5.0,
+                                 7.5,  10.0]
+
+# dim = (period,)
+Campbell08_sigma_coefficient = Campbell08_Table3.transpose()
+Campbell08_PGA_sigma_coefficient = Campbell08_sigma_coefficient[:,0]
+Campbell08_sigma_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
+                                       0.075, 0.10,  0.15,  0.20,  0.25,
+                                       0.30,  0.40,  0.50,  0.75,  1.0,
+                                       1.5,   2.0,   3.0,   4.0,   5.0,
+                                       7.5,  10.0]
+
+Campbell08_interpolation = linear_interpolation
+
+gound_motion_init['Campbell08'] = [Campbell08_distribution,
+                                   Campbell08_magnitude_type,
+                                   Campbell08_distance_type,
+                                   Campbell08_coefficient,
+                                   Campbell08_coefficient_period,
+                                   Campbell08_interpolation,
+                                   Campbell08_sigma_coefficient,
+                                   Campbell08_sigma_coefficient_period,
+                                   Campbell08_interpolation]
+
+del Campbell08_Table2, Campbell08_Table3
+
+#########################  End of Campbell08 model  ############################
 

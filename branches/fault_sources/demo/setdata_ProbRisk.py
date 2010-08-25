@@ -29,12 +29,6 @@ use_site_indexes = True
 site_indexes = [2997, 2657, 3004, 3500]
 
 # Scenario input
-scenario_azimuth = 340
-scenario_depth = 11.5
-scenario_latitude = -32.95
-scenario_longitude = 151.61
-scenario_magnitude = 5.6
-scenario_number_of_events = 167
 
 # Probabilistic input
 prob_azimuth_in_zones = [10, 30, 70, 100, 150, 15]

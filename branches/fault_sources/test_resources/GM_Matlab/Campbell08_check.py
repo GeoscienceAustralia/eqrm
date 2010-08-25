@@ -95,7 +95,6 @@ def eqn_A1100(M, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs):
 
     (result, _) = eqn_1(M, Rrup, Rjb, Ztor, 1100.0, delta, PGA_coeffs, PGA_sigma_coeffs)
     result = math.exp(result)
-#    print 'A1100: A1100=%f| ' % result,
 
     return result
 
@@ -190,7 +189,6 @@ def eqn_14(taulnY):
     return taulnY
 
 def eqn_15(ElnYB, ElnAB, alpha, rho):
-#    print '15: ElnYB=%.3f, ElnAF=%.3f, alpha=%f, ElnAB=%.3f, rho=%.3f| ' % (ElnYB, ElnAF, alpha, ElnAB, rho),
     return math.sqrt(ElnYB*ElnYB + ElnAF*ElnAF + alpha*alpha*ElnAB*ElnAB + 2*alpha*rho*ElnYB*ElnAB)
 
 def eqn_16(M, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs):
@@ -205,7 +203,6 @@ def eqn_16(M, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs):
     # calculate sigma, return log(sigma)
     sigma = eqn_15(ElnYB, ElnAB, alpha, rho)
     tau = eqn_14(taulnY)
-#    print '16: sigma=%f| ' % sigma,
     return math.sqrt(sigma*sigma + tau*tau)
 
 def eqn_17(M, Rrup, Rjb, Ztor, delta, Vs30, tab2_coeffs, tab3_coeffs):
@@ -220,7 +217,6 @@ def eqn_17(M, Rrup, Rjb, Ztor, delta, Vs30, tab2_coeffs, tab3_coeffs):
     tmp1 = 1/(A1100+C*math.pow(Vs30/K1, N))
     tmp2 = 1/(A1100+C)
     alpha = K2*A1100*(tmp1 - tmp2)
-#    print '17: A1100=%f, K2=%f, tmp1=%f, tmp2=%f, alpha=%f| ' % (A1100, K2, tmp1, tmp2, alpha),
     return alpha
 
 def eqn_1(M, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs):
@@ -456,6 +452,11 @@ estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, 
 Rrup = Rjb = 50.0
 M = 5.0
 expected = 2.8e-5 # estimated
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=7.0, R=50.0km
+M = 7.0
+expected = 2.8e-3
 estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
 ######
@@ -695,29 +696,29 @@ M = 5.0
 expected = 0.39
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=2.0km
+# period = 0.2, M=7.0, R=2.0km
 M = 7.0
 expected = 0.385
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=5.0, R=10.0km
+# period = 0.2, M=5.0, R=10.0km
 Rrup = Rjb = 10.0
 M = 5.0
 expected = 0.395
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=10.0km
+# period = 0.2, M=7.0, R=10.0km
 M = 7.0
 expected = 0.38
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=5.0, R=50.0km
+# period = 0.2, M=5.0, R=50.0km
 Rrup = Rjb = 50.0
 M = 5.0
 expected = 0.495
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=50.0km
+# period = 0.2, M=7.0, R=50.0km
 M = 7.0
 expected = 0.41
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
@@ -736,29 +737,29 @@ M = 5.0
 expected = 0.58
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=2.0km
+# period = 1.0, M=7.0, R=2.0km
 M = 7.0
 expected = 0.56
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=5.0, R=10.0km
+# period = 1.0, M=5.0, R=10.0km
 Rrup = Rjb = 10.0
 M = 5.0
 expected = 0.60
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=10.0km
+# period = 1.0, M=7.0, R=10.0km
 M = 7.0
 expected = 0.60
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=5.0, R=50.0km
+# period = 1.0, M=5.0, R=50.0km
 Rrup = Rjb = 50.0
 M = 5.0
 expected = 0.615
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=50.0km
+# period = 1.0, M=7.0, R=50.0km
 M = 7.0
 expected = 0.58
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
@@ -777,25 +778,25 @@ M = 5.0
 expected = 0.645
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=2.0km
+# period = 3.0, M=7.0, R=2.0km
 M = 7.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=5.0, R=10.0km
+# period = 3.0, M=5.0, R=10.0km
 Rrup = Rjb = 10.0
 M = 5.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=10.0km
+# period = 3.0, M=7.0, R=10.0km
 M = 7.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=5.0, R=50.0km
+# period = 3.0, M=5.0, R=50.0km
 Rrup = Rjb = 50.0
 M = 5.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=50.0km
+# period = 3.0, M=7.0, R=50.0km
 M = 7.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
@@ -813,25 +814,25 @@ M = 5.0
 expected = 0.825
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=2.0km
+# period = 10.0, M=7.0, R=2.0km
 M = 7.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=5.0, R=10.0km
+# period = 10.0, M=5.0, R=10.0km
 Rrup = Rjb = 10.0
 M = 5.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=10.0km
+# period = 10.0, M=7.0, R=10.0km
 M = 7.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=5.0, R=50.0km
+# period = 10.0, M=5.0, R=50.0km
 Rrup = Rjb = 50.0
 M = 5.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
-# period = 0.01, M=7.0, R=50.0km
+# period = 10.0, M=7.0, R=50.0km
 M = 7.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 

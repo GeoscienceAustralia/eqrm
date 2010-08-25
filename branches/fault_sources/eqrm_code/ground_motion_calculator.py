@@ -98,7 +98,7 @@ class Ground_motion_calculator(object):
 
     def distribution_function(self, dist_object, mag_dict, depth=None,
                               depth_to_top=None, faulting_type=None, vs30=None,
-                              dist_type=None, mag_type=None,
+                              dist_type=None, mag_type=None, Z25=None, dip=None,
                               event_activity=None, event_id=None):
         """
         dist_object must give distance info if dist_object.distance(dist_type)
@@ -122,16 +122,20 @@ class Ground_motion_calculator(object):
          faulting_type) = self.resize_mag_depth(mag, depth, depth_to_top,
                                                 faulting_type)
         dist = self.resize_dist(dist, mag.size)
-#?
 
-        # This is calling the distribution functions described
-        # in ground_motion_interface
+        # This is calling the distribution functions described in the
+        # ground_motion_interface module.
+        # We add the new 'dist_object' parameter to cater to models that
+        # require more than one distance.  Once all existing models use
+        # the new parameter we can remove the 'distance' parameter.
         (log_mean, log_sigma) = \
-            self.GM_spec.distribution(mag=mag, distance=dist,
+            self.GM_spec.distribution(dist_object=dist_object,
+                                      mag=mag, distance=dist,
                                       coefficient=self.coefficient,
                                       sigma_coefficient=self.sigma_coefficient,
                                       depth=depth, depth_to_top=depth_to_top,
-                                      faulting_type=faulting_type, vs30=vs30)
+                                      faulting_type=faulting_type, vs30=vs30,
+                                      Z25=Z25, dip=dip)
 
         # FIXME when will this fail?  Maybe let it fail then?
         # If it does not fail here it fails in analysis.py"
@@ -247,7 +251,7 @@ class Multiple_ground_motion_calculator(object):
                                             depth=event_set.depth,
                                             depth_to_top=event_set.depth_to_top,
                                             faulting_type=event_set.faulting_type,
-                                            vs30=vs30,
+                                            vs30=vs30, Z25=None, dip=None,
                                             event_activity=event_activity,
                                             event_id=event_id)
 
@@ -258,7 +262,8 @@ class Multiple_ground_motion_calculator(object):
 
     def _distribution_function(self, dist_object, mag_dict, depth=None,
                                depth_to_top=None, faulting_type=None,
-                               vs30=None, event_activity=None, event_id=None):
+                               vs30=None, Z25=None, dip=None,
+                               event_activity=None, event_id=None):
         """
         The event_activity and event_id are not used currently.
         But if we spawn they will be.
@@ -268,11 +273,12 @@ class Multiple_ground_motion_calculator(object):
 
         multi_log_mean = []
         multi_log_sigma = []
-        for attenuation_id, GM_model in enumerate(self.GM_models):
+        for GM_model in self.GM_models:
             (log_mean, log_sigma) = \
                 GM_model.distribution_function(dist_object, mag_dict,
                                                depth=depth, depth_to_top=depth_to_top,
                                                faulting_type=faulting_type, vs30=vs30,
+                                               Z25=Z25, dip=dip,
                                                dist_type=GM_model.GM_spec.distance_type,
                                                mag_type=GM_model.GM_spec.magnitude_type)
             multi_log_mean.append(log_mean)
