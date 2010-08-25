@@ -115,7 +115,7 @@ class Test_Generation_polygon(unittest.TestCase):
         azimuth = {'distribution':'uniform',
                        'minimum':float(azi[0])-float(dazi[0]),
                        'maximum': float(azi[0])+float(dazi[0])}
-        dip = {'distribution':'constant',
+        dip = {'distribution':'uniform',
                'minimum':float(dip)-float(delta_dip),
                'maximum': float(dip)+float(delta_dip)}
         magnitude = {'distribution':'uniform',

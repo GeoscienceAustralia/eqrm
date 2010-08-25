@@ -9,6 +9,7 @@
   ModifiedBy: $Author: dgray $
   ModifiedDate: $Date: 2010-05-12 09:34:07 +1000 (Wed, 12 May 2010) $
 """
+import os
 
 from eqrm_code.distributions import distribution_functions
 from eqrm_code.polygon import populate_polygon
@@ -105,12 +106,15 @@ def polygons_from_xml(filename,
             fault_width,
             prob_min_mag_cutoff,
             override_xml)
-    # Hacky checking code    
-#     handle = open('.\implementation_tests\input/newc_source_polygon.xmlq')
-#     #print "handle", handle
+    # Hacky checking code
+#     from eqrm_code.eqrm_filesystem import scenario_input_bridges_path
+    
+#     handle = open(os.path.join(scenario_input_bridges_path,
+#                                'newc_source_polygon.xml'))
+#     print "handle", handle
 #     doc=Xml_Interface(filename=handle)
     
-#     generation_polygons_h,magnitude_type_h = polygons_from_xml_horspool(
+#     generation_polygons_r,magnitude_type_h = polygons_from_xml_row(
 #         doc, 
 #         azi,
 #         dazi,
@@ -120,17 +124,20 @@ def polygons_from_xml(filename,
 #         override_xml)
 #     assert magnitude_type == magnitude_type_h
     
-#     for i in range(len(generation_polygons_h)):
-#         assert generation_polygons[i]._linestring == generation_polygons_h[i]._linestring 
+#     for i in range(len(generation_polygons_r)):
+#         assert generation_polygons[i]._linestring == generation_polygons_r[i]._linestring 
 
-#         assert generation_polygons[i].fault_width_dist == generation_polygons_h[i].fault_width_dist
-#         assert generation_polygons[i].fault_depth_dist == generation_polygons_h[i].fault_depth_dist
-#         assert generation_polygons[i].azimuth == generation_polygons_h[i].azimuth
-#         assert generation_polygons[i].dip == generation_polygons_h[i].dip
-#         print "i", i
-#         print "generation_polygons[i].magnitude",generation_polygons[i].magnitude 
-#         print "generation_polygons_h[i].magnitude", generation_polygons_h[i].magnitude
-#         assert generation_polygons[i].magnitude == generation_polygons_h[i].magnitude
+#         assert generation_polygons[i].fault_width_dist == generation_polygons_r[i].fault_width_dist
+#         assert generation_polygons[i].fault_depth_dist == generation_polygons_r[i].fault_depth_dist
+#         assert generation_polygons[i].azimuth == generation_polygons_r[i].azimuth
+#         #print "generation_polygons[i].dip", generation_polygons[i].dip
+#         #print "generation_polygons_r[i].dip", generation_polygons_r[i].dip
+#         #generation_polygons[i].dip = generation_polygons_r[i].dip
+#         #assert generation_polygons[i].dip == generation_polygons_r[i].dip
+#         #print "i", i
+#         #print "generation_polygons[i].magnitude",generation_polygons[i].magnitude 
+#         #print "generation_polygons_r[i].magnitude", generation_polygons_r[i].magnitude
+#         assert generation_polygons[i].magnitude == generation_polygons_r[i].magnitude
 
     return generation_polygons, magnitude_type
 

@@ -283,6 +283,8 @@ class Test_Source_model(unittest.TestCase):
                    0.0097141 ]
         self.failUnless( len(actual)==len(event_activity),
             'Failed!')
+        #print "array(actual)", array(actual)
+        #print "event_activity", event_activity
         # this fails using self.__contains_point_geo(point)
         self.assert_ (allclose(array(actual),event_activity))
 
@@ -290,5 +292,6 @@ class Test_Source_model(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Source_model,'test')
+    #suite = unittest.makeSuite(Test_Source_model,'test_Source_mini_check_gong')
     runner = unittest.TextTestRunner()
     runner.run(suite)

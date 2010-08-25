@@ -101,7 +101,6 @@ class Event_Set(object):
 
 
         """
-        
         self.azimuth = azimuth
         self.dip = dip
         self.ML = ML
@@ -449,7 +448,6 @@ class Event_Set(object):
             new_Mw=magnitude
         else:
             raise Exception('Magnitudes not set')
-        
         event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
                                  rupture_centroid_lon=rupture_centroid_lon,
                                  azimuth=azimuth,
