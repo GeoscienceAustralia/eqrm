@@ -83,6 +83,8 @@ class Test_Generation_polygon(unittest.TestCase):
         handle.close()
 
 
+        dip= 15
+        delta_dip = 5
         prob_min_mag_cutoff = 1.0
         azi=[45]
         dazi=[5]
@@ -113,7 +115,9 @@ class Test_Generation_polygon(unittest.TestCase):
         azimuth = {'distribution':'uniform',
                        'minimum':float(azi[0])-float(dazi[0]),
                        'maximum': float(azi[0])+float(dazi[0])}
-        dip = {'distribution':'constant','mean':float(fault_dip[0])}
+        dip = {'distribution':'constant',
+               'minimum':float(dip)-float(delta_dip),
+               'maximum': float(dip)+float(delta_dip)}
         magnitude = {'distribution':'uniform',
                          'minimum':3.4,
                          'maximum': '5.4'}

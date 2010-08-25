@@ -1,6 +1,8 @@
 <source_model_zone magnitude_type="Mw">
     <zone area = "5054.035">
     <geometry 
+    dip = "35"
+    delta_dip = "0"
     depth_top_seismogenic = "7">
         <boundary>
   -32.4000  151.1500    
@@ -22,6 +24,8 @@
     
     <zone area = "57731.425">
     <geometry 
+    dip = "35"
+    delta_dip = "0"
     depth_top_seismogenic = "7">
         <boundary>
 -31.0000  149.5000    
@@ -48,6 +52,8 @@
     
     <zone area = "56703.105">
     <geometry 
+    dip = "35"
+    delta_dip = "0"
     depth_top_seismogenic = "7">
         <boundary>
   -35.0000  149.5000    
@@ -75,6 +81,8 @@
     
     <zone area = "3046.615">
     <geometry 
+    dip = "35"
+    delta_dip = "0"
     depth_top_seismogenic = "7">
         <boundary>
   -32.9250  151.4000    
@@ -97,6 +105,8 @@
     
     <zone area = "72204.957">
     <geometry 
+    dip = "35"
+    delta_dip = "0"
     depth_top_seismogenic = "7">
         <boundary>
   -31.0000  149.5000    
@@ -124,6 +134,8 @@
     
     <zone area = "44149.044">
     <geometry 
+    dip = "35"
+    delta_dip = "0"
     depth_top_seismogenic = "7">
         <boundary>
   -35.0000  149.5000    

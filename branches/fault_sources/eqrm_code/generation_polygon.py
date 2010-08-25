@@ -56,7 +56,6 @@ class Generation_Polygon(polygon_object):
         """
         local_distribution_args = distribution_args.copy()
         #Copy the pdf_dict, so that the original doesn't get mutated
-
         distribution_name = local_distribution_args.pop('distribution')
         #get the name of the desired distribution (deleting it from the dict)
 
@@ -243,35 +242,35 @@ def polygons_from_xml_horspool(doc,
         geometry = xml_polygon['geometry'][0]
         geometry_atts = xml_polygon['geometry'][0].attributes 
         boundary = geometry['boundary'][0].array
-        boundary.shape = -1, 2  # Had to add for a test. 
-        try: dip = float(geometry_atts['dip'])
-        except: pass     
-        try: dip = float(geometry_atts['delta_dip'])
-        except: pass
+        boundary.shape = -1, 2  # Had to add for a test.
+        dip = float(geometry_atts['dip'])
+        delta_dip = float(geometry_atts['delta_dip'])
 
-        if override_xml:
-            #fault_depth = float(geometry_atts['depth_top_seismogenic'])
-            fault_depth = geometry_atts['depth_top_seismogenic']
-            fault_depth_dist = {'distribution':'constant','mean':fault_depth}
-            fault_width_dist = {'distribution':'constant','mean':fault_width}
-            dip = {'distribution':'constant','mean':float(fault_dip[i])}
-            recurrence = xml_polygon['recurrence_model'][0]
-            event_gen_atts = recurrence['event_generation'][0].attributes
-            min_magnitude = event_gen_atts['generation_min_mag']
-            recurrence_atts = recurrence.attributes
-            min_magnitude = recurrence_atts['recurrence_min_mag']
-            min_mag = prob_min_mag_cutoff
-            minmag = max(float(min_magnitude),
-                       float(min_mag))
-            #maxmag = float(recurrence_atts['recurrence_max_mag'])
-            maxmag = recurrence_atts['recurrence_max_mag']
-            magnitude = {'distribution':'uniform',
-                         'minimum':minmag,
-                         'maximum': maxmag}
-            azimuth = {'distribution':'uniform',
-                       'minimum':float(azi[i])-float(dazi[i]),
-                       'maximum': float(azi[i])+float(dazi[i])}
-           
+        #fault_depth = float(geometry_atts['depth_top_seismogenic'])
+        fault_depth = geometry_atts['depth_top_seismogenic']
+        fault_depth_dist = {'distribution':'constant','mean':fault_depth}
+        fault_width_dist = {'distribution':'constant','mean':fault_width}
+        
+        dip = {'distribution':'uniform',
+               'minimum':float(dip)-float(delta_dip),
+               'maximum': float(dip)+float(delta_dip)}
+        recurrence = xml_polygon['recurrence_model'][0]
+        event_gen_atts = recurrence['event_generation'][0].attributes
+        min_magnitude = event_gen_atts['generation_min_mag']
+        recurrence_atts = recurrence.attributes
+        min_magnitude = recurrence_atts['recurrence_min_mag']
+        min_mag = prob_min_mag_cutoff
+        minmag = max(float(min_magnitude),
+                     float(min_mag))
+        #maxmag = float(recurrence_atts['recurrence_max_mag'])
+        maxmag = recurrence_atts['recurrence_max_mag']
+        magnitude = {'distribution':'uniform',
+                     'minimum':minmag,
+                     'maximum': maxmag}
+        azimuth = {'distribution':'uniform',
+                   'minimum':float(azi[i])-float(dazi[i]),
+                   'maximum': float(azi[i])+float(dazi[i])}
+        
             
         exclude=[]
         for exclusion_zone in xml_polygon['excludes']:
