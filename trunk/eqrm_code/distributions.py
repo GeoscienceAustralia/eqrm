@@ -29,6 +29,9 @@ def uniform(minimum=None, maximum=None, n=1):
     """Generate a list with a uniform distribution"""
     minimum = float(minimum)
     maximum = float(maximum)
+
+    if minimum == maximum:
+        return n*[minimum]
     answer = []
     for i in range(n):
         answer.append(random.uniform(a=minimum, b=maximum))

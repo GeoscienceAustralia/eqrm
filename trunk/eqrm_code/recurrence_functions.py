@@ -63,7 +63,7 @@ def calc_event_activity(event_set, sources,
             grfctr=grscale(zone_b,zone_mhgh,zone_mlow,zone_m0)
             A_mlow=zone_f_gr*grfctr
             # print "zone_f_gr", zone_f_gr
-            # print "grfctr",grfctr 
+            #print "grfctr",grfctr 
             # print "A_mlow",A_mlow
 
             #print "zone_mlow",zone_mlow

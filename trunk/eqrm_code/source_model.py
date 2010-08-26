@@ -21,6 +21,9 @@ from eqrm_code.xml_interface import Xml_Interface
 
 class Source_Models(object):
     """
+    Class to handle multiple Source Models.
+
+    Code can currently only handle one Source Model
     """
     def __init__(self,prob_min_mag_cutoff, weight, *filenames):
         #print "prob_min_mag_cutoff", prob_min_mag_cutoff
@@ -143,6 +146,16 @@ class Source_Zone_Polygon(polygon_object):
     
 def source_model_from_xml(filename,prob_min_mag_cutoff):
     doc=Xml_Interface(filename=filename)
+    if not doc['Source_Model'] == []:
+        source_model = source_model_from_xml_row(
+            doc, prob_min_mag_cutoff)
+    else:
+        source_model = source_model_from_xml_horspool(
+            doc, prob_min_mag_cutoff)
+    return source_model
+
+
+def source_model_from_xml_row(doc, prob_min_mag_cutoff):
     xml_source_model=doc['Source_Model'][0]
     magnitude_type=xml_source_model.attributes['magnitude_type']
     
@@ -168,6 +181,42 @@ def source_model_from_xml(filename,prob_min_mag_cutoff):
                                                   min_magnitude,max_magnitude,
                                                   prob_min_mag_cutoff,
                                                   Lambda_Min,b)
+        source_zone_polygons.append(source_zone_polygon)
+        
+    doc.unlink()
+    return Source_Model(source_zone_polygons,magnitude_type)
+
+
+def source_model_from_xml_horspool(doc, prob_min_mag_cutoff):
+    xml_source_model=doc['source_model_zone'][0]
+    magnitude_type=xml_source_model.attributes['magnitude_type']
+    
+    source_zone_polygons=[]
+    xml_polygons = doc['zone']
+    for xml_polygon in xml_polygons:
+        geometry = xml_polygon['geometry'][0]
+        boundary = geometry['boundary'][0].array
+        recurrence = xml_polygon['recurrence_model'][0].attributes
+        
+        min_magnitude=float(recurrence['recurrence_min_mag'])
+        max_magnitude=float(recurrence['recurrence_max_mag'])
+        #prob_min_mag_cutoff=float(recurrence['prob_min_mag_cutoff'])
+        Lambda_Min=float(recurrence['lambda_min'])
+        b=float(recurrence['b'])
+        
+        area = float(xml_polygon.attributes['area'])
+        exclude=[]
+        for exclusion_zone in xml_polygon['excludes']:
+            exclude.append(exclusion_zone.array)
+        #print 'LAMBDAMIN 1 ',Lambda_Min
+
+        source_zone_polygon = Source_Zone_Polygon(
+            boundary,
+            exclude,
+            min_magnitude,
+            max_magnitude,
+            prob_min_mag_cutoff,
+            Lambda_Min,b)
         source_zone_polygons.append(source_zone_polygon)
         
     doc.unlink()
