@@ -190,7 +190,7 @@ def file_diff(fileA, fileB):
     return True, None, None
 
 def float_line_diff(lineA, lineB,
-                    relative_tolerance=1e-10):
+                    relative_tolerance=1e-10): #usually 1e-10
     """
     relative_tolerance=1e-1 still gives a failed file in Linux
     
