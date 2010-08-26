@@ -58,7 +58,7 @@ def create_event_set(event_num):
             prob_min_mag_cutoff,
             override_xml,
             prob_number_of_events_in_zones)
-#        print "events.trace_start_lat", events.trace_start_lat
+#         print "events.trace_start_lat", events.trace_start_lat
 #         print " events.trace_start_lon", events.trace_start_lon
 #         print "events.trace_end_lat", events.trace_end_lat
 #         print "events.trace_end_lon", events.trace_end_lon
@@ -74,7 +74,7 @@ def create_event_set(event_num):
                                                      
 #-------------------------------------------------------------
 if __name__ == "__main__":
-    event_num = 100000
+    event_num = 100000 
     eqrmlog.console_logging_level = eqrmlog.INFO
     eqrmlog.info('Memory: before creating ' + str(event_num) + ' events')
     eqrmlog.resource_usage(level=eqrmlog.INFO)
