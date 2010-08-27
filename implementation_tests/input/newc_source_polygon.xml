@@ -3,6 +3,8 @@
     <geometry 
     dip = "35"
     delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
     depth_top_seismogenic = "7">
         <boundary>
   -32.4000  151.1500    
@@ -26,6 +28,8 @@
     <geometry 
     dip = "35"
     delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
     depth_top_seismogenic = "7">
         <boundary>
 -31.0000  149.5000    
@@ -54,6 +58,8 @@
     <geometry 
     dip = "35"
     delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
     depth_top_seismogenic = "7">
         <boundary>
   -35.0000  149.5000    
@@ -83,6 +89,8 @@
     <geometry 
     dip = "35"
     delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
     depth_top_seismogenic = "7">
         <boundary>
   -32.9250  151.4000    
@@ -107,6 +115,8 @@
     <geometry 
     dip = "35"
     delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
     depth_top_seismogenic = "7">
         <boundary>
   -31.0000  149.5000    
@@ -136,6 +146,8 @@
     <geometry 
     dip = "35"
     delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
     depth_top_seismogenic = "7">
         <boundary>
   -35.0000  149.5000    

@@ -42,8 +42,8 @@ class Test_Generation_polygon(unittest.TestCase):
   name = "bad zone">
     
     <geometry 
-       azimuth= "6" 
-       delta_azimuth= "2" 
+       azimuth= "45" 
+       delta_azimuth= "5" 
        dip= "15"
        delta_dip = "5"
        depth_top_seismogenic = "7"
@@ -108,8 +108,9 @@ class Test_Generation_polygon(unittest.TestCase):
                        #[(151.1500, -32.4000),
                        #(152.1700, -32.7500),
                        #(151.4300, -33.4500)]
-        fault_depth_dist = {'distribution':'constant',
+        depth_top_seismogenic_dist = {'distribution':'constant',
                             'mean':'7'}
+        depth_bottom_seismogenic_dist = {'distribution':None}
         fault_width_dist = {'distribution':'constant',
                             'mean':fault_width}
         azimuth = {'distribution':'uniform',
@@ -123,10 +124,12 @@ class Test_Generation_polygon(unittest.TestCase):
                          'maximum': '5.4'}
         actual_gp = Generation_Polygon(
             boundary,
-            fault_depth_dist,
+            depth_top_seismogenic_dist,
             fault_width_dist,
             azimuth,dip,
-            magnitude,exclude)
+            magnitude,
+            depth_bottom_seismogenic_dist,
+            exclude)
         
         #print "source_zone_polygon.polygon_object", szp._linestring
         calc_gp = generation_polygons[0]
@@ -136,7 +139,7 @@ class Test_Generation_polygon(unittest.TestCase):
             'Failed!')
         self.failUnless( calc_gp.fault_width_dist==fault_width_dist,
             'Failed!')
-        self.failUnless( calc_gp.fault_depth_dist==fault_depth_dist,
+        self.failUnless( calc_gp.depth_top_seismogenic_dist==depth_top_seismogenic_dist,
             'Failed!')
         self.failUnless( calc_gp.azimuth==azimuth,
             'Failed!')

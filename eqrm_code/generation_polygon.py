@@ -20,27 +20,37 @@ from eqrm_code.xml_interface import Xml_Interface
 class Generation_Polygon(polygon_object):
     def __init__(self,
                  boundary,
-                 fault_depth_dist,
+                 depth_top_seismogenic_dist,
                  fault_width_dist,
                  azimuth,
                  dip,
                  magnitude,
+                 depth_bottom_seismogenic_dist,
                  exclude=None):
+        """
+        boundary is an array of polygon points
+        exclude is an array of polygon points
+        All other variables are dictionaries describing distributions
+        """
         if exclude is None:
             exclude = []        
         polygon_object.__init__(self,boundary,exclude)
         self.fault_width_dist=fault_width_dist
-        self.fault_depth_dist=fault_depth_dist
+        self.depth_top_seismogenic_dist=depth_top_seismogenic_dist
         self.azimuth=azimuth
         self.dip=dip
         self.magnitude=magnitude
+        self.depth_bottom_seismogenic_dist = depth_bottom_seismogenic_dist
 
     def populate_fault_width(self,n):
         return self.populate_distribution(self.fault_width_dist,n)
     
-    def populate_fault_depth(self,n):
-        return self.populate_distribution(self.fault_depth_dist,n)
+    def populate_depth_top_seismogenic(self,n):
+        return self.populate_distribution(self.depth_top_seismogenic_dist,n)
 
+    def populate_depth_bottom_seismogenic(self,n):
+        return self.populate_distribution(self.depth_bottom_seismogenic_dist,n)
+    
     def populate_azimuth(self,n):
         return self.populate_distribution(self.azimuth,n)
 
@@ -55,11 +65,16 @@ class Generation_Polygon(polygon_object):
         Use the distribution specifed in pdf_dict to
         calculate an n-vector with the correct distribution.
         """
+
         local_distribution_args = distribution_args.copy()
         #Copy the pdf_dict, so that the original doesn't get mutated
         distribution_name = local_distribution_args.pop('distribution')
         #get the name of the desired distribution (deleting it from the dict)
 
+        # Just used for depth_bottom_seismogenic_dist
+        if distribution_name == None:
+            return None
+        
         distribution_function = distribution_functions[distribution_name]
         #get the distribution function from a table of functions
 
@@ -99,13 +114,9 @@ def polygons_from_xml(filename,
             override_xml)
     else:
         generation_polygons, magnitude_type = polygons_from_xml_horspool(
-            doc, 
-            azi,
-            dazi,
-            fault_dip,
+            doc,
             fault_width,
-            prob_min_mag_cutoff,
-            override_xml)
+            prob_min_mag_cutoff)
     # Hacky checking code
 #     from eqrm_code.eqrm_filesystem import scenario_input_bridges_path
     
@@ -128,7 +139,7 @@ def polygons_from_xml(filename,
 #         assert generation_polygons[i]._linestring == generation_polygons_r[i]._linestring 
 
 #         assert generation_polygons[i].fault_width_dist == generation_polygons_r[i].fault_width_dist
-#         assert generation_polygons[i].fault_depth_dist == generation_polygons_r[i].fault_depth_dist
+#         assert generation_polygons[i].depth_top_seismogenic_dist == generation_polygons_r[i].depth_top_seismogenic_dist
 #         assert generation_polygons[i].azimuth == generation_polygons_r[i].azimuth
 #         #print "generation_polygons[i].dip", generation_polygons[i].dip
 #         #print "generation_polygons_r[i].dip", generation_polygons_r[i].dip
@@ -173,7 +184,7 @@ def polygons_from_xml_row(doc,
         boundary.shape = -1, 2  # Had to add for a test. 
         try: fault_width_dist = xml_polygon['fault_width'][0].attributes
         except: pass
-        try: fault_depth_dist = xml_polygon['fault_depth'][0].attributes
+        try: depth_top_seismogenic_dist = xml_polygon['fault_depth'][0].attributes
         except: pass
         try: dip = xml_polygon['dip'][0].attributes
         except: pass
@@ -184,7 +195,8 @@ def polygons_from_xml_row(doc,
 
         if override_xml:
             fault_depth=xml_polygon['recurrence'][0].attributes['depth']
-            fault_depth_dist = {'distribution':'constant','mean':fault_depth}
+            depth_top_seismogenic_dist = {'distribution':'constant','mean':fault_depth}
+            depth_bottom_seismogenic_dist = {'distribution':None}
             fault_width_dist = {'distribution':'constant','mean':fault_width}
             dip = {'distribution':'constant','mean':float(fault_dip[i])}
             
@@ -206,7 +218,7 @@ def polygons_from_xml_row(doc,
         for exclusion_zone in xml_polygon['exclude']:
             exclude.append(exclusion_zone.array)
         generation_polygon = Generation_Polygon(boundary,
-                                                fault_depth_dist,
+                                                depth_top_seismogenic_dist,
                                                 fault_width_dist,
                                                 azimuth,dip,
                                                 magnitude,exclude)
@@ -219,21 +231,12 @@ def polygons_from_xml_row(doc,
     return generation_polygons,magnitude_type
 
 def polygons_from_xml_horspool(doc,
-                               azi=None,
-                               dazi=None,
-                               fault_dip=None,
                                fault_width=None,
-                               prob_min_mag_cutoff=None,
-                               override_xml=False):
+                               prob_min_mag_cutoff=None):
     """
     
-    azi, dazi and fault_dip are lists of length len(xml_polygons)
+    fault_width and prob_min_mag_cutoff are lists of length len(xml_polygons)
 
-    Is the override_xml used so a list of events with no location can
-    be turned into an event set? 
-
-    Why are so many parameters passed in?
-    override_xml:  Analysis uses True
     Returns a list of Generation_Polygon and magnitude_type
 
     Assumes only one source model
@@ -252,10 +255,13 @@ def polygons_from_xml_horspool(doc,
         boundary.shape = -1, 2  # Had to add for a test.
         dip = float(geometry_atts['dip'])
         delta_dip = float(geometry_atts['delta_dip'])
+        azi = float(geometry_atts['azimuth'])
+        dazi = float(geometry_atts['delta_azimuth'])
 
         #fault_depth = float(geometry_atts['depth_top_seismogenic'])
         fault_depth = geometry_atts['depth_top_seismogenic']
-        fault_depth_dist = {'distribution':'constant','mean':fault_depth}
+        depth_top_seismogenic_dist = {'distribution':'constant','mean':fault_depth}
+        depth_bottom_seismogenic_dist = {'distribution':None}
         fault_width_dist = {'distribution':'constant','mean':fault_width}
         
         dip = {'distribution':'uniform',
@@ -275,8 +281,8 @@ def polygons_from_xml_horspool(doc,
                      'minimum':minmag,
                      'maximum': maxmag}
         azimuth = {'distribution':'uniform',
-                   'minimum':float(azi[i])-float(dazi[i]),
-                   'maximum': float(azi[i])+float(dazi[i])}
+                   'minimum':azi - dazi,
+                   'maximum':azi + dazi}
         
             
         exclude=[]
@@ -284,10 +290,12 @@ def polygons_from_xml_horspool(doc,
             exclude.append(exclusion_zone.array)
         generation_polygon = Generation_Polygon(
             boundary,
-            fault_depth_dist,
+            depth_top_seismogenic_dist,
             fault_width_dist,
             azimuth,dip,
-            magnitude,exclude)
+            magnitude,
+            depth_bottom_seismogenic_dist,
+            exclude)
         generation_polygons.append(generation_polygon)
 
     doc.unlink()
