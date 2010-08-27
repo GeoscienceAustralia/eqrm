@@ -44,10 +44,10 @@ class Test_Generation_polygon(unittest.TestCase):
     <geometry 
        azimuth= "45" 
        delta_azimuth= "5" 
-       dip= "15"
+       dip= "35"
        delta_dip = "5"
        depth_top_seismogenic = "7"
-       depth_bottom_seismogenic = "30">
+       depth_bottom_seismogenic = "15.60364655">
       <boundary>
 	  151.1500 -32.4000  
 	  152.1700 -32.7500
@@ -83,7 +83,7 @@ class Test_Generation_polygon(unittest.TestCase):
         handle.close()
 
 
-        dip= 15
+        dip= 35
         delta_dip = 5
         prob_min_mag_cutoff = 1.0
         azi=[45]
@@ -109,10 +109,10 @@ class Test_Generation_polygon(unittest.TestCase):
                        #(152.1700, -32.7500),
                        #(151.4300, -33.4500)]
         depth_top_seismogenic_dist = {'distribution':'constant',
-                            'mean':'7'}
+                            'mean':7}
         depth_bottom_seismogenic_dist = {'distribution':None}
         fault_width_dist = {'distribution':'constant',
-                            'mean':fault_width}
+                            'mean':15.000000008254018}
         azimuth = {'distribution':'uniform',
                        'minimum':float(azi[0])-float(dazi[0]),
                        'maximum': float(azi[0])+float(dazi[0])}
@@ -137,8 +137,9 @@ class Test_Generation_polygon(unittest.TestCase):
             'Failed!')
         self.failUnless( calc_gp._linestring==actual_gp._linestring,
             'Failed!')
-        self.failUnless( calc_gp.fault_width_dist==fault_width_dist,
-            'Failed!')
+        #print "calc_gp.fault_width_dist", calc_gp.fault_width_dist
+        self.failUnless( calc_gp.fault_width_dist==fault_width_dist,'Failed!')
+        
         self.failUnless( calc_gp.depth_top_seismogenic_dist==depth_top_seismogenic_dist,
             'Failed!')
         self.failUnless( calc_gp.azimuth==azimuth,
