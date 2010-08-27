@@ -30,8 +30,8 @@ from eqrm_code.ANUGA_utilities import log as eqrmlog
 
 # This specifies the dtypes used in  event set.
 # This is used ot save memory
-EVENT_FLOAT = float32 #float64
-EVENT_INT = int32 #int64
+EVENT_FLOAT = float64 #float32
+EVENT_INT = int64 #int32
 
 ######
 # Define the mapping from fault type NAME to integer INDEX.
@@ -206,7 +206,7 @@ class Event_Set(object):
 
         # set_vectors
         if depth is not None:
-            depth = asarray(depth) #, dtype=EVENT_FLOAT)
+            depth = asarray(depth)
 
         if fault_depth is not None:
             fault_depth = asarray(fault_depth)
@@ -223,7 +223,7 @@ class Event_Set(object):
                     
         rupture_centroid_lat = asarray(rupture_centroid_lat)
         rupture_centroid_lon = asarray(rupture_centroid_lon)
-        azimuth = asarray(azimuth) #, dtype=EVENT_FLOAT)
+        azimuth = asarray(azimuth)
         dip = asarray(dip)    
         if ML is not None:
             ML = asarray(ML)
