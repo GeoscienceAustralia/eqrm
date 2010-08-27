@@ -5,7 +5,8 @@
     delta_dip = "0"
     azimuth = "180"
     delta_azimuth = "180"
-    depth_top_seismogenic = "7">
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -32.4000  151.1500    
   -32.7500  152.1700    
@@ -30,7 +31,8 @@
     delta_dip = "0"
     azimuth = "180"
     delta_azimuth = "180"
-    depth_top_seismogenic = "7">
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
 -31.0000  149.5000    
   -32.4000  149.5000    
@@ -60,7 +62,8 @@
     delta_dip = "0"
     azimuth = "180"
     delta_azimuth = "180"
-    depth_top_seismogenic = "7">
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -35.0000  149.5000    
   -32.4000  149.5000    
@@ -91,7 +94,8 @@
     delta_dip = "0"
     azimuth = "180"
     delta_azimuth = "180"
-    depth_top_seismogenic = "7">
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -32.9250  151.4000    
   -32.7500  151.7500    
@@ -117,7 +121,8 @@
     delta_dip = "0"
     azimuth = "180"
     delta_azimuth = "180"
-    depth_top_seismogenic = "7">
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -31.0000  149.5000    
   -32.9250  149.5000    
@@ -148,7 +153,8 @@
     delta_dip = "0"
     azimuth = "180"
     delta_azimuth = "180"
-    depth_top_seismogenic = "7">
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -35.0000  149.5000    
   -32.9250  149.5000    

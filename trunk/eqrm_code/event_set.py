@@ -29,7 +29,9 @@ from eqrm_code.ANUGA_utilities import log as eqrmlog
 
 
 # This specifies the dtypes used in  event set.
-# This is used ot save memory
+# This is used to save memory
+# Float32 gives differnet results between windows and linux
+# therefore let's not use it.
 EVENT_FLOAT = float64 #float32
 EVENT_INT = int64 #int32
 
@@ -407,6 +409,7 @@ class Event_Set(object):
             eqrmlog.debug('Memory: populate_azimuth created')
             eqrmlog.resource_usage()
             polygon_dip = gp.populate_dip(num)
+            #rint "polygon_dip", polygon_dip
             eqrmlog.debug('Memory: populate_dip created')
             eqrmlog.resource_usage()
             polygon_magnitude = gp.populate_magnitude(num)

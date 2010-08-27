@@ -10,7 +10,7 @@
   ModifiedDate: $Date: 2010-05-12 09:34:07 +1000 (Wed, 12 May 2010) $
 """
 import os
-
+import math
 from eqrm_code.distributions import distribution_functions
 from eqrm_code.polygon import populate_polygon
 from eqrm_code.polygon_class import polygon_object
@@ -184,8 +184,6 @@ def polygons_from_xml_row(doc,
         boundary.shape = -1, 2  # Had to add for a test. 
         try: fault_width_dist = xml_polygon['fault_width'][0].attributes
         except: pass
-        try: depth_top_seismogenic_dist = xml_polygon['fault_depth'][0].attributes
-        except: pass
         try: dip = xml_polygon['dip'][0].attributes
         except: pass
         try: magnitude = xml_polygon['magnitude'][0].attributes   
@@ -195,7 +193,8 @@ def polygons_from_xml_row(doc,
 
         if override_xml:
             fault_depth=xml_polygon['recurrence'][0].attributes['depth']
-            depth_top_seismogenic_dist = {'distribution':'constant','mean':fault_depth}
+            depth_top_seismogenic_dist = {'distribution':'constant',
+                                          'mean':fault_depth}
             depth_bottom_seismogenic_dist = {'distribution':None}
             fault_width_dist = {'distribution':'constant','mean':fault_width}
             dip = {'distribution':'constant','mean':float(fault_dip[i])}
@@ -221,7 +220,9 @@ def polygons_from_xml_row(doc,
                                                 depth_top_seismogenic_dist,
                                                 fault_width_dist,
                                                 azimuth,dip,
-                                                magnitude,exclude)
+                                                magnitude,
+                                                depth_bottom_seismogenic_dist,
+                                                exclude)
         generation_polygons.append(generation_polygon)
 
     xml_Source_Model =doc['Source_Model'][0]
@@ -241,7 +242,6 @@ def polygons_from_xml_horspool(doc,
 
     Assumes only one source model
     """
-    
     xml_Source_Model =doc['source_model_zone'][0]
     magnitude_type=xml_Source_Model.attributes['magnitude_type']
     
@@ -258,12 +258,14 @@ def polygons_from_xml_horspool(doc,
         azi = float(geometry_atts['azimuth'])
         dazi = float(geometry_atts['delta_azimuth'])
 
-        #fault_depth = float(geometry_atts['depth_top_seismogenic'])
-        fault_depth = geometry_atts['depth_top_seismogenic']
-        depth_top_seismogenic_dist = {'distribution':'constant','mean':fault_depth}
+        depth_top = float(geometry_atts['depth_top_seismogenic'])
+        depth_bottom = float(geometry_atts['depth_bottom_seismogenic'])
+        depth_top_seismogenic_dist = {'distribution':'constant',
+                                      'mean':depth_top}
         depth_bottom_seismogenic_dist = {'distribution':None}
-        fault_width_dist = {'distribution':'constant','mean':fault_width}
-        
+        max_width = (depth_bottom - depth_top)/ \
+                    math.sin(dip*math.pi/180.)
+        fault_width_dist = {'distribution':'constant','mean':max_width}
         dip = {'distribution':'uniform',
                'minimum':float(dip)-float(delta_dip),
                'maximum': float(dip)+float(delta_dip)}
@@ -282,9 +284,7 @@ def polygons_from_xml_horspool(doc,
                      'maximum': maxmag}
         azimuth = {'distribution':'uniform',
                    'minimum':azi - dazi,
-                   'maximum':azi + dazi}
-        
-            
+                   'maximum':azi + dazi}       
         exclude=[]
         for exclusion_zone in xml_polygon['excludes']:
             exclude.append(exclusion_zone.array)
