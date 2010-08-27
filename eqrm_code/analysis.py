@@ -298,7 +298,7 @@ def main(parameter_handle,
     # parallelising over the site loop.
     parallel.calc_lo_hi(num_sites)
     all_sites = all_sites[parallel.lo:parallel.hi]
-    array_size = parallel.hi - parallel.lo   # site_block_size
+    array_size = parallel.hi - parallel.lo   # block_size
     msg = ('blocking over sites if running in parallel. block_size=' +
            str(array_size))
     log.debug(msg)
