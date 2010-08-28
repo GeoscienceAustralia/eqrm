@@ -1,6 +1,0 @@
-State,StateIndex,Mean,Sigma
-none,0,0.0,0.00001
-slight,1,0.6,0.6
-moderate,2,2.5,2.7
-extensive,3,75.0,42.0
-complete,4,230.0,110.0
