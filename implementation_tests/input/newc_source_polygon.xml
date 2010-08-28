@@ -1,5 +1,6 @@
 <source_model_zone magnitude_type="Mw">
-    <zone area = "5054.035">
+    <zone area = "5054.035"
+  event_type = "crustal fault">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -21,11 +22,14 @@
 	 lambda_min = "0.568"
 	  b = "1">
 	  <event_generation 
-          generation_min_mag = "4.5" /></recurrence_model>
+          generation_min_mag = "4.5"
+	  number_of_events = "0"
+	   /></recurrence_model>
     </zone>
     
     
-    <zone area = "57731.425">
+    <zone area = "57731.425"
+  event_type = "crustal fault">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -52,11 +56,13 @@
 	lambda_min= "2.53"
 	 b = "1.14" >
 	  <event_generation 
-          generation_min_mag = "4.5" /></recurrence_model>
+          generation_min_mag = "4.5"
+	  number_of_events = "0" /></recurrence_model>
     </zone>
     
     
-    <zone area = "56703.105">
+    <zone area = "56703.105"
+  event_type = "crustal fault">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -84,11 +90,13 @@
 	lambda_min= "2.48"
 	 b = "1.14" >
 	  <event_generation 
-          generation_min_mag = "4.5" /></recurrence_model>
+          generation_min_mag = "4.5"
+	  number_of_events = "0" /></recurrence_model>
     </zone>
     
     
-    <zone area = "3046.615">
+    <zone area = "3046.615"
+  event_type = "crustal fault">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -111,11 +119,13 @@
 	lambda_min= "0.0016"
 	 b = "1." >
 	  <event_generation 
-          generation_min_mag = "4.5" /></recurrence_model>	
+          generation_min_mag = "4.5"
+	  number_of_events = "0" /></recurrence_model>	
     </zone>
     
     
-    <zone area = "72204.957">
+    <zone area = "72204.957"
+  event_type = "crustal fault">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -143,11 +153,13 @@
 	lambda_min= "0.014"
 	 b = "1.118" >
 	  <event_generation 
-          generation_min_mag = "4.5" /></recurrence_model>
+          generation_min_mag = "4.5"
+	  number_of_events = "0" /></recurrence_model>
     </zone>
     
     
-    <zone area = "44149.044">
+    <zone area = "44149.044"
+  event_type = "crustal fault">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -175,6 +187,7 @@
 	lambda_min= "0.0086"
 	 b = "1.118" >
 	  <event_generation 
-          generation_min_mag = "4.5" /></recurrence_model>
+          generation_min_mag = "4.5" 
+	  number_of_events = "0"/></recurrence_model>
     </zone>
 </source_model_zone>
