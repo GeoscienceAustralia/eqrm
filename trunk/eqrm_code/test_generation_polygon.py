@@ -39,7 +39,8 @@ class Test_Generation_polygon(unittest.TestCase):
         sample = """<source_model_zone magnitude_type="Mw">
   <zone 
   area = "5054.035" 
-  name = "bad zone">
+  name = "bad zone"
+  event_type = "crustal fault">
     
     <geometry 
        azimuth= "45" 
@@ -122,6 +123,9 @@ class Test_Generation_polygon(unittest.TestCase):
         magnitude = {'distribution':'uniform',
                          'minimum':3.4,
                          'maximum': '5.4'}
+        polygon_name = 'bad zone'
+        polygon_event_type = "crustal fault"
+        number_of_events = 1000
         actual_gp = Generation_Polygon(
             boundary,
             depth_top_seismogenic_dist,
@@ -129,6 +133,9 @@ class Test_Generation_polygon(unittest.TestCase):
             azimuth,dip,
             magnitude,
             depth_bottom_seismogenic_dist,
+            polygon_name,
+            polygon_event_type,
+            number_of_events,
             exclude)
         
         #print "source_zone_polygon.polygon_object", szp._linestring
@@ -147,6 +154,8 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnless( calc_gp.dip==dip,
             'Failed!')
         self.failUnless( calc_gp.magnitude==magnitude,
+            'Failed!')
+        self.failUnless( calc_gp.number_of_events==number_of_events,
             'Failed!')
 
        

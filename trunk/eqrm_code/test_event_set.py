@@ -409,7 +409,7 @@ class Test_Event_Set(unittest.TestCase):
         fault_dip = array([35.0])
         prob_min_mag_cutoff = 1.0
         override_xml = True
-        prob_number_of_events_in_zones = 1
+        prob_number_of_events_in_zones = array([1])
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
@@ -460,6 +460,119 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(events.rupture_centroid_lon >= 151.0)
         os.remove(file_name)
 
+
+    def test_generate_synthetic_events_horspool(self):
+
+        handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+        
+        sample = """<source_model_zone magnitude_type="Mw">
+  <zone 
+  area = "5054.035" 
+  name = "bad zone"
+  event_type = "crustal fault">
+    
+    <geometry 
+       azimuth= "45" 
+       delta_azimuth= "5" 
+       dip= "35"
+       delta_dip = "5"
+       depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
+      <boundary>
+	  151.1500 -32.4000  
+	  152.1700 -32.7500
+	  151.4300 -33.4500  
+	  151.1500 -32.4000
+      </boundary>
+      <excludes>
+	  151.1500 -32.4000    
+	  152.1700 -32.7500   
+	  151.4300 -33.4500 
+      </excludes>
+    </geometry>
+    
+    <recurrence_model
+      distribution = "bounded_gutenberg_richter"
+      recurrence_min_mag = "3.4" 
+      recurrence_max_mag = "5.4" 
+      lambda_min= "0.568" 
+      b = "1">
+      <event_generation 
+      generation_min_mag = "3.3"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "1" />
+    </recurrence_model>
+    
+    <ground_motion_models 
+       faulting_type = "normal" 
+       ground_motion_selection = "crustal fault" />   
+  </zone>
+   <zone 
+  area = "5054.035" 
+  name = "bad zone"
+  event_type = "crustal fault">
+    
+    <geometry 
+       azimuth= "45" 
+       delta_azimuth= "5" 
+       dip= "35"
+       delta_dip = "5"
+       depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
+      <boundary>
+	  151.1500 -32.4000  
+	  152.1700 -32.7500
+	  151.4300 -33.4500  
+	  151.1500 -32.4000
+      </boundary>
+      <excludes>
+	  151.1500 -32.4000    
+	  152.1700 -32.7500   
+	  151.4300 -33.4500 
+      </excludes>
+    </geometry>
+    
+    <recurrence_model
+      distribution = "bounded_gutenberg_richter"
+      recurrence_min_mag = "3.4" 
+      recurrence_max_mag = "5.4" 
+      lambda_min= "0.568" 
+      b = "1">
+      <event_generation 
+      generation_min_mag = "3.3"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "2" />
+    </recurrence_model>
+    
+    <ground_motion_models 
+       faulting_type = "normal" 
+       ground_motion_selection = "crustal fault" />   
+  </zone>
+</source_model_zone>
+"""
+        handle.write(sample)
+        handle.close()
+
+        fault_width = None
+        azi = None
+        dazi = None
+        fault_dip = None
+        override_xml = None
+        prob_number_of_events_in_zones = None
+        prob_min_mag_cutoff = 0.1
+        events = Event_Set.generate_synthetic_events(
+            file_name,
+            fault_width,
+            azi,
+            dazi,
+            fault_dip,
+            prob_min_mag_cutoff,
+            override_xml,
+            prob_number_of_events_in_zones)
+        
+        self.assert_(len(events)==3)
         
     def test_event_set_subsetting(self):
         rupture_centroid_lat = [-33.351170370959323, -32.763381339789468]

@@ -26,7 +26,10 @@ class Generation_Polygon(polygon_object):
                  dip,
                  magnitude,
                  depth_bottom_seismogenic_dist,
-                 exclude=None):
+                 polygon_name,
+                 polygon_event_type,
+                 number_of_events, 
+                 exclude):
         """
         boundary is an array of polygon points
         exclude is an array of polygon points
@@ -41,6 +44,9 @@ class Generation_Polygon(polygon_object):
         self.dip=dip
         self.magnitude=magnitude
         self.depth_bottom_seismogenic_dist = depth_bottom_seismogenic_dist
+        self.polygon_name = polygon_name
+        self.polygon_event_type = polygon_event_type
+        self.number_of_events = number_of_events 
 
     def populate_fault_width(self,n):
         return self.populate_distribution(self.fault_width_dist,n)
@@ -115,7 +121,6 @@ def polygons_from_xml(filename,
     else:
         generation_polygons, magnitude_type = polygons_from_xml_horspool(
             doc,
-            fault_width,
             prob_min_mag_cutoff)
     # Hacky checking code
 #     from eqrm_code.eqrm_filesystem import scenario_input_bridges_path
@@ -216,15 +221,24 @@ def polygons_from_xml_row(doc,
         exclude=[]
         for exclusion_zone in xml_polygon['exclude']:
             exclude.append(exclusion_zone.array)
+            
+        polygon_name = 'zone_' + str(i)
+        polygon_event_type = None
+        number_of_events = None
+        
         generation_polygon = Generation_Polygon(boundary,
                                                 depth_top_seismogenic_dist,
                                                 fault_width_dist,
                                                 azimuth,dip,
                                                 magnitude,
                                                 depth_bottom_seismogenic_dist,
+                                                polygon_name,
+                                                polygon_event_type, 
+                                                number_of_events,
                                                 exclude)
         generation_polygons.append(generation_polygon)
-
+    
+        
     xml_Source_Model =doc['Source_Model'][0]
     magnitude_type=xml_Source_Model.attributes['magnitude_type']
     doc.unlink()
@@ -232,7 +246,6 @@ def polygons_from_xml_row(doc,
     return generation_polygons,magnitude_type
 
 def polygons_from_xml_horspool(doc,
-                               fault_width=None,
                                prob_min_mag_cutoff=None):
     """
     
@@ -248,7 +261,12 @@ def polygons_from_xml_horspool(doc,
     generation_polygons=[]
     xml_polygons = doc['zone']
     for i in range(len(xml_polygons)):
-        xml_polygon=xml_polygons[i]
+        xml_polygon = xml_polygons[i]
+        try:
+            polygon_name = xml_polygon.attributes['name']
+        except KeyError:
+            polygon_name = 'zone_' + str(i)
+        polygon_event_type = xml_polygon.attributes['event_type'] 
         geometry = xml_polygon['geometry'][0]
         geometry_atts = xml_polygon['geometry'][0].attributes 
         boundary = geometry['boundary'][0].array
@@ -263,20 +281,18 @@ def polygons_from_xml_horspool(doc,
         depth_top_seismogenic_dist = {'distribution':'constant',
                                       'mean':depth_top}
         depth_bottom_seismogenic_dist = {'distribution':None}
-        max_width = (depth_bottom - depth_top)/ \
+        fault_width = (depth_bottom - depth_top)/ \
                     math.sin(dip*math.pi/180.)
-        fault_width_dist = {'distribution':'constant','mean':max_width}
+        fault_width_dist = {'distribution':'constant','mean':fault_width}
         dip = {'distribution':'uniform',
-               'minimum':float(dip)-float(delta_dip),
-               'maximum': float(dip)+float(delta_dip)}
+               'minimum':dip - delta_dip,
+               'maximum': dip + delta_dip}
         recurrence = xml_polygon['recurrence_model'][0]
         event_gen_atts = recurrence['event_generation'][0].attributes
-        min_magnitude = event_gen_atts['generation_min_mag']
+        number_of_events = int(event_gen_atts['number_of_events'])
         recurrence_atts = recurrence.attributes
-        min_magnitude = recurrence_atts['recurrence_min_mag']
-        min_mag = prob_min_mag_cutoff
-        minmag = max(float(min_magnitude),
-                     float(min_mag))
+        minmag = max(float(recurrence_atts['recurrence_min_mag']),
+                     float(prob_min_mag_cutoff))
         #maxmag = float(recurrence_atts['recurrence_max_mag'])
         maxmag = recurrence_atts['recurrence_max_mag']
         magnitude = {'distribution':'uniform',
@@ -285,16 +301,20 @@ def polygons_from_xml_horspool(doc,
         azimuth = {'distribution':'uniform',
                    'minimum':azi - dazi,
                    'maximum':azi + dazi}       
-        exclude=[]
+        exclude = []
         for exclusion_zone in xml_polygon['excludes']:
             exclude.append(exclusion_zone.array)
         generation_polygon = Generation_Polygon(
             boundary,
             depth_top_seismogenic_dist,
             fault_width_dist,
-            azimuth,dip,
+            azimuth,
+            dip,
             magnitude,
             depth_bottom_seismogenic_dist,
+            polygon_name,
+            polygon_event_type,
+            number_of_events,
             exclude)
         generation_polygons.append(generation_polygon)
 

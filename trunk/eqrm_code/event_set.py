@@ -332,7 +332,7 @@ class Event_Set(object):
           override_xml: Boolean means the above arguments override the
             arguments in the xml file.  Analysis uses True
           prob_number_of_events_in_zones: Vector whose elements represent
-            the number of events for each generation.
+            the number of events for each generation.  Can be None.
           
         Returns: An event_set instance.
         
@@ -371,12 +371,18 @@ class Event_Set(object):
         num_polygons = len(generation_polygons)
         
         if prob_number_of_events_in_zones is None:
-            prob_number_of_events_in_zones = 1
-        prob_number_of_events_in_zones = asarray(prob_number_of_events_in_zones)
-        if (not prob_number_of_events_in_zones.shape or
-            prob_number_of_events_in_zones.shape[0]) == 1:
-            prob_number_of_events_in_zones = prob_number_of_events_in_zones* \
-                                                 asarray([1]*num_polygons)
+            prob_number_of_events_in_zones = zeros((len(generation_polygons)),
+                                                   dtype=EVENT_INT)
+            for i,gen_poly in enumerate(generation_polygons):
+                prob_number_of_events_in_zones[i] = gen_poly.number_of_events
+            # The number of events is not specified in the control file
+            # use the number of events in the xml file.
+#             prob_number_of_events_in_zones = 1
+#         prob_number_of_events_in_zones = asarray(prob_number_of_events_in_zones)
+#         if (not prob_number_of_events_in_zones.shape or
+#             prob_number_of_events_in_zones.shape[0]) == 1:
+#             prob_number_of_events_in_zones = prob_number_of_events_in_zones* \
+#                                                 asarray([1]*num_polygons)
         
         #initialise new attributes
         num_events = sum(prob_number_of_events_in_zones)
