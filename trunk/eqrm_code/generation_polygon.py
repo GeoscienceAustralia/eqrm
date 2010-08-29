@@ -28,7 +28,8 @@ class Generation_Polygon(polygon_object):
                  depth_bottom_seismogenic_dist,
                  polygon_name,
                  polygon_event_type,
-                 number_of_events, 
+                 number_of_events,
+                 number_of_mag_sample_bins_dist,
                  exclude):
         """
         boundary is an array of polygon points
@@ -47,6 +48,7 @@ class Generation_Polygon(polygon_object):
         self.polygon_name = polygon_name
         self.polygon_event_type = polygon_event_type
         self.number_of_events = number_of_events 
+        self.number_of_mag_sample_bins_dist = number_of_mag_sample_bins_dist
 
     def populate_fault_width(self,n):
         return self.populate_distribution(self.fault_width_dist,n)
@@ -65,6 +67,10 @@ class Generation_Polygon(polygon_object):
 
     def populate_magnitude(self,n):
         return self.populate_distribution(self.magnitude,n)
+    
+    def populate_number_of_mag_sample_bins(self,n):
+        return self.populate_distribution(self.number_of_mag_sample_bins_dist,
+                                          n)
     
     def populate_distribution(self,distribution_args,n):
         """
@@ -225,6 +231,7 @@ def polygons_from_xml_row(doc,
         polygon_name = 'zone_' + str(i)
         polygon_event_type = None
         number_of_events = None
+        number_of_mag_sample_bins_dist = None
         
         generation_polygon = Generation_Polygon(boundary,
                                                 depth_top_seismogenic_dist,
@@ -235,6 +242,7 @@ def polygons_from_xml_row(doc,
                                                 polygon_name,
                                                 polygon_event_type, 
                                                 number_of_events,
+                                                number_of_mag_sample_bins_dist,
                                                 exclude)
         generation_polygons.append(generation_polygon)
     
@@ -289,6 +297,10 @@ def polygons_from_xml_horspool(doc,
                'maximum': dip + delta_dip}
         recurrence = xml_polygon['recurrence_model'][0]
         event_gen_atts = recurrence['event_generation'][0].attributes
+        number_of_mag_sample_bins = int(event_gen_atts[
+            'number_of_mag_sample_bins'])
+        number_of_mag_sample_bins_dist = {'distribution':'constant',
+                                      'mean':number_of_mag_sample_bins}
         number_of_events = int(event_gen_atts['number_of_events'])
         recurrence_atts = recurrence.attributes
         minmag = max(float(recurrence_atts['recurrence_min_mag']),
@@ -315,6 +327,7 @@ def polygons_from_xml_horspool(doc,
             polygon_name,
             polygon_event_type,
             number_of_events,
+            number_of_mag_sample_bins_dist,
             exclude)
         generation_polygons.append(generation_polygon)
 

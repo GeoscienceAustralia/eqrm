@@ -394,6 +394,7 @@ class Event_Set(object):
         dip = zeros((num_events), dtype=EVENT_FLOAT)
         magnitude = zeros((num_events), dtype=EVENT_FLOAT)
         source_zone_id = zeros((num_events), dtype=EVENT_INT)
+        #number_of_mag_sample_bins = zeros((num_events), dtype=EVENT_INT)
 
         #print "magnitude.dtype.name", magnitude.dtype.name
         start = 0
@@ -421,6 +422,9 @@ class Event_Set(object):
             polygon_magnitude = gp.populate_magnitude(num)
             eqrmlog.debug('Memory: populate_magnitude created')
             eqrmlog.resource_usage()
+            #mag_sample_bins = gp.populate_number_of_mag_sample_bins(num)
+            #eqrmlog.debug('Memory: populate_number_of_mag_sample_bins')
+            #eqrmlog.resource_usage()
 
             #FIXME DSG-EQRM the events will not to randomly placed,
             # Due to  lat, lon being spherical coords and popolate
@@ -439,7 +443,7 @@ class Event_Set(object):
             azimuth[start:end] = polygon_azimuth
             dip[start:end] = polygon_dip
             magnitude[start:end] = polygon_magnitude
-            
+            #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
             eqrmlog.debug('Memory: event set lists have been combined')
             eqrmlog.resource_usage()
