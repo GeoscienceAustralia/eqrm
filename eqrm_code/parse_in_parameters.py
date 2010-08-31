@@ -390,6 +390,9 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'determ_dip':'scenario_dip',
                      'determ_number_of_events':'scenario_number_of_events',
                      'is_deterministic':'is_scenario',
+                     'prob_azimuth_in_zones':None,
+                     'prob_delta_azimuth_in_zones':None,
+                     'prob_dip_in_zones':None,
                      'prob_number_of_mag_sample_bins':None,
                      'save_prob_strucutural_damage':
                      'save_prob_structural_damage'
@@ -539,7 +542,8 @@ def depreciated_attributes(THE_PARAM_T):
                 del THE_PARAM_T[item]
             msg = 'WARNING: ' + item + \
                   ' term in set data files is depreciated.'
-            # 
+            # logging is only set-up after the para file has been passed.
+            # So these warnings will not in in the logs.
             log.warning(msg)
 
 def att_value_fixes(THE_PARAM_T):
