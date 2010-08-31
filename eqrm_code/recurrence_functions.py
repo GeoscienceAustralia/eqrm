@@ -91,12 +91,13 @@ def calc_event_activity(event_set, sources,
                 # print "poly_ind", poly_ind
                 event_ind=mag_ind[poly_ind]
                 #print "event_ind", event_ind
+                num_of_mag_sample_bins = source.number_of_mag_sample_bins
                 # make bins
                 mag_bin_centroids=make_bins(zone_mlow,zone_mhgh,
-                                            prob_number_of_mag_sample_bins)
+                                            num_of_mag_sample_bins)
 
                 # bin the event magnitudes
-                delta_mag=(zone_mhgh-zone_mlow)/prob_number_of_mag_sample_bins
+                delta_mag=(zone_mhgh-zone_mlow)/num_of_mag_sample_bins
                 event_bins=array([int(i) for i in
                                   (event_set.Mw[event_ind]
                                    -zone_mlow)/delta_mag])
@@ -108,7 +109,7 @@ def calc_event_activity(event_set, sources,
                 grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
                 #print "grpdf", grpdf
                 #print "A_mlow", A_mlow
-                event_activity=(prob_number_of_mag_sample_bins*A_mlow
+                event_activity=(num_of_mag_sample_bins*A_mlow
                                 *grpdf[event_bins]/len(event_ind))
                 #print "event_activity", event_activity
                 event_activity_matrix[event_ind,j]=event_activity

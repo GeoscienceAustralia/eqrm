@@ -187,6 +187,7 @@ def main(parameter_handle,
 
         # tell event set which source models to calculate activity with
         source_mods = Source_Models(THE_PARAM_T.prob_min_mag_cutoff, [1.0],
+                                    THE_PARAM_T.prob_number_of_mag_sample_bins,
                                     fid_sourcepolys)
 
         log.debug('Memory: source_mods created')

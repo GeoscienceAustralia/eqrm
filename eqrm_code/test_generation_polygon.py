@@ -127,8 +127,6 @@ class Test_Generation_polygon(unittest.TestCase):
         polygon_event_type = "crustal fault"
         number_of_events = 1000
         number_of_mag_sample_bins = 15
-        number_of_mag_sample_bins_dist = {'distribution':'constant',
-                                      'mean':number_of_mag_sample_bins}
         actual_gp = Generation_Polygon(
             boundary,
             depth_top_seismogenic_dist,
@@ -139,7 +137,6 @@ class Test_Generation_polygon(unittest.TestCase):
             polygon_name,
             polygon_event_type,
             number_of_events,
-            number_of_mag_sample_bins_dist,
             exclude)
         
         #print "source_zone_polygon.polygon_object", szp._linestring
@@ -161,8 +158,6 @@ class Test_Generation_polygon(unittest.TestCase):
             'Failed!')
         self.failUnless( calc_gp.number_of_events==number_of_events,
             'Failed!')
-        self.failUnless( calc_gp.number_of_mag_sample_bins_dist == \
-                         number_of_mag_sample_bins_dist)
 
        
     
