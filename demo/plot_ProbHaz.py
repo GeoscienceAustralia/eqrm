@@ -31,12 +31,8 @@ site_indexes = 2255
 # Scenario input
 
 # Probabilistic input
-prob_azimuth_in_zones = [10, 30, 70, 100, 150, 15]
-prob_delta_azimuth_in_zones = [5, 10, 20, 25, 50, 0]
 prob_min_mag_cutoff = 4.5
-prob_number_of_mag_sample_bins = 15
 prob_number_of_events_in_zones = [5000, 1000, 1000, 3000, 1000, 1000]
-prob_dip_in_zones = [35, 40, 45, 50, 55, 60]
 
 # Attenuation
 atten_models = ['Sadigh_97']
