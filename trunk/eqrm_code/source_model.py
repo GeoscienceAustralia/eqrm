@@ -25,7 +25,8 @@ class Source_Models(object):
 
     Code can currently only handle one Source Model
     """
-    def __init__(self,prob_min_mag_cutoff, weight, *filenames):
+    def __init__(self,prob_min_mag_cutoff, weight,
+                              number_of_mag_sample_bins, *filenames):
         #print "prob_min_mag_cutoff", prob_min_mag_cutoff
         #print "weight", weight
         #print "*filenames", filenames
@@ -33,10 +34,11 @@ class Source_Models(object):
         source_models=[]
         for fid_sourcepolys in filenames:
             source_model=source_model_from_xml(fid_sourcepolys.name,
-                                               prob_min_mag_cutoff)
+                                               prob_min_mag_cutoff,
+                                               number_of_mag_sample_bins)
             source_models.append(source_model)
         self.source_models=source_models
-        #print "self.source_models", self.source_models
+        
         assert len(self.weight) == len(self.source_models)
         
     def __len__(self):
@@ -99,7 +101,7 @@ class Source_Model(object):
     an extra attribute magnitude_type though
     
     """
-    def __init__(self,source_zone_polygons,magnitude_type):
+    def __init__(self, source_zone_polygons,magnitude_type):
         self._source_zone_polygons = source_zone_polygons
         #print "source_zone_polygons in __init__", source_zone_polygons
         self._magnitude_type=magnitude_type
@@ -124,7 +126,8 @@ class Source_Zone_Polygon(polygon_object):
     def __init__(self,boundary,exclude,
                  min_magnitude,max_magnitude,
                  prob_min_mag_cutoff,
-                 Lambda_Min,b):
+                 Lambda_Min,b,
+                 number_of_mag_sample_bins):
         """
         boundary is a list of points that forms a polygon
         exclude is a list of polygons (so a list of a list of points)
@@ -142,20 +145,24 @@ class Source_Zone_Polygon(polygon_object):
         self.prob_min_mag_cutoff=prob_min_mag_cutoff
         self.Lambda_Min=Lambda_Min
         self.b=b
+        self.number_of_mag_sample_bins = number_of_mag_sample_bins
 
     
-def source_model_from_xml(filename,prob_min_mag_cutoff):
+def source_model_from_xml(filename,prob_min_mag_cutoff,
+                              number_of_mag_sample_bins):
     doc=Xml_Interface(filename=filename)
     if not doc['Source_Model'] == []:
         source_model = source_model_from_xml_row(
-            doc, prob_min_mag_cutoff)
+            doc, prob_min_mag_cutoff,
+            number_of_mag_sample_bins)
     else:
         source_model = source_model_from_xml_horspool(
             doc, prob_min_mag_cutoff)
     return source_model
 
 
-def source_model_from_xml_row(doc, prob_min_mag_cutoff):
+def source_model_from_xml_row(doc, prob_min_mag_cutoff,
+                              number_of_mag_sample_bins):
     xml_source_model=doc['Source_Model'][0]
     magnitude_type=xml_source_model.attributes['magnitude_type']
     
@@ -176,11 +183,11 @@ def source_model_from_xml_row(doc, prob_min_mag_cutoff):
         for exclusion_zone in xml_polygon['exclude']:
             exclude.append(exclusion_zone.array)
         #print 'LAMBDAMIN 1 ',Lambda_Min
-
         source_zone_polygon = Source_Zone_Polygon(boundary,exclude,
                                                   min_magnitude,max_magnitude,
                                                   prob_min_mag_cutoff,
-                                                  Lambda_Min,b)
+                                                  Lambda_Min,b,
+                                                  number_of_mag_sample_bins)
         source_zone_polygons.append(source_zone_polygon)
         
     doc.unlink()
@@ -205,18 +212,24 @@ def source_model_from_xml_horspool(doc, prob_min_mag_cutoff):
         b=float(recurrence['b'])
         
         area = float(xml_polygon.attributes['area'])
+
+        event_gen = xml_polygon['recurrence_model'][0]['event_generation']
+        number_of_mag_sample_bins = int(event_gen[0].attributes[
+            'number_of_mag_sample_bins'])
+        
         exclude=[]
         for exclusion_zone in xml_polygon['excludes']:
             exclude.append(exclusion_zone.array)
         #print 'LAMBDAMIN 1 ',Lambda_Min
-
+        
         source_zone_polygon = Source_Zone_Polygon(
             boundary,
             exclude,
             min_magnitude,
             max_magnitude,
             prob_min_mag_cutoff,
-            Lambda_Min,b)
+            Lambda_Min,b,
+            number_of_mag_sample_bins)
         source_zone_polygons.append(source_zone_polygon)
         
     doc.unlink()

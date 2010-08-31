@@ -354,11 +354,14 @@ KNOWN_KWARGS = {'use_determ_seed':None,
                      'is_parallel':None,
                      'default_input_dir':None}
 # The key is the depreciated parameter.
-# the value is either a string, which replaces the depreciated parameter,
-# OR
+# the value is
+# None, which means the only action is a warming,
+#   OR
+# a string, which replaces the depreciated parameter,
+#   OR
 # the value has a dictinary where the the keys are the value of the
 # depreciated parameter and the values are attribute and value pairs
-# to use, based on the value of the parameter.
+# to use, based on the value of the parameter.  The
 DEPRECIATED_PARAS = {'atten_use_variability':
                      {True:None,
                       False:('atten_variability_method', None)},
@@ -387,6 +390,7 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'determ_dip':'scenario_dip',
                      'determ_number_of_events':'scenario_number_of_events',
                      'is_deterministic':'is_scenario',
+                     'prob_number_of_mag_sample_bins':None,
                      'save_prob_strucutural_damage':
                      'save_prob_structural_damage'
 #                      'csm_use_variability':
@@ -517,10 +521,13 @@ def depreciated_attributes(THE_PARAM_T):
     for item in DEPRECIATED_PARAS:
         if THE_PARAM_T.has_key(item):
             handle_logic = DEPRECIATED_PARAS[item]
-            if isinstance(handle_logic, str):
+            if handle_logic is None:
+                pass
+            elif isinstance(handle_logic, str):
                 # handle_logic is a replacement string
                 # for the parameter name
                 THE_PARAM_T[handle_logic] = THE_PARAM_T[item]
+                del THE_PARAM_T[item]
             else:                
                 # handle_logic is a dictionary
                 what_to_do = handle_logic[THE_PARAM_T[item]]
@@ -528,12 +535,12 @@ def depreciated_attributes(THE_PARAM_T):
                     # The value is a tuple.
                     # the first value is the att name
                     # the second value is the att value
-                    THE_PARAM_T[what_to_do[0]] = what_to_do[1]
-                
+                    THE_PARAM_T[what_to_do[0]] = what_to_do[1]                
+                del THE_PARAM_T[item]
             msg = 'WARNING: ' + item + \
-                  ' term in set data files is depreciated.' 
-            log.info(msg)
-            del THE_PARAM_T[item]
+                  ' term in set data files is depreciated.'
+            # 
+            log.warning(msg)
 
 def att_value_fixes(THE_PARAM_T):
     """

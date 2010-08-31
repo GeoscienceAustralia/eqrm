@@ -84,7 +84,9 @@ class Test_Source_model(unittest.TestCase):
         #print "handle.read()", handle.read()
         #handle.close()
         prob_min_mag_cutoff = 1.0
-        source_model = source_model_from_xml(file_name,prob_min_mag_cutoff)
+        number_of_mag_sample_bins = 100
+        source_model = source_model_from_xml(file_name,prob_min_mag_cutoff,
+                                             number_of_mag_sample_bins)
         os.remove(file_name)
         #print "source_model[1]", source_model[1]
         #print "source_model._source_zone_polygons", source_model._source_zone_polygons
@@ -97,7 +99,8 @@ class Test_Source_model(unittest.TestCase):
         szp = Source_Zone_Polygon(boundary,exclude,
                                   min_magnitude,max_magnitude,
                                   prob_min_mag_cutoff,
-                                  Lambda_Min,b)
+                                  Lambda_Min,b,
+                                  number_of_mag_sample_bins)
         #print "source_zone_polygon.polygon_object", szp._linestring
         result = source_model._source_zone_polygons[0]
         self.failUnless( result._linestring==szp._linestring,
@@ -113,6 +116,8 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless( result.prob_min_mag_cutoff==szp.prob_min_mag_cutoff,
             'Failed!')
         self.failUnless(source_model._magnitude_type=='Mw','Failed!')
+        self.failUnless(result.number_of_mag_sample_bins== \
+                        number_of_mag_sample_bins,'Failed!')
 
     
     def test_source_model_from_xml_horspool(self):
@@ -167,10 +172,11 @@ class Test_Source_model(unittest.TestCase):
         handle.write(sample)
         handle.close()
 
-
+        number_of_mag_sample_bins = 13
         prob_min_mag_cutoff = 1.0
         source_model = source_model_from_xml(file_name,
-                                             prob_min_mag_cutoff)
+                                             prob_min_mag_cutoff,
+                                             number_of_mag_sample_bins)
         os.remove(file_name)
         boundary = [(151.1500, -32.4000), 
                     (152.1700, -32.7500),
@@ -187,7 +193,8 @@ class Test_Source_model(unittest.TestCase):
         szp = Source_Zone_Polygon(boundary,exclude,
                                   min_magnitude,max_magnitude,
                                   prob_min_mag_cutoff,
-                                  Lambda_Min,b)
+                                  Lambda_Min,b,
+                                  number_of_mag_sample_bins)
         #print "source_zone_polygon.polygon_object", szp._linestring
         result = source_model._source_zone_polygons[0]
         self.failUnless( result._linestring==szp._linestring,
@@ -205,6 +212,7 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         self.failUnless(source_model._magnitude_type==
                         'Mw','Failed!')
+        self.failUnless(result.number_of_mag_sample_bins== 15,'Failed!')
 
     
     def test_Source_Zone_Polygon(self):
@@ -215,10 +223,12 @@ class Test_Source_model(unittest.TestCase):
         max_magnitude = 8
         b = 1
         Lambda_Min = 0.5
+        number_of_mag_sample_bins = 15
         szp = Source_Zone_Polygon(boundary,exclude,
                                   min_magnitude,max_magnitude,
                                   prob_min_mag_cutoff,
-                                  Lambda_Min,b)
+                                  Lambda_Min,b,
+                                  number_of_mag_sample_bins)
         self.failUnless( boundary==szp._linestring,
             'Failed!')
         self.failUnless( exclude==szp._exclude,
@@ -233,6 +243,9 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         self.failUnless( prob_min_mag_cutoff==szp.prob_min_mag_cutoff,
             'Failed!')
+        self.failUnless(szp.number_of_mag_sample_bins== \
+                        number_of_mag_sample_bins,'Failed!')
+
 
         
     def test_Source_mini_check_gong(self):
@@ -250,9 +263,10 @@ class Test_Source_model(unittest.TestCase):
         
         prob_min_mag_cutoff = 4.5
         weight = [1.0]
-        
+        number_of_mag_sample_bins = 100000000
         source_model = Source_Models(prob_min_mag_cutoff,
                                      weight,
+                                     number_of_mag_sample_bins,
                                      fid_sourcepolys)
 
         max_width = 15

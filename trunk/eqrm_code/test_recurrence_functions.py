@@ -94,13 +94,15 @@ class Test_Recurrence_functions(unittest.TestCase):
 
     
         szp1 = Source_Zone_Polygon(square1,[],
-                 min_magnitude,max_magnitude,
-                 prob_min_mag_cutoff,
-                 Lambda_Min,b)
+                                   min_magnitude,max_magnitude,
+                                   prob_min_mag_cutoff,
+                                   Lambda_Min,b,
+                                   prob_number_of_mag_sample_bins)
         szp2 = Source_Zone_Polygon(square2,[],
-                 min_magnitude,max_magnitude,
-                 prob_min_mag_cutoff,
-                 Lambda_Min,b)
+                                   min_magnitude,max_magnitude,
+                                   prob_min_mag_cutoff,
+                                   Lambda_Min,b,
+                                   prob_number_of_mag_sample_bins)
         sm = Source_Model([szp1], 'Is this used?')
         
         # The weight attribute is added to the instance in a real simulation
