@@ -1,14 +1,43 @@
-<Source_Model magnitude_type="Mw">
-    <polygon area = "5054.035">
+<source_model_zone magnitude_type="Mw">
+    <zone area = "5054.035"
+  event_type = "crustal fault">
+    <geometry 
+    dip = "35"
+    delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -32.4000  151.1500    
   -32.7500  152.1700    
   -33.4500  151.4300    
   -32.4000  151.1500    
           </boundary>
-        <recurrence distribution = "bounded_gutenberg_richter" min_magnitude= "3.3" max_magnitude= "5.4" Lambda_Min= "0.568" b = "1" min_mag = "4.5" depth = "7"></recurrence>
-    </polygon>
-    <polygon area = "57731.425">
+    </geometry  >
+        <recurrence_model
+	 distribution = "bounded_gutenberg_richter"
+	 recurrence_min_mag = "3.3"
+	 recurrence_max_mag = "5.4"
+	 lambda_min = "0.568"
+	  b = "1">
+	  <event_generation 
+          generation_min_mag = "4.5"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "0"
+	   /></recurrence_model>
+    </zone>
+    
+    
+    <zone area = "57731.425"
+  event_type = "crustal fault">
+    <geometry 
+    dip = "35"
+    delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
 -31.0000  149.5000    
   -32.4000  149.5000    
@@ -20,9 +49,29 @@
   -31.0000  153.2900    
   -31.0000  149.5000            
 </boundary>
-        <recurrence distribution = "bounded_gutenberg_richter" min_magnitude= "3.3" max_magnitude= "5.4" Lambda_Min= "2.53" b = "1.14" min_mag = "4.5" depth = "7"></recurrence>
-    </polygon>
-    <polygon area = "56703.105">
+    </geometry>
+        <recurrence_model 
+	distribution = "bounded_gutenberg_richter"
+	 recurrence_min_mag = "3.3"
+	 recurrence_max_mag = "5.4" 
+	lambda_min= "2.53"
+	 b = "1.14" >
+	  <event_generation 
+          generation_min_mag = "4.5"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "0" /></recurrence_model>
+    </zone>
+    
+    
+    <zone area = "56703.105"
+  event_type = "crustal fault">
+    <geometry 
+    dip = "35"
+    delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -35.0000  149.5000    
   -32.4000  149.5000    
@@ -35,9 +84,29 @@
   -35.0000  151.1000    
   -35.0000  149.5000    
         </boundary>
-        <recurrence distribution = "bounded_gutenberg_richter" min_magnitude= "3.3" max_magnitude= "5.4" Lambda_Min= "2.48" b = "1.14" min_mag = "4.5" depth = "7"></recurrence>
-    </polygon>
-    <polygon area = "3046.615">
+    </geometry>
+        <recurrence_model 
+	distribution = "bounded_gutenberg_richter"
+	 recurrence_min_mag = "3.3"
+	 recurrence_max_mag = "5.4" 
+	lambda_min= "2.48"
+	 b = "1.14" >
+	  <event_generation 
+          generation_min_mag = "4.5"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "0" /></recurrence_model>
+    </zone>
+    
+    
+    <zone area = "3046.615"
+  event_type = "crustal fault">
+    <geometry 
+    dip = "35"
+    delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -32.9250  151.4000    
   -32.7500  151.7500    
@@ -45,9 +114,29 @@
   -33.5000  151.9000    
   -32.9250  151.4000    
         </boundary>
-        <recurrence distribution = "bounded_gutenberg_richter" min_magnitude= "5.41" max_magnitude= "6.5" Lambda_Min= "0.0016" b = "1" min_mag = "4.5" depth = "7"></recurrence>
-    </polygon>
-    <polygon area = "72204.957">
+    </geometry>
+        <recurrence_model 
+	distribution = "bounded_gutenberg_richter"
+	 recurrence_min_mag = "5.41"
+	 recurrence_max_mag = "6.5" 
+	lambda_min= "0.0016"
+	 b = "1." >
+	  <event_generation 
+          generation_min_mag = "4.5"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "0" /></recurrence_model>	
+    </zone>
+    
+    
+    <zone area = "72204.957"
+  event_type = "crustal fault">
+    <geometry 
+    dip = "35"
+    delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -31.0000  149.5000    
   -32.9250  149.5000    
@@ -60,9 +149,29 @@
   -31.0000  153.2900    
   -31.0000  149.5000    
         </boundary>
-        <recurrence distribution = "bounded_gutenberg_richter" min_magnitude= "5.41" max_magnitude= "6.5" Lambda_Min= "0.014" b = "1.118" min_mag = "4.5" depth = "7"></recurrence>
-    </polygon>
-    <polygon area = "44149.044">
+    </geometry>
+        <recurrence_model 
+	distribution = "bounded_gutenberg_richter"
+	 recurrence_min_mag = "5.41"
+	 recurrence_max_mag = "6.5" 
+	lambda_min= "0.014"
+	 b = "1.118" >
+	  <event_generation 
+          generation_min_mag = "4.5"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "0" /></recurrence_model>
+    </zone>
+    
+    
+    <zone area = "44149.044"
+  event_type = "crustal fault">
+    <geometry 
+    dip = "35"
+    delta_dip = "0"
+    azimuth = "180"
+    delta_azimuth = "180"
+    depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "15.60364655">
         <boundary>
   -35.0000  149.5000    
   -32.9250  149.5000    
@@ -75,7 +184,16 @@
   -35.0000  151.1000    
   -35.0000  149.5000    
         </boundary>
-        <recurrence distribution = "bounded_gutenberg_richter" min_magnitude= "5.41" max_magnitude= "6.5" Lambda_Min= "0.0086" b = "1.118" min_mag = "4.5" depth = "7"></recurrence>
-    </polygon>
-
-</Source_Model>
+    </geometry>
+        <recurrence_model 
+	distribution = "bounded_gutenberg_richter"
+	 recurrence_min_mag = "5.41"
+	 recurrence_max_mag = "6.5" 
+	lambda_min= "0.0086"
+	 b = "1.118" >
+	  <event_generation 
+          generation_min_mag = "4.5" 
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "0"/></recurrence_model>
+    </zone>
+</source_model_zone>
