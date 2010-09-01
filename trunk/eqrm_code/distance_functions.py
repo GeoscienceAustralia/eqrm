@@ -1,26 +1,46 @@
 """
- Title: distance_functions.py
+Title: distance_functions.py
   
-  Author:  Peter Row, peter.row@ga.gov.au
+Author:  Peter Row, peter.row@ga.gov.au
 
 
-  Description: A group of functions that all calculate different
-  distance measurements.  The interface for each function is the same.
+Description: A group of functions that all calculate different
+distance measurements.  The interface for each function is the same,
+consisting of the following parameters:
 
-  This functions are built into a dictionary.
+  lat_sites        array of site latitudes
+  lon_sites        array of site longitudes
+  lat_events       array of event latitudes
+  lon_events       array of event longitudes
+  lengths          array of event lengths (km)
+  azimuths         array of trace headings (start -> end)
+  widths           array of event widths (km)
+  dips             array of event dips
+  depths           array of event depths
+  projection       ??
+  trace_start_lat  array of trace start latitudes
+  trace_start_lon  array of trace start longitudes
+  trace_start_x    array of trace start eastings (?)
+  trace_start_y    array of trace start northings (?)
 
-  Version: $Revision: 1360 $  
-  ModifiedBy: $Author: dgray $
-  ModifiedDate: $Date: 2009-12-08 17:41:02 +1100 (Tue, 08 Dec 2009) $
-  
-  Copyright 2007 by Geoscience Australia
+These functions are built into a dictionary.
+
+Version: $Revision: 1360 $  
+ModifiedBy: $Author: dgray $
+ModifiedDate: $Date: 2009-12-08 17:41:02 +1100 (Tue, 08 Dec 2009) $
+ 
+Copyright 2007 by Geoscience Australia
 """
 
-from scipy import newaxis, sqrt, pi, cos, sin, where, reshape
+from scipy import newaxis, sqrt, pi, cos, sin, where, reshape, arctan, sign
 
 from projections import azimuthal_orthographic_ll_to_xy as ll2xy
  
-    
+
+# constant used to convert degrees to radians: rad = deg * DegreesToRadians
+DegreesToRadians = pi / 180.0
+
+
 def Hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
                 widths, dips, depths, projection, trace_start_lat,
                 trace_start_lon, trace_start_x, trace_start_y):
@@ -238,6 +258,46 @@ def Joyner_Boore(lat_sites, lon_sites, lat_events, lon_events, lengths,
     
     joyner_boore_distance = sqrt(x*x + y*y)
     return where(joyner_boore_distance < 1, 1.0, joyner_boore_distance)
+
+def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
+               azimuths, widths, dips, depths, projection, trace_start_lat,
+               trace_start_lon, trace_start_x, trace_start_y):
+    """Distance function that calculates 'Rx'.
+
+    Rx is the shortest horizontal distance (km) from a site to the line defined
+    by extending the event fault trace to infinity.
+
+                 ^ north
+                /
+               /\azimuth
+        start 0======---+--------
+               \        |
+                \       |
+                 \      |
+                  \     | Rx
+                   \    |
+                    \   |
+                     \  |
+                      \ |
+                       \|
+                        .
+                      site
+
+    We get Rx by using ll2xy() to convert start/site positions to x and y
+    in the coordinates relative to start and with axes shown in fig 3.1
+    of the manual.  Rx is therefore the y value.
+    """
+
+    # get correct dimensionality
+    lat_sites = lat_sites[:,newaxis]
+    lon_sites = lon_sites[:,newaxis]
+    
+    # get x,y position of sites w.r.t. origin 'start'    
+    (_, Rx) = ll2xy(lat_sites, lon_sites, trace_start_lat,
+                    trace_start_lon, azimuths)
+
+    # limit distance to 1.0km minimum
+    return where(abs(Rx) < 1.0, sign(Rx)*1.0, Rx)
 
 ###################
 # END OF FUNCTIONS#
