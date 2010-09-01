@@ -32,7 +32,6 @@ site_indexes = [2255, 11511]
 
 # Probabilistic input
 prob_min_mag_cutoff = 4.5
-prob_number_of_events_in_zones = [5, 1, 10, 3, 1, 10]
 
 # Attenuation
 atten_models = ['Gaull_1990_WA']
