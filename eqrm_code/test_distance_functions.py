@@ -2,11 +2,12 @@ import os
 import sys
 import unittest
 
-from scipy import asarray, allclose, newaxis, sqrt, arccos, sin, cos, pi, \
-     newaxis
+from scipy import (asarray, allclose, newaxis, sqrt, arccos, sin, cos, pi,
+                   newaxis)
 
-from eqrm_code.distance_functions import distance_functions
-from eqrm_code.projections import azimuthal_orthographic
+from eqrm_code.distance_functions import distance_functions, Horizontal
+from eqrm_code.projections import (azimuthal_orthographic,
+                                   azimuthal_orthographic_ll_to_xy as ll2xy)
 from eqrm_code.sites import Sites
 from eqrm_code.distances import Distances
 
@@ -140,7 +141,53 @@ class Test_Distance_functions(unittest.TestCase):
         D = 1.852*60*180/pi*arccos(sin(L1)*sin(L2)+cos(L1)*cos(L2)*cos(DG))
         return D
 
-    
+    def test_Horizontal(self):
+        # calculate length of 1 degree of great circle
+        R = 6367.0		# Earth radius (km)
+        circumference = 2*pi*R
+        km_per_degree = circumference / 360.0
+
+        # define array of events, all at 0,0
+        lat_events = asarray((0.0,))
+        lon_events = asarray((0.0,))
+
+        azimuths = asarray((0.0,))
+        widths = asarray((10.0,))
+        lengths = asarray((20.0,))
+        dips = asarray((90.0,))
+        depths = asarray((30.0,))
+        trace_start_lat = asarray((0.0,))
+        trace_start_lon = asarray((0.0,))
+        trace_start_x = asarray((0.0,))
+        trace_start_y = asarray((0.0,))
+
+        # define varying sites, at different positions
+        # start at 1deg E of start, 0deg N, rotate CW, ~45deg per site
+        lon_sites = asarray((1.0, 1.0, 0.0, -1.0, -1.0, -1.0, 0.0, 1.0))
+        lat_sites = asarray((0.0, -1.0, -1.0, -1.0, 0.0, 1.0, 1.0, 1.0))
+
+        # don't use this
+        projection = None
+
+        # define expected Rx values
+        expected_Rx = asarray([[+km_per_degree],	# 1 deg E, 0 deg N of start
+                               [+km_per_degree],	# 1 deg E, 1 deg S of start
+                               [ 0.0],			# 0 deg E, 1 deg S of start
+                               [-km_per_degree],	# 1 deg W, 1 deg S of start
+                               [-km_per_degree],	# 1 deg W, 0 deg N of start
+                               [-km_per_degree],	# 1 deg W, 1 deg N of start
+                               [ 0.0],			# 0 deg E, 1 deg N of start
+                               [+km_per_degree]])	# 1 deg E, 1 deg N of start
+                             
+
+        Rx = Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
+                        azimuths, widths, dips, depths, projection,
+                        trace_start_lat, trace_start_lon,
+                        trace_start_x, trace_start_y)
+
+        msg = ('Expected Rx=\n%s\ngot\n%s' % (str(expected_Rx), str(Rx)))
+        self.failUnless(allclose(Rx, expected_Rx, rtol=5.0e-3), msg)
+
 def m_to_py1(m):
     """
     Input
