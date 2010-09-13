@@ -114,32 +114,55 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, interval = 0.1):
     annual_num_eq
     print 'Maximum catalog magnitude:', max(magnitudes)
     print 'Mmax = ', max_mag
-    max_mag_bin = max(magnitudes) + 0.15
+    #max_mag_bin = max(magnitudes) + 0.15
+    max_mag_bin = max_mag#6.0#max_mag - 1.0
+    
+    # Remove large values from catalogue for LS calculation, as these will
+    # bias the solution
+    deletions = []
+    for i, value in enumerate(magnitudes):
+        if value > max_mag_bin:
+            deletions.append(i)
+    magnitudes_clip = np.delete(magnitudes, deletions)
     
     # Magnitude bins
     bins = np.arange(min_mag, max_mag_bin, interval)
     # Magnitude bins for plotting - we will re-arrange bins later
     plot_bins = np.arange(min_mag, max_mag, interval)
 
+    
+    
+
     ###########################################################################
     # Generate distribution
     ###########################################################################
     # Generate histogram
-    hist = np.histogram(magnitudes,bins=bins, new=True)
+    hist = np.histogram(magnitudes_clip, bins=bins, new=True)
 
     # Reverse array order
     hist = hist[0][::-1]
     bins = bins[::-1]
 
+
     # Calculate cumulative sum
     cum_hist = hist.cumsum()
+
+    # Find annual rate of earthquakes greater than mean magnitude (of entire complete catalogue)
+    mean_mag = np.mean(magnitudes)
+    for i, value in enumerate(bins):
+        if value < mean_mag:
+            annual_rate_mean_eq = cum_hist[i-1]/num_years
+            break
+        else:
+            pass
+        
+            
     # Ensure bins have the same length has the cumulative histogram.
     # Remove the upper bound for the highest interval.
     bins = bins[1:]
 
     # Get annual rate
     cum_annual_rate = cum_hist/num_years
-
     new_cum_annual_rate = []
     for i in cum_annual_rate:
         new_cum_annual_rate.append(i+1e-20)
@@ -158,6 +181,7 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, interval = 0.1):
     beta = -1.0 * np.log(10) * b
 
     # Maximum Likelihood Estimator fitting
+    # Use Aki 1965 for continuous, unbounded data
     # b value
     b_mle = np.log10(np.exp(1)) / (np.mean(magnitudes) - min_mag)
     beta_mle = np.log(10) * b_mle
@@ -182,7 +206,11 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, interval = 0.1):
     ls_bounded = annual_num_eq * (numer / denom)
         
     # Generate data to plot maximum likelihood linear curve
-    mle_fit = -1.0 * b_mle * plot_bins + 1.0 * b_mle * min_mag + np.log10(annual_num_eq)
+    # Annual number of earthquakes greater than mean value
+    #annual_num_mean_eq = np.mean(magnitudes)
+    print annual_num_eq, annual_rate_mean_eq
+    mle_fit = -1.0 * b_mle * plot_bins + 1.0 * b_mle * np.mean(magnitudes) + np.log10(annual_rate_mean_eq)
+    #mle_fit = -1.0 * b_mle * plot_bins + 1.0 * b_mle * min_mag + np.log10(annual_num_eq)
     log_mle_fit = []
     for value in mle_fit:
         log_mle_fit.append(np.power(10,value))
