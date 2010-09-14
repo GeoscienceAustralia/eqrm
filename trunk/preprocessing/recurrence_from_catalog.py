@@ -183,7 +183,8 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
 
     # Find annual rate of earthquakes greater than mean magnitude (of entire complete catalogue)
     mean_mag = np.mean(magnitudes)
-    for i, value in enumerate(bins[::-1]):
+    for i, value in enumerate(bins_plot[::-1]):
+
         if value >= mean_mag:
             annual_rate_mean_eq = new_cum_annual_rate[-i-1]
             break
