@@ -1,5 +1,5 @@
-"""
-This script calculates Gutenberg-Richter recurrence parameters
+# -*- coding: cp1252 -*-
+"""This script calculates Gutenberg-Richter recurrence parameters
 (a and b values) from an earthquake catalogue. Recurrence parameters are
 calculated using several methods:
     1. Least Squares
@@ -29,10 +29,12 @@ minimum magnitude: The minumum magnitude for which the catalogue is complete.
 maximum magnitude: The maxumum magnitude expected for the source zone.
             Defaults to the maximum magnitude in the catalogue plu 0.1 magnitude
             units.
-interval: The size of the bins used in generating a histogram of earthquake
-            occurrence. Defaults to 0.1 magnitude units.    
+interval: Width of magnitude bins for generating cumulative histogram
+            of earthquake recurrence for least squares fit. Default value is
+            0.1 magnitude units.    
 
 Ref: Kramer, S.L. 1996. Geotechnical Earthquake Engineering, p123.
+Aki, K. (1965). Maximum likelihood estimate of b in the formula log N= a-bM and its confidence limits. Bull. Earthquake Res. Inst. Tokyo Univ 43: 237–239.
 
 Creator: Jonathan Griffin, Australia-Indonesia Facility for Disaster Reduction
 Created: 23 August 2010
@@ -47,10 +49,9 @@ from matplotlib import pylab as py
 
 
 
-def calc_recurrence(infile, min_mag = None, max_mag = None, interval = 0.1):
+def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, interval = 0.1):
 
-    """
-    This function reads an earthquake catalogue file and calculates the
+    """This function reads an earthquake catalogue file and calculates the
     Gutenberg-Richter recurrence parameters using both least squares and
     maximum likelihood (Aki 1965) approaches.
 
@@ -70,7 +71,8 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, interval = 0.1):
                 defined as the maximum magnitude in the catlogue + 0.1 magnitude
                 units.
         interval: Width of magnitude bins for generating cumulative histogram
-                of earthquake recurrence. Default avlue 0.1 magnitude units.  
+                of earthquake recurrence for least squares fit. Default value is
+                0.1 magnitude units.  
     
     """
 
@@ -112,63 +114,82 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, interval = 0.1):
     annual_num_eq = num_eq/num_years
     print 'Annual number of earthquakes greater than Mw', min_mag,':', \
     annual_num_eq
-    print 'Maximum catalog magnitude:', max(magnitudes)
+    max_catalogue = max(magnitudes)
+    print 'Maximum catalog magnitude:', max_catalogue
     print 'Mmax = ', max_mag
-    #max_mag_bin = max(magnitudes) + 0.15
-    max_mag_bin = max_mag#6.0#max_mag - 1.0
-    
-    # Remove large values from catalogue for LS calculation, as these will
-    # bias the solution
-    deletions = []
-    for i, value in enumerate(magnitudes):
-        if value > max_mag_bin:
-            deletions.append(i)
-    magnitudes_clip = np.delete(magnitudes, deletions)
-    
-    # Magnitude bins
-    bins = np.arange(min_mag, max_mag_bin, interval)
-    # Magnitude bins for plotting - we will re-arrange bins later
-    plot_bins = np.arange(min_mag, max_mag, interval)
 
+    # Maximum magnitude for least square fit
+    if max_mag_ls is None:
+        max_mag_bin = max(max_catalogue - 1.0, min(magnitudes) + 1.0)
+    else:
+        max_mag_bin = max_mag_ls
+    print 'Maximum magnitude used in least squares analysis ', max_mag_bin
     
+    
+
+    # Magnitude bins - we will re-arrange bins later
+    bins = np.arange(min_mag, max_mag_bin, interval)
+
+    # Magnitude bins for plotting - we will re-arrange bins later
+    bins_plot = np.arange(min_mag, max_catalogue + 0.15, interval)  
     
 
     ###########################################################################
     # Generate distribution
     ###########################################################################
-    # Generate histogram
-    hist = np.histogram(magnitudes_clip, bins=bins, new=True)
 
-    # Reverse array order
+    # Generate histogram for LS analysis
+    hist = np.histogram(magnitudes, bins=bins_plot, new=True)
+    # Generate histogram for plotting
+    hist_plot = np.histogram(magnitudes, bins=bins_plot, new=True)
+
+    # Reverse array orders
     hist = hist[0][::-1]
     bins = bins[::-1]
-
-
-    # Calculate cumulative sum
+    hist_plot = hist_plot[0][::-1]
+    bins_plot = bins_plot[::-1]
+    
+    # Calculate cumulative sums
     cum_hist = hist.cumsum()
-
-    # Find annual rate of earthquakes greater than mean magnitude (of entire complete catalogue)
-    mean_mag = np.mean(magnitudes)
-    for i, value in enumerate(bins):
-        if value < mean_mag:
-            annual_rate_mean_eq = cum_hist[i-1]/num_years
-            break
-        else:
-            pass
-        
+    cum_hist_plot = hist_plot.cumsum()    
             
-    # Ensure bins have the same length has the cumulative histogram.
+    # Ensure bins have the same length as the cumulative histogram.
     # Remove the upper bound for the highest interval.
     bins = bins[1:]
+    bins_plot = bins_plot[1:]
 
     # Get annual rate
     cum_annual_rate = cum_hist/num_years
+    cum_annual_rate_plot = cum_hist_plot/num_years
+    
     new_cum_annual_rate = []
     for i in cum_annual_rate:
         new_cum_annual_rate.append(i+1e-20)
 
+    new_cum_annual_rate_plot = []
+    for i in cum_annual_rate_plot:
+        new_cum_annual_rate_plot.append(i+1e-20)
+
+
+    # Remove large values from catalogue for LS calculation, as these will
+    # bias the solution
+    new_cum_annual_rate_clip = []
+    for i, value in enumerate(bins[::-1]):
+        new_cum_annual_rate_clip.append(new_cum_annual_rate[-i-1])
+    new_cum_annual_rate_clip = new_cum_annual_rate_clip[::-1]
+            
     # Take logarithm
-    log_cum_sum = np.log10(new_cum_annual_rate)
+    log_cum_sum = np.log10(new_cum_annual_rate_clip)
+
+    # Find annual rate of earthquakes greater than mean magnitude (of entire complete catalogue)
+    mean_mag = np.mean(magnitudes)
+    for i, value in enumerate(bins[::-1]):
+        if value >= mean_mag:
+            annual_rate_mean_eq = new_cum_annual_rate[-i-1]
+            break
+        else:
+            pass
+
     
     ###########################################################################
     # Fit a and b parameters using a varity of methods
@@ -194,13 +215,13 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, interval = 0.1):
     # Generate data to plot least squares linear curve
     # Calculate y-intercept for least squares solution
     yintercept = log_cum_sum[-1] - b * min_mag
-    ls_fit = b * plot_bins + yintercept
+    ls_fit = b * bins_plot + yintercept
     log_ls_fit = []
     for value in ls_fit:
         log_ls_fit.append(np.power(10,value))
 
     # Generate data to plot bounded Gutenberg-Richter for LS solution
-    numer = np.exp(-1. * beta * (plot_bins - min_mag)) - \
+    numer = np.exp(-1. * beta * (bins_plot - min_mag)) - \
             np.exp(-1. *beta * (max_mag - min_mag))
     denom = 1. - np.exp(-1. * beta * (max_mag - min_mag))
     ls_bounded = annual_num_eq * (numer / denom)
@@ -208,21 +229,19 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, interval = 0.1):
     # Generate data to plot maximum likelihood linear curve
     # Annual number of earthquakes greater than mean value
     #annual_num_mean_eq = np.mean(magnitudes)
-    print annual_num_eq, annual_rate_mean_eq
-    mle_fit = -1.0 * b_mle * plot_bins + 1.0 * b_mle * np.mean(magnitudes) + np.log10(annual_rate_mean_eq)
-    #mle_fit = -1.0 * b_mle * plot_bins + 1.0 * b_mle * min_mag + np.log10(annual_num_eq)
+    mle_fit = -1.0 * b_mle * bins_plot + 1.0 * b_mle * np.mean(magnitudes) + np.log10(annual_rate_mean_eq)
     log_mle_fit = []
     for value in mle_fit:
         log_mle_fit.append(np.power(10,value))
 
     # Generate data to plot bounded Gutenberg-Richter for MLE solution
-    numer = np.exp(-1. * beta_mle * (plot_bins - min_mag)) - \
+    numer = np.exp(-1. * beta_mle * (bins_plot - min_mag)) - \
             np.exp(-1. *beta_mle * (max_mag - min_mag))
     denom = 1. - np.exp(-1. * beta_mle * (max_mag - min_mag))
     mle_bounded = annual_num_eq * (numer / denom)
 
     # Compare b-value of 1
-    fit_data = -1.0 * plot_bins + min_mag + np.log10(annual_num_eq)
+    fit_data = -1.0 * bins_plot + min_mag + np.log10(annual_num_eq)
     log_fit_data = []
     for value in fit_data:
         log_fit_data.append(np.power(10,value))
@@ -232,18 +251,18 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, interval = 0.1):
     ###########################################################################
 
     # Plotting
-    fig = py.scatter(bins, new_cum_annual_rate, label = 'Catalogue')
+    fig = py.scatter(bins_plot, new_cum_annual_rate_plot, label = 'Catalogue')
     ax = py.gca()
-    ax.plot(plot_bins, log_ls_fit, c = 'r', label = 'Least Squares')
-    ax.plot(plot_bins, ls_bounded, c = 'r', linestyle ='--', label = 'Least Squares Bounded')
-    ax.plot(plot_bins, log_mle_fit, c = 'g', label = 'Maximum Likelihood')
-    ax.plot(plot_bins, mle_bounded, c = 'g', linestyle ='--', label = 'Maximum Likelihood Bounded')
-    ax.plot(plot_bins, log_fit_data, c = 'b', label = 'b = 1')
+    ax.plot(bins_plot, log_ls_fit, c = 'r', label = 'Least Squares')
+    ax.plot(bins_plot, ls_bounded, c = 'r', linestyle ='--', label = 'Least Squares Bounded')
+    ax.plot(bins_plot, log_mle_fit, c = 'g', label = 'Maximum Likelihood')
+    ax.plot(bins_plot, mle_bounded, c = 'g', linestyle ='--', label = 'Maximum Likelihood Bounded')
+    ax.plot(bins_plot, log_fit_data, c = 'b', label = 'b = 1')
     
     #ax.plot(bins, ls_fit2, c = 'k')
     ax.set_yscale('log')
-    ax.legend()
-    ax.set_ylim([min(new_cum_annual_rate) * 0.1, max(new_cum_annual_rate) * 10.])
+    ax.legend(loc=1)
+    ax.set_ylim([min(new_cum_annual_rate_plot) * 0.1, max(new_cum_annual_rate_plot) * 10.])
     ax.set_xlim([min_mag - 0.5, max_mag + 0.5])
     ax.set_ylabel('Annual probability')
     ax.set_xlabel('Magnitude')
@@ -269,17 +288,24 @@ if __name__=="__main__":
         print '\nMinimum magnitude not specified, defaulting to minimum magnitude in catalogue'
         min_mag = None
 
-    try:
-        
+    try:       
         max_mag = float(sys.argv[3])
     except IndexError:
         print '\nMaximum magnitude not specified, defaulting to maximum magnitude in catalogue + 0.1'
         max_mag = None
 
+    try:       
+        max_mag_ls = float(sys.argv[4])
+    except IndexError:
+        print '\nMaximum magnitude for least squares analysis not specified, defaulting \
+to maximum magnitude in catalogue - 1.0. You may want to check this after examining \
+the data.'
+        max_mag_ls = None
+
     try:
-        interval = float(sys.argv[4])
+        interval = float(sys.argv[5])
     except IndexError:
         print '\nMagnitude bin interval not specfied, defaulting to 0.1 magnitude units'
         interval = 0.1
 
-    calc_recurrence(infile, min_mag = min_mag, max_mag = max_mag, interval = interval)
+    calc_recurrence(infile, min_mag = min_mag, max_mag = max_mag, max_mag_ls = max_mag_ls, interval = interval)
