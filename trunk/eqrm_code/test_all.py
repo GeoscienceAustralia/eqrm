@@ -162,8 +162,7 @@ def main(path=None):
                   "         You must do 'ssh -X <machine>' to run these tests.")
 
     suite, moduleNames = regressionTest(path=path)
-    #import sys; sys.exit() 
-    runner = unittest.TextTestRunner() #verbosity=2) #verbosity=2
+    runner = unittest.TextTestRunner() # verbosity=2)
     test_result = runner.run(suite)
     
     # moduleNames is used for do_coverage
@@ -182,7 +181,6 @@ if __name__ == '__main__':
     from os import access, F_OK
     import sys
 
-    #print "sys.argv", sys.argv
     if len(sys.argv) > 1 and access(sys.argv[1],F_OK):
         path = sys.argv[1]
         path = None
