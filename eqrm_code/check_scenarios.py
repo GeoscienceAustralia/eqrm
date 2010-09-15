@@ -84,7 +84,7 @@ FILE_EXTENTION = '.asc'
 PARALLEL_FILES = ['TS_haz05.py', 'TS_haz09.py', 'TS_haz12.py',
                   'TS_haz19.py',
                   'TS_risk20.py',
-                  'TS_risk21.py', 'TS_risk22.py', 'TS_risk23.py',
+                  'TS_risk21.py', 'TS_risk22.py', 
                   'TS_risk32.py',
                   'TS_risk33.py', 'TS_risk34.py', 'TS_risk58.py',
                   'TS_risk60.py' ]
