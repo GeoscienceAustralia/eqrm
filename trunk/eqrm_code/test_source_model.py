@@ -257,13 +257,12 @@ class Test_Source_model(unittest.TestCase):
         
         eqrm_dir = determine_eqrm_path()
         file_name = join(eqrm_dir, 'implementation_tests', 'input',
-                             'newc_source_polygon.xml')
-        #file_name = '../implementation_tests/input/newc_source_polygon.xml'
+                         'newc_source_polygon.xml')
         fid_sourcepolys = open(file_name)
         
         prob_min_mag_cutoff = 4.5
         weight = [1.0]
-        number_of_mag_sample_bins = 7
+        number_of_mag_sample_bins = 100000000
         source_model = Source_Models(prob_min_mag_cutoff,
                                      weight,
                                      number_of_mag_sample_bins,
@@ -276,17 +275,21 @@ class Test_Source_model(unittest.TestCase):
         prob_min_mag_cutoff = 4.5
         prob_number_of_events_in_zones = [2, 1, 1, 2, 2, 2]
         prob_number_of_mag_sample_bins = 15
-        
-        events = Event_Set.generate_synthetic_events(
-            fid_genpolys=fid_sourcepolys,
-            fault_width=max_width,
-            azi=azi,
-            dazi=prob_delta_azimuth_in_zones,
-            fault_dip=dip,
-            prob_min_mag_cutoff=prob_min_mag_cutoff,
-            override_xml=True,
-            prob_number_of_events_in_zones=prob_number_of_events_in_zones)
-        new_event_set = source_model.calculate_recurrence(events, prob_number_of_mag_sample_bins)
+       
+        events = Event_Set.\
+                 generate_synthetic_events(fid_genpolys=fid_sourcepolys,
+                                           fault_width=max_width,
+                                           azi=azi,
+                                           dazi=prob_delta_azimuth_in_zones,
+                                           fault_dip=dip,
+                                           prob_min_mag_cutoff=
+                                               prob_min_mag_cutoff,
+                                           override_xml=True,
+                                           prob_number_of_events_in_zones=
+                                               prob_number_of_events_in_zones)
+        new_event_set = \
+            source_model.calculate_recurrence(events,
+                                              prob_number_of_mag_sample_bins)
         event_activity = new_event_set.event_activity
         # Warning - this is just the results from running
         # calculate_recurrence at this version.
@@ -295,15 +298,14 @@ class Test_Source_model(unittest.TestCase):
                    0.23324915,  0.00144009,  0.00121821,
                    0.0062062,   0.00902211,  0.00554215,
                    0.0097141 ]
-        self.failUnless( len(actual)==len(event_activity),
-            'Failed!')
-        #print "array(actual)", array(actual)
-        #print "event_activity", event_activity
+        self.failUnless(len(actual) == len(event_activity), 'Failed!')
         # this fails using self.__contains_point_geo(point)
-        self.assert_ (allclose(array(actual),event_activity))
+        msg = ('array(actual)=\n%s\nevent_activity=\n%s'
+               % (str(array(actual)), str(event_activity)))
+        self.assert_(allclose(array(actual),event_activity), msg)
 
-        
-#-------------------------------------------------------------
+################################################################################
+
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Source_model,'test')
     #suite = unittest.makeSuite(Test_Source_model,'test_Source_mini_check_gong')
