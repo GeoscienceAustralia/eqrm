@@ -44,8 +44,7 @@ WINDOWS INSTALL INSTRUCTIONS:
 
 4. Install numpy from
    http://numpy.scipy.org/
-    (if you are installing to python 2.4, the version must be no later than 
-   http://prdownloads.sourceforge.net/numpy/numpy-1.0.2.win32-py2.4.exe?download)
+    (Use version 1.3.0 or later)
 
 5. Install scipy from 
    http://scipy.org 
