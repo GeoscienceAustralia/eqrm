@@ -263,7 +263,7 @@ class Test_Source_model(unittest.TestCase):
         
         prob_min_mag_cutoff = 4.5
         weight = [1.0]
-        number_of_mag_sample_bins = 100000000
+        number_of_mag_sample_bins = 7
         source_model = Source_Models(prob_min_mag_cutoff,
                                      weight,
                                      number_of_mag_sample_bins,
