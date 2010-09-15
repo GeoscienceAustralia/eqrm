@@ -387,5 +387,13 @@ EXAMPLES Follow
 
 ---------------------------------------------------------------------
 
+RUNNING EQRM IN PARALLEL
 
-
+EQRM can run in parallel using mpi. Run mpirun and an EQRM script to
+run a scenario in parallel.  Here is an example of running
+check_scenarios in parallel, on 4 processes;
+ 
+ mpirun -np 4 -hostfile ~/.machines_tornado -x PYTHONPATH python2.5
+ check_scenarios.py
+ 
+ Check the web for more information on mpirun to run EQRM in parallel.
