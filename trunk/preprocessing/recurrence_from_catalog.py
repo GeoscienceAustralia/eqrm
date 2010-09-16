@@ -278,7 +278,7 @@ if __name__=="__main__":
 
     if len(sys.argv) < 2:
         print 'Usage: python recurrence_from_catalog.py <input_file> <minimum magnitude = minimum magnitude in catalogue> \
-<maximum magnitude = maximum magnitude in catalogue + 0.1> <interval = 0.1>'
+<maximum magnitude = maximum magnitude in catalogue + 0.1> <maximum magntiude for least squares analysis = maximum magnitude - 1.0> <interval = 0.1>'
         sys.exit(-1)
 
     infile  = sys.argv[1]
