@@ -14,41 +14,39 @@ Questions and comments are welcomed. Please please join the list
  the full simulation toggle small_site_flag in the parameter file.
     
 
-1) Ground Motion Scenario (example parameter file: setdata_ScenGM.par)
+1) Ground Motion Scenario 
 
     Run at DOS command line:
     cd *\eqrm_core\demo
-    python ..\eqrm_analysis.py setdata_ScenGM.par y
+    python setdata_ScenGM.py
 
 
-2) Damage Scenario with a single attenuation model (example parameter
+2) Damage Scenario with a single attenuation model 
    file: setdata_ScenRisk.txt)
 
     Run at DOS command line:
     cd *\eqrm_core\demo
-    python ..\eqrm_analysis.py setdata_ScenRisk.par y
+    python setdata_ScenRisk.py
 
-3) Damage Scenario with multiple attenuation models (example parameter
-   file: setdata_ScenRisk2.txt)
-
-    Run at DOS command line:
-    cd *\eqrm_core\demo
-    python ..\eqrm_analysis.py setdata_ScenRisk2.par y
-
-
-4) Probabilistic Hazard Simulation (example parameter file:
-   setdata_ProbHaz.txt)
+3) Damage Scenario with multiple attenuation models 
+  
 
     Run at DOS command line:
     cd *\eqrm_core\demo
-    python ..\eqrm_analysis.py setdata_ProbHaz.par y
+    python setdata_ScenRisk.py
 
-5) Probabilistic Risk Simulation (example parameter file:
-   setdata_ProbRisk.txt)
+
+4) Probabilistic Hazard Simulation 
 
     Run at DOS command line:
     cd *\eqrm_core\demo
-    python ..\eqrm_analysis.py setdata_ProbRisk.par y
+    python setdata_ProbHaz.py
+
+5) Probabilistic Risk Simulation
+
+    Run at DOS command line:
+    cd *\eqrm_core\demo
+    python setdata_ProbRisk.py
 
 
 INPUT:
