@@ -175,15 +175,14 @@ def main(parameter_handle,
         # (i.e. is_scenario is False) generate a probablistic event set
         # (using THE_PARAM_T.source_filename)
 
-        # Get name of xml file containing source polygons and GR type
-        # statistics First we look in a local input_dir (if found here
-        # take this copy) If not found in input_dir look in defaultdir
-        # Note use of site_tag as a prefix for the data file.
-
-        source_file = THE_PARAM_T.site_tag + '_source_polygon.xml'
-        fid_sourcepolys=get_local_or_default(source_file,
-                                             THE_PARAM_T.default_input_dir,
-                                             THE_PARAM_T.input_dir)
+        if THE_PARAM_T.source_polygon_xml_tag is None:
+            source_file = THE_PARAM_T.site_tag + '_source_polygon.xml'
+        else:
+            source_file = THE_PARAM_T.site_tag + '_' \
+                          + THE_PARAM_T.source_polygon_xml_tag \
+                          + '_source_polygon.xml'
+        source_file = os.path.join(THE_PARAM_T.input_dir, source_file)
+        fid_sourcepolys = open(source_file)
 
 
         # tell event set which source models to calculate activity with
