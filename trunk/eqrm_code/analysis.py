@@ -20,8 +20,9 @@ import os
 import time
 import shutil
 import copy
+import datetime 
+
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray
-import numpy as np
 
 from eqrm_code.parse_in_parameters import  \
     ParameterSyntaxError, create_parameter_data, convert_THE_PARAM_T_to_py
@@ -613,7 +614,8 @@ def main(parameter_handle,
 
     msg = "time_pre_site_loop_fraction " + str(time_pre_site_loop_fraction)
     log.info(msg)
-    msg = "loop_time (excluding file saving) " + str(loop_time)
+    msg = "loop_time (excluding file saving) " + \
+           str(datetime.timedelta(seconds=loop_time)) + " hr:min:sec"
     log.info(msg)
 
     #print "time_taken_pre_site_loop", time_taken_pre_site_loop
@@ -792,9 +794,10 @@ def main(parameter_handle,
     # Needed when scenarios are in series.
     # This was hanging nodes, when using mpirun
     real_time_taken_overall = (time.clock() - t0)
-    msg = "On node %i, %s time_taken_overall %f" % (parallel.rank,
-                                                    parallel.node,
-                                                    real_time_taken_overall)
+    msg = "On node %i, %s time_taken_overall %s hr:min:sec" % \
+          (parallel.rank,
+           parallel.node,
+           str(datetime.timedelta(seconds=real_time_taken_overall)) )
     log.info(msg)
     del parallel
     log.debug('Memory: End')
