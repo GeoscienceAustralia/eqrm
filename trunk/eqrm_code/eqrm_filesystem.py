@@ -33,6 +33,9 @@ Implementation_Path = os.path.join(eqrm_path, 'implementation_tests')
 mini_scenario_Path = os.path.join(eqrm_path, 'implementation_tests',
                                   'mini_scenarios')
 
+scenario_input_path = os.path.join(eqrm_path, 'implementation_tests',
+                                  'input')
+
 scenario_input_bridges_path = os.path.join(eqrm_path, 'implementation_tests',
                                   'input_bridges')
 
