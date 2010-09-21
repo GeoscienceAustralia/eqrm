@@ -9,6 +9,7 @@ The mean values are compared with values from the paper.
 The sigma values are compared with values from opensha.org.
 """
 
+import sys
 import math
 
 # table 2
@@ -90,7 +91,207 @@ PGA_sigma_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
 Z25 = 2.0
 
 ######
-# The Campbell08 equation(s)
+# Code mimicing the FORTRAN
+######
+
+def CB08_MODEL(period, M, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs):
+    """This code mimics the code in CB08_MODEL.FOR.
+
+    The major difference is that here we pass in the coefficient arrays specific
+    to the period.  The PGA coefficients are globals.
+    """
+
+    # unpack table 2 coefficients and PGA coefficients
+    (C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,K1,K2,K3) = tab2_coeffs
+    (pC0,pC1,pC2,pC3,pC4,pC5,pC6,pC7,pC8,pC9,pC10,pC11,pC12,pK1,pK2,pK3) = PGA_coeffs
+
+    # unpack table 3 coefficients and PGA coefficients
+    (ElnY, taulnY, EC, ET, EArb, rho) = tab3_coeffs
+    (pElnY, ptaulnY, pEC, pET, pEArb, prho) = PGA_sigma_coeffs
+    # NOTE: ET, pET, EArb, pEArb aren't used in this code
+
+    ######
+    # Calculate the rock PGA
+    ######
+
+    # magnitude term
+    if M <= 5.5:
+        Fmag = pC0 + pC1*M
+    elif M <= 6.5:
+        Fmag = pC0 + pC1*M + pC2*(M-5.5)
+    else:
+        Fmag = pC0 + pC1*M + pC2*(M-5.5) + pC3*(M-6.5)
+
+    # distance term
+    R = math.sqrt(Rrup*Rrup + pC6*pC6)
+    Fdis = (pC4 + pC5*M)*math.log(R)
+
+    # style-of-faulting term
+    if Ztor < 1.0:
+        Ffltz = Ztor
+    else:
+        Ffltz = 1.0
+
+    Fflt = pC7*Frv*Ffltz + pC8*Fnm
+
+    # hanging wall term
+    if Rjb == 0.0:
+        Fhngr = 1.0
+    elif Ztor < 1.0:
+        Rmax = max(Rrup, math.sqrt(Rjb*Rjb+1.0))
+        Fhngr = (Rmax - Rjb)/Rmax
+    else:
+        Fhngr = (Rrup - Rjb)/Rrup
+
+    if M <= 6.0:
+        Fhngm = 0.0
+    elif M < 6.5:
+        Fhngm = 2.0*(M-6.0)
+    else:
+        Fhngm = 1.0
+
+    if Ztor >= 20.0:
+        Fhngz = 0.0
+    else:
+        Fhngz = (20.0 - Ztor)/20.0
+
+    if delta <= 70.0:
+        Fhngd = 1.0
+    else:
+        Fhngd = (90.0 - delta)/20.0
+
+    Fhng = pC9*Fhngr*Fhngm*Fhngz*Fhngd
+
+    # shallow site response term (Vs30 = 1100)
+    Fsite = (pC10 + pK2*N)*math.log(1100.0/pK1)
+
+    # basin response term
+    if Z25 < 1.0:
+        Fsed = pC11*(Z25 - 1.0)
+    elif Z25 <= 3.0:
+        Fsed = 0.0
+    else:
+        Fsed = pC12*pK3*math.exp(-0.75)*(1.0 - math.exp(-0.25*(Z25-3.0)))
+
+    # PGA on rock
+    A1100 = math.exp(Fmag + Fdis + Fflt + Fhng + Fsite + Fsed)
+
+    # PGA on local site conditions
+    PGA = math.exp(math.log(A1100) - Fsite)
+    if Vs30 < pK1:
+        Fsite = pC10*math.log(Vs30/pK1) + pK2*(math.log(A1100+C*math.pow((Vs30/pK1), N)) - math.log(A1100+C))
+    elif Vs30 < 1100.0:
+        Fsite = (pC10 + pK2*N)*math.log(Vs30/pK1)
+    else:
+        Fsite = (pC10 + pK2*N)*math.log(1100.0/pK1)
+    PGA = math.exp(math.log(PGA) + Fsite)
+
+    # standard deviation of ln PGA
+    slnPGA = pElnY
+    tlnPGA = ptaulnY
+
+    ######
+    # Now calculate the strong motion parameter
+    ######
+
+    # magnitude term
+    if M <= 5.5:
+        Fmag = C0 + C1*M
+    elif M <= 6.5:
+        Fmag = C0 + C1*M + C2*(M-5.5)
+    else:
+        Fmag = C0 + C1*M + C2*(M-5.5) + C3*(M-6.5)
+
+    # distance term
+    R = math.sqrt(Rrup*Rrup + C6*C6)
+    Fdis = (C4 + C5*M)*math.log(R)
+
+    # style-of-faulting term
+    if Ztor < 1.0:
+        Ffltz = Ztor
+    else:
+        Ffltz = 1.0
+
+    Fflt = C7*Frv*Ffltz + C8*Fnm
+
+    # hanging wall term
+    if Rjb == 0.0:
+        Fhngr = 1.0
+    elif Ztor < 1.0:
+        Rmax = max(Rrup, math.sqrt(Rjb*Rjb+1.0))
+        Fhngr = (Rmax - Rjb)/Rmax
+    else:
+        Fhngr = (Rrup - Rjb)/Rrup
+
+    if M <= 6.0:
+        Fhngm = 0.0
+    elif M < 6.5:
+        Fhngm = 2.0*(M-6.0)
+    else:
+        Fhngm = 1.0
+
+    if Ztor >= 20.0:
+        Fhngz = 0.0
+    else:
+        Fhngz = (20.0 - Ztor)/20.0
+
+    if delta <= 70.0:
+        Fhngd = 1.0
+    else:
+        Fhngd = (90.0 - delta)/20.0
+
+    Fhng = C9*Fhngr*Fhngm*Fhngz*Fhngd
+
+    # shallow site response term (Vs30 = 1100)
+    if Vs30 < K1:
+        #Fsite = C10*math.log(Vs30/K1) + K2*(math.log(A1100+C*math.pow((Vs30/K1), N))) - math.log(A1100+C)
+        Fsite = C10*math.log(Vs30/K1) + K2*(math.log(A1100+C*math.pow((Vs30/K1), N)) - math.log(A1100+C))
+    elif Vs30 < 1100.0:
+        Fsite = (C10 + K2*N)*math.log(Vs30/K1)
+    else:
+        Fsite = (C10 + K2*N)*math.log(1100.0/K1)
+
+    # basin response term
+    if Z25 < 1.0:
+        Fsed = C11*(Z25 - 1.0)
+    elif Z25 <= 3.0:
+        Fsed = 0.0
+    else:
+        Fsed = C12*K3*math.exp(-0.75)*(1.0 - math.exp(-0.25*(Z25-3.0)))
+
+    # calculate ground motion parameter
+    Y = math.exp(Fmag + Fdis + Fflt + Fhng + Fsite + Fsed)
+
+    # check if Y < PGA at short periods
+    if (period <= 0.25) and (Y < PGA):
+        Y = PGA
+
+    ######
+    # calculate aleatory uncertainty
+    ######
+
+    # linearized relationship between Fsite and ln(PGA)
+    if Vs30 < K1:
+        alpha = K2*A1100*(1.0/(A1100+C*math.pow((Vs30/K1), N)) - 1.0/(A1100+C))
+    else:
+        alpha = 0.0
+
+    # intra-event standard deviation at base of site profile
+    slnYB = math.sqrt(ElnY*ElnY - ElnAF*ElnAF)
+    slnAB = math.sqrt(slnPGA*slnPGA - ElnAF*ElnAF)
+
+    # standard deviation of geometric mean of ln(Y)
+    sigma = math.sqrt(slnYB*slnYB + ElnAF*ElnAF + alpha*alpha*slnAB*slnAB + 2.0*alpha*rho*slnYB*slnAB)
+    tau = taulnY
+    sig = math.sqrt(sigma*sigma + tau*tau)
+
+    # standard deviation of arbitrary horizontal component of ln(Y)
+    sigarb = math.sqrt(sig*sig + EC*EC)
+
+    return (math.log(Y), math.log(sigma), tau, sig, sigarb)
+
+######
+# The Campbell08 equation(s) from the paper
 ######
 
 def eqn_1(M, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs):
@@ -210,6 +411,7 @@ def eqn_16(M, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs):
     # calculate sigma, return log(sigma)
     sigma = eqn_15(ElnYB, ElnAB, alpha, rho)
     tau = eqn_14(taulnY)
+
     return math.sqrt(sigma*sigma + tau*tau)
 
 def eqn_17(M, Rrup, Rjb, Ztor, delta, Vs30, tab2_coeffs, tab3_coeffs):
@@ -234,31 +436,141 @@ def eqn_A1100(M, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs):
 
     return result
 
+def eqn_page147(A1100, Fsite, tab2_coeffs, tab3_coeffs):
+    # implement the limit of PSA for short periods on page 147, paragraph 2
+    (C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,K1,K2,K3) = tab2_coeffs
+
+    # get PGA rock - remove site component
+    pga = math.exp(math.log(A1100) - Fsite)
+
+    # compute site response using Vs30 supplied
+    Fsite = eqn_11(M, Rrup, Rjb, Ztor, Vs30, delta, PGA_coeffs, PGA_sigma_coeffs)
+
+    pga = math.exp(math.log(pga) + Fsite)
+
+    return pga
+
 ######
 # handle doing one estimate (log_mean or log_sigma)
 ######
 
 def estimate(period, Mw, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs, expected):
-    (lnY, lnE) = eqn_1(Mw, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs)
+    #(lnY, lnE) = eqn_1(Mw, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs)
+    (lnY, lnE) = CB08_MODEL(period, Mw, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs)
     g = math.exp(lnY)
     sigma = math.exp(lnE)
     tol = abs(g-expected)/max(g, expected)
     flag = ' ' if tol <= Tolerance else '*'
-    print('period=%5.2f, Rrup=%5.1f, Rjb=%5.1f, M=%.1f, lnY=%8.4f, log_sigma=%7.4f, sigma=%7.4f\tg=%8.5f, expected=%7.5f, tol=%.2f%s'
-          % (period, Rrup, Rjb, Mw, lnY, lnE, sigma, g, expected, tol, flag))
+    print('period=%5.2f, Z25=%3.1f, Rrup=%5.1f, Rjb=%5.1f, del=%f, M=%.1f, lnY=%8.4f\tg=%7.5f, expected=%7.5f, tol=%.2f%s'
+          % (period, Z25, Rrup, Rjb, (Rrup-Rjb)/Rrup, Mw, lnY, g, expected, tol, flag))
+#          % (period, Z25, Rrup, Rjb, Mw, lnY, lnE, sigma, g, expected, tol, flag))
 
 def estimate_sigma(period, Mw, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs, expected):
-    (lnY, lnE) = eqn_1(Mw, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs)
+    #(lnY, lnE) = eqn_1(Mw, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs)
+    (lnY, lnE) = CB08_MODEL(period, Mw, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_coeffs)
     g = math.exp(lnY)
     sigma = math.exp(lnE)
     tol = abs(sigma-expected)/max(sigma, expected)
     flag = ' ' if tol <= Tolerance else '*'
-    print('period=%5.2f, Rrup=%5.1f, M=%.1f, Vs30=%6.1f, g=%7.4f, sigma=%7.5f\texpected sigma=%7.5f, tol=%.2f%s'
-          % (period, Rrup, Mw, Vs30, g, sigma, expected, tol, flag))
+    print('period=%5.2f, Z25=%3.1f, Rrup=%5.1f, Rjb=%5.1f, M=%.1f, Vs30=%6.1f, g=%6.4f\tsigma=%7.5f, expected sigma=%7.5f, tol=%.2f%s'
+          % (period, Z25, Rrup, Rjb, Mw, Vs30, g, sigma, expected, tol, flag))
 
 ######
 # Handle various cases
 ######
+
+# cases from the CB08_MODEL.FOR program
+Rrup_M5 = [5.0, 10.0, 15.0, 30.0, 50.0, 100.0, 200.0]
+Rrup_M7 = [5.0, 10.0, 15.0, 30.0, 50.0, 100.0, 200.0]
+Rjb_M5_SS = [0.0, 8.7, 14.1, 29.6, 49.7, 99.9, 199.9]
+Rjb_M5_RV = [0.0, 7.0, 13.2, 29.1, 49.5, 99.7, 199.9]
+Rjb_M7_SS = [5.0, 10.0, 15.0, 30.0, 50.0, 100.0, 200.0]
+Rjb_M7_RV = [0.0, 0.0, 6.2, 26., 47.7, 98.9, 199.4]
+Per = [0.01, 0.2, 1.0, 3.0]
+
+
+Frv = 0.0
+Fnm = 0.0
+delta = 90.0
+Vs30 = 760.0
+Z25 = 2.0
+
+tab2_001 = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+tab3_001 = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+tab2_020 = [ -0.486, 0.500, -0.446, -0.398, -2.220, 0.170, 7.60, 0.280, -0.012, 0.490,  2.194, 0.040, 0.610,  748, -2.188, 1.856] # 0.20
+tab3_020 = [0.534, 0.249, 0.186, 0.589, 0.618, 0.871] # 0.20
+tab2_100 = [ -6.406, 1.196, -0.772, -0.314, -2.000, 0.170, 4.00, 0.255,  0.000, 0.490,  1.571, 0.150, 1.000,  400, -1.955, 1.929] # 1.0
+tab3_100 = [0.568, 0.255, 0.225, 0.623, 0.662, 0.534] # 1.0
+tab2_300 = [-10.556, 1.600, -0.638, -0.491, -2.000, 0.170, 4.00, 0.000,  0.000, 0.154, -0.820, 0.300, 1.000,  400,  0.000, 2.110] # 3.0
+tab3_300 = [0.558, 0.326, 0.229, 0.646, 0.686, 0.289] # 3.0
+
+tab2_per = [tab2_001, tab2_020, tab2_100, tab2_300]
+tab3_per = [tab3_001, tab3_020, tab3_100, tab3_300]
+
+# strike/slip faulting
+
+for (pi, period) in enumerate(Per):
+    Mw = 5.0
+    Ztor = 5.0
+    Fltype = 'SS'
+    tab2 = tab2_per[pi]
+    tab3 = tab3_per[pi]
+    print('\nT=%6.3f Mw=%.1f Flt=%s Frv=%.1f Fnm=%.1f Ztor=%4.1f Dip=%4.1f Vs30=%6.1f Z25=%4.1f\n'
+          % (period, Mw, Fltype, Frv, Fnm, Ztor, delta, Vs30, Z25))
+    print(' Rrup      Rjb       Y         Sigma     Tau       SigT      SigArb')
+    for i in range(7):
+        (lnY, lnE, tau, sig, sigarb) = CB08_MODEL(period, Mw, Rrup_M5[i], Rjb_M5_SS[i], Ztor, Vs30, delta, tab2, tab3)
+        print(' %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E'
+              % (Rrup_M5[i], Rjb_M5_SS[i], math.exp(lnY), math.exp(lnE), tau, sig, sigarb))
+
+    Mw = 7.0
+    Ztor = 0.0
+    Fltype = 'SS'
+    print('\nT=%6.3f Mw=%.1f Flt=%s Frv=%.1f Fnm=%.1f Ztor=%4.1f Dip=%4.1f Vs30=%6.1f Z25=%4.1f\n'
+          % (period, Mw, Fltype, Frv, Fnm, Ztor, delta, Vs30, Z25))
+    print(' Rrup      Rjb       Y         Sigma     Tau       SigT      SigArb')
+    for i in range(7):
+        (lnY, lnE, tau, sig, sigarb) = CB08_MODEL(period, Mw, Rrup_M7[i], Rjb_M7_SS[i], Ztor, Vs30, delta, tab2, tab3)
+        print(' %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E'
+              % (Rrup_M7[i], Rjb_M7_SS[i], math.exp(lnY), math.exp(lnE), tau, sig, sigarb))
+
+# reverse faulting
+
+Frv = 1.0
+Fnm = 0.0
+delta = 45.0
+Vs30 = 760.0
+Z25 = 2.0
+
+for (pi, period) in enumerate(Per):
+    Mw = 5.0
+    Ztor = 5.0
+    Fltype = 'RV'
+    tab2 = tab2_per[pi]
+    tab3 = tab3_per[pi]
+    print('\nT=%6.3f Mw=%.1f Flt=%s Frv=%.1f Fnm=%.1f Ztor=%4.1f Dip=%4.1f Vs30=%6.1f Z25=%4.1f\n'
+          % (period, Mw, Fltype, Frv, Fnm, Ztor, delta, Vs30, Z25))
+    print(' Rrup      Rjb       Y        Sigma    Tau       SigT      SigArb')
+    for i in range(7):
+        (lnY, lnE, tau, sig, sigarb) = CB08_MODEL(period, Mw, Rrup_M5[i], Rjb_M5_RV[i], Ztor, Vs30, delta, tab2, tab3)
+        print(' %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E'
+              % (Rrup_M5[i], Rjb_M5_RV[i], math.exp(lnY), math.exp(lnE), tau, sig, sigarb))
+
+    Mw = 7.0
+    Ztor = 0.0
+    Fltype = 'RV'
+    print('\nT=%6.3f Mw=%.1f Flt=%s Frv=%.1f Fnm=%.1f Ztor=%4.1f Dip=%4.1f Vs30=%6.1f Z25=%4.1f\n'
+          % (period, Mw, Fltype, Frv, Fnm, Ztor, delta, Vs30, Z25))
+    print(' Rrup      Rjb       Y        Sigma    Tau       SigT      SigArb')
+    for i in range(7):
+        (lnY, lnE, tau, sig, sigarb) = CB08_MODEL(period, Mw, Rrup_M7[i], Rjb_M7_RV[i], Ztor, Vs30, delta, tab2, tab3)
+        print(' %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E'
+              % (Rrup_M7[i], Rjb_M7_RV[i], math.exp(lnY), math.exp(lnE), tau, sig, sigarb))
+
+        
+sys.exit(0)
+
+###################################################################################################
 
 Vs30 = 760.0
 
@@ -478,6 +790,416 @@ M = 7.0
 expected = 2.7e-3
 estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
+######################################
+
+Vs30 = 1070.0
+
+print('\n\nCampbell08 model: Ztor=%.1f, Vs30=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Vs30, Frv, Fnm, delta))
+print('Tolerance limit=%.2f, tolerance=abs(computed-expected)/'
+      'max(computed, expected)'
+      % Tolerance)
+print('*' * 102)
+
+
+# period = PGA (0.01), M=5.0, R=2.0km
+period = 0.01
+Rrup = Rjb = 2.0
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 5.0
+expected = 2.0e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=2.0km
+M = 7.0
+expected = 4.1e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 9.1e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=10.0km
+M = 7.0
+expected = 2.2e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 1.3e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=50.0km
+M = 7.0
+expected = 5.7e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = 0.2, M=5.0, R=2.0km
+period = 0.2
+Rrup = Rjb = 2.0
+table2_coeffs = [ -0.486, 0.500, -0.446, -0.398, -2.220, 0.170, 7.60, 0.280, -0.012, 0.490,  2.194, 0.040, 0.610,  748, -2.188, 1.856] # 0.20
+table3_coeffs = [0.534, 0.249, 0.186, 0.589, 0.618, 0.871] # 0.20
+M = 5.0
+expected = 3.8e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=7.0, R=2.0km
+M = 7.0
+expected = 8.9e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 2.0e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=7.0, R=10.0km
+M = 7.0
+expected = 5.4e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 3.0e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=7.0, R=50.0km
+M = 7.0
+expected = 1.2e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = 1.0, M=5.0, R=2.0km
+period = 1.0
+Rrup = Rjb = 2.0
+table2_coeffs = [ -6.406, 1.196, -0.772, -0.314, -2.000, 0.170, 4.00, 0.255,  0.000, 0.490,  1.571, 0.150, 1.000,  400, -1.955, 1.929] # 1.0
+table3_coeffs = [0.568, 0.255, 0.225, 0.623, 0.662, 0.534] # 1.0
+M = 5.0
+expected = 5.6e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=7.0, R=2.0km
+M = 7.0
+expected = 2.7e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 2.0e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=7.0, R=10.0km
+M = 7.0
+expected = 1.3e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 3.4e-3
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=7.0, R=50.0km
+M = 7.0
+expected = 3.9e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = 3.0, M=5.0, R=2.0km
+period = 3.0
+Rrup = Rjb = 2.0
+table2_coeffs = [-10.556, 1.600, -0.638, -0.491, -2.000, 0.170, 4.00, 0.000,  0.000, 0.154, -0.820, 0.300, 1.000,  400,  0.000, 2.110] # 3.0
+table3_coeffs = [0.558, 0.326, 0.229, 0.646, 0.686, 0.289] # 3.0
+M = 5.0
+expected = 6.0e-3
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=7.0, R=2.0km
+M = 7.0
+expected = 7.5e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 2.2e-3
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=7.0, R=10.0km
+M = 7.0
+expected = 3.5e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 3.8e-4
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=7.0, R=50.0km
+M = 7.0
+expected = 1.0e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = 10.0, M=5.0, R=2.0km
+period = 10.0
+Rrup = Rjb = 2.0
+table2_coeffs = [-13.087, 1.600, -0.070, -0.422, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.744] # 10.0
+table3_coeffs = [0.667, 0.485, 0.290, 0.825, 0.874, 0.174] # 10.0
+M = 5.0
+expected = 4.9e-4
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=7.0, R=2.0km
+M = 7.0
+expected = 1.4e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 1.8e-4
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=7.0, R=10.0km
+M = 7.0
+expected = 7.0e-3
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 3.0e-5
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=7.0, R=50.0km
+M = 7.0
+expected = 2.0e-3
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+######################################
+
+Vs30 = 150.0
+
+print('\n\nCampbell08 model: Ztor=%.1f, Vs30=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Vs30, Frv, Fnm, delta))
+print('Tolerance limit=%.2f, tolerance=abs(computed-expected)/'
+      'max(computed, expected)'
+      % Tolerance)
+print('*' * 102)
+
+
+# period = PGA (0.01), M=5.0, R=2.0km
+period = 0.01
+Rrup = Rjb = 2.0
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 5.0
+expected = 2.2e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=2.0km
+M = 7.0
+expected = 3.1e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 1.3e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=10.0km
+M = 7.0
+expected = 2.2e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 2.5e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=50.0km
+M = 7.0
+expected = 9.0e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = 0.2, M=5.0, R=2.0km
+period = 0.2
+Rrup = Rjb = 2.0
+table2_coeffs = [ -0.486, 0.500, -0.446, -0.398, -2.220, 0.170, 7.60, 0.280, -0.012, 0.490,  2.194, 0.040, 0.610,  748, -2.188, 1.856] # 0.20
+table3_coeffs = [0.534, 0.249, 0.186, 0.589, 0.618, 0.871] # 0.20
+M = 5.0
+expected = 3.0e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=7.0, R=2.0km
+M = 7.0
+expected = 4.0e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 2.4e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=7.0, R=10.0km
+M = 7.0
+expected = 4.1e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 5.5e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 0.2, M=7.0, R=50.0km
+M = 7.0
+expected = 2.0e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = 1.0, M=5.0, R=2.0km
+period = 1.0
+Rrup = Rjb = 2.0
+table2_coeffs = [ -6.406, 1.196, -0.772, -0.314, -2.000, 0.170, 4.00, 0.255,  0.000, 0.490,  1.571, 0.150, 1.000,  400, -1.955, 1.929] # 1.0
+table3_coeffs = [0.568, 0.255, 0.225, 0.623, 0.662, 0.534] # 1.0
+M = 5.0
+expected = 1.6e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=7.0, R=2.0km
+M = 7.0
+expected = 6.0e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 7.0e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=7.0, R=10.0km
+M = 7.0
+expected = 3.8e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 1.4e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 1.0, M=7.0, R=50.0km
+M = 7.0
+expected = 1.4e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = 3.0, M=5.0, R=2.0km
+period = 3.0
+Rrup = Rjb = 2.0
+table2_coeffs = [-10.556, 1.600, -0.638, -0.491, -2.000, 0.170, 4.00, 0.000,  0.000, 0.154, -0.820, 0.300, 1.000,  400,  0.000, 2.110] # 3.0
+table3_coeffs = [0.558, 0.326, 0.229, 0.646, 0.686, 0.289] # 3.0
+M = 5.0
+expected = 3.0e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=7.0, R=2.0km
+M = 7.0
+expected = 3.8e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 1.1e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=7.0, R=10.0km
+M = 7.0
+expected = 1.9e-1
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 1.9e-3
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 3.0, M=7.0, R=50.0km
+M = 7.0
+expected = 5.2e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = 10.0, M=5.0, R=2.0km
+period = 10.0
+Rrup = Rjb = 2.0
+table2_coeffs = [-13.087, 1.600, -0.070, -0.422, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.744] # 10.0
+table3_coeffs = [0.667, 0.485, 0.290, 0.825, 0.874, 0.174] # 10.0
+M = 5.0
+expected = 2.3e-3
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=7.0, R=2.0km
+M = 7.0
+expected = 7.1e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 9.0e-4
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=7.0, R=10.0km
+M = 7.0
+expected = 3.5e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 1.5e-4
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = 10.0, M=7.0, R=50.0km
+M = 7.0
+expected = 1.0e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
 ######
 # Sigma estimations
 # Expected values are from opensha.org
@@ -643,6 +1365,377 @@ table2_coeffs = [-13.087, 1.600, -0.070, -0.422, -2.000, 0.170, 4.00, 0.000,  0.
 table3_coeffs = [0.667, 0.485, 0.290, 0.825, 0.874, 0.174] # 10.0
 M = 5.0
 expected = 8.1e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=7.0, R=2.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=7.0, R=10.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=7.0, R=50.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('\n\nCampbell08 model: Ztor=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Frv, Fnm, delta))
+print('Tolerance limit=%.2f, tolerance=abs(computed-expected)/'
+      'max(computed, expected)'
+      % Tolerance)
+print('*' * 102)
+
+Vs30 = 1070.0
+
+# period = PGA (0.01), Vs30=760.0, M=5.0, R=2.0km
+period = 0.01
+Rrup = Rjb = 2.0
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 5.0
+expected = 5.2e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=2.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=10.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=50.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = PGA (0.20), Vs30=760.0, M=5.0, R=2.0km
+period = 0.20
+Rrup = Rjb = 2.0
+table2_coeffs = [ -0.486, 0.500, -0.446, -0.398, -2.220, 0.170, 7.60, 0.280, -0.012, 0.490,  2.194, 0.040, 0.610,  748, -2.188, 1.856] # 0.20
+table3_coeffs = [0.534, 0.249, 0.186, 0.589, 0.618, 0.871] # 0.20
+M = 5.0
+expected = 5.9e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=7.0, R=2.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=7.0, R=10.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=7.0, R=50.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = PGA (1.00), Vs30=760.0, M=5.0, R=2.0km
+period = 1.00
+Rrup = Rjb = 2.0
+table2_coeffs = [ -6.406, 1.196, -0.772, -0.314, -2.000, 0.170, 4.00, 0.255,  0.000, 0.490,  1.571, 0.150, 1.000,  400, -1.955, 1.929] # 1.0
+table3_coeffs = [0.568, 0.255, 0.225, 0.623, 0.662, 0.534] # 1.0
+M = 5.0
+expected = 6.1e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=7.0, R=2.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=7.0, R=10.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=7.0, R=50.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = PGA (3.00), Vs30=760.0, M=5.0, R=2.0km
+period = 3.00
+Rrup = Rjb = 2.0
+table2_coeffs = [-10.556, 1.600, -0.638, -0.491, -2.000, 0.170, 4.00, 0.000,  0.000, 0.154, -0.820, 0.300, 1.000,  400,  0.000, 2.110] # 3.0
+table3_coeffs = [0.558, 0.326, 0.229, 0.646, 0.686, 0.289] # 3.0
+M = 5.0
+expected = 6.3e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=7.0, R=2.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=7.0, R=10.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=7.0, R=50.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = PGA (10.00), Vs30=760.0, M=5.0, R=2.0km
+period = 10.00
+Rrup = Rjb = 2.0
+table2_coeffs = [-13.087, 1.600, -0.070, -0.422, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.744] # 10.0
+table3_coeffs = [0.667, 0.485, 0.290, 0.825, 0.874, 0.174] # 10.0
+M = 5.0
+expected = 8.2e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=7.0, R=2.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=7.0, R=10.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (10.00), M=7.0, R=50.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('\n\nCampbell08 model: Ztor=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Frv, Fnm, delta))
+print('Tolerance limit=%.2f, tolerance=abs(computed-expected)/'
+      'max(computed, expected)'
+      % Tolerance)
+print('*' * 102)
+
+Vs30 = 150.0
+
+# period = PGA (0.01), Vs30=760.0, M=5.0, R=2.0km
+period = 0.01
+Rrup = Rjb = 2.0
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 5.0
+expected = 4.1e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=2.0km
+M = 7.0
+expected = 4.2e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 4.2e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=10.0km
+M = 7.0
+expected = 4.4e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 4.8e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.01), M=7.0, R=50.0km
+M = 7.0
+expected = 5.1e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = PGA (0.20), Vs30=760.0, M=5.0, R=2.0km
+period = 0.20
+Rrup = Rjb = 2.0
+table2_coeffs = [ -0.486, 0.500, -0.446, -0.398, -2.220, 0.170, 7.60, 0.280, -0.012, 0.490,  2.194, 0.040, 0.610,  748, -2.188, 1.856] # 0.20
+table3_coeffs = [0.534, 0.249, 0.186, 0.589, 0.618, 0.871] # 0.20
+M = 5.0
+expected = 4.3e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=7.0, R=2.0km
+M = 7.0
+expected = 4.5e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 4.5e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=7.0, R=10.0km
+M = 7.0
+expected = 5.0e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 5.2e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (0.20), M=7.0, R=50.0km
+M = 7.0
+expected = 5.6e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = PGA (1.00), Vs30=760.0, M=5.0, R=2.0km
+period = 1.00
+Rrup = Rjb = 2.0
+table2_coeffs = [ -6.406, 1.196, -0.772, -0.314, -2.000, 0.170, 4.00, 0.255,  0.000, 0.490,  1.571, 0.150, 1.000,  400, -1.955, 1.929] # 1.0
+table3_coeffs = [0.568, 0.255, 0.225, 0.623, 0.662, 0.534] # 1.0
+M = 5.0
+expected = 5.6e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=7.0, R=2.0km
+M = 7.0
+expected = 5.7e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+expected = 5.7e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=7.0, R=10.0km
+M = 7.0
+expected = 6.0e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+expected = 6.0e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (1.00), M=7.0, R=50.0km
+M = 7.0
+expected = 6.1e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = PGA (3.00), Vs30=760.0, M=5.0, R=2.0km
+period = 3.00
+Rrup = Rjb = 2.0
+table2_coeffs = [-10.556, 1.600, -0.638, -0.491, -2.000, 0.170, 4.00, 0.000,  0.000, 0.154, -0.820, 0.300, 1.000,  400,  0.000, 2.110] # 3.0
+table3_coeffs = [0.558, 0.326, 0.229, 0.646, 0.686, 0.289] # 3.0
+M = 5.0
+expected = 6.3e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=7.0, R=2.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=5.0, R=10.0km
+Rrup = Rjb = 10.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=7.0, R=10.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=5.0, R=50.0km
+Rrup = Rjb = 50.0
+M = 5.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+# period = PGA (3.00), M=7.0, R=50.0km
+M = 7.0
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+
+print('-' * 102)
+
+# period = PGA (10.00), Vs30=760.0, M=5.0, R=2.0km
+period = 10.00
+Rrup = Rjb = 2.0
+table2_coeffs = [-13.087, 1.600, -0.070, -0.422, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.744] # 10.0
+table3_coeffs = [0.667, 0.485, 0.290, 0.825, 0.874, 0.174] # 10.0
+M = 5.0
+expected = 8.2e-1
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
 # period = PGA (10.00), M=7.0, R=2.0km
@@ -1038,6 +2131,122 @@ estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_co
 M = 7.0
 estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
+
+print('~' * 102)
+
+Vs30 = 760.0
+
+Ztor = 1.5
+delta = 45.0
+
+print('Campbell08 model: Ztor=%.1f, Vs30=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Vs30, Frv, Fnm, delta))
+
+# period = 0.01, M=5.7, R=50.0km
+period = 0.01
+Z25 = 0.3
+Rrup = 50.0
+Rjb = 47.5
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 5.7
+expected = 4.0e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+Ztor = 25.0
+delta = 45.0
+
+print('Campbell08 model: Ztor=%.1f, Vs30=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Vs30, Frv, Fnm, delta))
+
+# period = 0.01, M=6.2, R=50.0km
+period = 0.01
+Z25 = 3.5
+Rrup = 50.0
+Rjb = 31.3
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 6.2
+expected = 6.1e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+Ztor = 0.0
+delta = 90.0
+
+print('Campbell08 model: Ztor=%.1f, Vs30=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Vs30, Frv, Fnm, delta))
+
+# period = 0.01, M=6.2, R=50.0km
+period = 0.01
+Z25 = 2.0
+Rrup = 50.0
+Rjb = 50.0
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 5.7
+expected = 3.2e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+Ztor = 0.0
+delta = 90.0
+
+print('Campbell08 model: Ztor=%.1f, Vs30=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Vs30, Frv, Fnm, delta))
+
+# period = 0.01, M=6.2, R=50.0km
+period = 0.01
+Z25 = 2.0
+Rrup = 50.0
+Rjb = 50.0
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 5.7
+expected = 3.2e-2
+estimate(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+print('~' * 102)
+
+Vs30 = 760.0
+
+Ztor = 1.5
+delta = 45.0
+
+print('Campbell08 model: Ztor=%.1f, Vs30=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Vs30, Frv, Fnm, delta))
+
+# period = 0.01, M=5.7, R=50.0km
+period = 0.01
+Z25 = 0.3
+Rrup = 50.0
+Rjb = 47.5
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 5.7
+expected = 5.2e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
+
+Ztor = 25.0
+delta = 45.0
+
+print('Campbell08 model: Ztor=%.1f, Vs30=%.1f, Frv=%d, Fnm=%d, delta=%d - '
+      'expected values from opensha.org'
+      % (Ztor, Vs30, Frv, Fnm, delta))
+
+# period = 0.01, M=6.2, R=50.0km
+period = 0.01
+Z25 = 3.5
+Rrup = 50.0
+Rjb = 31.3
+table2_coeffs = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
+table3_coeffs = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
+M = 6.2
+expected = 5.2e-1
+estimate_sigma(period, M, Rrup, Rjb, Ztor, Vs30, delta, table2_coeffs, table3_coeffs, expected)
 
 print('-' * 102)
 
