@@ -359,7 +359,7 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
     """
 
     # decide what sort of data we have in 'sites'
-    if sites.attributes['STRUCTURE_CATEGORY'][0] == 'BUILDING':
+    if sites.attributes['STRUCTURE_CATEGORY'][0].upper() == 'BUILDING':
         # note: damage_model has an object called capacity_spectrum_model
         #       buried inside, which will now calculate capacity curves
         #       parameters
@@ -408,7 +408,7 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
             days_to_complete = np.ones(dtc_shape) * np.nan
         else:
             days_to_complete = None
-    elif sites.attributes['STRUCTURE_CATEGORY'][0] == 'BRIDGE':
+    elif sites.attributes['STRUCTURE_CATEGORY'][0].upper() == 'BRIDGE':
         # until we *have* a THE_PARAM_T.bridge_model value, pass None for model
         #damage_model = Bridge_damage_model(sites, THE_PARAM_T.bridge_model, SA,
         damage_model = Bridge_damage_model(sites, None, SA,
