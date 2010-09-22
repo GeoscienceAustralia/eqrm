@@ -35,7 +35,7 @@ from eqrm_code.source_model import Source_Models
 from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
          save_event_set, save_hazard, save_structures, save_val, \
          save_ecloss, join_parallel_files, join_parallel_files_column, \
-         save_damage
+         save_damage, get_source_file_handle
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
 from ground_motion_distribution import Log_normal_distribution
@@ -175,14 +175,7 @@ def main(parameter_handle,
         # (i.e. is_scenario is False) generate a probablistic event set
         # (using THE_PARAM_T.source_filename)
 
-        if THE_PARAM_T.source_polygon_xml_tag is None:
-            source_file = THE_PARAM_T.site_tag + '_source_polygon.xml'
-        else:
-            source_file = THE_PARAM_T.site_tag + '_' \
-                          + THE_PARAM_T.source_polygon_xml_tag \
-                          + '_source_polygon.xml'
-        source_file = os.path.join(THE_PARAM_T.input_dir, source_file)
-        fid_sourcepolys = open(source_file)
+        fid_sourcepolys = get_source_file_handle(THE_PARAM_T)
 
 
         # tell event set which source models to calculate activity with
