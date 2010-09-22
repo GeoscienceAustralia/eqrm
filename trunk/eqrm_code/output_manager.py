@@ -25,6 +25,8 @@ from csv_interface import csv2dict
 
 EXTENSION = '.txt'
 FILE_TAG_DELIMITER = '-'
+FAULT_SOURCE_FILE_ENDING = '_source_polygon.xml'
+ZONE_SOURCE_FILE_ENDING = '_source_polygon.xml'
 
 class myGzipFile(GzipFile):
     def __init__(self,name,mode='r'):
@@ -895,6 +897,27 @@ def load_bridges(save_dir, site_tag):
     (attributes, _) = csv2dict(file, convert=convert, delimiter=' ')
 
     return attributes
+
+def get_source_file_handle(THE_PARAM_T, is_zone_source=True):
+    """
+    Return a file handle of a source xml file.
+    """
+    if is_zone_source:
+        source_tag = THE_PARAM_T.fault_source_tag
+        file_end = FAULT_SOURCE_FILE_ENDING
+    else:
+        source_tag = THE_PARAM_T.zone_source_tag
+        file_end = ZONE_SOURCE_FILE_ENDING
+        
+    if source_tag is None:
+        source_file = THE_PARAM_T.site_tag + file_end
+    else:
+        source_file = THE_PARAM_T.site_tag + '_' \
+                      + source_tag + file_end
+    source_file = os.path.join(THE_PARAM_T.input_dir, source_file)
+    return open(source_file)
+    
+    
 
 ################################################################################
 
