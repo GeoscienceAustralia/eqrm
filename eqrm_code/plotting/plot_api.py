@@ -18,6 +18,8 @@ import eqrm_code.plotting.plot_gmt_xyz_contour as pgxc
 import eqrm_code.plotting.calc_ignore_xyz as cix
 import eqrm_code.plotting.calc_annloss_deagg_distmag as cadd
 import eqrm_code.plotting.plot_annloss_deagg_distmag as padd
+import eqrm_code.plotting.plot_barchart as pb
+import eqrm_code.plotting.utilities as util
 
 from eqrm_code.plotting import plot_pml
 from eqrm_code.plotting import calc_pml
@@ -207,7 +209,7 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
     out_dict = om.load_event_set_subset(input_dir, site_tag)
     event_activity = out_dict['event_activity']
     
-    # Run annulised loss calc and bin data
+    # Run annualised loss calc and bin data
     percent_ann_loss, lat_lon, binx, _ = calc_annloss.calc_annloss_deagg_grid(
         lat,
         lon,
@@ -226,4 +228,90 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
                      title=title, np_posn=np_posn, s_posn=s_posn,
                      cb_label=cb_label, cb_steps=cb_steps, colourmap=colourmap,
                      annotate=annotate, show_graph=False)
+
+
+def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
+                      plotfile, savefile=None,
+                      title=None, xlabel=None, ylabel=None,
+                      xrange=None, yrange=None,
+                      bins=100, bardict=None, show_graph=False):
+    """Plot a 1D histogram from XYZ data.
+
+    input_dir      general input/output directory
+    site_tag       overall site identifier
+    soil_amp       soil/bedrock switch - True means soil, False means bedrock
+    period         the RSA period to be plotted
+    return_period  the data return period
+    plotfile       name of plot output file to create in 'output_dir' directory
+    savefile       name of data output file to create in 'output_dir' directory
+    title          title to put on the graph
+    xlabel         text of X axis label
+    ylabel         text of Y axis label
+    xrange         Either <max> or (<min>, <max>) of X range to plot
+    yrange         Either <max> or (<min>, <max>) of Y range to plot
+    bins           number of bins to use
+    bardict        dictionary of extra keywords to pass to plot_barchart()
+                   see plot_barchart.py for the details on this
+    show_graph     True if the plot is to be shown on the screen
+    """
+
+    # read in raw data - load_xyz_from_hazard() returns [[[lon, lat, SA], ...]]
+    data = om.load_xyz_from_hazard(input_dir, site_tag, soil_amp, period,
+                                   return_period)
+
+    # throw away all but SA values (the Z value)
+    data = data[:,2]
+
+    # if we want a save of actual plotted data, do it here
+    if savefile:
+        save_outfile = os.path.join(input_dir, savefile)
+        f = open(save_outfile, 'w')
+        for d in data:
+            f.write('%f\n' % d)
+        f.close()
+
+    # plot the data
+    if plotfile:
+        if title is None:
+            title = ''          #######  needs work!
+
+        # now generate histogrammed data
+        (hist_data, xedges) = scipy.histogram(data, bins=bins, normed=False)
+
+        # get array of bin centres
+        bins = []
+        for i in range(len(xedges)-1):
+            bins.append(xedges[i] + (xedges[i+1] - xedges[i])/2.0)
+        bins = scipy.array(bins)
+
+        # calculate optimal bin width
+        bin_width = xedges[1] - xedges[0]
+
+        # return nx2 array of (x, y)
+        data = scipy.hstack((bins[:,scipy.newaxis], hist_data[:,scipy.newaxis]))
+
+        # now standardise xrange
+        xrange = util.get_canonical_range(xrange)
+        yrange = util.get_canonical_range(yrange)
+        
+        range_ann = []
+        
+        if xrange:
+            range_ann.append((0.02, 0.05,
+                              'X range forced to (%.2f,%.2f)' % xrange))
+
+        if yrange:
+            range_ann.append((0.02, 0.03,
+                              'Y range forced to (%.2f,%.2f)' % yrange))
+
+        # actually plot the thing
+        plot_outfile = os.path.join(input_dir, plotfile)
+        pb.plot_barchart(data, plot_outfile, title=title,
+                         xlabel=xlabel, ylabel=ylabel,
+                         bin_width=bin_width,
+                         xrange=xrange, yrange=yrange,
+                         show_graph=show_graph, bardict=bardict,
+                         annotate=range_ann)
+
+
 
