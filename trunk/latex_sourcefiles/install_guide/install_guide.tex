@@ -6,7 +6,7 @@
 \usepackage{supertabular}
 \usepackage{hyperref}
 
-%\input ../manual_tech/eqrmtech-macros  % load in a bunch of purpose built macros
+\input ../manual_tech/eqrmtech-macros  % load in a bunch of purpose built macros
 
 
 % A couple of changes to the formatting
@@ -59,7 +59,8 @@ For any help, please post to:
 \item eqrm-user@lists.sourceforge.net; or
 \item \url{https://sourceforge.net/mail/?group_id=198293}.
 \end{itemize}
-Also, to keep up to date with EQRM, join the develope or user lists.
+Also, to keep up to date with EQRM, join the developer or user
+lists.
 
 We would also like to hear from you if you are not able to install
 the software.
@@ -80,14 +81,33 @@ Note: when \texttt{*/eqrm\_core/eqrm\_code} is mentioned below you
 need to replace the * with the actual place you have installed EQRM
 on your computer.
 
-\section{WINDOWS INSTALL INSTRUCTIONS:}
+\section{Getting a copy of the EQRM}
+
+The most stable release of the EQRM can be downloaded from \\
+\url{http://sourceforge.net/projects/eqrm/}.
+
+If you are interested in the bleeding edge version then please
+contact the developers at eqrm-user@lists.sourceforge.net
+
+\section{Instalation}
+
+This section deals with the installation of the open source packages
+and the setup of paths to get the EQRM running. More packages are
+required for the plotting tools (\sref{sec:-plotting-tools}) and to
+analyse the test coverage (\sref{sec:test-coverage}).
+
+\subsection{WINDOWS INSTALL INSTRUCTIONS:}
+
+There are two options for installing the EQRM and the required open
+source packages in Windows. Option 1 (\sref{sec:windows-option1})
+involves installing each package individually. Option 2
+(\sref{sec:windows-option2}) uses Python(x,y) which conveniently
+packages many of the required packages.
+
+\subsubsection{Option 1 - Installing all open source packages individually}
+\label{sec:windows-option1}
 
 \begin{enumerate}
-
-\item Delete any old versions of EQRM from your system. \\
-
-\item Unzip the EQRM install file \\
-(e.g. \texttt{eqrm\_versionX.X.svn\_X.zip}). \\
 
 \item Install python from \\
 \url{http://www.python.org/download/}. \\
@@ -101,15 +121,16 @@ We recommend python2.5
  \url{http://scipy.org}
  Use version 0.7.1 or later \\
 
-\item Install Shapely 1.X.X (python GIS kit) from \\
-\url{http://pypi.python.org/pypi/Shapely/.}
-
 \item Install the full package of MinGW.
 When installing using \\
 \texttt{mingw-5.X.X.exe}, you are
 asked to choose components.  \\
 \underline{Tick the g++ compiler} and do not untick any components. \\
  \url{http://www.mingw.org/}
+
+\item Install Shapely 1.X.X (python GIS kit) from \\
+\url{http://pypi.python.org/pypi/Shapely/.}
+
 \item Add \texttt{C:/MinGW/bin} (so you can compile c extensions
 to python) and \texttt{C:/Python25} (so you can call Python from a
 DOS prompt) to your \underline{``path"} and \texttt{*/eqrm\_core} to
@@ -132,9 +153,7 @@ add \texttt{"*/python\_core;}" to Variable Value \\
 (use ";" to separate values).
 \end{enumerate}
 
-\item Optional: install gzip working with compressed output \\
-\url{http://gnuwin32.sourceforge.net/downlinks/gzip.php}
-\item At the dos prompt: \\
+\item At the DOS prompt: \\
 \texttt{cd */eqrm\_core/eqrm\_code} \\
 \texttt{python test\_all.py} \\
 \texttt{cd ..} \\
@@ -143,42 +162,20 @@ If you get a Could not locate executable g++ error, it means MinGW
 is not working.  Check steps 9 and 10.
 \end{enumerate}
 %
-To install the components required for any plotting you may require
-matplotlib (xy plotting, histograms etc.) and GMT (maps). Follow
-these steps:
-
-\begin{enumerate}
-\item Install matplotlib from \\
-\url{http://sourceforge.net/projects/matplotlib/]} \\
-You must choose the file to install that matches your operating
-system 'type' and python version. For example, the matplotlib
-install file \texttt{matplotlib-0.98.5.2.win32-py2.5.exe} is meant
-for a Win32 system running python 2.5.
-
-\item If you require any visualisation with a map in it, install GMT
-from \\
-\url{http://gmt.soest.hawaii.edu/gmt/gmt_windows.html} \\
-You will need the basic GMT distribution and the High and Full
-resolution GSHHS coastlines installs.
-
-\end{enumerate}
-
-% _________________________________
-For developers running using the SVN repository:
-\begin{enumerate}
-\item If you want to run the coverage scrips(\texttt{coverage\_of\_tests.py}) the
-python coverage module needs to be installed.  To do this go to; \\
-\url{http://www.nedbatchelder.com/code/modules/coverage.html} and
-follow the install instructions. Note, if the file is downloaded as
-\texttt{coverage-2.77.tar.tar}, change it to
-\texttt{coverage-2.77.tar.gz}
-\end{enumerate}
-%
-%
 %-----------------------------------------------------------------------------
 %
 %
-\section{GENERAL LINUX INSTALL INSTRUCTIONS}
+\subsubsection{Option 2 - Installing python(x,y)}:
+\label{sec:windows-option2}
+
+\begin{enumerate}
+\item Install python(x,y) \\
+\url{http://www.pythonxy.com/}
+\item Repeat steps 5 to 7 from \sref{sec:windows-option1}
+\end{enumerate}
+
+
+\subsection{GENERAL LINUX INSTALL INSTRUCTIONS}
 
 There are a variety of Linux distributions.  The best instructions
 for installing each of the necessary packages is found at the
@@ -195,7 +192,8 @@ Install;
 \item python package scipy \\
 \url{http://www.scipy.org/}
 \item \texttt{python package libgeos\_c} (for shapely)
-\item python package \texttt{python-setuptolls} (for installing shapely using \texttt{easy\_install})
+\item python package \texttt{python-setuptolls} \\
+(for installing shapely using \texttt{easy\_install})
 \item python package \texttt{shapely}  (see notes below) \\
 \url{http://pypi.python.org/pypi/Shapely/}
 \item \texttt{gcc} also needs to be installed. Using versions higher than 4.2
@@ -221,28 +219,6 @@ to run some scenarios and check the output
 failing.  To fix I get g++ to work with g$++$v4.2, instead of
 g$++$v4.3.  Weave will also fail if python-dev is not installed.
 
-To install the components required for any plotting you may require,
-install:
-\begin{enumerate}
-\item python-matplotlib
-\item gmt \\
-When you install GMT you will need to install the high and full
-resolution coastlines.  Get these from
-\url{http://gmt.soest.hawaii.edu/} \\
-by clicking on the 'DOWNLOAD' link and then clicking on the 'INSTALL
-FORM' link.  You choose many options on the form - if you do not
-understand a choice it is usually safe to leave the default choice,
-with the exception of the NetCDF question. Unless you are sure you
-already have NetCDF 3.6.x installed, always ask for NetCDF to be
-installed.  You should also select the high-resolution and
-full-resolution coastline data installs.
-\vspace{1em} Note that in
-question 8 you can install GMT anywhere you wish, though you may
-choose to use the suggested directories (such as /usr/local, for
-example). Note that if you do choose a 'system'place you will need
-to do it via 'sudo'.
-\end{enumerate}
-%_________________________________________________
 
 \textbf{Notes for installing Shapely on a Linux system:} \\
 
@@ -251,7 +227,9 @@ process may vary over time.
 \begin{enumerate}
 
 \item download and install \texttt{ez\_setup.py} - need to be root \\
+\scriptsize
 \url{http://peak.telecommunity.com/DevCenter/EasyInstall#installing-easy-install}
+\normalsize
 
 \item download and install the GIS library (i.e.
 \texttt{libgeos\_c}) \\
@@ -275,9 +253,54 @@ from \url{http://trac.osgeo.org/geos/} \\
 
 \end{enumerate}
 
-%_________________________________________________
-%
-%----------------------------------------------------------------
+\section{Setting up for Plotting Tools} \label{sec:-plotting-tools}
+
+
+To install the components required for any plotting you may require
+matplotlib (xy plotting, histograms etc.) and GMT (maps). Follow
+these steps:
+
+\begin{enumerate}
+\item Install matplotlib from \\
+\url{http://sourceforge.net/projects/matplotlib/]} \\
+You must choose the file to install that matches your operating
+system 'type' and python version. For example, the matplotlib
+install file \texttt{matplotlib-0.98.5.2.win32-py2.5.exe} is meant
+for a Win32 system running python 2.5.
+
+\item If you require any visualisation with a map in it, install GMT
+from \\
+\url{http://gmt.soest.hawaii.edu/gmt/gmt_windows.html} \\
+You will need the basic GMT distribution and the High and Full
+resolution GSHHS coastlines installs.  Get these from \\
+\url{http://gmt.soest.hawaii.edu/} \\
+by clicking on the 'DOWNLOAD' link and then clicking on the 'INSTALL
+FORM' link.  You choose many options on the form - if you do not
+understand a choice it is usually safe to leave the default choice,
+with the exception of the NetCDF question. Unless you are sure you
+already have NetCDF 3.6.x installed, always ask for NetCDF to be
+installed.  You should also select the high-resolution and
+full-resolution coastline data installs. \vspace{1em} Note that in
+question 8 you can install GMT anywhere you wish, though you may
+choose to use the suggested directories (such as /usr/local, for
+example). Note that if you do choose a 'system' place you will need
+to lof in as administrator.
+
+\end{enumerate}
+
+
+\section{Setting up for Test Coverage} \label{sec:test-coverage}
+
+For developers running using the SVN repository:
+\begin{enumerate}
+\item If you want to run the coverage scrips(\texttt{coverage\_of\_tests.py}) the
+python coverage module needs to be installed.  To do this go to; \\
+\url{http://www.nedbatchelder.com/code/modules/coverage.html} and
+follow the install instructions. Note, if the file is downloaded as
+\\ \texttt{coverage-2.77.tar.tar}, change it to
+\texttt{coverage-2.77.tar.gz}
+\end{enumerate}
+
 %
 \section{General Notes}
 
