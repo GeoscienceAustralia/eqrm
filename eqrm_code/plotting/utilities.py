@@ -740,6 +740,29 @@ def min_nan(vector):
     return vector[num.nanargmin(vector)]
 
 ######
-#
+# 
 ######
+
+def get_canonical_range(plot_range):
+    """Convert a plot range value to the canonical form.
+
+    plot_range  a range value, either None, a scalar or a 2-tuple of scalars
+
+    Plot ranges are specified as a 2-tuple of scalars (int or float).
+    Convert a range of either None, 1 scalar or a tuple/list to a 2-tuple
+    of floats.
+
+    If only one scalar is supplied, assume it's the upper limit and assume
+    the lower limit is 0.
+    """
+    
+    if plot_range:
+        if isinstance(plot_range, int) or isinstance(plot_range, float):
+            plot_range = (0, float(plot_range))
+        else:
+            if len(plot_range) == 1:
+                plot_range = (0, float(plot_range[0]))
+
+    return plot_range
+
 
