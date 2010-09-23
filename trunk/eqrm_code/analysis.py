@@ -474,7 +474,7 @@ def main(parameter_handle,
                 #print 'ENDING Calculating soil amplification'
                 #print
 
-            # account for very small ground motions due to distances
+            # Set to 0 ground motions due to distances
             # greater than Rthresh
             bedrock_SA[Haznull[0], Haznull[1],:] = 0
             soil_SA[Haznull[0], Haznull[1],:] = 0
@@ -534,7 +534,10 @@ def main(parameter_handle,
                         hzd_do_value(new_soil_SA[:,:,j],
                                      event_set.event_activity,
                                      1.0/array(THE_PARAM_T.return_periods))
-
+                    
+        # End the Ground motion splitting loop
+        # Build the SA, soil, if we did it.  If not, Bedrock.
+        
         # calculate damage
         if THE_PARAM_T.run_type == "risk":
             #print 'STARTING building damage calculations'
@@ -544,6 +547,7 @@ def main(parameter_handle,
             else:
                 SA = bedrock_SA
 
+        
             # smooth SA (function of periods) using a weighted
             # running 3-point smoother
             if THE_PARAM_T.atten_smooth_spectral_acceleration is True:

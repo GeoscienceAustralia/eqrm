@@ -146,6 +146,7 @@ class Source_Zone_Polygon(polygon_object):
         self.Lambda_Min=Lambda_Min
         self.b=b
         self.number_of_mag_sample_bins = number_of_mag_sample_bins
+        
 
     
 def source_model_from_xml(filename,prob_min_mag_cutoff,
