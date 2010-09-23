@@ -698,6 +698,8 @@ class Pseudo_Event_Set(Event_Set):
         
         # WARNING, WHEN ADDING/CHANGING ATTRIBUTES __getattribute__
         # HAS TO BE MODIFIED.
+        # These are the attributes that incexed directly,
+        # rather than indexed indirectly into an event set instance.
         # This attribute converts a pseudo_event_index into a event_index
         # e.g. it looks like [0,1,2,0,1,2]
         self.index = asarray(index)
