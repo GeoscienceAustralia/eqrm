@@ -26,6 +26,6 @@ def plot_timestamp(fig, x=0.02, y=0.02, fontsize=6):
     
     time_str = 'generated at %s on %s' % (time.strftime('%H:%M:%S'),
                                           time.strftime('%a %d %b %Y'))
-    plt.text(0.02, 0.02, time_str, fontsize=fontsize, transform=fig.transFigure)
+    plt.text(0.02, 0.01, time_str, fontsize=fontsize, transform=fig.transFigure)
 
 
