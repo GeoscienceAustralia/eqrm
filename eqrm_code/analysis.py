@@ -200,6 +200,7 @@ def main(parameter_handle,
             fault_dip=THE_PARAM_T.prob_dip_in_zones,
             prob_min_mag_cutoff=THE_PARAM_T.prob_min_mag_cutoff,
             override_xml=True,
+            source_models=source_mods,
             prob_number_of_events_in_zones= \
             THE_PARAM_T.prob_number_of_events_in_zones)
 

@@ -43,7 +43,10 @@ FaultingTypeDictionary = {'reverse': 0,
                           'normal': 1,
                           'strikeslip': 2}
 
-
+class Event_Collection(object):
+    def __init__(self, event_sets):
+        pass
+    
 class Event_Set(object):
     def __init__(self, azimuth, dip, ML, Mw,
                  depth, depth_to_top, faulting_type,
@@ -312,6 +315,7 @@ class Event_Set(object):
     @classmethod
     def generate_synthetic_events(cls, fid_genpolys, fault_width, azi, dazi,
                                   fault_dip, prob_min_mag_cutoff, override_xml,
+                                  source_models,
                                   prob_number_of_events_in_zones=None):
         """Randomly generate the event_set parameters.
 

@@ -276,20 +276,21 @@ class Test_Source_model(unittest.TestCase):
         prob_number_of_events_in_zones = [2, 1, 1, 2, 2, 2]
         prob_number_of_mag_sample_bins = 15
        
-        events = Event_Set.\
-                 generate_synthetic_events(fid_genpolys=fid_sourcepolys,
-                                           fault_width=max_width,
-                                           azi=azi,
-                                           dazi=prob_delta_azimuth_in_zones,
-                                           fault_dip=dip,
-                                           prob_min_mag_cutoff=
-                                               prob_min_mag_cutoff,
-                                           override_xml=True,
-                                           prob_number_of_events_in_zones=
-                                               prob_number_of_events_in_zones)
-        new_event_set = \
-            source_model.calculate_recurrence(events,
-                                              prob_number_of_mag_sample_bins)
+        events = Event_Set.generate_synthetic_events(
+            fid_genpolys=fid_sourcepolys,
+            fault_width=max_width,
+            azi=azi,
+            dazi=prob_delta_azimuth_in_zones,
+            fault_dip=dip,
+            prob_min_mag_cutoff=
+            prob_min_mag_cutoff,
+            override_xml=True,
+            source_models=source_model,
+            prob_number_of_events_in_zones=
+            prob_number_of_events_in_zones)
+        new_event_set = source_model.calculate_recurrence(
+            events,
+            prob_number_of_mag_sample_bins)
         event_activity = new_event_set.event_activity
         # Warning - this is just the results from running
         # calculate_recurrence at this version.

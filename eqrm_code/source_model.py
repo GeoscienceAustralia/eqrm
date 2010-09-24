@@ -146,7 +146,16 @@ class Source_Zone_Polygon(polygon_object):
         self.Lambda_Min=Lambda_Min
         self.b=b
         self.number_of_mag_sample_bins = number_of_mag_sample_bins
-        
+
+        # indexes to the event sets in this source zone
+        self.event_set_index_start = None
+        self.event_set_index_end = None
+
+    def set_event_set_range(self, start, end):
+        """
+        Set which indexes into 
+        """
+        pass
 
     
 def source_model_from_xml(filename,prob_min_mag_cutoff,
