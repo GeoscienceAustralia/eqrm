@@ -114,6 +114,7 @@ def calc_event_activity(event_set, sources,
                 #print "event_activity", event_activity
                 event_activity_matrix[event_ind,j]=event_activity
                 weight_matrix[event_ind,j]=weight[j]
+
                 # print "sources[j].weight", sources[j].weight
             #endif
         #endfor
@@ -128,6 +129,12 @@ def calc_event_activity(event_set, sources,
     #print "weight_matrix", weight_matrix
     weight_sum=weight_matrix.sum(axis=1)
     non_zerod_ind=where(weight_sum!=0)[0]
+#     zerod_ind=where(weight_sum==0)[0]
+#     if len(zerod_ind) > 0:
+#         print "**************************************"
+#         print "zerod_ind", zerod_ind
+#         print "**************************************"
+#         import sys; sys.exit() 
     #print 'zero_ind',where(weight_sum==0)[0]
     #print "len(non_zerod_ind)", len(non_zerod_ind)
     #print 'len(zero_ind)',len(where(weight_sum==0)[0]) # this is 4 indexes

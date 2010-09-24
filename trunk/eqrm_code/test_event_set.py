@@ -431,7 +431,8 @@ class Test_Event_Set(unittest.TestCase):
 """
         handle.write(sample)
         handle.close()
-        
+
+        source_mod = Dummy()
         #file_name = os.path.join('..','implementation_tests','input','newc_source_polygon.xml')
         #return
         # need to fix
@@ -443,6 +444,7 @@ class Test_Event_Set(unittest.TestCase):
             fault_dip,
             prob_min_mag_cutoff,
             override_xml,
+            source_mod,
             prob_number_of_events_in_zones)
 #         print "events.trace_start_lat", events.trace_start_lat
 #         print " events.trace_start_lon", events.trace_start_lon
@@ -562,6 +564,9 @@ class Test_Event_Set(unittest.TestCase):
         override_xml = None
         prob_number_of_events_in_zones = None
         prob_min_mag_cutoff = 0.1
+        
+        source_mod = Dummy()
+        
         events = Event_Set.generate_synthetic_events(
             file_name,
             fault_width,
@@ -570,6 +575,7 @@ class Test_Event_Set(unittest.TestCase):
             fault_dip,
             prob_min_mag_cutoff,
             override_xml,
+            source_mod,
             prob_number_of_events_in_zones)
         
         self.assert_(len(events)==3)
