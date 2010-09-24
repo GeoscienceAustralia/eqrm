@@ -27,8 +27,11 @@ Optional:
 minimum magnitude: The minumum magnitude for which the catalogue is complete.
             Defaults to the minimum magnitude within the catalogue
 maximum magnitude: The maxumum magnitude expected for the source zone.
-            Defaults to the maximum magnitude in the catalogue plu 0.1 magnitude
+            Defaults to the maximum magnitude in the catalogue plus 0.1 magnitude
             units.
+maximum magnitude for least squares: The maxumum magnitude used in the least squares
+            analysis. Defaults to the maximum magnitude in the catalogue minus 1.0
+            magnitude units.
 interval: Width of magnitude bins for generating cumulative histogram
             of earthquake recurrence for least squares fit. Default value is
             0.1 magnitude units.    
@@ -70,6 +73,9 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
         max_mag: maximum magnitude used in bounded G-R curve. If not specified,
                 defined as the maximum magnitude in the catlogue + 0.1 magnitude
                 units.
+        maximum magnitude for least squares: The maxumum magnitude used in the least squares
+            analysis. Defaults to the maximum magnitude in the catalogue minus 1.0
+            magnitude units.
         interval: Width of magnitude bins for generating cumulative histogram
                 of earthquake recurrence for least squares fit. Default value is
                 0.1 magnitude units.  
