@@ -130,8 +130,8 @@ class Test_Recurrence_functions(unittest.TestCase):
         #print "len(event_set)", len(event_set)
         new_event_set = calc_event_activity(event_set,sources,prob_number_of_mag_sample_bins, weight)
         #print "len(new_event_set)", len(new_event_set)
-        #print "event_set", event_set
-        #print "new_event_set", new_event_set
+        #print "event_set", event_set.Mw[3:29]
+        #print "new_event_set", new_event_set.Mw
         self.assert_(allclose(event_set.Mw[3:29], new_event_set.Mw))
         self.assert_(allclose(event_set.rupture_centroid_lat[3:29],
                               new_event_set.rupture_centroid_lat))

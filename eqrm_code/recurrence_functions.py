@@ -31,11 +31,12 @@ def calc_event_activity(event_set, sources,
     #print "len(sources)", len(sources)
     #print "prob_number_of_mag_sample_bins", prob_number_of_mag_sample_bins
     #import sys; sys.exit()
-    
-    assert len(weight) == len(sources)
+
+    # EQRM currently does just 1 source
+    assert len(weight) == len(sources) == 1
         
     event_activity_matrix=zeros((len(event_set),len(sources)),float)
-    weight_matrix=zeros((len(event_set),len(sources)),float)
+    #weight_matrix=zeros((len(event_set),len(sources)),float)
     eqrmlog.debug('Memory: event_activity_matrix weight_matrix created')
     eqrmlog.resource_usage()
 
@@ -48,12 +49,8 @@ def calc_event_activity(event_set, sources,
     # which in future versions of EQRM may not be the same
     # as source zone polygons.
     for j in range(len(sources)): # loop over all source models
-        # print "sources[j]", sources[j]
-        #import sys; sys.exit() 
         for i in range(len(sources[j])): # loop over source zones 
             source=sources[j][i]
-            #print "source in rf", source
-            #print 'LAMBDAMIN',source.Lambda_Min
             zone_m0=source.min_magnitude            
             zone_mlow=max(source.prob_min_mag_cutoff,zone_m0)
             zone_mhgh=source.max_magnitude
@@ -62,37 +59,28 @@ def calc_event_activity(event_set, sources,
 
             grfctr=grscale(zone_b,zone_mhgh,zone_mlow,zone_m0)
             A_mlow=zone_f_gr*grfctr
-            # print "zone_f_gr", zone_f_gr
-            #print "grfctr",grfctr 
-            # print "A_mlow",A_mlow
-
-            #print "zone_mlow",zone_mlow
-            #print "zone_mhgh", zone_mhgh
-            mag_ind=where((zone_mlow<event_set.Mw)&
-                          (event_set.Mw<zone_mhgh))[0]
-            #print "mag_ind", mag_ind
-            #import sys; sys.exit()
+            
+            
             # WAY ONE - to get the poly_id - probably slow
             # Does the source contain an event set rupture centroid
             # Get the events in this source zone.
             # mag_ind limits the events checked.
             # This info could already be known, since EQRM generated the events
             # Should this function only be used on generated events though?
-            contains_point=[source.contains_point((lat,lon), use_cach=False) for
-                            lat,lon in zip(
-                                event_set.rupture_centroid_lat[mag_ind],
-                                event_set.rupture_centroid_lon[mag_ind])]
+            contains_point=[source.contains_point((lat,lon), use_cach=False) \
+                            for lat,lon in zip(
+                event_set.rupture_centroid_lat,
+                event_set.rupture_centroid_lon)]
             poly_ind=where(contains_point)[0]
-            #print "poly_ind", poly_ind
-            #print "contains_point", contains_point
+
+            source.set_event_set_indexes(poly_ind)
             
-            #print "sources[j].weight", sources[j].weight
-            if len(poly_ind)>0:
-                # print "poly_ind", poly_ind
-                event_ind=mag_ind[poly_ind]
-                #print "event_ind", event_ind
+            mag_ind=where((zone_mlow<event_set.Mw[poly_ind])&
+                          (event_set.Mw[poly_ind]<zone_mhgh))[0]
+            if len(mag_ind)>0:
+                event_ind= poly_ind[mag_ind]
+                #event_ind=mag_ind[poly_ind]
                 num_of_mag_sample_bins = source.number_of_mag_sample_bins
-                # make bins
                 mag_bin_centroids=make_bins(zone_mlow,zone_mhgh,
                                             num_of_mag_sample_bins)
 
@@ -101,31 +89,37 @@ def calc_event_activity(event_set, sources,
                 event_bins=array([int(i) for i in
                                   (event_set.Mw[event_ind]
                                    -zone_mlow)/delta_mag])
-                #event_bins=mag_bin_centroids[event_bins]
-                # print "zone_b", zone_b
-                #print "mag_bin_centroids",mag_bin_centroids
-                #print "zone_mlow",zone_mlow
-                #print "zone_mhgh",zone_mhgh
                 grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
-                #print "grpdf", grpdf
-                #print "A_mlow", A_mlow
                 event_activity=(num_of_mag_sample_bins*A_mlow
                                 *grpdf[event_bins]/len(event_ind))
-                #print "event_activity", event_activity
+                
                 event_activity_matrix[event_ind,j]=event_activity
-                weight_matrix[event_ind,j]=weight[j]
+                
+                #weight_matrix[event_ind,j]=weight[j]
 
-                # print "sources[j].weight", sources[j].weight
             #endif
         #endfor
+        # NOTE, no weights have been applied.
+        event_set.set_event_activity(event_activity_matrix[:,j])
     #endfor
 
+    # This should be used to remove events from the scenario's
+    # that are not in the mag range.
+    # But currently events not in range are removed.
+    no_event_activity_index = where(event_set.event_activity==0)
+
+    
+    event_activity_index = where(event_set.event_activity!=0)
     eqrmlog.debug('Memory: Out of the event_activity loop')
     eqrmlog.resource_usage()
     # FIXME DSG - Make the weight_matrix an object. These calc's
     # should occur in this object.
     # Then this object can be tested seperately
     
+    return event_set[event_activity_index]
+
+
+    """
     #print "weight_matrix", weight_matrix
     weight_sum=weight_matrix.sum(axis=1)
     non_zerod_ind=where(weight_sum!=0)[0]
@@ -155,7 +149,8 @@ def calc_event_activity(event_set, sources,
     new_event_set.set_event_activity(event_activity)
     #print "new_event_set.event_activity", new_event_set.event_activity
     # returning an event set with the attribute event_activity tacked on.
-    return new_event_set
+    """
+    return event_set
                 
 
 def m2grpdfb(b,m,m0,mmax):

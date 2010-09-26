@@ -56,7 +56,8 @@ class Event_Set(object):
                  trace_end_lat, trace_end_lon,
                  trace_start_x, trace_start_y,
                  rupture_x, rupture_y,
-                 rupture_centroid_lat, rupture_centroid_lon):
+                 rupture_centroid_lat, rupture_centroid_lon,
+                 event_activity=None):
         """
     A set of seismic events. Can be created  either directly or from an
     XML file which generates the events from eqrm_code.generation polygons.
@@ -77,13 +78,13 @@ class Event_Set(object):
     faulting_type         index (0, 1 or 2) from the FaultingTypeDictionary
                           above, depending on fault type key
     Mw                    moment magnitudes - scalar or n-vector
-                          range (-large:+large) in practice ~(0:9)              
+                          range (-large:+large) in practice ~(0:9)
     ML                    local magnitudes - scalar or n-vector
                           range (-large:+large) in practice ~(0:9)         
     rupture_centroid_lat  latitude of the rupture_centroid - scalar or n-vector
                           range (-90,90)
-    rupture_centroid_lon  longitude of the rupture_centroid - scalor or n-vector
-                          range unbounded.
+    rupture_centroid_lon  longitude of the rupture_centroid - scalor or
+                          n-vector range unbounded.
                          
       event_activity: probability that this event will occur is this
         year.  Takes into account; - The actual probability that a
@@ -129,7 +130,7 @@ class Event_Set(object):
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
         self.event_num = r_[0:len(self.depth)] # gives every event an id
-
+        self.event_activity = event_activity
         self.check_arguments() 
 
 
@@ -490,20 +491,31 @@ class Event_Set(object):
 
         Attributes that are tacked onto an event_set instance.
         """
-
-        # Moved from analysis
-        
+        # Moved from analysis        
         self.event_activity = array(0*self.depth+1) # create a vector of 1's
         self.source_zone_id = array(0*self.depth+1) # create a vector of 1's
+
 
     def set_event_activity(self, event_activity):
         """        
         Set event activity boiler plate code.  I'm doing this so I
         know when this is being set.        
         """
-
         self.event_activity = asarray(event_activity)
+
             
+    def remove_events_with_no_activity(self):
+        """        
+        Set event activity boiler plate code.  I'm doing this so I
+        know when this is being set.
+
+        returns an event instance which is a subset of this event index.
+          where all events with 0 event activity have been removed.
+        """
+        event_activity_index = where(event_set.event_activity!=0)
+        return self[event_activity_index]
+
+        
     def check_arguments(self):
         """
         Checks that all arguments are the same size (or scalar).
@@ -565,7 +577,11 @@ class Event_Set(object):
                 fault_width = self.fault_width + 0*self.width
             else:
                 fault_width = self.fault_width
-            
+
+            if self.event_activity == None:
+                event_activity = None
+            else:
+                event_activity = self.event_activity[key] 
             return Event_Set(self.azimuth[key],
                              self.dip[key],
                              self.ML[key],
@@ -587,7 +603,8 @@ class Event_Set(object):
                              self.rupture_x[key],
                              self.rupture_y[key],
                              self.rupture_centroid_lat[key],
-                             self.rupture_centroid_lon[key])
+                             self.rupture_centroid_lon[key],
+                             event_activity)
         # self.source_zone_id[key] has to be an array.
         # eg array([0])
         # additional attributes aren't carried over. eg event_id, activity.
@@ -732,6 +749,9 @@ class Pseudo_Event_Set(Event_Set):
 
         super(Pseudo_Event_Set, self).__init__(**att_values)
 
+        # This overwrites the None value that can be set in event_set
+        self.event_activity = asarray(event_activity)
+        
     def __len__(self):
         return len(self.index)
     
@@ -776,7 +796,6 @@ class Pseudo_Event_Set(Event_Set):
            _calc_attenuation_logic_split(attenuation_models, weights, 
                                          event_set_instance.event_activity,
                                          event_set_instance.event_num)
-        
         # Assertions
         # event_num is an array of [event_ids] concatenated num att models
         # times.

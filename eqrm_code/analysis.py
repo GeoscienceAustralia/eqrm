@@ -280,9 +280,12 @@ def main(parameter_handle,
                                                THE_PARAM_T.default_input_dir,
                                                THE_PARAM_T.input_dir)
         soil_amplification_model = \
-            Regolith_amplification_model.from_xml(amp_factor_file.name,
-                                                  distribution_instance= \
-                                                      regolith_amp_distribution)
+            Regolith_amplification_model.from_xml(
+            amp_factor_file.name,
+            distribution_instance= \
+            regolith_amp_distribution)
+    else:
+        soil_amplification_model = None
 
     # This is where info should be given to all the subprocesses.
     # But what info is there?
@@ -314,29 +317,37 @@ def main(parameter_handle,
         bedrock_hazard = zeros((array_size, len(THE_PARAM_T.atten_periods),
                                 len(THE_PARAM_T.return_periods)),
                                dtype=float)
-        if THE_PARAM_T.use_amplification is True:
-            soil_hazard = zeros((array_size, len(THE_PARAM_T.atten_periods),
-                                 len(THE_PARAM_T.return_periods)),
-                                dtype=float)
-        else:
-            soil_hazard=None
-
-        log.debug('Memory: hazard_map array created')
-        log.resource_usage()
+        
+    else:
+        bedrock_hazard = None
+        
+    if THE_PARAM_T.save_hazard_map is True and \
+           THE_PARAM_T.use_amplification is True:
+        soil_hazard = zeros((array_size, len(THE_PARAM_T.atten_periods),
+                             len(THE_PARAM_T.return_periods)),
+                            dtype=float)
+    else:
+        soil_hazard = None     
+    log.debug('Memory: hazard_map array created')
+    log.resource_usage()  
 
     if THE_PARAM_T.save_motion is True:
         bedrock_SA_all = zeros((array_size, NUM_SITES_PER_SITE_LOOP,
                                 len(THE_PARAM_T.atten_periods)),
-                               dtype=float)
-        if THE_PARAM_T.use_amplification is True:
-            soil_SA_all = zeros((array_size, NUM_SITES_PER_SITE_LOOP,
-                                 len(THE_PARAM_T.atten_periods)),
-                                dtype=float)
-        else:
-            soil_SA_all = None
+                               dtype=float)        
+    else:
+        bedrock_SA_all = None
+        
+    if THE_PARAM_T.use_amplification is True and \
+           THE_PARAM_T.use_amplification is True:
+        soil_SA_all = zeros((array_size, NUM_SITES_PER_SITE_LOOP,
+                             len(THE_PARAM_T.atten_periods)),
+                            dtype=float)
+    else:
+        soil_SA_all = None        
+    log.debug('Memory: save_motion array created')
+    log.resource_usage()
 
-        log.debug('Memory: save_motion array created')
-        log.resource_usage()
 
     if THE_PARAM_T.save_total_financial_loss is True:
         total_building_loss = zeros((array_size, num_psudo_events),
@@ -387,7 +398,7 @@ def main(parameter_handle,
 
         # note if you take sites[i], it will collapse the dimension
 
-        # By not collapsing sites, and making the tempory assignment
+        # By not collapsing sites, and making the assignment
         # sites=all_sites[i:i+1], the code will work with a single site
         # at a time, without multiple reference to the loop variable 'i'.
 
@@ -399,146 +410,21 @@ def main(parameter_handle,
         # CAUTIONS:
         #  1.  this will run out of memory if sites*events is large.
         #  2.  this has not been tested recently
-
-
-        # evaluate the mean and sigma from the attenuation models at the
-        # site of interest note that this is not the RSA that is used
-        # - it comes later based on sampling mu and sigma
-        # note that we also compute the distance between source and site here
-        #print "event_set.event_activity", event_set.event_activity
-        bedrock_SA_pdf = ground_motion_calc.distribution(event_set=event_set,
-                                                         sites=sites)
-        # Note, it is event_set, not pseudo_event_set that is passed in,
-        # The Mw and distance att's are assumed to be the same for
-        # each GM and the results from each GM are appended, so the
-        # len of the results = len(pseudo_event_set)
-
-        # evaluate the RSA - using bedrock_SA_pdf and sampling technique
-        # that is desired (i.e. chosen in parameter_handle)
-        (_, bedrock_SA, _) = bedrock_SA_pdf.sample_for_eqrm()
-        assert isfinite(bedrock_SA).all()
-
-        # re-compute the source-site distances
-        # (NEEDED because this is not returned from bedrock_SA_pdf)
-        # Identify sites which are greater than
-        # THE_PARAM_T.atten_threshold_distance from an event
-        # (NO GM computed for these sites)
-        # This is not necessarily recomputing, since the
-        # distance method used previously may not be Joyner_Boore.
-        # But does this need to be Joyner_Boore?
-        # FIXME do this earlier, and reduce the distribution calcs to do.
-        distances = sites.distances_from_event_set(pseudo_event_set). \
-                        distance('Joyner_Boore')
-        Haznull = where(distances > THE_PARAM_T.atten_threshold_distance)
-        #print 'ENDING Calculating attenuation'
-
-        # Setup for amplification  model
-        # handles interpolation to periods of interest
-        # finds the mean and sigma (i.e. PDF) based on bedrock PGA and
-        # Moment magnitude (if amps are a function of these)
-        if THE_PARAM_T.use_amplification is True:
-            soil_SA_pdf = \
-                soil_amplification_model.distribution(bedrock_SA,
-                                              sites.attributes['SITE_CLASS'],
-                                                      pseudo_event_set.Mw,
-                                                      THE_PARAM_T.atten_periods)
-
-            # sample from the amplification PDF based on sampling method
-            # chosen in parameter_handle evaluating the RSA on soil
-            #soil_SA_pdf.event_activities=bedrock_activity
-            (_, soil_SA, _) = soil_SA_pdf.sample_for_eqrm()
-            # Amplification factor cutoffs
-            # Applies a minimum and maxium acceptable amplification factor
-            # re-scale SAsoil if Ampfactor falls ouside acceptable
-            # ampfactor bounds
-            if THE_PARAM_T.amp_variability_method is not None:
-                if THE_PARAM_T.amp_min_factor is not None:
-                    too_low = (soil_SA/bedrock_SA) < THE_PARAM_T.amp_min_factor
-                    soil_SA[where(too_low)] = (THE_PARAM_T.amp_min_factor *
-                                               bedrock_SA[where(too_low)])
-                    del too_low
-                if THE_PARAM_T.amp_max_factor is not None:
-                    too_high = (soil_SA/bedrock_SA) > THE_PARAM_T.amp_max_factor
-                    soil_SA[where(too_high)] = (THE_PARAM_T.amp_max_factor*
-                                                bedrock_SA[where(too_high)])
-                    del too_high
-
-            # PGA cutoff
-            # applies a pga cutoff to the bedrock motion
-            bedrock_SA = cutoff_pga(bedrock_SA,
-                                    THE_PARAM_T.atten_pga_scaling_cutoff)
-            assert isfinite(soil_SA).all()
-            soil_SA = cutoff_pga(soil_SA, THE_PARAM_T.atten_pga_scaling_cutoff)
-
-            # qa on ampfactors
-            #if int(THE_PARAM_T.qa_switch_ampfactors)>=1:
-                #print 'ENDING Calculating soil amplification'
-                #print
-
-            # Set to 0 ground motions due to distances
-            # greater than Rthresh
-            bedrock_SA[Haznull[0], Haznull[1],:] = 0
-            soil_SA[Haznull[0], Haznull[1],:] = 0
-        else: 		# THE_PARAM_T.use_amplification
-            #if int(THE_PARAM_T.qa_switch_ampfactors)>=1:
-            #    print 'No soil amplification'
-            #    print
-
-            soil_SA = None
-            bedrock_SA = cutoff_pga(bedrock_SA,
-                                    THE_PARAM_T.atten_pga_scaling_cutoff)
-
-            # account for very small ground motions due to distances
-            # greater than Rthresh
-            bedrock_SA[Haznull[0], Haznull[1],:] = 0
-        del distances
-        del Haznull
-
-        #print "bedrock_SA", bedrock_SA
-        # collapse logic tree as desired (bedrock and soil RSA)
-        if (THE_PARAM_T.save_motion is True or
-            THE_PARAM_T.save_hazard_map is True):
-            (new_bedrock_SA, _, _) = \
-                    do_collapse_logic_tree(bedrock_SA,
-                                           pseudo_event_set.index,
-                                           pseudo_event_set.attenuation_weights,
-                                           THE_PARAM_T)
-
-        #print "new_bedrock_SA", new_bedrock_SA
-        if soil_SA is not None:
-            # Collapse multiple attenuation models
-            (new_soil_SA, _, _) = \
-                    do_collapse_logic_tree(soil_SA, pseudo_event_set.index,
-                                           pseudo_event_set.attenuation_weights,
-                                           THE_PARAM_T)
-
-        # saving RSA - only generally done for Ground Motion Simulation
-        # (not for probabilistic hazard or if doing risk/secnario loss)
-        if THE_PARAM_T.save_motion is True:
-            # Put into arrays
-            #print bedrock_SA_all.shape,new_bedrock_SA.shape,i
-            #print "new_bedrock_SA[0,:,:].shape", new_bedrock_SA[0,:,:].shape
-
-            bedrock_SA_all[rel_i] = new_bedrock_SA[0,:,:]
-            if soil_SA is not None:
-                soil_SA_all[rel_i] = new_soil_SA[0,:,:]
-
-        # Compute hazard if desired
-        if THE_PARAM_T.save_hazard_map is True:
-            for j in range(len(THE_PARAM_T.atten_periods)):
-                bedrock_hazard[i,j] = \
-                        hzd_do_value(new_bedrock_SA[:,:,j],
-                                     event_set.event_activity,
-                                     1.0/array(THE_PARAM_T.return_periods))
-                if soil_SA is not None:
-                    soil_hazard[i,j] = \
-                        hzd_do_value(new_soil_SA[:,:,j],
-                                     event_set.event_activity,
-                                     1.0/array(THE_PARAM_T.return_periods))
-                    
-        # End the Ground motion splitting loop
-        # Build the SA, soil, if we did it.  If not, Bedrock.
         
+        soil_SA, bedrock_SA = calc_and_save_SA(
+            THE_PARAM_T,
+            sites,
+            event_set,
+            pseudo_event_set,
+            bedrock_SA_all,
+            soil_SA_all,
+            bedrock_hazard,
+            soil_hazard,
+            ground_motion_calc,
+            soil_amplification_model,
+            i,
+            rel_i)
+
         # calculate damage
         if THE_PARAM_T.run_type == "risk":
             #print 'STARTING building damage calculations'
@@ -805,6 +691,157 @@ def main(parameter_handle,
 # these are subfunctions
 ################################################################################
 
+def calc_and_save_SA(THE_PARAM_T,
+                     sites,
+                     event_set,
+                     pseudo_event_set,
+                     bedrock_SA_all,
+                     soil_SA_all,
+                     bedrock_hazard,
+                     soil_hazard,
+                     ground_motion_calc,
+                     soil_amplification_model,
+                     site_index,
+                     rel_site_index):
+    
+        # evaluate the mean and sigma from the attenuation models at the
+        # site of interest note that this is not the RSA that is used
+        # - it comes later based on sampling mu and sigma
+        # note that we also compute the distance between source and site here
+        bedrock_SA_pdf = ground_motion_calc.distribution(event_set=event_set,
+                                                         sites=sites)
+        # Note, it is event_set, not pseudo_event_set that is passed in,
+        # The Mw and distance att's are assumed to be the same for
+        # each GM and the results from each GM are appended, so the
+        # len of the results = len(pseudo_event_set)
+
+        # evaluate the RSA - using bedrock_SA_pdf and sampling technique
+        # that is desired (i.e. chosen in parameter_handle)
+        (_, bedrock_SA, _) = bedrock_SA_pdf.sample_for_eqrm()
+        assert isfinite(bedrock_SA).all()
+
+        # re-compute the source-site distances
+        # (NEEDED because this is not returned from bedrock_SA_pdf)
+        # Identify sites which are greater than
+        # THE_PARAM_T.atten_threshold_distance from an event
+        # (NO GM computed for these sites)
+        # This is not necessarily recomputing, since the
+        # distance method used previously may not be Joyner_Boore.
+        # But does this need to be Joyner_Boore?
+        # FIXME do this earlier, and reduce the distribution calcs to do.
+        distances = sites.distances_from_event_set(pseudo_event_set). \
+                        distance('Joyner_Boore')
+        Haznull = where(distances > THE_PARAM_T.atten_threshold_distance)
+        #print 'ENDING Calculating attenuation'
+
+        # Setup for amplification  model
+        # handles interpolation to periods of interest
+        # finds the mean and sigma (i.e. PDF) based on bedrock PGA and
+        # Moment magnitude (if amps are a function of these)
+        if THE_PARAM_T.use_amplification is True:
+            soil_SA_pdf = \
+                soil_amplification_model.distribution(bedrock_SA,
+                                              sites.attributes['SITE_CLASS'],
+                                                      pseudo_event_set.Mw,
+                                                      THE_PARAM_T.atten_periods)
+
+            # sample from the amplification PDF based on sampling method
+            # chosen in parameter_handle evaluating the RSA on soil
+            #soil_SA_pdf.event_activities=bedrock_activity
+            (_, soil_SA, _) = soil_SA_pdf.sample_for_eqrm()
+            # Amplification factor cutoffs
+            # Applies a minimum and maxium acceptable amplification factor
+            # re-scale SAsoil if Ampfactor falls ouside acceptable
+            # ampfactor bounds
+            if THE_PARAM_T.amp_variability_method is not None:
+                if THE_PARAM_T.amp_min_factor is not None:
+                    too_low = (soil_SA/bedrock_SA) < THE_PARAM_T.amp_min_factor
+                    soil_SA[where(too_low)] = (THE_PARAM_T.amp_min_factor *
+                                               bedrock_SA[where(too_low)])
+                    del too_low
+                if THE_PARAM_T.amp_max_factor is not None:
+                    too_high = (soil_SA/bedrock_SA) > THE_PARAM_T.amp_max_factor
+                    soil_SA[where(too_high)] = (THE_PARAM_T.amp_max_factor*
+                                                bedrock_SA[where(too_high)])
+                    del too_high
+
+            # PGA cutoff
+            # applies a pga cutoff to the bedrock motion
+            bedrock_SA = cutoff_pga(bedrock_SA,
+                                    THE_PARAM_T.atten_pga_scaling_cutoff)
+            assert isfinite(soil_SA).all()
+            soil_SA = cutoff_pga(soil_SA, THE_PARAM_T.atten_pga_scaling_cutoff)
+
+            # qa on ampfactors
+            #if int(THE_PARAM_T.qa_switch_ampfactors)>=1:
+                #print 'ENDING Calculating soil amplification'
+                #print
+
+            # Set to 0 ground motions due to distances
+            # greater than Rthresh
+            bedrock_SA[Haznull[0], Haznull[1],:] = 0
+            soil_SA[Haznull[0], Haznull[1],:] = 0
+        else: 		# THE_PARAM_T.use_amplification
+            #if int(THE_PARAM_T.qa_switch_ampfactors)>=1:
+            #    print 'No soil amplification'
+            #    print
+
+            soil_SA = None
+            bedrock_SA = cutoff_pga(bedrock_SA,
+                                    THE_PARAM_T.atten_pga_scaling_cutoff)
+
+            # account for very small ground motions due to distances
+            # greater than Rthresh
+            bedrock_SA[Haznull[0], Haznull[1],:] = 0
+        del distances
+        del Haznull
+
+        #print "bedrock_SA", bedrock_SA
+        # collapse logic tree as desired (bedrock and soil RSA)
+        if (THE_PARAM_T.save_motion is True or
+            THE_PARAM_T.save_hazard_map is True):
+            (new_bedrock_SA, _, _) = \
+                    do_collapse_logic_tree(bedrock_SA,
+                                           pseudo_event_set.index,
+                                           pseudo_event_set.attenuation_weights,
+                                           THE_PARAM_T)
+
+        #print "new_bedrock_SA", new_bedrock_SA
+        if soil_SA is not None:
+            # Collapse multiple attenuation models
+            (new_soil_SA, _, _) = \
+                    do_collapse_logic_tree(soil_SA, pseudo_event_set.index,
+                                           pseudo_event_set.attenuation_weights,
+                                           THE_PARAM_T)
+
+        # saving RSA - only generally done for Ground Motion Simulation
+        # (not for probabilistic hazard or if doing risk/secnario loss)
+        if THE_PARAM_T.save_motion is True:
+            # Put into arrays
+            #print bedrock_SA_all.shape,new_bedrock_SA.shape,i
+            #print "new_bedrock_SA[0,:,:].shape", new_bedrock_SA[0,:,:].shape
+
+            bedrock_SA_all[rel_site_index] = new_bedrock_SA[0,:,:]
+            if soil_SA is not None:
+                soil_SA_all[rel_site_index] = new_soil_SA[0,:,:]
+
+        # Compute hazard if desired
+        if THE_PARAM_T.save_hazard_map is True:
+            for j in range(len(THE_PARAM_T.atten_periods)):
+                bedrock_hazard[site_index,j] = \
+                        hzd_do_value(new_bedrock_SA[:,:,j],
+                                     event_set.event_activity,
+                                     1.0/array(THE_PARAM_T.return_periods))
+                if soil_SA is not None:
+                    soil_hazard[site_index,j] = \
+                        hzd_do_value(new_soil_SA[:,:,j],
+                                     event_set.event_activity,
+                                     1.0/array(THE_PARAM_T.return_periods))
+                    
+        # End the Ground motion splitting loop
+        # Build the SA, soil, if we did it.  If not, Bedrock.
+        return soil_SA, bedrock_SA
+        
 # handles the pga_cutoff
 def cutoff_pga(ground_motion, max_pga):
     if max_pga is None:
@@ -854,21 +891,21 @@ def load_data(THE_PARAM_T):
 
         if site_file:
             # if indeed there is a BUILDING file
-            sites = \
-                Structures.from_csv(site_file,
-                                    building_parameters_table=building_par_file,
-                                    default_input_dir=
-                                        THE_PARAM_T.default_input_dir,
-                                    input_dir=THE_PARAM_T.input_dir,
-                                    eqrm_dir=THE_PARAM_T.eqrm_dir,
-                                    buildings_usage_classification=
-                                     THE_PARAM_T.buildings_usage_classification,
-                                    use_refined_btypes=
-                                        not THE_PARAM_T.hazus_btypes_flag,
-                                    force_btype_flag=
-                                        THE_PARAM_T.force_btype_flag,
-                                    loss_aus_contents=
-                                        THE_PARAM_T.loss_aus_contents)
+            sites = Structures.from_csv(
+                site_file,
+                building_parameters_table=building_par_file,
+                default_input_dir=
+                THE_PARAM_T.default_input_dir,
+                input_dir=THE_PARAM_T.input_dir,
+                eqrm_dir=THE_PARAM_T.eqrm_dir,
+                buildings_usage_classification=
+                THE_PARAM_T.buildings_usage_classification,
+                use_refined_btypes=
+                not THE_PARAM_T.hazus_btypes_flag,
+                force_btype_flag=
+                THE_PARAM_T.force_btype_flag,
+                loss_aus_contents=
+                THE_PARAM_T.loss_aus_contents)
 
             #FIXME do this after subsampling the sites
             # Hard wires the Demand Curve damping to 5%
