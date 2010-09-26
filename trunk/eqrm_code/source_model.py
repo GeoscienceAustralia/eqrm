@@ -148,16 +148,39 @@ class Source_Zone_Polygon(polygon_object):
         self.number_of_mag_sample_bins = number_of_mag_sample_bins
 
         # indexes to the event sets in this source zone
-        self.event_set_index_start = None
-        self.event_set_index_end = None
+        self.event_set_indexes = None
 
-    def set_event_set_range(self, start, end):
+    def set_event_set_indexes(self, event_indexes):
         """
-        Set which indexes into 
+        Input an array of integers which represent the events in a zone source.
+        The intergers are indexes into an event set.
         """
-        pass
+        self.event_set_indexes = event_indexes
 
-    
+    def not_implemented_calc_event_activity(self, event_set):
+        """
+        Calculate the event activity for all of the events in this
+        source zone.
+        """
+        mag_ind=where((zone_mlow<event_set.Mw[poly_ind])&
+                      (event_set.Mw[poly_ind]<zone_mhgh))[0]
+        if len(mag_ind)>0:
+            event_ind= poly_ind[mag_ind]
+            #event_ind=mag_ind[poly_ind]
+            num_of_mag_sample_bins = source.number_of_mag_sample_bins
+            mag_bin_centroids=make_bins(zone_mlow,zone_mhgh,
+                                        num_of_mag_sample_bins)
+            
+            # bin the event magnitudes
+            delta_mag=(zone_mhgh-zone_mlow)/num_of_mag_sample_bins
+            event_bins=array([int(i) for i in
+                              (event_set.Mw[event_ind]
+                               -zone_mlow)/delta_mag])
+            grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
+            event_activity=(num_of_mag_sample_bins*A_mlow
+                            *grpdf[event_bins]/len(event_ind))
+            
+                
 def source_model_from_xml(filename,prob_min_mag_cutoff,
                               number_of_mag_sample_bins):
     doc=Xml_Interface(filename=filename)

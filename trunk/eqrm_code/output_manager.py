@@ -486,6 +486,8 @@ def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
     """
     Save event_set information to file.
     This funtion is called in eqrm analysis.
+
+    r_new is event activity.  It will be a vector or None.
     """
     if compress: open = myGzipFile
     else: open = file
@@ -557,7 +559,7 @@ def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
             s.append('-1')
         try:
             s.append(str(r_new[i]))
-        except IndexError:
+        except (IndexError, TypeError):
             s.append('-1')
             
         s.append(str(Mw[i]))
