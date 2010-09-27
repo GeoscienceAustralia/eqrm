@@ -246,7 +246,6 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless(szp.number_of_mag_sample_bins== \
                         number_of_mag_sample_bins,'Failed!')
 
-
         
     def test_Source_mini_check_gong(self):
         # Might start off hacky
@@ -305,6 +304,30 @@ class Test_Source_model(unittest.TestCase):
                % (str(array(actual)), str(event_activity)))
         self.assert_(allclose(array(actual),event_activity), msg)
 
+    def test_Source_Model(self):
+        
+        eqrm_dir = determine_eqrm_path()
+        file_name = join(eqrm_dir, 'implementation_tests', 'input',
+                         'newc_source_polygon.xml')
+        fid_sourcepolys = open(file_name)
+        
+        prob_min_mag_cutoff = 4.5
+        weight = [1.0]
+        number_of_mag_sample_bins = 100000000
+        source_model = Source_Models(prob_min_mag_cutoff,
+                                     weight,
+                                     number_of_mag_sample_bins,
+                                     fid_sourcepolys)
+        atten_models = ["Neal", "Jack"]
+        atten_model_weights = array([.4, .6])
+        source_model[0].set_attenuation(atten_models, atten_model_weights)
+        msg = 'Fail'
+        for sm in source_model[0]:
+            self.assert_(allclose(array(sm.atten_model_weights),
+                                  atten_model_weights), msg)
+            self.assert_(sm.atten_models == atten_models, msg)
+            
+        
 ################################################################################
 
 if __name__ == "__main__":

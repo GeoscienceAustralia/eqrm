@@ -121,6 +121,16 @@ class Source_Model(object):
         s = s+'magnitude_type = '+str(self._magnitude_type)+n
         return s
 
+    def set_attenuation(self, atten_models, atten_model_weights):
+        """
+
+        atten_model_weights must sum to 1.0.
+        """
+        
+        for poly_zone in self:
+            poly_zone.set_atten_models_and_weights(atten_models,
+                                                   atten_model_weights)
+            
 
 class Source_Zone_Polygon(polygon_object):
     def __init__(self,boundary,exclude,
@@ -162,24 +172,15 @@ class Source_Zone_Polygon(polygon_object):
         Calculate the event activity for all of the events in this
         source zone.
         """
-        mag_ind=where((zone_mlow<event_set.Mw[poly_ind])&
-                      (event_set.Mw[poly_ind]<zone_mhgh))[0]
-        if len(mag_ind)>0:
-            event_ind= poly_ind[mag_ind]
-            #event_ind=mag_ind[poly_ind]
-            num_of_mag_sample_bins = source.number_of_mag_sample_bins
-            mag_bin_centroids=make_bins(zone_mlow,zone_mhgh,
-                                        num_of_mag_sample_bins)
-            
-            # bin the event magnitudes
-            delta_mag=(zone_mhgh-zone_mlow)/num_of_mag_sample_bins
-            event_bins=array([int(i) for i in
-                              (event_set.Mw[event_ind]
-                               -zone_mlow)/delta_mag])
-            grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
-            event_activity=(num_of_mag_sample_bins*A_mlow
-                            *grpdf[event_bins]/len(event_ind))
-            
+        pass
+
+    def set_atten_models_and_weights(self, atten_models,
+                                     atten_model_weights):
+        self.atten_models = atten_models
+        self.atten_model_weights = atten_model_weights
+        
+
+
                 
 def source_model_from_xml(filename,prob_min_mag_cutoff,
                               number_of_mag_sample_bins):

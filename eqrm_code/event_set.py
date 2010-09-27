@@ -13,13 +13,14 @@
 
   Copyright 2007 by Geoscience Australia
 """
-
-from eqrm_code.ANUGA_utilities import log
+import copy
 import xml.dom.minidom
 
 from scipy import (asarray, transpose, array, r_, concatenate, sin, cos, pi, 
-     ndarray, absolute, allclose, zeros, ones, float32, int32, float64, int64)
+     ndarray, absolute, allclose, zeros, ones, float32, int32, float64, int64,
+                   reshape)
 
+from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
 from eqrm_code.projections import projections
 from eqrm_code.generation_polygon import polygons_from_xml
@@ -803,7 +804,63 @@ class Pseudo_Event_Set(Event_Set):
         # event_activity*model_weights[attenuation_id] for each psudo_event
         return cls(event_set_instance, event_num, event_activity,
                    attenuation_ids, attenuation_weights)
+
+class Event_Activity(object):
+    """
+    Class to manipulate the event activity value.
+    Handles a lot of the logic splitting in EQRM.
+    It assumes the logic splitting is done in a certain order.
+    First the event activities are added, then they are logically
+    spit based on the attenuation models.
+
+    The next split is based on spawning.
+
+    Only call the splitting method once.
+
+    The dimensions of the event_activity are;
+      (num_events, max_num_models, num_spawns)
+    """
+    def __init__(self, num_events, max_num_models=1, num_spawns=1):
+        """
+        num_events is number of events
+        max_num_models is the maximum number of ground motion models
+          for any source.
+        num_spawns is the number of spawned events.
+        """
+        self.event_activity = zeros((num_events, max_num_models, num_spawns),
+                                    dtype=EVENT_FLOAT)
+        self.max_num_models = max_num_models
         
+
+    def set_event_activity(self, event_indexes, event_activities):
+        """
+        event_indexes - the indexes of the events relating to the
+          event activities
+        """
+        self.event_activity[event_indexes, 0, 0] = event_activities
+
+    def attenuation_logic_split(self, source_model):
+        """
+        Given a source model, apply the attenuation weights to logically
+        split the event activities.
+
+        This must be called before any other splitting.
+        This must only be called once.
+
+        source_model is a collection of Source_Zone_Polygon's.
+        """
+        
+        unsplit_event_activity = copy.copy(self.event_activity[:,0,0])
+        
+        for szp in source_model:
+            #self.event_activity[szp.event_set_indexes] =
+            sub_activity = unsplit_event_activity[szp.event_set_indexes]
+            maxed_weights = zeros((self.max_num_models))
+            maxed_weights[0:len(szp.atten_model_weights)] = \
+                                                      szp.atten_model_weights
+            activities = sub_activity * reshape(maxed_weights, (-1,1))
+            self.event_activity[szp.event_set_indexes, :, 0] = activities.T
+    
 ################################################################################
 
 # this will run if this is called from DOS prompt or double clicked

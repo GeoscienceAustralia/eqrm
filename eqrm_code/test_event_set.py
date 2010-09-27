@@ -7,13 +7,13 @@ import unittest
 from os import sep
 import tempfile
 
-from scipy import array, allclose, asarray
+from scipy import array, allclose, asarray, arange, sum
 
 from xml_interface import Xml_Interface
 from source_model import source_model_from_xml
 import conversions
 
-from eqrm_code.event_set import Event_Set, Pseudo_Event_Set
+from eqrm_code.event_set import * #Event_Set, Pseudo_Event_Set
 
 
 class Dummy:
@@ -663,7 +663,42 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(pes.event_activity , pseudo_event_activity))
         self.assert_(allclose(pes.att_model_index , array([0,0,1,1])))
         self.assert_(allclose(pes.attenuation_weights , array([.4,.4,.6,.6])))
+
         
+    def test_Event_Activity(self):
+        num_events = 3
+        ea = Event_Activity(num_events)
+        event_indexes = array([0,2])
+        event_activities = array([0, 20])
+        ea.set_event_activity(event_indexes, event_activities)
+        self.assert_(allclose(ea.event_activity[0,0,0], 0))
+        self.assert_(allclose(ea.event_activity[1,0,0], 0))
+        self.assert_(allclose(ea.event_activity[2,0,0], 20))
+
+    def test_Event_Activity2(self):
+
+        
+        num_events = 5
+        max_weights = 5
+        ea = Event_Activity(num_events, max_weights)
+        indexes = arange(5)
+        activity = indexes*10
+        
+        ea.set_event_activity(indexes, activity)
+        atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
+        a = Dummy()
+        b = Dummy()
+        source_model = [a, b]
+        #event_set_indexes = [array([0,1,3]), array([2,4])]
+        event_set_indexes = [[0,1,3], [2,4]]
+        for sp, esi, amw in map(None, source_model, event_set_indexes,
+                                atten_model_weights):
+            sp.atten_model_weights = amw
+            sp.event_set_indexes = esi
+        ea.attenuation_logic_split(source_model)   
+        self.assert_(allclose(sum(ea.event_activity), sum(activity)))
+        self.assert_(ea.event_activity[3,0,0], 12.)
+        self.assert_(ea.event_activity[4,0,0], 4.)
         
 #-------------------------------------------------------------
 if __name__ == "__main__":
