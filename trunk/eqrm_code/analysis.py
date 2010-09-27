@@ -170,6 +170,13 @@ def main(parameter_handle,
         # Rupture area, length, and width are calculated from Mw
         # using Wells and Coppersmith 94 (modified so rupture
         # width is less than fault_width).
+        num_spawning_bins = 1
+        event_activity = Event_Activity(len(event_set),
+                                        len(THE_PARAM_T.atten_model_weights),
+                                        num_spawning_bins)
+        event_activity.set_scenario_event_activity()
+        event_activity.scenario_attenuation_logic_split(
+            THE_PARAM_T.atten_model_weights)
         event_set.scenario_setup()
     else:
         # (i.e. is_scenario is False) generate a probablistic event set
@@ -182,14 +189,15 @@ def main(parameter_handle,
         source_mods = Source_Models(THE_PARAM_T.prob_min_mag_cutoff, [1.0],
                                     THE_PARAM_T.prob_number_of_mag_sample_bins,
                                     fid_sourcepolys)
-
+        source_mods[0].set_attenuation(THE_PARAM_T.atten_models,
+                                    THE_PARAM_T.atten_model_weights)
         log.debug('Memory: source_mods created')
         log.resource_usage()
 
         # Generating the event set (i.e. a synthetic event catalogue)
         #  - see manual for details
         # FIXME DSG-DSG
-        #generate_synthetic_events and Source_Models seem too connected.
+        #generate_synthetic_events and Source_Mset_scenario_event_activityodels seem too connected.
         # They both need fid_sourcepolys and prob_min_mag_cutoff.
         # Yet can these values be different?
         events = Event_Set.generate_synthetic_events(
@@ -219,6 +227,11 @@ def main(parameter_handle,
         log.debug('Memory: event activity has been calculated')
         log.resource_usage()
         del events
+        
+        # Add the atten model stuff to the zone source 
+        # This assumes there is one source model
+        event_activity.attenuation_logic_split(source_mods[0])
+    
 
     msg = 'Event set created. Number of events=' + str(len(event_set.depth))
     log.info(msg)
@@ -245,9 +258,6 @@ def main(parameter_handle,
         THE_PARAM_T.atten_models,
         THE_PARAM_T.atten_model_weights)
 
-    # Add the atten model stuff to the zone source 
-    # This assumes there is one source model
-    #event_activity.attenuation_logic_split(source_mods[0])
     num_psudo_events = len(pseudo_event_set)
     msg = ('Pseudo event set created. Number of pseudo_events=' +
            str(num_psudo_events))
