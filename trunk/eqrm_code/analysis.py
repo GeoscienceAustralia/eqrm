@@ -26,7 +26,7 @@ from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray
 
 from eqrm_code.parse_in_parameters import  \
     ParameterSyntaxError, create_parameter_data, convert_THE_PARAM_T_to_py
-from eqrm_code.event_set import Event_Set, Pseudo_Event_Set
+from eqrm_code.event_set import Event_Set, Pseudo_Event_Set, Event_Activity
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
 from eqrm_code.regolith_amplification_model import \
@@ -206,15 +206,18 @@ def main(parameter_handle,
 
         log.debug('Memory: events created')
         log.resource_usage()
-        # calculate event activities
-        #FIXME This should be an event method.
         # event activity is calculated here and the events are subsampled.
-        event_set = source_mods.calculate_recurrence(events,
-                                    THE_PARAM_T.prob_number_of_mag_sample_bins)
+        num_spawning_bins = 1
+        event_activity = Event_Activity(len(events),
+                                        len(THE_PARAM_T.atten_model_weights),
+                                        num_spawning_bins)
+        event_set = source_mods.calculate_recurrence(
+            events,
+            THE_PARAM_T.prob_number_of_mag_sample_bins,
+            event_activity)
 
         log.debug('Memory: event activity has been calculated')
         log.resource_usage()
-        del source_mods
         del events
 
     msg = 'Event set created. Number of events=' + str(len(event_set.depth))
@@ -237,11 +240,14 @@ def main(parameter_handle,
     log.debug('Memory: Sites created')
     log.resource_usage()
 
-    pseudo_event_set = \
-        Pseudo_Event_Set.split_logic_tree(event_set,
-                                          THE_PARAM_T.atten_models,
-                                          THE_PARAM_T.atten_model_weights)
+    pseudo_event_set = Pseudo_Event_Set.split_logic_tree(
+        event_set,
+        THE_PARAM_T.atten_models,
+        THE_PARAM_T.atten_model_weights)
 
+    # Add the atten model stuff to the zone source 
+    # This assumes there is one source model
+    #event_activity.attenuation_logic_split(source_mods[0])
     num_psudo_events = len(pseudo_event_set)
     msg = ('Pseudo event set created. Number of pseudo_events=' +
            str(num_psudo_events))

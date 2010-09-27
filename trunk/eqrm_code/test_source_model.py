@@ -8,7 +8,7 @@ from scipy import array, allclose
 
 from source_model import *
 from source_model import Source_Zone_Polygon
-from eqrm_code.event_set import Event_Set
+from eqrm_code.event_set import Event_Set, Event_Activity
 from eqrm_code.util import reset_seed, determine_eqrm_path
 
 
@@ -287,10 +287,12 @@ class Test_Source_model(unittest.TestCase):
             source_models=source_model,
             prob_number_of_events_in_zones=
             prob_number_of_events_in_zones)
+        event_activity = Event_Activity(len(events))
         new_event_set = source_model.calculate_recurrence(
             events,
-            prob_number_of_mag_sample_bins)
-        event_activity = new_event_set.event_activity
+            prob_number_of_mag_sample_bins,
+            event_activity)
+        event_activity_calc = new_event_set.event_activity
         # Warning - this is just the results from running
         # calculate_recurrence at this version.
         # It is not independantly calculated to be correct
@@ -298,11 +300,16 @@ class Test_Source_model(unittest.TestCase):
                    0.23324915,  0.00144009,  0.00121821,
                    0.0062062,   0.00902211,  0.00554215,
                    0.0097141 ]
-        self.failUnless(len(actual) == len(event_activity), 'Failed!')
+        self.failUnless(len(actual) == len(event_activity_calc), 'Failed!')
         # this fails using self.__contains_point_geo(point)
         msg = ('array(actual)=\n%s\nevent_activity=\n%s'
-               % (str(array(actual)), str(event_activity)))
-        self.assert_(allclose(array(actual),event_activity), msg)
+               % (str(array(actual)), str(event_activity_calc)))
+        self.assert_(allclose(array(actual),event_activity_calc), msg)
+        
+        msg = ('array(actual)=\n%s\nevent_activity=\n%s'
+               % (str(array(actual)), str(event_activity.event_activity)))
+        self.assert_(allclose(array(actual),
+                              event_activity.event_activity[:,0,0]), msg)
 
     def test_Source_Model(self):
         
