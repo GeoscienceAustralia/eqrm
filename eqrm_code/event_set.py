@@ -18,7 +18,7 @@ import xml.dom.minidom
 
 from scipy import (asarray, transpose, array, r_, concatenate, sin, cos, pi, 
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, int64,
-                   reshape)
+                   reshape, arange)
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
@@ -44,9 +44,11 @@ FaultingTypeDictionary = {'reverse': 0,
                           'normal': 1,
                           'strikeslip': 2}
 
-class Event_Collection(object):
-    def __init__(self, event_sets):
+
+class Dummy:
+    def __init__(self):
         pass
+
     
 class Event_Set(object):
     def __init__(self, azimuth, dip, ML, Mw,
@@ -830,8 +832,13 @@ class Event_Activity(object):
         self.event_activity = zeros((num_events, max_num_models, num_spawns),
                                     dtype=EVENT_FLOAT)
         self.max_num_models = max_num_models
+        self.num_events = num_events
         
 
+    def set_scenario_event_activity(self):
+        event_indexes = arange(self.num_events)
+        self.set_event_activity(event_indexes, ones((self.num_events)))
+        
     def set_event_activity(self, event_indexes, event_activities):
         """
         event_indexes - the indexes of the events relating to the
@@ -839,7 +846,12 @@ class Event_Activity(object):
         """
         assert len(event_indexes) == len(event_activities)
         self.event_activity[event_indexes, 0, 0] = event_activities
-
+    def scenario_attenuation_logic_split(self, atten_model_weights):
+        source_model = Dummy()
+        source_model.event_set_indexes = arange((self.num_events))
+        source_model.atten_model_weights = atten_model_weights       
+        self.attenuation_logic_split([source_model])
+    
     def attenuation_logic_split(self, source_model):
         """
         Given a source model, apply the attenuation weights to logically
