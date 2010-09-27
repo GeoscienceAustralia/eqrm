@@ -837,6 +837,7 @@ class Event_Activity(object):
         event_indexes - the indexes of the events relating to the
           event activities
         """
+        assert len(event_indexes) == len(event_activities)
         self.event_activity[event_indexes, 0, 0] = event_activities
 
     def attenuation_logic_split(self, source_model):

@@ -17,14 +17,17 @@ from scipy import exp, log, sum, zeros, array, newaxis, where, allclose, r_
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 
 def calc_event_activity(event_set, sources,
-                        prob_number_of_mag_sample_bins, weight):
+                        prob_number_of_mag_sample_bins, weight,
+                        event_activity):
     """
     event_set - Event_Set instance - this function uses Mw and rupture_centroid
                                and returns a subset of event_set
-    sources - a list of Source_Models.  Why this dimension? 
-    nbin - number of bins desired?
+    sources - a list of Source_Model.
+    prob_number_of_mag_sample_bins - number of magnitude sample bins.
 
     when analysis uses this function, the weight used is a constant of [1.0]
+    EQRM can currently only handle one source model.
+    A source model has many source polygons.
     """
     # print "event_set", event_set
     #print "sources", sources
@@ -90,11 +93,12 @@ def calc_event_activity(event_set, sources,
                                   (event_set.Mw[event_ind]
                                    -zone_mlow)/delta_mag])
                 grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
-                event_activity=(num_of_mag_sample_bins*A_mlow
-                                *grpdf[event_bins]/len(event_ind))
+                event_activity_source = (num_of_mag_sample_bins*A_mlow
+                                         *grpdf[event_bins]/len(event_ind))
                 
-                event_activity_matrix[event_ind,j]=event_activity
-                
+                event_activity_matrix[event_ind,j]=event_activity_source
+                event_activity.set_event_activity(event_ind,
+                                                  event_activity_source)
                 #weight_matrix[event_ind,j]=weight[j]
 
             #endif
@@ -107,16 +111,20 @@ def calc_event_activity(event_set, sources,
     # that are not in the mag range.
     # But currently events not in range are removed.
     no_event_activity_index = where(event_set.event_activity==0)
+    assert len(no_event_activity_index[0]) == 0
 
-    
-    event_activity_index = where(event_set.event_activity!=0)
     eqrmlog.debug('Memory: Out of the event_activity loop')
     eqrmlog.resource_usage()
+    # this is temp'
+    # If any events are outside of all of the source zones
+    # EQRM crashes.
+    return event_set #[event_activity_index]
+    
+    #event_activity_index = where(event_set.event_activity!=0)
     # FIXME DSG - Make the weight_matrix an object. These calc's
     # should occur in this object.
     # Then this object can be tested seperately
-    
-    return event_set[event_activity_index]
+    #return event_set[event_activity_index]
 
 
     """
