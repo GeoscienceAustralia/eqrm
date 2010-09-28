@@ -296,10 +296,14 @@ class Test_Source_model(unittest.TestCase):
         # Warning - this is just the results from running
         # calculate_recurrence at this version.
         # It is not independantly calculated to be correct
-        actual =  [0.0058021,   0.01526108,  0.12673276,
-                   0.23324915,  0.00144009,  0.00121821,
-                   0.0062062,   0.00902211,  0.00554215,
-                   0.0097141 ]
+        #actual =  [0.0058021,   0.01526108,  0.12673276,
+        #          0.23324915,  0.00144009,  0.00121821,
+        #         0.0062062,   0.00902211,  0.00554215,
+        #        0.0097141 ]
+        actual =  [0.00869837,  0.02287905,  0.09860858,
+                   0.09665979,  0.00086677,  0.00073323,
+                   0.00570561,  0.00829439,  0.00312413,
+                   0.00547587]
         self.failUnless(len(actual) == len(event_activity_calc), 'Failed!')
         # this fails using self.__contains_point_geo(point)
         msg = ('array(actual)=\n%s\nevent_activity=\n%s'
