@@ -162,6 +162,6 @@ class Test_Recurrence_functions(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Recurrence_functions,'test')
-    suite = unittest.makeSuite(Test_Recurrence_functions,'test_calc_event_activity')
+    #suite = unittest.makeSuite(Test_Recurrence_functions,'test_calc_event_activity')
     runner = unittest.TextTestRunner()
     runner.run(suite)
