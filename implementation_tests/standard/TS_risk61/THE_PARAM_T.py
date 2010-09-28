@@ -18,7 +18,7 @@ from os.path import join
 
 # Operation Mode
 run_type = "risk" 
-is_scenario = False
+is_scenario = True
 max_width = 15
 site_tag = "newc" 
 site_db_tag = "" 
@@ -29,6 +29,14 @@ use_site_indexes = True
 site_indexes = 6315
 
 # Scenario input
+scenario_azimuth = 340
+scenario_depth = 11.5
+scenario_latitude = -32.95
+scenario_longitude = 151.61
+scenario_magnitude = 7.2
+scenario_dip = 35
+scenario_number_of_events = 1
+
 
 # Probabilistic input
 prob_min_mag_cutoff = 4.5
