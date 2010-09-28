@@ -185,29 +185,29 @@ class Event_Set(object):
             if hasattr(rupture_centroid_lat, __len__):
                 rupture_centroid_lat = \
                     concatenate([rupture_centroid_lat for i in
-                                 range(scenario_number_of_events)])
+                                 xrange(scenario_number_of_events)])
             if hasattr(rupture_centroid_lon, __len__):
                 rupture_centroid_lon = \
                     concatenate([rupture_centroid_lon for i in
-                                 range(scenario_number_of_events)])
+                                 xrange(scenario_number_of_events)])
             if hasattr(azimuth, __len__):
                 azimuth = concatenate([azimuth for i in
-                                       range(scenario_number_of_events)])
+                                       xrange(scenario_number_of_events)])
             if hasattr(dip, __len__):
-                dip = concatenate([dip for i in range(scenario_number_of_events)])
+                dip = concatenate([dip for i in xrange(scenario_number_of_events)])
             if hasattr(depth, __len__):
                 depth = concatenate([depth for i in
-                                     range(scenario_number_of_events)])
+                                     xrange(scenario_number_of_events)])
             if hasattr(ML, __len__):
-                ML = concatenate([ML for i in range(scenario_number_of_events)])
+                ML = concatenate([ML for i in xrange(scenario_number_of_events)])
             if hasattr(Mw, __len__):
-                Mw = concatenate([Mw for i in range(scenario_number_of_events)])
+                Mw = concatenate([Mw for i in xrange(scenario_number_of_events)])
             if fault_width is not None:
                 fault_width = concatenate([[fault_width] for i in 
-                                           range(scenario_number_of_events)])
+                                           xrange(scenario_number_of_events)])
             if fault_depth is not None:
                 fault_depth = concatenate([[fault_depth] for i in
-                                           range(scenario_number_of_events)])
+                                           xrange(scenario_number_of_events)])
 
         # There is a diff between width and fault width.
         # Width is rupture width.
@@ -406,7 +406,7 @@ class Event_Set(object):
 
         #print "magnitude.dtype.name", magnitude.dtype.name
         start = 0
-        for i in range(num_polygons):
+        for i in xrange(num_polygons):
             gp = generation_polygons[i]
             #ep = event polygon
             num = prob_number_of_events_in_zones[i]
@@ -657,7 +657,7 @@ class Event_Set(object):
         except:
             recurrence = None
         
-        for i in range(len(multi_multi_polygons_list)):
+        for i in xrange(len(multi_multi_polygons_list)):
             multi_multi_polygons = multi_multi_polygons_list[i]
             frame = MainWindow(None, i, 'Stand alone module',
                                self.rupture_start, self.rupture_end,
