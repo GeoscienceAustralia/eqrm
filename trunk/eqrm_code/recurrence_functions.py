@@ -12,9 +12,11 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import exp, log, sum, zeros, array, newaxis, where, allclose, r_
+from scipy import exp, log, sum, zeros, newaxis, where, array, allclose, r_,sin,cos,sqrt,arctan2,unique
+from math import atan2, radians 
 
 from eqrm_code.ANUGA_utilities import log as eqrmlog
+
 
 def calc_event_activity(event_set, sources,
                         prob_number_of_mag_sample_bins, weight,
@@ -43,7 +45,6 @@ def calc_event_activity(event_set, sources,
     eqrmlog.debug('Memory: event_activity_matrix weight_matrix created')
     eqrmlog.resource_usage()
 
-    
     # A hacky way of finding the source_zone_id
     # There should really be a source zone object that is
     # used by event set as well
@@ -64,6 +65,22 @@ def calc_event_activity(event_set, sources,
             A_mlow=zone_f_gr*grfctr
             
             
+            #length = calc_ll_dist()
+            
+            #if slip_rate>0 :
+                #A_mlow= calc_A_min_from_slip_rate(zone_b,zone_m0,zone_mhgh,slip_rate,source.area)
+                #A_min= calc_A_min_from_slip_rate(1,4,7,slip_rate,area)
+            # print "zone_f_gr", zone_f_gr
+            #print "grfctr",grfctr 
+            # print "A_mlow",A_mlow
+
+            #print "zone_mlow",zone_mlow
+            #print "zone_mhgh", zone_mhgh
+            #get the magnitude index where Mw is in the 
+            mag_ind=where((zone_mlow<event_set.Mw)&
+                          (event_set.Mw<zone_mhgh))[0]
+            #print "mag_ind", mag_ind
+            #import sys; sys.exit()
             # WAY ONE - to get the poly_id - probably slow
             # Does the source contain an event set rupture centroid
             # Get the events in this source zone.
@@ -74,6 +91,7 @@ def calc_event_activity(event_set, sources,
                             for lat,lon in zip(
                 event_set.rupture_centroid_lat,
                 event_set.rupture_centroid_lon)]
+            #print "where(contains_point)",where(contains_point)
             poly_ind=where(contains_point)[0]
 
             source.set_event_set_indexes(poly_ind)
@@ -92,10 +110,21 @@ def calc_event_activity(event_set, sources,
                 event_bins=array([int(i) for i in
                                   (event_set.Mw[event_ind]
                                    -zone_mlow)/delta_mag])
+
+                if len(event_bins)<(50*num_of_mag_sample_bins):
+                    new_mag_bin_centroids = array([where((sum(where(event_bins==[z], 1,0)))>0, mag_bin_centroids[z],0)for z in event_bins])
+                    new_mag_bin_centroids=unique(new_mag_bin_centroids)
+                    if len(mag_bin_centroids) <> len(new_mag_bin_centroids):
+                        list_mag_bin_centroids=new_mag_bin_centroids.tolist()
+                        event_bins=array([(list_mag_bin_centroids.index(mag_bin_centroids[z]))for z in event_bins])
+                        mag_bin_centroids= new_mag_bin_centroids
+                                             
                 grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
-                event_activity_source = (num_of_mag_sample_bins*A_mlow
-                                         *grpdf[event_bins]/len(event_ind))
-                
+                event_activity_source =array([(A_mlow*grpdf[z]/(sum(where(event_bins==z, 1,0))))for z in event_bins])
+                print "sum(event_activity_source) ", sum(event_activity_source)
+                print "A_mlow ", A_mlow
+                #old method: event_activity_source = (num_of_mag_sample_bins*A_mlow 
+                                         #*grpdf[event_bins]/len(event_ind))
                 event_activity_matrix[event_ind,j]=event_activity_source
                 event_activity.set_event_activity(event_ind,
                                                   event_activity_source)
@@ -224,3 +253,66 @@ def grscale(b,max_magnitude,new_min,min_magnitude):
 
     denominator=1-exp(-beta*(max_magnitude-min_magnitude))
     return numerator/denominator
+
+def calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate,area):
+    c=1.5
+    d=16.1
+    beta=log(10)*b
+    shear= 3*10**11
+    Mo_max=10**((c*mMax)+d)
+    #M_total= shear*area*slip_rate
+    numerator=shear*area*slip_rate*(c-b)*(1-exp(-beta*(mMax-mMin)))
+    denominator=Mo_max*exp(-beta*(mMax-mMin))
+    return numerator/denominator
+
+
+def calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,slip_rate,area):
+    c=1.5
+    d=16.1
+    m2=0.5
+    m1=1
+    beta=log(10)*b
+    m_c=mMax-m2
+    shear= float(3*10**11)
+    Mo_max=10**((c*mMax)+d)
+    c=1.5
+    K =((b*10**(-c/2)) /(c-b)) +((b*exp(beta)*(1-10**(-c/2)))/c)
+    K2 = (( b*10**(-c/2)) / (c - b))  + ( (b*exp(beta)*(1-10**(-c/2))) / (c))
+
+
+    numerator=shear*area*slip_rate*(1-exp(-beta*(mMax-mMin-0.5)))
+    denominator=Mo_max*K*exp(-beta*(mMax-mMin-0.5))
+    lambda_m1 =numerator/denominator
+    numerator=beta*lambda_m1*exp(-beta*(mMax-mMin-1.5))
+    denominator=2*(1-exp(-beta*(mMax-mMin-0.5)))
+    lambda_mc =numerator/denominator
+    lambda_m=lambda_m1+lambda_mc
+        
+    return lambda_m
+
+def calc_activity_from_slip_rate_Characteristic(magnitude,b,m0,mMax):
+    c=1.5
+    d=16.1
+    m2=0.5
+    m1=1.0
+    m=magnitude
+    beta=log(10)*b
+    m_c=mMax-m2
+    C=((beta*exp(-beta*(mMax-m0-m1-m2)))*m2)/(1-exp(-beta*(mMax-m0-m2)))
+    if magnitude <=m_c:
+        pdf=(beta*exp(-beta*(m-m0-m1-m2)))/((1-1*exp(-beta*(mMax-m0-m2)))*(1+C)) 
+    if magnitude >m_c:
+        pdf=(beta*exp(-beta*(m-m0-m1-m2)))/((1-1*exp(-beta*(mMax-m0-m2)))*(1+C))
+    return pdf
+        
+
+def calc_ll_dist(lat1,lon1,lat2,lon2):
+    R = 6371
+    dLat = radians(abs(lat2-lat1))
+    dLon = radians(abs(lon2-lon1))
+    a = (sin(dLat/2) * sin(dLat/2) +
+            cos(radians(lat1)) * cos(radians(lat2)) *
+            sin(dLon/2) * sin(dLon/2))
+    c = 2 * arctan2(sqrt(a), sqrt(1-a))
+    return R * c
+    
