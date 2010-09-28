@@ -479,7 +479,7 @@ def estimate_sigma(period, Mw, Rrup, Rjb, Ztor, Vs30, delta, tab2_coeffs, tab3_c
 # Handle various cases
 ######
 
-# cases from the CB08_MODEL.FOR program
+# cases from the CB08_MODEL.FOR program, limited for testing
 Rrup_M5 = [5.0, 10.0, 15.0, 30.0, 50.0, 100.0, 200.0]
 Rrup_M7 = [5.0, 10.0, 15.0, 30.0, 50.0, 100.0, 200.0]
 Rjb_M5_SS = [0.0, 8.7, 14.1, 29.6, 49.7, 99.9, 199.9]
@@ -489,12 +489,7 @@ Rjb_M7_RV = [0.0, 0.0, 6.2, 26., 47.7, 98.9, 199.4]
 Per = [0.01, 0.2, 1.0, 3.0]
 
 
-Frv = 0.0
-Fnm = 0.0
-delta = 90.0
-Vs30 = 760.0
-Z25 = 2.0
-
+# coefficient lists for different periods
 tab2_001 = [ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839]  # PGA
 tab3_001 = [0.478, 0.219, 0.166, 0.526, 0.551, 1.000] # PGA
 tab2_020 = [ -0.486, 0.500, -0.446, -0.398, -2.220, 0.170, 7.60, 0.280, -0.012, 0.490,  2.194, 0.040, 0.610,  748, -2.188, 1.856] # 0.20
@@ -509,6 +504,12 @@ tab3_per = [tab3_001, tab3_020, tab3_100, tab3_300]
 
 # strike/slip faulting
 
+Frv = 0.0
+Fnm = 0.0
+delta = 90.0
+Vs30 = 760.0
+Z25 = 2.0
+
 for (pi, period) in enumerate(Per):
     Mw = 5.0
     Ztor = 5.0
@@ -517,10 +518,10 @@ for (pi, period) in enumerate(Per):
     tab3 = tab3_per[pi]
     print('\nT=%6.3f Mw=%.1f Flt=%s Frv=%.1f Fnm=%.1f Ztor=%4.1f Dip=%4.1f Vs30=%6.1f Z25=%4.1f\n'
           % (period, Mw, Fltype, Frv, Fnm, Ztor, delta, Vs30, Z25))
-    print(' Rrup      Rjb       Y         Sigma     Tau       SigT      SigArb')
+    print(' Rrup       Rjb        Y          Sigma      Tau        SigT       SigArb')
     for i in range(7):
         (lnY, lnE, tau, sig, sigarb) = CB08_MODEL(period, Mw, Rrup_M5[i], Rjb_M5_SS[i], Ztor, Vs30, delta, tab2, tab3)
-        print(' %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E'
+        print(' %6.4E %6.4E %6.4E %6.4E %6.4E %6.4E %6.4E'
               % (Rrup_M5[i], Rjb_M5_SS[i], math.exp(lnY), math.exp(lnE), tau, sig, sigarb))
 
     Mw = 7.0
@@ -528,10 +529,10 @@ for (pi, period) in enumerate(Per):
     Fltype = 'SS'
     print('\nT=%6.3f Mw=%.1f Flt=%s Frv=%.1f Fnm=%.1f Ztor=%4.1f Dip=%4.1f Vs30=%6.1f Z25=%4.1f\n'
           % (period, Mw, Fltype, Frv, Fnm, Ztor, delta, Vs30, Z25))
-    print(' Rrup      Rjb       Y         Sigma     Tau       SigT      SigArb')
+    print(' Rrup       Rjb        Y          Sigma      Tau        SigT       SigArb')
     for i in range(7):
         (lnY, lnE, tau, sig, sigarb) = CB08_MODEL(period, Mw, Rrup_M7[i], Rjb_M7_SS[i], Ztor, Vs30, delta, tab2, tab3)
-        print(' %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E'
+        print(' %6.4E %6.4E %6.4E %6.4E %6.4E %6.4E %6.4E'
               % (Rrup_M7[i], Rjb_M7_SS[i], math.exp(lnY), math.exp(lnE), tau, sig, sigarb))
 
 # reverse faulting
@@ -550,10 +551,10 @@ for (pi, period) in enumerate(Per):
     tab3 = tab3_per[pi]
     print('\nT=%6.3f Mw=%.1f Flt=%s Frv=%.1f Fnm=%.1f Ztor=%4.1f Dip=%4.1f Vs30=%6.1f Z25=%4.1f\n'
           % (period, Mw, Fltype, Frv, Fnm, Ztor, delta, Vs30, Z25))
-    print(' Rrup      Rjb       Y        Sigma    Tau       SigT      SigArb')
+    print(' Rrup       Rjb        Y         Sigma     Tau        SigT       SigArb')
     for i in range(7):
         (lnY, lnE, tau, sig, sigarb) = CB08_MODEL(period, Mw, Rrup_M5[i], Rjb_M5_RV[i], Ztor, Vs30, delta, tab2, tab3)
-        print(' %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E'
+        print(' %6.4E %6.4E %6.4E %6.4E %6.4E %6.4E %6.4E'
               % (Rrup_M5[i], Rjb_M5_RV[i], math.exp(lnY), math.exp(lnE), tau, sig, sigarb))
 
     Mw = 7.0
@@ -561,15 +562,17 @@ for (pi, period) in enumerate(Per):
     Fltype = 'RV'
     print('\nT=%6.3f Mw=%.1f Flt=%s Frv=%.1f Fnm=%.1f Ztor=%4.1f Dip=%4.1f Vs30=%6.1f Z25=%4.1f\n'
           % (period, Mw, Fltype, Frv, Fnm, Ztor, delta, Vs30, Z25))
-    print(' Rrup      Rjb       Y        Sigma    Tau       SigT      SigArb')
+    print(' Rrup       Rjb        Y         Sigma     Tau        SigT       SigArb')
     for i in range(7):
         (lnY, lnE, tau, sig, sigarb) = CB08_MODEL(period, Mw, Rrup_M7[i], Rjb_M7_RV[i], Ztor, Vs30, delta, tab2, tab3)
-        print(' %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E %5.3E'
+        print(' %6.4E %6.4E %6.4E %6.4E %6.4E %6.4E %6.4E'
               % (Rrup_M7[i], Rjb_M7_RV[i], math.exp(lnY), math.exp(lnE), tau, sig, sigarb))
 
         
 sys.exit(0)
 
+###################################################################################################
+# Code here is old - could still be used to check against opensha.org
 ###################################################################################################
 
 Vs30 = 760.0
