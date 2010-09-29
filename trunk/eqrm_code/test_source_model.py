@@ -292,7 +292,7 @@ class Test_Source_model(unittest.TestCase):
             events,
             prob_number_of_mag_sample_bins,
             event_activity)
-        event_activity_calc = new_event_set.event_activity
+        event_activity_calc = events.event_activity
         # Warning - this is just the results from running
         # calculate_recurrence at this version.
         # It is not independantly calculated to be correct

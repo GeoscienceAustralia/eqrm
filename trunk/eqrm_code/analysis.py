@@ -197,10 +197,10 @@ def main(parameter_handle,
         # Generating the event set (i.e. a synthetic event catalogue)
         #  - see manual for details
         # FIXME DSG-DSG
-        #generate_synthetic_events and Source_Mset_scenario_event_activityodels seem too connected.
+        #generate_synthetic_events and Source_Models seem too connected.
         # They both need fid_sourcepolys and prob_min_mag_cutoff.
         # Yet can these values be different?
-        events = Event_Set.generate_synthetic_events(
+        event_set = Event_Set.generate_synthetic_events(
             fid_genpolys=fid_sourcepolys,
             fault_width=THE_PARAM_T.max_width,
             azi=THE_PARAM_T.prob_azimuth_in_zones,
@@ -212,21 +212,20 @@ def main(parameter_handle,
             prob_number_of_events_in_zones= \
             THE_PARAM_T.prob_number_of_events_in_zones)
 
-        log.debug('Memory: events created')
+        log.debug('Memory: event_set created')
         log.resource_usage()
-        # event activity is calculated here and the events are subsampled.
+        # event activity is calculated here and the event_set are subsampled.
         num_spawning_bins = 1
-        event_activity = Event_Activity(len(events),
+        event_activity = Event_Activity(len(event_set),
                                         len(THE_PARAM_T.atten_model_weights),
                                         num_spawning_bins)
-        event_set = source_mods.calculate_recurrence(
-            events,
+        source_mods.calculate_recurrence(
+            event_set,
             THE_PARAM_T.prob_number_of_mag_sample_bins,
             event_activity)
 
         log.debug('Memory: event activity has been calculated')
         log.resource_usage()
-        del events
         
         # Add the atten model stuff to the zone source 
         # This assumes there is one source model
