@@ -70,7 +70,7 @@ class Source_Models(object):
             prob_number_of_mag_sample_bins)
         # Assuming only 1 source model
         event_activity.set_event_activity(event_activity_matrix)
-        return event_set
+        
     
     def stratify_source_models_obsolete(self,independent_polygons = None):
         """
