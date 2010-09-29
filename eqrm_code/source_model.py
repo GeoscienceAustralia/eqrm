@@ -60,14 +60,14 @@ class Source_Models(object):
         #print "event_set", event_set
         source_models = self.source_models
 
-        new_event_set = calc_event_activity(
+        event_activity_matrix = calc_event_activity(
             event_set,
             source_models,
             prob_number_of_mag_sample_bins,
-            self.weight,
-            event_activity)
-        
-        return new_event_set
+            self.weight)
+        # Assuming only 1 source model
+        event_activity.set_event_activity(event_activity_matrix[:,0])
+        return event_set
     
     def stratify_source_models_obsolete(self,independent_polygons = None):
         """
