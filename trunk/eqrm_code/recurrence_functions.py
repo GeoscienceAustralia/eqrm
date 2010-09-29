@@ -120,9 +120,10 @@ def calc_event_activity(event_set, sources,
                         mag_bin_centroids= new_mag_bin_centroids
                                              
                 grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
+                
                 event_activity_source =array([(A_mlow*grpdf[z]/(sum(where(event_bins==z, 1,0))))for z in event_bins])
-                print "sum(event_activity_source) ", sum(event_activity_source)
-                print "A_mlow ", A_mlow
+                #print "sum(event_activity_source) ", sum(event_activity_source)
+                #print "A_mlow ", A_mlow
                 #old method: event_activity_source = (num_of_mag_sample_bins*A_mlow 
                                          #*grpdf[event_bins]/len(event_ind))
                 event_activity_matrix[event_ind,j]=event_activity_source
