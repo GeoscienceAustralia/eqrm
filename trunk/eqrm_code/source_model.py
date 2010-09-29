@@ -11,7 +11,7 @@
   
   Copyright 2007 by Geoscience Australia
 """
-from scipy import zeros
+from scipy import zeros, where
 
 from eqrm_code.recurrence_functions import calc_event_activity
 from eqrm_code.polygon_class import polygon_object
@@ -60,6 +60,10 @@ class Source_Models(object):
         #print "event_set", event_set
         source_models = self.source_models
 
+        for szp in source_models[0]:
+            if szp.event_set_indexes is None:
+                szp.determine_event_set_indexes(event_set)
+                
         event_activity_matrix = calc_event_activity(
             event_set,
             source_models[0],
@@ -162,6 +166,15 @@ class Source_Zone_Polygon(polygon_object):
         # indexes to the event sets in this source zone
         self.event_set_indexes = None
 
+    def determine_event_set_indexes(self, event_set):
+        contains_point=[self.contains_point((lat,lon), use_cach=False) \
+                        for lat,lon in zip(
+        event_set.rupture_centroid_lat,
+        event_set.rupture_centroid_lon)]
+        poly_ind=where(contains_point)[0]
+        
+        self.set_event_set_indexes(poly_ind)
+        
     def set_event_set_indexes(self, event_indexes):
         """
         Input an array of integers which represent the events in a zone source.

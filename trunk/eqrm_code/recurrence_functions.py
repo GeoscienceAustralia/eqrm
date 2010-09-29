@@ -43,26 +43,18 @@ def calc_event_activity(event_set, source_model,
     # which in future versions of EQRM may not be the same
     # as source zone polygons.
     for source in source_model: # loop over source zones 
-        zone_m0=source.min_magnitude            
-        zone_mlow=max(source.prob_min_mag_cutoff,zone_m0)
-        zone_mhgh=source.max_magnitude
-        zone_b=source.b
-        zone_f_gr=source.Lambda_Min
+        zone_mlow = max(source.prob_min_mag_cutoff, source.min_magnitude)
+        zone_mhgh = source.max_magnitude
+               
+        poly_ind = source.event_set_indexes
+        mag_ind = where((zone_mlow < event_set.Mw[poly_ind])&
+                        (event_set.Mw[poly_ind] < zone_mhgh))[0]
         
-        grfctr=grscale(zone_b,zone_mhgh,zone_mlow,zone_m0)
-        A_mlow=zone_f_gr*grfctr
-        
-        contains_point=[source.contains_point((lat,lon), use_cach=False) \
-                        for lat,lon in zip(
-        event_set.rupture_centroid_lat,
-        event_set.rupture_centroid_lon)]
-        poly_ind=where(contains_point)[0]
-        
-        source.set_event_set_indexes(poly_ind)
-        
-        mag_ind=where((zone_mlow<event_set.Mw[poly_ind])&
-                      (event_set.Mw[poly_ind]<zone_mhgh))[0]
         if len(mag_ind)>0:
+            zone_b = source.b
+            grfctr = grscale(zone_b,zone_mhgh,zone_mlow, source.min_magnitude)
+            A_mlow = source.Lambda_Min * grfctr
+            
             event_ind= poly_ind[mag_ind]
             #event_ind=mag_ind[poly_ind]
             num_of_mag_sample_bins = source.number_of_mag_sample_bins
@@ -70,32 +62,36 @@ def calc_event_activity(event_set, source_model,
                                         num_of_mag_sample_bins)
 
             # bin the event magnitudes
-            delta_mag=(zone_mhgh-zone_mlow)/num_of_mag_sample_bins
-            event_bins=array([int(i) for i in
-                              (event_set.Mw[event_ind]
-                               -zone_mlow)/delta_mag])
+            delta_mag = (zone_mhgh-zone_mlow)/num_of_mag_sample_bins
+            event_bins = array([int(i) for i in
+                                (event_set.Mw[event_ind]
+                                 -zone_mlow)/delta_mag])
 
+            # Check to see if all mag_bin_centroids have events
+            # Assume that if there are 50 events for every bin
+            # all bins will have events.
             if len(event_bins)<(50*num_of_mag_sample_bins):
                 new_mag_bin_centroids = array(
                     [where((sum(
-                    where(event_bins==[z], 1,0)))>0,
+                    where(event_bins == [z], 1,0)))>0,
                            mag_bin_centroids[z],0)for z in event_bins])
                 
                 new_mag_bin_centroids=unique(new_mag_bin_centroids)
                 if len(mag_bin_centroids) <> len(new_mag_bin_centroids):
-                    list_mag_bin_centroids=new_mag_bin_centroids.tolist()
-                    event_bins=array(
+                    list_mag_bin_centroids = new_mag_bin_centroids.tolist()
+                    event_bins = array(
                         [(list_mag_bin_centroids.index(
-                        mag_bin_centroids[z]))for z in event_bins])
+                        mag_bin_centroids[z])) for z in event_bins])
                     mag_bin_centroids= new_mag_bin_centroids
 
                                          
-            grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
+            grpdf = m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
             
-            event_activity_source =array(
+            event_activity_source = array(
                 [(A_mlow*grpdf[z]/(sum(where(
-                event_bins==z, 1,0))))for z in event_bins])
-            event_activity_matrix[event_ind]=event_activity_source
+                event_bins == z, 1,0)))) for z in event_bins])
+            event_activity_matrix[event_ind] = event_activity_source
+            
         event_set.set_event_activity(event_activity_matrix)
 
     # This should be used to remove events from the scenario's
@@ -112,46 +108,6 @@ def calc_event_activity(event_set, source_model,
 
     return event_activity_matrix 
     
-    #event_activity_index = where(event_set.event_activity!=0)
-    # FIXME DSG - Make the weight_matrix an object. These calc's
-    # should occur in this object.
-    # Then this object can be tested seperately
-    #return event_set[event_activity_index]
-
-
-    """
-    #print "weight_matrix", weight_matrix
-    weight_sum=weight_matrix.sum(axis=1)
-    non_zerod_ind=where(weight_sum!=0)[0]
-#     zerod_ind=where(weight_sum==0)[0]
-#     if len(zerod_ind) > 0:
-#         print "**************************************"
-#         print "zerod_ind", zerod_ind
-#         print "**************************************"
-#         import sys; sys.exit() 
-    #print 'zero_ind',where(weight_sum==0)[0]
-    #print "len(non_zerod_ind)", len(non_zerod_ind)
-    #print 'len(zero_ind)',len(where(weight_sum==0)[0]) # this is 4 indexes
-    weight_matrix=weight_matrix[non_zerod_ind,:]/weight_sum[
-        non_zerod_ind][:,newaxis]
-
-    # test that the normalised weight matrix sums to 1 for all events:
-    if not (weight_matrix.sum(axis=1)==1).all():
-        raise Exception('weight_matrix did not sum to 1')
-    event_activity=event_activity_matrix[non_zerod_ind,:]*weight_matrix
-    event_activity=event_activity.sum(axis=1)
-    #print "event_activity", event_activity
-     # create a sub set of the current events.
-    new_event_set=event_set[non_zerod_ind]
-    # FIXME DSG Think about the object design.
-    # Maybe this method sould be within event set, since it
-    # is adding an attribute to event_set
-    new_event_set.set_event_activity(event_activity)
-    #print "new_event_set.event_activity", new_event_set.event_activity
-    # returning an event set with the attribute event_activity tacked on.
-    """
-    return event_set
-                
 
 def m2grpdfb(b,m,m0,mmax):
     """
