@@ -837,15 +837,20 @@ class Event_Activity(object):
 
     def set_scenario_event_activity(self):
         event_indexes = arange(self.num_events)
-        self.set_event_activity(event_indexes, ones((self.num_events)))
+        self.set_event_activity(ones((self.num_events)), event_indexes)
+
         
-    def set_event_activity(self, event_indexes, event_activities):
+    def set_event_activity(self, event_activities, event_indexes=None):
         """
         event_indexes - the indexes of the events relating to the
           event activities
         """
+        if event_indexes == None:
+            event_indexes = arange(self.num_events)
         assert len(event_indexes) == len(event_activities)
         self.event_activity[event_indexes, 0, 0] = event_activities
+
+        
     def scenario_attenuation_logic_split(self, atten_model_weights):
         source_model = Dummy()
         source_model.event_set_indexes = arange((self.num_events))

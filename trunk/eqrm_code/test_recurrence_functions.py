@@ -132,7 +132,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         event_set.source_zone_id = r_[0.0:0.0:30j]
         #print "len(event_set)", len(event_set)
         
-        new_event_set = calc_event_activity(event_set, sources,
+        event_activity_matrix = calc_event_activity(event_set, sources,
                                             prob_number_of_mag_sample_bins,
                                             weight,
                                             )
