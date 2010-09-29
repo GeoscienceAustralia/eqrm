@@ -18,29 +18,20 @@ from math import atan2, radians
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 
 
-def calc_event_activity(event_set, sources,
-                        prob_number_of_mag_sample_bins, weight):
+def calc_event_activity(event_set, source_model,
+                        prob_number_of_mag_sample_bins):
     """
     event_set - Event_Set instance - this function uses Mw and rupture_centroid
                                and returns a subset of event_set
-    sources - a list of Source_Model.
+    source_model - The source_model - holds a list of source_zone_polygons.
     prob_number_of_mag_sample_bins - number of magnitude sample bins.
 
     when analysis uses this function, the weight used is a constant of [1.0]
     EQRM can currently only handle one source model.
     A source model has many source polygons.
     """
-    # print "event_set", event_set
-    #print "sources", sources
-    #print "len(sources)", len(sources)
-    #print "prob_number_of_mag_sample_bins", prob_number_of_mag_sample_bins
-    #import sys; sys.exit()
-
-    # EQRM currently does just 1 source
-    assert len(weight) == len(sources) == 1
-        
-    event_activity_matrix=zeros((len(event_set),len(sources)),float)
-    #weight_matrix=zeros((len(event_set),len(sources)),float)
+    
+    event_activity_matrix=zeros((len(event_set)),float)
     eqrmlog.debug('Memory: event_activity_matrix weight_matrix created')
     eqrmlog.resource_usage()
 
@@ -51,88 +42,61 @@ def calc_event_activity(event_set, sources,
     # Maybe.  But event set uses generation polygons,
     # which in future versions of EQRM may not be the same
     # as source zone polygons.
-    for j in range(len(sources)): # loop over all source models
-        for i in range(len(sources[j])): # loop over source zones 
-            source=sources[j][i]
-            zone_m0=source.min_magnitude            
-            zone_mlow=max(source.prob_min_mag_cutoff,zone_m0)
-            zone_mhgh=source.max_magnitude
-            zone_b=source.b
-            zone_f_gr=source.Lambda_Min
+    for source in source_model: # loop over source zones 
+        zone_m0=source.min_magnitude            
+        zone_mlow=max(source.prob_min_mag_cutoff,zone_m0)
+        zone_mhgh=source.max_magnitude
+        zone_b=source.b
+        zone_f_gr=source.Lambda_Min
+        
+        grfctr=grscale(zone_b,zone_mhgh,zone_mlow,zone_m0)
+        A_mlow=zone_f_gr*grfctr
+        
+        contains_point=[source.contains_point((lat,lon), use_cach=False) \
+                        for lat,lon in zip(
+        event_set.rupture_centroid_lat,
+        event_set.rupture_centroid_lon)]
+        poly_ind=where(contains_point)[0]
+        
+        source.set_event_set_indexes(poly_ind)
+        
+        mag_ind=where((zone_mlow<event_set.Mw[poly_ind])&
+                      (event_set.Mw[poly_ind]<zone_mhgh))[0]
+        if len(mag_ind)>0:
+            event_ind= poly_ind[mag_ind]
+            #event_ind=mag_ind[poly_ind]
+            num_of_mag_sample_bins = source.number_of_mag_sample_bins
+            mag_bin_centroids=make_bins(zone_mlow,zone_mhgh,
+                                        num_of_mag_sample_bins)
 
-            grfctr=grscale(zone_b,zone_mhgh,zone_mlow,zone_m0)
-            A_mlow=zone_f_gr*grfctr
-            
-            
-            #length = calc_ll_dist()
-            
-            #if slip_rate>0 :
-                #A_mlow= calc_A_min_from_slip_rate(zone_b,zone_m0,zone_mhgh,slip_rate,source.area)
-                #A_min= calc_A_min_from_slip_rate(1,4,7,slip_rate,area)
-            # print "zone_f_gr", zone_f_gr
-            #print "grfctr",grfctr 
-            # print "A_mlow",A_mlow
+            # bin the event magnitudes
+            delta_mag=(zone_mhgh-zone_mlow)/num_of_mag_sample_bins
+            event_bins=array([int(i) for i in
+                              (event_set.Mw[event_ind]
+                               -zone_mlow)/delta_mag])
 
-            #print "zone_mlow",zone_mlow
-            #print "zone_mhgh", zone_mhgh
-            #get the magnitude index where Mw is in the 
-            mag_ind=where((zone_mlow<event_set.Mw)&
-                          (event_set.Mw<zone_mhgh))[0]
-            #print "mag_ind", mag_ind
-            #import sys; sys.exit()
-            # WAY ONE - to get the poly_id - probably slow
-            # Does the source contain an event set rupture centroid
-            # Get the events in this source zone.
-            # mag_ind limits the events checked.
-            # This info could already be known, since EQRM generated the events
-            # Should this function only be used on generated events though?
-            contains_point=[source.contains_point((lat,lon), use_cach=False) \
-                            for lat,lon in zip(
-                event_set.rupture_centroid_lat,
-                event_set.rupture_centroid_lon)]
-            #print "where(contains_point)",where(contains_point)
-            poly_ind=where(contains_point)[0]
-
-            source.set_event_set_indexes(poly_ind)
-            
-            mag_ind=where((zone_mlow<event_set.Mw[poly_ind])&
-                          (event_set.Mw[poly_ind]<zone_mhgh))[0]
-            if len(mag_ind)>0:
-                event_ind= poly_ind[mag_ind]
-                #event_ind=mag_ind[poly_ind]
-                num_of_mag_sample_bins = source.number_of_mag_sample_bins
-                mag_bin_centroids=make_bins(zone_mlow,zone_mhgh,
-                                            num_of_mag_sample_bins)
-
-                # bin the event magnitudes
-                delta_mag=(zone_mhgh-zone_mlow)/num_of_mag_sample_bins
-                event_bins=array([int(i) for i in
-                                  (event_set.Mw[event_ind]
-                                   -zone_mlow)/delta_mag])
-
-                if len(event_bins)<(50*num_of_mag_sample_bins):
-                    new_mag_bin_centroids = array([where((sum(where(event_bins==[z], 1,0)))>0, mag_bin_centroids[z],0)for z in event_bins])
-                    new_mag_bin_centroids=unique(new_mag_bin_centroids)
-                    if len(mag_bin_centroids) <> len(new_mag_bin_centroids):
-                        list_mag_bin_centroids=new_mag_bin_centroids.tolist()
-                        event_bins=array([(list_mag_bin_centroids.index(mag_bin_centroids[z]))for z in event_bins])
-                        mag_bin_centroids= new_mag_bin_centroids
-                                             
-                grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
+            if len(event_bins)<(50*num_of_mag_sample_bins):
+                new_mag_bin_centroids = array(
+                    [where((sum(
+                    where(event_bins==[z], 1,0)))>0,
+                           mag_bin_centroids[z],0)for z in event_bins])
                 
-                event_activity_source =array([(A_mlow*grpdf[z]/(sum(where(event_bins==z, 1,0))))for z in event_bins])
-                #print "sum(event_activity_source) ", sum(event_activity_source)
-                #print "A_mlow ", A_mlow
-                #old method: event_activity_source = (num_of_mag_sample_bins*A_mlow 
-                                         #*grpdf[event_bins]/len(event_ind))
-                event_activity_matrix[event_ind,j]=event_activity_source
-                #weight_matrix[event_ind,j]=weight[j]
+                new_mag_bin_centroids=unique(new_mag_bin_centroids)
+                if len(mag_bin_centroids) <> len(new_mag_bin_centroids):
+                    list_mag_bin_centroids=new_mag_bin_centroids.tolist()
+                    event_bins=array(
+                        [(list_mag_bin_centroids.index(
+                        mag_bin_centroids[z]))for z in event_bins])
+                    mag_bin_centroids= new_mag_bin_centroids
 
-            #endif
-        #endfor
-        # NOTE, no weights have been applied.
-        event_set.set_event_activity(event_activity_matrix[:,j])
-    #endfor
+                                         
+            grpdf=m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
+            
+            event_activity_source =array(
+                [(A_mlow*grpdf[z]/(sum(where(
+                event_bins==z, 1,0))))for z in event_bins])
+            event_activity_matrix[event_ind]=event_activity_source
+        event_set.set_event_activity(event_activity_matrix)
 
     # This should be used to remove events from the scenario's
     # that are not in the mag range.
