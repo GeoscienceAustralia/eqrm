@@ -60,6 +60,33 @@ import math
 # [-0.9222,  0.0000, -0.001440, 0.003223, 0.4799, 0.005517, 320.9,  0.2295],  # 5.0
 # [-0.8346,  0.0000, -0.001369, 0.001134, 0.4800, 0.005517, 320.3,  0.2660],  # 7.5
 # [-0.7332,  0.0000, -0.001361, 0.000515, 0.4800, 0.005517, 320.1,  0.2682]]) # 10.0
+#
+# Chiou08_Table4 = array([
+#  tau1    tau2    sigma1  sigma2  sigma3  sigma4
+# [0.3437, 0.2637, 0.4458, 0.3459, 0.8000, 0.0663],  # pga
+# [0.3437, 0.2637, 0.4458, 0.3459, 0.8000, 0.0663],  # 0.01
+# [0.3471, 0.2671, 0.4458, 0.3459, 0.8000, 0.0663],  # 0.02
+# [0.3603, 0.2803, 0.4535, 0.3537, 0.8000, 0.0663],  # 0.03
+# [0.3718, 0.2918, 0.4589, 0.3592, 0.8000, 0.0663],  # 0.04
+# [0.3848, 0.3048, 0.4630, 0.3635, 0.8000, 0.0663],  # 0.05
+# [0.3878, 0.3129, 0.4702, 0.3713, 0.8000, 0.0663],  # 0.075
+# [0.3835, 0.3152, 0.4747, 0.3769, 0.8000, 0.0663],  # 0.1
+# [0.3719, 0.3128, 0.4798, 0.3847, 0.8000, 0.0612],  # 0.15
+# [0.3601, 0.3076, 0.4816, 0.3902, 0.8000, 0.0530],  # 0.2
+# [0.3522, 0.3047, 0.4815, 0.3946, 0.7999, 0.0457],  # 0.25
+# [0.3438, 0.3005, 0.4801, 0.3981, 0.7997, 0.0398],  # 0.3
+# [0.3351, 0.2984, 0.4758, 0.4036, 0.7988, 0.0312],  # 0.4
+# [0.3353, 0.3036, 0.4710, 0.4079, 0.7966, 0.0255],  # 0.5
+# [0.3429, 0.3205, 0.4621, 0.4157, 0.7792, 0.0175],  # 0.75
+# [0.3577, 0.3419, 0.4581, 0.4213, 0.7504, 0.0133],  # 1.0
+# [0.3769, 0.3703, 0.4493, 0.4213, 0.7136, 0.0090],  # 1.5
+# [0.4023, 0.4023, 0.4459, 0.4213, 0.7035, 0.0068],  # 2.0
+# [0.4406, 0.4406, 0.4433, 0.4213, 0.7006, 0.0045],  # 3.0
+# [0.4784, 0.4784, 0.4424, 0.4213, 0.7001, 0.0034],  # 4.0
+# [0.5074, 0.5074, 0.4420, 0.4213, 0.7000, 0.0027],  # 5.0
+# [0.5328, 0.5328, 0.4416, 0.4213, 0.7000, 0.0018],  # 7.5
+# [0.5542, 0.5542, 0.4414, 0.4213, 0.7000, 0.0014]]) # 10.0
+
 
 ######
 # Globals
@@ -116,6 +143,28 @@ def eqn_13(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab3_
 
     return eqn_13b(Yref, Vs30, Z1, tab3_coeffs)
 
+def eqn_19(M, tab4_coeffs):
+    (tau1, tau2, sigma1, sigma2, sigma3, sigma4) = tab4_coeffs
+
+    return tau1 + ((tau2-tau1)/2)*(min(max(M, 5), 7) - 5)
+
+def eqn_20(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab4_coeffs):
+    (tau1, tau2, sigma1, sigma2, sigma3, sigma4) = tab4_coeffs
+
+    NL = eqn_20a(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab4_coeffs)
+    sigma = (sigma1 + ((sigma2-sigma1)/2)*(min(max(M, 5), 7)-5) + sigma4*AS)*math.sqrt((sigma3*Finferred + 0.7*Fmeasured)+(1+NL)*(1+NL))
+
+def eqn_20a(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab4_coeffs):
+    return 0
+
+def eqn_21(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab4_coeffs):
+#    NL0 = 0
+#    tau = eqn_19(M, tab4_coeffs)
+#    Enl0 = 0
+#
+#    return math.sqrt((1_NL0)*(1+NL0)*tau*tau+Enl0*Enl0)
+    return 0
+
 ######
 # handle doing one estimate
 ######
@@ -127,6 +176,16 @@ def estimate(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab
     flag = ' ' if tol < Tolerance else '*'
     print('period=%.2f, Vs30=%.1f, Rx=%5.1f, M=%.1f\tlnY=%f\tg=%f, expected=%f, tol=%.2f%s'
           % (period, Vs30, Rx, M, lnY, g, expected, tol, flag))
+
+def estimate_sigma(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab4_coeffs, expected):
+#    Et = eqn_21(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab4_coeffs)
+#    g = math.exp(lnY)
+#    tol = abs(g-expected)/max(g, expected) 
+#    flag = ' ' if tol < Tolerance else '*'
+#    print('period=%.2f, Vs30=%.1f, Rx=%5.1f, M=%.1f\tlnY=%f\tg=%f, expected=%f, tol=%.2f%s'
+#          % (period, Vs30, Rx, M, lnY, g, expected, tol, flag))
+    pass
+
 
 ######
 # Handle various cases
@@ -145,7 +204,7 @@ delta = 90		# vertical strike-slip fault
 print('Chiou08')
 print('Frv=%d, Fnm=%d, Fhw=%d' % (Frv, Fnm, Fhw))
 Vs30 = 520.0		# from figure 19, page 206
-print('Rock, delta=%d %s' % (delta, '*' * 65))
+print('Rock, delta=%d %s' % (delta, '*' * 80))
 
 # period = 0.01, M=5.5
 period = 0.01
@@ -187,6 +246,7 @@ expected = 0.048
 estimate(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab3_coeffs, expected)
 
 
+print('-' * 95)
 
 
 # period = 0.2, M=5.5
@@ -229,6 +289,7 @@ expected = 0.10
 estimate(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab3_coeffs, expected)
 
 
+print('-' * 95)
 
 
 # period = 1.0, M=5.5
@@ -271,6 +332,7 @@ expected = 0.05
 estimate(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab3_coeffs, expected)
 
 
+print('-' * 95)
 
 
 # period = 3.0, M=5.5
@@ -313,10 +375,39 @@ expected = 0.015
 estimate(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab3_coeffs, expected)
 
 
+print('=' * 95)
+
+
+# period = 0.01, M=5.5
+period = 0.01
+M = 5.5
+tab4_coeffs = [0.3437, 0.2637, 0.4458, 0.3459, 0.8000, 0.0663]  # 0.01
+
+Rrup = Rjb = Rx = 5.0
+expected = 0.25
+
+estimate_sigma(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab4_coeffs, expected)
+
+Rrup = Rjb = Rx = 20.0
+expected = 0.065
+
+estimate_sigma(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab4_coeffs, expected)
+
+Rrup = Rjb = Rx = 100.0
+expected = 0.0062
+
+estimate_sigma(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab4_coeffs, expected)
+
+
+
+
+
+
+
 
 
 Vs30 = 310.0		# from figure 19, page 206
-print('Soil, delta=%d %s' % (delta, '*' * 65))
+print('Soil, delta=%d %s' % (delta, '*' * 80))
 
 # period = 0.01, M=5.5
 period = 0.01
@@ -358,6 +449,7 @@ expected = 0.059
 estimate(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab3_coeffs, expected)
 
 
+print('-' * 95)
 
 
 # period = 0.2, M=5.5
@@ -400,6 +492,7 @@ expected = 0.13
 estimate(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab3_coeffs, expected)
 
 
+print('-' * 95)
 
 
 # period = 1.0, M=5.5
@@ -442,6 +535,7 @@ expected = 0.078
 estimate(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab3_coeffs, expected)
 
 
+print('-' * 95)
 
 
 # period = 3.0, M=5.5
@@ -485,4 +579,5 @@ estimate(M, Rrup, Ztor, Rjb, Rx, Frv, Fnm, AS, Vs30, delta, tab2_coeffs, tab3_co
 
 
 
+print('#' * 95)
 
