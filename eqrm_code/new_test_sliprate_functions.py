@@ -47,7 +47,7 @@ class Test_Sliprate_functions(unittest.TestCase):
                                                                       slip_rate_mm,
                                                                       area_kms)
         print "\nA_min from -slip rate Characteristic: ", A_minCharacteristic 
-        
+        print "\n bin centroids(magnitudes): ",bin_centroids
         pdfs= calc_activities_from_slip_rate_Characteristic(bin_centroids, b, 
                                                               prob_min_mag_cutoff, 
                                                               max_magnitude)
