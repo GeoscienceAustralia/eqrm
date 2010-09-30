@@ -580,6 +580,8 @@ class Test_Event_Set(unittest.TestCase):
         
         self.assert_(len(events)==3)
         
+        os.remove(file_name)
+        
     def test_event_set_subsetting(self):
         rupture_centroid_lat = [-33.351170370959323, -32.763381339789468]
         rupture_centroid_lon = [151.45946928787703, 151.77787395867014]
