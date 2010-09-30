@@ -10,7 +10,7 @@ from os.path import join
 from scipy import array, allclose
 
 from eqrm_code.csv_interface import csv_to_arrays
-from eqrm_code.aggregate_building_db import aggregate_building_db, \
+from eqrm_code.aggregate_building_db_cd_code import aggregate_building_db, \
      Building_db_writer
 from eqrm_code.structures import attribute_conversions, Structures
 from eqrm_code.util import dict2csv
@@ -18,7 +18,7 @@ from eqrm_code.util import dict2csv
 """
 """
 
-class Test_Structures(unittest.TestCase):
+class Agg_db_cd_code(unittest.TestCase):
     
     def setUp(self):
         pass
@@ -76,7 +76,8 @@ class Test_Structures(unittest.TestCase):
             'FLOOR_AREA':[50,40,10],
             'SURVEY_FACTOR':[1,2,1],
             'FCB_USAGE':[111,491,491],
-            'SITE_CLASS':['A','B','B']
+            'SITE_CLASS':['A','B','B'],
+            'CD_CODE':[111,491,491]
             }
         attribute_dic, site = write_aggregate_read_csv(attribute_dic)
         #print "test_aggregate_building_db site", site
@@ -102,9 +103,57 @@ class Test_Structures(unittest.TestCase):
                 self.assertEqual(site['CONTENTS_COST_DENSITY'][i] , 30)
                 self.assertEqual(site['FCB_USAGE'][i] , 491)
                 self.assertEqual(site['POSTCODE'][i] , 2291)
-            
+     
+    def test_aggregate_building_db2(self):
+        # Note the survey_factor is used to weight the values
+        # that are averaged.
+        attribute_dic={
+            'BID':[1,2,3], # This is really ufi
+            'LATITUDE':[-1.20,-1.15,-1.60],
+            'LONGITUDE':[1.30,1.15,1.60],
+            'STRUCTURE_CLASSIFICATION':['URMLMETAL','URMLMETAL','URMLMETAL'],
+            'STRUCTURE_CATEGORY':['BUILDING','BUILDING','BUILDING'],
+            'HAZUS_USAGE':['COM5','COM5','COM5'],
+            'SUBURB':['MEREWETHER','MEREWETHER','MEREWETHER'],
+            'POSTCODE':[2291,2291,2291],
+            'PRE1989':[0,0,0],
+            'HAZUS_STRUCTURE_CLASSIFICATION':['C1','C1','C1'],
+            'CONTENTS_COST_DENSITY':[150,15,60],
+            'BUILDING_COST_DENSITY':[30,1.5,6.0],
+            'FLOOR_AREA':[50,40,10],
+            'SURVEY_FACTOR':[1,2,1],
+            'FCB_USAGE':[491,491,491],
+            'SITE_CLASS':['B','B','B'],
+            'CD_CODE':[2,1,1]
+            }
+        attribute_dic, site = write_aggregate_read_csv(attribute_dic)
+        
+        self.assertEqual(2,len(site['UFI']))
+        for i in [0,1]:
+            if site['UFI'][i] == 1:
+                self.assertEqual(site['LATITUDE'][i], -1.20)
+                self.assertEqual( 
+                    site['STRUCTURE_CLASSIFICATION'][i], 'URMLMETAL')
+                self.assertEqual(site['SURVEY_FACTOR'][i], 1)
+                self.assertEqual( site['CONTENTS_COST_DENSITY'][i] , 150)
+                self.assertEqual(site['FCB_USAGE'][i] , 491)
+                self.assertEqual(site['POSTCODE'][i] , 2291)
+                self.assertEqual(
+                    site['HAZUS_STRUCTURE_CLASSIFICATION'][i] , 'C1')
+                self.assertEqual(site['CD_CODE'][i] , 2)
+                
+            elif site['UFI'][i] == 2:
+                self.assertEqual(site['LATITUDE'][i] , -1.30)
+                self.assertEqual( 
+                    site['STRUCTURE_CLASSIFICATION'][i], 'URMLMETAL')
+                self.assertEqual(site['SURVEY_FACTOR'][i], 3)
+                self.assertEqual(site['CONTENTS_COST_DENSITY'][i] , 30)
+                self.assertEqual(site['FCB_USAGE'][i] , 491)
+                self.assertEqual(site['POSTCODE'][i] , 2291)
+                   
 
     def test_structure_aggregate_building_db_load(self):
+        
         attribute_dic={
             'BID':[1,2,3], # This is really ufi
             'LATITUDE':[-20,-15,-60],
@@ -121,7 +170,8 @@ class Test_Structures(unittest.TestCase):
             'FLOOR_AREA':[50,40,10],
             'SURVEY_FACTOR':[1,2,1],
             'FCB_USAGE':[111,491,491],
-            'SITE_CLASS':['A','B','B']
+            'SITE_CLASS':['A','B','B'],
+            'CD_CODE':[111,491,491]
             }
         attribute_dic, sites = write_aggregate_read_struct(attribute_dic)
         site = sites.attributes
@@ -137,6 +187,8 @@ class Test_Structures(unittest.TestCase):
                 self.assertEqual(site['POSTCODE'][i] , 22)
                 self.assertEqual(
                     site['HAZUS_STRUCTURE_CLASSIFICATION'][i] , 'W1')
+                #self.assertEqual(site['CD_CODE'][i] , 111)
+                # cd-code not tested, since structure does not load it.
                 
             elif site['FCB_USAGE'][i] == 491:
                 self.assertEqual(sites.latitude[i] , -30)
@@ -145,9 +197,10 @@ class Test_Structures(unittest.TestCase):
                 self.assertEqual(site['SURVEY_FACTOR'][i], 3)
                 self.assertEqual(site['CONTENTS_COST_DENSITY'][i] , 30)
                 self.assertEqual(site['POSTCODE'][i] , 2291)
+                #self.assertEqual(site['CD_CODE'][i] , 491)
+                # cd-code not tested, since structure does not load it.
             else:
                 self.assertEqual(1==2)
-                
 
                 
     def Xtest_Building_db_writer(self):
@@ -170,9 +223,9 @@ def write_aggregate_read_csv(attribute_dic=None,
         handle, file_name = tempfile.mkstemp('.csv','test_aggregate_csv_')
         os.close(handle)
         file_name, attribute_dic = write_test_file(file_name,attribute_dic)
-
         attribute_conversions_extended = copy.deepcopy(attribute_conversions)
         attribute_conversions_extended['UFI'] = int
+        attribute_conversions_extended['CD_CODE'] = int
         file_out = file_name + "out"
         aggregate_building_db(file_name, file_out)
         site = csv_to_arrays(file_out,
@@ -240,7 +293,8 @@ def write_test_file(file_name, attribute_dic=None):
         'FLOOR_AREA':12,
         'SURVEY_FACTOR':13,
         'FCB_USAGE':14,
-        'SITE_CLASS':15
+        'SITE_CLASS':15,
+        'CD_CODE':16
         }    
 
     if attribute_dic is None:
@@ -260,15 +314,16 @@ def write_test_file(file_name, attribute_dic=None):
             'FLOOR_AREA':[150,300],
             'SURVEY_FACTOR':[1,9.8],
             'FCB_USAGE':[111,451],
-            'SITE_CLASS':['A','B']
-            }    
+            'SITE_CLASS':['A','B'],
+            'CD_CODE':['A','B']
+            }
     dict2csv(file_name, title_index_dic, attribute_dic)
     return file_name, attribute_dic
     
 
 #-------------------------------------------------------------
 if __name__ == "__main__":
-    suite = unittest.makeSuite(Test_Structures,'test')
-    #suite = unittest.makeSuite(Test_Structures,'test_aggregate_building_db')
+    suite = unittest.makeSuite(Agg_db_cd_code,'test')
+    #suite = unittest.makeSuite(Agg_db_cd_code,'test_aggregate_building_db2')
     runner = unittest.TextTestRunner()
     runner.run(suite)
