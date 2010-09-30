@@ -221,9 +221,9 @@ def calc_activity_from_slip_rate_Characteristic(magnitude,b,m0,mMax):
     m_c=mMax-m2
     C=((beta*exp(-beta*(mMax-m0-m1-m2)))*m2)/(1-exp(-beta*(mMax-m0-m2)))
     if magnitude <=m_c:
-        pdf=(beta*exp(-beta*(magnitude-m0-m1-m2)))/((1-1*exp(-beta*(mMax-m0-m2)))*(1+C)) 
+        pdf=(beta*exp(-beta*(magnitude-m0)))/((1-1*exp(-beta*(mMax-m0-m2)))*(1+C)) 
     if magnitude >m_c:
-        pdf=(beta*exp(-beta*(magnitude-m0-m1-m2)))/((1-1*exp(-beta*(mMax-m0-m2)))*(1+C))
+        pdf=(beta*exp(-beta*(mMax-m0-m1-m2)))/((1-1*exp(-beta*(mMax-m0-m2)))*(1+C))
     return pdf
         
 
