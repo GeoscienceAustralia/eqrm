@@ -159,12 +159,6 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnless( calc_gp.number_of_events==number_of_events,
             'Failed!')
 
-
-       
-    def test_generation_polygon(self):
-        gp = Generation_Polygon
-    
-
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Generation_polygon,'test')
