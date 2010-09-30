@@ -173,25 +173,29 @@ def grscale(b,max_magnitude,new_min,min_magnitude):
     denominator=1-exp(-beta*(max_magnitude-min_magnitude))
     return numerator/denominator
 
-def calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate,area):
+def calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate_mm,area_kms):
     c=1.5
     d=16.1
     beta=log(10)*b
     shear= 3*10**11
     Mo_max=10**((c*mMax)+d)
+    area=area_kms*10**10
+    slip_rate =slip_rate_mm/10
     #M_total= shear*area*slip_rate
     numerator=shear*area*slip_rate*(c-b)*(1-exp(-beta*(mMax-mMin)))
     denominator=Mo_max*exp(-beta*(mMax-mMin))
     return numerator/denominator
 
 
-def calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,slip_rate,area):
+def calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,slip_rate_mm,area_kms):
     c=1.5
     d=16.1
     beta=log(10)*b
     shear= float(3*10**11)
     Mo_max=10**((c*mMax)+d)
     c=1.5
+    area=area_kms*10**10
+    slip_rate =slip_rate_mm/10
     K =((b*10**(-c/2)) /(c-b)) +((b*exp(beta)*(1-10**(-c/2)))/c)
 
     numerator=shear*area*slip_rate*(1-exp(-beta*(mMax-mMin-0.5)))
