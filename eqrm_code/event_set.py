@@ -932,6 +932,7 @@ class Event_Activity(object):
         unsplit_event_activity = copy.copy(self.event_activity[:,0,0])
         
         for szp in source_model:
+            assert sum(szp.atten_model_weights) == 1
             #self.event_activity[szp.event_set_indexes] =
             sub_activity = unsplit_event_activity[szp.event_set_indexes]
             maxed_weights = zeros((self.max_num_models))
@@ -939,6 +940,14 @@ class Event_Activity(object):
                                                       szp.atten_model_weights
             activities = sub_activity * reshape(maxed_weights, (-1,1))
             self.event_activity[szp.event_set_indexes, :, 0] = activities.T
+
+    def spawn(weights):
+        """
+        
+        Make len(weight) copies of the current event activity,
+        applying the weights, which sum to zero
+        
+        """
     
 ################################################################################
 
