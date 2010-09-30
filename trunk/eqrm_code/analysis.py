@@ -385,9 +385,11 @@ def main(parameter_handle,
     # create result array to save 'days to complete' data
     # need to store 'fp' days + state field
     
-    if THE_PARAM_T.bridges_functional_percentages is not None and have_bridge_data:
-        saved_days_to_complete = zeros((array_size, num_psudo_events,
-                                        len(THE_PARAM_T.bridges_functional_percentages)))
+    if THE_PARAM_T.bridges_functional_percentages is not None and \
+           have_bridge_data:
+        saved_days_to_complete = zeros((
+            array_size, num_psudo_events,
+            len(THE_PARAM_T.bridges_functional_percentages)))
 
     log.debug('Memory: Created all data collection arrays.')
     log.resource_usage()
@@ -718,7 +720,7 @@ def calc_and_save_SA(THE_PARAM_T,
                      soil_amplification_model,
                      site_index,
                      rel_site_index):
-    
+    if True: # turn this into the ground-motion splitting loop
         # evaluate the mean and sigma from the attenuation models at the
         # site of interest note that this is not the RSA that is used
         # - it comes later based on sampling mu and sigma
