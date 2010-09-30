@@ -46,7 +46,7 @@ prob_number_of_events_in_zones = [0, 0, 0, 0, 0, 1]
 atten_models = ['Toro_1997_midcontinent']
 atten_model_weights = [1.0]
 atten_collapse_Sa_of_atten_models = False
-atten_variability_method = 2
+atten_variability_method = 4
 atten_periods = [0.0, 0.17499999999999999, 0.29999999999999999, 0.80000000000000004, 1.0, 1.2, 1.3999999999999999, 1.6000000000000001, 1.8, 2.1000000000000001, 3.3999999999999999]
 atten_threshold_distance = 400
 atten_override_RSA_shape = None
@@ -57,7 +57,7 @@ atten_log_sigma_eq_weight = 0
 
 # Amplification
 use_amplification = True
-amp_variability_method = 2
+amp_variability_method = 4
 amp_min_factor = 0.6
 amp_max_factor = 10000
 
@@ -67,8 +67,8 @@ buildings_set_damping_Be_to_5_percent = False
 bridges_functional_percentages = [25, 50, 75]
 
 # Capacity Spectrum Method
-csm_use_variability = True
-csm_variability_method = 3
+csm_use_variability = False
+csm_variability_method = None
 csm_standard_deviation = 0.3
 csm_damping_regimes = 0
 csm_damping_modify_Tav = True

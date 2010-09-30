@@ -37,7 +37,7 @@ prob_min_mag_cutoff = 4.5
 atten_models = ['Gaull_1990_WA']
 atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
-atten_variability_method = 2
+atten_variability_method = 4
 atten_periods = [0.0, 0.30303000000000002, 1.0]
 atten_threshold_distance = 400
 atten_override_RSA_shape = None
@@ -48,7 +48,7 @@ atten_log_sigma_eq_weight = 0
 
 # Amplification
 use_amplification = True
-amp_variability_method = 2
+amp_variability_method = 4
 amp_min_factor = 0.6
 amp_max_factor = 10000
 
