@@ -82,7 +82,7 @@ class Log_normal_distribution(object):
         """
         if True:
             if self.var_method == None:
-                print "self.log_mean", self.log_mean
+                #print "self.log_mean", self.log_mean
                 sample_values=exp(self.log_mean)           
             elif self.var_method == 2:
                 # monte carlo
