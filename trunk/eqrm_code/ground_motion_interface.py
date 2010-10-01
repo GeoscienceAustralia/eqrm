@@ -99,7 +99,7 @@ import math
 from copy import  deepcopy
 from scipy import (where, sqrt, array, asarray, exp, log, newaxis, zeros,
                    log10, isfinite, weave, ones, shape, reshape, concatenate,
-                   cosh, power, shape)
+                   cosh, power, shape, tile)
  
 from eqrm_code.ground_motion_misc import (linear_interpolation,
                                           Australian_standard_model,
@@ -235,16 +235,17 @@ def Gaull_1990_WA_distribution(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     
-    num_periods=coefficient.shape[3]
+    num_periods = coefficient.shape[3]
+    events = distance.shape[1]
     assert coefficient.shape==(3,1,1,num_periods)
     assert sigma_coefficient.shape==(2,1,1,num_periods)
     # mag.shape (site, events, 1)
     # distance.shape (site, events, 1)
     
-    a,b,c=coefficient
-    log_sigma=sigma_coefficient[0]
-    log_mean=a+b*mag-c*log(distance)
-    return log_mean,log_sigma
+    a,b,c = coefficient
+    log_sigma = tile(sigma_coefficient[0],(1,events,1))
+    log_mean = a+b*mag-c*log(distance)
+    return log_mean, log_sigma
 
 
 def Gaull_1990_WA_coefficient_interpolation(new_period,c,old_period):
@@ -750,8 +751,9 @@ def AllenSEA06_distribution(**kwargs):
     
     log_mean = ((c1+c2*mag+c3*(mag**2)+(c4+c5*mag)*f1+
                 (c6+c7*mag)*f2+(c8+c9*mag)*f0+D)-log10(980))/LOG10E
-
-    log_sigma=sigma_coefficient[0]
+                
+    num_events = distance.shape[2]
+    log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
     return log_mean,log_sigma
 
 AllenSEA06_args=[
@@ -810,8 +812,9 @@ Atkinson_Boore_97_sigma_coefficient_interpolation=linear_interpolation
 def Atkinson_Boore_97_distribution_python(mag,distance,coefficient,
                                    sigma_coefficient,depth):
     c1,c2,c3,c4=coefficient
-    log_mean = c1+c2*(mag-6)+c3*(mag-6)**2-log(distance)-c4*distance         
-    log_sigma=sigma_coefficient[0]
+    log_mean = c1+c2*(mag-6)+c3*(mag-6)**2-log(distance)-c4*distance    
+    num_events=distance.shape[2]
+    log_sigma = tile(sigma_coefficient[0],(1,num_events,1))   
     return log_mean,log_sigma
 
 def Atkinson_Boore_97_distribution(**kwargs):
@@ -1922,7 +1925,8 @@ def Somerville_distribution(**kwargs):
 #     print "num_periods", num_periods
 
     log_mean = Somerville_log_mean(coefficient, mag, distance)
-    log_sigma=sigma_coefficient[0]
+    num_events = distance.shape[2]
+    log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
     assert isfinite(log_mean).all()
     return log_mean,log_sigma
 
@@ -2132,7 +2136,8 @@ def Liang_2008_distribution(**kwargs):
     # calculate result in ln(mm/s/s)
     (a, b, c, d, e) = coefficient
     log_mean = a + b*mag + c*distance + d*log(distance) + e*mag*log(distance)
-    log_sigma = sigma_coefficient[0]
+    num_events = distance.shape[2]
+    log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
 
     # return mean as ln(g)
     return (log_mean - LnMmss2Lng, log_sigma - LnMmss2Lng)
@@ -2270,7 +2275,8 @@ def Atkinson06_basic(**kwargs):
 
     log_mean = (c1 + c2*M + c3*M*M + (c4 + c5*M)*f1 + (c6 + c7*M)*f2 +
                    (c8 + c9*M)*f0 + c10*Rcd + S)
-    log_sigma = sigma_coefficient[0]
+    num_events = M.shape[2]
+    log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
 
     return (log_mean, log_sigma)
 
@@ -2708,7 +2714,8 @@ def Chiou08_distribution(**kwargs):
                 phi5*(1.0-1.0/(cosh(phi6*max_zero_Z1_min_phi7))) + 
                     phi8/cosh(0.15*max_zero_Z1_min_15))
 
-    log_sigma = sigma_coefficient[0]
+    num_events=M.shape[2]
+    log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
 
     return (log_mean, log_sigma)
 

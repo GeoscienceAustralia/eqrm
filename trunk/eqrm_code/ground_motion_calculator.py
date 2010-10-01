@@ -292,10 +292,16 @@ class Multiple_ground_motion_calculator(object):
                 log_sigma_array = log_sigma[:,newaxis]
             else:
                 new_axis = len(log_mean.shape)
-                #concatenate((log_mean_array, log_mean[:,newaxis]),
-                #  axis=new_axis)
-                #concatenate((log_sigma_array, log_sigma[:,newaxis]),
-                #           axis=new_axis)
+                #print "log_sigma_array", log_sigma_array
+                #print "log_sigma[:,newaxis]", log_sigma[:,newaxis]
+                #print "log_sigma_array s", log_sigma_array.shape
+                #print "log_sigma[:,newaxis] s", log_sigma[:,newaxis].shape
+                #log_mean_array = concatenate(
+                #    (log_mean_array, log_mean[:,newaxis]),
+                #    axis=new_axis)
+                #log_sigma_array = concatenate(
+                #    (log_sigma_array, log_sigma[:,newaxis]),
+                #    axis=new_axis)
             multi_log_mean.append(log_mean)
             multi_log_sigma.append(log_sigma)
 
