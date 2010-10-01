@@ -73,6 +73,8 @@ class Log_normal_distribution(object):
         #self.log_sigma = event_id
         self.event_activity = event_activity
         self.event_id = event_id
+        #print "self.log_mean", self.log_mean
+        #print "self.log_sigma", self.log_sigma 
         #assert self.num_psudo_events == self.log_mean.shape[1]
         
 

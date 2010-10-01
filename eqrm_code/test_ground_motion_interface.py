@@ -47,20 +47,20 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         
     def test_Gaull_1990_WA_distribution(self):
-        model_name='Gaull_1990_WA'
-        model=Ground_motion_specification(model_name)
+        model_name = 'Gaull_1990_WA'
+        model = Ground_motion_specification(model_name)
         
-        mag=[[7.0]]
-        #FIXME DSG-EQRM should log_sigma=sigma_coefficient[0]
-        a=100
-        distance=exp(10)
-        b=3.0
-        c=2.0
-        coefficient=array([[[[a]]],[[[b]]],[[[c]]]])
-        sigma_1= 0.7
-        dummy = 43543545
-        sigma_coefficient=array([[[[sigma_1]]],[[[dummy]]]])
-        log_mean,log_sigma=model.distribution(mag=mag,
+        mag = [[7.0]]
+        #FIXME DSG-EQRM should log_sigma = sigma_coefficient[0]
+        a = 100
+        distance = array([[[exp(10)]]])
+        b = 3.0
+        c = 2.0
+        coefficient = array([[[[a]]],[[[b]]],[[[c]]]])
+        sigma_1 =  0.7
+        dummy  =  43543545
+        sigma_coefficient = array([[[[sigma_1]]],[[[dummy]]]])
+        log_mean,log_sigma = model.distribution(mag=mag,
             distance=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient)

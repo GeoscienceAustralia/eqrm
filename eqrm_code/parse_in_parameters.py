@@ -681,7 +681,7 @@ def verify_THE_PARAM_T(THE_PARAM_T):
     if is_ba08:
         if len(THE_PARAM_T.atten_models) > 1:
             raise ParameterSyntaxError(
-                "Parameter file error: BA09 attenuation model can not " +
+                "Parameter file error: Boore_08 attenuation model can not " +
                 "be used with other attenuation models.")
         if THE_PARAM_T.use_amplification != 0:
             raise ParameterSyntaxError(
