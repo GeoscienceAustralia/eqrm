@@ -246,18 +246,18 @@ class Multiple_ground_motion_calculator(object):
         magnitudes = {'Mw': event_set.Mw, 'ML': event_set.ML}
         vs30 = sites.attributes.get('VS30', None)
 
-        results=self._distribution_function(distances,
-                                            magnitudes,
-                                            depth=event_set.depth,
-                                            depth_to_top=event_set.depth_to_top,
-                                            faulting_type=event_set.faulting_type,
-                                            vs30=vs30, Z25=None, dip=None,
-                                            event_activity=event_activity,
-                                            event_id=event_id)
-
+        results=self._distribution_function(
+            distances,
+            magnitudes,
+            depth=event_set.depth,
+            depth_to_top=event_set.depth_to_top,
+            faulting_type=event_set.faulting_type,
+            vs30=vs30, Z25=None, dip=None,
+            event_activity=event_activity,
+            event_id=event_id)
         self.log_normal_distribution.set_log_mean_log_sigma_etc(*results)
-
-        return self.log_normal_distribution
+        _, _, log_mean_array, log_sigma_array = results
+        return self.log_normal_distribution, log_mean_array, log_sigma_array
 
 
     def _distribution_function(self, dist_object, mag_dict, depth=None,
@@ -267,23 +267,42 @@ class Multiple_ground_motion_calculator(object):
         """
         The event_activity and event_id are not used currently.
         But if we spawn they will be.
+
+        returning values
+          log_mean_array the log_mean values
+            dimensions (GM_model, sites, events, periods)
+          log_sigma_array the log_sigma values
+            dimensions (GM_model, sites, events, periods)
         """
 
         # This is where spawning occured.  Though it never worked.
-
+        #log_mean_array = zeros((len(self.GM_models), ))
         multi_log_mean = []
         multi_log_sigma = []
-        for GM_model in self.GM_models:
-            (log_mean, log_sigma) = \
-                GM_model.distribution_function(dist_object, mag_dict,
-                                               depth=depth, depth_to_top=depth_to_top,
-                                               faulting_type=faulting_type, vs30=vs30,
-                                               Z25=Z25, dip=dip,
-                                               dist_type=GM_model.GM_spec.distance_type,
-                                               mag_type=GM_model.GM_spec.magnitude_type)
+        for mod_i, GM_model in enumerate(self.GM_models):
+            (log_mean, log_sigma) = GM_model.distribution_function(
+                dist_object, mag_dict,
+                depth=depth, depth_to_top=depth_to_top,
+                faulting_type=faulting_type, vs30=vs30,
+                Z25=Z25, dip=dip,
+                dist_type=GM_model.GM_spec.distance_type,
+                mag_type=GM_model.GM_spec.magnitude_type)
+            if mod_i == 0:
+                log_mean_array = log_mean[:,newaxis]
+                log_sigma_array = log_sigma[:,newaxis]
+            else:
+                new_axis = len(log_mean.shape)
+                #concatenate((log_mean_array, log_mean[:,newaxis]),
+                          #  axis=new_axis)
+                #concatenate((log_sigma_array, log_sigma[:,newaxis]),
+                 #           axis=new_axis)
+                
             multi_log_mean.append(log_mean)
             multi_log_sigma.append(log_sigma)
 
+        # dimensions of log_mean and log_sigma are (sites, events, periods)
+        # note, sites is currently always 1.
+        
         # FIXME Do we need to do this? Yes!
         # make multi_log_sigma all the same shape
         sigma_shape = [log_sigma.shape for log_sigma in multi_log_sigma]
@@ -302,6 +321,6 @@ class Multiple_ground_motion_calculator(object):
         # The event_activity is used by save_event_set
         #print "Multiple_ground_motion_cal event_activity", event_activity
         #print "Multiple_ground_motion_calculator event_ids", event_ids
-        return (log_mean, log_sigma, event_activity, event_id)
+        return (log_mean, log_sigma, log_mean_array, log_sigma_array)
 
 

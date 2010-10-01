@@ -725,8 +725,9 @@ def calc_and_save_SA(THE_PARAM_T,
         # site of interest note that this is not the RSA that is used
         # - it comes later based on sampling mu and sigma
         # note that we also compute the distance between source and site here
-        bedrock_SA_pdf = ground_motion_calc.distribution(event_set=event_set,
-                                                         sites=sites)
+        bedrock_SA_pdf, log_mean, log_sigma = ground_motion_calc.distribution(
+            event_set=event_set,
+            sites=sites)
         # Note, it is event_set, not pseudo_event_set that is passed in,
         # The Mw and distance att's are assumed to be the same for
         # each GM and the results from each GM are appended, so the
