@@ -943,11 +943,20 @@ class Event_Activity(object):
 
     def spawn(weights):
         """
+        Spawn the event activity.
         
-        Make len(weight) copies of the current event activity,
-        applying the weights, which sum to zero
+        weights is a ??D array that sums to one.
+
+        Has to handle that the GM is interated over and that the
+        weights are different for each event.
+        
+        Make len(weight) copies, in the 3rd dimension, of the current
+        event activity, applying the weights.
+
+        This value is set as the new event activity.
         
         """
+        pass
     
 ################################################################################
 

@@ -258,27 +258,31 @@ def main(parameter_handle,
         THE_PARAM_T.atten_model_weights)
 
     num_psudo_events = len(pseudo_event_set)
+    num_events = len(event_set)
     msg = ('Pseudo event set created. Number of pseudo_events=' +
            str(num_psudo_events))
     log.debug(msg)
     log.debug('Memory: Pseudo Event Set created')
     log.resource_usage()
 
-    ground_motion_distribution = \
-        Log_normal_distribution(THE_PARAM_T.atten_variability_method,
-                                num_psudo_events,
-                                num_sites_per_site_loop=NUM_SITES_PER_SITE_LOOP)
+    ground_motion_distribution = Log_normal_distribution(
+        THE_PARAM_T.atten_variability_method,
+        num_psudo_events,
+        num_sites_per_site_loop=NUM_SITES_PER_SITE_LOOP)
 
+    atten_distribution = Log_normal_distribution(
+        THE_PARAM_T.atten_variability_method,
+        num_events,
+        num_sites_per_site_loop=NUM_SITES_PER_SITE_LOOP)
+    
     # Initialise the ground motion object
     # Tasks here include
     #  - interpolation of coefficients to periods of interest
-    ground_motion_calc = \
-        Multiple_ground_motion_calculator(THE_PARAM_T.atten_models,
-                                          periods=THE_PARAM_T.atten_periods,
-                                          model_weights= \
-                                              THE_PARAM_T.atten_model_weights,
-                                          log_normal_distribution= \
-                                              ground_motion_distribution)
+    ground_motion_calc = Multiple_ground_motion_calculator(
+        THE_PARAM_T.atten_models,
+        periods=THE_PARAM_T.atten_periods,
+        model_weights=THE_PARAM_T.atten_model_weights,
+        log_normal_distribution=ground_motion_distribution)
 
 
     # load in soil amplifications factors
