@@ -69,9 +69,11 @@ class Log_normal_distribution(object):
         """
         self.log_mean = log_mean
         self.log_sigma = log_sigma
+        #self.log_mean = event_activity
+        #self.log_sigma = event_id
         self.event_activity = event_activity
         self.event_id = event_id
-        assert self.num_psudo_events == self.log_mean.shape[1]
+        #assert self.num_psudo_events == self.log_mean.shape[1]
         
 
     def sample_for_eqrm(self):
@@ -80,6 +82,7 @@ class Log_normal_distribution(object):
         """
         if True:
             if self.var_method == None:
+                print "self.log_mean", self.log_mean
                 sample_values=exp(self.log_mean)           
             elif self.var_method == 2:
                 # monte carlo

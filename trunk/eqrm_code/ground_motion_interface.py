@@ -88,6 +88,10 @@ Description:
             depth_to_top.shape = (site, events, 1)
             faulting_type.shape = (site, events, 1)
 
+        The shapes of the returned arrays are:
+            log_mean = (site, events, num_periods)
+            log_sigma = (site, events, num_periods)
+
         Note that the 'site' dimension above is currently 1.
 """
 

@@ -169,6 +169,6 @@ class Test_ground_motion_calculator(unittest.TestCase):
 #------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_calculator,'test')
-    #suite = unittest.makeSuite(Test_ground_motion_calculator,'test_log_sigma_Somerville_Yilgarn')
+    #suite = unittest.makeSuite(Test_ground_motion_calculator,'test_event_activityII')
     runner = unittest.TextTestRunner()
     runner.run(suite)
