@@ -32,7 +32,7 @@ site_indexes = [2255, 11511, 10963, 686, 1026]
 
 # Probabilistic input
 prob_min_mag_cutoff = 4.5
-prob_number_of_events_in_zones = [5, 2, 1, 3, 3, 1]
+prob_number_of_events_in_zones = [1, 2, 1, 0, 0, 0]
 
 # Attenuation
 atten_models = ['Toro_1997_midcontinent']
