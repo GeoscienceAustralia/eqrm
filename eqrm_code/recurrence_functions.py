@@ -84,14 +84,20 @@ def calc_event_activity(event_set, source_model,
                         mag_bin_centroids[z])) for z in event_bins])
                     mag_bin_centroids= new_mag_bin_centroids
 
-                                         
-            grpdf = m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
+            if source.recurr_model_distrib=='bounded_gutenberg_ricter':
+                grpdf = m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
+                
             
-            event_activity_source = array(
-                [(A_mlow*grpdf[z]/(sum(where(
-                event_bins == z, 1,0)))) for z in event_bins])
+            if source.recurr_model_distrib=='characteristic':
+                grpdf=calc_activities_from_slip_rate_Characteristic(mag_bin_centroids, 
+                                                                    zone_b, zone_mlow,
+                                                                    zone_mhgh)
+        
+        
+            event_activity_source = array( [(A_mlow*grpdf[z]/(sum(where(
+                                               event_bins == z, 1,0)))) 
+                                              for z in event_bins])
             event_activity_matrix[event_ind] = event_activity_source
-            
         event_set.set_event_activity(event_activity_matrix)
 
     # This should be used to remove events from the scenario's
