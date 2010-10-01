@@ -75,8 +75,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         max_magnitude = 7.0
         prob_min_mag_cutoff = 4.0
         slip_rate_mm=2.0
-        area_kms= float(30*10)
-        
+        area_kms= float(30*10)        
         b = 1.
         A_min= calc_A_min_from_slip_rate_Characteristic(b,prob_min_mag_cutoff,
                                             max_magnitude,

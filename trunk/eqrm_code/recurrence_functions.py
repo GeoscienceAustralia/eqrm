@@ -84,11 +84,11 @@ def calc_event_activity(event_set, source_model,
                         mag_bin_centroids[z])) for z in event_bins])
                     mag_bin_centroids= new_mag_bin_centroids
 
-            if source.recurr_model_distrib=='bounded_gutenberg_ricter':
+            if source.recurrence_model_distribution=='bounded_gutenberg_ricter':
                 grpdf = m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
                 
             
-            if source.recurr_model_distrib=='characteristic':
+            if source.recurrence_model_distribution=='characteristic':
                 grpdf=calc_activities_from_slip_rate_Characteristic(mag_bin_centroids, 
                                                                     zone_b, zone_mlow,
                                                                     zone_mhgh)
