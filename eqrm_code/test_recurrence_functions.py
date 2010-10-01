@@ -58,6 +58,65 @@ class Test_Recurrence_functions(unittest.TestCase):
         test = (exp(-1*beta*(m-m0))-tmp)/(1-tmp)
         self.assertEqual(test, grscale(b,mmax,m,m0))     
 
+
+    def test_calc_A_min_from_slip_rate_GR(self):
+        max_magnitude = 7.0
+        prob_min_mag_cutoff = 4.0
+        slip_rate_mm=2.0
+        area_kms= float(30*10)
+        
+        b = 1.
+        A_min= calc_A_min_from_slip_rate_GR(b,prob_min_mag_cutoff,
+                                            max_magnitude,
+                                            slip_rate_mm,area_kms)
+        self.assert_(allclose(A_min,0.225843709057))
+
+    def test_calc_A_min_from_slip_rate_Characteristic(self):
+        max_magnitude = 7.0
+        prob_min_mag_cutoff = 4.0
+        slip_rate_mm=2.0
+        area_kms= float(30*10)
+        
+        b = 1.
+        A_min= calc_A_min_from_slip_rate_Characteristic(b,prob_min_mag_cutoff,
+                                            max_magnitude,
+                                            slip_rate_mm,area_kms)
+        self.assert_(allclose(A_min,0.0253104984335))
+
+    def test_calc_activities_from_slip_rate_Characteristic(self):
+        max_magnitude = 7.0
+        prob_min_mag_cutoff = 4.0
+        slip_rate_mm=2.0
+        area_kms= float(30*10)
+        prob_number_of_mag_sample_bins=10
+        b = 1.
+        bin_centroids = make_bins(prob_min_mag_cutoff,max_magnitude,prob_number_of_mag_sample_bins)
+        event_bins=r_[0:10]
+        event_bins=sorted(event_bins)
+    
+        A_minCharacteristic= calc_A_min_from_slip_rate_Characteristic(b,prob_min_mag_cutoff,
+                                            max_magnitude,
+                                            slip_rate_mm,area_kms)
+        
+        pdfs= calc_activities_from_slip_rate_Characteristic(bin_centroids, b, 
+                                                              prob_min_mag_cutoff, 
+                                                              max_magnitude)
+        
+        event_activity_source = array(
+                [(A_minCharacteristic*pdfs[z]/(sum(where(
+                event_bins == z, 1,0)))) for z in event_bins])
+        
+        self.assert_(allclose(event_activity_source,[1.21328345e-02,   
+                                                     6.08082174e-03,   
+                                                     3.04763023e-03,   
+                                                     1.52743336e-03,
+                                                     7.65530102e-04,   
+                                                     3.83673914e-04,   
+                                                     1.92292468e-04,   
+                                                     9.63745299e-05,
+                                                     5.41953808e-04,   
+                                                     5.41953808e-04]))
+       
     # This test assumes events can be generated
     # outside of a source model
     # this is not the case right now

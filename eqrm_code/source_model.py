@@ -143,7 +143,8 @@ class Source_Zone_Polygon(polygon_object):
                  min_magnitude,max_magnitude,
                  prob_min_mag_cutoff,
                  Lambda_Min,b,
-                 number_of_mag_sample_bins):
+                 number_of_mag_sample_bins,
+                 recurr_model_distrib='bounded_gutenberg_ricter'):
         """
         boundary is a list of points that forms a polygon
         exclude is a list of polygons (so a list of a list of points)
@@ -162,6 +163,7 @@ class Source_Zone_Polygon(polygon_object):
         self.Lambda_Min=Lambda_Min
         self.b=b
         self.number_of_mag_sample_bins = number_of_mag_sample_bins
+        self.recurr_model_distrib=recurr_model_distrib
 
         # indexes to the event sets in this source zone
         self.event_set_indexes = None
