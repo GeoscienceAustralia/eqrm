@@ -750,10 +750,6 @@ def calc_and_save_SA(THE_PARAM_T,
             log_mean_extend_GM, log_sigma_extend_GM)
         (spawn_weights, new_bedrock_SA, _) = \
                         atten_distribution.sample_for_eqrm()
-        #print "bedrock_SA", bedrock_SA
-        #print "new_bedrock_SA", new_bedrock_SA
-        print "bedrock_SA s", bedrock_SA.shape
-        print "new_bedrock_SA s", new_bedrock_SA.shape
         
         new_soil_SA = None
         #print 'ENDING Calculating attenuation'
@@ -783,30 +779,29 @@ def calc_and_save_SA(THE_PARAM_T,
                 (_, sub_soil_SA, _) = new_soil_SA_pdf.sample_for_eqrm()
                 new_soil_SA[i_gmm,:] = sub_soil_SA
                 
-            
             # Amplification factor cutoffs
             # Applies a minimum and maxium acceptable amplification factor
             # re-scale SAsoil if Ampfactor falls ouside acceptable
             # ampfactor bounds
             if THE_PARAM_T.amp_variability_method is not None:
-                if THE_PARAM_T.amp_min_factor is not None:
-                    too_low = (soil_SA/bedrock_SA) < THE_PARAM_T.amp_min_factor
-                    soil_SA[where(too_low)] = (THE_PARAM_T.amp_min_factor *
-                                               bedrock_SA[where(too_low)])
-                    del too_low
-                if THE_PARAM_T.amp_max_factor is not None:
-                    too_high = (soil_SA/bedrock_SA) > THE_PARAM_T.amp_max_factor
-                    soil_SA[where(too_high)] = (THE_PARAM_T.amp_max_factor*
-                                                bedrock_SA[where(too_high)])
-                    del too_high
+                soil_SA = amp_rescale(
+                    THE_PARAM_T.amp_min_factor,
+                    THE_PARAM_T.amp_max_factor,
+                    soil_SA,
+                    bedrock_SA)
+                
+                new_soil_SA = amp_rescale(
+                    THE_PARAM_T.amp_min_factor,
+                    THE_PARAM_T.amp_max_factor,
+                    new_soil_SA,
+                    new_bedrock_SA)
 
             # PGA cutoff
-            # applies a pga cutoff to the bedrock motion
-            bedrock_SA = cutoff_pga(bedrock_SA,
-                                    THE_PARAM_T.atten_pga_scaling_cutoff)
             assert isfinite(soil_SA).all()
             soil_SA = cutoff_pga(soil_SA, THE_PARAM_T.atten_pga_scaling_cutoff)
-
+            new_soil_SA = cutoff_pga_4d(new_soil_SA,
+                                        THE_PARAM_T.atten_pga_scaling_cutoff)
+            
             # qa on ampfactors
             #if int(THE_PARAM_T.qa_switch_ampfactors)>=1:
                 #print 'ENDING Calculating soil amplification'
@@ -817,8 +812,10 @@ def calc_and_save_SA(THE_PARAM_T,
             #    print 'No soil amplification'
             #    print
             soil_SA = None
-            bedrock_SA = cutoff_pga(bedrock_SA,
-                                    THE_PARAM_T.atten_pga_scaling_cutoff)
+        bedrock_SA = cutoff_pga(bedrock_SA,
+                                THE_PARAM_T.atten_pga_scaling_cutoff)
+        new_bedrock_SA = cutoff_pga_4d(new_bedrock_SA,
+                                       THE_PARAM_T.atten_pga_scaling_cutoff)
 
         bedrock_SA, soil_SA = apply_threshold_distance(
             sites,
@@ -826,56 +823,68 @@ def calc_and_save_SA(THE_PARAM_T,
             THE_PARAM_T.use_amplification, pseudo_event_set,
             bedrock_SA, soil_SA)
         
-#         new_bedrock_SA, new_soil_SA = apply_threshold_distance(
-#             sites,
-#             THE_PARAM_T.atten_threshold_distance,
-#             THE_PARAM_T.use_amplification, pseudo_event_set,
-#             new_bedrock_SA, new_soil_SA)
+        new_bedrock_SA, new_soil_SA = apply_threshold_distance(
+            sites,
+            THE_PARAM_T.atten_threshold_distance,
+            THE_PARAM_T.use_amplification, pseudo_event_set,
+            new_bedrock_SA, new_soil_SA)
         
-        #print "bedrock_SA", bedrock_SA
         # collapse logic tree as desired (bedrock and soil RSA)
         if (THE_PARAM_T.save_motion is True or
             THE_PARAM_T.save_hazard_map is True):
-            (new_bedrock_SA, _, _) = do_collapse_logic_tree(
+            (collapsed_bedrock_SA, _, _) = do_collapse_logic_tree(
                 bedrock_SA,
                 pseudo_event_set.index,
                 pseudo_event_set.attenuation_weights,
                 THE_PARAM_T)
-
-        #print "new_bedrock_SA", new_bedrock_SA
-        if soil_SA is not None:
-            # Collapse multiple attenuation models
-            (new_soil_SA, _, _) = do_collapse_logic_tree(
-                soil_SA, pseudo_event_set.index,
-                pseudo_event_set.attenuation_weights,
+            (new_collapsed_bedrock_SA, _, _) = do_collapse_logic_tree(
+                new_bedrock_SA,
+                [1],
+                THE_PARAM_T.atten_model_weights,
                 THE_PARAM_T)
+            assert(allclose(collapsed_bedrock_SA, new_collapsed_bedrock_SA))
+            
+            if soil_SA is not None:
+                # Collapse multiple attenuation models
+                (collapsed_soil_SA, _, _) = do_collapse_logic_tree(
+                    soil_SA, pseudo_event_set.index,
+                    pseudo_event_set.attenuation_weights,
+                    THE_PARAM_T)
+                (new_collapsed_soil_SA, _, _) = do_collapse_logic_tree(
+                    new_soil_SA, [1],
+                    THE_PARAM_T.atten_model_weights,
+                    THE_PARAM_T)
+
 
         # saving RSA - only generally done for Ground Motion Simulation
         # (not for probabilistic hazard or if doing risk/secnario loss)
         if THE_PARAM_T.save_motion is True:
             # Put into arrays
-            #print bedrock_SA_all.shape,new_bedrock_SA.shape,i
-            #print "new_bedrock_SA[0,:,:].shape", new_bedrock_SA[0,:,:].shape
+            #print bedrock_SA_all.shape,collapsed_bedrock_SA.shape,i
+            #print "collapsed_bedrock_SA[0,:,:].shape", collapsed_bedrock_SA[0,:,:].shape
 
-            bedrock_SA_all[rel_site_index] = new_bedrock_SA[0,:,:]
+            bedrock_SA_all[rel_site_index] = collapsed_bedrock_SA[0,:,:]
             if soil_SA is not None:
-                soil_SA_all[rel_site_index] = new_soil_SA[0,:,:]
+                soil_SA_all[rel_site_index] = collapsed_soil_SA[0,:,:]
 
         # Compute hazard if desired
         if THE_PARAM_T.save_hazard_map is True:
             for j in range(len(THE_PARAM_T.atten_periods)):
                 bedrock_hazard[site_index,j] = \
-                        hzd_do_value(new_bedrock_SA[:,:,j],
+                        hzd_do_value(collapsed_bedrock_SA[:,:,j],
                                      event_set.event_activity,
                                      1.0/array(THE_PARAM_T.return_periods))
                 if soil_SA is not None:
                     soil_hazard[site_index,j] = \
-                        hzd_do_value(new_soil_SA[:,:,j],
+                        hzd_do_value(collapsed_soil_SA[:,:,j],
                                      event_set.event_activity,
                                      1.0/array(THE_PARAM_T.return_periods))
                     
         # End the Ground motion splitting loop
         # Build the SA, soil, if we did it.  If not, Bedrock.
+
+        # Change dimensions.  Put the ground motion model dimension
+        # into the event dimension
         return soil_SA, bedrock_SA
 
 def apply_threshold_distance(sites,
@@ -915,7 +924,18 @@ def apply_threshold_distance(sites,
         
     return bedrock_SA, soil_SA
 
-        
+def amp_rescale(amp_min_factor, amp_max_factor, soil_SA, bedrock_SA):
+    if amp_min_factor is not None:
+        too_low = (soil_SA/bedrock_SA) < amp_min_factor
+        soil_SA[where(too_low)] = (amp_min_factor *
+                                   bedrock_SA[where(too_low)])
+    if amp_max_factor is not None:
+        too_high = (soil_SA/bedrock_SA) > amp_max_factor
+        soil_SA[where(too_high)] = (amp_max_factor*
+                                    bedrock_SA[where(too_high)])
+    return soil_SA
+
+
 # handles the pga_cutoff
 def cutoff_pga(ground_motion, max_pga):
     if max_pga is None:
@@ -926,7 +946,7 @@ def cutoff_pga(ground_motion, max_pga):
     too_high = ground_motion[:,:,0:1] > max_pga
     # Doing ground_motion[:,:,0:1] gets the first values of the last dimension,
     # but does not drop a dimension in the return value.
-    # ground_motion[:,:,1] would drop a dimension.
+    # ground_motion[:,:,0] would drop a dimension.
     scaling_factor = where(too_high, max_pga/ground_motion[:,:,0:1], 1.0)
     ground_motion *= scaling_factor
 
@@ -934,6 +954,23 @@ def cutoff_pga(ground_motion, max_pga):
 
     return ground_motion
 
+
+def cutoff_pga_4d(ground_motion, max_pga):
+    if max_pga is None:
+        return ground_motion
+
+    assert isfinite(ground_motion).all()
+
+    too_high = ground_motion[:,:,:,0:1] > max_pga
+    # Doing ground_motion[:,:,0:1] gets the first values of the last dimension,
+    # but does not drop a dimension in the return value.
+    # ground_motion[:,:,0] would drop a dimension.
+    scaling_factor = where(too_high, max_pga/ground_motion[:,:,:,0:1], 1.0)
+    ground_motion *= scaling_factor
+
+    assert isfinite(ground_motion).all()
+
+    return ground_motion
 
 def load_data(THE_PARAM_T):
     """Load structure and bridge data into memory.
