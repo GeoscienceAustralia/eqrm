@@ -38,7 +38,8 @@ from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
          save_damage, get_source_file_handle
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
-from ground_motion_distribution import Log_normal_distribution
+from ground_motion_distribution import Log_normal_distribution, \
+     Distribution_Log_Normal
 from eqrm_code.structures import Structures, build_par_file
 from eqrm_code.exceedance_curves import do_collapse_logic_tree, hzd_do_value
 from eqrm_code.sites import Sites, truncate_sites_for_test
@@ -270,10 +271,8 @@ def main(parameter_handle,
         num_psudo_events,
         num_sites_per_site_loop=NUM_SITES_PER_SITE_LOOP)
 
-    atten_distribution = Log_normal_distribution(
-        THE_PARAM_T.atten_variability_method,
-        num_events,
-        num_sites_per_site_loop=NUM_SITES_PER_SITE_LOOP)
+    atten_distribution = Distribution_Log_Normal(
+        THE_PARAM_T.atten_variability_method)
     
     # Initialise the ground motion object
     # Tasks here include
@@ -444,7 +443,8 @@ def main(parameter_handle,
             ground_motion_calc,
             soil_amplification_model,
             i,
-            rel_i)
+            rel_i,
+            atten_distribution)
 
         # calculate damage
         if THE_PARAM_T.run_type == "risk":
@@ -723,7 +723,8 @@ def calc_and_save_SA(THE_PARAM_T,
                      ground_motion_calc,
                      soil_amplification_model,
                      site_index,
-                     rel_site_index):
+                     rel_site_index,
+                     atten_distribution):
     if True: # turn this into the ground-motion splitting loop
         # evaluate the mean and sigma from the attenuation models at the
         # site of interest note that this is not the RSA that is used
@@ -732,6 +733,8 @@ def calc_and_save_SA(THE_PARAM_T,
         bedrock_SA_pdf, log_mean, log_sigma = ground_motion_calc.distribution(
             event_set=event_set,
             sites=sites)
+        #print "log_mean",log_mean.shape
+        #print "bedrock_SA_pdf.log_mean.shape", bedrock_SA_pdf.log_mean.shape
         # Note, it is event_set, not pseudo_event_set that is passed in,
         # The Mw and distance att's are assumed to be the same for
         # each GM and the results from each GM are appended, so the
@@ -741,7 +744,14 @@ def calc_and_save_SA(THE_PARAM_T,
         # that is desired (i.e. chosen in parameter_handle)
         (_, bedrock_SA, _) = bedrock_SA_pdf.sample_for_eqrm()
         assert isfinite(bedrock_SA).all()
-
+        atten_distribution.set_log_mean_log_sigma_etc(log_mean, log_sigma)
+        (spawn_weights, new_bedrock_SA, _) = \
+                        atten_distribution.sample_for_eqrm()
+        #print "bedrock_SA", bedrock_SA
+        #print "new_bedrock_SA", new_bedrock_SA
+        #print "bedrock_SA", bedrock_SA.shape
+        #print "new_bedrock_SA", new_bedrock_SA.shape
+        
         # re-compute the source-site distances
         # (NEEDED because this is not returned from bedrock_SA_pdf)
         # Identify sites which are greater than

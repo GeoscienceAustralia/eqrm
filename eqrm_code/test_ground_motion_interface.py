@@ -1316,6 +1316,24 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
+    def test_mean_10_sigma_1(self):
+        model_name = 'mean_10_sigma_1'
+        model = Ground_motion_specification(model_name)
+
+        num_sites =  2
+        num_events =  3
+        num_periods = 4
+        
+        distance = zeros((num_sites, num_events, 1))
+        coefficient = zeros((1, 1, 1, num_periods))
+        (log_mean, log_sigma) = model.distribution(
+            distance=distance, coefficient=coefficient)
+        act_log_sigma = zeros((num_sites, num_events, num_periods))
+        act_log_mean = ones((num_sites, num_events, num_periods))*log(10)
+        self.failUnless(allclose(log_mean, act_log_mean))
+        self.failUnless(allclose(log_sigma, act_log_sigma))
+        
+        
 ################################################################################
 
 if __name__ == "__main__":

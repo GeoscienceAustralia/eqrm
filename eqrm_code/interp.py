@@ -44,6 +44,8 @@ def interp(new_period, old_c, old_period, axis=0,
 
     # if this assert fails, maybe you need to add an extra dimension,
     # with a value of 1, to an array.
+    #print "interp old_c", old_c
+    #print "interp old_c.shape", old_c.shape
     assert old_c.shape[-1] == old_period.shape[0]
     
     if not len(old_period)>1:

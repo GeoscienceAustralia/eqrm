@@ -13,7 +13,7 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import exp, log, where, isfinite
+from scipy import exp, log, where, isfinite, reshape
 from scipy.stats import norm
 
 class Log_normal_distribution(object):
@@ -69,8 +69,6 @@ class Log_normal_distribution(object):
         """
         self.log_mean = log_mean
         self.log_sigma = log_sigma
-        #self.log_mean = event_activity
-        #self.log_sigma = event_id
         self.event_activity = event_activity
         self.event_id = event_id
         #print "self.log_mean", self.log_mean
@@ -150,6 +148,91 @@ class Log_normal_distribution(object):
         ground_motion=exp(self.log_mean-(self.log_sigma**2))
         return ground_motion
 
+    corrected_mean = property(get_corrected_mean)    
+    median = property(get_median)    
+    mode = property(get_mode)
+
+
+class Distribution_Log_Normal(object):
+    """
+    Log normal distribution.
+
+    Note, since this uses random numbers, just instanciating an instance
+    of this class will cause check_scenario to fail.
+
+    """
+    def __init__(self,
+                 var_method):
+        
+        self.var_method = var_method        
+        self.rvs=norm.rvs # function from scipy.stats
+        self.pdf=norm.pdf # function from scipy.stats
+        
+            
+    def set_log_mean_log_sigma_etc(self, log_mean, log_sigma):
+        """
+        log_mean and log_sigma may have the dimensions
+         (GM_model, sites, events, periods)
+        """
+        self.log_mean = log_mean
+        self.log_sigma = log_sigma
+        
+
+    def sample_for_eqrm(self):
+        """
+        FIXME needs comments
+        """
+        if True:
+            if self.var_method == None:
+                #print "self.log_mean", self.log_mean
+                sample_values=exp(self.log_mean)           
+            elif self.var_method == 2:
+                # monte carlo
+                sample_values = self._monte_carlo()
+            elif self.var_method == 3:
+                # + 2 sigma
+                sample_values = exp(self.log_mean+2*self.log_sigma)  
+            elif self.var_method == 4:
+                # + 1 sigma
+                sample_values = exp(self.log_mean+1*self.log_sigma)
+            elif self.var_method == 5:
+                # - 1 sigma
+                sample_values = exp(self.log_mean-1*self.log_sigma)
+            elif self.var_method == 6:
+                # - 2 sigma
+                sample_values = exp(self.log_mean-2*self.log_sigma)
+            #elif self.var_method == 7:
+                # corrected mean
+             #   sample_values = self.corrected_mean
+        spawn_weights = None
+        return spawn_weights, sample_values, None
+    
+
+    def _monte_carlo(self, variate_site=None):
+        """
+        variate_site should only be used for testing
+        """      
+        if variate_site is None:
+            # size sets the shape of the returned array
+            variate_site=self.rvs(size=self.log_sigma.size)
+            reshape(variate_site, self.log_sigma.shape)
+        sample_values=exp(self.log_mean + variate_site*self.log_sigma)        
+        return sample_values
+
+    
+    def get_corrected_mean(self):
+        ground_motion=exp(self.log_mean+(self.log_sigma**2)/2)
+        return ground_motion
+    
+    def get_median(self):
+        ground_motion=exp(self.log_mean)
+        return ground_motion
+    
+    def get_mode(self):
+        ground_motion=exp(self.log_mean-(self.log_sigma**2))
+        return ground_motion
+
+    # Who uses these?
     corrected_mean = property(get_corrected_mean)    
     median = property(get_median)    
     mode = property(get_mode)
