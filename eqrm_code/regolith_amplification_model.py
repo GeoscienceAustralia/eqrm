@@ -88,8 +88,7 @@ class Regolith_amplification_model(object):
           Don't clean up though, just incase we need to spawn.
           event_activity: ditto.  
         """
-
-        if not Mw.size==ground_motion.shape[1]:
+        if not Mw.size == ground_motion.shape[1]:
             raise ValueError
         
         # bin all the pga and magnitudes
