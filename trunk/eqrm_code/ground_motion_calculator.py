@@ -256,8 +256,9 @@ class Multiple_ground_motion_calculator(object):
             event_activity=event_activity,
             event_id=event_id)
         self.log_normal_distribution.set_log_mean_log_sigma_etc(*results)
-        _, _, log_mean_array, log_sigma_array = results
-        return self.log_normal_distribution, log_mean_array, log_sigma_array
+        _, _, log_mean_extend_GM, log_sigma_extend_GM = results
+        return self.log_normal_distribution, \
+               log_mean_extend_GM, log_sigma_extend_GM
 
 
     def _distribution_function(self, dist_object, mag_dict, depth=None,
