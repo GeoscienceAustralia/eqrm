@@ -1,7 +1,7 @@
 
 import unittest
 
-from scipy import array, exp, log, allclose, newaxis, asarray
+from scipy import array, exp, log, allclose, newaxis, asarray, zeros
 
 from eqrm_code.ground_motion_specification import *
 from eqrm_code.ground_motion_interface import gound_motion_init
@@ -98,48 +98,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         #FIXME check the shape as well
         self.assert_(allclose(log_sigma, test_log_sigma, rtol=0.0000005),
                      "%s did not pass assert" %model_name )
-
         
-    def test_event_activityII(self):
-        """
-        This checks that for the given test_distance and test_magnitudes,
-        the calculated ground motion is the same as the test_ground_motion
-        """
-        
-        model_name = 'Combo_Sadigh_Youngs_M8_trimmed'        
-        (distances, magnitudes,
-         test_mean, periods, depths, _, _, _, _, _) = data2atts(model_name)
-
-        model_name2 = 'Youngs_97_interface'        
-        (dist2 , mag2, test_mean2,
-         periods2, depths2, _, _, _, _, _) = data2atts(model_name2)
-
-        self.assert_(allclose(distances.distance(None), dist2.distance(None)))
-        self.assert_(magnitudes == mag2)
-        self.assert_(periods == periods2)
-        self.assert_(depths == depths2)
-        
-        model_name = 'Combo_Sadigh_Youngs_M8'
-
-        model_names = [model_name, model_name2]
-        model_weights = array([0.1, 0.9])
-        gm = Multiple_ground_motion_calculator(model_names,
-                                               periods,
-                                               model_weights)
-        
-        log_mean, log_sigma,_, _ = gm._distribution_function(
-            distances, magnitudes,
-            depths,
-            None, None) 
-        
-        mean_out = []
-        for i in range(len(distances.distance(None))):
-            mean_out.append([test_mean[i][0], test_mean2[i][0]])
-        #print "mean_out", mean_out
-        #print "distribution.median", distribution.median
-        self.assert_(allclose(exp(log_mean), mean_out, rtol=0.05),
-                     "Fail")
-    
     
     def test_mult_gm(self):
         """
@@ -151,7 +110,6 @@ class Test_ground_motion_calculator(unittest.TestCase):
         
         (distances, magnitudes,
          test_mean, periods, depths, _, _, _, _, _) = data2atts(model_name)
-        
         model_weights = [1]
         gm = Multiple_ground_motion_calculator(
             [model_name], periods, model_weights)
@@ -165,10 +123,55 @@ class Test_ground_motion_calculator(unittest.TestCase):
                      "%s did not pass assert" %model_name  )
         
 
+    def test_multiple_GM(self):
+        # test that multiple ground motion model results
+        # are returned with the right dimensions
+
+        model_1 = 'mean_10_sigma_1'
+        model_2 = 'mean_10_sigma_1'
+      
+        num_sites =  2
+        num_events =  3
+        num_periods = 4 
         
+        periods = [0.0, 0.3, 1, 1.2]
+        model_weights = [0.5, 0.5]
+        gm = Multiple_ground_motion_calculator(
+            [model_1, model_2], periods, model_weights)
+
+        
+        # a fake dist_object class
+        class ADistObj(object):
+            def __init__(self, distance):
+                self.the_distance = distance
+
+            def Rupture(self):
+                return self.the_distance
+            
+            def distance(self, dist_type):
+                return self.the_distance
+            
+        # The extra dimension will be added by reshaping.
+        distance = zeros((num_sites, num_events))
+        dist_ob = ADistObj(distance)
+        magnitudes = {'Mw': array([3.0, 2.0, 1.5]),
+                      'ML': array([3.0, 2.0, 1.5])}
+        results = gm._distribution_function(
+            dist_object=dist_ob,
+            mag_dict=magnitudes)
+        
+        log_mean, log_sigma, log_mean_array, log_sigma_array = results
+        # When combining multiple GM's on the event axis
+        self.assert_(log_mean.shape == (num_sites, num_events*2, num_periods))
+        self.assert_(log_sigma.shape == (num_sites, num_events*2, num_periods))
+
+        self.assert_(log_mean_array.shape == (
+            2, num_sites, num_events, num_periods))
+        self.assert_(log_sigma_array.shape == (
+            2, num_sites, num_events, num_periods))
 #------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_calculator,'test')
-    #suite = unittest.makeSuite(Test_ground_motion_calculator,'test_event_activityII')
+    #suite = unittest.makeSuite(Test_ground_motion_calculator,'test_multiple_GM')
     runner = unittest.TextTestRunner()
     runner.run(suite)

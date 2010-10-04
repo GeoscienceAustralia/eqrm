@@ -4,7 +4,7 @@ import sys
 import unittest
 from ground_motion_distribution import *
 from scipy import array, log, exp, newaxis, concatenate, allclose, sqrt, \
-     r_, alltrue,where
+     r_, alltrue, where, arange, resize
 
 
 class Test_Log_normal_distribution(unittest.TestCase):
@@ -25,16 +25,18 @@ class Test_Log_normal_distribution(unittest.TestCase):
         variate_site=array([[2,56,42],[5.5,3.2,9.1],[9,46,51]])[...,newaxis]
         sample_values = dist._monte_carlo_intra_inter(
             variate_site=variate_site)
-        actual = exp(log_mean + atten_log_sigma_eq_weight*variate_eq*log_sigma + \
-                     (1-atten_log_sigma_eq_weight)*variate_site*log_sigma)        
+        actual = exp(
+            log_mean + atten_log_sigma_eq_weight*variate_eq*log_sigma + \
+            (1-atten_log_sigma_eq_weight)*variate_site*log_sigma)        
         assert allclose(sample_values,actual)
         
         variate_site=array([[26,56,2],[.5,3.,.1],[.9,.46,.51]])[...,newaxis]
         sample_values = dist._monte_carlo_intra_inter(
             variate_site=variate_site)
         
-        actual = exp(log_mean + atten_log_sigma_eq_weight*variate_eq*log_sigma + \
-                     (1-atten_log_sigma_eq_weight)*variate_site*log_sigma)
+        actual = exp(
+            log_mean + atten_log_sigma_eq_weight*variate_eq*log_sigma + \
+            (1-atten_log_sigma_eq_weight)*variate_site*log_sigma)
         assert allclose(sample_values,actual)
               
     def test_monte_carlo3(self):
@@ -51,7 +53,8 @@ class Test_Log_normal_distribution(unittest.TestCase):
         dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
 
         sample_values = dist._monte_carlo_intra_inter()
-        actual = exp(log_mean + atten_log_sigma_eq_weight*variate_eq*log_sigma)      
+        actual = exp(
+            log_mean + atten_log_sigma_eq_weight*variate_eq*log_sigma)      
         assert allclose(sample_values,actual)
 
         event_activity=dist.sample_for_eqrm()     
@@ -72,7 +75,8 @@ class Test_Log_normal_distribution(unittest.TestCase):
         variate_site=array([[2,56,42],[5.5,3.2,9.1],[9,46,51]])[...,newaxis]
         sample_values = dist._monte_carlo_intra_inter(
             variate_site=variate_site)
-        actual = exp(log_mean + (1-atten_log_sigma_eq_weight)*variate_site*log_sigma)
+        actual = exp(
+            log_mean + (1-atten_log_sigma_eq_weight)*variate_site*log_sigma)
         assert allclose(sample_values,actual)
         
     def test_no_variability(self):
@@ -150,6 +154,84 @@ class Test_Log_normal_distribution(unittest.TestCase):
         (_, sample_values, _) = dist.sample_for_eqrm()
         actual = exp(log_mean - 2*log_sigma)
         assert allclose(sample_values,actual)
+
+
+    def test_DLN_monte_carlo2(self):
+        # dimensions (2,1,3,4) = 24 elements
+        dim = (2,1,3,4)
+        count_up = arange(1,24,1)
+        log_mean = resize(count_up*10, dim)
+        log_sigma = resize(count_up, dim)
+        count_up_2 = arange(1,48,2)
+        variate = resize(count_up_2, dim)
+        var_method = 2
+        
+        dist = Distribution_Log_Normal(var_method)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+        sample_values = dist._monte_carlo(variate_site=variate)
+        
+        actual = exp(log_mean + variate*log_sigma)
+        self.assert_(allclose(sample_values, actual))
+        self.assert_(actual.shape == dim)
+
+
+    def test_DLN_no_variability(self):
+        # dimensions (2,1,3,4) = 24 elements
+        dim = (2,1,3,4)
+        count_up = arange(1,24,1)
+        log_mean = resize(count_up*10, dim)
+        log_sigma = resize(count_up, dim)
+        var_method = None
+        
+        dist = Distribution_Log_Normal(var_method)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+        (_, sample_values, _) = dist.sample_for_eqrm()
+        
+        actual = exp(log_mean)
+        self.assert_(allclose(sample_values, actual))
+        self.assert_(actual.shape == dim)
+
+        
+    def test_DLN_sigmas(self):
+        # dimensions (2,1,3,4) = 24 elements
+        dim = (2,1,3,4)
+        count_up = arange(1,24,1)
+        log_mean = resize(count_up*10, dim)
+        log_sigma = resize(count_up, dim)
+        
+        var_method = 3       
+        dist = Distribution_Log_Normal(var_method)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+        (_, sample_values, _) = dist.sample_for_eqrm()       
+        actual = exp(log_mean + 2*log_sigma)
+        self.assert_(allclose(sample_values, actual))
+        self.assert_(actual.shape == dim)
+
+        var_method = 4      
+        dist = Distribution_Log_Normal(var_method)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+        (_, sample_values, _) = dist.sample_for_eqrm()       
+        actual = exp(log_mean + log_sigma)
+        self.assert_(allclose(sample_values, actual))
+        self.assert_(actual.shape == dim)
+        
+        var_method = 5      
+        dist = Distribution_Log_Normal(var_method)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+        (_, sample_values, _) = dist.sample_for_eqrm()       
+        actual = exp(log_mean - log_sigma)
+        self.assert_(allclose(sample_values, actual))
+        self.assert_(actual.shape == dim)
+        
+        var_method = 6    
+        dist = Distribution_Log_Normal(var_method)
+        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
+        (_, sample_values, _) = dist.sample_for_eqrm()       
+        actual = exp(log_mean - 2*log_sigma)
+        self.assert_(allclose(sample_values, actual))
+        self.assert_(actual.shape == dim)
+
+        
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Log_normal_distribution,'test')

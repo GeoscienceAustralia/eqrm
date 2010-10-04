@@ -108,8 +108,7 @@ from eqrm_code import util
 import event_set
 import conversions
 
-# might be better as: LOG10E = math.log10(math.e)
-LOG10E = 0.43429448190325182
+LOG10E = math.log10(math.e)
 
 # A dictionary of all the info specified bellow.
 # This is used by ground_motion_specification.
@@ -176,14 +175,16 @@ def Allen_distribution(**kwargs):
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-
+    
+    events = distance.shape[1]
+    
     num_periods=coefficient.shape[3]
     assert coefficient.shape==(6,1,1,num_periods)
     assert sigma_coefficient.shape==(2,1,1,num_periods)
     c1,c2,c4,c6,c7,c10=coefficient
     model_sigma,regression_sigma=sigma_coefficient
     log_mean=c1+c2*mag+log((distance+exp(c4))**(c6+c7*mag))+c10*(mag-6.0)**2
-    log_sigma=(model_sigma+regression_sigma)
+    log_sigma = tile(model_sigma+regression_sigma,(1,events,1))
     return log_mean,log_sigma
 
 
@@ -752,7 +753,7 @@ def AllenSEA06_distribution(**kwargs):
     log_mean = ((c1+c2*mag+c3*(mag**2)+(c4+c5*mag)*f1+
                 (c6+c7*mag)*f2+(c8+c9*mag)*f0+D)-log10(980))/LOG10E
                 
-    num_events = distance.shape[2]
+    num_events = distance.shape[1]
     log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
     return log_mean,log_sigma
 
@@ -1925,7 +1926,7 @@ def Somerville_distribution(**kwargs):
 #     print "num_periods", num_periods
 
     log_mean = Somerville_log_mean(coefficient, mag, distance)
-    num_events = distance.shape[2]
+    num_events = distance.shape[1]
     log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
     assert isfinite(log_mean).all()
     return log_mean,log_sigma
@@ -2136,7 +2137,7 @@ def Liang_2008_distribution(**kwargs):
     # calculate result in ln(mm/s/s)
     (a, b, c, d, e) = coefficient
     log_mean = a + b*mag + c*distance + d*log(distance) + e*mag*log(distance)
-    num_events = distance.shape[2]
+    num_events = distance.shape[1]
     log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
 
     # return mean as ln(g)
@@ -3314,5 +3315,111 @@ gound_motion_init['Campbell08'] = [Campbell08_distribution,
 
 del Campbell08_Table2, Campbell08_Table3
 
-#########################  End of Campbell08 model  ############################
+#########################  End of Campbell08 model  ##########################
+#***************  START OF mean_10_sigma_1  ****************************
 
+mean_10_sigma_1_magnitude_type='ML'
+mean_10_sigma_1_distance_type='Rupture'
+mean_10_sigma_1_coefficient=[[0.28,0.28],[0.28,0.28]]
+mean_10_sigma_1_coefficient_period=[0.0,1.0]
+mean_10_sigma_1_sigma_coefficient=[[0.28,0.28],[0.28,0.28]]
+mean_10_sigma_1_sigma_coefficient_period=[0.0,1.0]
+
+def mean_10_sigma_1_distribution(**kwargs):    
+    """
+    
+    This is a dummy ground motion model used for testing.
+    The parameter distance and coefficient are used, to get the returned
+    shape right.
+
+    
+    distance.shape = (site, events, 1)
+    coefficient.shape = (num_coefficients, 1, 1, num_periods)
+    
+        The shapes of the returned arrays are:
+            log_mean = (site, events, num_periods)
+            log_sigma = (site, events, num_periods)
+    """
+    num_sites =  kwargs['distance'].shape[0]
+    num_events =  kwargs['distance'].shape[1]
+    num_periods = kwargs['coefficient'].shape[3]
+
+    # exp(0) = 1
+    log_sigma = zeros((num_sites, num_events, num_periods))
+    log_mean = ones((num_sites, num_events, num_periods))*math.log(10)
+    return log_mean, log_sigma
+
+
+mean_10_sigma_1_sigma_coefficient_interpolation = linear_interpolation
+mean_10_sigma_1_coefficient_interpolation = linear_interpolation
+
+mean_10_sigma_1_args=[
+    mean_10_sigma_1_distribution,
+    mean_10_sigma_1_magnitude_type,
+    mean_10_sigma_1_distance_type,
+    
+    mean_10_sigma_1_coefficient,
+    mean_10_sigma_1_coefficient_period,
+    mean_10_sigma_1_coefficient_interpolation,
+    
+    mean_10_sigma_1_sigma_coefficient,
+    mean_10_sigma_1_sigma_coefficient_period,
+    mean_10_sigma_1_sigma_coefficient_interpolation]
+
+gound_motion_init['mean_10_sigma_1'] = mean_10_sigma_1_args
+
+#***************  End of mean_10_sigma_1 ****************************
+
+#***************  START OF mean_20_sigma_2  ****************************
+
+mean_20_sigma_2_magnitude_type='ML'
+mean_20_sigma_2_distance_type='Rupture'
+mean_20_sigma_2_coefficient=[[0.28,0.28],[0.28,0.28]]
+mean_20_sigma_2_coefficient_period=[0.0,10.0]
+mean_20_sigma_2_sigma_coefficient=[[0.28,0.28],[0.28,0.28]]
+mean_20_sigma_2_sigma_coefficient_period=[0.0,10.0]
+
+def mean_20_sigma_2_distribution(**kwargs):    
+    """
+    
+    This is a dummy ground motion model used for testing.
+    The parameter distance and coefficient are used, to get the returned
+    shape right.
+
+    
+    distance.shape = (site, events, 1)
+    coefficient.shape = (num_coefficients, 1, 1, num_periods)
+    
+        The shapes of the returned arrays are:
+            log_mean = (site, events, num_periods)
+            log_sigma = (site, events, num_periods)
+    """
+    num_sites =  kwargs['distance'].shape[0]
+    num_events =  kwargs['distance'].shape[1]
+    num_periods = kwargs['coefficient'].shape[3]
+
+    # exp(0) = 1
+    log_sigma = ones((num_sites, num_events, num_periods))*math.log(2)
+    log_mean = ones((num_sites, num_events, num_periods))*math.log(10)
+    return log_mean, log_sigma
+
+
+mean_20_sigma_2_sigma_coefficient_interpolation=linear_interpolation
+mean_20_sigma_2_coefficient_interpolation = linear_interpolation
+
+mean_20_sigma_2_args=[
+    mean_20_sigma_2_distribution,
+    mean_20_sigma_2_magnitude_type,
+    mean_20_sigma_2_distance_type,
+    
+    mean_20_sigma_2_coefficient,
+    mean_20_sigma_2_coefficient_period,
+    mean_20_sigma_2_coefficient_interpolation,
+    
+    mean_20_sigma_2_sigma_coefficient,
+    mean_20_sigma_2_sigma_coefficient_period,
+    mean_20_sigma_2_sigma_coefficient_interpolation]
+
+gound_motion_init['mean_20_sigma_2'] = mean_20_sigma_2_args
+
+#***************  End of Gaull 1990 WA MODEL  ****************************

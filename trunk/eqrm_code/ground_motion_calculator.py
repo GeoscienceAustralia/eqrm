@@ -274,11 +274,6 @@ class Multiple_ground_motion_calculator(object):
           log_sigma_array the log_sigma values
             dimensions (GM_model, sites, events, periods)
         """
-
-        # This is where spawning occured.  Though it never worked.
-        #log_mean_array = zeros((len(self.GM_models), ))
-        multi_log_mean = []
-        multi_log_sigma = []
         for mod_i, GM_model in enumerate(self.GM_models):
             (log_mean, log_sigma) = GM_model.distribution_function(
                 dist_object, mag_dict,
@@ -288,44 +283,28 @@ class Multiple_ground_motion_calculator(object):
                 dist_type=GM_model.GM_spec.distance_type,
                 mag_type=GM_model.GM_spec.magnitude_type)
             if mod_i == 0:
-                log_mean_array = log_mean[:,newaxis]
-                log_sigma_array = log_sigma[:,newaxis]
+                log_mean_extend_GM = log_mean[newaxis,:]
+                log_sigma_extend_GM = log_sigma[newaxis,:]
+                log_mean_extend_event = log_mean
+                log_sigma_extend_event = log_sigma
             else:
-                new_axis = len(log_mean.shape)
-                #print "log_sigma_array", log_sigma_array
-                #print "log_sigma[:,newaxis]", log_sigma[:,newaxis]
-                #print "log_sigma_array s", log_sigma_array.shape
-                #print "log_sigma[:,newaxis] s", log_sigma[:,newaxis].shape
-                #log_mean_array = concatenate(
-                #    (log_mean_array, log_mean[:,newaxis]),
-                #    axis=new_axis)
-                #log_sigma_array = concatenate(
-                #    (log_sigma_array, log_sigma[:,newaxis]),
-                #    axis=new_axis)
-            multi_log_mean.append(log_mean)
-            multi_log_sigma.append(log_sigma)
-
+                new_axis = 0
+                event_axis = 1
+                log_mean_extend_GM = concatenate(
+                    (log_mean_extend_GM, log_mean[newaxis, :]),
+                    axis=new_axis)
+                log_sigma_extend_GM = concatenate(
+                    (log_sigma_extend_GM, log_sigma[newaxis, :]),
+                    axis=new_axis)
+                log_mean_extend_event = concatenate(
+                    (log_mean_extend_event, log_mean), axis=event_axis)
+                log_sigma_extend_event = concatenate(
+                    (log_sigma_extend_event, log_sigma), axis=event_axis)
+        
         # dimensions of log_mean and log_sigma are (sites, events, periods)
         # note, sites is currently always 1.
         
-        # FIXME Do we need to do this? Yes!
-        # make multi_log_sigma all the same shape
-        sigma_shape = [log_sigma.shape for log_sigma in multi_log_sigma]
-        max_sigma_shape = []
-        for i in range(len(sigma_shape[0])):
-            max_sigma_shape.append(max([shape[i] for shape in sigma_shape]))
-        max_sigma_shape = tuple(max_sigma_shape)
-        max_sigma_array = zeros(max_sigma_shape)
-        multi_log_sigma = [log_sigma+max_sigma_array
-                           for log_sigma in multi_log_sigma]
-        # End of code to make sigma all the same shape
-
-        log_mean = concatenate(multi_log_mean,axis=1)
-        log_sigma = concatenate(multi_log_sigma,axis=1)
-
-        # The event_activity is used by save_event_set
-        #print "Multiple_ground_motion_cal event_activity", event_activity
-        #print "Multiple_ground_motion_calculator event_ids", event_ids
-        return (log_mean, log_sigma, log_mean_array, log_sigma_array)
+        return (log_mean_extend_event, log_sigma_extend_event,
+                log_mean_extend_GM, log_sigma_extend_GM)
 
 
