@@ -13,7 +13,7 @@
 from numpy import NaN
 import scipy
 from scipy import allclose, isfinite, array, newaxis, zeros, ndarray, \
-     asarray, where, concatenate, allclose, resize
+     asarray, where, concatenate, allclose, reshape
     
 def do_collapse_logic_tree(data, event_num, weights,
                            THE_PARAM_T, use_C=True):
@@ -24,19 +24,26 @@ def do_collapse_logic_tree(data, event_num, weights,
     Data is the array to be collapsed (eg ground_motion or loss)
 
     """
-    # if there is only one attenuation model.
-    no_attn_collapse=(
-        (len(THE_PARAM_T.atten_models)==1) or
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models is False)
-    
-    if no_attn_collapse:        
-        new_data=data 
+    if len(data.shape) == 4:
+        # Assume the extra dimension is the ground motion model
+        new_data = _collapse_att_model_dimension(data,
+                                                 weights)
     else:
-        weights = asarray(weights)
-        num_of_att_models = int(len(event_num)/(max(event_num) + 1))
-        new_data = _collapse_att_model_results(data,
-                                               weights,
-                                               num_of_att_models) 
+        
+        # if there is only one attenuation model.
+        no_attn_collapse = (
+            (len(THE_PARAM_T.atten_models) == 1) or
+            THE_PARAM_T.atten_collapse_Sa_of_atten_models is False)
+        
+        if no_attn_collapse:        
+            new_data=data 
+        else:
+            weights = asarray(weights)
+            num_of_att_models = int(len(event_num)/(max(event_num) + 1))
+            new_data = _collapse_att_model_results(data,
+                                                   weights,
+                                                   num_of_att_models)
+            
     return new_data, None, None
 
 def _collapse_att_model_results(data, weights, num_of_att_models):
@@ -48,9 +55,8 @@ def _collapse_att_model_results(data, weights, num_of_att_models):
     The second dimension is event*attenuation model.  The data is grouped
     results per event for the first att' model, then the second att' model ect.
     
-    Data is an array with 3 dimensions; Y, psudo events axis, period axis
-    (or damage states?).
-    I don't know what Y is.  Maybe Site.  It is commonly 1.
+    Data has 3 dimensions; (site, events*attenuation models, periods)
+    Site is 1.
     
     What the data is changes. Sometimes its SA, sometimes it's cost.
     
@@ -65,7 +71,22 @@ def _collapse_att_model_results(data, weights, num_of_att_models):
     
     return sum
         
+def _collapse_att_model_dimension(data, weights):
+    """
+    Collapse the data so it does not have an attenuation model dimension.
+    To collapse it, multiply the data by the weights and sum.
+
+    Parameters:
+      data:  3 dimensions; (ground motion model, site, events, periods)
+        Site is 1. What the data is changes. Sometimes its SA, sometimes
+        it's cost.
+      weights: The weight to apply to each ground motion model 'layer'
     
+    """
+    weighted_data = data * reshape(weights, (-1,1,1,1)) 
+    sum = scipy.sum(weighted_data, 0)
+    
+    return sum    
 
 def hzd_do_value(sa, r_nu, rtrn_rte): #,hack=[0]):
     """

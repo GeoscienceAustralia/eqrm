@@ -2,9 +2,11 @@ import os
 import sys
 import unittest
 
-from scipy import allclose, array
+import scipy
+from scipy import allclose, array, arange, reshape
 
 from eqrm_code.exceedance_curves import *
+from eqrm_code.exceedance_curves import _collapse_att_model_dimension
 
 
 class Dummy:
@@ -450,6 +452,7 @@ class Test_Exceedance(unittest.TestCase):
         hzd = hzd_do_value(new_bedrock_SA, event_activity, rtrn_rte)
    
    
+
         bedrock_hazard = array([ 0.01435674, 0.05114633, 0.05809098,
                                  0.0625557,  0.06011379
                            , 0.1082926
@@ -459,6 +462,30 @@ class Test_Exceedance(unittest.TestCase):
                            , 0.13190761, 0.13190761])
         
         self.assert_ (allclose(hzd, bedrock_hazard))
+
+    def test_collapse_att_model_dimension(self):
+        gmm = 3
+        site = 1
+        events = 2
+        periods = 4
+        size = gmm * site * events * periods
+        data = arange(0, size, 1)
+        data = reshape(data, (gmm, site, events, periods))
+        weights = [0.2, 0.3, 0.5]
+        sum = _collapse_att_model_dimension(data, weights)
+
+        actual = zeros((gmm, site, events, periods))
+        for i in [0,1,2]:
+            actual[i,:] = data[i, :, :, :] * weights[i]
+        sum_act = scipy.sum(actual, 0)
+
+        self.assert_ (allclose(sum, sum_act))
+        self.assert_ (sum[0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
+        
+            
+        
+        
+        
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Exceedance,'test')
