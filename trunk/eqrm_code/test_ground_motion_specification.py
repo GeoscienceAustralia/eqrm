@@ -1,6 +1,7 @@
 import unittest
 
 from scipy import array, exp, log, allclose, newaxis, asarray, zeros
+import math
 
 from eqrm_code.ground_motion_specification import *
 from eqrm_code.ground_motion_interface import gound_motion_init
@@ -10,15 +11,14 @@ from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
      Multiple_ground_motion_calculator
 
 classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
-                          'Toro_1997_midcontinent',
-                          'Sadigh_97', 'Youngs_97_interface',
-                          'Youngs_97_intraslab',
-                          'Combo_Sadigh_Youngs_M8',
-                          'Boore_08', 'Somerville_Yilgarn',
-                          'Somerville_Non_Cratonic',
+                          'Toro_1997_midcontinent', 'Sadigh_97',
+                          'Youngs_97_interface', 'Youngs_97_intraslab',
+                          'Combo_Sadigh_Youngs_M8', 'Boore_08',
+                          'Somerville_Yilgarn', 'Somerville_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
                           'Chiou08', 'Campbell03', 'Campbell08')
+#                          'Chiou08', 'Campbell03', 'Campbell08', 'Abrahamson08')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -546,7 +546,7 @@ tmp[2,:] = [150.0, 150.0, 150.0, 150.0] # distance - 3rd site and all 4 events
 tmp[3,:] = [200.0, 200.0, 200.0, 200.0] # distance - 4th site and all 4 events
 test_data['Liang_2008_test_distance'] = tmp
 
-# result values, in 'g'
+# result values, in 'g' - values taken from spreadsheet
 tmp = zeros((4,4,3))		# distance, magnitude, period
 # period:     0.1       1.0       10.0
 tmp[0,0,:] = [5.16E-03, 8.72E-04, 5.89E-06]	# R= 50.0, ML=4.0
@@ -598,7 +598,7 @@ tmp = zeros((4,2,4))		# num_sites, num_events, num_periods
 #tmp[3,0,:] = [0.273531, 0.650310, 0.055971, -0.463949]	# R=300.0, ML=5.5
 #tmp[3,1,:] = [1.250613, 1.587275, 1.312415,  1.092019]	# R=300.0, ML=7.5
 
-# values above are log10 cmm/s/s, converted programmatically to ln g, then g:
+# values above are log10 cm/s/s, converted programmatically to ln g, then g:
 tmp[0,0,:] = [2.05886715e+00, 1.65781599e+00, 1.86334093e-01, 5.38980837e-02]
 tmp[0,1,:] = [3.69888070e+00, 3.18351811e+00, 6.39932732e-01, 2.79706349e-01]
 tmp[1,0,:] = [3.12967560e-01, 2.46010886e-01, 2.76451738e-02, 7.46035209e-03]
@@ -760,6 +760,19 @@ tmp[2,1,:] = [0.062533, 0.146149, 0.080264, 0.021578] # R=100.0, ML=7.5
 test_data['Chiou08_test_mean'] = tmp
 del tmp
 
+## # sigma values, in 'g'
+## # data is from openSHA.org
+## tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+## # period:     0.01    0.20    1.00    3.00
+## tmp[0,0,:] = [5.8e-1, 5.8e-1, 6.4e-1, 7.2e-1] # R=  5.0, ML=5.5
+## tmp[0,1,:] = [4.6e-1, 4.7e-1, 6.0e-1, 7.0e-1] # R=  5.0, ML=7.5
+## tmp[1,0,:] = [6.1e-1, 6.2e-1, 6.6e-1, 7.2e-1] # R= 20.0, ML=5.5
+## tmp[1,1,:] = [4.7e-1, 5.0e-1, 6.2e-1, 7.0e-1] # R= 20.0, ML=7.5
+## tmp[2,0,:] = [6.2e-1, 6.8e-1, 6.8e-1, 7.2e-1] # R=100.0, ML=5.5
+## tmp[2,1,:] = [5.0e-1, 5.4e-1, 6.3e-1, 7.0e-1] # R=100.0, ML=7.5
+## test_data['Chiou08_test_sigma'] = tmp
+## del tmp
+
 ################################################################################
 # Campbell03 Tests - data values from Campbell03_check.py
 
@@ -793,51 +806,240 @@ del tmp
 
 ################################################################################
 # Campbell08 Tests - test against data values from Campbell08_check.py
+#                    which got good agreement against FORTRAN code
+
+class Campbell08_distance_object(object):
+    def __init__(self, Rrup, Rjb):
+        self.Rrup = Rrup
+        self.Rjb = Rjb
+
+    def Rupture(self):
+        return self.Rrup
+
+    def Joyner_Boore(self):
+        return self.Rjb
+
+    def distance(self, type):
+        """We *must* define a 'distance' method, results unused."""
+
+        return self.Rrup
+
+# Rrup distances - num_sites = 7
+tmp = zeros((7,4)) # initialise an array: (num_sites, num_events)
+tmp[0,:] = [  5.0,   5.0,   5.0,   5.0] # Rrup - 1st site and all 4 events
+tmp[1,:] = [ 10.0,  10.0,  10.0,  10.0] # Rrup - 2nd site and all 4 events
+tmp[2,:] = [ 15.0,  15.0,  15.0,  15.0] # Rrup - 3rd site and all 4 events
+tmp[3,:] = [ 30.0,  30.0,  30.0,  30.0] # Rrup - 4th site and all 4 events
+tmp[4,:] = [ 50.0,  50.0,  50.0,  50.0] # Rrup - 5th site and all 4 events
+tmp[5,:] = [100.0, 100.0, 100.0, 100.0] # Rrup - 6th site and all 4 events
+tmp[6,:] = [200.0, 200.0, 200.0, 200.0] # Rrup - 7th site and all 4 events
+Campbell08_Rrup = tmp
+del tmp
+
+# Rjb distances - num_sites = 7 - values from check code
+tmp = zeros((7,4)) # initialise an array: (num_sites, num_events)
+tmp[0,:] = [  0.0,   0.0,   0.0,   0.0] # Rjb - 1st site and all 4 events
+tmp[1,:] = [  0.0,   0.0,   0.0,   0.0] # Rjb - 2nd site and all 4 events
+tmp[2,:] = [  6.2,   6.2,   6.2,   6.2] # Rjb - 3rd site and all 4 events
+tmp[3,:] = [ 26.0,  26.0,  26.0,  26.0] # Rjb - 4th site and all 4 events
+tmp[4,:] = [ 47.7,  47.7,  47.7,  47.7] # Rjb - 5th site and all 4 events
+tmp[5,:] = [ 98.9,  98.9,  98.9,  98.9] # Rjb - 6th site and all 4 events
+tmp[6,:] = [199.4, 199.4, 199.4, 199.4] # Rjb - 7th site and all 4 events
+Campbell08_Rjb = tmp
+del tmp
+
+# test distance object
+test_data['Campbell08_test_distance_object'] = \
+        Campbell08_distance_object(Campbell08_Rrup, Campbell08_Rjb)
+
+# num_events = 4
+test_data['Campbell08_test_magnitude'] = [5.0, 7.0, 5.0, 7.0]
+
+# num_events = 4
+test_data['Campbell08_test_dip'] = [90.0, 90.0, 45.0, 45.0]
+
+# num_events = 4
+test_data['Campbell08_test_depth_to_top'] = [5.0, 0.0, 5.0, 0.0]
+
+# num_events = 4
+# 'strikeslip' fault type index is 2, 'reverse' is 0
+test_data['Campbell08_test_faulting_type'] = [2, 2, 0, 0]
+
+# num_periods = 4
+test_data['Campbell08_test_period'] = [0.01, 0.20, 1.00, 3.00]
+
+# Z25 override - num_sites = 7
+test_data['Campbell08_test_Z25'] = [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
+
+# Vs30 override - num_sites = 7
+test_data['Campbell08_test_vs30'] = [760.0, 760.0, 760.0, 760.0, 760.0,
+                                     760.0, 760.0]
+
+# result values, in 'g' - from 'check' code
+tmp = zeros((7,4,4))		# num_sites, num_events, num_periods
+# period:     0.01       0.20       1.00       3.00
+tmp[0,0,:] = [1.7519e-1, 3.6164e-1, 4.8140e-2, 5.4202e-3] # R=  5.0, ML=5.0, type=SS
+tmp[0,1,:] = [3.6907e-1, 8.7425e-1, 2.6571e-1, 7.5109e-2] # R=  5.0, ML=7.0, type=SS
+tmp[0,2,:] = [2.3079e-1, 4.7850e-1, 6.2123e-2, 5.4202e-3] # R=  5.0, ML=5.0, type=RV
+tmp[0,3,:] = [5.9403e-1, 1.4271e+0, 4.3373e-1, 8.7614e-2] # R=  5.0, ML=7.0, type=RV
+tmp[1,0,:] = [1.0306e-1, 2.3247e-1, 2.6472e-2, 2.9806e-3] # R= 10.0, ML=5.0, type=SS
+tmp[1,1,:] = [2.5133e-1, 6.2711e-1, 1.7438e-1, 4.9290e-2] # R= 10.0, ML=7.0, type=SS
+tmp[1,2,:] = [1.3598e-1, 3.0758e-1, 3.4162e-2, 2.9806e-3] # R= 10.0, ML=5.0, type=RV
+tmp[1,3,:] = [4.0581e-1, 1.0236e+0, 2.8464e-1, 5.7497e-2] # R= 10.0, ML=7.0, type=RV
+tmp[2,0,:] = [6.7652e-2, 1.5587e-1, 1.7386e-2, 1.9575e-3] # R= 15.0, ML=5.0, type=SS
+tmp[2,1,:] = [1.8523e-1, 4.6434e-1, 1.2968e-1, 3.6657e-2] # R= 15.0, ML=7.0, type=SS
+tmp[2,2,:] = [8.9346e-2, 2.0624e-1, 2.2436e-2, 1.9575e-3] # R= 15.0, ML=5.0, type=RV
+tmp[2,3,:] = [2.4577e-1, 6.1899e-1, 1.7287e-1, 4.0123e-2] # R= 15.0, ML=7.0, type=RV
+tmp[3,0,:] = [2.9958e-2, 6.7581e-2, 8.0680e-3, 9.0840e-4] # R= 30.0, ML=5.0, type=SS
+tmp[3,1,:] = [1.0249e-1, 2.4772e-1, 7.5513e-2, 2.1345e-2] # R= 30.0, ML=7.0, type=SS
+tmp[3,2,:] = [3.9604e-2, 8.9419e-2, 1.0411e-2, 9.0840e-4] # R= 30.0, ML=5.0, type=RV
+tmp[3,3,:] = [1.0934e-1, 2.6445e-1, 8.0612e-2, 2.1788e-2] # R= 30.0, ML=7.0, type=RV
+tmp[4,0,:] = [1.5913e-2, 3.4483e-2, 4.5128e-3, 5.0811e-4] # R= 50.0, ML=5.0, type=SS
+tmp[4,1,:] = [6.4653e-2, 1.4937e-1, 5.0154e-2, 1.4177e-2] # R= 50.0, ML=7.0, type=SS
+tmp[4,2,:] = [2.1045e-2, 4.5625e-2, 5.8236e-3, 5.0811e-4] # R= 50.0, ML=5.0, type=RV
+tmp[4,3,:] = [6.6118e-2, 1.5278e-1, 5.1297e-2, 1.4278e-2] # R= 50.0, ML=7.0, type=RV
+tmp[5,0,:] = [6.6525e-3, 1.3498e-2, 2.0392e-3, 2.2960e-4] # R=100.0, ML=5.0, type=SS
+tmp[5,1,:] = [3.4220e-2, 7.3795e-2, 2.8662e-2, 8.1019e-3] # R=100.0, ML=7.0, type=SS
+tmp[5,2,:] = [8.8004e-3, 1.7860e-2, 2.6315e-3, 2.2960e-4] # R=100.0, ML=5.0, type=RV
+tmp[5,3,:] = [3.4404e-2, 7.4914e-2, 2.8817e-2, 8.1156e-3] # R=100.0, ML=7.0, type=RV
+tmp[6,0,:] = [2.7675e-3, 5.2378e-3, 9.1954e-4, 1.0353e-4] # R=200.0, ML=5.0, type=SS
+tmp[6,1,:] = [1.8031e-2, 3.6219e-2, 1.6356e-2, 4.6234e-3] # R=200.0, ML=7.0, type=SS
+tmp[6,2,:] = [3.6614e-3, 6.9303e-3, 1.1866e-3, 1.0353e-4] # R=200.0, ML=5.0, type=RV
+tmp[6,3,:] = [1.8058e-2, 3.6272e-2, 1.6380e-2, 4.6256e-3] # R=200.0, ML=7.0, type=RV
+
+#tmp = zeros((7,2,4))		# num_sites, num_events, num_periods
+## period:     0.01       0.20       1.00       3.00
+#tmp[0,0,:] = [1.7519e-1, 3.6164e-1, 4.8140e-2, 5.4202e-3] # R=  5.0, ML=5.0, type=SS
+#tmp[0,1,:] = [3.6907e-1, 8.7425e-1, 2.6571e-1, 7.5109e-2] # R=  5.0, ML=7.0, type=SS
+#tmp[1,0,:] = [1.0306e-1, 2.3247e-1, 2.6472e-2, 2.9806e-3] # R= 10.0, ML=5.0, type=SS
+#tmp[1,1,:] = [2.5133e-1, 6.2711e-1, 1.7438e-1, 4.9290e-2] # R= 10.0, ML=7.0, type=SS
+#tmp[2,0,:] = [6.7652e-2, 1.5587e-1, 1.7386e-2, 1.9575e-3] # R= 15.0, ML=5.0, type=SS
+#tmp[2,1,:] = [1.8523e-1, 4.6434e-1, 1.2968e-1, 3.6657e-2] # R= 15.0, ML=7.0, type=SS
+#tmp[3,0,:] = [2.9958e-2, 6.7581e-2, 8.0680e-3, 9.0840e-4] # R= 30.0, ML=5.0, type=SS
+#tmp[3,1,:] = [1.0249e-1, 2.4772e-1, 7.5513e-2, 2.1345e-2] # R= 30.0, ML=7.0, type=SS
+#tmp[4,0,:] = [1.5913e-2, 3.4483e-2, 4.5128e-3, 5.0811e-4] # R= 50.0, ML=5.0, type=SS
+#tmp[4,1,:] = [6.4653e-2, 1.4937e-1, 5.0154e-2, 1.4177e-2] # R= 50.0, ML=7.0, type=SS
+#tmp[5,0,:] = [6.6525e-3, 1.3498e-2, 2.0392e-3, 2.2960e-4] # R=100.0, ML=5.0, type=SS
+#tmp[5,1,:] = [3.4220e-2, 7.3795e-2, 2.8662e-2, 8.1019e-3] # R=100.0, ML=7.0, type=SS
+#tmp[6,0,:] = [2.7675e-3, 5.2378e-3, 9.1954e-4, 1.0353e-4] # R=200.0, ML=5.0, type=SS
+#tmp[6,1,:] = [1.8031e-2, 3.6219e-2, 1.6356e-2, 4.6234e-3] # R=200.0, ML=7.0, type=SS
+
+test_data['Campbell08_test_mean'] = tmp
+del tmp
+
+# sigma values, in ln('g') - from 'check' code
+tmp = zeros((7,4,4))		# num_sites, num_events, num_periods
+# period:     0.01                 0.20                 1.00                 3.00
+tmp[0,0,:] = [math.log(4.7403e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=  5.0, ML=5.0, type=SS
+tmp[0,1,:] = [math.log(4.7094e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=  5.0, ML=7.0, type=SS
+tmp[0,2,:] = [math.log(4.7303e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=  5.0, ML=5.0, type=RV
+tmp[0,3,:] = [math.log(4.6852e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=  5.0, ML=7.0, type=RV
+tmp[1,0,:] = [math.log(4.7551e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 10.0, ML=5.0, type=SS
+tmp[1,1,:] = [math.log(4.7268e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 10.0, ML=7.0, type=SS
+tmp[1,2,:] = [math.log(4.7481e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 10.0, ML=5.0, type=RV
+tmp[1,3,:] = [math.log(4.7047e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 10.0, ML=7.0, type=RV
+tmp[2,0,:] = [math.log(4.7631e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 15.0, ML=5.0, type=SS
+tmp[2,1,:] = [math.log(4.7384e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 15.0, ML=7.0, type=SS
+tmp[2,2,:] = [math.log(4.7581e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 15.0, ML=5.0, type=RV
+tmp[2,3,:] = [math.log(4.7277e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 15.0, ML=7.0, type=RV
+tmp[3,0,:] = [math.log(4.7723e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 30.0, ML=5.0, type=SS
+tmp[3,1,:] = [math.log(4.7552e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 30.0, ML=7.0, type=SS
+tmp[3,2,:] = [math.log(4.7699e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 30.0, ML=5.0, type=RV
+tmp[3,3,:] = [math.log(4.7537e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 30.0, ML=7.0, type=RV
+tmp[4,0,:] = [math.log(4.7758e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 50.0, ML=5.0, type=SS
+tmp[4,1,:] = [math.log(4.7638e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 50.0, ML=7.0, type=SS
+tmp[4,2,:] = [math.log(4.7745e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 50.0, ML=5.0, type=RV
+tmp[4,3,:] = [math.log(4.7635e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 50.0, ML=7.0, type=RV
+tmp[5,0,:] = [math.log(4.7782e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=100.0, ML=5.0, type=SS
+tmp[5,1,:] = [math.log(4.7712e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=100.0, ML=7.0, type=SS
+tmp[5,2,:] = [math.log(4.7777e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=100.0, ML=5.0, type=RV
+tmp[5,3,:] = [math.log(4.7711e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=100.0, ML=7.0, type=RV
+tmp[6,0,:] = [math.log(4.7793e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=200.0, ML=5.0, type=SS
+tmp[6,1,:] = [math.log(4.7753e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=200.0, ML=7.0, type=SS
+tmp[6,2,:] = [math.log(4.7790e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=200.0, ML=5.0, type=RV
+tmp[6,3,:] = [math.log(4.7753e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=200.0, ML=7.0, type=RV
+
+#tmp = zeros((7,2,4))		# num_sites, num_events, num_periods
+## period:     0.01                 0.20                 1.00                 3.00
+#tmp[0,0,:] = [math.log(4.7403e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=  5.0, ML=5.0, type=SS
+#tmp[0,1,:] = [math.log(4.7094e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=  5.0, ML=7.0, type=SS
+#tmp[1,0,:] = [math.log(4.7551e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 10.0, ML=5.0, type=SS
+#tmp[1,1,:] = [math.log(4.7268e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 10.0, ML=7.0, type=SS
+#tmp[2,0,:] = [math.log(4.7631e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 15.0, ML=5.0, type=SS
+#tmp[2,1,:] = [math.log(4.7384e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 15.0, ML=7.0, type=SS
+#tmp[3,0,:] = [math.log(4.7723e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 30.0, ML=5.0, type=SS
+#tmp[3,1,:] = [math.log(4.7552e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 30.0, ML=7.0, type=SS
+#tmp[4,0,:] = [math.log(4.7758e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 50.0, ML=5.0, type=SS
+#tmp[4,1,:] = [math.log(4.7638e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R= 50.0, ML=7.0, type=SS
+#tmp[5,0,:] = [math.log(4.7782e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=100.0, ML=5.0, type=SS
+#tmp[5,1,:] = [math.log(4.7712e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=100.0, ML=7.0, type=SS
+#tmp[6,0,:] = [math.log(4.7793e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=200.0, ML=5.0, type=SS
+#tmp[6,1,:] = [math.log(4.7753e-1), math.log(5.3400e-1), math.log(5.6800e-1), math.log(5.5800e-1)] # R=200.0, ML=7.0, type=SS
+
+test_data['Campbell08_test_sigma'] = tmp
+del tmp
+
+################################################################################
+# Abrahamson08 Tests - test against data values from [openSHA.org].
 
 # num_events = 2
-test_data['Campbell08_test_magnitude'] = [5.0, 7.0]
+test_data['Abrahamson08_test_magnitude'] = [5.0, 7.0]
 
 # num_events = 2
-test_data['Campbell08_test_dip'] = [90.0, 90.0]
+test_data['Abrahamson08_test_dip'] = [90.0, 90.0]
 
 # num_events = 2
-test_data['Campbell08_test_depth_to_top'] = [0.0, 0.0]
+test_data['Abrahamson08_test_depth_to_top'] = [0.0, 0.0]
 
 # num_events = 2
 # 'reverse' fault type index is 0
-test_data['Campbell08_test_faulting_type'] = [0, 0]
+test_data['Abrahamson08_test_faulting_type'] = [0, 0]
 
-# num_periods = 5
-test_data['Campbell08_test_period'] = [0.01, 0.20, 1.00, 3.00, 10.00]
-
-# Z25 override - num_sites = 3
-test_data['Campbell08_test_Z25'] = [2.0, 2.0, 2.0]
+# num_periods = 4
+test_data['Abrahamson08_test_period'] = [0.01, 0.20, 1.00, 3.00]
 
 # Vs30 override - num_sites = 3
-test_data['Campbell08_test_vs30'] = [760.0, 760.0, 760.0]
+test_data['Abrahamson08_test_vs30'] = [760.0, 760.0, 760.0]
 
 # num_sites = 3
 tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
-tmp[0,:] = [ 2.0,  2.0] # distance - 1st site and all 2 events
-tmp[1,:] = [10.0, 10.0] # distance - 2nd site and all 2 events
-tmp[2,:] = [50.0, 50.0] # distance - 3rd site and all 2 events
-test_data['Campbell08_test_distance'] = tmp
+tmp[0,:] = [  5.0,   5.0] # distance - 1st site and all 2 events
+tmp[1,:] = [ 20.0,  20.0] # distance - 2nd site and all 2 events
+tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
+test_data['Abrahamson08_test_distance'] = tmp
 
 # result values, in 'g'
-tmp = zeros((3,2,5))		# num_sites, num_events, num_periods
-# period:     0.01     0.20     1.00     3.00     10.00
-tmp[0,0,:] = [0.23435, 0.44193, 0.07274, 0.00819, 0.00065] # R= 2.0, ML=5.0
-tmp[0,1,:] = [0.45559, 1.01648, 0.35536, 0.10045, 0.01940] # R= 2.0, ML=7.0
-tmp[1,0,:] = [0.10306, 0.23247, 0.02647, 0.00298, 0.00024] # R=10.0, ML=5.0
-tmp[1,1,:] = [0.25133, 0.62711, 0.17438, 0.04929, 0.00952] # R=10.0, ML=7.0
-tmp[2,0,:] = [0.01591, 0.03448, 0.00451, 0.00051, 0.00004] # R=50.0, ML=5.0
-tmp[2,1,:] = [0.06465, 0.14937, 0.05015, 0.01418, 0.00274] # R=50.0, ML=7.0
-test_data['Campbell08_test_mean'] = tmp
+tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+# period:     0.01     0.20     1.00     3.00
+tmp[0,0,:] = [0.14523, 0.33164, 0.04562, 0.00593] # R=  5.0, ML=5.0
+tmp[0,1,:] = [0.34456, 0.81772, 0.27475, 0.06944] # R=  5.0, ML=7.0
+tmp[1,0,:] = [0.02974, 0.06711, 0.01105, 0.00146] # R= 20.0, ML=5.0
+tmp[1,1,:] = [0.12817, 0.29870, 0.12011, 0.03079] # R= 20.0, ML=7.0
+tmp[2,0,:] = [0.00308, 0.00691, 0.00147, 0.00020] # R=100.0, ML=5.0
+tmp[2,1,:] = [0.03093, 0.07126, 0.03700, 0.00968] # R=100.0, ML=7.0
+test_data['Abrahamson08_test_mean'] = tmp
+del tmp
+
+# sigma values, in 'g' (ie, not log()) - this data from opensha.org
+tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+# period:     0.01    0.20    1.00    3.00
+tmp[0,0,:] = [7.0e-1, 8.0e-1, 6.8e-1, 6.2e-1] # R=  5.0, ML=5.0
+tmp[0,1,:] = [5.2e-1, 5.9e-1, 6.1e-1, 6.0e-1] # R=  5.0, ML=7.0
+tmp[1,0,:] = [7.0e-1, 8.0e-1, 6.8e-1, 6.2e-1] # R= 20.0, ML=5.0
+tmp[1,1,:] = [5.3e-1, 5.9e-1, 6.1e-1, 6.0e-1] # R= 20.0, ML=7.0
+tmp[2,0,:] = [7.1e-1, 8.0e-1, 6.8e-1, 6.2e-1] # R=100.0, ML=5.0
+tmp[2,1,:] = [5.3e-1, 5.9e-1, 6.1e-1, 6.0e-1] # R=100.0, ML=7.0
+test_data['Abrahamson08_test_sigma'] = tmp
 del tmp
 
 ################################################################################
 
 class Distance_stub(object):
+    """This object is used for simple cases.
+
+    For more complex models, this object is overridden.
+    """
+
     def __init__(self,dist):
         self.dist = asarray(dist)
 
@@ -848,6 +1050,9 @@ class Distance_stub(object):
         return self.dist
 
     def Joyner_Boore(self):
+        return self.dist
+
+    def Horizontal(self):
         return self.dist
 
 def mag2dict(mag):
@@ -866,11 +1071,16 @@ def data2atts(model_name):
 
     # get params that exist for every model
     # default Vs30 to 1000.0 if not supplied
-    distances = Distance_stub(test_data[model_name+'_test_distance'])
     magnitudes = mag2dict(test_data[model_name+'_test_magnitude'])
     test_mean = test_data[model_name+'_test_mean']
     periods = test_data[model_name+'_test_period']
     vs30 = test_data.get(model_name+'_test_vs30', 1000.0)
+
+    # get distance object, if it exists, else get distances
+    try:
+        distances = test_data[model_name+'_test_distance_object']
+    except KeyError:
+        distances = Distance_stub(test_data[model_name+'_test_distance'])
 
     # params not there for every model (usually return None if not there)
     depths = test_data.get(model_name+'_test_depth', None)
@@ -878,8 +1088,9 @@ def data2atts(model_name):
     faulting_type = test_data.get(model_name+'_test_faulting_type', None)
     dip = array(test_data.get(model_name+'_test_dip', None))
     Z25 = array(test_data.get(model_name+'_test_Z25', None))
+    test_sigma = test_data.get(model_name+'_test_sigma', None)
 
-    return (distances, magnitudes, test_mean, periods, depths, vs30,
+    return (distances, magnitudes, test_mean, test_sigma, periods, depths, vs30,
             depth_to_top, faulting_type, Z25, dip)
 
 def ground_motion_interface_conformance(GM_class, model_name):
@@ -888,14 +1099,15 @@ def ground_motion_interface_conformance(GM_class, model_name):
     the calculated ground motion is the same as the test_ground_motion
     """
 
-    (distances, magnitudes, test_mean, periods, depths, vs30,
+    (distances, magnitudes, test_mean, test_sigma, periods, depths, vs30,
      depth_to_top, faulting_type, Z25, dip) = data2atts(model_name)
 
     if GM_class is Ground_motion_calculator:
         gm = GM_class(model_name, periods)
         (log_mean, log_sigma) = \
-            gm.distribution_function(distances, magnitudes, depth=depths,
-                                     vs30=vs30, depth_to_top=depth_to_top,
+            gm.distribution_function(distances, magnitudes, periods=periods,
+                                     depth=depths, vs30=vs30,
+                                     depth_to_top=depth_to_top,
                                      faulting_type=faulting_type, Z25=Z25,
                                      dip=dip)
     elif GM_class is Multiple_ground_motion_calculator:
@@ -903,12 +1115,13 @@ def ground_motion_interface_conformance(GM_class, model_name):
         gm = GM_class([model_name], periods, model_weights)
         # ignoring event_activity, event_id
         (log_mean, log_sigma, _, _) = \
-            gm._distribution_function(distances, magnitudes, depth=depths,
-                                      vs30=vs30, depth_to_top=depth_to_top,
+            gm._distribution_function(distances, magnitudes, periods=periods,
+                                      depth=depths, vs30=vs30,
+                                      depth_to_top=depth_to_top,
                                       faulting_type=faulting_type, Z25=Z25,
                                       dip=dip)
 
-    return (exp(log_mean), test_mean)
+    return (exp(log_mean), test_mean, log_sigma, test_sigma)
 
 
 class Test_ground_motion_specification(unittest.TestCase):
@@ -919,13 +1132,20 @@ class Test_ground_motion_specification(unittest.TestCase):
         pass
 
     def ground_motion_interface_conformance(self, GM_class, model_name):
-        (median, test_mean) = ground_motion_interface_conformance(GM_class,
+        (median, test_mean,
+         sigma, test_sigma) = ground_motion_interface_conformance(GM_class,
                                                                   model_name)
 
 
-        msg = 'median=\n%s\ntest_mean=\n%s' % (str(median), str(test_mean))
+        msg = 'median=\n%s\ntest_median=\n%s' % (str(median), str(test_mean))
+#        msg = 'diff=\n%s' % str(median-test_mean)
         self.assert_(allclose(median, test_mean, rtol=0.05, atol=1.0e-5),
                      "%s did not pass assert:\n%s" % (model_name, msg))
+
+        if test_sigma is not None:
+            msg = 'sigma=\n%s\ntest_sigma=\n%s' % (str(sigma), str(test_sigma))
+            self.assert_(allclose(sigma, test_sigma, rtol=0.05, atol=1.0e-5),
+                         "%s did not pass assert:\n%s" % (model_name, msg))
 
 
     def test_all_ground_motion_interfaces(self):
@@ -961,9 +1181,5 @@ class Test_ground_motion_specification(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_specification, 'test')
-    #suite = unittest.makeSuite(Test_ground_motion_specification,
-     #                          'test_all_ground_motion_interfaces')
-    #suite = unittest.makeSuite(Test_ground_motion_specification,
-    #                           'event_activity_get_data')
     runner = unittest.TextTestRunner()
     runner.run(suite)
