@@ -1,0 +1,97 @@
+%% COMMON MACROS FOR ALL FILES
+
+\renewcommand{\Pr}{\mathrm{Pr}}
+\newcommand{\eva}{r_{\nu_i}^*}
+\newcommand{\Imm}{I_{\mathrm{MMI}}}
+
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+
+%\newcommand{\captionspace}}{\hspace{0.8em}}
+%\renewcommand{\figurename}{\textbf{Figure}}
+%\renewcommand{\tablename}{\textbf{Table}}
+
+%For indexing
+\newcommand{\indexfunc}[1]{\index{#1@\texttt{#1}}\index{function!#1@\texttt{#1}}}
+\newcommand{\indexparfile}[1]{\index{parameter file!#1@\texttt{#1}}} %\index{#1@\texttt{#1}}}
+\newcommand{\indexgui}[1]{\index{#1@\texttt{#1}}\index{GUI!#1@\texttt{#1}}}
+\newcommand{\indexdir}[1]{\index{directory!#1@\texttt{#1}}} %\index{#1@\texttt{#1}}}
+\newcommand{\indexpar}[1]{\index{#1@\texttt{#1}}\index{setdata parameter@ \texttt{setdata} parameter!#1@\texttt{#1}}}
+\newcommand{\indexoutput}[1]{\index{#1@\texttt{#1}}\index{output file!#1@\texttt{#1}}}
+\newcommand{\indexscript}[1]{\index{#1@\texttt{#1}}\index{Script!#1@\texttt{#1}}}
+\newcommand{\indexvariable}[1]{\index{#1@\texttt{#1}}\index{Function Variable!#1@\texttt{#1}}}
+
+%For typing important things
+\newcommand{\typefunc}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexfunc{#1#2#3}}
+\newcommand{\typeparfile}[4]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\-\texttt{#4}\indexparfile{#1#2#3}}
+\newcommand{\typepar}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexpar{#1#2#3}}
+\newcommand{\typedir}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexdir{#1#2#3}}
+\newcommand{\typegui}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexgui{#1#2#3}}
+\newcommand{\typeoutput}[4]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\-\texttt{#4}\indexoutput{#1#2#3}}
+\newcommand{\typescript}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexscript{#1#2#3}}
+\newcommand{\typevar}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexvariable{#1#2#3}}
+
+
+% For typing important things in captions
+\newcommand{\typeparcaption}[3]{\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexpar{#1#2#3}}
+\newcommand{\typeparfilecaption}[4]{\texttt{#1}\-\texttt{#2}\-\texttt{#3}\-\texttt{#4}\indexparfile{#1#2#3}}
+\newcommand{\typeparfilelong}[5]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\-\texttt{#4}\indexparfile{#5}}
+\newcommand{\typeoutputcaption}[4]{\texttt{#1}\-\texttt{#2}\-\texttt{#3}\-\texttt{#4}\indexoutput{#1#2#3}}
+\newcommand{\typedircaption}[3]{\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexdir{#1#2#3}}
+\newcommand{\typevarcaption}[3]{\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexvariable{#1#2#3}}
+\newcommand{\typefunccaption}[3]{\texttt{#1}\-\texttt{#2}\-\texttt{#3}\indexfunc{#1#2#3}}
+
+\newcommand{\typeself}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}\index{#1#2#3@\texttt{#1#2#3}}}
+\newcommand{\typeselfnoline}[3]{\texttt{#1}\-\texttt{#2}\-\texttt{#3}\index{#1#2#3@\texttt{#1#2#3}}}
+\newcommand{\typeselfnoindex}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}}
+\newcommand{\typevarnoindex}[3]{\linebreak[2]\texttt{#1}\-\texttt{#2}\-\texttt{#3}}
+
+\newcommand{\typeselfnoindexnoline}[3]{\texttt{#1}\-\texttt{#2}\-\texttt{#3}}
+\newcommand{\typeim}{\texttt{Input} \texttt{Manager}\index{Input Manager@\texttt{Input Manager}}}
+\newcommand{\typesf}{\texttt{survey} \texttt{factor}\index{survey factor@\texttt{survey factor}}}
+\newcommand{\typenewc}{`\texttt{newc}' }
+\newcommand{\typeperth}{`\texttt{perth}' }
+
+
+% For splitting rows Key Files etc... (ALSO handles indexing)
+\newcommand{\splitrowfunc}[2] {\begin{tabular}[t]{@{} p{0.02\textwidth}l} \texttt{#1} & \\ & \texttt{#2} \end{tabular}\indexfunc{#1#2}}
+\newcommand{\splitrowparfile}[3] {\begin{tabular}[t]{@{} p{0.02\textwidth}l} \texttt{#1} & \\ & \texttt{#2}\texttt{#3} \end{tabular}\indexparfile{#1#2}}
+\newcommand{\splitrowgui}[2] {\begin{tabular}[t]{@{} p{0.02\textwidth}l} \texttt{#1} & \\ & \texttt{#2} \end{tabular}\indexgui{#1#2}}
+\newcommand{\splitrowdir}[2] {\begin{tabular}[t]{@{} p{0.02\textwidth}l} \texttt{#1} & \\ & \texttt{#2} \end{tabular}\indexdir{#1#2}}
+\newcommand{\splitrowpar}[2] {\begin{tabular}[t]{@{} p{0.02\textwidth}l} \texttt{#1} & \\ & \texttt{#2} \end{tabular}\indexpar{#1#2}}
+\newcommand{\splitrowoutput}[3] {\begin{tabular}[t]{@{} p{0.02\textwidth}l} \texttt{#1} & \\ & \texttt{#2}\texttt{#3} \end{tabular}\indexoutput{#1#2}}
+
+\newcommand{\keyrowsep}{\vspace{0.4em}}
+
+
+
+
+\newcommand{\fref}[1]{Figure~\ref{#1}}
+\newcommand{\Fref}[1]{Figure~\ref{#1}}
+\newcommand{\Freftwo}[2]{Figures ~\ref{#1} and ~\ref{#2}} % reference 2 figures
+\newcommand{\Frefmulti}[2]{Figures ~\ref{#1} to ~\ref{#2}} % reference multiple succesive figures
+\newcommand{\tref}[1]{Table~\ref{#1}}
+\newcommand{\aref}[1]{Appendix~\ref{#1}}    % reference appendix
+\newcommand{\sref}[1]{Section~\ref{#1}}     % reference section
+\newcommand{\sreftwo}[2]{Sections ~\ref{#1} and ~\ref{#2}}  % reference 2 sections
+\newcommand{\cref}[1]{Chapter~\ref{#1}}     % reference Chapter
+\newcommand{\eref}[1]{Equation~\ref{#1}}    % reference Equation
+\newcommand{\ereftwo}[2]{Equations ~\ref{#1} and ~\ref{#2}}  % reference 2 equations
+\newcommand{\creftwo}[2]{Chapters ~\ref{#1} and ~\ref{#2}}  % reference 2 chapters
+\newcommand{\crefmulti}[2]{Chapters ~\ref{#1} to ~\ref{#2}}  % reference 2 chapters
+
+\newcommand{\var}{\operatorname{var}}
+\newcommand{\prob}{\operatorname{Pr}}
+\newcommand{\Beff}{B_{T}}
+
+\newcommand{\ii}[1]{\index{#1}}
+
+
+
+\newcommand{\Prob}{{\rm Pr}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "eqrmtech"
+%%% End:

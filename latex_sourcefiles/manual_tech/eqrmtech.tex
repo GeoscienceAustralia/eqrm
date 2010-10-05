@@ -1,0 +1,137 @@
+\documentclass[a4paper, 12pt]{report}
+\textwidth = 14.5cm \textheight = 21.5cm \topmargin = -.5cm
+\leftmargin = 5cm
+
+\setcounter{secnumdepth}{2} \setcounter{tocdepth}{3}
+
+%\oddsidemargin = 1cm
+%\leftmargin = -3cm
+%\evensidemargin = 5cm
+
+
+%\includeonly{eqrmtech-h-apps}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{natbib}
+\bibliographystyle{grfchicago}
+\usepackage{makeidx}
+\usepackage{url}
+\usepackage{psfrag}
+\usepackage{supertabular}
+\usepackage{drcaptionstyle}
+
+
+\graphicspath{{diags/}}
+
+\input eqrmtech-macros
+
+\setlength{\parskip}{1em plus 0.1em minus 0.2em}
+\setlength{\parindent}{0pt}
+
+\makeindex
+
+
+
+\title{EQRM: Geoscience Australia's Earthquake Risk Model\\
+}
+
+%\begin{center}
+% Version 2.0
+%\end{center}
+
+\author{Technical Manual \\[1em]
+Version 3.0 \\[3em]
+David Robinson, Glenn Fulford and Trevor Dhu\\[1em]
+Geoscience Australia}
+
+
+
+\begin{document}
+\maketitle
+
+\pagenumbering{roman}
+
+this is a blank page \newpage
+
+
+this is a blank page
+\newpage
+
+ {\Huge \textbf{Acknowledgements}  }
+
+The authors wish to thank John Schneider, leader of the Risk
+Research Group at Geoscience Australia. John's expertise in the
+areas of earthquake hazard and risk analysis have proven
+invaluable throughout the project. Without his ongoing support and
+advice the EQRM would not be half the product that it is today.
+
+Andres Mendez from Aon Re in Chicago is acknowledged for providing
+software that formed the backbone of the earthquake catalogue
+generation. This generous contribution, as well as his high level
+of collaborative support, was fundamental to the project's
+success.
+
+Bradley Horton is appreciated for the programming support that he
+provided through a number of contracts with Ceanet. The
+professionalism with which Bradley conducted his work extended
+beyond the call of duty on many occasions. Bradley's efforts have
+lead to great improvements in the useability and robustness of the
+EQRM. Duncan Gray, Kurt Pudniks and Ken Dale, all of Geoscience
+Australia, are also acknowledged for their coding efforts in
+particular modules of the EQRM software.
+
+The authors have sought advice on specific topics from a range of
+people involved in the earthquake hazard and risk fields. The
+following are acknowledged for their expertise and assistance;
+George Walker of Aon Re, Professor John McAneney of Risk
+Frontiers, Walt Silva of Pacific Engineering and Analysis, Don
+Windeler and his team at Risk Management Solutions (RMS), Mike
+Griffith at The University of Adelaide, Gary Gibson of the
+Seismology Research Centre and Brian Gaull from Guria Consulting.
+
+A number of people at Geoscience Australia have contributed
+ to the development of the EQRM. Members of the Newcastle
+and Lake Macquarie project team lead by Trevor Jones are
+acknowledged for their assistance in shaping the early design of
+the EQRM. Mark Edwards and Ken Dale are thanked for the countless
+engineering questions that they have fielded over the four year
+project. Matt Hayne, project leader of the Risk Assessment Methods
+Project is thanked for creating the productive and supportive
+environment that allowed this project to flourish. EQRM users,
+Cvetan Sinadinovski, Annette Patchett, Ken Dale and Augusto
+Sanabria are thanked for their feedback and for continually
+inspiring the incorporation of new functionality. Ole Nielsen and
+Duncan Gray are acknowledged for the provision of software
+engineering advice and for generally improving the coding
+abilities of the authors. Angie Jaensch, Greg Michalowski and
+Fiona Watford are acknowledged for drafting some of the figures.
+Finally, the authors wish to thank Adrian Hitchman, Ken Dale and
+Augusto Sanabria for reviewing the drafts of this report. Their
+reviews lead to substantial improvements to this manual.
+
+
+\tableofcontents
+
+\newpage
+\pagenumbering{arabic}
+%\include{eqrmtech-intro}
+%\include{eqrmtech-hv-application}
+%\include{eqrmtech-h-source}
+%\include{eqrmtech-hv-grids}
+%\include{eqrmtech-h-attn}
+%\include{eqrmtech-h-regolith}
+%\include{eqrmtech-v-damage}
+%\include{eqrmtech-v-losses}
+%\include{eqrmtech-v-risk}
+
+\appendix
+%\include{eqrmtech-apps}
+
+\small
+\bibliography{../refs/drrefs,../refs/garefs}
+
+\printindex
+
+\end{document}
