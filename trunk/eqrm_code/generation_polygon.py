@@ -157,6 +157,56 @@ def polygons_from_xml(filename,
 
     return generation_polygons, magnitude_type
 
+
+def xml_fault_generators(filename, azi=None, dazi=None, fault_dip=None,
+                         fault_width=None, prob_min_mag_cutoff=None):
+    """Read new-style XML.
+
+    filename  is the path to the XML file to read
+    **kwargs  dictionary of values that override XML values
+    """
+   
+    # get XML doc and top-level tag object 
+    try:
+        doc = Xml_Interface(filename=filename)
+    except Exception, e:
+        msg = 'Malformed XML in file %s: %s' % (filename, str(e))
+        raise Exception(msg)
+
+    top_tag = doc['source_model_fault'][0]
+    if len(doc['source_model_fault']) == 0:
+        msg = ("XML file %s: expected 'source_model_fault' tag, got '%s'"
+               % (filename, doc.xml_node.documentElement.nodeName))
+        raise Exception(msg)
+
+    # get magnitude type attribute
+    try:
+        magnitude_type = top_tag.attributes['magnitude_type']
+    except KeyError:
+        msg = ("Badly formed XML in file %s: no 'magnitude_type' attribute "
+               "for 'source_model_fault' tag"
+               % filename)
+        raise Exception(msg)
+
+    # check that we have one or more 'fault' tags
+    faults = doc['fault']
+    if len(faults) == 0:
+        msg = "XML file %s: expected one or more 'fault' tags" % filename
+        raise Exception(msg)
+    
+    # now cycle through 'fault' tags
+    gen_poly = []
+    for fault in faults:
+        fault_attr = fault.attributes
+        print('fault_attr=%s' % str(fault_attr))
+        geometry = doc['geometry'][0]
+        print('    geometry=%s' % str(geometry.attributes))
+        rec_model = doc['recurrence_model'][0]
+        print('    rec_model=%s' % str(rec_model.attributes))
+
+    return (gen_poly, magnitude_type)
+
+
 def polygons_from_xml_row(doc,
                           azi=None,
                           dazi=None,
