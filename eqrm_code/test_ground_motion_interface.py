@@ -1243,35 +1243,37 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
-    def test_Campbell08(self):
-        """Test the Campbell08 model."""
+    def test_Campbell08_SS1(self):
+        """Test the Campbell08 model - StrikeSlip fault."""
 
         model_name = 'Campbell08'
         model = Ground_motion_specification(model_name)
 
         # a fake dist_object class
-        # it can be this simple since delta=90 and Ztor=0.0
+        # assume Rrup=200 and Rjb=199.9
         class DistObj(object):
-            def __init__(self, distance):
-                self.distance = distance
+            def __init__(self):
+                pass
 
             def Rupture(self):
-                return self.distance
+                return numpy.array([[[2.0000e+2]]])
 
             def Joyner_Boore(self):
-                return self.distance
+                return numpy.array([[[1.9990e+2]]])
 
         ######
-        # period = 0.01, ML=7.0, Rrup=Rjb=10.0,
-        # expect lnY=-1.3810, sigma=?????? (from Campbell08_check.py)
+        # period = 0.01, ML=5.0, Rrup=200.0, Rjb=1.999
+        # expect lnY=math.log(2.7675e-3) (from Campbell08_check.py)
+        #        lnE=math.log(4.7793e-1)
         ######
 
         period = 0.01
-        dist_object = DistObj(numpy.array([[[10.0]]]))
-        ML = numpy.array([[[7.0]]])
-        depth = numpy.array([[[0.0]]])
+        periods = numpy.array([period])
+        dist_object = DistObj()
+        ML = numpy.array([[[5.0]]])
+        depth = numpy.array([[[5.0]]])
         dip = numpy.array([[[90.0]]])
-        faulting_type = numpy.array([[[0]]], dtype=int)
+        faulting_type = numpy.array([[[2]]], dtype=int)	# SS
         Vs30 = numpy.array([[[760.0]]])
         Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
 
@@ -1289,11 +1291,11 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 
         # expected values from Campbell08_check.py
-        log_mean_expected = numpy.array([[[-1.3810]]])
-        log_sigma_expected = numpy.array([[[-0.6521]]])
+        log_mean_expected = numpy.array([[[math.log(2.7675e-3)]]])
+        log_sigma_expected = numpy.array([[[math.log(4.7793e-1)]]])
 
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
-                                                   mag=ML,
+                                                   mag=ML, periods=periods,
                                                    depth_to_top=depth,
                                                    faulting_type=faulting_type,
                                                    dip=dip,
@@ -1304,16 +1306,389 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         # tests for equality should be quite tight as we check against
         # Campbell08_check.py
-        msg = ('T=%.1f, ML=%.1f, Rrup=%.1f: log_mean=%s, expected=%s'
+        msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_mean=%s, expected=%s'
                % (period, ML, 10.0, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
-        msg = ('T=%.1f, ML=%.1f, Rrup=%.1f: log_sigma=%s, expected=%s'
+        msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_sigma=%s, expected=%s'
                % (period, ML, 10.0, str(log_sigma), str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
                                          rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+    def test_Campbell08_SS1(self):
+        """Test the Campbell08 model - StrikeSlip fault."""
+
+        model_name = 'Campbell08'
+        model = Ground_motion_specification(model_name)
+
+        # a fake dist_object class
+        # assume Rrup=200 and Rjb=199.9
+        class DistObj(object):
+            def __init__(self):
+                pass
+
+            def Rupture(self):
+                return numpy.array([[[2.0000e+2]]])
+
+            def Joyner_Boore(self):
+                return numpy.array([[[1.9990e+2]]])
+
+        ######
+        # period = 0.01, ML=5.0, Rrup=200.0, Rjb=1.999
+        # expect lnY=math.log(2.7675e-3) (from Campbell08_check.py)
+        #        lnE=math.log(4.7793e-1)
+        ######
+
+        period = 0.01
+        periods = numpy.array([period])
+        dist_object = DistObj()
+        ML = numpy.array([[[5.0]]])
+        depth = numpy.array([[[5.0]]])
+        dip = numpy.array([[[90.0]]])
+        faulting_type = numpy.array([[[2]]], dtype=int)	# SS
+        Vs30 = numpy.array([[[760.0]]])
+        Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
+
+        # get coeffs for this period (C0 -> K3 from table 2)
+        coeffs = numpy.array([[[[-1.715]]], [[[0.500]]],  [[[-0.530]]],
+                              [[[-0.262]]], [[[-2.118]]], [[[0.170]]],
+                              [[[5.60]]],   [[[0.280]]],  [[[-0.120]]],
+                              [[[0.490]]],  [[[1.058]]],  [[[0.040]]],
+                              [[[0.610]]],  [[[865]]],    [[[-1.186]]],
+                              [[[1.839]]]])
+
+        # sigma coefficients for this period (ElnY -> rho from table 3)
+        sigma_coeffs = numpy.array([[[[0.478]]], [[[0.219]]], [[[0.166]]],
+                                    [[[0.526]]], [[[0.551]]], [[[1.000]]]])
+
+
+        # expected values from Campbell08_check.py
+        log_mean_expected = numpy.array([[[math.log(2.7675e-3)]]])
+        log_sigma_expected = numpy.array([[[math.log(4.7793e-1)]]])
+
+        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+                                                   mag=ML, periods=periods,
+                                                   depth_to_top=depth,
+                                                   faulting_type=faulting_type,
+                                                   dip=dip,
+                                                   vs30=Vs30, Z25=Z25,
+                                                   coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+
+        # tests for equality should be quite tight as we check against
+        # Campbell08_check.py
+        msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, 10.0, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, 10.0, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+    def test_Campbell08_SS2(self):
+        """Test the Campbell08 model - StrikeSlip fault."""
+
+        model_name = 'Campbell08'
+        model = Ground_motion_specification(model_name)
+
+        Rrup = 5.0000e+0
+        Rjb = 5.0000e+0
+
+        # a fake dist_object class
+        class DistObj(object):
+            def __init__(self):
+                pass
+
+            def Rupture(self):
+                return numpy.array([[[Rrup]]])
+
+            def Joyner_Boore(self):
+                return numpy.array([[[Rjb]]])
+
+        ######
+        # period = 0.2, ML=7.0
+        ######
+
+        period = 0.2
+        periods = numpy.array([period])
+        dist_object = DistObj()
+        ML = numpy.array([[[7.0]]])
+        depth = numpy.array([[[0.0]]])
+        dip = numpy.array([[[90.0]]])
+        faulting_type = numpy.array([[[2]]], dtype=int)	# SS
+        Vs30 = numpy.array([[[760.0]]])
+        Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
+
+        # get coeffs for this period (C0 -> K3 from table 2)
+        coeffs = numpy.array([[[[-0.486]]], [[[0.500]]], [[[-0.446]]],
+                              [[[-0.398]]], [[[-2.220]]], [[[0.170]]],
+                              [[[7.60]]], [[[0.280]]], [[[-0.012]]],
+                              [[[0.490]]], [[[2.194]]], [[[0.040]]],
+                              [[[0.610]]], [[[748]]], [[[-2.188]]],
+                              [[[1.856]]]])
+
+        # sigma coefficients for this period (ElnY -> rho from table 3)
+        sigma_coeffs = numpy.array([[[[0.534]]], [[[0.249]]], [[[0.186]]],
+                                    [[[0.589]]], [[[0.618]]], [[[0.871]]]])
+
+
+        # expected values from Campbell08_check.py
+        log_mean_expected = numpy.array([[[math.log(8.7425e-1)]]])
+        log_sigma_expected = numpy.array([[[math.log(5.3400e-1)]]])
+
+        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+                                                   mag=ML, periods=periods,
+                                                   depth_to_top=depth,
+                                                   faulting_type=faulting_type,
+                                                   dip=dip,
+                                                   vs30=Vs30, Z25=Z25,
+                                                   coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+
+        # tests for equality should be quite tight as we check against
+        # Campbell08_check.py
+        msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, Rrup, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, Rrup, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+    def test_Campbell08_RV1(self):
+        """Test the Campbell08 model - Reverse fault."""
+
+        model_name = 'Campbell08'
+        model = Ground_motion_specification(model_name)
+
+        Rrup = 2.0000e+2
+        Rjb = 1.9990e+2
+
+        # a fake dist_object class
+        class DistObj(object):
+            def __init__(self):
+                pass
+
+            def Rupture(self):
+                return numpy.array([[[Rrup]]])
+
+            def Joyner_Boore(self):
+                return numpy.array([[[Rjb]]])
+
+        ######
+        # period = 0.01, M=5.0
+        ######
+
+        period = 0.01
+        periods = numpy.array([period])
+        dist_object = DistObj()
+        M = numpy.array([[[5.0]]])
+        depth = numpy.array([[[5.0]]])
+        dip = numpy.array([[[45.0]]])
+        faulting_type = numpy.array([[[0]]], dtype=int)	# RV
+        Vs30 = numpy.array([[[760.0]]])
+        Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
+
+        # get coeffs for this period (C0 -> K3 from table 2)
+        coeffs = numpy.array([[[[-1.715]]], [[[0.500]]],  [[[-0.530]]],
+                              [[[-0.262]]], [[[-2.118]]], [[[0.170]]],
+                              [[[5.60]]],   [[[0.280]]],  [[[-0.120]]],
+                              [[[0.490]]],  [[[1.058]]],  [[[0.040]]],
+                              [[[0.610]]],  [[[865]]],    [[[-1.186]]],
+                              [[[1.839]]]])
+
+        # sigma coefficients for this period (ElnY -> rho from table 3)
+        sigma_coeffs = numpy.array([[[[0.478]]], [[[0.219]]], [[[0.166]]],
+                                    [[[0.526]]], [[[0.551]]], [[[1.000]]]])
+
+
+        # expected values from Campbell08_check.py
+        log_mean_expected = numpy.array([[[math.log(3.6614e-3)]]])
+        log_sigma_expected = numpy.array([[[math.log(4.7790e-1)]]])
+
+        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+                                                   mag=M, periods=periods,
+                                                   depth_to_top=depth,
+                                                   faulting_type=faulting_type,
+                                                   dip=dip,
+                                                   vs30=Vs30, Z25=Z25,
+                                                   coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+
+        # tests for equality should be quite tight as we check against
+        # Campbell08_check.py
+        msg = ('T=%.2f, M=%.1f, Rrup=%.1f: log_mean=%s, expected=%s'
+               % (period, M, Rrup, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.2f, M=%.1f, Rrup=%.1f: log_sigma=%s, expected=%s'
+               % (period, M, Rrup, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+    def test_Campbell08_RV2(self):
+        """Test the Campbell08 model - Reverse fault."""
+
+        model_name = 'Campbell08'
+        model = Ground_motion_specification(model_name)
+
+        Rrup = 5.0000e+0
+        Rjb = 0.0000e+0
+
+        # a fake dist_object class
+        class DistObj(object):
+            def __init__(self):
+                pass
+
+            def Rupture(self):
+                return numpy.array([[[Rrup]]])
+
+            def Joyner_Boore(self):
+                return numpy.array([[[Rjb]]])
+
+        ######
+        # period = 0.01, M=7.0
+        ######
+
+        period = 0.01
+        periods = numpy.array([period])
+        dist_object = DistObj()
+        M = numpy.array([[[7.0]]])
+        depth = numpy.array([[[0.0]]])
+        dip = numpy.array([[[45.0]]])
+        faulting_type = numpy.array([[[0]]], dtype=int)	# RV
+        Vs30 = numpy.array([[[760.0]]])
+        Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
+
+        # get coeffs for this period (C0 -> K3 from table 2)
+        coeffs = numpy.array([[[[-1.715]]], [[[0.500]]],  [[[-0.530]]],
+                              [[[-0.262]]], [[[-2.118]]], [[[0.170]]],
+                              [[[5.60]]],   [[[0.280]]],  [[[-0.120]]],
+                              [[[0.490]]],  [[[1.058]]],  [[[0.040]]],
+                              [[[0.610]]],  [[[865]]],    [[[-1.186]]],
+                              [[[1.839]]]])
+
+        # sigma coefficients for this period (ElnY -> rho from table 3)
+        sigma_coeffs = numpy.array([[[[0.478]]], [[[0.219]]], [[[0.166]]],
+                                    [[[0.526]]], [[[0.551]]], [[[1.000]]]])
+
+
+        # expected values from Campbell08_check.py
+        log_mean_expected = numpy.array([[[math.log(5.9403e-1)]]])
+        log_sigma_expected = numpy.array([[[math.log(4.6852e-1)]]])
+
+        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+                                                   mag=M, periods=periods,
+                                                   depth_to_top=depth,
+                                                   faulting_type=faulting_type,
+                                                   dip=dip,
+                                                   vs30=Vs30, Z25=Z25,
+                                                   coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+
+        # tests for equality should be quite tight as we check against
+        # Campbell08_check.py
+        msg = ('T=%.2f, M=%.1f, Rrup=%.1f: log_mean=%s, expected=%s'
+               % (period, M, Rrup, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.2f, M=%.1f, Rrup=%.1f: log_sigma=%s, expected=%s'
+               % (period, M, Rrup, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+    def Xtest_Abrahamson08(self):
+        """Test the Abrahamson08 model.
+
+        Compare with data from Abrahamson08_check.py.
+        """
+
+        model_name = 'Abrahamson08'
+        model = Ground_motion_specification(model_name)
+
+        # a fake dist_object class
+        # it can be this simple since delta=90 and Ztor=0.0
+        class DistObj(object):
+            def __init__(self, distance):
+                self.distance = distance
+
+            def Rupture(self):
+                return self.distance
+
+            def Joyner_Boore(self):
+                return self.distance
+
+            def Horizontal(self):
+                return self.distance
+
+        # Test various scenarios for period=0.2
+        period = 0.2
+        periods = numpy.array([period])
+        Rrup = 100.0
+        dist_object = DistObj(numpy.array([[[Rrup]]]))
+        ML = numpy.array([[[7.0], [5.0]]])
+        depth = numpy.array([[[0.0]]])
+        dip = numpy.array([[[90.0]]])
+        faulting_type = numpy.array([[[0]]], dtype=int)
+        Vs30 = numpy.array([[[760.0]]])
+
+        # get coeffs for this period (Vlin -> A18 from table 5)
+        coeffs = numpy.array([[[[ 748.2]]], [[[-2.188]]], [[[1.687]]],
+                              [[[-0.9700]]], [[[-0.0396]]], [[[2.0773]]],
+                              [[[0.0309]]], [[[-0.0600]]], [[[1.1274]]],
+                              [[[-0.3500]]], [[[0.9000]]], [[[-0.0083]]]])
+
+        # sigma coefficients for this period (S1 -> rho from table 6)
+        sigma_coeffs = numpy.array([[[[0.630]]], [[[0.514]]], [[[0.520]]],
+                                    [[[0.329]]], [[[0.874]]]])
+
+        # expected values from Abrahamson08_check.py
+        log_mean_expected = numpy.array([[[-2.64143177533], [-4.97495805631]]])
+        log_sigma_expected = numpy.array([[[6.8e-1], [8.7e-1]]])
+
+        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+                                                   mag=ML, periods=periods,
+                                                   depth_to_top=depth,
+                                                   faulting_type=faulting_type,
+                                                   dip=dip, vs30=Vs30,
+                                                   coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+
+        # tests for equality should be quite tight as we check against
+        # Abrahamson08_check.py
+        msg = ('\nT=%.2f, Rrup=%.1f, ML=\n%s\nlog_mean=\n%s\nexpected=\n%s' %
+               (period, Rrup, str(ML), str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=5.0e-3, atol=5.0e-3),
+                                 msg)
+
+        msg = ('\nT=%.2f, Rrup=%.1f, ML=\n%s\nlog_sigma=\n%s\nexpected=\n%s'
+               % (period, Rrup, str(ML), str(log_sigma),
+                  str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=5.0e-3, atol=5.0e-3),
                                  msg)
 
     def test_mean_10_sigma_1(self):
@@ -1332,7 +1707,6 @@ class Test_ground_motion_interface(unittest.TestCase):
         act_log_mean = ones((num_sites, num_events, num_periods))*log(10)
         self.failUnless(allclose(log_mean, act_log_mean))
         self.failUnless(allclose(log_sigma, act_log_sigma))
-        
         
 ################################################################################
 

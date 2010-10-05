@@ -2343,9 +2343,8 @@ def Atkinson06_calcS(pgaBC, **kwargs):
     BnlA = B1
     BnlB = (B1 - B2) * log(vs30/Atkinson06_V2) / Atkinson06_logV1divV2 + B2
     BnlC = B2 * log(vs30/Atkinson06_Vref) / Atkinson06_logV2divVref
-    Bnl = 0.0
+    Bnl = 0.0	# zeros(vs30.shape)
 
-    # TODO: TEST IF where(x < A <= y, ?, ??) FASTER
     Bnl = where(vs30 <= Atkinson06_Vref, BnlC, Bnl)
     Bnl = where(vs30 <= Atkinson06_V2, BnlB, Bnl)
     Bnl = where(vs30 <= Atkinson06_V1, BnlA, Bnl)
@@ -2715,8 +2714,7 @@ def Chiou08_distribution(**kwargs):
                 phi5*(1.0-1.0/(cosh(phi6*max_zero_Z1_min_phi7))) + 
                     phi8/cosh(0.15*max_zero_Z1_min_15))
 
-    num_events=M.shape[2]
-    log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
+    log_sigma = ones(log_mean.shape) * sigma_coefficient[0]
 
     return (log_mean, log_sigma)
 
@@ -2957,17 +2955,19 @@ del Campbell03_Table6
         Geometric Mean Horizontal Component of PGA, PGV, PGD and 5% Damped
         Linear Elastic Response Spectra for Periods Ranging from 0.01 to 10s
         Earthquake Spectra, Volume 24, No. 1, pp 139-171.
+
+    The FORTRAN code by Campbell & Bozorgnia was the basis for below.
 """
 
-######
-# Globals - constants
-######
+# some constants from the paper
+Campbell08_C = 1.88		# table 2, page 148
+Campbell08_N = 1.18
 
-C = 1.88		# from note at foot of table on page 148
-N = 1.18
+Campbell08_ElnAF = 0.3		# page 150
+Campbell08_ElnPGA = 0.478	# ElnY for PGA, table 3, page 149
 
-ElnAF = 0.3		# paper, page 150
-ElnPGA = 0.478		# table 3, page 149, sigmalnY for PGA value
+# code constants
+Campbell08_exp_min_075 = math.exp(-0.75)
 
 ######
 # Set up a numpy array to convert a 'faulting_type' flag to an array slice
@@ -2980,7 +2980,7 @@ Campbell08_faulting_flags = {'reverse':    (1, 0),
                              'normal':     (0, 1),
                              'strikeslip': (0, 0)}
 
-# generate 'Campbell08_faulting_type' from the dictionary above and event_set data
+# generate 'Campbell08_faulting_type' from the dictionary above
 tmp = []
 for (k, v) in Campbell08_faulting_flags.iteritems():
     index = event_set.FaultingTypeDictionary[k]
@@ -2995,110 +2995,20 @@ Campbell08_faulting_type = array(tmp2)
 del tmp, tmp2
 
 ######
-# The model function, from [1] page 1021.
+# Code mimicing the FORTRAN
 ######
-
-def Campbell08_A1100(num_periods, M, Rrup, Rjb, Ztor, Z25, delta, Frv, Fnm):
-    """The Campbell08 model calculation of A1100.
-
-    num_periods  number of periods to use - used to reshape coefficients
-    M            magnitude
-    Rrup         rupture distance
-    Rjb          Joyner_Boore distance
-    Ztor         depth to top of rupture
-    Z25          Z2.5 value(s)
-    delta        fault dip
-    Frv          reverse fault flag
-    Fnm          normal fault flag
-
-    Returns the A1100 value calculated from equation 1 with a PGA set of
-    coefficients and Vs30 set to 1100.
-
-    The algorithm here is taken from [1], pp 144-146  with simplifications.
-    """
-
-    # get default arg values
-    Vs30 = 1100.0				# ignore, use 1100.0
-    coefficient = Campbell08_PGA_coefficient	# ignore, use PGA
-
-    # resize coefficients to (X, 1, 1, num_periods) shape
-    num_coeffs = coefficient.shape[0]
-    tmp = ones((num_periods, num_coeffs))
-
-    coefficient = (coefficient*tmp).transpose()[:,newaxis,newaxis,:]
-
-    # unpack coefficients
-    (C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,K1,K2,K3) = coefficient
-
-    # calculate some common repeated sub-expressions
-    Rjb2 = Rjb * Rjb
-    exp_min_075 = math.exp(-0.75)
-
-    # calculate Fmag from equation 2
-    # precalculate some terms so we don't do repeatedly
-    term2 = C2*(M-5.5)
-    term3 = C3*(M-6.5)
-    Fmag = C0 + C1*M				# M <= 5.5
-    Fmag = where(M > 5.5, Fmag+term2, Fmag)	# 5.5 < M <= 6.5
-    Fmag = where(M > 6.5, Fmag+term3, Fmag)	# M > 6.5
-    del term2, term3
-
-    # calculate Fdis from equation 3
-    Fdis = (C4 + C5*M)*log(sqrt(Rrup*Rrup + C6*C6))
-
-    # calculate Fflt from equations 4 and 5
-    # eqn 5 is simply Ffltz = min(Ztor, 1)
-    Fflt = C7*Frv*where(Ztor < 1, Ztor, 1.0) + C8*Fnm
-
-    # calculate hanging wall distance sub-term - eqn 7
-    Fhngr = ones(Rrup.shape)			# Rjb == 0 case
-    sqrt_Rjb2_plus_1 = sqrt(Rjb2+1.0)
-    max_1 = where(Rrup > sqrt_Rjb2_plus_1-Rjb, Rrup, sqrt_Rjb2_plus_1-Rjb)
-    max_2 = where(Rrup > sqrt_Rjb2_plus_1, Rrup, sqrt_Rjb2_plus_1)
-    Fhngr = where(Ztor < 1.0, max_1/max_2, Fhngr)
-    Fhngr = where(Ztor >= 1.0, (Rrup-Rjb)/Rrup, Fhngr)
-   
-    # hanging wall magnitude sub-term - eqn 8 
-    Fhngm = zeros(M.shape)			# M <= 6.0
-    Fhngm = where(M > 6.0, 2*(M-6.0), Fhngm)	# 6.0 < M < 6.5
-    Fhngm = where(M >= 6.5, 1.0, Fhngm)		# M >= 6.5
-
-    # hanging wall Ztor sub-term - eqn 9
-    Fhngz = zeros(Ztor.shape)
-    Fhngz = where(Ztor < 20.0, (20.0-Ztor)/20.0, 0.0)
-
-    # hanging wall dip sub-term - eqn 10
-    Fhngd = ones(delta.shape)
-    Fhngd = where(delta > 70.0, (90.0-delta)/20.0, Fhngd)
-    Fhngd = Fhngd[newaxis,:,newaxis]
-
-    # calculate total hanging wall sub-term - equation 6
-    Fhng = C9*Fhngr*Fhngm*Fhngz*Fhngd
-
-    # calculate Fsite from equation 11
-    Fsite = ones(Rrup.shape) * (C10+K2*N)*log(1100.0/K1)
-
-    # calculate Fsed from equation 12
-    Fsed = zeros(Z25.shape)
-    Fsed = where(Z25 < 1, C11*(Z25-1.0), Fsed)
-    Fsed = where(Z25 > 3, C12*K3*exp_min_075*(1 - exp(-0.25*(Z25-3))), Fsed)
-
-    # equation 1 gives final log_mean value (lnYhat in Campbell08-speak)
-    lnYhat = Fmag + Fdis + Fflt + Fhng + Fsite + Fsed
-
-    return lnYhat
 
 def Campbell08_distribution(**kwargs):
     """The Campbell08 model.
 
-    kwargs  dictionary of parameters, expect:
-                mag, distance, coefficient
+    kwargs  dictionary of parameters
 
     The algorithm here is taken from [1], pp 144-146  and returns results
-    that are natural log g.
+    that are natural log g.  Code derived from the original FORTRAN.
     """
 
     # get args
+    periods = kwargs['periods']			# site-specific
     M = kwargs['mag']				# event-specific
     dist_object = kwargs['dist_object']		# distance object
     Ztor = kwargs['depth_to_top']		# event-specific
@@ -3134,97 +3044,165 @@ def Campbell08_distribution(**kwargs):
     Frv = Campbell08_faulting_type[:,0][faulting_type]
     Fnm = Campbell08_faulting_type[:,1][faulting_type]
 
-    # unpack coefficients, massage dimensions
+    # unpack coefficients
     (C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,K1,K2,K3) = coefficient
     (ElnY, TlnY, Ec, Et, Earb, rho) = sigma_coefficient
 
+    # unpack the PGA coefficients
+    (pC0,pC1,pC2,pC3,pC4,pC5,pC6,pC7,
+     pC8,pC9,pC10,pC11,pC12,pK1,pK2,pK3) = Campbell08_PGA_coefficient
+    (pElnY, ptaulnY, pEC, pET, pEArb, prho) = Campbell08_PGA_sigma_coefficient
+
+    # massage dimensions
     Rrup = Rrup[:,:,newaxis]
     Rjb = Rjb[:,:,newaxis]
-
+    periods = array(periods)
+    periods = periods[newaxis,newaxis,:]
     Vs30 = array(Vs30)
     Vs30 = Vs30[:,newaxis,newaxis]
 
     # calculate some common repeated sub-expressions
     Rjb2 = Rjb * Rjb
-    Vs30_div_K1 = Vs30 / K1
-    exp_min_075 = math.exp(-0.75)
+    Rrup2 = Rrup * Rrup
 
-    # calculate Fmag from equation 2
-    # precalculate some terms so we don't do repeatedly
-    term2 = C2*(M-5.5)
-    term3 = C3*(M-6.5)
-    Fmag = C0 + C1*M				# M <= 5.5
-    Fmag = where(M > 5.5, Fmag+term2, Fmag)	# 5.5 < M <= 6.5
-    Fmag = where(M > 6.5, Fmag+term3, Fmag)	# M > 6.5
-    del term2, term3
+    ######
+    # Calculate the rock PGA
+    ######
 
-    # calculate Fdis from equation 3
-    Fdis = (C4 + C5*M)*log(sqrt(Rrup*Rrup + C6*C6))
+    # magnitude term
+    Fmag = pC0 + pC1*M							# M <= 5.5
+    Fmag = where(M > 5.5, pC0+pC1*M+pC2*(M-5.5), Fmag)			# 5.5 < M <= 6.5
+    Fmag = where(M > 6.5, pC0+pC1*M+pC2*(M-5.5)+pC3*(M-6.5), Fmag)	# M > 6.5
 
-    # calculate Fflt from equations 4 and 5
-    # eqn 5 is simply Ffltz = min(Ztor, 1)
-    Fflt = C7*Frv*where(Ztor < 1, Ztor, 1.0) + C8*Fnm
+    # distance term
+    Fdis = (pC4 + pC5*M)*log(sqrt(Rrup2 + pC6*pC6))
 
-    # calculate hanging wall distance sub-term from eqn 7
-    Fhngr = ones(Rrup.shape)			# Rjb == 0 case
-    sqrt_Rjb2_plus_1 = sqrt(Rjb2+1.0)
-    max_1 = where(Rrup > sqrt_Rjb2_plus_1-Rjb, Rrup, sqrt_Rjb2_plus_1-Rjb)
-    max_2 = where(Rrup > sqrt_Rjb2_plus_1, Rrup, sqrt_Rjb2_plus_1)
-    Fhngr = where(Ztor < 1.0, max_1/max_2, Fhngr)
-    Fhngr = where(Ztor >= 1.0, (Rrup-Rjb)/Rrup, Fhngr)
-   
-    # hanging wall magnitude sub-term - eqn 8 
-    Fhngm = zeros(M.shape)			# M <= 6.0 case
+    # style-of-faulting term
+    Fflt = pC7*Frv*where(Ztor < 1.0, Ztor, 1.0) + pC8*Fnm
+
+    # hanging wall term
+    sqrt_Rjb2_1 = sqrt(Rjb2 + 1.0)
+    Rmax = where(Rrup > sqrt_Rjb2_1, Rrup, sqrt_Rjb2_1)	# max(Rrup, sqrt(Rjb*Rjb+1))
+
+    Fhngr = ones(Rrup.shape) * (Rmax-Rjb)/Rmax		# Ztor < 1.0
+    Fhngr = where(Ztor >= 1.0, (Rrup-Rjb)/Rrup, Fhngr)	# Ztor >= 1.0
+    Fhngr = where(Rjb == 0.0, 1.0, Fhngr)		# Rjb == 0.0
+
+    Fhngm = zeros(M.shape)			# M <= 6.0
     Fhngm = where(M > 6.0, 2*(M-6.0), Fhngm)	# 6.0 < M < 6.5
     Fhngm = where(M >= 6.5, 1.0, Fhngm)		# M >= 6.5
 
-    # hanging wall Ztor sub-term - eqn 9
     Fhngz = zeros(Ztor.shape)
     Fhngz = where(Ztor < 20.0, (20.0-Ztor)/20.0, 0.0)
 
-    # hanging wall dip sub-term - eqn 10
     Fhngd = ones(delta.shape)
     Fhngd = where(delta > 70.0, (90.0-delta)/20.0, Fhngd)
     Fhngd = Fhngd[newaxis,:,newaxis]
 
-    # calculate total hanging wall sub-term - eqn 6
+    Fhng = pC9*Fhngr*Fhngm*Fhngz*Fhngd
+
+    # shallow site response term (Vs30 = 1100)
+    Fsite = ones(Rrup.shape) * (pC10+pK2*Campbell08_N) * log(1100.0/pK1)
+
+    # basin response term
+    Fsed = zeros(Z25.shape)				# Z25 <= 3.0
+    Fsed = where(Z25 < 1.0, pC11*(Z25-1.0), Fsed)	# Z25 < 1.0
+    Fsed = where(Z25 > 3.0, pC12*pK3*Campbell08_exp_min_075*(1.0-exp(-0.25*(Z25-3.0))), Fsed)
+
+    # PGA on rock
+    A1100 = exp(Fmag + Fdis + Fflt + Fhng + Fsite + Fsed)
+
+    # PGA on local site conditions
+    PGA = exp(log(A1100) - Fsite)
+
+    Fsite = pC10*log(Vs30/pK1) + pK2*(log(A1100+Campbell08_C*power((Vs30/pK1), Campbell08_N)) - log(A1100+Campbell08_C))
+    Fsite = where(Vs30 >= pK1, (pC10 + pK2*Campbell08_N)*log(Vs30/pK1), Fsite)
+    Fsite = where(Vs30 >= 1100.0, (pC10 + pK2*Campbell08_N)*log(1100.0/pK1), Fsite)
+
+    PGA = exp(log(PGA) + Fsite)
+
+    # standard deviation of ln PGA
+    slnPGA = pElnY
+    tlnPGA = ptaulnY
+
+    ######
+    # Now calculate the strong motion parameter
+    ######
+
+    # magnitude term
+    Fmag = C0 + C1*M						# M <= 5.5
+    Fmag = where(M > 5.5, C0+C1*M+C2*(M-5.5), Fmag)		# 5.5 < M <= 6.5
+    Fmag = where(M > 6.5, C0+C1*M+C2*(M-5.5)+C3*(M-6.5), Fmag)	# M > 6.5
+
+    # distance term
+    Fdis = (C4 + C5*M)*log(sqrt(Rrup2 + C6*C6))
+
+    # style-of-faulting term
+    Fflt = C7*Frv*where(Ztor < 1.0, Ztor, 1.0) + C8*Fnm
+
+    # hanging wall term
+    sqrt_Rjb2_1 = sqrt(Rjb2 + 1.0)
+    Rmax = where(Rrup > sqrt_Rjb2_1, Rrup, sqrt_Rjb2_1)	# max(Rrup, sqrt(Rjb*Rjb+1))
+
+    Fhngr = ones(Rrup.shape) * (Rmax-Rjb)/Rmax		# Ztor < 1.0
+    Fhngr = where(Ztor >= 1.0, (Rrup-Rjb)/Rrup, Fhngr)	# Ztor >= 1.0
+    Fhngr = where(Rjb == 0.0, 1.0, Fhngr)		# Rjb == 0.0
+
+    Fhngm = zeros(M.shape)			# M <= 6.0
+    Fhngm = where(M > 6.0, 2*(M-6.0), Fhngm)	# 6.0 < M < 6.5
+    Fhngm = where(M >= 6.5, 1.0, Fhngm)		# M >= 6.5
+
+    Fhngz = zeros(Ztor.shape)
+    Fhngz = where(Ztor < 20.0, (20.0-Ztor)/20.0, 0.0)
+
+    Fhngd = ones(delta.shape)
+    Fhngd = where(delta > 70.0, (90.0-delta)/20.0, Fhngd)
+    Fhngd = Fhngd[newaxis,:,newaxis]
+
     Fhng = C9*Fhngr*Fhngm*Fhngz*Fhngd
 
-    # get the A1100 value - PGA for Vs30=1100
-    A1100 = exp(Campbell08_A1100(num_periods, M, Rrup, Rjb, Ztor, Z25, delta, Frv, Fnm))
+    # shallow site response term (Vs30 = 1100)
+    Fsite = ones(Rrup.shape) * (C10+K2*Campbell08_N)*log(1100.0/K1)	# Vs30 >= 1100.0
+    Fsite = where(Vs30 < 1100.0, (C10 + K2*Campbell08_N)*log(Vs30/K1), Fsite)
+    Fsite = where(Vs30 < K1, C10*log(Vs30/K1) + K2*(log(A1100+Campbell08_C*power((Vs30/K1), Campbell08_N)) - log(A1100+Campbell08_C)),
+                             Fsite)
 
-    # calculate Fsite from equation 11
-    Fsite = ones(Rrup.shape) * (C10+K2*N)*log(1100.0/K1)
-    less_1100 = (C10+K2*N)*log(Vs30_div_K1)
-    Fsite = where(Vs30 < 1100.0, less_1100, Fsite)
-    less_K1 = C10*log(Vs30_div_K1)+K2*(log(A1100+C*power(Vs30_div_K1,N))-log(A1100+C))
-    Fsite = where(Vs30 < K1, less_K1, Fsite)
+    # basin response term
+    Fsed = zeros(Z25.shape)				# Z25 <= 3.0
+    Fsed = where(Z25 < 1.0, C11*(Z25-1.0), Fsed)	# Z25 < 1.0
+    Fsed = where(Z25 > 3.0, C12*K3*Campbell08_exp_min_075*(1.0-exp(-0.25*(Z25-3.0))), Fsed)
 
-    # calculate Fsed from equation 12
-    Fsed = zeros(Z25.shape)
-    Fsed = where(Z25 < 1, C11*(Z25 - 1), Fsed)
-    Fsed = where(Z25 > 3, C12*K3*exp_min_075*(1 - exp(-0.25*(Z25-3))), Fsed)
+    # calculate ground motion parameter
+    Y = exp(Fmag + Fdis + Fflt + Fhng + Fsite + Fsed)
 
-    # equation 1 gives final log_mean value (lnYhat in Campbell08-speak)
-    lnYhat = Fmag + Fdis + Fflt + Fhng + Fsite + Fsed
+    # check if Y < PGA at short periods
+    max_Y_PGA =  where(Y < PGA, PGA, Y)
+    Y = where(periods <= 0.25, max_Y_PGA, Y)
 
-    # calculate sigma values
-    (ElnY, TlnY, Ec, Et, Earb, rho) = sigma_coefficient
+    ######
+    # calculate aleatory uncertainty
+    ######
 
-    ElnYb = sqrt(ElnY*ElnY - ElnAF*ElnAF)		# page 147
-    ElnAB = sqrt(ElnPGA*ElnPGA - ElnAF*ElnAF)	# page 147
+    # linearized relationship between Fsite and ln(PGA)
+    alpha = zeros(A1100.shape)
+    alpha = where(Vs30 < K1, K2*A1100*(1.0/(A1100+Campbell08_C*power((Vs30/K1), Campbell08_N)) - 1.0/(A1100+Campbell08_C)), alpha)
 
-    alpha = K2*A1100*(1/(A1100+C*pow(Vs30_div_K1, N)) - 1/(A1100 + C))
-    alpha = where(Vs30 >= K1, 0.0, alpha)
+    # intra-event standard deviation at base of site profile
+    slnYB = sqrt(ElnY*ElnY - Campbell08_ElnAF*Campbell08_ElnAF)
+    slnAB = sqrt(slnPGA*slnPGA - Campbell08_ElnAF*Campbell08_ElnAF)
 
-    sigma = sqrt(ElnYb*ElnYb + ElnAF*ElnAF + alpha*alpha*ElnAB + 2*alpha*rho*ElnYb*ElnAB)
-    sigmaT = sqrt(sigma*sigma + TlnY*TlnY)		# eqn 16
-    log_sigma = log(sigmaT)
+    # standard deviation of geometric mean of ln(Y)
+    sigma = sqrt(slnYB*slnYB + Campbell08_ElnAF*Campbell08_ElnAF +
+                 alpha*alpha*slnAB*slnAB + 2.0*alpha*rho*slnYB*slnAB)
 
-    return (lnYhat, log_sigma)
+#    # extra terms - not used
+#    tau = taulnY
+#    sig = sqrt(sigma*sigma + tau*tau)
+#
+#    # standard deviation of arbitrary horizontal component of ln(Y)
+#    sigarb = sqrt(sig*sig + Ec*Ec)
 
-Campbell08_magnitude_type = 'Mw'
-Campbell08_distance_type = 'Rupture'
+    return (log(Y), log(sigma))
 
 ######
 # Build the coefficient arrays
@@ -3301,6 +3279,8 @@ Campbell08_sigma_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
                                        1.5,   2.0,   3.0,   4.0,   5.0,
                                        7.5,  10.0]
 
+Campbell08_magnitude_type = 'Mw'
+Campbell08_distance_type = 'Rupture'
 Campbell08_interpolation = linear_interpolation
 
 gound_motion_init['Campbell08'] = [Campbell08_distribution,
@@ -3316,6 +3296,7 @@ gound_motion_init['Campbell08'] = [Campbell08_distribution,
 del Campbell08_Table2, Campbell08_Table3
 
 #########################  End of Campbell08 model  ##########################
+
 #***************  START OF mean_10_sigma_1  ****************************
 
 mean_10_sigma_1_magnitude_type='ML'
