@@ -280,9 +280,10 @@ class Multiple_ground_motion_calculator(object):
           log_sigma_array the log_sigma values
             dimensions (GM_model, sites, events, periods)
         """
+
         for mod_i, GM_model in enumerate(self.GM_models):
             (log_mean, log_sigma) = GM_model.distribution_function(
-                dist_object, mag_dict,
+                dist_object, mag_dict, periods=periods,
                 depth=depth, depth_to_top=depth_to_top,
                 faulting_type=faulting_type, vs30=vs30,
                 Z25=Z25, dip=dip,
