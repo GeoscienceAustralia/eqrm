@@ -1,0 +1,638 @@
+\chapter{The EQRM application}
+\label{ch:application}
+
+This chapter describes the EQRM application. The directory
+structure, input parameters and directions on how to run the EQRM
+are all described. Converting the EQRM into a stand-alone
+executable is also explained at the end of the chapter. Readers
+who are interested in only the EQRM methodology and not the EQRM
+software package may wish to skip this chapter.
+
+
+\section{Directory structure}
+\label{sec:app-dirstruct}
+
+The code is currently organised in the following directory
+structure:
+
+\begin{supertabular}{lp{0.6\textwidth}}
+ \typedir{*/eqrm}{/datacvt}{} & `off-line' routines for
+preparing input data. \\
+\typedir{*/eqrm}{/eqrm}{\_app} & software and default data files
+comprising the EQRM application. \\
+\typedir{*/eqrm}{/testing}{\_harness} & testing suite to
+ensure new development meets pre-defined back-compatibility criteria. \\
+\end{supertabular}
+
+\vspace{2em}
+
+The most significant sub-directories of
+\typedir{*/eqrm}{/datacvt}{} are:
+
+\begin{supertabular}{lp{0.7\textwidth}}
+\typedir{*/buildingdb}{}{} & tools to assist the preparation of building databases\index{building database} (see \cref{ch:grids}).\\
+\typedir{*/buildingpars}{}{} & tools to assist the preparation of engineering parameters (see \cref{ch:damage}).\\
+\typedir{*/econsoc}{pars}{} & tools to assist the preparation of direct financial loss parameters  (see \cref{ch:losses}). \\
+\typedir{*/site}{\_classes}{} & tools to prepare site class polygons (see \cref{ch:reg}). \\
+\typedir{*/stats}{}{} & tools to extract statistics from building database\index{building database}s (see \cref{ch:grids}). Note that these tools were originally written to extract Newcastle information however they can easily be modified to work with other data sets. \\
+\end{supertabular}
+
+\vspace{2em} The most significant sub-directories of
+\typedir{*/eqrm}{/eqrm}{\_app} are:
+
+\begin{supertabular}{lp{0.7\textwidth}}
+\typedir{*/m}{\_code}{} & EQRM source code, predominately MATLAB functions (see below for more details). \\
+\typedir{*/resources}{}{} & data files to support the EQRM (see below for more details). \\
+\typedir{*/system}{}{} &  tools and path information directing the EQRM to individual components (e.g. \typedir{*/m}{\_code}{} and \typedir{*/resources}{}{}). \\
+\end{supertabular}
+
+\vspace{2em}
+
+The most significant sub-directories of
+\typedir{*/eqrm}{/eqrm\_app}{/m\_code} are:
+
+\begin{supertabular}{lp{0.7\textwidth}}
+\typedir{*/general}{}{} & general functions (includes error manager). \\
+\typedir{*/startup}{}{} & functions to assist with setting up the MATLAB Path (\sref{app:runEQRM}).\\
+\typedir{*/hazard}{}{} & functions for source generation
+(\cref{ch:source}), attenuation (\cref{ch:atten}),
+amplification (\cref{ch:reg}) and hazard calculation (\cref{ch:risk}).\\
+\typedir{*/c3}{\_gui}{} & functions to support the \typegui{eqrm}{\_param}{\_gui} (\sref{app:runEQRM}).\\
+\typedir{*/mcc}{\_build}{\_apps} & functions to assist in building a stand--alone executable.\\
+\typedir{*/utils}{}{} & general utility tools used by other functions.\\
+\typedir{*/compare}{\_utils}{} & important functions for comparing MATLAB binary files (used by the testing suite).\\
+\typedir{*/vuln}{}{} & functions for building damage
+(\cref{ch:damage}), financial loss (\cref{ch:losses}) and
+risk calculation (\cref{ch:risk}).\\
+\typedir{*/processing}{}{} & post-processing functions for manipulating and plotting EQRM outputs (\cref{ch:risk}).\\
+\typedir{*/dit}{}{} & functions to support the data interrogation tool GUI (output manager: \sref{app:runEQRM}).\\
+\end{supertabular}
+
+
+\vspace{2em} The most significant sub-directories of
+\typedir{*/eqrm}{/eqrm\_app}{/resources} are:
+
+\begin{supertabular}{lp{0.7\textwidth}}
+\typedir{*/data}{}{} & parameter files and input data for the EQRM (e.g. attenuation model coefficients, engineering parameters etc.).\\
+\typedir{*/c3}{\_gui}{} & figure files for the \typegui{eqrm}{\_param}{\_gui}.\\
+\typedir{*/dit}{\_gui}{} & figure files for the DIT GUI (output manager).\\
+\end{supertabular}
+
+\vspace{2em} The most significant sub-directories of
+\typedir{*/eqrm}{/testing}{\_harness} are:
+
+\begin{supertabular}{lp{0.7\textwidth}}
+\typedir{*/hazard}{}{} & input and output data for EQRM hazard back compatibility tests.\\
+\typedir{*/vuln}{}{} & input and output data for EQRM risk back compatibility tests.\\
+\end{supertabular}
+
+
+\section{EQRM inputs}
+
+For the purpose of this manual the EQRM inputs are discussed in
+two separate sections. \sref{sec:application-setdata} describes
+the contents of the \typeself{set}{da}{ta} file, which contains a
+series of input parameters and flags that must be set by the user.
+\sref{sec:application-parfiles} describes other files that are
+required by the EQRM modules. In most cases these files can be
+used directly from \typedir{*/eqrm/eqrm\_app}{/resources}{/data},
+however the user has the ability to provide alternatives.
+
+\subsection{The \texttt{setdata} file}
+\label{sec:application-setdata}
+
+The full path to the \typeself{set}{da}{ta} file must be passed to
+the EQRM when the program is run. It contains a series of input
+variables (or parameters) that define the manner in which the EQRM
+is operated. For example; there is a flag to control whether the
+EQRM models hazard or risk. Other flags can be used to define
+which attenuation model is selected, whether site amplification is
+considered or which set of engineering parameters is used. A
+description of all of the variables in the \typeself{set}{da}{ta}
+file is given below. The \typeself{set}{da}{ta} file contains a
+single variable
+\typeself{eqrm}{\_param}{\_T}\index{setdata!\texttt{eqrm\_param\_T}}.
+For the purpose of this manual the fields of
+\typeself{eqrm}{\_param}{\_T}\index{\texttt{setdata}!\texttt{eqrm\_param\_T}}
+are segregated into 13 sub-groups as they appear on the EQRM GUI
+(\sref{app:runEQRM}) however no such separation exists in the
+\typeself{set}{da}{ta} file itself.
+
+\textbf{Operation Mode:}
+
+\begin{tabular}{lp{0.6\textwidth}}
+\typepar{run}{\_type}{} & Defines the operation mode of the EQRM: \\
+  & \hspace{0.5em} 1 $\Rightarrow$ hazard; \\
+  & \hspace{0.5em} 2 $\Rightarrow$ risk; \\
+  & \hspace{0.5em} 3 $\Rightarrow$ risk from hazard. \\
+ \end{tabular}
+
+\vspace{2em}
+ \textbf{General:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+  \typepar{inp}{ut}{dir} &  Directory containing any local input files.\\
+ \typepar{sav}{e}{dir}{} &   Directory for output files.    \\
+ \typepar{site}{\_}{loc}    &   String used in input and output file names.    \\
+ \typepar{i}{ea}{st}   &   Direction of increasing longitude: \\
+  &  \hspace{0.5em} 1 $\Rightarrow$ increases toward East; \\
+  &  \hspace{0.5em} -1 $\Rightarrow$ increases toward West. \\
+\typepar{grid}{\_}{flag}   & Define grid type: \\
+  & \hspace{0.5em} 1 $\Rightarrow$ Grid produced in GIS; \\
+  & \hspace{0.5em} 2 $\Rightarrow$ Grid produced by \typeim. \\
+\typepar{small}{\_site}{\_flag} &   Sampling of sites: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ use all sites; \\
+ & \hspace{0.5em} 1 $\Rightarrow$  use sub-sample defined by \typepar{Si}{te}{Ind}.  \\
+\typepar{Si}{te}{Ind} & Vector whose elements represent the site indices to be used in the sub-sample  \\
+& \hspace{0.5em} (if $\typepar{small}{\_site}{\_flag}=1$). \\
+\typepar{de}{str}{ing}    &   Optional string to be used in logfile. Currently only used with risk runs.    \\
+\typepar{rtrn}{\_}{per}   &   Vector whose elements represent the return periods to be considered for hazard.    \\
+ \end{supertabular}
+
+\vspace{2em} \textbf{Source:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{a}{z}{i} &     Predominant azimuth of events.  \\
+\typepar{d}{\_a}{zi}   &   Azimuth range for events (i.e. \typepar{a}{z}{i} $\pm$ \typepar{d}{\_a}{zi}).   \\
+\typepar{d}{i}{p} &    Dip of virtual fault\index{virtual fault}s.    \\
+\typepar{ntrg}{vec}{tor}  &  Vector whose elements represent the desired number of simulated event\index{simulated event}s for each generation zone.   \\
+\typepar{f}{ty}{pe}   &  Fault type for attenuation models.
+\textit{Note that this parameter is currently not operational}.
+ \\
+ & \hspace{0.5em} 0 $\Rightarrow$ ss; \\
+ & \hspace{0.5em} 0.5 $\Rightarrow$ ro; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ rv, nr or no; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ uk. \\
+\typepar{w}{d}{th}    &  Width of virtual fault\index{virtual fault}.      \\
+\typepar{min}{\_mag}{\_cutoff}  &  Minimum magnitude below which hazard is not considered.     \\
+\typepar{n}{bin}{s}   &   Number of magnitude bins used to sample
+event magnitudes.    \\
+ \end{supertabular}
+
+
+\vspace{2em} \textbf{Event Spawn:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{src}{\_eps}{\_switch}  &   Make copies of events for
+incorporation of attenuation uncertainty  i.e. spawning: \\
+& \hspace{0.5em} 0 $\Rightarrow$ events NOT copied; \\
+& \hspace{0.5em} 1 $\Rightarrow$ events copied: logic tree collapsed.  \\
+& \hspace{0.5em} 2 $\Rightarrow$ events copied: logic tree NOT collapsed.  \\
+\typepar{m}{bn}{d} &  Only events with magnitude greater than \typepar{m}{bn}{d} are spawned. \\
+\typepar{nsa}{mpl}{es} & Creates \typepar{nsa}{mpl}{es} copies of each spawned event. \\
+\typepar{n}{sig}{ma} &  Defines the x-limits of the probability density function to be considered when spawning.\\
+ \end{supertabular}
+
+
+\vspace{2em} \textbf{Scenario:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{det}{erm}{\_flag} &  Event simulation type: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ standard probabilistic simulation; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ consider a specific scenario event. \\
+\typepar{det}{erm}{\_ntrg} & The desired number of copies to be generated \\
+ & \hspace{0.5em} (if $\typepar{det}{erm}{\_flag}=1$). \\
+\typepar{det}{erm}{\_azi}  &   Azimuth of event    \\
+ & \hspace{0.5em} (if $\typepar{det}{erm}{\_flag}=1$). \\
+\typepar{det}{erm}{\_lat}  &  Latitude of rupture centroid \\
+ & \hspace{0.5em} (if $\typepar{det}{erm}{\_flag}=1$). \\
+\typepar{det}{erm}{\_lon}  &  Longitude of rupture centroid    \\
+ & \hspace{0.5em} (if $\typepar{det}{erm}{\_flag}=1$). \\
+\typepar{det}{erm}{\_mag}  &  Moment magnitude of event    \\
+ & \hspace{0.5em} (if $\typepar{det}{erm}{\_flag}=1$). \\
+\typepar{det}{erm}{\_r\_z}  &  Depth to event     \\
+ & \hspace{0.5em} (if $\typepar{det}{erm}{\_flag}=1$). \\
+ \end{supertabular}
+
+
+\vspace{2em} \textbf{Attenuation:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{atten}{uation}{\_flag}    &  A 2 row matrix containing one column for each attenuation model to be used.
+The first row contains a pointer to the attenuation model (see below) and the second row contains its weight. \\
+&  Attenuation Model Pointers: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ \cite{dr_Gaull90a}; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ \cite{dr_Toro97a}; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ \cite{dr_Atkinson97a}; \\
+ & \hspace{0.5em} 3 $\Rightarrow$ \cite{dr_Sadigh97a}; \\
+ & \hspace{0.5em} 4 $\Rightarrow$ \cite{dr_Somerville01a}; \\
+ & \hspace{0.5em} 100 $\Rightarrow$ \cite{dr_Gaull90a} (MMI). \\
+\typepar{attn}{\_reg}{ion}    &   Defines version of selected
+attenuation model (i.e. region or type
+ of magnitude). Options vary depending on the value of \typepar{atten}{uat}{ion\_flag} (see \cref{ch:atten}).  \\
+\typepar{var}{\_attn}{\_flag}   &  Variability for attenuation: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ NOT included; \\
+  & \hspace{0.5em}  1 $\Rightarrow$ included.   \\
+\typepar{var}{\_attn}{\_method} & Technique used to
+incorporate attenuation aleatory uncertainty: \\
+ & \hspace{0.5em} 1 $\Rightarrow$ Sample PDF - spawning; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
+ & \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
+ & \hspace{0.5em} 4 $\Rightarrow$ $+\sigma$; \\
+ & \hspace{0.5em} 5 $\Rightarrow$ $-\sigma$; \\
+ & \hspace{0.5em} 6 $\Rightarrow$ $-2\sigma$.\\
+\typepar{resp}{\_crv}{\_flag} & Secondary options for choice of
+response spectral acceleration\index{response spectral acceleration} $S_a$: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ $S_a$ from attenuation model; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ $S_a$ from attenuation model and cutoff\\
+ & \hspace{2.8em} maximum spectral displacement\index{response spectral displacement}; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ use PGA from attenuation model to scale\\
+ & \hspace{2.8em} Australia Standard $S_a$; \\
+ & \hspace{0.5em} 3 $\Rightarrow$ use PGA from attenuation model to scale \\
+ & \hspace{2.8em} Australia Standard and cutoff at \\
+ & \hspace{2.8em} maximum spectral displacement\index{response spectral displacement}; \\
+ & \hspace{0.5em} 4 $\Rightarrow$ use PGA from attenuation model to scale \\
+ & \hspace{2.8em} HAZUS $S_a$. \\
+\typepar{R}{thr}{sh}  &  Threshold distance, beyond which motion is assigned to zero.       \\
+\typepar{per}{io}{ds} &  Periods for $S_a$.     \\
+\typepar{pga}{cut}{off}   & PGA cutoff for re-scaling $S_a$ with PGA greater than \typepar{pga}{cut}{off}.      \\
+\typepar{smoothed}{\_response}{\_flag}  & Controls smoothing of $S_a$: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ No smoothing; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ Smoothing.  \\
+ \end{supertabular}
+
+
+\vspace{2em} \textbf{Amplification:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{amp}{\_swit}{ch}  &  Amplification associated with local regolith: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ NOT included; \\
+ & \hspace{0.5em}  1 $\Rightarrow$ included. \\
+\typepar{var}{\_amp}{\_flag}    &   Variability for amplification: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ NOT included; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ included.  \\
+\typepar{var}{\_amp}{\_method} & Technique used to incorporate amplification aleatory uncertainty: \\
+ & \hspace{0.5em} 1 $\Rightarrow$ Sample PDF - spawning; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
+ & \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
+ & \hspace{0.5em} 4 $\Rightarrow$ $+\sigma$; \\
+ & \hspace{0.5em} 5 $\Rightarrow$ $-\sigma$; \\
+ & \hspace{0.5em} 6 $\Rightarrow$ $-2\sigma$.\\
+\typepar{Max}{Amp}{Factor}    &   Maximum accepted value for amplification factor.   \\
+\typepar{Min}{Amp}{Factor}    &   Minimum accepted value for amplification factor.    \\
+ \end{supertabular}
+
+
+\vspace{2em} \textbf{Bclasses:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{b\_usage}{\_type}{\_flag} & Building usage classification system: \\
+ & \hspace{0.5em} 1 $\Rightarrow$ HAZUS usage\index{building usgage!HAZUS} classification; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ FCB\index{building usgage!FCB} usage classification.\\
+\typepar{hazus}{\_btypes}{\_flag}   & Building construction type classification system: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ refined HAZUS building classification\index{building type}; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ HAZUS building classification\index{building type}.     \\
+\typepar{hazus}{\_damping}{is5\_flag}   &   Level of damping when \typepar{build}{pars}{\_flag} = 2: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ Use damping level corresponding to  \\
+ & \hspace{2.8em} \typepar{build}{pars}{\_flag}=0; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ Use $5\%$.    \\
+\typepar{build}{pars}{\_flag} & Engineering parameters to be used: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ Australian Engineers Workshop  \\
+& \hspace{2.8em} Parameters (AEWP) with Edwards \\
+& \hspace{2.8em}  modifications 1; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ AEWP; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ original HAZUS paramaters; \\
+ & \hspace{0.5em} 3 $\Rightarrow$ AEWP with Edwards modifications 2; \\
+ & \hspace{0.5em} 4 $\Rightarrow$ AEWP with Edwards modifications 3. \\
+ \end{supertabular}
+
+
+\vspace{2em} \textbf{Bclasses2:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{force}{\_btype}{\_flag}    & Force all buildings to have the same usage and type classification: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ Use buildings as defined in database; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ Force modification. \\
+\typepar{det}{erm}{\_btype}    &  Building type when \typepar{force}{\_btype}{\_flag}=1.    \\
+\typepar{det}{erm}{\_buse} &   Building usage when \typepar{force}{\_btype}{\_flag}=1.     \\
+\typepar{ignore}{\_post89}{\_flag}  &  Ignore buildings built after 1989: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ include all ages; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ ignore the post 89 buildings.           \\
+ \end{supertabular}
+
+
+\vspace{2em} \textbf{CSM:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{var}{\_bcap}{\_flag}   &   Variability with building capacity curve\index{capacity curve}: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ NOT included; \\
+ & \hspace{0.5em}  1 $\Rightarrow$ included.    \\
+\typepar{bcap}{\_var}{\_method} & Method used to incorporate variability in capacity curve\index{capacity curve}: \\
+ & \hspace{0.5em} 1 $\Rightarrow$ Random sampling used to adjust the \\
+& \hspace{2.8em} vertical position of the yield and ultimate \\
+& \hspace{2.8em} points; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ Preferred technique: Random sampling \\
+& \hspace{2.8em} applied to ultimate point only and yield \\
+& \hspace{2.8em}  point re-calculated to satisfy capacity \\
+& \hspace{2.8em}  curve\index{capacity curve} `shape' constraint. \\
+
+\typepar{st}{d}{cap}  & standard deviation for capacity curve\index{capacity curve} log--normal PDF.      \\
+\typepar{damp}{\_fla}{gs}  & Vector to control nature of linear damping (see below for explanation of each element). \\
+\typepar{damp}{\_fla}{gs}$(1)$ & Damping multiplicative formula to
+be
+used - \sref{subsec:v-dam-damping}: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ Preferred technique: use $R_a$, $R_v$, and $R_d$; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ use $R_a$, $R_v$ and assign $R_d= R_v$; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ use $R_v$ only and assign $R_a=R_d=R_v$. \\
+\typepar{damp}{\_fla}{gs}$(2)$ & Modify transition building period i.e. corner period $T_{av}$: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ Preferred technique: modify as in HAZUS; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ do NOT modify. \\
+\typepar{damp}{\_fla}{gs}$(3)$ & Smoothing of damped curve: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ Preferred technique: apply smoothing; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ NO smoothing.\\
+\typepar{Har}{ea}{\_flag} & Technique for Hysteretic  damping: \\
+ & \hspace{0.5em} 0 $\Rightarrow$ NO Hysteretic  damping; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ Hysteretic  damping via trapezoidal approximation; \\
+ & \hspace{0.5em} 2 $\Rightarrow$ Hysteretic  damping via curve fitting.  \\
+\typepar{SD}{Rel}{Tol}    &    Tolerance (as a percentage) for SDcr (in nonlinear damping calculations).   \\
+\typepar{max}{\_iter}{ations}  & Maximum iterations for nonlinear damping calculations.\\
+ \end{supertabular}
+
+\vspace{2em} \textbf{Diagnostics:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{qa}{\_switch}{\_ampfactors} & Diagnostics for \typefunc{do}{\_amp}{lification} (a few sites only): \\
+ & \hspace{0.5em} 0 $\Rightarrow$ NO diagnostic plots; \\
+ & \hspace{0.5em} 1 $\Rightarrow$ display diagnostic plots.      \\
+\typepar{qa}{\_switch}{\_attn}  &   Diagnostics for \typefunc{do}{\_atten}{uation} (a few sites only): \\
+& \hspace{0.5em} 0 $\Rightarrow$ NO diagnostic plots; \\
+& \hspace{0.5em} 1 $\Rightarrow$ display diagnostic plots.  \\
+\typepar{qa}{\_switch}{\_fuse}  &   Diagnostics for \typefunc{fuse}{\_4}{hzd}: \\
+& \hspace{0.5em} 0 $\Rightarrow$ NO diagnostic plots; \\
+& \hspace{0.5em} 1 $\Rightarrow$ display diagnostic plots.  \\
+\typepar{qa}{\_switch}{\_map}   &  Diagnostics for \typefunc{do}{\_ana}{lysis} (works in hazard mode only): \\
+& \hspace{0.5em} 0 $\Rightarrow$ NO diagnostic plots; \\
+& \hspace{0.5em} 1 $\Rightarrow$ display diagnostic plots. \\
+\typepar{qa\_switch}{\_mke}{\_evnts} &  Diagnostics for \typefunc{mke}{\_ev}{nts}: \\
+& \hspace{0.5em} 0 $\Rightarrow$ NO diagnostics and save all events; \\
+& \hspace{0.5em} 1 $\Rightarrow$ display diagnostic plots and ask user about \\
+& \hspace{2.8em} saving; \\
+& \hspace{0.5em} 2 $\Rightarrow$ display diagnostic plots and save events \\
+& \hspace{2.8em} inside polygon; \\
+& \hspace{0.5em} 3 $\Rightarrow$ display diagnostic plots and save all events.  \\
+\typepar{qa\_switch}{\_water}{check}    & No longer used.      \\
+\typepar{qa}{\_switch}{\_soc}   &  Diagnostics for casualty model: \\
+& \hspace{0.5em} 0 $\Rightarrow$ NO diagnostics; \\
+& \hspace{0.5em} 1 $\Rightarrow$ plot injuries and casualties.     \\
+\typepar{qa}{\_switch}{\_vun}   &  Diagnostics for capacity spectrum method\index{capacity spectrum method}: \\
+& \hspace{0.5em} 0 $\Rightarrow$ NO diagnostic plots; \\
+& \hspace{0.5em} 1 $\Rightarrow$ display building info to screen; \\
+& \hspace{0.5em} 2 $\Rightarrow$ Do $1$ and plot each building's convergence \\
+& \hspace{2.8em} for the 1st earthquake (pause after \\
+& \hspace{2.8em} every iteration); \\
+& \hspace{0.5em} 3 $\Rightarrow$ Do $1$ and plot each building's convergence \\
+& \hspace{2.8em} for the worst earthquake (pause after \\
+& \hspace{2.8em} final convergence); \\
+& \hspace{0.5em} 4 $\Rightarrow$ Do $1$ and plot each building's convergence \\
+for the worst earthquake (pause after \\
+& \hspace{2.8em} every iteration).    \\
+ \end{supertabular}
+
+\vspace{2em} \textbf{Loss:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+ \typepar{pga}{\_min}{damage}   &  minimum PGA(g) below which financial loss is assigned to zero. \\
+ \typepar{c}{}{i} & Regional cost index multiplier to convert dollar values in building database\index{building database} to desired regional and temporal (i.e. inflation) values.\\
+\typepar{aus}{\_contents}{\_flag}   &  Contents value for residential buildings and salvageability after complete building damage:   \\
+& \hspace{0.5em} 0 $\Rightarrow$ contents value as defined in building \\
+& \hspace{2.8em} database\index{building database} and salvageability of $50\%$;\\
+& \hspace{0.5em} 1 $\Rightarrow$ $60\%$ contents value as defined in building \\
+& \hspace{2.8em} database\index{building database} and salvageability of zero.\\
+ \end{supertabular}
+
+\vspace{2em} \textbf{Save:}
+
+\begin{supertabular}{lp{0.6\textwidth}}
+\typepar{hazard}{\_map}{\_flag} & Save data for hazard maps: \\
+& \hspace{0.5em} 0 $\Rightarrow$ do NOT save; \\
+& \hspace{0.5em} 1 $\Rightarrow$ save.      \\
+\typepar{save}{\_ecloss}{\_flag}    & Save direct financial loss data: \\
+& \hspace{0.5em} 0 $\Rightarrow$ do NOT save; \\
+& \hspace{0.5em} 1 $\Rightarrow$ save total financial loss; \\
+& \hspace{0.5em} 2 $\Rightarrow$ save contents and building loss separately.        \\
+\typepar{save}{\_socloss}{\_flag}  & Save casualty and injury data: \\
+& \hspace{0.5em} 0 $\Rightarrow$ do NOT save; \\
+& \hspace{0.5em} 1 $\Rightarrow$ save.     \\
+\typepar{save}{\_motion}{\_flag}   &  Save RSA motion when conducting a risk simulation: \\
+& \hspace{0.5em} 0 $\Rightarrow$ do NOT save; \\
+& \hspace{0.5em} 1 $\Rightarrow$ save.     \\
+\typepar{save}{\_probdam}{\_flag}   &  Save damage state probabilities for each building (\textit{currently not operational}): \\
+& \hspace{0.5em} 0 $\Rightarrow$ do NOT save; \\
+& \hspace{0.5em} 1 $\Rightarrow$ save.      \\
+\typepar{save}{\_deagecloss}{\_flag}   &  Save loss associated with individual damage types i.e. structural, non-structural (\textit{currently not operational}): \\
+& \hspace{0.5em} 0 $\Rightarrow$ do NOT save; \\
+& \hspace{0.5em} 1 $\Rightarrow$ save.     \\
+ \end{supertabular}
+
+
+
+
+\subsection{Parameter files}
+\label{sec:application-parfiles}
+
+This section identifies the important input files that are used by
+different components of the EQRM. Input files can be dependent or
+independent of region. For example the file
+ \typeparfile{newc}{\_par}{\_ampfactors}{.mat} contains the amplification factors
+for the Newcastle region (see \sref{ch:reg}), whereas the file
+ \typeparfile{attn\_toro}{\_midcontinent}{\_momag}{.txt}
+contains attenuation coefficients for the \citet*{dr_Toro97a}
+attenuation model (see \sref{ch:atten}) which are not dependent on
+region. The EQRM identifies the desired region dependent files
+using the user defined parameter \typepar{site}{\_loc}{} (see
+\sref{sec:application-setdata}).
+
+The EQRM makes use of default data to reduce the need for a large
+number of defined input files. Default data files are stored in
+the directory \typedir{*/eqrm/eqrm\_app}{/resources}{/data} (see
+\sref{sec:app-dirstruct}). The EQRM facilitates the use of
+non-default data by first looking in the user defined
+ \typepar{inp}{ut}{dir} (see \sref{sec:application-setdata}) for
+required files. If the required files are found in
+ \typepar{inp}{ut}{dir} they will be used by the EQRM, if the files
+are not found in  \typepar{inp}{ut}{dir} then the default files
+are used.
+
+Note that default files are available for pre-defined regions
+only. For example; Newcastle and Perth region default data can be
+accessed by defining \typepar{site}{\_}{loc} of \typenewc and
+\typeperth respectively.
+
+\begin{table}
+\caption{Default parameter files in
+\typedircaption{*/eqrm/eqrm\_app}{/resources}{/data}.}
+\label{tab:app-inputfiles} \vspace{0.8em}
+\begin{tabular}{|l|p{0.7\textwidth}|}
+\hline
+Chapter & Files \\
+\hline Earthquake & $\typeparfile{<site\_loc>}{\_par}{\_sourcepolys}{.txt}$ \\
+Source generation &  $\typeparfile{<site\_loc>}{\_par}{\_sourcezones}{.txt}$ \\
+\hline
+Grids and & $\typeparfile{au}{s}{\_mat}{.txt}$\\
+building & $\typeparfile{aust}{ralia}{\_bndy}{.txt}$\\
+databases & $\typeparfile{<site\_loc>}{\_par}{\_site}{.mat}$\\
+ &  $\typeparfile{<site\_loc>}{\_par\_site}{\_uniform}{.mat}$ \\
+ &  $\typeparfile{<site\_loc>}{\_par\_study}{\_region\_box}{.txt}$ \\
+  & $\typeparfile{sitedb}{\_<site}{\_loc>}{.mat}$ \\
+ & $\typeparfile{suburb}{\_post}{code}{.csv}$\\
+  & $\typeparfile{text}{b}{types}{.txt}$ \\
+ & $\typeparfile{text}{busage}{FCB}{.txt}$ \\
+ &  $\typeparfile{text}{b}{uses}{.txt}$ \\
+\hline
+Attenuation & $\typeparfile{attn}{\_atkboore}{\_momag}{.txt}$\\
+ &  $\typeparfile{attn\_sadigh}{\_coeff\_momag}{\_great65}{.txt}$ \\
+ &  $\typeparfile{attn\_sadigh}{\_coeff\_momag}{\_less65}{.txt}$ \\
+ &  $\typeparfile{attn\_somer}{\_nonrift}{\_hori}{.txt}$ \\
+ &  $\typeparfile{attn\_somer}{\_nonrift}{\_vert}{.txt}$ \\
+ &  $\typeparfile{attn\_somer}{\_rift}{\_hori}{.txt}$ \\
+ &  $\typeparfile{attn\_somer}{\_rift}{\_vert}{.txt}$ \\
+ & $\typeparfile{attn\_toro}{\_midcontinent}{\_momag}{.txt}$,              \\
+\hline
+Regolith &  $\typeparfile{<site\_loc>}{\_par}{\_ampfactors}{.mat}$\\
+amplification &  $\typeparfile{<site\_loc>\_par}{\_site\_class}{\_mask}{.mat}$ \\
+ &  $\typeparfile{<site\_loc>\_par}{\_site\_class}{\_polys}{.mat}$ \\
+\hline
+Building & $\typeparfile{b}{factors}{db}{.mat}$\\
+damage & $\typeparfile{bfactors}{db}{\_hazus}{.mat}$ \\
+ & $\typeparfile{bfactors}{db}{\_wshop}{.mat}$ \\
+ & $\typeparfile{bfactorsdb}{\_wshop}{\_update2}{.mat}$ \\
+ & $\typeparfile{bfactorsdb}{\_wshop}{\_update3}{.mat}$ \\
+ & $\typeparfile{factors}{-nonstruct}{dam}{.csv}$ \\
+ &  $\typeparfile{factors}{-struct}{dam}{.csv}$ \\
+\hline
+Losses & $\typeparfilelong{rc\_perRepl}{CostwrtBuildC}{EdwardsFCBusage}{.mat}{rc\_perRepl...EdwardsFCBusage}$ \\
+& $\typeparfilelong{rc\_perReplCost}{wrtBuildCEdwards}{Hazususage}{.mat}{rc\_perRepl...EdwardsHazususage}$\\
+% & $\typeselfnoindex{rc\_perReplCost}{wrtBuildCEdwards}{Hazususage.mat}\index{\scriptsize\texttt{rc\_perReplCostwrtBuildCEdwardsHazususage.mat}\normalsize}$\\
+& $\typeparfile{rc\_perReplCost}{wrtBuildC}{Hazusage}{.mat}$\\
+& $\typeparfile{econ}{\_p}{ar}{.mat}$\\
+\hline
+\end{tabular}
+\end{table}
+
+\tref{tab:app-inputfiles} summarises the important input files
+that can be found in the default data area. The files are listed
+against the chapter where more information can be found.
+
+
+\subsection{Running the EQRM in MATLAB}
+\label{app:runEQRM}
+
+
+The EQRM has a special startup function
+(\typefunc{eqrm}{\_start}{up}) that adds all the required
+directories to the MATLAB path. The following instructions
+describe how to use \typefunc{eqrm}{\_start}{up} to set the MATLAB
+path:
+\begin{itemize}
+\item move to the directory
+\typedir{*/eqrm/eqrm\_app}{/m\_code}{/startup} \item at the
+command line type \newline \texttt{>>
+eqrm\_startup\indexfunc{eqrm\_startup}(`*$\backslash$eqrm$\backslash$eqrm\_app')}
+\end{itemize}
+
+The EQRM has a special GUI known as the
+\typegui{eqrm}{\_param}{\_gui} that can be used to create a
+\typeself{set}{da}{ta} file, run the EQRM application or analyse
+the EQRM outputs. To launch the GUI simply type the following at
+the command line:
+\begin{itemize} \item[\texttt{>>}] \texttt{eqrm\_param\_gui}\indexgui{eqrm\_param\_gui} \end{itemize}
+It is beyond the scope of this manual to discuss the
+\typeself{eqrm}{\_param}{\_gui} further. However it is user
+friendly and reasonably self explanatory. Alternatively the EQRM
+can be run from the command line using the function
+\typefunc{eqrm}{\_analy}{sis}. To find out how to use
+\typefunc{eqrm}{\_analy}{sis} type the following at the MATLAB
+command line: \begin{itemize} \item[\texttt{>>}] \texttt{help
+eqrm\_analysis}
+\end{itemize}
+
+The EQRM has a special Output Manager GUI that can be used to
+view, analyse and plot EQRM outputs. The Output Manager is also
+known as the Data Interrogation Tool
+(DIT)\index{DIT}\index{GUI!DIT}\index{Data Interrogation
+Tool}\index{GUI!Data Interrogation Tool}. A report generation
+facility has been included with the Output Manager and can be used
+to create a \LaTeX \texttt{*.tex} file with EQRM output figures.
+The \LaTeX file can be compiled into a \texttt{.ps} and/or
+\texttt{.pdf} file if the appropriate MikTeX software is
+installed.
+
+
+\subsection{Compiling and using a stand--alone version of the EQRM in MATLAB R14SP1}
+
+Using the MATLAB compiler it is possible to create a stand--alone
+version of the EQRM that can be used without requiring MATLAB. The
+instructions for MATLAB R13 are given in \aref{app:MATLABR13}.
+
+\section{Creating a stand--alone executable of the EQRM GUI in MATLAB R14SP1:}
+\label{app:MATLABR13}
+
+Type the following at the MATLAB command line for the source
+machine \begin{itemize} \item[\texttt{>>}]
+\texttt{cnt\_do\_mcc\_build\_to\_system(`eqrm\_param\_gui',<*/path>)}
+\end{itemize}
+
+This process will create the following files in \texttt{<*/path>}:
+\begin{enumerate}
+\item \typeselfnoindexnoline{eqrm}{\_param}{\_gui.exe};  \item a
+directory named \typeselfnoindexnoline{eqrm}{\_param}{\_gui\_mcr};
+and \item \typeselfnoindexnoline{eqrm}{\_param}{\_gui.ctf}.
+\end{enumerate}
+
+\vspace{2em}
+
+\textbf{Prepare the files for transportation as follows:}
+\begin{enumerate} \item Create a folder entitled
+\typeselfnoindexnoline{*/te}{st}{exe}. \item In
+\typeselfnoindexnoline{*/te}{st}{exe} create two folders
+ \typeselfnoindexnoline{*/}{testexe}{/system} and
+ \typeselfnoindexnoline{*/}{testexe}{/mcr}.
+\item Copy  \typeselfnoindexnoline{eqrm}{\_param}{\_gui.exe},
+\typeselfnoindexnoline{eqrm}{\_param}{\_gui\_mcr} and
+\typeselfnoindexnoline{eqrm}{\_param}{\_gui.ctf} (created above)
+into \typeselfnoindexnoline{*/}{testexe}{/system}. \item Copy the
+following files from \typeselfnoindexnoline{*/EQRM}{ROOT}{/system}
+into \typeselfnoindex{*/}{testexe}{/system}:
+\begin{enumerate}
+\item \typeselfnoindexnoline{root\_mat}{\_creator}{\_cnt.exe};
+\item the directory
+\typeselfnoindexnoline{root\_mat}{\_creator}{\_cnt\_mcr}; and
+\item \typeselfnoindexnoline{root\_mat}{\_creator}{\_cnt.ctf}.
+\end{enumerate}
+\item Copy \typeself{\_MCR}{Instal}{ler.exe} from
+\typeselfnoindexnoline{<MATLABROOT>/toolbox}{/compiler/deploy}{/win32/MCRInstaller.exe}
+into \typeselfnoindexnoline{*/}{testexe}{/mcr}. \item Copy the
+directory \typeselfnoindexnoline{*/EQRM}{ROOT}{/resources} to
+\typeselfnoindexnoline{*/}{testexe}{/resources}.
+\end{enumerate}
+
+\vspace{2em} \textbf{Installation onto the target machine is
+achieved as follows:}
+\begin{enumerate}
+\item Move the contents of \typeselfnoindex{*/te}{st}{exe} onto
+the target machine. \item Run \typeself{\_MCR}{Instal}{ler.exe} on
+\typeselfnoindex{*/}{testexe}{/mcr} by double clicking on it.
+\item Set environment path on the target machine
+\begin{enumerate}
+\item open the control panel; \item open system; \item select the
+advanced tab; \item select environment variables; \item create new
+user variable entitled \typeselfnoindex{p}{a}{th}; \item add the
+following path names (separated by semi colons) into the value
+field for \texttt{path};
+\begin{itemize} \item
+\typeselfnoindexnoline{*/}{testexe}{/system}; and \item
+\typeselfnoindexnoline{*/testexe}{/mcr/v71}{runtime/win32};
+\end{itemize}
+\item Log off and log back on.
+\end{enumerate}
+\item Set the software path as follows
+\begin{enumerate}
+\item Open a DOS shell; \item Type
+\typeselfnoindex{root}{\_mat\_creator}{\_cnt.exe}; \item On the
+`EQRM root file creation' GUI select the EQRM root directory (i.e.
+\typeselfnoindex{*/te}{st}{exe}).
+\end{enumerate}
+\item Open the EQRM GUI by typing
+\typeselfnoindex{eqrm}{\_param}{\_gui.exe} at the DOS command
+prompt.
+\end{enumerate}
