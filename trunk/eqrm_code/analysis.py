@@ -23,7 +23,7 @@ import copy
 import datetime 
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
-     arange
+     arange, reshape
 
 from eqrm_code.parse_in_parameters import  \
     ParameterSyntaxError, create_parameter_data, convert_THE_PARAM_T_to_py
@@ -885,6 +885,20 @@ def calc_and_save_SA(THE_PARAM_T,
 
         # Change dimensions.  Put the ground motion model dimension
         # into the event dimension
+        num_gmm = new_bedrock_SA.shape[0]
+        num_sites = new_bedrock_SA.shape[1]
+        num_events = new_bedrock_SA.shape[2]
+        num_periods = new_bedrock_SA.shape[3]
+        if new_soil_SA is not None:
+            new_soil_SA = reshape(new_soil_SA, (num_sites,
+                                                num_events*num_gmm,
+                                                num_periods))      
+            assert(allclose(new_soil_SA, soil_SA))
+        new_bedrock_SA = reshape(new_bedrock_SA, (num_sites,
+                                                num_events*num_gmm,
+                                                num_periods ))       
+        assert(allclose(new_bedrock_SA, new_bedrock_SA))
+        
         return soil_SA, bedrock_SA
 
 def apply_threshold_distance(sites,
