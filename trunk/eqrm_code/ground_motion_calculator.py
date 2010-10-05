@@ -23,6 +23,7 @@ class Ground_motion_calculator(object):
       GM_spec: instance of Ground_motion_specification
       coefficient:   ground motion coefficient for the given periods
       sigma_coefficient:  ground motion sigma coefficient for the given periods
+      periods:  the periods
     """
 
     def __init__(self, ground_motion_model_name, periods):
@@ -86,7 +87,7 @@ class Ground_motion_calculator(object):
 
         # FIXME: seems like double dipping
         #assert isinstance(periods,ndarray)
-        periods=asarray(periods)
+        periods = asarray(periods)
         # calc the coefficient and sigma_coefficient for the input periods
         coefficient = self.GM_spec.calc_coefficient(periods)
         sigma_coefficient = self.GM_spec.calc_sigma_coefficient(periods)
@@ -96,10 +97,11 @@ class Ground_motion_calculator(object):
         self.sigma_coefficient = sigma_coefficient[:,newaxis,newaxis,:]
 
 
-    def distribution_function(self, dist_object, mag_dict, depth=None,
-                              depth_to_top=None, faulting_type=None, vs30=None,
-                              dist_type=None, mag_type=None, Z25=None, dip=None,
-                              event_activity=None, event_id=None):
+    def distribution_function(self, dist_object, mag_dict, periods=None,
+                              depth=None, depth_to_top=None, faulting_type=None,
+                              vs30=None, dist_type=None, mag_type=None,
+                              Z25=None, dip=None, event_activity=None,
+                              event_id=None):
         """
         dist_object must give distance info if dist_object.distance(dist_type)
         is called.  The distance info must be an array.
@@ -109,6 +111,7 @@ class Ground_motion_calculator(object):
 
         FIXME: Why should we let depth be None?
         """
+
         # dist_type and mag_type are attributes of self.GM_spec
         # we shouldn't pass them around.
 
@@ -135,7 +138,7 @@ class Ground_motion_calculator(object):
                                       sigma_coefficient=self.sigma_coefficient,
                                       depth=depth, depth_to_top=depth_to_top,
                                       faulting_type=faulting_type, vs30=vs30,
-                                      Z25=Z25, dip=dip)
+                                      Z25=Z25, dip=dip, periods=periods)
 
         # FIXME when will this fail?  Maybe let it fail then?
         # If it does not fail here it fails in analysis.py"
@@ -224,9 +227,11 @@ class Multiple_ground_motion_calculator(object):
 
     def __init__(self, ground_motion_model_names, periods, model_weights,
                  log_normal_distribution=None):
+        self.periods = periods
+
         # Should do this just once, when the para values are first verified.
         # The -ve value means 'the logic tree is not collapsed'
-        self.model_weights=asarray(model_weights)
+        self.model_weights = asarray(model_weights)
         if not allclose(1,self.model_weights.sum()):
             print 'model_weights,',-self.model_weights
             raise ValueError('abs(self.model_weights) did not sum to 1!')
@@ -246,25 +251,25 @@ class Multiple_ground_motion_calculator(object):
         magnitudes = {'Mw': event_set.Mw, 'ML': event_set.ML}
         vs30 = sites.attributes.get('VS30', None)
 
-        results=self._distribution_function(
-            distances,
-            magnitudes,
-            depth=event_set.depth,
-            depth_to_top=event_set.depth_to_top,
-            faulting_type=event_set.faulting_type,
-            vs30=vs30, Z25=None, dip=None,
-            event_activity=event_activity,
-            event_id=event_id)
+        results=self._distribution_function(distances, magnitudes,
+                                            depth=event_set.depth,
+                                            depth_to_top=event_set.depth_to_top,
+                                            faulting_type=event_set.faulting_type,
+                                            vs30=vs30, Z25=None, dip=None,
+                                            event_activity=event_activity,
+                                            event_id=event_id,
+                                            periods=self.periods)
+
         self.log_normal_distribution.set_log_mean_log_sigma_etc(*results)
         _, _, log_mean_extend_GM, log_sigma_extend_GM = results
         return self.log_normal_distribution, \
                log_mean_extend_GM, log_sigma_extend_GM
 
 
-    def _distribution_function(self, dist_object, mag_dict, depth=None,
-                               depth_to_top=None, faulting_type=None,
-                               vs30=None, Z25=None, dip=None,
-                               event_activity=None, event_id=None):
+    def _distribution_function(self, dist_object, mag_dict, periods=None,
+                               depth=None, depth_to_top=None,
+                               faulting_type=None, vs30=None, Z25=None,
+                               dip=None, event_activity=None, event_id=None):
         """
         The event_activity and event_id are not used currently.
         But if we spawn they will be.
