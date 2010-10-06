@@ -19,7 +19,7 @@
 	 distribution = "bounded_gutenberg_richter"
 	 recurrence_min_mag = "3.3"
 	 recurrence_max_mag = "5.4"
-	 lambda_min = "0.568"
+	 A_min = "0.568"
 	  b = "1">
 	  <event_generation 
           generation_min_mag = "4.5"
@@ -54,7 +54,7 @@
 	distribution = "bounded_gutenberg_richter"
 	 recurrence_min_mag = "3.3"
 	 recurrence_max_mag = "5.4" 
-	lambda_min= "2.53"
+	A_min= "2.53"
 	 b = "1.14" >
 	  <event_generation 
           generation_min_mag = "4.5"
@@ -89,7 +89,7 @@
 	distribution = "bounded_gutenberg_richter"
 	 recurrence_min_mag = "3.3"
 	 recurrence_max_mag = "5.4" 
-	lambda_min= "2.48"
+	A_min= "2.48"
 	 b = "1.14" >
 	  <event_generation 
           generation_min_mag = "4.5"
@@ -119,7 +119,7 @@
 	distribution = "bounded_gutenberg_richter"
 	 recurrence_min_mag = "5.41"
 	 recurrence_max_mag = "6.5" 
-	lambda_min= "0.0016"
+	A_min= "0.0016"
 	 b = "1." >
 	  <event_generation 
           generation_min_mag = "4.5"
@@ -154,7 +154,7 @@
 	distribution = "bounded_gutenberg_richter"
 	 recurrence_min_mag = "5.41"
 	 recurrence_max_mag = "6.5" 
-	lambda_min= "0.014"
+	A_min= "0.014"
 	 b = "1.118" >
 	  <event_generation 
           generation_min_mag = "4.5"
@@ -189,7 +189,7 @@
 	distribution = "bounded_gutenberg_richter"
 	 recurrence_min_mag = "5.41"
 	 recurrence_max_mag = "6.5" 
-	lambda_min= "0.0086"
+	A_min= "0.0086"
 	 b = "1.118" >
 	  <event_generation 
           generation_min_mag = "4.5" 

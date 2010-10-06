@@ -86,7 +86,7 @@ class Test_ElementTree(unittest.TestCase):
       distribution = "bounded_gutenberg_richter"
       recurrence_min_mag = "3.3" 
       recurrence_max_mag = "5.4" 
-      lambda_min= "0.568" 
+      A_min= "0.568" 
       b = "1">
       <event_generation 
       generation_min_mag = "3.3"
@@ -142,7 +142,7 @@ def build_zone_xml():
       distribution = "bounded_gutenberg_richter"
       recurrence_min_mag = "3.3" 
       recurrence_max_mag = "5.4" 
-      lambda_min= "0.568" 
+      A_min= "0.568" 
       b = "1">
       <event_generation 
       generation_min_mag = "3.3"
