@@ -259,7 +259,7 @@ def source_model_from_xml_horspool(doc, prob_min_mag_cutoff):
         min_magnitude=float(recurrence['recurrence_min_mag'])
         max_magnitude=float(recurrence['recurrence_max_mag'])
         #prob_min_mag_cutoff=float(recurrence['prob_min_mag_cutoff'])
-        Lambda_Min=float(recurrence['lambda_min'])
+        Lambda_Min=float(recurrence['A_min'])
         b=float(recurrence['b'])
         
         area = float(xml_polygon.attributes['area'])
