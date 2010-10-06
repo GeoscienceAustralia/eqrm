@@ -134,6 +134,28 @@ class Fault_Source_Generator(object):
 
         The *_dict parameters contain exactly what was in the XML and must be
         checked for required data.  We ignore extra unrecognized parameters.
+
+        The returned object will have the following data attributes:
+            dip_dist
+            out_of_dip_theta_dist
+            depth_top_seismogenic_dist
+            depth_bottom_seismogenic_dist
+            slab_width
+            trace_start_lat
+            trace_start_lon
+            trace_end_lat
+            trace_end_lon
+            azimuth_dist
+            distribution
+            recurrence_min_mag
+            recurrence_max_mag
+            b
+            slip_rate
+            A_min
+            generation_min_mag
+            number_of_mag_sample_bins
+            number_of_events
+            magnitude_dist
         """
 
         # save generic fault information
@@ -152,7 +174,8 @@ class Fault_Source_Generator(object):
         #               'end': {'lon': <value>,     # required
         #                       'lat': <value>}}    # required
         #     }
-        self.dip = self.n2t(geometry_dict, 'dip')
+        dip = self.n2t(geometry_dict, 'dip')
+        self.dip_dist = {'distribution': 'constant', 'mean': dip}
         out_of_dip_theta = self.n2t(geometry_dict, 'out_of_dip_theta')
         delta_theta = self.n2t(geometry_dict, 'delta_theta')
         self.out_of_dip_theta_dist = {'distribution': 'uniform', 
@@ -176,8 +199,9 @@ class Fault_Source_Generator(object):
         self.trace_end_lon = self.n2t(trace_point, 'lon')
 
         # calculate azimuth (in degrees)
-        self.azimuth = azimuth_of_trace(self.trace_start_lat, self.trace_start_lon,
-                                        self.trace_end_lat, self.trace_end_lon)
+        azimuth = azimuth_of_trace(self.trace_start_lat, self.trace_start_lon,
+                                   self.trace_end_lat, self.trace_end_lon)
+        self.azimuth_dist = {'distribution': 'constant', 'mean': azimuth}
 
         # look in recurrence_model_dict parameter - we expect:
         #    {'distribution': <value>,
@@ -229,7 +253,7 @@ class Fault_Source_Generator(object):
         d     data dictionary value with 'name' defined
         name  name of value in data dictionary 'd'
 
-        If 'name' is not found in the dictionary, assume a None value.
+        If 'name' is not found in the data dictionary, assume a None value.
         If 'name' not found in type dictionary, assume 'str'.
         """
 
@@ -249,10 +273,10 @@ class Fault_Source_Generator(object):
         return self.populate_distribution(self.depth_bottom_seismogenic_dist,n)
     
     def populate_azimuth(self,n):
-        return self.populate_distribution(self.azimuth,n)
+        return self.populate_distribution(self.azimuth_dist,n)
 
     def populate_dip(self,n):
-        return self.populate_distribution(self.dip,n)
+        return self.populate_distribution(self.dip_dist,n)
 
     def populate_magnitude(self,n):
         return self.populate_distribution(self.magnitude_dist,n)

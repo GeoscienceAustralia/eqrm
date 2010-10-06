@@ -142,13 +142,14 @@ class Test_Conversions(unittest.TestCase):
 
         azimuth_of_trace = conversion_functions['azimuth_of_trace']
 
-        # test data: list of tuples:
-        #  (start_lat, start_lon, end_lat, end_lon, expected_azimuth)
-        data = [( 0.0, 110.0,  0.0, 111.0,  90.0),	#  90 at equator
-                ( 0.0, 111.0,  0.0, 110.0, 270.0),	# -90 at equator
-                ( 0.0, 110.0,  1.0, 111.0,  45.0),	#  45 at equator
-                (60.0, 110.0, 61.0, 111.0,  26.6),	#     at 60N
-                (85.0, 110.0, 86.0, 111.0,   5.0),	#     at 85N
+        # test data - list of tuples:
+        #   (start_lat, start_lon, end_lat, end_lon, expected_azimuth)
+        data = [(  0.0,    110.0,     0.0,   111.0,   90.0), #  90 at equator
+                (  0.0,    111.0,     0.0,   110.0,  270.0), # -90 at equator
+                (  0.0,    110.0,     1.0,   111.0,   45.0), #  45 at equator
+                ( 60.0,    110.0,    61.0,   111.0,   26.6), # mod(45) at 60N
+                ( 85.0,    110.0,    86.0,   111.0,    5.0), # mod(45) at 85N
+                (-85.0,    110.0,   -84.0,   111.0,    5.0), # mod(45) at 85S
                ]
 
         for (start_lat, start_lon, end_lat, end_lon, expected) in data:
