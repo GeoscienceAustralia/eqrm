@@ -245,7 +245,8 @@ class Test_Generation_polygon(unittest.TestCase):
             msg = "Couldn't find 'big fault' fault!?"
             self.fail(msg)
         self.failUnlessEqual(fault.event_type, 'crustal fault')
-        self.failUnlessEqual(fault.dip, 30.0)
+        expected = {'distribution': 'constant', 'mean': 30.0}
+        self.failUnlessEqual(fault.dip_dist, expected)
         expected = {'distribution': 'uniform', 'minimum': 0.0, 'maximum': 0.0}
         self.failUnlessEqual(fault.out_of_dip_theta_dist, expected)
         expected = {'distribution': 'constant', 'mean': 0.0}
@@ -257,7 +258,8 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnlessEqual(fault.trace_start_lon, 110.0)
         self.failUnlessEqual(fault.trace_end_lat, -17.0)
         self.failUnlessEqual(fault.trace_end_lon, 110.0)
-        self.failUnlessEqual(fault.azimuth, 0.0)
+        expected = {'distribution': 'constant', 'mean': 0.0}
+        self.failUnlessEqual(fault.azimuth_dist, expected)
         self.failUnlessEqual(fault.distribution, 'bounded_gutenberg_richter')
         self.failUnlessEqual(fault.recurrence_min_mag, 4.0)
         self.failUnlessEqual(fault.recurrence_max_mag, 7.0)
@@ -278,7 +280,8 @@ class Test_Generation_polygon(unittest.TestCase):
             msg = "Couldn't find 'sumba intraplate' fault!?"
             self.fail(msg)
         self.failUnlessEqual(fault.event_type, 'intraplate')
-        self.failUnlessEqual(fault.dip, 20.0)
+        expected = {'distribution': 'constant', 'mean': 20.0}
+        self.failUnlessEqual(fault.dip_dist, expected)
         self.failUnlessEqual(fault.number_of_events, 3000)
 
 ################################################################################
