@@ -1,0 +1,22 @@
+This documents the requirements for calculating bridge damage from
+earthquakes.
+
+The initial document that covers the technical method of arriving
+at damage estimates is "Bridge Seismic Fragility Modelling in EQRM.doc".
+
+Initial requirements:
+1. Write a python function:
+     (none, slight, moderate,
+      extensive, complete) = bridge_damage(CLASS, sa_0_3, sa_1_0, skew, spans)
+   where the parameters to the function are:
+     CLASS   bridge class (a string like 'HWB1')
+     sa_0_3  spectral acceleration for T=0.3s
+     sa_1_0  spectral acceleration for T=1.0s
+     skew    the bridge skew, in degrees
+     spans   the number of bridge spans
+
+   The spectral acceleration figures are AFTER any adjustments for soil and
+   distance effects.
+2. Write a function to take raw earthquake data and produce spectral
+   acceleration figures AT THE BRIDGE.
+3. Modify the existing EQRM code for buildings to handle bridges.

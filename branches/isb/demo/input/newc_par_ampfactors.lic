@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+  <ga_license_file>
+    <metadata>
+      <author>David Robinson</author>
+    </metadata>
+    <datafile>
+      <filename>newc_par_ampfactors.xml</filename>
+      <checksum>874079894</checksum>
+      <publishable>Yes</publishable>
+      <accountable>David Robinson</accountable>
+      <source>Created by EQRM team.</source>
+      <IP_owner>Geoscience Australia</IP_owner>
+      <IP_info>For use with EQRM. See TRIM D2008-56963 </IP_info>
+    </datafile>
+
+  </ga_license_file>
