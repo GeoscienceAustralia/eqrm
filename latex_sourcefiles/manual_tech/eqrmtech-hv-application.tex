@@ -1,93 +1,53 @@
 \chapter{The EQRM application}
 \label{ch:application}
 
-This chapter describes the EQRM application. The directory
-structure, input parameters and directions on how to run the EQRM
-are all described. Converting the EQRM into a stand-alone
-executable is also explained at the end of the chapter. Readers
-who are interested in only the EQRM methodology and not the EQRM
-software package may wish to skip this chapter.
+The Earthquake Risk Model (EQRM) is capable of earthquake scenario
+ground motion and scenario loss modeling as well as probabilistic
+seismic hazard (PSHA) and risk (PSRA) modeling. It is a product of
+Geoscience Australia an Australian Government Agency.
 
-
-\section{Directory structure}
-\label{sec:app-dirstruct}
-
-The code is currently organised in the following directory
-structure:
-
-\begin{supertabular}{lp{0.6\textwidth}}
- \typedir{*/eqrm}{/datacvt}{} & `off-line' routines for
-preparing input data. \\
-\typedir{*/eqrm}{/eqrm}{\_app} & software and default data files
-comprising the EQRM application. \\
-\typedir{*/eqrm}{/testing}{\_harness} & testing suite to
-ensure new development meets pre-defined back-compatibility criteria. \\
-\end{supertabular}
-
-\vspace{2em}
-
-The most significant sub-directories of
-\typedir{*/eqrm}{/datacvt}{} are:
-
-\begin{supertabular}{lp{0.7\textwidth}}
-\typedir{*/buildingdb}{}{} & tools to assist the preparation of building databases\index{building database} (see \cref{ch:grids}).\\
-\typedir{*/buildingpars}{}{} & tools to assist the preparation of engineering parameters (see \cref{ch:damage}).\\
-\typedir{*/econsoc}{pars}{} & tools to assist the preparation of direct financial loss parameters  (see \cref{ch:losses}). \\
-\typedir{*/site}{\_classes}{} & tools to prepare site class polygons (see \cref{ch:reg}). \\
-\typedir{*/stats}{}{} & tools to extract statistics from building database\index{building database}s (see \cref{ch:grids}). Note that these tools were originally written to extract Newcastle information however they can easily be modified to work with other data sets. \\
-\end{supertabular}
-
-\vspace{2em} The most significant sub-directories of
-\typedir{*/eqrm}{/eqrm}{\_app} are:
-
-\begin{supertabular}{lp{0.7\textwidth}}
-\typedir{*/m}{\_code}{} & EQRM source code, predominately MATLAB functions (see below for more details). \\
-\typedir{*/resources}{}{} & data files to support the EQRM (see below for more details). \\
-\typedir{*/system}{}{} &  tools and path information directing the EQRM to individual components (e.g. \typedir{*/m}{\_code}{} and \typedir{*/resources}{}{}). \\
-\end{supertabular}
-
-\vspace{2em}
-
-The most significant sub-directories of
-\typedir{*/eqrm}{/eqrm\_app}{/m\_code} are:
-
-\begin{supertabular}{lp{0.7\textwidth}}
-\typedir{*/general}{}{} & general functions (includes error manager). \\
-\typedir{*/startup}{}{} & functions to assist with setting up the MATLAB Path (\sref{app:runEQRM}).\\
-\typedir{*/hazard}{}{} & functions for source generation
-(\cref{ch:source}), attenuation (\cref{ch:atten}),
-amplification (\cref{ch:reg}) and hazard calculation (\cref{ch:risk}).\\
-\typedir{*/c3}{\_gui}{} & functions to support the \typegui{eqrm}{\_param}{\_gui} (\sref{app:runEQRM}).\\
-\typedir{*/mcc}{\_build}{\_apps} & functions to assist in building a stand--alone executable.\\
-\typedir{*/utils}{}{} & general utility tools used by other functions.\\
-\typedir{*/compare}{\_utils}{} & important functions for comparing MATLAB binary files (used by the testing suite).\\
-\typedir{*/vuln}{}{} & functions for building damage
-(\cref{ch:damage}), financial loss (\cref{ch:losses}) and
-risk calculation (\cref{ch:risk}).\\
-\typedir{*/processing}{}{} & post-processing functions for manipulating and plotting EQRM outputs (\cref{ch:risk}).\\
-\typedir{*/dit}{}{} & functions to support the data interrogation tool GUI (output manager: \sref{app:runEQRM}).\\
-\end{supertabular}
-
-
-\vspace{2em} The most significant sub-directories of
-\typedir{*/eqrm}{/eqrm\_app}{/resources} are:
-
-\begin{supertabular}{lp{0.7\textwidth}}
-\typedir{*/data}{}{} & parameter files and input data for the EQRM (e.g. attenuation model coefficients, engineering parameters etc.).\\
-\typedir{*/c3}{\_gui}{} & figure files for the \typegui{eqrm}{\_param}{\_gui}.\\
-\typedir{*/dit}{\_gui}{} & figure files for the DIT GUI (output manager).\\
-\end{supertabular}
-
-\vspace{2em} The most significant sub-directories of
-\typedir{*/eqrm}{/testing}{\_harness} are:
-
-\begin{supertabular}{lp{0.7\textwidth}}
-\typedir{*/hazard}{}{} & input and output data for EQRM hazard back compatibility tests.\\
-\typedir{*/vuln}{}{} & input and output data for EQRM risk back compatibility tests.\\
-\end{supertabular}
-
+This chapter describes the EQRM application. Input files and
+parameters are discussed and directions on how to run the EQRM
+provided. Readers who are interested in only the EQRM methodology
+and not the EQRM software package may wish to skip this chapter.
 
 \section{EQRM inputs}
+
+The input files required by the EQRM depend on the nature of the
+simulation conducted. For example, the inputs for a scenario loss
+simulation are different to those required for a probabilistic
+seismic hazard analysis. \tref{tab:input-overview} provides a
+summary of the inputs required by the EQRM.
+
+
+\begin{table}
+\begin{centering}
+\caption{Inputs required for different types of simulation with the
+EQRM.} \label{tab:input-overview}
+\begin{tabular}{|l|l|l|}
+\hline
+ & \textbf{hazard} & \textbf{risk} \\
+\hline
+\textbf{scenario} & EQRM controlfile & EQRM controlfile \\
+  & amplification factors* & amplification factors* \\
+  & hazard grid & building database \\
+\hline
+\textbf{probabilistic} & EQRM controlfile & EQRM controlfile\\
+  & source file(s) & source file(s) \\
+  & event type controlfile & event type controlfile \\
+  & amplification factors* & amplification factors* \\
+  & hazard grid & building database \\
+\hline
+\end{tabular}
+\end{centering}
+\end{table}
+
+
+
+
+
+
+
 
 For the purpose of this manual the EQRM inputs are discussed in
 two separate sections. \sref{sec:application-setdata} describes
@@ -101,16 +61,14 @@ however the user has the ability to provide alternatives.
 \subsection{The \texttt{setdata} file}
 \label{sec:application-setdata}
 
-The full path to the \typeself{set}{da}{ta} file must be passed to
-the EQRM when the program is run. It contains a series of input
-variables (or parameters) that define the manner in which the EQRM
-is operated. For example; there is a flag to control whether the
-EQRM models hazard or risk. Other flags can be used to define
-which attenuation model is selected, whether site amplification is
-considered or which set of engineering parameters is used. A
-description of all of the variables in the \typeself{set}{da}{ta}
-file is given below. The \typeself{set}{da}{ta} file contains a
-single variable
+It contains a series of input variables (or parameters) that define
+the manner in which the EQRM is operated. For example; there is a
+flag to control whether the EQRM models hazard or risk. Other flags
+can be used to define which attenuation model is selected, whether
+site amplification is considered or which set of engineering
+parameters is used. A description of all of the variables in the
+control file is given below. The \typeself{set}{da}{ta} file
+contains a single variable
 \typeself{eqrm}{\_param}{\_T}\index{setdata!\texttt{eqrm\_param\_T}}.
 For the purpose of this manual the fields of
 \typeself{eqrm}{\_param}{\_T}\index{\texttt{setdata}!\texttt{eqrm\_param\_T}}
