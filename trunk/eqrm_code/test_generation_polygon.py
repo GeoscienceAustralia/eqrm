@@ -282,6 +282,8 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnlessEqual(fault.event_type, 'intraplate')
         expected = {'distribution': 'constant', 'mean': 20.0}
         self.failUnlessEqual(fault.dip_dist, expected)
+        self.failUnlessEqual(fault.slip_rate, None)
+        self.failUnlessEqual(fault.A_min, 0.58)
         self.failUnlessEqual(fault.number_of_events, 3000)
 
 ################################################################################
