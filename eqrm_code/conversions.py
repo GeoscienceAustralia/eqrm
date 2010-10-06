@@ -137,6 +137,25 @@ def convert_Z10_to_Z25(Z10):
     return 0.519 + 3.595*Z10
 
 
+def azimuth_of_trace(start_lat, start_lon, end_lat, end_lon):
+    """Calculate a trace azimuth given start and end positions.
+
+    start_lat  latitude of start point
+    start_lon  longitude of start point
+    end_lat    latitude of end point
+    end_lon    longitude of end point
+
+    Returns azimuth at start point in degrees, in range [0, 360).
+    """
+
+    dx = end_lon - start_lon
+    dy = end_lat - start_lat
+    azimuth = math.atan2(dx*math.cos(start_lat*math.pi/180.0), dy)*180.0/math.pi
+    if azimuth < 0.0:
+        azimuth += 360.0
+
+    return azimuth
+
 ###################
 # END OF FUNCTIONS#
 ###################

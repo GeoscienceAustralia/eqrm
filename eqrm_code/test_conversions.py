@@ -137,6 +137,25 @@ class Test_Conversions(unittest.TestCase):
                % (str(Vs30), str(expected_Z10), str(Z10)))
         self.failUnless(allclose(Z10, expected_Z10), msg)
 
+    def test_azimuth_of_trace(self):
+        """Test the azimuth_of_trace() function."""
+
+        azimuth_of_trace = conversion_functions['azimuth_of_trace']
+
+        # test data: list of tuples:
+        #  (start_lat, start_lon, end_lat, end_lon, expected_azimuth)
+        data = [( 0.0, 110.0,  0.0, 111.0,  90.0),	#  90 at equator
+                ( 0.0, 111.0,  0.0, 110.0, 270.0),	# -90 at equator
+                ( 0.0, 110.0,  1.0, 111.0,  45.0),	#  45 at equator
+                (60.0, 110.0, 61.0, 111.0,  26.6),	#     at 60N
+                (85.0, 110.0, 86.0, 111.0,   5.0),	#     at 85N
+               ]
+
+        for (start_lat, start_lon, end_lat, end_lon, expected) in data:
+            result = azimuth_of_trace(start_lat, start_lon, end_lat, end_lon)
+            msg = ('At %.1fN, expected azimuth of %.1f, got %.1f'
+                   % (start_lat, expected, result))
+            self.failUnlessAlmostEqual(result, expected, 1, msg)
         
 
 ################################################################################
