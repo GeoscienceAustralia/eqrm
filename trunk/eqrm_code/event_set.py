@@ -15,6 +15,7 @@
 """
 import copy
 import xml.dom.minidom
+import math
 
 from scipy import (asarray, transpose, array, r_, concatenate, sin, cos, pi, 
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, int64,
@@ -140,8 +141,8 @@ class Event_Set(object):
     @classmethod
     def create(cls, rupture_centroid_lat, rupture_centroid_lon, azimuth,
                dip=None, ML=None, Mw=None, depth=None, fault_width=None,
-               fault_depth=None, # Need for generate synthetic events
-               scenario_number_of_events=1):
+               depth_top_seismogenic=None, # Need for generate synthetic events
+               depth_bottom_seismogenic=None):
         """generate a scenario event set or a synthetic event set.
         Args:
           rupture_centroid_lat: Latitude of rupture centriod
@@ -151,8 +152,8 @@ class Event_Set(object):
           ML or Mw: earthquake magnitude. analysis only uses Mw.
           depth: depth to event centroid, km
           fault_width: Maximum width along virtual fault, km
-          fault_depth: depth to the top of the seismmogenic region, km.
-          scenario_number_of_events: Number of events
+          depth_top_seismogenic: depth to the top of the seismmogenic region,
+            km.
           
           Note, if you supply either ML or Mw, the other will be
           calculated. If you supply both, it is up to you to ensure that
@@ -171,65 +172,21 @@ class Event_Set(object):
 
     Should accept a fault type and use that instead of hardcoded 'reverse'.
         """
-#         print "rupture_centroid_lat", rupture_centroid_lat
-#         print "rupture_centroid_lon", rupture_centroid_lon
-#         print "azimuth", azimuth
-#         print "dip", dip
-#         print "Mw", Mw
-#         print "fault_width", fault_width
-#         print "fault_depth", fault_depth
-        # concatenate vectors to match matlab's treatment of
-        # scenario_number_of_events
-        __len__ = '__len__'
-        if scenario_number_of_events > 1:
-            if hasattr(rupture_centroid_lat, __len__):
-                rupture_centroid_lat = \
-                    concatenate([rupture_centroid_lat for i in
-                                 xrange(scenario_number_of_events)])
-            if hasattr(rupture_centroid_lon, __len__):
-                rupture_centroid_lon = \
-                    concatenate([rupture_centroid_lon for i in
-                                 xrange(scenario_number_of_events)])
-            if hasattr(azimuth, __len__):
-                azimuth = concatenate([azimuth for i in
-                                       xrange(scenario_number_of_events)])
-            if hasattr(dip, __len__):
-                dip = concatenate([dip for i in xrange(scenario_number_of_events)])
-            if hasattr(depth, __len__):
-                depth = concatenate([depth for i in
-                                     xrange(scenario_number_of_events)])
-            if hasattr(ML, __len__):
-                ML = concatenate([ML for i in xrange(scenario_number_of_events)])
-            if hasattr(Mw, __len__):
-                Mw = concatenate([Mw for i in xrange(scenario_number_of_events)])
-            if fault_width is not None:
-                fault_width = concatenate([[fault_width] for i in 
-                                           xrange(scenario_number_of_events)])
-            if fault_depth is not None:
-                fault_depth = concatenate([[fault_depth] for i in
-                                           xrange(scenario_number_of_events)])
+        
 
         # There is a diff between width and fault width.
-        # Width is rupture width.
+        # Width is rupture/event width.
         # rupture width <= fault width
 
-        # set_vectors
+        # turn into arrays
         if depth is not None:
             depth = asarray(depth)
-
-        if fault_depth is not None:
-            fault_depth = asarray(fault_depth)
-            if fault_depth.shape == tuple():
-                if depth is not None:
-                    # FIXME: Fault_depth shaping is only conditionally occuring
-                    fault_depth = fault_depth + 0*depth #Shaping fault_depth
+        if depth_top_seismogenic is not None:
+            depth_top_seismogenic = asarray(depth_top_seismogenic)          
+        if depth_bottom_seismogenic is not None:
+            depth_bottom_seismogenic = asarray(depth_bottom_seismogenic)   
         if fault_width is not None:
-            fault_width = asarray(fault_width)
-            if fault_width.shape == tuple():
-                if depth is not None:
-                    # FIXME: Fault_width shaping is only conditionally occuring
-                    fault_width = fault_width + 0*depth #Shaping fault_depth
-                    
+            fault_width = asarray(fault_width)           
         rupture_centroid_lat = asarray(rupture_centroid_lat)
         rupture_centroid_lon = asarray(rupture_centroid_lon)
         azimuth = asarray(azimuth)
@@ -244,19 +201,27 @@ class Event_Set(object):
         if ML is None:
             ML = conversions.Johnston_01_ML(Mw)
         area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
-        
+        # finish turning into arrays arrays
+                
+        if fault_width is None:
+            fault_width = (depth_bottom_seismogenic \
+                           - depth_top_seismogenic)/ \
+                           sin(dip*math.pi/180.)
+                              
         width = conversions.\
                 modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
                                                         fault_width)
         if depth is None:
-            depth = conversions.depth(fault_depth, dip, Mw, fault_width)
+            depth = conversions.depth(depth_top_seismogenic,
+                                      dip, Mw, fault_width)
             
         # calculate depth_to_top from depth, width, dip
         depth_to_top = conversions.calc_depth_to_top(depth, width, dip)
 
         # manufacture an array of 'faulting_type' with dimensions of 'depth'
         # should accept a fault type and use that instead of hardcoded 'reverse'
-        faulting_type = ones(depth.shape, dtype=int)*FaultingTypeDictionary['reverse']
+        faulting_type = ones(
+            depth.shape, dtype=int) * FaultingTypeDictionary['reverse']
 
         # Add function conversions
         length = area/width
@@ -281,17 +246,6 @@ class Event_Set(object):
                                    rupture_centroid_lat,rupture_centroid_lon,
                                    azimuth)  
 
-        # Currently obsolete
-        if rupture_centroid_lat is None:            
-            assert rupture_centroid_lon is None
-            lat,lon = xy_to_ll(rupture_x,rupture_y,
-                               trace_start_lat,trace_start_lon,
-                               azimuth)
-            trace_start_lat = lat
-            trace_start_lon = lon           
-
-        # fault_depth can be None
-
         # Create an Event_Set instance
         event_set = cls(azimuth,
                         dip,
@@ -315,10 +269,64 @@ class Event_Set(object):
                         rupture_centroid_lon)
         return event_set
     
+    
+    @classmethod
+    def create_scenario_events(cls, rupture_centroid_lat,
+                               rupture_centroid_lon, azimuth,
+                               dip, Mw, depth, 
+                               scenario_number_of_events,
+                               fault_width=None,
+                               depth_top_seismogenic=None, 
+                               depth_bottom_seismogenic=None):
+        
+        __len__ = '__len__'
+        if scenario_number_of_events > 1:
+            rupture_centroid_lat = concatenate(
+                [rupture_centroid_lat for i in
+                 xrange(scenario_number_of_events)])
+            rupture_centroid_lon = concatenate(
+                [rupture_centroid_lon for i in
+                 xrange(scenario_number_of_events)])
+            azimuth = concatenate(
+                [azimuth for i in
+                 xrange(scenario_number_of_events)])
+            dip = concatenate([dip for i in xrange(
+                scenario_number_of_events)])
+            depth = concatenate([depth for i in
+                                 xrange(scenario_number_of_events)])
+            Mw = concatenate([Mw for i in xrange(
+                scenario_number_of_events)])
+            
+            fault_width = concatenate([[fault_width] for i in 
+                                       xrange(scenario_number_of_events)])
+            if depth_top_seismogenic is not None:
+                depth_top_seismogenic = concatenate(
+                    [[depth_top_seismogenic] for i in
+                     xrange(scenario_number_of_events)])
+        else:
+            rupture_centroid_lat = asarray(rupture_centroid_lat)
+            rupture_centroid_lon = asarray(rupture_centroid_lon)
+            azimuth = asarray(azimuth)
+            dip = asarray(dip)
+            depth = asarray(depth)
+            Mw = asarray(Mw)
+                
+        event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
+                                 rupture_centroid_lon=rupture_centroid_lon,
+                                 azimuth=azimuth,
+                                 dip=dip,
+                                 Mw=Mw,
+                                 depth=depth,
+                                 fault_width=fault_width,
+                                 depth_top_seismogenic=depth_top_seismogenic,
+                                 depth_bottom_seismogenic=
+                                 depth_bottom_seismogenic)
+        return event
+        
 
     @classmethod
-    def generate_synthetic_events(cls, fid_genpolys, fault_width, azi, dazi,
-                                  fault_dip, prob_min_mag_cutoff, override_xml,
+    def generate_synthetic_events(cls, fid_genpolys,
+                                  prob_min_mag_cutoff,
                                   source_models,
                                   prob_number_of_events_in_zones=None):
         """Randomly generate the event_set parameters.
@@ -372,10 +380,8 @@ class Event_Set(object):
         log.info('generating events')
         
         (generation_polygons,
-             magnitude_type) = polygons_from_xml(fid_genpolys, azi, dazi,
-                                                 fault_dip, fault_width,
-                                                 prob_min_mag_cutoff,
-                                                 override_xml)
+             magnitude_type) = polygons_from_xml(fid_genpolys,
+                                                 prob_min_mag_cutoff)
         num_polygons = len(generation_polygons)
         
         if prob_number_of_events_in_zones is None:
@@ -396,12 +402,13 @@ class Event_Set(object):
         num_events = sum(prob_number_of_events_in_zones)
         rupture_centroid_lat = zeros((num_events), dtype=EVENT_FLOAT)
         rupture_centroid_lon = zeros((num_events), dtype=EVENT_FLOAT)
-        fault_depth = zeros((num_events), dtype=EVENT_FLOAT)
-        fault_width = zeros((num_events), dtype=EVENT_FLOAT)
+        depth_top_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
+        depth_bottom_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
         azimuth = zeros((num_events), dtype=EVENT_FLOAT)
         dip = zeros((num_events), dtype=EVENT_FLOAT)
         magnitude = zeros((num_events), dtype=EVENT_FLOAT)
         source_zone_id = zeros((num_events), dtype=EVENT_INT)
+        
         #number_of_mag_sample_bins = zeros((num_events), dtype=EVENT_INT)
 
         #print "magnitude.dtype.name", magnitude.dtype.name
@@ -414,10 +421,7 @@ class Event_Set(object):
                 continue
 
             #populate the polygons
-            polygon_fault_width = gp.populate_fault_width(num)
-            eqrmlog.debug('Memory: populate_fault_width created')
-            eqrmlog.resource_usage()
-            polygon_fault_depth = gp.populate_depth_top_seismogenic(num)
+            polygon_depth_top_seismogenic = gp.populate_depth_top_seismogenic(num)
             eqrmlog.debug('Memory: populate_depth_top_seismogenic created')
             eqrmlog.resource_usage()
             polygon_azimuth = gp.populate_azimuth(num)
@@ -430,6 +434,7 @@ class Event_Set(object):
             polygon_magnitude = gp.populate_magnitude(num)
             eqrmlog.debug('Memory: populate_magnitude created')
             eqrmlog.resource_usage()
+            polygon_depth_bottom = gp.populate_depth_bottom_seismogenic(num)
             #mag_sample_bins = gp.populate_number_of_mag_sample_bins(num)
             #eqrmlog.debug('Memory: populate_number_of_mag_sample_bins')
             #eqrmlog.resource_usage()
@@ -446,8 +451,8 @@ class Event_Set(object):
             rupture_centroid_lat[start:end] = lat
             rupture_centroid_lon[start:end] = lon
             
-            fault_depth[start:end] = polygon_fault_depth
-            fault_width[start:end] = polygon_fault_width
+            depth_top_seismogenic[start:end] = polygon_depth_top_seismogenic
+            depth_bottom_seismogenic[start:end] = polygon_depth_bottom
             azimuth[start:end] = polygon_azimuth
             dip[start:end] = polygon_dip
             magnitude[start:end] = polygon_magnitude
@@ -475,8 +480,9 @@ class Event_Set(object):
                                  dip=dip,
                                  ML=new_ML,
                                  Mw=new_Mw,
-                                 fault_width=fault_width,
-                                 fault_depth=fault_depth)
+                                 depth_top_seismogenic=depth_top_seismogenic,
+                                 depth_bottom_seismogenic=
+                                 depth_bottom_seismogenic)
         event.source_zone_id = asarray(source_zone_id)
         #print "event.source_zone_id", event.source_zone_id
         eqrmlog.debug('Memory: finished generating events')
@@ -972,7 +978,7 @@ if __name__ == '__main__':
             dip=35.*ones((event_num,)),
             Mw=5.*ones((event_num,)),
             fault_width=15.*ones((event_num,)),
-            fault_depth=7.*ones((event_num,))
+            depth_top_seismogenic=7.*ones((event_num,))
             )
     eqrmlog.debug('Memory: after')
     eqrmlog.resource_usage()

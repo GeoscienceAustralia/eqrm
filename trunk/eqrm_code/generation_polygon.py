@@ -25,7 +25,6 @@ class Generation_Polygon(polygon_object):
     def __init__(self,
                  boundary,
                  depth_top_seismogenic_dist,
-                 fault_width_dist,
                  azimuth,
                  dip,
                  magnitude,
@@ -42,7 +41,6 @@ class Generation_Polygon(polygon_object):
         if exclude is None:
             exclude = []        
         polygon_object.__init__(self,boundary,exclude)
-        self.fault_width_dist=fault_width_dist
         self.depth_top_seismogenic_dist=depth_top_seismogenic_dist
         self.azimuth=azimuth
         self.dip=dip
@@ -52,9 +50,6 @@ class Generation_Polygon(polygon_object):
         self.polygon_event_type = polygon_event_type
         self.number_of_events = number_of_events 
 
-    def populate_fault_width(self,n):
-        return self.populate_distribution(self.fault_width_dist,n)
-    
     def populate_depth_top_seismogenic(self,n):
         return self.populate_distribution(self.depth_top_seismogenic_dist,n)
 
@@ -287,24 +282,10 @@ class Fault_Source_Generator(object):
         #see python tutorial s4.7.4
 
 
-def polygons_from_xml(filename,
-                      azi=None,
-                      dazi=None,
-                      fault_dip=None,
-                      fault_width=None,
-                      prob_min_mag_cutoff=None,
-                      override_xml=False):
-    
+def polygons_from_xml(filename, prob_min_mag_cutoff=None):
     doc=Xml_Interface(filename=filename)
     if not doc['Source_Model'] == []:
-        generation_polygons, magnitude_type = polygons_from_xml_row(
-            doc, 
-            azi,
-            dazi,
-            fault_dip,
-            fault_width,
-            prob_min_mag_cutoff,
-            override_xml)
+        raise Exception('zone source file format incorrect.')
     else:
         generation_polygons, magnitude_type = polygons_from_xml_horspool(
             doc,
@@ -330,7 +311,6 @@ def polygons_from_xml(filename,
 #     for i in range(len(generation_polygons_r)):
 #         assert generation_polygons[i]._linestring == generation_polygons_r[i]._linestring 
 
-#         assert generation_polygons[i].fault_width_dist == generation_polygons_r[i].fault_width_dist
 #         assert generation_polygons[i].depth_top_seismogenic_dist == generation_polygons_r[i].depth_top_seismogenic_dist
 #         assert generation_polygons[i].azimuth == generation_polygons_r[i].azimuth
 #         #print "generation_polygons[i].dip", generation_polygons[i].dip
@@ -453,94 +433,6 @@ def xml_fault_generators(filename, azi=None, dazi=None, fault_dip=None,
     return (fsg_list, magnitude_type)
 
 
-def polygons_from_xml_row(doc,
-                          azi=None,
-                          dazi=None,
-                          fault_dip=None,
-                          fault_width=None,
-                          prob_min_mag_cutoff=None,
-                          override_xml=False):
-    """
-    
-    azi, dazi and fault_dip are lists of length len(xml_polygons)
-
-    Is the override_xml used so a list of events with no location can
-    be turned into an event set? 
-
-    Why are so many parameters passed in?
-    override_xml:  Analysis uses True
-    Returns a list of Generation_Polygon and magnitude_type
-
-    Assumes only one source model
-    """
-    #FIXME implement;
-    # azi=, dazi, fault_dip = can be a single value or a vector with
-    # differnet elements
-    #          for each source zone 
-    generation_polygons=[]
-    xml_polygons = doc['polygon']
-    for i in range(len(xml_polygons)):
-        xml_polygon=xml_polygons[i]
-        boundary = xml_polygon['boundary'][0].array
-        boundary.shape = -1, 2  # Had to add for a test. 
-        try: fault_width_dist = xml_polygon['fault_width'][0].attributes
-        except: pass
-        try: dip = xml_polygon['dip'][0].attributes
-        except: pass
-        try: magnitude = xml_polygon['magnitude'][0].attributes   
-        except: pass        
-        try: azimuth = xml_polygon['azimuth'][0].attributes
-        except: pass
-
-        if override_xml:
-            fault_depth=xml_polygon['recurrence'][0].attributes['depth']
-            depth_top_seismogenic_dist = {'distribution':'constant',
-                                          'mean':fault_depth}
-            depth_bottom_seismogenic_dist = {'distribution':None}
-            fault_width_dist = {'distribution':'constant','mean':fault_width}
-            dip = {'distribution':'constant','mean':float(fault_dip[i])}
-            
-            min_magnitude=xml_polygon['recurrence'][0].attributes[
-                'min_magnitude']
-            min_mag=prob_min_mag_cutoff
-            minmag=max(float(min_magnitude),
-                       float(min_mag))
-            maxmag=xml_polygon['recurrence'][0].attributes['max_magnitude']
-            magnitude = {'distribution':'uniform',
-                         'minimum':minmag,
-                         'maximum': maxmag}
-            azimuth = {'distribution':'uniform',
-                       'minimum':float(azi[i])-float(dazi[i]),
-                       'maximum': float(azi[i])+float(dazi[i])}
-           
-            
-        exclude=[]
-        for exclusion_zone in xml_polygon['exclude']:
-            exclude.append(exclusion_zone.array)
-            
-        polygon_name = 'zone_' + str(i)
-        polygon_event_type = None
-        number_of_events = None
-        
-        generation_polygon = Generation_Polygon(boundary,
-                                                depth_top_seismogenic_dist,
-                                                fault_width_dist,
-                                                azimuth,dip,
-                                                magnitude,
-                                                depth_bottom_seismogenic_dist,
-                                                polygon_name,
-                                                polygon_event_type, 
-                                                number_of_events,
-                                                exclude)
-        generation_polygons.append(generation_polygon)
-    
-        
-    xml_Source_Model =doc['Source_Model'][0]
-    magnitude_type=xml_Source_Model.attributes['magnitude_type']
-    doc.unlink()
-
-    return generation_polygons,magnitude_type
-
 def polygons_from_xml_horspool(doc,
                                prob_min_mag_cutoff=None):
     """
@@ -576,10 +468,9 @@ def polygons_from_xml_horspool(doc,
         depth_bottom = float(geometry_atts['depth_bottom_seismogenic'])
         depth_top_seismogenic_dist = {'distribution':'constant',
                                       'mean':depth_top}
-        depth_bottom_seismogenic_dist = {'distribution':None}
-        fault_width = (depth_bottom - depth_top)/ \
-                    math.sin(dip*math.pi/180.)
-        fault_width_dist = {'distribution':'constant','mean':fault_width}
+        depth_bottom_seismogenic_dist = {'distribution':'constant',
+                                      'mean':depth_bottom}
+        
         dip = {'distribution':'uniform',
                'minimum':dip - delta_dip,
                'maximum': dip + delta_dip}
@@ -605,7 +496,6 @@ def polygons_from_xml_horspool(doc,
         generation_polygon = Generation_Polygon(
             boundary,
             depth_top_seismogenic_dist,
-            fault_width_dist,
             azimuth,
             dip,
             magnitude,

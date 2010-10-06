@@ -52,9 +52,9 @@ def modified_Wells_and_Coppersmith_94_width(dip,Mw,area,fault_width=15.0):
 modified_Wells_and_Coppersmith_94_width = vectorize(
     modified_Wells_and_Coppersmith_94_width)
 
-def depth(fault_depth,dip,Mw,fault_width=None):
+def depth(depth_top_seismogenic,dip,Mw,fault_width=None):
     """
-    fault_depth - depth to the top of the seismmogenic region, km.
+    depth_top_seismogenic - depth to the top of the seismmogenic region, km.
     dip: dip of the seismmogenic region, degrees
     """
     if fault_width is None:
@@ -65,8 +65,8 @@ def depth(fault_depth,dip,Mw,fault_width=None):
     f2=where(f2<1,1,f2)
     f2=where(f2>2,2,f2)
 
-    depth1=fault_depth+f2/3*fault_width*sin(dip*rad)
-    depth2=fault_depth+fault_width*sin(dip*rad)-0.5*Mw*sin(dip*rad)
+    depth1=depth_top_seismogenic+f2/3*fault_width*sin(dip*rad)
+    depth2=depth_top_seismogenic+fault_width*sin(dip*rad)-0.5*Mw*sin(dip*rad)
     depth=where(depth1<depth2,depth1,depth2)
     return depth
 

@@ -148,7 +148,7 @@ class Test_Event_Set(unittest.TestCase):
         THE_PARAM_T.scenario_depth = 11.5
         THE_PARAM_T.scenario_number_of_events = 1
         
-        event_set = Event_Set.create(
+        event_set = Event_Set.create_scenario_events(
             rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
             rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
             azimuth=[THE_PARAM_T.scenario_azimuth],
@@ -204,7 +204,7 @@ class Test_Event_Set(unittest.TestCase):
         THE_PARAM_T.scenario_depth = [11.5, 11.0]
         THE_PARAM_T.scenario_number_of_events = 1 # If this is 2 it fails
         
-        event_set = Event_Set.create(
+        event_set = Event_Set.create_scenario_events(
             rupture_centroid_lat=THE_PARAM_T.scenario_latitude,
             rupture_centroid_lon=THE_PARAM_T.scenario_longitude,
             azimuth=THE_PARAM_T.scenario_azimuth,
@@ -214,7 +214,6 @@ class Test_Event_Set(unittest.TestCase):
             depth=THE_PARAM_T.scenario_depth,
             scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
     
-        #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
         answer = array(THE_PARAM_T.scenario_latitude)
         self.assert_(allclose(event_set.rupture_centroid_lat, answer))
         
@@ -245,7 +244,8 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
+            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area,
+            THE_PARAM_T.max_width ))
         self.assert_(allclose(event_set.width, width))
         
         answer = area/width 
@@ -263,7 +263,7 @@ class Test_Event_Set(unittest.TestCase):
         THE_PARAM_T.scenario_depth = 11.5
         THE_PARAM_T.scenario_number_of_events = 2
         
-        event_set = Event_Set.create(
+        event_set = Event_Set.create_scenario_events(
             rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
             rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
             azimuth=[THE_PARAM_T.scenario_azimuth],
@@ -274,13 +274,16 @@ class Test_Event_Set(unittest.TestCase):
             scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
 
         #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
-        answer = array((THE_PARAM_T.scenario_latitude, THE_PARAM_T.scenario_latitude))
+        answer = array((THE_PARAM_T.scenario_latitude,
+                        THE_PARAM_T.scenario_latitude))
         self.assert_ (allclose(event_set.rupture_centroid_lat, answer))
         
-        answer = array((THE_PARAM_T.scenario_longitude, THE_PARAM_T.scenario_longitude))
+        answer = array((THE_PARAM_T.scenario_longitude,
+                        THE_PARAM_T.scenario_longitude))
         self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array([THE_PARAM_T.scenario_azimuth, THE_PARAM_T.scenario_azimuth])
+        answer = array([THE_PARAM_T.scenario_azimuth,
+                        THE_PARAM_T.scenario_azimuth])
         self.assert_ (allclose(event_set.azimuth, answer))
         
         answer = array([THE_PARAM_T.dip, THE_PARAM_T.dip])
@@ -306,14 +309,16 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_ (allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
+            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude,
+            area, THE_PARAM_T.max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
         self.assert_ (allclose(event_set.length, answer))
 
 
-        self.assert_ (len(event_set.length)==THE_PARAM_T.scenario_number_of_events)
+        self.assert_ (len(event_set.length)== \
+                      THE_PARAM_T.scenario_number_of_events)
         
     def test_scenario_event_4(self):
         
@@ -327,7 +332,7 @@ class Test_Event_Set(unittest.TestCase):
         THE_PARAM_T.scenario_depth = [7]
         THE_PARAM_T.scenario_number_of_events = 1 # If this is 2 it fails
         
-        event_set = Event_Set.create(
+        event_set = Event_Set.create_scenario_events(
             rupture_centroid_lat=THE_PARAM_T.scenario_latitude,
             rupture_centroid_lon=THE_PARAM_T.scenario_longitude,
             azimuth=THE_PARAM_T.scenario_azimuth,
@@ -346,8 +351,10 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_ (allclose(100., area))
         self.assert_ (allclose(event_set.area, area))
 
-        width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
+        width = array(
+            conversions.modified_Wells_and_Coppersmith_94_width(
+            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude,
+            area, THE_PARAM_T.max_width ))
         self.assert_ (allclose(5., width))
         self.assert_ (allclose(event_set.width, width))
         
@@ -393,11 +400,14 @@ class Test_Event_Set(unittest.TestCase):
         results = repr_list[1].split(':')
         self.assert_ (int(results[1]) == 1)
         results = repr_list[2].split(':')
-        self.assert_ (float(results[1].strip('[]')) == THE_PARAM_T.scenario_latitude[0])
+        self.assert_ (float(results[1].strip('[]')) == \
+                      THE_PARAM_T.scenario_latitude[0])
         results = repr_list[3].split(':')
-        self.assert_ (float(results[1].strip('[]')) == THE_PARAM_T.scenario_longitude[0])
+        self.assert_ (float(results[1].strip('[]')) == \
+                      THE_PARAM_T.scenario_longitude[0])
         results = repr_list[4].split(':')
-        self.assert_ (float(results[1].strip('[]')) == THE_PARAM_T.scenario_magnitude [0])
+        self.assert_ (float(results[1].strip('[]')) == \
+                      THE_PARAM_T.scenario_magnitude [0])
         self.assert_ (len(event_set) == 1)
         
     def test_generate_synthetic_events(self):
@@ -421,13 +431,29 @@ class Test_Event_Set(unittest.TestCase):
         #  polygon is a small square
 
         
-        sample = """<Source_Model magnitude_type='Mw'>
-<polygon area="5054.035">
+        sample = """<source_model_zone magnitude_type='Mw'>
+<zone area="5054.035" name = "tongs" event_type = "crustal fault">
+<geometry
+       azimuth= "6" 
+       delta_azimuth= "2" 
+       dip= "15"
+       delta_dip = "5"
+       depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "30">
   <boundary>-32.000 151.00 -32.0 151.05 -32.05 151.05 -32.05 151.0</boundary> 
-  <recurrence distribution="bounded_gutenberg_richter" min_magnitude="3.3" max_magnitude="5.4" Lambda_Min="0.568" b="1" min_mag="4.5" depth="7" /> 
-  </polygon>
-
-</Source_Model>
+</geometry>
+  <recurrence_model distribution = "bounded_gutenberg_richter"
+      recurrence_min_mag = "3.3" 
+      recurrence_max_mag = "5.4" 
+      A_min= "0.568" 
+      b = "1"> 
+      <event_generation 
+      generation_min_mag = "3.3"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "1000" />
+    </recurrence_model>
+  </zone>
+</source_model_zone>
 """
         handle.write(sample)
         handle.close()
@@ -438,12 +464,7 @@ class Test_Event_Set(unittest.TestCase):
         # need to fix
         events = Event_Set.generate_synthetic_events(
             file_name,
-            fault_width,
-            azi,
-            dazi,
-            fault_dip,
             prob_min_mag_cutoff,
-            override_xml,
             source_mod,
             prob_number_of_events_in_zones)
 #         print "events.trace_start_lat", events.trace_start_lat
@@ -569,14 +590,10 @@ class Test_Event_Set(unittest.TestCase):
         
         events = Event_Set.generate_synthetic_events(
             file_name,
-            fault_width,
-            azi,
-            dazi,
-            fault_dip,
             prob_min_mag_cutoff,
-            override_xml,
             source_mod,
             prob_number_of_events_in_zones)
+        
         
         self.assert_(len(events)==3)
         
@@ -592,7 +609,7 @@ class Test_Event_Set(unittest.TestCase):
         Mw = [5.0286463459649076, 4.6661943094693887]
         fault_width = [15.0, 15.0]
         #fault_width = None
-        fault_depth = [7.0, 7.0]
+        depth_top_seismogenic = [7.0, 7.0]
 
         set = Event_Set.create(
             rupture_centroid_lat,
@@ -603,7 +620,7 @@ class Test_Event_Set(unittest.TestCase):
             Mw,
             None, #depth,
             fault_width,
-            fault_depth=fault_depth)
+            depth_top_seismogenic=depth_top_seismogenic)
         set.source_zone_id = asarray([0,1]) #FIXME
         for i,event in enumerate(set):
             self.assert_(event.trace_start_lat == set.trace_start_lat[i])
@@ -635,7 +652,7 @@ class Test_Event_Set(unittest.TestCase):
         Mw = [5.0286463459649076, 4.6661943094693887]
         fault_width = [15.0, 15.0]
         #fault_width = None
-        fault_depth = [7.0, 30.0]
+        depth_top_seismogenic = [7.0, 30.0]
 
         set = Event_Set.create(
             rupture_centroid_lat,
@@ -646,7 +663,7 @@ class Test_Event_Set(unittest.TestCase):
             Mw,
             None, #depth,
             fault_width,
-            fault_depth=fault_depth)
+            depth_top_seismogenic=depth_top_seismogenic)
         event_activity = [1,0.1]
         set.set_event_activity(event_activity)
         set.source_zone_id = asarray([0,1]) #FIXME
