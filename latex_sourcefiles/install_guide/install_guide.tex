@@ -52,15 +52,15 @@ between useability and speed. For these two reasons the installation
 process contains multiple steps.
 
 Currently EQRM can be installed on the Windows and Linux operating
-system. Installation on the Mac has not been tested.
+system. Installation on the Mac OS has not been tested.
 
 For any help, please post to:
 \begin{itemize}
 \item eqrm-user@lists.sourceforge.net; or
 \item \url{https://sourceforge.net/mail/?group_id=198293}.
 \end{itemize}
-Also, to keep up to date with EQRM, join the developer or user
-lists.
+Also, to keep up to date with EQRM developments, join the developer
+or user lists.
 
 We would also like to hear from you if you are not able to install
 the software.
@@ -71,15 +71,21 @@ EQRM is currently dependant on;
 \item numpy;
 \item scipy;
 \item Shapely; and
-\item gcc
+\item gcc (MinGW on Windows)
+\item Matplotlib (Plotting utilities only)
+\item GMT (Plotting utilities only)
 \end{itemize}
 
 The above requirements are for the 'core' of EQRM. The plotting
 functions require one or more of the following: matplotlib GMT
 
-Note: when \texttt{*/eqrm\_core/eqrm\_code} is mentioned below you
-need to replace the * with the actual place you have installed EQRM
-on your computer.
+\begin{supertabular}{|p{1\textwidth}|}
+\hline  \\
+ Note: when \texttt{*/eqrm\_core/eqrm\_code} is mentioned
+below you need to replace the * with the actual place you have
+installed EQRM on your computer.  \\
+\\ \hline
+\end{supertabular}
 
 \section{Getting a copy of the EQRM}
 
@@ -109,9 +115,9 @@ packages many of the required packages.
 
 \begin{enumerate}
 
-\item Install python from \\
+\item Install python 2.5 from \\
 \url{http://www.python.org/download/}. \\
-We recommend python2.5
+Note that the EQRM is not compatable with Python 3$+$ \\
 
 \item Install numpy from \\
   \url{http://numpy.scipy.org/} \\
@@ -185,7 +191,8 @@ here.
 Install;
 \begin{enumerate}
 \item python 2.5 \\
-\url{http://www.python.org/download/}
+\url{http://www.python.org/download/} \\
+Note that the EQRM is not compatable with Python 3$+$ \\
 \item python-dev
 \item python package numpy \\
 \url{http://numpy.scipy.org/}
@@ -280,11 +287,12 @@ understand a choice it is usually safe to leave the default choice,
 with the exception of the NetCDF question. Unless you are sure you
 already have NetCDF 3.6.x installed, always ask for NetCDF to be
 installed.  You should also select the high-resolution and
-full-resolution coastline data installs. \vspace{1em} Note that in
-question 8 you can install GMT anywhere you wish, though you may
+full-resolution coastline data installs. \\
+\\
+Note that you can install GMT anywhere you wish, though you may
 choose to use the suggested directories (such as /usr/local, for
-example). Note that if you do choose a 'system' place you will need
-to lof in as administrator.
+example). If you choose a 'system' location you will need to log in
+as administrator.
 
 \end{enumerate}
 
