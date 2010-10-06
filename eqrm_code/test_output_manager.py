@@ -587,7 +587,7 @@ class Test_Output_manager(unittest.TestCase):
         Mw = [5.0286463459649076, 4.6661943094693887]
         fault_width = [15.0, 15.0]
         #fault_width = None
-        fault_depth = [7.0, 7.0]
+        depth_top_seismogenic = [7.0, 7.0]
 
         set = Event_Set.create(
             rupture_centroid_lat,
@@ -598,7 +598,7 @@ class Test_Output_manager(unittest.TestCase):
             Mw,
             None, #depth,
             fault_width,
-            fault_depth=fault_depth)
+            depth_top_seismogenic=depth_top_seismogenic)
         set.source_zone_id = asarray([0,1]) # FIXME
         set.att_model_index = asarray([0,1]) # FIXME
         event_activity = [0.2, 0.4]

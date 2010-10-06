@@ -16,20 +16,6 @@ class Test_Generation_polygon(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_polygons_from_xml(self):
-
-        # Let's work-out the eqrm dir
-        eqrm_dir, tail = split( __file__)
-        # Since this is the eqrn_code dir and we want the python_eqrm dir
-        eqrm_dir = join(eqrm_dir, "..", "test_resources")
-        filename = join(eqrm_dir, "sample_event.xml")
-
-        return
-    # need to work on.
-        generation_polygons,magnitude_type = polygons_from_xml(
-            filename=filename,
-            fault_width= 13
-            )
      
     def test_polygons_from_xml_horspool(self):
         
@@ -93,14 +79,10 @@ class Test_Generation_polygon(unittest.TestCase):
         fault_dip=[60]
         fault_width=12
         prob_min_mag_cutoff=2.1
+        
         generation_polygons, magnitude_type = polygons_from_xml(
             file_name,
-            azi=azi,
-            dazi=dazi,
-            fault_dip=fault_dip,
-            fault_width=fault_width,
-            prob_min_mag_cutoff=prob_min_mag_cutoff,
-            override_xml=True)
+            prob_min_mag_cutoff=prob_min_mag_cutoff)
         os.remove(file_name)
         boundary = [(151.1500, -32.4000), 
                     (152.1700, -32.7500),
@@ -112,9 +94,8 @@ class Test_Generation_polygon(unittest.TestCase):
                        #(151.4300, -33.4500)]
         depth_top_seismogenic_dist = {'distribution':'constant',
                             'mean':7}
-        depth_bottom_seismogenic_dist = {'distribution':None}
-        fault_width_dist = {'distribution':'constant',
-                            'mean':15.000000008254018}
+        depth_bottom_seismogenic_dist = {'distribution':'constant',
+                            'mean':15.60364655}
         azimuth = {'distribution':'uniform',
                        'minimum':float(azi[0])-float(dazi[0]),
                        'maximum': float(azi[0])+float(dazi[0])}
@@ -131,7 +112,6 @@ class Test_Generation_polygon(unittest.TestCase):
         actual_gp = Generation_Polygon(
             boundary,
             depth_top_seismogenic_dist,
-            fault_width_dist,
             azimuth,dip,
             magnitude,
             depth_bottom_seismogenic_dist,
@@ -142,22 +122,22 @@ class Test_Generation_polygon(unittest.TestCase):
         
         #print "source_zone_polygon.polygon_object", szp._linestring
         calc_gp = generation_polygons[0]
-        self.failUnless( magnitude_type=="Mw",
+        self.failUnless(magnitude_type=="Mw",
             'Failed!')
-        self.failUnless( calc_gp._linestring==actual_gp._linestring,
+        self.failUnless(calc_gp._linestring==actual_gp._linestring,
             'Failed!')
-        #print "calc_gp.fault_width_dist", calc_gp.fault_width_dist
-        self.failUnless( calc_gp.fault_width_dist==fault_width_dist,'Failed!')
+        self.failUnless(calc_gp.depth_bottom_seismogenic_dist ==
+                        depth_bottom_seismogenic_dist,'Failed!')
         
-        self.failUnless( calc_gp.depth_top_seismogenic_dist==depth_top_seismogenic_dist,
+        self.failUnless(calc_gp.depth_top_seismogenic_dist==depth_top_seismogenic_dist,
             'Failed!')
-        self.failUnless( calc_gp.azimuth==azimuth,
+        self.failUnless(calc_gp.azimuth==azimuth,
             'Failed!')
-        self.failUnless( calc_gp.dip==dip,
+        self.failUnless(calc_gp.dip==dip,
             'Failed!')
-        self.failUnless( calc_gp.magnitude==magnitude,
+        self.failUnless(calc_gp.magnitude==magnitude,
             'Failed!')
-        self.failUnless( calc_gp.number_of_events==number_of_events,
+        self.failUnless(calc_gp.number_of_events==number_of_events,
             'Failed!')
 
     def test_xml_fault_generators(self):

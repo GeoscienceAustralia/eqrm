@@ -158,7 +158,7 @@ def main(parameter_handle,
 
     if THE_PARAM_T.is_scenario is True:
         # generate a scenario event set
-        event_set = Event_Set.create(
+        event_set = Event_Set.create_scenario_events(
             rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
             rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
             azimuth=[THE_PARAM_T.scenario_azimuth],
@@ -204,12 +204,7 @@ def main(parameter_handle,
         # Yet can these values be different?
         event_set = Event_Set.generate_synthetic_events(
             fid_genpolys=fid_sourcepolys,
-            fault_width=THE_PARAM_T.max_width,
-            azi=THE_PARAM_T.prob_azimuth_in_zones,
-            dazi=THE_PARAM_T.prob_delta_azimuth_in_zones,
-            fault_dip=THE_PARAM_T.prob_dip_in_zones,
             prob_min_mag_cutoff=THE_PARAM_T.prob_min_mag_cutoff,
-            override_xml=True,
             source_models=source_mods,
             prob_number_of_events_in_zones= \
             THE_PARAM_T.prob_number_of_events_in_zones)
