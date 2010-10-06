@@ -317,7 +317,7 @@ save_socloss_flag=[1]\n")
         set.loss_aus_contents = 0   # (0|1)
 
         #  Save
-        set.save_hazard_map = True
+        set.save_hazard_map = False
         set.save_total_financial_loss = True
         set.save_building_loss = True
         set.save_contents_loss = True
@@ -393,7 +393,7 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.loss_regional_cost_index_multiplier == 3.2)
         self.failUnless(TPT.loss_aus_contents == 0)
 
-        self.failUnless(TPT.save_hazard_map == 1)
+        self.failUnless(TPT.save_hazard_map == False)
         self.failUnless(TPT.save_motion == 1)
         self.failUnless(TPT.save_prob_structural_damage is True)
         self.failUnless(TPT.save_building_loss == True)
