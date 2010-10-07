@@ -142,14 +142,14 @@ class Source_Zone_Polygon(polygon_object):
     def __init__(self,boundary,exclude,
                  min_magnitude,max_magnitude,
                  prob_min_mag_cutoff,
-                 Lambda_Min,b,
+                 A_min,b,
                  number_of_mag_sample_bins,
                  recurrence_model_distribution='bounded_gutenberg_ricter'):
         """
         boundary is a list of points that forms a polygon
         exclude is a list of polygons (so a list of a list of points)
         min_magnitude,max_magnitude,
-        prob_min_mag_cutoff,Lambda_Min,b are floats
+        prob_min_mag_cutoff,A_min,b are floats
         
         #FIXME DSG-EQRM This class needs comments.
         What is prob_min_mag_cutoff?
@@ -160,7 +160,7 @@ class Source_Zone_Polygon(polygon_object):
         self.min_magnitude = min_magnitude
         self.max_magnitude = max_magnitude
         self.prob_min_mag_cutoff = prob_min_mag_cutoff
-        self.Lambda_Min = Lambda_Min
+        self.A_min = A_min
         self.b = b
         self.number_of_mag_sample_bins = number_of_mag_sample_bins
         self.recurrence_model_distribution = recurrence_model_distribution
@@ -226,18 +226,18 @@ def source_model_from_xml_row(doc, prob_min_mag_cutoff,
         min_magnitude=float(recurrence['min_magnitude'])
         max_magnitude=float(recurrence['max_magnitude'])
         #prob_min_mag_cutoff=float(recurrence['prob_min_mag_cutoff'])
-        Lambda_Min=float(recurrence['Lambda_Min'])
+        A_min=float(recurrence['A_min'])
         b=float(recurrence['b'])
         
         area = float(xml_polygon.attributes['area'])
         exclude=[]
         for exclusion_zone in xml_polygon['exclude']:
             exclude.append(exclusion_zone.array)
-        #print 'LAMBDAMIN 1 ',Lambda_Min
+        #print 'LAMBDAMIN 1 ',A_min
         source_zone_polygon = Source_Zone_Polygon(boundary,exclude,
                                                   min_magnitude,max_magnitude,
                                                   prob_min_mag_cutoff,
-                                                  Lambda_Min,b,
+                                                  A_min,b,
                                                   number_of_mag_sample_bins)
         source_zone_polygons.append(source_zone_polygon)
         
@@ -259,7 +259,7 @@ def source_model_from_xml_horspool(doc, prob_min_mag_cutoff):
         min_magnitude=float(recurrence['recurrence_min_mag'])
         max_magnitude=float(recurrence['recurrence_max_mag'])
         #prob_min_mag_cutoff=float(recurrence['prob_min_mag_cutoff'])
-        Lambda_Min=float(recurrence['A_min'])
+        A_min=float(recurrence['A_min'])
         b=float(recurrence['b'])
         
         area = float(xml_polygon.attributes['area'])
@@ -271,7 +271,7 @@ def source_model_from_xml_horspool(doc, prob_min_mag_cutoff):
         exclude=[]
         for exclusion_zone in xml_polygon['excludes']:
             exclude.append(exclusion_zone.array)
-        #print 'LAMBDAMIN 1 ',Lambda_Min
+        #print 'LAMBDAMIN 1 ',A_min
         
         source_zone_polygon = Source_Zone_Polygon(
             boundary,
@@ -279,7 +279,7 @@ def source_model_from_xml_horspool(doc, prob_min_mag_cutoff):
             min_magnitude,
             max_magnitude,
             prob_min_mag_cutoff,
-            Lambda_Min,b,
+            A_min,b,
             number_of_mag_sample_bins)
         source_zone_polygons.append(source_zone_polygon)
         

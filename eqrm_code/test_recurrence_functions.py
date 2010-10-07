@@ -143,7 +143,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         min_magnitude = 0.9
         max_magnitude = 2.0
         prob_min_mag_cutoff = 1.0
-        Lambda_Min = 1.
+        A_min = 1.
         b = 1.
 
         prob_number_of_mag_sample_bins = 10
@@ -157,12 +157,12 @@ class Test_Recurrence_functions(unittest.TestCase):
         szp1 = Source_Zone_Polygon(square1,[],
                                    min_magnitude,max_magnitude,
                                    prob_min_mag_cutoff,
-                                   Lambda_Min,b,
+                                   A_min,b,
                                    prob_number_of_mag_sample_bins)
         szp2 = Source_Zone_Polygon(square2,[],
                                    min_magnitude,max_magnitude,
                                    prob_min_mag_cutoff,
-                                   Lambda_Min,b,
+                                   A_min,b,
                                    prob_number_of_mag_sample_bins)
         sm = Source_Model([szp1], 'Is this used?')
         
@@ -204,7 +204,7 @@ class Test_Recurrence_functions(unittest.TestCase):
                               new_event_set.rupture_centroid_lat))
         #print " new_event_set.event_activity", new_event_set.event_activity
 
-        A_mlow=grscale(b,max_magnitude,prob_min_mag_cutoff,min_magnitude)*Lambda_Min
+        A_mlow=grscale(b,max_magnitude,prob_min_mag_cutoff,min_magnitude)*A_min
         #print "A_mlow - test",  A_mlow
         #print "event_bins", event_bins
         bins = make_bins(prob_min_mag_cutoff,max_magnitude,prob_number_of_mag_sample_bins)
