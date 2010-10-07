@@ -157,13 +157,13 @@ class Source_Zone_Polygon(polygon_object):
         And where are it's methods? recurrence_functions might have 1.
         """
         polygon_object.__init__(self,boundary,exclude)
-        self.min_magnitude=min_magnitude
-        self.max_magnitude=max_magnitude
-        self.prob_min_mag_cutoff=prob_min_mag_cutoff
-        self.Lambda_Min=Lambda_Min
-        self.b=b
+        self.min_magnitude = min_magnitude
+        self.max_magnitude = max_magnitude
+        self.prob_min_mag_cutoff = prob_min_mag_cutoff
+        self.Lambda_Min = Lambda_Min
+        self.b = b
         self.number_of_mag_sample_bins = number_of_mag_sample_bins
-        self.recurrence_model_distribution=recurrence_model_distribution
+        self.recurrence_model_distribution = recurrence_model_distribution
 
         # indexes to the event sets in this source zone
         self.event_set_indexes = None

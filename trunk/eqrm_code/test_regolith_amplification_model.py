@@ -60,9 +60,10 @@ class Test_Regolith_Amplification_Model(unittest.TestCase):
         Mw=array((4.5,6.5))
         event_periods=array([0,0.01])
 
-        dist= amp_model.distribution(exp(log_ground_motion),
-                                     site_classes,
-                                     Mw,event_periods)
+        dist, log_mean, log_sigma = amp_model.distribution(
+            exp(log_ground_motion),
+            site_classes,
+            Mw,event_periods)
 
         mean_log_amp=array([[[0.36327,0.36327+1],[0.31896,0.31896+1]],
                             [[0.74521,0.74521],
