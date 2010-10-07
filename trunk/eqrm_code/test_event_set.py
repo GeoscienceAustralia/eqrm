@@ -120,14 +120,14 @@ class Test_Event_Set(unittest.TestCase):
         os.close(handle)
         handle = open(file_name,'w')
         
-        # I don't know what this is Lambda_Min="1.0"
+        # I don't know what this is A_min="1.0"
         # But I added it so the tests would pass
         # Another example file at
         # Q:\python_eqrm\implementation_tests\input\newc_source_polygon.xml
         sample = """<Source_Model magnitude_type='Mw'>
 <polygon area="5054.035">
   <boundary>-32.4000 151.1500 -32.7500 152.1700 -33.4500 151.4300 -32.4000 151.1500</boundary> 
-  <recurrence distribution="bounded_gutenberg_richter" min_magnitude="3.3" max_magnitude="5.4" Lambda_Min="0.568" b="1" min_mag="4.5" depth="7" /> 
+  <recurrence distribution="bounded_gutenberg_richter" min_magnitude="3.3" max_magnitude="5.4" A_min="0.568" b="1" min_mag="4.5" depth="7" /> 
   </polygon>
 
 </Source_Model>
@@ -424,7 +424,7 @@ class Test_Event_Set(unittest.TestCase):
         os.close(handle)
         handle = open(file_name,'w')
         
-        # I don't know what this is Lambda_Min="1.0"
+        # I don't know what this is A_min="1.0"
         # But I added it so the tests would pass
         # Another example file at
         # Q:\python_eqrm\implementation_tests\input\newc_source_polygon.xml

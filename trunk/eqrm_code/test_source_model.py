@@ -30,7 +30,7 @@ class Test_Source_model(unittest.TestCase):
         os.close(handle)
         handle = open(file_name,'w')
         
-        # I don't know what this is Lambda_Min="1.0"
+        # I don't know what this is A_min="1.0"
         # But I added it so the tests would pass
         # Another example file at
         # Q:\python_eqrm\implementation_tests\input\newc_source_polygon.xml
@@ -42,7 +42,7 @@ class Test_Source_model(unittest.TestCase):
 -37 140
 -20 126.0   
  </boundary>
-        <recurrence distribution="sample" min_magnitude="5"  max_magnitude="8" A="2" Lambda_Min="0.5" b="1"></recurrence>
+        <recurrence distribution="sample" min_magnitude="5"  max_magnitude="8" A="2" A_min="0.5" b="1"></recurrence>
     </polygon>
     <polygon area='1000'>
         <boundary>
@@ -74,7 +74,7 @@ class Test_Source_model(unittest.TestCase):
 -37 140
 -20 126.0   
         </exclude>
-        <recurrence distribution="sample" min_magnitude="5"  max_magnitude="8" A="1" Lambda_Min="2.0"  b="1"></recurrence>
+        <recurrence distribution="sample" min_magnitude="5"  max_magnitude="8" A="1" A_min="2.0"  b="1"></recurrence>
     </polygon>
 </Source_Model>
 """
@@ -95,11 +95,11 @@ class Test_Source_model(unittest.TestCase):
         min_magnitude = 5
         max_magnitude = 8
         b = 1
-        Lambda_Min = 0.5
+        A_min = 0.5
         szp = Source_Zone_Polygon(boundary,exclude,
                                   min_magnitude,max_magnitude,
                                   prob_min_mag_cutoff,
-                                  Lambda_Min,b,
+                                  A_min,b,
                                   number_of_mag_sample_bins)
         #print "source_zone_polygon.polygon_object", szp._linestring
         result = source_model._source_zone_polygons[0]
@@ -111,7 +111,7 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         self.failUnless( result.b==szp.b,
             'Failed!')
-        self.failUnless( result.Lambda_Min==szp.Lambda_Min,
+        self.failUnless( result.A_min==szp.A_min,
             'Failed!')
         self.failUnless( result.prob_min_mag_cutoff==szp.prob_min_mag_cutoff,
             'Failed!')
@@ -189,11 +189,11 @@ class Test_Source_model(unittest.TestCase):
         min_magnitude = 3.3
         max_magnitude = 5.4
         b = 1
-        Lambda_Min = 0.568
+        A_min = 0.568
         szp = Source_Zone_Polygon(boundary,exclude,
                                   min_magnitude,max_magnitude,
                                   prob_min_mag_cutoff,
-                                  Lambda_Min,b,
+                                  A_min,b,
                                   number_of_mag_sample_bins)
         #print "source_zone_polygon.polygon_object", szp._linestring
         result = source_model._source_zone_polygons[0]
@@ -205,7 +205,7 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         self.failUnless( result.b==szp.b,
             'Failed!')
-        self.failUnless( result.Lambda_Min==szp.Lambda_Min,
+        self.failUnless( result.A_min==szp.A_min,
             'Failed!')
         self.failUnless( result.prob_min_mag_cutoff==
                          szp.prob_min_mag_cutoff,
@@ -222,12 +222,12 @@ class Test_Source_model(unittest.TestCase):
         min_magnitude = 5
         max_magnitude = 8
         b = 1
-        Lambda_Min = 0.5
+        A_min = 0.5
         number_of_mag_sample_bins = 15
         szp = Source_Zone_Polygon(boundary,exclude,
                                   min_magnitude,max_magnitude,
                                   prob_min_mag_cutoff,
-                                  Lambda_Min,b,
+                                  A_min,b,
                                   number_of_mag_sample_bins)
         self.failUnless( boundary==szp._linestring,
             'Failed!')
@@ -239,7 +239,7 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         self.failUnless( b==szp.b,
             'Failed!')
-        self.failUnless( Lambda_Min==szp.Lambda_Min,
+        self.failUnless( A_min==szp.A_min,
             'Failed!')
         self.failUnless( prob_min_mag_cutoff==szp.prob_min_mag_cutoff,
             'Failed!')

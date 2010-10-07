@@ -53,7 +53,7 @@ def calc_event_activity(event_set, source_model,
         if len(mag_ind)>0:
             zone_b = source.b
             grfctr = grscale(zone_b,zone_mhgh,zone_mlow, source.min_magnitude)
-            A_mlow = source.Lambda_Min * grfctr
+            A_mlow = source.A_min * grfctr
             
             event_ind= poly_ind[mag_ind]
             #event_ind=mag_ind[poly_ind]
