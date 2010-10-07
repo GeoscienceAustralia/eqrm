@@ -184,12 +184,6 @@ class Source_Zone_Polygon(polygon_object):
         """
         self.event_set_indexes = event_indexes
 
-    def not_implemented_calc_event_activity(self, event_set):
-        """
-        Calculate the event activity for all of the events in this
-        source zone.
-        """
-        pass
 
     def set_atten_models_and_weights(self, atten_models,
                                      atten_model_weights):
