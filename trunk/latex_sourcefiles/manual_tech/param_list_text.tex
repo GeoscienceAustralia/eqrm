@@ -1,35 +1,38 @@
-\LARGE \noindent \textbf{The \texttt{setdata} python file}
 
-\vspace{1em} \normalsize The \texttt{setdata} python file is used to
-control EQRM simulations. It contains a series of input parameters
-that define the manner in which the EQRM is operated. For example,
-there is a parameter to control whether the EQRM models hazard or
-risk. Other parameters can be used to define which ground motion
-model is used and whether site amplification is considered. A
-description of all of the parameters in the
- \texttt{setdata} python file is given below.
+The EQRM control file is the primary input file for an EQRM
+simulation. It:
+\begin{itemize}
+\item contains a series of input variables (or parameters) that define
+the manner in which the EQRM is operated; and
+\item initiallises the simulation.
+\end{itemize}
+For example, there is a parameter to control whether the EQRM models
+hazard or risk. Other parameters can be used to define which ground
+motion model is used and whether site amplification is considered. A
+description of all of the parameters is given below.
 
-\vspace{1em} Note that it not essential to supply all parameters for
-each simulation. For example, if amplification is not being used
-(i.e. \texttt{use\_amplification} $=$ \texttt{False}) it is not
-necessary to supply the remaining amplification parameters.
-Furthermore, default values are set by the EQRM for several
-parameters. These are indicated in the following when applicable.
-Omission of these input parameters in the \texttt{setdata} file will
-lead to use of the default values. For example, the default value
-for \texttt{atten\_threshold\_distance} is 400\,km.
+Note that it not essential to supply all parameters for each
+simulation. For example, if amplification is not being used (i.e.
+\texttt{use\_amplification} $=$ \texttt{False}) it is not necessary
+to supply the remaining amplification parameters. Furthermore,
+default values are set by the EQRM for several parameters. These are
+indicated in the following when applicable. Omission of these input
+parameters in the \texttt{setdata} file will lead to use of the
+default values. For example, the default value for
+\texttt{atten\_threshold\_distance} is 400\,km.
 
-\vspace{1em} The following also provides suggested values for
-several parameters. Users are free to change these values as
-desired. The developers are merely suggesting the value they would
-use in most circumstances. For example, the suggested value for
-\texttt{loss\_min\_pga} is 0.05.
+The following also provides suggested values for several parameters.
+Users are free to change these values as desired. The developers are
+merely suggesting the value they would use in most circumstances.
+For example, the suggested value for \texttt{loss\_min\_pga} is
+0.05.
 
-\vspace{1em}
-Finally, the term preferred is used to indicate those parameters that the developers believe to
-be the most appropriate. For example, the preferred value for \typepar{csm\_}{hysteretic\_}{damping}
-is \texttt{curve}. In this case the alternative choices of \texttt{None} and \texttt{curve}
-would typically only be used for experimental purposes.
+Finally, the term preferred is used to indicate those parameters
+that the developers believe to be the most appropriate. For example,
+the preferred value for \typepar{csm\_}{hysteretic\_}{damping} is
+\texttt{curve}. In this case the alternative choices of
+\texttt{None} and \texttt{curve} would typically only be used for
+experimental purposes.
 
 
 \vspace{2em}
@@ -154,6 +157,7 @@ desired number of simulated evenst for each generation zone.\\
 \vspace{0.1em} \texttt{prob\_min\_mag\_cutoff}: \\
 Minimum magnitude below which hazard or risk is not considered.     \\
 %---------------------------------------------------------
+\hline
  \end{tabular}
 
 \vspace{2em}
@@ -322,7 +326,7 @@ Standard deviation for capacity curve\index{capacity curve} log--normal PDF.    
 \hline \vspace{0.1em} \texttt{csm\_damping\_regimes}: \\
 SUGGESTED = 0 \\
  Damping multiplicative formula to be
-used - \manual{Section 7.2.2}: \\
+used: \\
  \hspace{0.5em} 0 $\Rightarrow$ \small{PREFERRED}: use $R_a$, $R_v$, and $R_d$; \\
  \hspace{0.5em} 1 $\Rightarrow$ use $R_a$, $R_v$ and assign $R_d= R_v$; \\
  \hspace{0.5em} 2 $\Rightarrow$ use $R_v$ only and assign $R_a=R_d=R_v$. \\

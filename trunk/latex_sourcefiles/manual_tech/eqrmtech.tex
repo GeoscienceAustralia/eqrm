@@ -21,6 +21,15 @@
 \usepackage{psfrag}
 \usepackage{supertabular}
 \usepackage{drcaptionstyle}
+\usepackage{listings}
+%\usepackage{color}
+\usepackage[usenames,dvipsnames]{color}
+
+% set up some environments
+\definecolor{light-gray}{gray}{0.8}
+\lstset{basicstyle=\scriptsize}
+%\lstset{frame=shadowbox, rulesepcolor=\color{blue}, fillcolor = \color{blue}} % create a frame and blue boundary for the xml file
+\lstset{frame=single, backgroundcolor=\color{light-gray}}
 
 
 \graphicspath{{diags/}}
@@ -29,6 +38,7 @@
 
 \setlength{\parskip}{1em plus 0.1em minus 0.2em}
 \setlength{\parindent}{0pt}
+
 
 \makeindex
 
