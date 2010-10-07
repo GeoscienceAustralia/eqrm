@@ -163,11 +163,12 @@ class Regolith_amplification_model(object):
                                 log_sigma[i,j,k]=log_stds[m,n,k]
                                 
         log_mean=log(ground_motion)+log_amplification
-        
-        self.distribution_instance.set_log_mean_log_sigma_etc(
-            log_mean,log_sigma,
-            event_activity=event_activity,
-            event_id=event_id)
+
+        if self.distribution_instance is not None:
+            self.distribution_instance.set_log_mean_log_sigma_etc(
+                log_mean,log_sigma,
+                event_activity=event_activity,
+                event_id=event_id)
         return self.distribution_instance, log_mean, log_sigma
     
 
