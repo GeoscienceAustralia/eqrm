@@ -39,8 +39,7 @@ from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
          save_damage, get_source_file_handle
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
-from ground_motion_distribution import Log_normal_distribution, \
-     Distribution_Log_Normal
+from ground_motion_distribution import Distribution_Log_Normal
 from eqrm_code.structures import Structures, build_par_file
 from eqrm_code.exceedance_curves import do_collapse_logic_tree, hzd_do_value
 from eqrm_code.sites import Sites, truncate_sites_for_test
@@ -277,14 +276,8 @@ def main(parameter_handle,
     # load in soil amplifications factors
     # searches input_dir then defaultdir
     if THE_PARAM_T.use_amplification is True:
-        regolith_amp_distribution = \
-            Log_normal_distribution(THE_PARAM_T.amp_variability_method,
-                                    num_psudo_events=num_psudo_events,
-                                    num_sites_per_site_loop= \
-                                        NUM_SITES_PER_SITE_LOOP)
-        
         amp_distribution = Distribution_Log_Normal(
-            THE_PARAM_T.atten_variability_method)
+            THE_PARAM_T.amp_variability_method)
     
         amp_factor_file = THE_PARAM_T.site_tag + '_par_ampfactors.xml'
         amp_factor_file = get_local_or_default(amp_factor_file,
@@ -293,8 +286,7 @@ def main(parameter_handle,
         soil_amplification_model = \
             Regolith_amplification_model.from_xml(
             amp_factor_file.name,
-            distribution_instance= \
-            regolith_amp_distribution)
+            distribution_instance= None)
     else:
         soil_amplification_model = None
         amp_distribution = None
@@ -429,7 +421,6 @@ def main(parameter_handle,
             THE_PARAM_T,
             sites,
             event_set,
-            pseudo_event_set,
             bedrock_SA_all,
             soil_SA_all,
             bedrock_hazard,
@@ -439,7 +430,8 @@ def main(parameter_handle,
             i,
             rel_i,
             ground_motion_distribution,
-            amp_distribution)
+            amp_distribution,
+            event_activity)
 
         # calculate damage
         if THE_PARAM_T.run_type == "risk":
@@ -713,7 +705,6 @@ def main(parameter_handle,
 def calc_and_save_SA(THE_PARAM_T,
                      sites,
                      event_set,
-                     pseudo_event_set, # can remove
                      bedrock_SA_all,
                      soil_SA_all,
                      bedrock_hazard,
@@ -723,7 +714,8 @@ def calc_and_save_SA(THE_PARAM_T,
                      site_index,
                      rel_site_index,
                      ground_motion_distribution,
-                     amp_distribution):
+                     amp_distribution,
+                     event_activity):
     if True: # turn this into the ground-motion splitting loop
         # evaluate the mean and sigma from the attenuation models at the
         # site of interest note that this is not the RSA that is used
@@ -752,26 +744,17 @@ def calc_and_save_SA(THE_PARAM_T,
 
             soil_SA = zeros(bedrock_SA.shape)
             for i_gmm in arange(bedrock_SA.shape[0]):
-                soil_SA_pdf, log_mean, log_sigma = \
-                             soil_amplification_model.distribution(
+                _, log_mean, log_sigma = \
+                   soil_amplification_model.distribution(
                     bedrock_SA[i_gmm,:],
                     sites.attributes['SITE_CLASS'],
                     event_set.Mw,
                     THE_PARAM_T.atten_periods)
-                (_, sub_soil_SA, _) = soil_SA_pdf.sample_for_eqrm()
                 
                 amp_distribution.set_log_mean_log_sigma_etc(
                     log_mean, log_sigma)
-                (spawn_weights, new_sub_soil_SA, _) = \
+                (spawn_weights, sub_soil_SA, _) = \
                                 amp_distribution.sample_for_eqrm()
-#                 print "log_mean.shape", log_mean.shape
-#                 print "new_sub_soil_SA.shape", new_sub_soil_SA.shape
-#                 print "sub_soil_SA.shape", sub_soil_SA.shape
-                
-#                 print "exp(log_mean)", exp(log_mean)
-#                 print "new_sub_soil_SA", new_sub_soil_SA
-#                 print "sub_soil_SA", sub_soil_SA
-#                 assert(allclose(new_sub_soil_SA, sub_soil_SA))
                 soil_SA[i_gmm,:] = sub_soil_SA
                 
             # Amplification factor cutoffs

@@ -16,6 +16,7 @@
 from scipy import exp, log, where, isfinite, reshape
 from scipy.stats import norm
 
+# FIXME: REMOVE THIS CLASS  THIS CLASS IS OBSOLETE.  DO NOT USE#
 class Log_normal_distribution(object):
     """
     Log normal distribution.
@@ -184,8 +185,7 @@ class Distribution_Log_Normal(object):
         """
         if True:
             if self.var_method == None:
-                #print "self.log_mean", self.log_mean
-                sample_values=exp(self.log_mean)           
+                sample_values = exp(self.log_mean)           
             elif self.var_method == 2:
                 # monte carlo
                 sample_values = self._monte_carlo()
