@@ -1,6 +1,6 @@
 <source_model_fault magnitude_type="Mw">
   <fault 
-  name = "Newie Fault"
+  name = "Newie South Fault"
   event_type = "crustal fault">
   
     <geometry 
@@ -11,8 +11,8 @@
         depth_bottom_seismogenic = "10"
         slab_width = "0">
         <trace> 	
-            <start lat="-33.0" lon="151.5" />
-            <end lat="-33.0" lon="151.8" />
+            <start lat="-33.1" lon="151.5" />
+            <end lat="-33.1" lon="151.8" />
         </trace>
     </geometry>
       
@@ -29,4 +29,67 @@
     </recurrence_model>
            
   </fault>
+  
+  <fault 
+  name = "Newie North Fault"
+  event_type = "crustal fault">
+  
+    <geometry 
+        dip= "45" 
+        out_of_dip_theta = "0"
+        delta_theta = "0" 
+        depth_top_seismogenic = "2"
+        depth_bottom_seismogenic = "10"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-32.9" lon="151.5" />
+            <end lat="-32.9" lon="151.8" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "characteristic"
+       recurrence_min_mag = "3.5" 
+       recurrence_max_mag = "6.5" 
+       slip_rate = "10.0" 
+       b = "1">
+      <event_generation 
+        generation_min_mag = "3.5"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "1500" />
+    </recurrence_model>
+           
+  </fault>
+
+  <fault 
+  name = "Newie Subduction Zone"
+  event_type = "subduction interface">
+  
+    <geometry 
+        dip= "30" 
+        out_of_dip_theta = "90"
+        delta_theta = "10" 
+        depth_top_seismogenic = "5"
+        depth_bottom_seismogenic = "100"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-28.0" lon="152.5" />
+            <end lat="-38.0" lon="152.5" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "bounded_gutenberg_richter"
+       recurrence_min_mag = "4.0" 
+       recurrence_max_mag = "8.5" 
+       A_min = "10" 
+       b = "1">
+      <event_generation 
+        generation_min_mag = "4.0"
+        number_of_mag_sample_bins = "25" 
+        number_of_events = "2000" />
+    </recurrence_model>
+           
+  </fault>  
+  
 </source_model_fault>
