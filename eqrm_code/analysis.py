@@ -834,6 +834,27 @@ def calc_and_save_SA(THE_PARAM_T,
                         hzd_do_value(collapsed_soil_SA[:,:,j],
                                      event_set.event_activity,
                                      1.0/array(THE_PARAM_T.return_periods))
+#         # Compute hazard if desired
+#         if THE_PARAM_T.save_hazard_map is True:
+#             assert collapsed_bedrock_SA.shape[0] == 1 # only one site
+#             for j in range(len(THE_PARAM_T.atten_periods)):
+#                 # get these two arrays to be vectors
+#                 # The spawning dimension is flattened into the events dimension
+#                 bedrock_SA_d_events = collapsed_bedrock_SA[:,:,j].reshape(-1)
+#                 event_act_d_events = event_activity.event_activity.reshape(-1)
+#                 bedrock_hazard[site_index,j] = \
+#                         hzd_do_value(collapsed_bedrock_SA[:,:,j],
+#                                      event_set.event_activity,
+#                                      #event_act_d_events,
+#                                      1.0/array(THE_PARAM_T.return_periods))
+#                 if soil_SA is not None:
+#                     soil_SA_d_events = collapsed_bedrock_SA[:,:,j].reshape((-1))
+#                     #event_act_d_events = event_activity.event_activity.reshape(-1)
+#                     soil_hazard[site_index,j] = \
+#                         hzd_do_value(collapsed_bedrock_SA[:,:,j],
+#                                      event_set.event_activity,
+#                                      #event_act_d_events,
+#                                      1.0/array(THE_PARAM_T.return_periods))
                     
         # End the Ground motion splitting loop
         # Build the SA, soil, if we did it.  If not, Bedrock.
