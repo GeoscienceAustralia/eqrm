@@ -20,7 +20,8 @@ import os
 import time
 import shutil
 import copy
-import datetime 
+import datetime
+import scipy
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
      arange, reshape, exp
@@ -111,6 +112,7 @@ def main(parameter_handle,
         print 'File parameter error:', e
         import sys
         sys.exit(1)
+        # FIXME throw error to catch
 
     del use_determ_seed
     del compress_output
@@ -253,7 +255,7 @@ def main(parameter_handle,
         THE_PARAM_T.atten_models,
         THE_PARAM_T.atten_model_weights)
 
-    num_psudo_events = len(pseudo_event_set)
+    num_psudo_events = len(THE_PARAM_T.atten_models) * len(event_set)
     num_events = len(event_set)
     msg = ('Pseudo event set created. Number of pseudo_events=' +
            str(num_psudo_events))
@@ -824,37 +826,26 @@ def calc_and_save_SA(THE_PARAM_T,
 
         # Compute hazard if desired
         if THE_PARAM_T.save_hazard_map is True:
+            # FIXME optimise.  Have this precomputed, out of the loop.
+            event_act_sum_on_GMM = scipy.sum(event_activity.event_activity,
+                                             axis=1)
+            event_act_d_events = event_act_sum_on_GMM.reshape(-1)
+            assert collapsed_bedrock_SA.shape[0] == 1 # only one site
             for j in range(len(THE_PARAM_T.atten_periods)):
+                # get these two arrays to be vectors
+                # The spawning dimension is flattened into the events dimension
+                bedrock_SA_d_events = collapsed_bedrock_SA[:,:,j].reshape(1,-1)
+                
                 bedrock_hazard[site_index,j] = \
-                        hzd_do_value(collapsed_bedrock_SA[:,:,j],
-                                     event_set.event_activity,
+                        hzd_do_value(bedrock_SA_d_events,
+                                     event_act_d_events,
                                      1.0/array(THE_PARAM_T.return_periods))
                 if soil_SA is not None:
+                    soil_SA_d_events = collapsed_soil_SA[:,:,j].reshape((-1))
                     soil_hazard[site_index,j] = \
-                        hzd_do_value(collapsed_soil_SA[:,:,j],
-                                     event_set.event_activity,
+                        hzd_do_value(soil_SA_d_events,
+                                     event_act_d_events,
                                      1.0/array(THE_PARAM_T.return_periods))
-#         # Compute hazard if desired
-#         if THE_PARAM_T.save_hazard_map is True:
-#             assert collapsed_bedrock_SA.shape[0] == 1 # only one site
-#             for j in range(len(THE_PARAM_T.atten_periods)):
-#                 # get these two arrays to be vectors
-#                 # The spawning dimension is flattened into the events dimension
-#                 bedrock_SA_d_events = collapsed_bedrock_SA[:,:,j].reshape(-1)
-#                 event_act_d_events = event_activity.event_activity.reshape(-1)
-#                 bedrock_hazard[site_index,j] = \
-#                         hzd_do_value(collapsed_bedrock_SA[:,:,j],
-#                                      event_set.event_activity,
-#                                      #event_act_d_events,
-#                                      1.0/array(THE_PARAM_T.return_periods))
-#                 if soil_SA is not None:
-#                     soil_SA_d_events = collapsed_bedrock_SA[:,:,j].reshape((-1))
-#                     #event_act_d_events = event_activity.event_activity.reshape(-1)
-#                     soil_hazard[site_index,j] = \
-#                         hzd_do_value(collapsed_bedrock_SA[:,:,j],
-#                                      event_set.event_activity,
-#                                      #event_act_d_events,
-#                                      1.0/array(THE_PARAM_T.return_periods))
                     
         # End the Ground motion splitting loop
         # Build the SA, soil, if we did it.  If not, Bedrock.
@@ -867,11 +858,11 @@ def calc_and_save_SA(THE_PARAM_T,
         num_periods = bedrock_SA.shape[3]
         if soil_SA is not None:
             soil_SA = reshape(soil_SA, (num_sites,
-                                                num_events*num_gmm,
-                                                num_periods))  
+                                        num_events*num_gmm,
+                                        num_periods))  
         bedrock_SA = reshape(bedrock_SA, (num_sites,
-                                                num_events*num_gmm,
-                                                num_periods ))  
+                                          num_events*num_gmm,
+                                          num_periods ))  
         
         return soil_SA, bedrock_SA
 
