@@ -137,8 +137,55 @@ class Source_Model(object):
             poly_zone.set_atten_models_and_weights(atten_models,
                                                    atten_model_weights)
             
+class Source(object):
+    def __init__(self,
+                 min_magnitude,max_magnitude,
+                 prob_min_mag_cutoff,
+                 A_min,b,
+                 number_of_mag_sample_bins,
+                 recurrence_model_distribution='bounded_gutenberg_ricter'):
+        """
+       
+        min_magnitude,max_magnitude,
+        prob_min_mag_cutoff,A_min,b are floats
+        
+        #FIXME DSG-EQRM This class needs comments.
+        What is prob_min_mag_cutoff?
 
-class Source_Zone_Polygon(polygon_object):
+        And where are it's methods? recurrence_functions might have 1.
+        """
+        self.min_magnitude = min_magnitude
+        self.max_magnitude = max_magnitude
+        self.prob_min_mag_cutoff = prob_min_mag_cutoff
+        self.A_min = A_min
+        self.b = b
+        self.number_of_mag_sample_bins = number_of_mag_sample_bins
+        self.recurrence_model_distribution = recurrence_model_distribution
+
+        # indexes to the event sets in this source zone
+        self.event_set_indexes = None
+
+        
+    def set_event_set_indexes(self, event_indexes):
+        """
+        Input an array of integers which represent the events in a zone source.
+        The intergers are indexes into an event set.
+        """
+        self.event_set_indexes = event_indexes
+
+
+    def set_atten_models_and_weights(self, atten_models,
+                                     atten_model_weights):
+        """
+        parameters:
+          atten_models: list of ground motion models
+          atten_weights: list of ground motion model weights
+        """
+        self.atten_models = atten_models
+        self.atten_model_weights = atten_model_weights
+
+        
+class Source_Zone_Polygon(Source, polygon_object):
     def __init__(self,boundary,exclude,
                  min_magnitude,max_magnitude,
                  prob_min_mag_cutoff,
@@ -157,16 +204,11 @@ class Source_Zone_Polygon(polygon_object):
         And where are it's methods? recurrence_functions might have 1.
         """
         polygon_object.__init__(self,boundary,exclude)
-        self.min_magnitude = min_magnitude
-        self.max_magnitude = max_magnitude
-        self.prob_min_mag_cutoff = prob_min_mag_cutoff
-        self.A_min = A_min
-        self.b = b
-        self.number_of_mag_sample_bins = number_of_mag_sample_bins
-        self.recurrence_model_distribution = recurrence_model_distribution
-
-        # indexes to the event sets in this source zone
-        self.event_set_indexes = None
+        Source.__init__(self,min_magnitude,max_magnitude,
+                 prob_min_mag_cutoff,
+                 A_min,b,
+                 number_of_mag_sample_bins,
+                 recurrence_model_distribution)
 
     def determine_event_set_indexes(self, event_set):
         contains_point=[self.contains_point((lat,lon), use_cach=False) \
