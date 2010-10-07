@@ -222,11 +222,9 @@ class Multiple_ground_motion_calculator(object):
     Attributes:
       model_weights: The weight assossicated with each model (array)
       GM_models: a list of Ground_motion_calculator instances.
-      log_normal_distribution: a log_normal_distribution instance.
     """
 
-    def __init__(self, ground_motion_model_names, periods, model_weights,
-                 log_normal_distribution=None):
+    def __init__(self, ground_motion_model_names, periods, model_weights):
         self.periods = periods
 
         # Should do this just once, when the para values are first verified.
@@ -240,7 +238,6 @@ class Multiple_ground_motion_calculator(object):
         for GM_model_name in ground_motion_model_names:
             self.GM_models.append(Ground_motion_calculator(GM_model_name,
                                                            periods))
-        self.log_normal_distribution = log_normal_distribution
 
     def distribution(self, sites, event_set, event_activity=None,
                      event_id=None):
@@ -251,18 +248,17 @@ class Multiple_ground_motion_calculator(object):
         magnitudes = {'Mw': event_set.Mw, 'ML': event_set.ML}
         vs30 = sites.attributes.get('VS30', None)
 
-        results=self._distribution_function(distances, magnitudes,
-                                            depth=event_set.depth,
-                                            depth_to_top=event_set.depth_to_top,
-                                            faulting_type=event_set.faulting_type,
-                                            vs30=vs30, Z25=None, dip=None,
-                                            event_activity=event_activity,
-                                            event_id=event_id,
-                                            periods=self.periods)
-
-        self.log_normal_distribution.set_log_mean_log_sigma_etc(*results)
+        results=self._distribution_function(
+            distances, magnitudes,
+            depth=event_set.depth,
+            depth_to_top=event_set.depth_to_top,
+            faulting_type=event_set.faulting_type,
+            vs30=vs30, Z25=None, dip=None,
+            event_activity=event_activity,
+            event_id=event_id,
+            periods=self.periods)
         _, _, log_mean_extend_GM, log_sigma_extend_GM = results
-        return self.log_normal_distribution, \
+        return None, \
                log_mean_extend_GM, log_sigma_extend_GM
 
 

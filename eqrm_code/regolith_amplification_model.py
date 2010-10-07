@@ -168,7 +168,7 @@ class Regolith_amplification_model(object):
             log_mean,log_sigma,
             event_activity=event_activity,
             event_id=event_id)
-        return self.distribution_instance
+        return self.distribution_instance, log_mean, log_sigma
     
 
     def _bin_indices(self, values, bin_points):
