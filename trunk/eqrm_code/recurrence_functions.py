@@ -84,7 +84,7 @@ def calc_event_activity(event_set, source_model,
                         mag_bin_centroids[z])) for z in event_bins])
                     mag_bin_centroids= new_mag_bin_centroids
 
-            if source.recurrence_model_distribution=='bounded_gutenberg_ricter':
+            if source.recurrence_model_distribution=='bounded_gutenberg_richter':
                 grpdf = m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
                 
             

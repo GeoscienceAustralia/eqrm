@@ -138,12 +138,9 @@ class Source_Model(object):
                                                    atten_model_weights)
             
 class Source(object):
-    def __init__(self,
-                 min_magnitude,max_magnitude,
-                 prob_min_mag_cutoff,
-                 A_min,b,
-                 number_of_mag_sample_bins,
-                 recurrence_model_distribution='bounded_gutenberg_ricter'):
+    def __init__(self, min_magnitude, max_magnitude, prob_min_mag_cutoff,
+                 A_min, b, number_of_mag_sample_bins,
+                 recurrence_model_distribution='bounded_gutenberg_richter'):
         """
        
         min_magnitude,max_magnitude,
@@ -191,7 +188,7 @@ class Source_Zone_Polygon(Source, polygon_object):
                  prob_min_mag_cutoff,
                  A_min,b,
                  number_of_mag_sample_bins,
-                 recurrence_model_distribution='bounded_gutenberg_ricter'):
+                 recurrence_model_distribution='bounded_gutenberg_richter'):
         """
         boundary is a list of points that forms a polygon
         exclude is a list of polygons (so a list of a list of points)
