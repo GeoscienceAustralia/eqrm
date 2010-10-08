@@ -32,7 +32,7 @@ from eqrm_code.event_set import Event_Set, Pseudo_Event_Set, Event_Activity, \
      Obsolete_Event_Activity
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
-from eqrm_code.regolith_amplification_model import \
+from eqrm_code.regolith_amplification_model import get_soil_SA, \
      Regolith_amplification_model, load_site_class2vs30
 from eqrm_code.source_model import Source_Models
 from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
@@ -723,13 +723,24 @@ def calc_and_save_SA(THE_PARAM_T,
             event_set=event_set,
             sites=sites)
         _ , log_mean_extend_GM, log_sigma_extend_GM = results 
-
+        # *_extend_GM has shape of (GM_model, sites, events, periods)
+        
         # evaluate the RSA
         # that is desired (i.e. chosen in parameter_handle)
         ground_motion_distribution.set_log_mean_log_sigma_etc(
             log_mean_extend_GM, log_sigma_extend_GM)
-        (spawn_weights, bedrock_SA, _) = \
+        (_, bedrock_SA, _) = \
                         ground_motion_distribution.sample_for_eqrm()
+        # planned *_SA has shape (spawn, GM_model, sites, events, periods)
+        GM_model_axis = 0
+        event_axis = 2
+        periods_axis = 3
+        
+        # currently *_SA has shape (GM_model, sites, events, periods)
+        if True:
+            GM_model_axis = 0
+            event_axis = 2
+            periods_axis = 3
         
         soil_SA = None
         #print 'ENDING Calculating attenuation'
@@ -739,21 +750,11 @@ def calc_and_save_SA(THE_PARAM_T,
         # finds the mean and sigma (i.e. PDF) based on bedrock PGA and
         # Moment magnitude (if amps are a function of these)
         if THE_PARAM_T.use_amplification is True:
-
-            soil_SA = zeros(bedrock_SA.shape)
-            for i_gmm in arange(bedrock_SA.shape[0]):
-                _, log_mean, log_sigma = \
-                   soil_amplification_model.distribution(
-                    bedrock_SA[i_gmm,:],
-                    sites.attributes['SITE_CLASS'],
-                    event_set.Mw,
-                    THE_PARAM_T.atten_periods)
-                
-                amp_distribution.set_log_mean_log_sigma_etc(
-                    log_mean, log_sigma)
-                (spawn_weights, sub_soil_SA, _) = \
-                                amp_distribution.sample_for_eqrm()
-                soil_SA[i_gmm,:] = sub_soil_SA
+            soil_SA = get_soil_SA(bedrock_SA,
+                                  sites.attributes['SITE_CLASS'],
+                                  event_set.Mw, THE_PARAM_T.atten_periods,
+                                  soil_amplification_model,
+                                  amp_distribution, ground_motion_calc)
                 
             # Amplification factor cutoffs
             # Applies a minimum and maxium acceptable amplification factor
@@ -891,6 +892,12 @@ def apply_threshold_distance(sites,
             soil_SA[:,Haznull[0], Haznull[1],:] = 0
         else:
             bedrock_SA[:,Haznull[0], Haznull[1],:] = 0
+    elif len(bedrock_SA.shape) == 5:
+        if use_amplification is True:
+            bedrock_SA[:,:,Haznull[0], Haznull[1],:] = 0
+            soil_SA[:,:,Haznull[0], Haznull[1],:] = 0
+        else:
+            bedrock_SA[:,:,Haznull[0], Haznull[1],:] = 0
         
         
     return bedrock_SA, soil_SA
@@ -931,17 +938,32 @@ def cutoff_pga_4d(ground_motion, max_pga):
         return ground_motion
 
     assert isfinite(ground_motion).all()
-
     too_high = ground_motion[:,:,:,0:1] > max_pga
     # Doing ground_motion[:,:,0:1] gets the first values of the last dimension,
     # but does not drop a dimension in the return value.
     # ground_motion[:,:,0] would drop a dimension.
     scaling_factor = where(too_high, max_pga/ground_motion[:,:,:,0:1], 1.0)
     ground_motion *= scaling_factor
-
     assert isfinite(ground_motion).all()
 
     return ground_motion
+
+
+def cutoff_pga_5d(ground_motion, max_pga):
+    if max_pga is None:
+        return ground_motion
+
+    assert isfinite(ground_motion).all()
+    too_high = ground_motion[:,:,:,:,0:1] > max_pga
+    # Doing ground_motion[:,:,0:1] gets the first values of the last dimension,
+    # but does not drop a dimension in the return value.
+    # ground_motion[:,:,0] would drop a dimension.
+    scaling_factor = where(too_high, max_pga/ground_motion[:,:,:,:,0:1], 1.0)
+    ground_motion *= scaling_factor
+    assert isfinite(ground_motion).all()
+
+    return ground_motion
+
 
 def load_data(THE_PARAM_T):
     """Load structure and bridge data into memory.
