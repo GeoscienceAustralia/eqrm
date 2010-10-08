@@ -4,7 +4,7 @@ import sys
 import unittest
 from ground_motion_distribution import *
 from scipy import array, log, exp, newaxis, concatenate, allclose, sqrt, \
-     r_, alltrue, where, arange, resize
+     r_, alltrue, where, arange, resize, sum
 
 
 class Test_Log_normal_distribution(unittest.TestCase):
@@ -229,12 +229,50 @@ class Test_Log_normal_distribution(unittest.TestCase):
         (_, sample_values, _) = dist.sample_for_eqrm()       
         actual = exp(log_mean - 2*log_sigma)
         self.assert_(allclose(sample_values, actual))
-        self.assert_(actual.shape == dim)
+        self.assert_(actual.shape == dim)       
 
         
+    def test_normalised_pdf(self):
+        sigma_delta = 3
+        number_of_bins = 1
+        weights, centroids = normalised_pdf(sigma_delta, number_of_bins)
+        self.assert_(weights[0] == 1)       
+        self.assert_(len(weights) == 1)    
+        self.assert_(centroids == 0)       
+        self.assert_(len(centroids) == 1)       
+        
+    def test_normalised_pdfII(self):
+        sigma_delta = 2.5
+        number_of_bins = 2
+        weights, centroids = normalised_pdf(sigma_delta, number_of_bins)
+        self.assert_(allclose(weights, [0.5,0.5]))       
+        self.assert_(len(weights) == 2)    
+        self.assert_(allclose(centroids, [-2.5, 2.5]))       
+        self.assert_(len(centroids) == 2)
+        
+    def test_normalised_pdf3(self):
+        sigma_delta = 2.5
+        number_of_bins = 10
+        weights, centroids = normalised_pdf(sigma_delta, number_of_bins)
+        act_cends = array([-2.5000, -1.9444, -1.3889, -0.8333,
+                                          -0.2778, 0.2778, 0.8333, 1.3889,
+                                          1.9444, 2.5])
+        #print "centroids", centroids
+        #print "act_cends", act_cends
+        self.assert_(allclose(centroids, act_cends, 0.001))       
+        self.assert_(len(centroids) == 10)
+        
+        act_unnormed_wts = [0.0175, 0.0602, 0.1521, 0.2819,
+                                        0.3838, 0.3838, 0.2819, 0.1521,
+                                        0.0602, 0.0175]
+        act_wts = act_unnormed_wts/sum(act_unnormed_wts)
+        #print "act_wts", act_wts
+        #print "weights", weights
+        self.assert_(allclose(weights, act_wts, 0.01))       
+        self.assert_(len(weights) == 10)     
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Log_normal_distribution,'test')
-    #suite = unittest.makeSuite(Test_Log_normal_distribution,'test_monte_carlo2')
+    suite = unittest.makeSuite(Test_Log_normal_distribution,'test_normalised_pdf')
     runner = unittest.TextTestRunner()
     runner.run(suite)
