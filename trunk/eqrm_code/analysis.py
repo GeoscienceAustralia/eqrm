@@ -28,7 +28,8 @@ from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
 
 from eqrm_code.parse_in_parameters import  \
     ParameterSyntaxError, create_parameter_data, convert_THE_PARAM_T_to_py
-from eqrm_code.event_set import Event_Set, Pseudo_Event_Set, Event_Activity
+from eqrm_code.event_set import Event_Set, Pseudo_Event_Set, Event_Activity, \
+     Obsolete_Event_Activity
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
 from eqrm_code.regolith_amplification_model import \
@@ -174,12 +175,8 @@ def main(parameter_handle,
         # using Wells and Coppersmith 94 (modified so rupture
         # width is less than fault_width).
         num_spawning_bins = 1
-        event_activity = Event_Activity(len(event_set),
-                                        len(THE_PARAM_T.atten_model_weights),
-                                        num_spawning_bins)
+        event_activity = Event_Activity(len(event_set))
         event_activity.set_scenario_event_activity()
-        event_activity.scenario_attenuation_logic_split(
-            THE_PARAM_T.atten_model_weights)
         event_set.scenario_setup()
     else:
         # (i.e. is_scenario is False) generate a probablistic event set
@@ -214,9 +211,7 @@ def main(parameter_handle,
         log.resource_usage()
         # event activity is calculated here and the event_set are subsampled.
         num_spawning_bins = 1
-        event_activity = Event_Activity(len(event_set),
-                                        len(THE_PARAM_T.atten_model_weights),
-                                        num_spawning_bins)
+        event_activity = Event_Activity(len(event_set))
         source_mods.calculate_recurrence(
             event_set,
             THE_PARAM_T.prob_number_of_mag_sample_bins,
@@ -225,9 +220,6 @@ def main(parameter_handle,
         log.debug('Memory: event activity has been calculated')
         log.resource_usage()
         
-        # Add the atten model stuff to the zone source 
-        # This assumes there is one source model
-        event_activity.attenuation_logic_split(source_mods[0])
     
 
     msg = 'Event set created. Number of events=' + str(len(event_set.depth))
@@ -255,7 +247,8 @@ def main(parameter_handle,
         THE_PARAM_T.atten_models,
         THE_PARAM_T.atten_model_weights)
 
-    num_psudo_events = len(THE_PARAM_T.atten_models) * len(event_set)
+    num_psudo_events = len(THE_PARAM_T.atten_models) * len(event_set) * \
+                       num_spawning_bins
     num_events = len(event_set)
     msg = ('Pseudo event set created. Number of pseudo_events=' +
            str(num_psudo_events))
@@ -590,6 +583,9 @@ def main(parameter_handle,
 
     if (THE_PARAM_T.save_total_financial_loss is True and
             parallel.lo != parallel.hi):
+        # The do_collapse_logic_tree here will
+        # have to be changed to take into account
+        # the different atten weigths for each source.
         # No sites were investigated.
         #print "analysis total_building_loss",total_building_loss
         (new_total_building_loss, _, _) = \
@@ -826,10 +822,7 @@ def calc_and_save_SA(THE_PARAM_T,
 
         # Compute hazard if desired
         if THE_PARAM_T.save_hazard_map is True:
-            # FIXME optimise.  Have this precomputed, out of the loop.
-            event_act_sum_on_GMM = scipy.sum(event_activity.event_activity,
-                                             axis=1)
-            event_act_d_events = event_act_sum_on_GMM.reshape(-1)
+            event_act_d_events = event_activity.event_activity.reshape(-1)
             assert collapsed_bedrock_SA.shape[0] == 1 # only one site
             for j in range(len(THE_PARAM_T.atten_periods)):
                 # get these two arrays to be vectors
