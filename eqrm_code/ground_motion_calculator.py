@@ -107,7 +107,8 @@ class Ground_motion_calculator(object):
         is called.  The distance info must be an array.
 
         Returns:
-          A Log_normal_distribution
+          log_mean - dimensions are 
+          log_sigma
 
         FIXME: Why should we let depth be None?
         """
@@ -271,10 +272,14 @@ class Multiple_ground_motion_calculator(object):
         But if we spawn they will be.
 
         returning values
-          log_mean_array the log_mean values
+          log_mean_extend_GM the log_mean values
             dimensions (GM_model, sites, events, periods)
-          log_sigma_array the log_sigma values
+          log_sigma_extend_GM the log_sigma values
             dimensions (GM_model, sites, events, periods)
+          log_mean_extend_event the log_mean values
+            dimensions (sites, events * GM_model, periods)
+          log_sigma_extend_GM the log_sigma values
+            dimensions (sites, events * GM_model, periods)
         """
 
         for mod_i, GM_model in enumerate(self.GM_models):
@@ -304,7 +309,7 @@ class Multiple_ground_motion_calculator(object):
                 log_sigma_extend_event = concatenate(
                     (log_sigma_extend_event, log_sigma), axis=event_axis)
         
-        # dimensions of log_mean and log_sigma are (sites, events, periods)
+        # dimensions of log_mean_extend_event and log_sigma_extend_event are (sites, events, periods)
         # note, sites is currently always 1.
         
         return (log_mean_extend_event, log_sigma_extend_event,
