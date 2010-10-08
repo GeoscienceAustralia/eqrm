@@ -3,6 +3,7 @@ import sys
 import unittest
 from os.path import join
 import tempfile
+import types
 
 from scipy import array, allclose
 
@@ -331,6 +332,72 @@ class Test_Source_model(unittest.TestCase):
             self.assert_(allclose(array(sm.atten_model_weights),
                                   atten_model_weights), msg)
             self.assert_(sm.atten_models == atten_models, msg)
+
+    def test_Source(self):
+        def dump_eg(eg):
+            """Helper function to dump info from EG object."""
+
+            for attr in dir(eg):
+                if attr[0] != '_': # and attr != 'name_type_map':
+                    val = eval('eg.%s' % attr)
+                    if isinstance(val, dict):
+                        print('    %s=%s' % (attr, str(val)))
+                    elif isinstance(val, types.MethodType):
+                        pass
+                    else:
+                        print('    %s=%s (%s)' % (attr, str(val), type(val)))
+
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            '  <event_group event_type = "background">'
+                            '    <GMPE fault_type = "normal">'
+                            '      <branch model = "Toro_1997_midcontinent" 	weight = "0.3"/> '
+                            '      <branch model = "Atkinson_Boore_97" weight = "0.4"/> '
+                            '      <branch model = "Sadigh_97" weight = "0.3"/> '
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '  </event_group>'
+                            '  '
+                            '  <event_group event_type = "crustal fault">'
+                            '    <GMPE fault_type = "reverse">'
+                            '      <branch model = "Campbell08" weight = "0.8"/> '
+                            '      <branch model = "Boore08" weight = "0.2"/>'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "reverse" />'
+                            '  </event_group>'
+                            '  '
+                            '  <event_group event_type = "interface">'
+                            '    <GMPE fault_type = "reverse">'
+                            '      <branch model = "Zhao06_crustalinterface" weight = "0.5"/> '
+                            '      <branch model = "Atkinson03_interface" weight = "0.5"/> '
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "reverse" />'
+                            '  </event_group>'
+                            '  '
+                            '  <event_group event_type = "intraslab">'
+                            '    <GMPE fault_type = "reverse">'
+                            '      <branch model = "Zhao06_slab" weight = "0.5"/> '
+                            '      <branch model = "Atkinson03_inslab" weight = "0.5"/> '
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '  </event_group>	'
+                            '</event_type_controlfile>'])
+
+        handle.write(sample)
+        handle.close()
+
+        eg_list = event_control_from_xml(file_name)
+
+#        # dump the EG objects
+#        for eg in eg_list:
+#            print('-'*50)
+#            print('%s:' % eg.event_type)
+#            dump_eg(eg)
+
             
         
 ################################################################################

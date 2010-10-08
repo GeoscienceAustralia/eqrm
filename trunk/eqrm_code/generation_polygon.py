@@ -349,8 +349,7 @@ def polygons_from_xml(filename, prob_min_mag_cutoff=None):
     return generation_polygons, magnitude_type
 
 
-def xml_fault_generators(filename, azi=None, dazi=None, fault_dip=None,
-                         fault_width=None, prob_min_mag_cutoff=None):
+def xml_fault_generators(filename, prob_min_mag_cutoff=None):
     """Read new-style XML.
 
     filename  is the path to the XML file to read
