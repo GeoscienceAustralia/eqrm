@@ -8,7 +8,7 @@ from scipy import array, allclose
 
 from source_model import *
 from source_model import Source_Zone_Polygon
-from eqrm_code.event_set import Event_Set, Event_Activity
+from eqrm_code.event_set import Event_Set, Obsolete_Event_Activity
 from eqrm_code.util import reset_seed, determine_eqrm_path
 
 
@@ -281,7 +281,7 @@ class Test_Source_model(unittest.TestCase):
             source_model,
             prob_number_of_events_in_zones)
         
-        event_activity = Event_Activity(len(events))
+        event_activity = Obsolete_Event_Activity(len(events))
         new_event_set = source_model.calculate_recurrence(
             events,
             prob_number_of_mag_sample_bins,

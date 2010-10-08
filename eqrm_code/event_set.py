@@ -877,6 +877,60 @@ class Pseudo_Event_Set(Event_Set):
 class Event_Activity(object):
     """
     Class to manipulate the event activity value.
+    Handles the logic of splitting based on spawning.
+    
+    The event activity is NOT split based on the attenuation models.
+    Use the weights in the list of sources to handle this.
+
+
+    The dimensions of the event_activity are;
+      (num_events, num_spawns)
+    """
+    def __init__(self, num_events):
+        """
+        num_events is number of events
+        """
+        self.event_activity = zeros((num_events, 1),
+                                    dtype=EVENT_FLOAT)
+        self.num_events = num_events
+        
+
+    def set_scenario_event_activity(self):
+        event_indexes = arange(self.num_events)
+        self.set_event_activity(ones((self.num_events)), event_indexes)
+
+        
+    def set_event_activity(self, event_activities, event_indexes=None):
+        """
+        event_indexes - the indexes of the events relating to the
+          event activities
+        """
+        if event_indexes == None:
+            event_indexes = arange(self.num_events)
+        assert len(event_indexes) == len(event_activities)
+        self.event_activity[event_indexes, 0] = event_activities
+
+    def spawn(weights):
+        """
+        Spawn the event activity.
+        
+        weights is a ??D array that sums to one.
+
+        Has to handle that the GM is interated over and that the
+        weights are different for each event.
+        
+        Make len(weight) copies, in the 3rd dimension, of the current
+        event activity, applying the weights.
+
+        This value is set as the new event activity.
+        
+        """
+        pass
+
+    
+class Obsolete_Event_Activity(object):
+    """
+    Class to manipulate the event activity value.
     Handles a lot of the logic splitting in EQRM.
     It assumes the logic splitting is done in a certain order.
     First the event activities are added, then they are logically
@@ -932,7 +986,7 @@ class Event_Activity(object):
         This must be called before any other splitting.
         This must only be called once.
 
-        source_model is a collection of Source_Zone_Polygon's.
+        Source_model is a collection of Source's.
         """
         
         unsplit_event_activity = copy.copy(self.event_activity[:,0,0])

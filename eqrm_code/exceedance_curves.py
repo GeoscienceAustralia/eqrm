@@ -14,7 +14,7 @@ from numpy import NaN
 import scipy
 from scipy import allclose, isfinite, array, newaxis, zeros, ndarray, \
      asarray, where, concatenate, allclose, reshape
-    
+
 def do_collapse_logic_tree(data, event_num, weights,
                            THE_PARAM_T, use_C=True):
     """
