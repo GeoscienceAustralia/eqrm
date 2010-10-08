@@ -334,12 +334,12 @@ class Test_Source_model(unittest.TestCase):
             self.assert_(sm.atten_models == atten_models, msg)
 
     def test_Source(self):
-        def dump_eg(eg):
+        def dump_etc(etc):
             """Helper function to dump info from EG object."""
 
-            for attr in dir(eg):
+            for attr in dir(etc):
                 if attr[0] != '_': # and attr != 'name_type_map':
-                    val = eval('eg.%s' % attr)
+                    val = eval('etc.%s' % attr)
                     if isinstance(val, dict):
                         print('    %s=%s' % (attr, str(val)))
                     elif isinstance(val, types.MethodType):
@@ -387,13 +387,28 @@ class Test_Source_model(unittest.TestCase):
         handle.write(sample)
         handle.close()
 
-        eg_list = event_control_from_xml(file_name)
+        etc_list = event_control_from_xml(file_name)
 
 #        # dump the EG objects
-#        for eg in eg_list:
+#        for etc in etc_list:
 #            print('-'*50)
-#            print('%s:' % eg.event_type)
-#            dump_eg(eg)
+#            print('%s:' % etc.event_type)
+#            dump_etc(etc)
+
+        for etc in etc_list:
+            if etc.event_type == 'crustal fault':
+                break
+        else:
+            msg = "Couldn't find 'crustal fault' <event_group>!?"
+            self.fail(msg)
+        self.failUnlessEqual(etc.fault_type, 'reverse')
+        expected = ['Campbell08', 'Boore08']
+        self.failUnlessEqual(etc.branch_models, expected)
+        expected = [0.80000000000000004, 0.20000000000000001]
+        self.failUnlessEqual(etc.branch_weights, expected)
+        expected = {'scaling_rule': 'WellsCoppersmith94',
+                    'scaling_event_type': 'reverse'}
+        self.failUnlessEqual(etc.scaling_dict,  expected)
 
     def test_Source2(self):
         """Test various expected exceptions for XML errors."""

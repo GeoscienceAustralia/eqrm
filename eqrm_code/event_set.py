@@ -27,7 +27,9 @@ from eqrm_code.projections import projections
 from eqrm_code.generation_polygon import polygons_from_xml
 from eqrm_code.projections import azimuthal_orthographic_ll_to_xy as ll_to_xy
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
+from eqrm_code.generation_polygon import xml_fault_generators
 from eqrm_code.ANUGA_utilities import log as eqrmlog
+from eqrm_code.source_model import create_fault_sources
 
 
 # This specifies the dtypes used in  event set.
@@ -697,59 +699,18 @@ def _calc_attenuation_logic_split(GM_models, model_weights,
 
 def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                     prob_min_mag_cutoff):
-    """Randomly generate the event_set parameters.
+    """Create Source objects from XML files for faults and events.
 
-    Note: The rupture centroid are within the polygons.  The trace
-    start and end can be outside of the polygon.  The trace is on
-    the surface, the centroid is underground.
-    
-    Args: 
-      fault_xml_file: The full path name of the fault xml file
-      fault_width: Maximum width along virtual fault, km
-      azi: Predominant azimuth of events, degrees *
-      dazi: Azimuth range of events (azi +/- dazi) *
-      fault_dip: dip of virtual faults, degrees * 
-      * = can be a single value or a vector with differnet elements
-          for each source zone          
-      prob_min_mag_cutoff: Mimimum magnitude below which hazard is not
-        considered
-      override_xml: Boolean means the above arguments override the
-        arguments in the xml file.  Analysis uses True
-      prob_number_of_events_in_zones: Vector whose elements represent
-        the number of events for each generation.  Can be None.
-      
-    Returns: An event_set instance.
-    
-    Creates generation_polygons (from
-    eqrm_code.generation_polygon.py) out of filename, then
-    generate events in those polygons.
-    
-    prob_number_of_events_in_zones is a sequence of
-    length number_of_polygons -
-    polygon[i] will generate events_in_polygon[i]
-    
-    See populate, and populate_distribution from
-    eqrm_code.generation_polygon.py:
-
-
-    Notes:
-    file (from filename) contains xml "generation polygons" example:
-    <Source_Model magnitude_type="Mw">
-    <polygon area="100">
-    <boundary>-20 126.0 -21 126.5 -22 126.0 -20 126.0</boundary>
-    <recurrence distribution="uniform" min_magnitude="5"
-    max_magnitude="8"/> 
-    </polygon>
-    </Source_Model>
-    
-    Boundary is in lat,long pairs. First node is repeated.
+    fault_xml_file       path to the fault source generator (FSG) XML file
+    event_control_file   path to event type control XML (ETC) file
+    prob_min_mag_cutoff  mimimum magnitude below which hazard is not considered
     """      
 
     log.info('generating events')
     
     (fsg_list, magnitude_type) = xml_fault_generators(fault_xml_file, 
                                                       prob_min_mag_cutoff)
-    source_list = create_fault_sources(event_control_file, generation_polygons)
+    return create_fault_sources(event_control_file, fsg_list)
 
     
 class Pseudo_Event_Set(Event_Set):

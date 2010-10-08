@@ -5,6 +5,7 @@ from random import uniform,seed
 from time import time
 import unittest
 from os import sep
+import types
 import tempfile
 
 from scipy import array, allclose, asarray, arange, sum
@@ -758,6 +759,122 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(ea.event_activity[0,0], 0))
         self.assert_(allclose(ea.event_activity[1,0], 10))
         self.assert_(allclose(ea.event_activity[2,0], 20))
+
+    def test_generate_synthetic_events_fault(self):
+        def dump_src(etc):
+            """Helper function to dump info from SRC object."""
+
+            for attr in dir(src):
+                if attr[0] != '_': # and attr != 'name_type_map':
+                    val = eval('src.%s' % attr)
+                    if isinstance(val, dict):
+                        print('    %s=%s' % (attr, str(val)))
+                    elif isinstance(val, types.MethodType):
+                        pass
+                    else:
+                        print('    %s=%s (%s)' % (attr, str(val), type(val)))
+
+        # create a test FSG file
+        (handle, fault_xml_file) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(fault_xml_file,'w')
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<source_model_fault magnitude_type="Mw">',
+                            '  <fault name="big fault" event_type="crustal fault">',
+                            '    <geometry dip="30" out_of_dip_theta="0"',
+                            '              delta_theta="0"',
+                            '              depth_top_seismogenic="0"',
+                            '              depth_bottom_seismogenic="15"',
+                            '              slab_width="0">',
+                            '      <trace>',
+                            '        <start lat="-17.5" lon="110.0" />',
+                            '        <end lat="-17.0" lon="110.0" />',
+                            '      </trace>',
+                            '    </geometry>',
+                            '    <recurrence_model distribution="bounded_gutenberg_richter"',
+                            '                      recurrence_min_mag="4.0"',
+                            '                      recurrence_max_mag="7.0"',
+                            '                      slip_rate="2.0" b="1">',
+                            '      <event_generation generation_min_mag="4.0"',
+                            '                        number_of_mag_sample_bins="15"',
+                            '                        number_of_events="1500" />',
+                            '    </recurrence_model>',
+                            '  </fault>',
+                            '  <fault name="small fault" event_type="intraslab">',
+                            '    <geometry dip="90" out_of_dip_theta="10"',
+                            '              delta_theta="5"',
+                            '              depth_top_seismogenic="10"',
+                            '              depth_bottom_seismogenic="50"',
+                            '              slab_width="10">',
+                            '      <trace>',
+                            '        <start lat="-17.0" lon="120.0" />',
+                            '        <end lat="-17.0" lon="120.5" />',
+                            '      </trace>',
+                            '    </geometry>',
+                            '    <recurrence_model distribution="characteristic"',
+                            '                      recurrence_min_mag="4.5"',
+                            '                      recurrence_max_mag="7.5"',
+                            '                      slip_rate="3.0" b="2">',
+                            '      <event_generation generation_min_mag="4.0"',
+                            '                        number_of_mag_sample_bins="15"',
+                            '                        number_of_events="1500" />',
+                            '    </recurrence_model>',
+                            '  </fault>',
+                            '</source_model_fault>'])
+        handle.write(sample)
+        handle.close()
+
+        # create a test ETC file
+        (handle, event_control_file) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(event_control_file, 'w')
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            '  <event_group event_type = "background">'
+                            '    <GMPE fault_type = "normal">'
+                            '      <branch model = "Toro_1997_midcontinent" weight = "0.3"/>'
+                            '      <branch model = "Atkinson_Boore_97" weight = "0.4"/>'
+                            '      <branch model = "Sadigh_97" weight = "0.3"/>'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '  </event_group>'
+                            '  <event_group event_type = "crustal fault">'
+                            '    <GMPE fault_type = "reverse">'
+                            '      <branch model = "Campbell08" weight = "0.8"/>'
+                            '      <branch model = "Boore08" weight = "0.2"/>'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "reverse" />'
+                            '  </event_group>'
+                            '  <event_group event_type = "interface">'
+                            '    <GMPE fault_type = "reverse">'
+                            '      <branch model = "Zhao06_crustalinterface" weight = "0.5"/>'
+                            '      <branch model = "Atkinson03_interface" weight = "0.5"/>'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "reverse" />'
+                            '  </event_group>'
+                            '  <event_group event_type = "intraslab">'
+                            '    <GMPE fault_type = "reverse">'
+                            '      <branch model = "Zhao06_slab" weight = "0.5"/>'
+                            '      <branch model = "Atkinson03_inslab" weight = "0.5"/>'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '  </event_group>'
+                            '</event_type_controlfile>'])
+        handle.write(sample)
+        handle.close()
+
+        prob_min_mag_cutoff = 4.0
+
+        src_list = generate_synthetic_events_fault(fault_xml_file,
+                                                   event_control_file,
+                                                   prob_min_mag_cutoff)
+
+#        # dump the SRC objects
+#        for src in src_list:
+#            print('-'*50)
+#            print('%s:' % src.event_type)
+#            dump_src(src)
+
         
 #-------------------------------------------------------------
 if __name__ == "__main__":
