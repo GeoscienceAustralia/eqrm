@@ -13,7 +13,7 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import exp, log, where, isfinite, reshape
+from scipy import exp, log, where, isfinite, reshape, array, r_
 from scipy.stats import norm
 
 # FIXME: REMOVE THIS CLASS  THIS CLASS IS OBSOLETE.  DO NOT USE#
@@ -236,3 +236,35 @@ class Distribution_Log_Normal(object):
     corrected_mean = property(get_corrected_mean)    
     median = property(get_median)    
     mode = property(get_mode)
+
+def normalised_pdf(sigma_delta, number_of_bins):
+    """
+    
+    Parameters
+      sigma_delta: Bound the bin centroids within -sigma_delta to sigma_delta.
+        There will always be a centroid on the -sigma_delta and sigma_delta,
+        unless number_of_bins = 1.
+      number_of_bins: the number of centroids that will sample the pdf.
+
+    Return
+      An array of weights, sampled from the pdf, at the centroid values.
+        These values are then normalised, so the list sums to 1.0.
+        len(weights) == len(number_of_bins)
+    """
+    assert(number_of_bins >= 1)
+    if number_of_bins == 1:        
+        weights = array([1.])
+        centroids = array([0.])
+    else:
+        centroids = r_[-sigma_delta: sigma_delta: number_of_bins*1j]
+        unnormed_weights = norm.pdf(centroids)
+        weights = unnormed_weights/sum(unnormed_weights)
+
+    return weights, centroids
+    
+    
+
+    
+    
+
+    
