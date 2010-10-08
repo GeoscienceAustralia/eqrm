@@ -355,36 +355,33 @@ class Test_Source_model(unittest.TestCase):
                             '<event_type_controlfile>'
                             '  <event_group event_type = "background">'
                             '    <GMPE fault_type = "normal">'
-                            '      <branch model = "Toro_1997_midcontinent" 	weight = "0.3"/> '
-                            '      <branch model = "Atkinson_Boore_97" weight = "0.4"/> '
-                            '      <branch model = "Sadigh_97" weight = "0.3"/> '
+                            '      <branch model = "Toro_1997_midcontinent" weight = "0.3"/>'
+                            '      <branch model = "Atkinson_Boore_97" weight = "0.4"/>'
+                            '      <branch model = "Sadigh_97" weight = "0.3"/>'
                             '    </GMPE>'
                             '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
                             '  </event_group>'
-                            '  '
                             '  <event_group event_type = "crustal fault">'
                             '    <GMPE fault_type = "reverse">'
-                            '      <branch model = "Campbell08" weight = "0.8"/> '
+                            '      <branch model = "Campbell08" weight = "0.8"/>'
                             '      <branch model = "Boore08" weight = "0.2"/>'
                             '    </GMPE>'
                             '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "reverse" />'
                             '  </event_group>'
-                            '  '
                             '  <event_group event_type = "interface">'
                             '    <GMPE fault_type = "reverse">'
-                            '      <branch model = "Zhao06_crustalinterface" weight = "0.5"/> '
-                            '      <branch model = "Atkinson03_interface" weight = "0.5"/> '
+                            '      <branch model = "Zhao06_crustalinterface" weight = "0.5"/>'
+                            '      <branch model = "Atkinson03_interface" weight = "0.5"/>'
                             '    </GMPE>'
                             '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "reverse" />'
                             '  </event_group>'
-                            '  '
                             '  <event_group event_type = "intraslab">'
                             '    <GMPE fault_type = "reverse">'
-                            '      <branch model = "Zhao06_slab" weight = "0.5"/> '
-                            '      <branch model = "Atkinson03_inslab" weight = "0.5"/> '
+                            '      <branch model = "Zhao06_slab" weight = "0.5"/>'
+                            '      <branch model = "Atkinson03_inslab" weight = "0.5"/>'
                             '    </GMPE>'
                             '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
-                            '  </event_group>	'
+                            '  </event_group>'
                             '</event_type_controlfile>'])
 
         handle.write(sample)
@@ -398,8 +395,136 @@ class Test_Source_model(unittest.TestCase):
 #            print('%s:' % eg.event_type)
 #            dump_eg(eg)
 
-            
-        
+    def test_Source2(self):
+        """Test various expected exceptions for XML errors."""
+
+        # is badly-formed XML caught?
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            '</event_type_controlfileX>'])
+
+        handle.write(sample)
+        handle.close()
+
+        self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        # missing <event_type_controlfile> tag
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfileX>'
+                            '</event_type_controlfileX>'])
+
+        handle.write(sample)
+        handle.close()
+
+        self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        # missing <event_group> tag
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            '  <event_groupX event_type = "background">'
+                            '  </event_groupX>'
+                            '</event_type_controlfile>'])
+
+        handle.write(sample)
+        handle.close()
+
+        self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        # 0 occurrences of <GMPE> tag
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            '  <event_group event_type = "background">'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '  </event_group>'
+                            '</event_type_controlfile>'])
+
+        handle.write(sample)
+        handle.close()
+
+        self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        # >1 occurrence of <GMPE> tag
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            '  <event_group event_type = "background">'
+                            '    <GMPE fault_type = "reverse">'
+                            '      <branch model = "Zhao06_slab" weight = "0.5"/>'
+                            '      <branch model = "Atkinson03_inslab" weight = "0.5"/>'
+                            '    </GMPE>'
+                            '    <GMPE fault_type = "reverse">'
+                            '      <branch model = "Zhao06_slab" weight = "0.5"/>'
+                            '      <branch model = "Atkinson03_inslab" weight = "0.5"/>'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '  </event_group>'
+                            '</event_type_controlfile>'])
+
+        handle.write(sample)
+        handle.close()
+
+        self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        # 0 occurrence of <branch> tag
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            '  <event_group event_type = "background">'
+                            '    <GMPE fault_type = "reverse">'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '  </event_group>'
+                            '</event_type_controlfile>'])
+
+        handle.write(sample)
+        handle.close()
+
+        self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        # sum of <branch weight> attributes != 1.0
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            '  <event_group event_type = "background">'
+                            '    <GMPE fault_type = "reverse">'
+                            '      <branch model = "Zhao06_slab" weight = "0.6"/>'
+                            '      <branch model = "Atkinson03_inslab" weight = "0.5"/>'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '  </event_group>'
+                            '</event_type_controlfile>'])
+
+        handle.write(sample)
+        handle.close()
+
+        self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+
 ################################################################################
 
 if __name__ == "__main__":
