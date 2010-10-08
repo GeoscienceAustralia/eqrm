@@ -145,7 +145,7 @@ class Source(object):
     """
 
     def __init__(self, min_magnitude, max_magnitude, prob_min_mag_cutoff,
-                 A_min, b, number_of_mag_sample_bins,
+                 A_min, b, number_of_mag_sample_bins, event_type,
                  recurrence_model_distribution='bounded_gutenberg_richter'):
         """
         min_magnitude,max_magnitude,
@@ -163,6 +163,7 @@ class Source(object):
         self.A_min = A_min
         self.b = b
         self.number_of_mag_sample_bins = number_of_mag_sample_bins
+        self.event_type = event_type
         self.recurrence_model_distribution = recurrence_model_distribution
 
         # indexes to the event sets in this source zone
@@ -287,9 +288,13 @@ def event_control_from_xml(filename):
                        % (filename, event_type, sum(self.branch_weights)))
                 raise Exception(msg)
 
-            self.scaling_rule = scaling_dict['scaling_rule']
-            self.scaling_event_type = scaling_dict.get('scaling_event_type',
-                                                       'unspecified')
+            try:
+                _ = scaling_dict['scaling_rule']
+            except KeyError:
+                msg = ("XML file %s: missing 'scaling_rule' attribute in event group '%s'"
+                       % (filename, event_type))
+                raise Exception(msg)
+            self.scaling_dict = scaling_dict
 
     # get XML doc and top-level tag object 
     try:
@@ -338,7 +343,7 @@ def event_control_from_xml(filename):
             branch_dict = b.attributes
             branch_list.append(branch_dict)
 
-        # get <scaling> attributes
+        # get <scaling> dictionary
         scaling = eg['scaling']
         if len(scaling) != 1:
             msg = ("Badly formed XML in file %s: Expected exactly one "
@@ -356,14 +361,49 @@ def event_control_from_xml(filename):
     return eg_list
 
 def create_fault_sources(event_control_file, fsg_list):
-    """Takes an FSG list and an event controfile and creates a list
+    """Takes an FSG list and an event contro file and creates a list
     of Source objects.
 
     event_control_file  path to an <event_type_controlfile> XML file
     fsg_list            list of Fault_Source_Generator objects
 
-    
+    Returns a list of Source objects containing attributes from each
+    FSG object and attributes from the appropriate event in the
+    event_control_file.
     """
+
+    # get list of ETC objects from XML file
+    etc_list = event_control_from_xml(event_control_file)
+
+    # for each FSG object, create a Source object from FSG and ETC attributes
+    source_list = []
+    for fsg in fsg_list:
+        # create a Source object with some FSG attributes
+        min_magnitude = fsg.magnitude_dist['minimum']
+        max_magnitude = fsg.magnitude_dist['maximum']
+        prob_min_mag_cutoff = fsg.magnitude_dist['minimum']
+        source = Source(min_magnitude, max_magnitude,
+                        prob_min_mag_cutoff, fsg.A_min, fsg.b,
+                        fsg.number_of_mag_sample_bins, fsg.event_type,
+                        recurrence_model_distribution=fsg.distribution)
+
+        # find event in ETC list matching FSG event_type
+        for etc in etc_list:
+            if etc.event_type == fsg.event_type:
+                break
+        else:
+            msg = ("Didn't find event_type '%s' in XML file '%s'"
+                   % (fsg.event_type, event_control_file))
+            raise Exception(msg)
+
+        # attach appropriate ETC attributes to Source object
+        source.fault_type = etc.fault_type
+        source.atten_models = etc.branch_models
+        source.atten_model_weights = etc.branch_weights
+        source.scaling = etc.scaling_dict
+
+        # add new source to result list
+        source_list.append(source)
 
     return source_list
 
