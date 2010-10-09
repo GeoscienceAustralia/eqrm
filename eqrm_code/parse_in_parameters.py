@@ -691,11 +691,11 @@ def verify_THE_PARAM_T(THE_PARAM_T):
                 "When using BA09 attenuation model" +
                 " do not use amplification.")
                 
-    if THE_PARAM_T.save_motion == True and THE_PARAM_T.is_scenario == True \
-            and THE_PARAM_T.scenario_number_of_events > 1:
-      raise ParameterSyntaxError(
-      'Cannot save motion for a scenario' + 
-                       ' with more than one event.')
+#     if THE_PARAM_T.save_motion == True and THE_PARAM_T.is_scenario == True \
+#             and THE_PARAM_T.scenario_number_of_events > 1:
+#       raise ParameterSyntaxError(
+#       'Cannot save motion for a scenario' + 
+#                        ' with more than one event.')
     
     if THE_PARAM_T.save_hazard_map == True and THE_PARAM_T.is_scenario == True:
       raise ParameterSyntaxError(
@@ -709,7 +709,13 @@ def verify_THE_PARAM_T(THE_PARAM_T):
            THE_PARAM_T.run_type == 'risk':
       raise ParameterSyntaxError(
       'Cannot use spawning when doing a risk simulation.')
-    
+
+    # need to change some array sizes, e.g. bedrock_SA_all
+#     if THE_PARAM_T.save_motion == True and \
+#            THE_PARAM_T.amp_variability_method == 1:
+#       raise ParameterSyntaxError(
+#       'Cannot save the RSA values and spawn.')
+
   
     # FIXME This needs to be done, and be updated.
     #assert not ((THE_PARAM_T.save_ecloss_flag)>0 and (THE_PARAM_T.run_type<2))
