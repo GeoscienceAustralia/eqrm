@@ -183,7 +183,11 @@ class Distribution_Log_Normal(object):
         """
         FIXME needs comments
         """
-        if True:
+        if self.var_method == 1 :
+            # spawn
+            # The 
+            pass
+        else:
             if self.var_method == None:
                 sample_values = exp(self.log_mean)           
             elif self.var_method == 2:
@@ -204,8 +208,10 @@ class Distribution_Log_Normal(object):
             #elif self.var_method == 7:
                 # corrected mean
              #   sample_values = self.corrected_mean
-        spawn_weights = None
-        return spawn_weights, sample_values, None
+            new_shape = [1] + list(sample_values.shape)
+            # This adds the spawning dimension
+            sample_values.reshape(new_shape) 
+        return None, sample_values, None
     
 
     def _monte_carlo(self, variate_site=None):
@@ -232,6 +238,9 @@ class Distribution_Log_Normal(object):
         ground_motion=exp(self.log_mean-(self.log_sigma**2))
         return ground_motion
 
+    def get_spawn_weights(self,):
+        pass
+    
     # Who uses these?
     corrected_mean = property(get_corrected_mean)    
     median = property(get_median)    

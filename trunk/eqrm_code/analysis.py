@@ -65,9 +65,6 @@ BridgeDataColumns = {'BID': int,
                      'SITE_CLASS': str}
 
 
-NUM_SITES_PER_SITE_LOOP = 1
-
-
 def main(parameter_handle,
          use_determ_seed=True,
          compress_output=False,
@@ -174,7 +171,7 @@ def main(parameter_handle,
         # Rupture area, length, and width are calculated from Mw
         # using Wells and Coppersmith 94 (modified so rupture
         # width is less than fault_width).
-        num_spawning_bins = 1
+        num_spawning = 1
         event_activity = Event_Activity(len(event_set))
         event_activity.set_scenario_event_activity()
         event_set.scenario_setup()
@@ -210,7 +207,7 @@ def main(parameter_handle,
         log.debug('Memory: event_set created')
         log.resource_usage()
         # event activity is calculated here and the event_set are subsampled.
-        num_spawning_bins = 1
+        num_spawning = 1
         event_activity = Event_Activity(len(event_set))
         source_mods.calculate_recurrence(
             event_set,
@@ -248,8 +245,10 @@ def main(parameter_handle,
         THE_PARAM_T.atten_model_weights)
 
     num_psudo_events = len(THE_PARAM_T.atten_models) * len(event_set) * \
-                       num_spawning_bins
+                       num_spawning
     num_events = len(event_set)
+    num_spawning = num_spawning
+    
     msg = ('Pseudo event set created. Number of pseudo_events=' +
            str(num_psudo_events))
     log.debug(msg)
@@ -328,10 +327,9 @@ def main(parameter_handle,
     else:
         soil_hazard = None     
     log.debug('Memory: hazard_map array created')
-    log.resource_usage()  
-
+    log.resource_usage() 
     if THE_PARAM_T.save_motion is True:
-        bedrock_SA_all = zeros((array_size, NUM_SITES_PER_SITE_LOOP,
+        bedrock_SA_all = zeros((array_size, num_events * num_spawning,
                                 len(THE_PARAM_T.atten_periods)),
                                dtype=float)        
     else:
@@ -339,7 +337,7 @@ def main(parameter_handle,
         
     if THE_PARAM_T.use_amplification is True and \
            THE_PARAM_T.use_amplification is True:
-        soil_SA_all = zeros((array_size, NUM_SITES_PER_SITE_LOOP,
+        soil_SA_all = zeros((array_size, num_events * num_spawning,
                              len(THE_PARAM_T.atten_periods)),
                             dtype=float)
     else:
@@ -526,7 +524,8 @@ def main(parameter_handle,
     # Save Ground Motion
     if THE_PARAM_T.save_motion is True and parallel.lo != parallel.hi:
         file = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
-                          sites=all_sites, compress=THE_PARAM_T.compress_output,
+                          sites=all_sites,
+                          compress=THE_PARAM_T.compress_output,
                           parallel_tag=parallel.file_tag,
                           write_title=(parallel.rank == False))
         row_files_that_parallel_splits.append(file)
@@ -769,7 +768,7 @@ def calc_and_save_SA(THE_PARAM_T,
 
             # PGA cutoff
             assert isfinite(soil_SA).all()
-            soil_SA = cutoff_pga_4d(soil_SA,
+            soil_SA = cutoff_pga(soil_SA,
                                     THE_PARAM_T.atten_pga_scaling_cutoff)
             
             # qa on ampfactors
@@ -782,7 +781,7 @@ def calc_and_save_SA(THE_PARAM_T,
             #    print 'No soil amplification'
             #    print
             soil_SA = None
-        bedrock_SA = cutoff_pga_4d(bedrock_SA,
+        bedrock_SA = cutoff_pga(bedrock_SA,
                                    THE_PARAM_T.atten_pga_scaling_cutoff)
         
         bedrock_SA, soil_SA = apply_threshold_distance(
@@ -791,19 +790,16 @@ def calc_and_save_SA(THE_PARAM_T,
             THE_PARAM_T.use_amplification, event_set,
             bedrock_SA, soil_SA)
         
-        # collapse logic tree as desired (bedrock and soil RSA)
+        # collapse  multiple attenuation models 
         if (THE_PARAM_T.save_motion is True or
-            THE_PARAM_T.save_hazard_map is True):
-            
+            THE_PARAM_T.save_hazard_map is True):           
             (collapsed_bedrock_SA, _, _) = do_collapse_logic_tree(
                 bedrock_SA,
                 [1],
                 THE_PARAM_T.atten_model_weights,
                 THE_PARAM_T)
             
-            if soil_SA is not None:
-                # Collapse multiple attenuation models
-                
+            if soil_SA is not None:               
                 (collapsed_soil_SA, _, _) = do_collapse_logic_tree(
                     soil_SA, [1],
                     THE_PARAM_T.atten_model_weights,
@@ -815,7 +811,6 @@ def calc_and_save_SA(THE_PARAM_T,
         if THE_PARAM_T.save_motion is True:
             # Put into arrays
             #print bedrock_SA_all.shape,collapsed_bedrock_SA.shape,i
-            #print "collapsed_bedrock_SA[0,:,:].shape", collapsed_bedrock_SA[0,:,:].shape
 
             bedrock_SA_all[rel_site_index] = collapsed_bedrock_SA[0,:,:]
             if soil_SA is not None:
@@ -826,18 +821,28 @@ def calc_and_save_SA(THE_PARAM_T,
             event_act_d_events = event_activity.event_activity.reshape(-1)
             assert collapsed_bedrock_SA.shape[0] == 1 # only one site
             for j in range(len(THE_PARAM_T.atten_periods)):
-                # get these two arrays to be vectors
-                # The spawning dimension is flattened into the events dimension
-                bedrock_SA_d_events = collapsed_bedrock_SA[:,:,j].reshape(1,-1)
+                # Get these two arrays to be vectors.
+                # The sites and spawning dimensions are flattened
+                # into the events dimension.
+                if collapsed_bedrock_SA.ndim == 3:
+                    bedrock_SA_events = collapsed_bedrock_SA[:,:,j].reshape(
+                        1,-1)
+                else: # assuming 4 dimensions
+                    bedrock_SA_events = collapsed_bedrock_SA[:,:,:,j].reshape(
+                        1,-1)
                 
                 bedrock_hazard[site_index,j] = \
-                        hzd_do_value(bedrock_SA_d_events,
+                        hzd_do_value(bedrock_SA_events,
                                      event_act_d_events,
                                      1.0/array(THE_PARAM_T.return_periods))
                 if soil_SA is not None:
-                    soil_SA_d_events = collapsed_soil_SA[:,:,j].reshape((-1))
+                    if collapsed_bedrock_SA.ndim == 3:
+                        soil_SA_events = collapsed_soil_SA[:,:,j].reshape((-1))
+                    else: # assuming 4 dimensions
+                        soil_SA_events = collapsed_soil_SA[:,:,:,j].reshape(
+                            (-1))
                     soil_hazard[site_index,j] = \
-                        hzd_do_value(soil_SA_d_events,
+                        hzd_do_value(soil_SA_events,
                                      event_act_d_events,
                                      1.0/array(THE_PARAM_T.return_periods))
                     
@@ -845,17 +850,29 @@ def calc_and_save_SA(THE_PARAM_T,
         # Build the SA, soil, if we did it.  If not, Bedrock.
 
         # Change dimensions.  Put the ground motion model dimension
-        # into the event dimension for the risk calculations
-        num_gmm = bedrock_SA.shape[0]
-        num_sites = bedrock_SA.shape[1]
-        num_events = bedrock_SA.shape[2]
-        num_periods = bedrock_SA.shape[3]
+        # and spawning dimension into the event dimension
+        # for the risk calculations
+        # Assume the SA's have
+        # 3 or more dimensions; with ground motion model being the
+        # third last dimension e.g.
+        # (ground motion model, site, events, periods)
+        # (spawn, ground motion model, site, events, periods)
+        last_4_dims = bedrock_SA.shape[-4:]
+        num_gmm = last_4_dims[0]
+        num_sites = last_4_dims[1]
+        num_events = last_4_dims[2]
+        num_periods = last_4_dims[3]
+        if bedrock_SA.ndim == 4:
+            event_overloaded = num_events * num_gmm
+        else:  # assume 5 dimensions
+            num_spawn = bedrock_SA.shape[0]
+            event_overloaded = num_events * num_gmm * num_spawn
         if soil_SA is not None:
             soil_SA = reshape(soil_SA, (num_sites,
-                                        num_events*num_gmm,
+                                        event_overloaded,
                                         num_periods))  
         bedrock_SA = reshape(bedrock_SA, (num_sites,
-                                          num_events*num_gmm,
+                                          event_overloaded,
                                           num_periods ))  
         
         return soil_SA, bedrock_SA
@@ -880,19 +897,19 @@ def apply_threshold_distance(sites,
                 distance('Joyner_Boore')
     # distances.shape = (site, event)
     Haznull = where(distances > atten_threshold_distance)
-    if len(bedrock_SA.shape) == 3:
+    if bedrock_SA.ndim == 3:
         if use_amplification is True:
             bedrock_SA[Haznull[0], Haznull[1],:] = 0
             soil_SA[Haznull[0], Haznull[1],:] = 0
         else:
             bedrock_SA[Haznull[0], Haznull[1],:] = 0
-    elif len(bedrock_SA.shape) == 4:
+    elif bedrock_SA.ndim == 4:
         if use_amplification is True:
             bedrock_SA[:,Haznull[0], Haznull[1],:] = 0
             soil_SA[:,Haznull[0], Haznull[1],:] = 0
         else:
             bedrock_SA[:,Haznull[0], Haznull[1],:] = 0
-    elif len(bedrock_SA.shape) == 5:
+    elif bedrock_SA.ndim == 5:
         if use_amplification is True:
             bedrock_SA[:,:,Haznull[0], Haznull[1],:] = 0
             soil_SA[:,:,Haznull[0], Haznull[1],:] = 0
@@ -918,50 +935,21 @@ def amp_rescale(amp_min_factor, amp_max_factor, soil_SA, bedrock_SA):
 def cutoff_pga(ground_motion, max_pga):
     if max_pga is None:
         return ground_motion
-
-    assert isfinite(ground_motion).all()
-
-    too_high = ground_motion[:,:,0:1] > max_pga
-    # Doing ground_motion[:,:,0:1] gets the first values of the last dimension,
+    
+    # Doing ground_motion[:,:,0:1] gets the first values of
+    # the last dimension,
     # but does not drop a dimension in the return value.
     # ground_motion[:,:,0] would drop a dimension.
-    scaling_factor = where(too_high, max_pga/ground_motion[:,:,0:1], 1.0)
-    ground_motion *= scaling_factor
-
     assert isfinite(ground_motion).all()
-
-    return ground_motion
-
-
-def cutoff_pga_4d(ground_motion, max_pga):
-    if max_pga is None:
-        return ground_motion
-
-    assert isfinite(ground_motion).all()
-    too_high = ground_motion[:,:,:,0:1] > max_pga
-    # Doing ground_motion[:,:,0:1] gets the first values of the last dimension,
-    # but does not drop a dimension in the return value.
-    # ground_motion[:,:,0] would drop a dimension.
-    scaling_factor = where(too_high, max_pga/ground_motion[:,:,:,0:1], 1.0)
+    if ground_motion.ndim == 4:
+        too_high = ground_motion[:,:,:,0:1] > max_pga
+        scaling_factor = where(too_high, max_pga/ground_motion[:,:,:,0:1], 1.0)
+    elif ground_motion.ndim == 5:
+        too_high = ground_motion[:,:,:,:,0:1] > max_pga
+        scaling_factor = where(
+            too_high, max_pga/ground_motion[:,:,:,:,0:1], 1.0)
     ground_motion *= scaling_factor
     assert isfinite(ground_motion).all()
-
-    return ground_motion
-
-
-def cutoff_pga_5d(ground_motion, max_pga):
-    if max_pga is None:
-        return ground_motion
-
-    assert isfinite(ground_motion).all()
-    too_high = ground_motion[:,:,:,:,0:1] > max_pga
-    # Doing ground_motion[:,:,0:1] gets the first values of the last dimension,
-    # but does not drop a dimension in the return value.
-    # ground_motion[:,:,0] would drop a dimension.
-    scaling_factor = where(too_high, max_pga/ground_motion[:,:,:,:,0:1], 1.0)
-    ground_motion *= scaling_factor
-    assert isfinite(ground_motion).all()
-
     return ground_motion
 
 

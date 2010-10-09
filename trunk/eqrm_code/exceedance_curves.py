@@ -13,7 +13,7 @@
 from numpy import NaN
 import scipy
 from scipy import allclose, isfinite, array, newaxis, zeros, ndarray, \
-     asarray, where, concatenate, allclose, reshape
+     asarray, where, concatenate, allclose, reshape, ones
 
 def do_collapse_logic_tree(data, event_num, weights,
                            THE_PARAM_T, use_C=True):
@@ -24,7 +24,7 @@ def do_collapse_logic_tree(data, event_num, weights,
     Data is the array to be collapsed (eg ground_motion or loss)
 
     """
-    if len(data.shape) == 4:
+    if len(data.shape) >= 4:
         # Assume the extra dimension is the ground motion model
         new_data = _collapse_att_model_dimension(data,
                                                  weights)
@@ -77,14 +77,21 @@ def _collapse_att_model_dimension(data, weights):
     To collapse it, multiply the data by the weights and sum.
 
     Parameters:
-      data:  3 dimensions; (ground motion model, site, events, periods)
+      data:  3 or more dimensions; with ground motion model being the
+        third last dimension e.g.
+      (ground motion model, site, events, periods)
+      (spawn, ground motion model, site, events, periods)
         Site is 1. What the data is changes. Sometimes its SA, sometimes
         it's cost.
       weights: The weight to apply to each ground motion model 'layer'
     
     """
-    weighted_data = data * reshape(weights, (-1,1,1,1)) 
-    sum = scipy.sum(weighted_data, 0)
+    new_weight_shape = ones((data.ndim))
+    gmm_index_from_end = -4
+    gmm_index_from_start = data.ndim - 4
+    new_weight_shape[gmm_index_from_end] = -1
+    weighted_data = data * reshape(weights, new_weight_shape) 
+    sum = scipy.sum(weighted_data, gmm_index_from_start)
     
     return sum    
 
