@@ -171,7 +171,10 @@ def main(parameter_handle,
         # Rupture area, length, and width are calculated from Mw
         # using Wells and Coppersmith 94 (modified so rupture
         # width is less than fault_width).
-        num_spawning = 1
+        if THE_PARAM_T.atten_spawn_bins is not None:
+            num_spawning = THE_PARAM_T.atten_spawn_bins
+        else:
+            num_spawning = 1
         event_activity = Event_Activity(len(event_set))
         event_activity.set_scenario_event_activity()
         event_set.scenario_setup()
@@ -244,19 +247,19 @@ def main(parameter_handle,
         THE_PARAM_T.atten_models,
         THE_PARAM_T.atten_model_weights)
 
-    num_psudo_events = len(THE_PARAM_T.atten_models) * len(event_set) * \
-                       num_spawning
     num_events = len(event_set)
-    num_spawning = num_spawning
+    num_psudo_events = len(THE_PARAM_T.atten_models) * num_events * \
+                       num_spawning
     
     msg = ('Pseudo event set created. Number of pseudo_events=' +
            str(num_psudo_events))
     log.debug(msg)
     log.debug('Memory: Pseudo Event Set created')
     log.resource_usage()
-
     ground_motion_distribution = Distribution_Log_Normal(
-        THE_PARAM_T.atten_variability_method)
+        THE_PARAM_T.atten_variability_method,
+        THE_PARAM_T.atten_spawn_bins)
+    event_activity.spawn(ground_motion_distribution.spawn_weights)
     
     # Initialise the ground motion object
     # Tasks here include
@@ -726,20 +729,9 @@ def calc_and_save_SA(THE_PARAM_T,
         
         # evaluate the RSA
         # that is desired (i.e. chosen in parameter_handle)
-        ground_motion_distribution.set_log_mean_log_sigma_etc(
-            log_mean_extend_GM, log_sigma_extend_GM)
         (_, bedrock_SA, _) = \
-                        ground_motion_distribution.sample_for_eqrm()
-        # planned *_SA has shape (spawn, GM_model, sites, events, periods)
-        GM_model_axis = 0
-        event_axis = 2
-        periods_axis = 3
-        
-        # currently *_SA has shape (GM_model, sites, events, periods)
-        if True:
-            GM_model_axis = 0
-            event_axis = 2
-            periods_axis = 3
+                        ground_motion_distribution.sample_for_eqrm(
+            log_mean_extend_GM, log_sigma_extend_GM)
         
         soil_SA = None
         #print 'ENDING Calculating attenuation'
@@ -810,16 +802,20 @@ def calc_and_save_SA(THE_PARAM_T,
         # (not for probabilistic hazard or if doing risk/secnario loss)
         if THE_PARAM_T.save_motion is True:
             # Put into arrays
-            #print bedrock_SA_all.shape,collapsed_bedrock_SA.shape,i
-
-            bedrock_SA_all[rel_site_index] = collapsed_bedrock_SA[0,:,:]
+            # combining the site and spawning dimensions
+            assert collapsed_bedrock_SA.shape[1] == 1 # only one site
+            coll_fold_bedrock_SA = collapsed_bedrock_SA.reshape(
+                (-1, len(THE_PARAM_T.atten_periods)))
+            bedrock_SA_all[rel_site_index] = coll_fold_bedrock_SA
             if soil_SA is not None:
-                soil_SA_all[rel_site_index] = collapsed_soil_SA[0,:,:]
+                coll_fold_soil_SA = collapsed_soil_SA.reshape(
+                    (-1, len(THE_PARAM_T.atten_periods)))
+                soil_SA_all[rel_site_index] = coll_fold_soil_SA
 
         # Compute hazard if desired
         if THE_PARAM_T.save_hazard_map is True:
             event_act_d_events = event_activity.event_activity.reshape(-1)
-            assert collapsed_bedrock_SA.shape[0] == 1 # only one site
+            assert collapsed_bedrock_SA.shape[1] == 1 # only one site
             for j in range(len(THE_PARAM_T.atten_periods)):
                 # Get these two arrays to be vectors.
                 # The sites and spawning dimensions are flattened
@@ -830,7 +826,6 @@ def calc_and_save_SA(THE_PARAM_T,
                 else: # assuming 4 dimensions
                     bedrock_SA_events = collapsed_bedrock_SA[:,:,:,j].reshape(
                         1,-1)
-                
                 bedrock_hazard[site_index,j] = \
                         hzd_do_value(bedrock_SA_events,
                                      event_act_d_events,

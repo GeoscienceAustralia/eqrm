@@ -3326,8 +3326,8 @@ def mean_10_sigma_1_distribution(**kwargs):
     num_periods = kwargs['coefficient'].shape[3]
 
     # exp(0) = 1
-    log_sigma = zeros((num_sites, num_events, num_periods))
-    log_mean = ones((num_sites, num_events, num_periods))*math.log(10)
+    log_sigma = ones((num_sites, num_events, num_periods))
+    log_mean = ones((num_sites, num_events, num_periods))*10
     return log_mean, log_sigma
 
 
@@ -3380,8 +3380,8 @@ def mean_20_sigma_2_distribution(**kwargs):
     num_periods = kwargs['coefficient'].shape[3]
 
     # exp(0) = 1
-    log_sigma = ones((num_sites, num_events, num_periods))*math.log(2)
-    log_mean = ones((num_sites, num_events, num_periods))*math.log(10)
+    log_sigma = ones((num_sites, num_events, num_periods))*2
+    log_mean = ones((num_sites, num_events, num_periods))*10
     return log_mean, log_sigma
 
 

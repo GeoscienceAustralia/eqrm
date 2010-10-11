@@ -842,13 +842,13 @@ class Event_Activity(object):
 
 
     The dimensions of the event_activity are;
-      (num_events, num_spawns)
+      (num_spawns, num_events)
     """
     def __init__(self, num_events):
         """
         num_events is number of events
         """
-        self.event_activity = zeros((num_events, 1),
+        self.event_activity = zeros((1,num_events),
                                     dtype=EVENT_FLOAT)
         self.num_events = num_events
         
@@ -860,30 +860,32 @@ class Event_Activity(object):
         
     def set_event_activity(self, event_activities, event_indexes=None):
         """
+
+        Assumes that spawning has not occured yet.
+        
+        Parameters
         event_indexes - the indexes of the events relating to the
           event activities
+          
         """
+        assert self.event_activity.shape[0] == 1
         if event_indexes == None:
             event_indexes = arange(self.num_events)
         assert len(event_indexes) == len(event_activities)
-        self.event_activity[event_indexes, 0] = event_activities
+        self.event_activity[0, event_indexes] = event_activities
 
-    def spawn(weights):
+    def spawn(self, weights):
         """
         Spawn the event activity.
         
-        weights is a ??D array that sums to one.
-
-        Has to handle that the GM is interated over and that the
-        weights are different for each event.
-        
-        Make len(weight) copies, in the 3rd dimension, of the current
-        event activity, applying the weights.
-
-        This value is set as the new event activity.
+        weights is a 1D array that sums to one.
         
         """
-        pass
+        # currently set up to only spawn once
+        assert self.event_activity.shape[0] == 1
+        wea_transposed = self.event_activity.T * weights
+        self.event_activity = wea_transposed.T
+        
 
     
 class Obsolete_Event_Activity(object):
@@ -953,6 +955,7 @@ class Obsolete_Event_Activity(object):
             assert sum(szp.atten_model_weights) == 1
             #self.event_activity[szp.event_set_indexes] =
             sub_activity = unsplit_event_activity[szp.event_set_indexes]
+            # going from e.g. [0.2, 0.8] to [0.2, 0.8, 0.0]
             maxed_weights = zeros((self.max_num_models))
             maxed_weights[0:len(szp.atten_model_weights)] = \
                                                       szp.atten_model_weights
