@@ -35,7 +35,7 @@ prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [5, 1, 10, 3, 10, 10]
 
 # Attenuation
-atten_models = ['Somerville_Yilgarn']
+atten_models = ['Somerville09_Yilgarn']
 atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 4

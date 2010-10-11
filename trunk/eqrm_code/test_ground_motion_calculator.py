@@ -79,8 +79,8 @@ class Test_ground_motion_calculator(unittest.TestCase):
         self.assert_(allclose(log_sigma, test_log_sigma, rtol=0.05),
                      "%s did not pass assert" %model_name )
         
-    def test_log_sigma_Somerville_Yilgarn(self):
-        model_name = 'Somerville_Yilgarn'
+    def test_log_sigma_Somerville09_Yilgarn(self):
+        model_name = 'Somerville09_Yilgarn'
         
         (distances, magnitudes, test_mean, test_sigma,
          periods, depths, _, _, _, _, _) = data2atts('Toro_1997_midcontinent')

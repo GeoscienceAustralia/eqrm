@@ -570,8 +570,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.assert_(allclose([1, 1+5*-2+6*4, 15], fm))
 
 
-    def test_Somerville_Yilgarn_distribution(self):
-        model_name='Somerville_Yilgarn'
+    def test_Somerville09_Yilgarn_distribution(self):
+        model_name='Somerville09_Yilgarn'
         model=Ground_motion_specification(model_name)
         
         mag = 5.4
@@ -589,7 +589,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         c8 = 8.0
         
         coefficient=(c1, c2, c3, c4, c5, c6, c7, c8)
-        log_mean = Somerville_log_mean(coefficient, mag, distance)
+        log_mean = Somerville09_log_mean(coefficient, mag, distance)
         #print "log_mean", log_mean
 
 
@@ -599,7 +599,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.failUnless(allclose(asarray(log_mean_actual), log_mean),
                           'log_mean Model incorrect.')
         mag = 7.4
-        log_mean = Somerville_log_mean(coefficient, mag, distance)
+        log_mean = Somerville09_log_mean(coefficient, mag, distance)
         
         # for M>m1, r<r1
         log_mean_actual = 1. + 7.*(1.) + 3.*2. + 4.*(1.)*2. + \
@@ -616,7 +616,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_mean_actual = 1. + 2.*(-1.) + 3.*ln_R1 + 4.*(-1.)*4. \
                           + 5.*(e**8. - 36.)**0.5 + 6.*(4 - ln_R1) \
                           + 8.0*(8.5-5.4)**2
-        log_mean = Somerville_log_mean(coefficient, mag, distance)
+        log_mean = Somerville09_log_mean(coefficient, mag, distance)
         self.failUnless(allclose(asarray(log_mean_actual), log_mean),
                           'log_mean Model incorrect.')
 
@@ -626,17 +626,17 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_mean_actual = 1. + 7.*(1.) + 3.*ln_R1 + 4.*(1.)*4. \
                           + 5.*(e**8. - 36.)**0.5 + 6.*(4 - ln_R1) \
                           + 8.0*(8.5-mag)**2
-        log_mean = Somerville_log_mean(coefficient, mag, distance)
+        log_mean = Somerville09_log_mean(coefficient, mag, distance)
         self.failUnless(allclose(asarray(log_mean_actual), log_mean),
                           'log_mean Model incorrect.')
         
-    def Xtest_Somerville_Yilgarn_coefficents_sigma(self):
+    def Xtest_Somerville09_Yilgarn_coefficents_sigma(self):
 
         # how this test could work.
         # it will call some internal functions, to do the math,
         # since the test before checks up on on this.
         # this test is for the coefficients
-        model_name = 'Somerville_Yilgarn'
+        model_name = 'Somerville09_Yilgarn'
         model = Ground_motion_specification(model_name)
         
         distance = array([[[4]]])

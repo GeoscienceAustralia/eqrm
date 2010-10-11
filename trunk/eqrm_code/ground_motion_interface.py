@@ -1900,11 +1900,11 @@ gound_motion_init['Boore_08'] = Boore_08_args
 
 #***************  START COMMON_SOMMERVILLE BLOCK  ************
 
-Somerville_interpolation=linear_interpolation
+Somerville09_interpolation=linear_interpolation
 
-Somerville_sigma_coefficient_interpolation=linear_interpolation
+Somerville09_sigma_coefficient_interpolation=linear_interpolation
 
-def Somerville_distribution(**kwargs):
+def Somerville09_distribution(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
@@ -1925,13 +1925,13 @@ def Somerville_distribution(**kwargs):
 #     print "num_events",num_events 
 #     print "num_periods", num_periods
 
-    log_mean = Somerville_log_mean(coefficient, mag, distance)
+    log_mean = Somerville09_log_mean(coefficient, mag, distance)
     num_events = distance.shape[1]
     log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
     assert isfinite(log_mean).all()
     return log_mean,log_sigma
 
-def Somerville_log_mean(coefficient, mag, distance):
+def Somerville09_log_mean(coefficient, mag, distance):
     #print "coefficient", coefficient
     c1, c2, c3, c4, c5, c6, c7, c8 = coefficient
     m1 = 6.4
@@ -1968,14 +1968,14 @@ def Somerville_log_mean(coefficient, mag, distance):
                c8*(8.5 - mag)**2
     return log_mean
 
-Somerville_distance_type='Joyner_Boore'
-Somerville_magnitude_type='Mw'
+Somerville09_distance_type='Joyner_Boore'
+Somerville09_magnitude_type='Mw'
 
 #***************  END COMMON_SOMMERVILLE BLOCK  ************
 
 #***************  Start of Somerville_Yilgarn MODEL  ************
 # dimension = (period, coeffiecient)
-Somerville_Yilgarn_coefficient_raw = array([
+Somerville09_Yilgarn_coefficient_raw = array([
     [1.5456,1.4565,-1.1151,0.1664,-0.00567,-1.049,1.0553,0.2],
     [1.5551,1.4638,-1.1146,0.1662,-0.00568,-1.0484,1.0585,0.2014],
     [2.338,1.3806,-1.2297,0.1801,-0.00467,-1.3985,0.9599,0.2013],
@@ -2001,43 +2001,43 @@ Somerville_Yilgarn_coefficient_raw = array([
     [-2.6033,0.5906,-0.8094,0.1609,-0.00106,-0.6855,0.7035,-0.2291]])
 
 # dimension = (coeffiecient, period)
-Somerville_Yilgarn_coefficient = Somerville_Yilgarn_coefficient_raw.transpose()
+Somerville09_Yilgarn_coefficient = Somerville09_Yilgarn_coefficient_raw.transpose()
 
-Somerville_Yilgarn_sigma_coefficient=[[
+Somerville09_Yilgarn_sigma_coefficient=[[
     0.5513, 0.5512, 0.551, 0.5508 ,0.5509, 0.551, 0.5514, 0.5529, 0.5544,
     0.5558, 0.5583, 0.5602, 0.5614, 0.5636, 0.5878, 0.6817, 0.8514,
     0.8646, 0.8424, 0.8225, 0.8088, 0.7808, 0.7624
     ]]
 
-Somerville_Yilgarn_coefficient_period=[
+Somerville09_Yilgarn_coefficient_period=[
     0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3003,
    0.4, 0.5, 0.75, 1., 1.4993, 2., 3.003, 4., 5., 7.5019, 10.,]
 
-Somerville_Yilgarn_sigma_coefficient_period=[
+Somerville09_Yilgarn_sigma_coefficient_period=[
    0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3003,
    0.4, 0.5, 0.75, 1., 1.4993, 2., 3.003, 4., 5., 7.5019, 10.,]
 #print "len(Somerville_Yilgarn_sig_coefficient)", len(Somerville_Yilgarn_sigma_coefficient)
 #print "len(Somerville_Yilgarn_sigma_coefficient_period)", len(Somerville_Yilgarn_sigma_coefficient_period)
 
 
-Somerville_Yilgarn_args=[
-    Somerville_distribution,
-    Somerville_magnitude_type,
-    Somerville_distance_type,
+Somerville09_Yilgarn_args=[
+    Somerville09_distribution,
+    Somerville09_magnitude_type,
+    Somerville09_distance_type,
     
-    Somerville_Yilgarn_coefficient,
-    Somerville_Yilgarn_coefficient_period,
-    Somerville_interpolation,
+    Somerville09_Yilgarn_coefficient,
+    Somerville09_Yilgarn_coefficient_period,
+    Somerville09_interpolation,
     
-    Somerville_Yilgarn_sigma_coefficient,
-    Somerville_Yilgarn_sigma_coefficient_period,
-    Somerville_sigma_coefficient_interpolation]
+    Somerville09_Yilgarn_sigma_coefficient,
+    Somerville09_Yilgarn_sigma_coefficient_period,
+    Somerville09_sigma_coefficient_interpolation]
 
-gound_motion_init['Somerville_Yilgarn'] = Somerville_Yilgarn_args
+gound_motion_init['Somerville09_Yilgarn'] = Somerville09_Yilgarn_args
 #***************  End of Somerville_Yilgarn MODEL   ************
 #***************  Start of Somerville_Non_Cratonic MODEL   ************
 # dimension = (period, coeffiecient)
-Somerville_Non_Cratonic_coefficient_raw = array([
+Somerville09_Non_Cratonic_coefficient_raw = array([
     [1.03780,-0.03970,-0.79430,0.14450,-0.00618,-0.72540,-0.03590,-0.09730],
     [1.05360,-0.04190,-0.79390,0.14450,-0.00619,-0.72660,-0.03940,-0.09740],
     [1.05680,-0.03920,-0.79680,0.14550,-0.00617,-0.73230,-0.03930,-0.09600],
@@ -2064,36 +2064,36 @@ Somerville_Non_Cratonic_coefficient_raw = array([
 
 
 # dimension = (coeffiecient, period)
-Somerville_Non_Cratonic_coefficient = Somerville_Non_Cratonic_coefficient_raw.transpose()
+Somerville09_Non_Cratonic_coefficient = Somerville09_Non_Cratonic_coefficient_raw.transpose()
 
-Somerville_Non_Cratonic_sigma_coefficient=[[
+Somerville09_Non_Cratonic_sigma_coefficient=[[
     0.5513, 0.5512, 0.551, 0.5508 ,0.5509, 0.551, 0.5514, 0.5529, 0.5544,
     0.5558, 0.5583, 0.5602, 0.5614, 0.5636, 0.5878, 0.6817, 0.8514,
     0.8646, 0.8424, 0.8225, 0.8088, 0.7808, 0.7624
     ]]
 
-Somerville_Non_Cratonic_coefficient_period=[
+Somerville09_Non_Cratonic_coefficient_period=[
     0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3003,
    0.4, 0.5, 0.75, 1., 1.4993, 2., 3.003, 4., 5., 7.5019, 10.,]
 
-Somerville_Non_Cratonic_sigma_coefficient_period=[
+Somerville09_Non_Cratonic_sigma_coefficient_period=[
    0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3003,
    0.4, 0.5, 0.75, 1., 1.4993, 2., 3.003, 4., 5., 7.5019, 10.,]
 
-Somerville_Non_Cratonic_args=[
-    Somerville_distribution,
-    Somerville_magnitude_type,
-    Somerville_distance_type,
+Somerville09_Non_Cratonic_args=[
+    Somerville09_distribution,
+    Somerville09_magnitude_type,
+    Somerville09_distance_type,
     
-    Somerville_Non_Cratonic_coefficient,
-    Somerville_Non_Cratonic_coefficient_period,
-    Somerville_interpolation,
+    Somerville09_Non_Cratonic_coefficient,
+    Somerville09_Non_Cratonic_coefficient_period,
+    Somerville09_interpolation,
     
-    Somerville_Non_Cratonic_sigma_coefficient,
-    Somerville_Non_Cratonic_sigma_coefficient_period,
-    Somerville_sigma_coefficient_interpolation]
+    Somerville09_Non_Cratonic_sigma_coefficient,
+    Somerville09_Non_Cratonic_sigma_coefficient_period,
+    Somerville09_sigma_coefficient_interpolation]
 
-gound_motion_init['Somerville_Non_Cratonic'] = Somerville_Non_Cratonic_args
+gound_motion_init['Somerville09_Non_Cratonic'] = Somerville09_Non_Cratonic_args
 #***************  End of Somerville_Non_Cratonic MODEL   ************
 
 #########################  Start of Liang_2008 model  ##########################
