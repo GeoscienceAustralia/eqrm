@@ -747,8 +747,8 @@ class Test_Event_Set(unittest.TestCase):
         event_activities = array([10, 20])
         ea.set_event_activity(event_activities, event_indexes)
         self.assert_(allclose(ea.event_activity[0,0], 10))
-        self.assert_(allclose(ea.event_activity[1,0], 0))
-        self.assert_(allclose(ea.event_activity[2,0], 20))
+        self.assert_(allclose(ea.event_activity[0,1], 0))
+        self.assert_(allclose(ea.event_activity[0,2], 20))
 
         
     def test_Event_Activity_set_event_activity(self):
@@ -757,9 +757,30 @@ class Test_Event_Set(unittest.TestCase):
         event_activities = array([0, 10, 20])
         ea.set_event_activity(event_activities)
         self.assert_(allclose(ea.event_activity[0,0], 0))
-        self.assert_(allclose(ea.event_activity[1,0], 10))
-        self.assert_(allclose(ea.event_activity[2,0], 20))
+        self.assert_(allclose(ea.event_activity[0,1], 10))
+        self.assert_(allclose(ea.event_activity[0,2], 20))
 
+        
+    def test_Event_Activity_spawn(self):
+        num_events = 3
+        ea = Event_Activity(num_events)
+        event_activities = array([1, 10, 100])
+        ea.set_event_activity(event_activities)
+        w = array([0.2, 0.8])
+        ea.spawn(w)
+        self.assert_(allclose(ea.event_activity[0,0], 0.2))
+        self.assert_(allclose(ea.event_activity[0,1], 2))
+        self.assert_(allclose(ea.event_activity[0,2], 20))
+        self.assert_(allclose(ea.event_activity[1,0], 0.8))
+        self.assert_(allclose(ea.event_activity[1,1], 8))
+        self.assert_(allclose(ea.event_activity[1,2], 80))
+
+        event = ea.event_activity.reshape(-1)
+        # this should 'stack' so it goes [0,0 0,1 0,2 1,0 1,1 1,2]
+        # with the numbers representing the indexes from the 2D array
+        self.assert_(allclose(event[1], 2))
+        self.assert_(allclose(event[4], 8))
+        
     def test_generate_synthetic_events_fault(self):
         def dump_src(etc):
             """Helper function to dump info from SRC object."""

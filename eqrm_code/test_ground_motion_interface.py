@@ -1703,8 +1703,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         coefficient = zeros((1, 1, 1, num_periods))
         (log_mean, log_sigma) = model.distribution(
             distance=distance, coefficient=coefficient)
-        act_log_sigma = zeros((num_sites, num_events, num_periods))
-        act_log_mean = ones((num_sites, num_events, num_periods))*log(10)
+        act_log_sigma = ones((num_sites, num_events, num_periods))
+        act_log_mean = ones((num_sites, num_events, num_periods))*10
         self.failUnless(allclose(log_mean, act_log_mean))
         self.failUnless(allclose(log_sigma, act_log_sigma))
         

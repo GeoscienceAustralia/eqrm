@@ -336,10 +336,8 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
                     Mw,
                     atten_periods)
                 
-                amp_distribution.set_log_mean_log_sigma_etc(
-                    log_mean, log_sigma)
                 (_, sub_soil_SA, _) = \
-                    amp_distribution.sample_for_eqrm()
+                    amp_distribution.sample_for_eqrm(log_mean, log_sigma)
                 soil_SA[i_spawn,i_gmm,:] = sub_soil_SA
         
     return soil_SA

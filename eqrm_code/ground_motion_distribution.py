@@ -13,9 +13,126 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import exp, log, where, isfinite, reshape, array, r_
+from scipy import exp, log, where, isfinite, reshape, array, r_, rollaxis
 from scipy.stats import norm
 
+SPAWN = 1 
+
+class Distribution_Log_Normal(object):
+    """
+    Log normal distribution.
+
+    Note, since this uses random numbers, just instanciating an instance
+    of this class will cause check_scenario to fail.
+
+    """
+    def __init__(self, var_method, atten_spawn_bins=None):
+        
+        self.var_method = var_method        
+        self.rvs = norm.rvs # function from scipy.stats
+        self.pdf = norm.pdf # function from scipy.stats
+        if var_method == None:
+            atten_spawn_bins = 1
+        self.atten_spawn_bins = atten_spawn_bins
+        
+        sigma_delta = 2.5
+        weights, centroids = normalised_pdf(sigma_delta, atten_spawn_bins)
+        self.spawn_weights = weights
+        # Get the dimensions ready for applying to log_sigma's
+        self.spawn_centroids = centroids #.reshape(1,-1)
+        
+            
+    def sample_for_eqrm(self, log_mean=None, log_sigma=None):
+        """
+        FIXME needs comments
+        """
+        
+        if self.var_method == SPAWN :
+            # spawn
+            # log_mean will have dimensions of (site, event, period)
+            sample_values = self._spawn(log_mean, log_sigma)    
+        else:
+            if self.var_method == None:
+                sample_values = exp(log_mean)           
+            elif self.var_method == 2:
+                # monte carlo
+                sample_values = self._monte_carlo(log_mean, log_sigma)
+            elif self.var_method == 3:
+                # + 2 sigma
+                sample_values = exp(log_mean+2*log_sigma)  
+            elif self.var_method == 4:
+                # + 1 sigma
+                sample_values = exp(log_mean+1*log_sigma)
+            elif self.var_method == 5:
+                # - 1 sigma
+                sample_values = exp(log_mean-1*log_sigma)
+            elif self.var_method == 6:
+                # - 2 sigma
+                sample_values = exp(log_mean-2*log_sigma)
+            #elif self.var_method == 7:
+                # corrected mean
+             #   sample_values = self.corrected_mean
+            new_shape = [1] + list(sample_values.shape)
+            # This adds the spawning dimension,
+            # as the first dimension
+            sample_values = sample_values.reshape(new_shape) 
+        return None, sample_values, None
+    
+    def _spawn(self, log_mean, log_sigma):
+        """
+        Spawning will add a spawning dimension, as the first dimension.
+        Each cut into the spawning dimension represents the SA at
+        a different centroid.
+        """
+        #print "SPAWNING"
+        #print "self.spawn_centroids", self.spawn_centroids
+        # start off by adding the spawn dimension at the end.
+        new_shape = list(log_sigma.shape) + [1]
+        log_sigma = log_sigma.reshape(new_shape)
+        spawned_log_sigma = log_sigma * self.spawn_centroids
+        # roll the spawn dimension to the front
+        spawned_log_sigma = rollaxis(spawned_log_sigma,
+                                     spawned_log_sigma.ndim-1, 0)
+        sample_values = exp(log_mean + spawned_log_sigma)
+        return sample_values
+        
+    def _monte_carlo(self, log_mean=None, log_sigma=None, variate_site=None):
+        """
+        variate_site should only be used for testing
+        """      
+        if variate_site is None:
+            # size sets the shape of the returned array
+            variate_site=self.rvs(size=log_sigma.size)
+        sample_values = exp(log_mean + variate_site * log_sigma)        
+        return sample_values
+
+    
+
+def normalised_pdf(sigma_delta, atten_spawn_bins):
+    """
+    
+    Parameters
+      sigma_delta: Bound the bin centroids within -sigma_delta to sigma_delta.
+        There will always be a centroid on the -sigma_delta and sigma_delta,
+        unless atten_spawn_bins = 1.
+      atten_spawn_bins: the number of centroids that will sample the pdf.
+
+    Return
+      An array of weights, sampled from the pdf, at the centroid values.
+        These values are then normalised, so the list sums to 1.0.
+        len(weights) == len(atten_spawn_bins)
+    """
+    if atten_spawn_bins == None or atten_spawn_bins <= 1:        
+        weights = array([1.])
+        centroids = array([0.])
+    else:
+        centroids = r_[-sigma_delta: sigma_delta: atten_spawn_bins*1j]
+        unnormed_weights = norm.pdf(centroids)
+        weights = unnormed_weights/sum(unnormed_weights)
+
+    return weights, centroids
+    
+    
 # FIXME: REMOVE THIS CLASS  THIS CLASS IS OBSOLETE.  DO NOT USE#
 class Log_normal_distribution(object):
     """
@@ -153,125 +270,6 @@ class Log_normal_distribution(object):
     median = property(get_median)    
     mode = property(get_mode)
 
-
-class Distribution_Log_Normal(object):
-    """
-    Log normal distribution.
-
-    Note, since this uses random numbers, just instanciating an instance
-    of this class will cause check_scenario to fail.
-
-    """
-    def __init__(self,
-                 var_method):
-        
-        self.var_method = var_method        
-        self.rvs=norm.rvs # function from scipy.stats
-        self.pdf=norm.pdf # function from scipy.stats
-        
-            
-    def set_log_mean_log_sigma_etc(self, log_mean, log_sigma):
-        """
-        log_mean and log_sigma may have the dimensions
-         (GM_model, sites, events, periods)
-        """
-        self.log_mean = log_mean
-        self.log_sigma = log_sigma
-        
-
-    def sample_for_eqrm(self):
-        """
-        FIXME needs comments
-        """
-        if self.var_method == 1 :
-            # spawn
-            # The 
-            pass
-        else:
-            if self.var_method == None:
-                sample_values = exp(self.log_mean)           
-            elif self.var_method == 2:
-                # monte carlo
-                sample_values = self._monte_carlo()
-            elif self.var_method == 3:
-                # + 2 sigma
-                sample_values = exp(self.log_mean+2*self.log_sigma)  
-            elif self.var_method == 4:
-                # + 1 sigma
-                sample_values = exp(self.log_mean+1*self.log_sigma)
-            elif self.var_method == 5:
-                # - 1 sigma
-                sample_values = exp(self.log_mean-1*self.log_sigma)
-            elif self.var_method == 6:
-                # - 2 sigma
-                sample_values = exp(self.log_mean-2*self.log_sigma)
-            #elif self.var_method == 7:
-                # corrected mean
-             #   sample_values = self.corrected_mean
-            new_shape = [1] + list(sample_values.shape)
-            # This adds the spawning dimension
-            sample_values.reshape(new_shape) 
-        return None, sample_values, None
-    
-
-    def _monte_carlo(self, variate_site=None):
-        """
-        variate_site should only be used for testing
-        """      
-        if variate_site is None:
-            # size sets the shape of the returned array
-            variate_site=self.rvs(size=self.log_sigma.size)
-            reshape(variate_site, self.log_sigma.shape)
-        sample_values=exp(self.log_mean + variate_site*self.log_sigma)        
-        return sample_values
-
-    
-    def get_corrected_mean(self):
-        ground_motion=exp(self.log_mean+(self.log_sigma**2)/2)
-        return ground_motion
-    
-    def get_median(self):
-        ground_motion=exp(self.log_mean)
-        return ground_motion
-    
-    def get_mode(self):
-        ground_motion=exp(self.log_mean-(self.log_sigma**2))
-        return ground_motion
-
-    def get_spawn_weights(self,):
-        pass
-    
-    # Who uses these?
-    corrected_mean = property(get_corrected_mean)    
-    median = property(get_median)    
-    mode = property(get_mode)
-
-def normalised_pdf(sigma_delta, number_of_bins):
-    """
-    
-    Parameters
-      sigma_delta: Bound the bin centroids within -sigma_delta to sigma_delta.
-        There will always be a centroid on the -sigma_delta and sigma_delta,
-        unless number_of_bins = 1.
-      number_of_bins: the number of centroids that will sample the pdf.
-
-    Return
-      An array of weights, sampled from the pdf, at the centroid values.
-        These values are then normalised, so the list sums to 1.0.
-        len(weights) == len(number_of_bins)
-    """
-    assert(number_of_bins >= 1)
-    if number_of_bins == 1:        
-        weights = array([1.])
-        centroids = array([0.])
-    else:
-        centroids = r_[-sigma_delta: sigma_delta: number_of_bins*1j]
-        unnormed_weights = norm.pdf(centroids)
-        weights = unnormed_weights/sum(unnormed_weights)
-
-    return weights, centroids
-    
-    
 
     
     

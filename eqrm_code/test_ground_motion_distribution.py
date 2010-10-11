@@ -4,7 +4,7 @@ import sys
 import unittest
 from ground_motion_distribution import *
 from scipy import array, log, exp, newaxis, concatenate, allclose, sqrt, \
-     r_, alltrue, where, arange, resize, sum
+     r_, alltrue, where, arange, resize, sum, ones
 
 
 class Test_Log_normal_distribution(unittest.TestCase):
@@ -167,8 +167,8 @@ class Test_Log_normal_distribution(unittest.TestCase):
         var_method = 2
         
         dist = Distribution_Log_Normal(var_method)
-        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
-        sample_values = dist._monte_carlo(variate_site=variate)
+        sample_values = dist._monte_carlo(log_mean,log_sigma,
+                                          variate_site=variate)
         
         actual = exp(log_mean + variate*log_sigma)
         self.assert_(allclose(sample_values, actual))
@@ -184,8 +184,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         var_method = None
         
         dist = Distribution_Log_Normal(var_method)
-        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
-        (_, sample_values, _) = dist.sample_for_eqrm()
+        (_, sample_values, _) = dist.sample_for_eqrm(log_mean,log_sigma)
         
         actual = exp(log_mean)
         self.assert_(allclose(sample_values, actual))
@@ -201,32 +200,28 @@ class Test_Log_normal_distribution(unittest.TestCase):
         
         var_method = 3       
         dist = Distribution_Log_Normal(var_method)
-        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
-        (_, sample_values, _) = dist.sample_for_eqrm()       
+        (_, sample_values, _) = dist.sample_for_eqrm(log_mean,log_sigma)
         actual = exp(log_mean + 2*log_sigma)
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)
 
         var_method = 4      
         dist = Distribution_Log_Normal(var_method)
-        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
-        (_, sample_values, _) = dist.sample_for_eqrm()       
+        (_, sample_values, _) = dist.sample_for_eqrm(log_mean,log_sigma)
         actual = exp(log_mean + log_sigma)
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)
         
         var_method = 5      
         dist = Distribution_Log_Normal(var_method)
-        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
-        (_, sample_values, _) = dist.sample_for_eqrm()       
+        (_, sample_values, _) = dist.sample_for_eqrm(log_mean,log_sigma)
         actual = exp(log_mean - log_sigma)
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)
         
         var_method = 6    
         dist = Distribution_Log_Normal(var_method)
-        dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
-        (_, sample_values, _) = dist.sample_for_eqrm()       
+        (_, sample_values, _) = dist.sample_for_eqrm(log_mean,log_sigma)
         actual = exp(log_mean - 2*log_sigma)
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)       
@@ -269,10 +264,42 @@ class Test_Log_normal_distribution(unittest.TestCase):
         #print "act_wts", act_wts
         #print "weights", weights
         self.assert_(allclose(weights, act_wts, 0.01))       
-        self.assert_(len(weights) == 10)     
+        self.assert_(len(weights) == 10)
+
+    def test_spawning(self):
+        spawn_bins = 2
+
+        dln = Distribution_Log_Normal(var_method=SPAWN,
+                                      atten_spawn_bins=spawn_bins)
+        log_mean = ones((3,4))
+        log_mean *= 10
+        log_sigma = ones((3,4))
+        (_, sample_values, _) = dln.sample_for_eqrm(log_mean,log_sigma)
+        act_SA_0 = ones((1, 3, 4)) * (10 - 2.5)
+        act_SA_1 = ones((1, 3, 4)) * (10 + 2.5)
+        act_SA = exp(concatenate((act_SA_0, act_SA_1)))
+        self.assert_(allclose(act_SA, sample_values))   
+        
+        
+    def test_spawningII(self):
+        spawn_bins = 3
+
+        dln = Distribution_Log_Normal(var_method=SPAWN,
+                                      atten_spawn_bins=spawn_bins)
+        log_mean = ones((2, 3, 4))
+        log_mean *= 10
+        log_sigma = ones((2, 3, 4))
+        (_, sample_values, _) = dln.sample_for_eqrm(log_mean,log_sigma)
+        act_SA_0 = ones((1, 2, 3, 4)) * (10 - 2.5)
+        act_SA_1 = ones((1, 2, 3, 4)) * (10)
+        act_SA_2 = ones((1, 2, 3, 4)) * (10 + 2.5)
+        act_SA = exp(concatenate((act_SA_0, act_SA_1, act_SA_2)))
+        self.assert_(allclose(act_SA, sample_values))
+               
+        
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Log_normal_distribution,'test')
-    suite = unittest.makeSuite(Test_Log_normal_distribution,'test_normalised_pdf')
+    #suite = unittest.makeSuite(Test_Log_normal_distribution,'test_spawning')
     runner = unittest.TextTestRunner()
     runner.run(suite)
