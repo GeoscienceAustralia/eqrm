@@ -15,7 +15,7 @@
 """
 
 from scipy import (vectorize, sqrt, sin, minimum, pi, where, asarray,
-                   exp, log, power)
+                   exp, log, power, cos, arccos, arcsin, arctan2)
 import math
 
 def Johnston_01_ML(Mw):
@@ -51,6 +51,31 @@ def modified_Wells_and_Coppersmith_94_width(dip,Mw,area,fault_width=15.0):
 
 modified_Wells_and_Coppersmith_94_width = vectorize(
     modified_Wells_and_Coppersmith_94_width)
+
+def Wells_and_Coppersmith_94(fault_type,Mw,max_width,max_length):
+    
+    if fault_type== "normal":
+        area =10**(-2.87+(0.82*Mw))
+        widthWC =10**(-1.14+(0.35*Mw))
+    elif fault_type== "reverse":
+        area =10**(-3.99+(0.98*Mw))
+        widthWC =10**(-1.61+(0.41*Mw))
+    elif fault_type== "strike_slip":
+        area =10**(-3.42+(0.90*Mw))
+        widthWC =10**(-0.76+(0.27*Mw))
+    elif fault_type== "unspecified":
+        area =10**(-3.497+(0.91*Mw))
+        widthWC =10**(-1.01+(0.32*Mw))
+    else:
+        area =10**(-3.497+(0.91*Mw))
+        widthWC =10**(-1.01+(0.32*Mw))
+
+    width = minimum(widthWC,max_width)
+    length = minimum((area/width),max_length)
+    return width,length
+
+#Wells_and_Coppersmith_94 = vectorize(
+    #Wells_and_Coppersmith_94)
 
 def depth(depth_top_seismogenic,dip,Mw,fault_width=None):
     """
@@ -156,6 +181,135 @@ def azimuth_of_trace(start_lat, start_lon, end_lat, end_lon):
 
     return azimuth
 
+def calc_ll_dist(lat1,lon1,lat2,lon2):
+    """Calculate a length in kms given start and end positions.
+
+    lat1  latitude of start point
+    lon1  longitude of start point
+    lat2    latitude of end point
+    lon2    longitude of end point
+
+    Returns length from start point in kms.
+    """
+    R = 6371
+    dLat = math.radians(abs(lat2-lat1))
+    dLon = math.radians(abs(lon2-lon1))
+    a = (sin(dLat/2) * sin(dLat/2) +
+            cos(math.radians(lat1)) * cos(math.radians(lat2)) *
+            sin(dLon/2) * sin(dLon/2))
+    c = 2 * arctan2(sqrt(a), sqrt(1-a))
+    return R * c
+    
+def calc_fault_area(lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip):
+    """Calculate the area of a fault in kms given the trace, dip and depth 
+       top and bottom.
+
+    lat1          latitude of start point
+    lon1          longitude of start point
+    lat2          latitude of end point
+    lon2          longitude of end point
+    depth_top     depth to the top of the seismogenic zone
+    depth_bottom  depth to the bottom of the seismogenic zone
+    dip           angle of dip of the fault in decimal degrees
+
+    Returns area of fault in kms.
+    """
+    fault_length = calc_ll_dist(lat1,lon1,lat2,lon2)
+    fault_width = (depth_bottom - depth_top) / sin(math.radians(dip))
+    fault_area = fault_length * fault_width
+    return fault_area
+
+def calc_fault_width(depth_top,depth_bottom,dip):
+    """Calculate the width of a fault in kms given the dip and depth top and bottom.
+
+    
+    depth_top     depth to the top of the seismogenic zone
+    depth_bottom  depth to the bottom of the seismogenic zone
+    dip           angle of dip of the fault in decimal degrees
+
+    Returns width of fault in kms.
+    """
+    fault_width = (depth_bottom - depth_top) / sin(math.radians(dip))
+    return fault_width
+
+def calc_fault_length(lat1,lon1,lat2,lon2): 
+    """Calculate the length of a fault in kms given the start and end coords 
+       of the fault trace.
+
+    lat1          latitude of start point
+    lon1          longitude of start point
+    lat2          latitude of end point
+    lon2          longitude of end point
+    
+    Returns length of fault in kms.
+    """
+    fault_length = calc_ll_dist(lat1,lon1,lat2,lon2)
+    return fault_length
+
+
+
+def obsolete_calc_azimuth(lat1,lon1,lat2,lon2):
+    """NOT USED
+       Calculate a trace azimuth given start and end positions.
+
+    lat1          latitude of start point
+    lon1          longitude of start point
+    lat2          latitude of end point
+    lon2          longitude of end point
+    
+    Returns azimuth at start point in degrees, in range [0, 360).
+    """
+    lat1 = math.radians(lat1)  
+    lon1 = math.radians(lon1)  
+    lat2 = math.radians(lat2) 
+    lon2 = math.radians(lon2)
+    numerator = sin(lon1 -lon2) * cos(lat2)
+    denominator = sin(arccos((sin(lat2)*sin(lat1))+(cos(lat1)*cos(lat2)*cos(lon2-lon1))))
+    azimuth = math.degrees(arcsin(numerator/denominator))  
+    return azimuth
+
+def obsolete_calc_azimuth2(lat1,lon1,lat2,lon2):
+    """NOT USED
+       Calculate a trace azimuth given start and end positions.
+
+    lat1          latitude of start point
+    lon1          longitude of start point
+    lat2          latitude of end point
+    lon2          longitude of end point
+    
+    Returns azimuth at start point in degrees, in range [0, 360).
+    """
+
+    x=calc_ll_dist(lat1,lon1,lat1,lon2)
+    y=calc_ll_dist(lat1,lon1,lat2,lon1)
+    if y==0:
+        azimuth=90
+    elif x==0:
+        azimuth=0
+    else:
+        azimuth=math.degrees(arctan2(x,y))
+    return azimuth
+def obsolete_calc_azimuth3(lat1,lon1,lat2,lon2):
+    """NOT USED
+       Calculate a trace azimuth given start and end positions.
+
+    lat1          latitude of start point
+    lon1          longitude of start point
+    lat2          latitude of end point
+    lon2          longitude of end point
+    
+    Returns azimuth at start point in degrees, in range [0, 360).
+    """
+
+    x=(lon1-lon2)*(cos(lat1))
+    y=lat1-lat2
+    if y==0:
+        azimuth=90
+    elif x==0:
+        azimuth=0
+    else:
+        azimuth=math.degrees(arctan2(x,y))
+    return azimuth
 ###################
 # END OF FUNCTIONS#
 ###################
