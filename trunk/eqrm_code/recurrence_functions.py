@@ -12,10 +12,12 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import exp, log, sum, zeros, newaxis, where, array, asarray, r_,sin,cos,sqrt,arctan2,unique
-from math import radians 
+from scipy import exp, log, sum, zeros, newaxis, where, array, asarray, r_,sin,cos,sqrt,arctan2,unique,arcsin,arccos
+from math import radians, degrees,atan
 
 from eqrm_code.ANUGA_utilities import log as eqrmlog
+from eqrm_code.test_distance_functions import azimuths
+#ma.core import sin
 
 
 def calc_event_activity(event_set, source_model,
@@ -89,10 +91,11 @@ def calc_event_activity(event_set, source_model,
                 
             
             if source.recurrence_model_distribution=='characteristic':
-                grpdf=calc_activities_from_slip_rate_Characteristic(mag_bin_centroids, 
-                                                                    zone_b, zone_mlow,
-                                                                    zone_mhgh)
-        
+                grpdf=calc_activities_from_slip_rate_Characteristic(
+                    mag_bin_centroids, 
+                    zone_b, zone_mlow,
+                    zone_mhgh)
+                
         
             event_activity_source = array( [(A_mlow*grpdf[z]/(sum(where(
                                                event_bins == z, 1,0)))) 
@@ -157,7 +160,6 @@ def make_bins(min_magnitude,max_magnitude,num_bins):
     bins = r_[min_magnitude+delta_mag/2:max_magnitude-delta_mag/2:num_bins*1j]
     #approximate the number of earthquakes in discrete (0.1 unit) bins
     return bins
-
 
 
 def grscale(b,max_magnitude,new_min,min_magnitude):
@@ -233,13 +235,3 @@ def calc_activity_from_slip_rate_Characteristic(magnitude,b,m0,mMax):
     return pdf
         
 
-def calc_ll_dist(lat1,lon1,lat2,lon2):
-    R = 6371
-    dLat = radians(abs(lat2-lat1))
-    dLon = radians(abs(lon2-lon1))
-    a = (sin(dLat/2) * sin(dLat/2) +
-            cos(radians(lat1)) * cos(radians(lat2)) *
-            sin(dLon/2) * sin(dLon/2))
-    c = 2 * arctan2(sqrt(a), sqrt(1-a))
-    return R * c
-    
