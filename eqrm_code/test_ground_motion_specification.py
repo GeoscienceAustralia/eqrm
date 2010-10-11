@@ -14,7 +14,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Toro_1997_midcontinent', 'Sadigh_97',
                           'Youngs_97_interface', 'Youngs_97_intraslab',
                           'Combo_Sadigh_Youngs_M8', 'Boore_08',
-                          'Somerville_Yilgarn', 'Somerville_Non_Cratonic',
+                          'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
                           'Chiou08', 'Campbell03', 'Campbell08')
@@ -426,9 +426,9 @@ test_data['Boore_08_test_vs30'] = 1000.0
 
 
 # ***********************************************************
-# Somerville_Yilgarn Test
+# Somerville09_Yilgarn Test
 
-test_data['Somerville_Yilgarn_test_period'] = [
+test_data['Somerville09_Yilgarn_test_period'] = [
     0.0, 0.02, 0.025, 0.035, 0.5, 0.7, 1.0, 1.12,3.5,7.4, 9.0, 10.0]
 
 tmp = zeros((4,3)) # initialise an array: 3 events/mags and distance to 2 sites
@@ -436,7 +436,7 @@ tmp[0,:] = [0.0, 0.0, 0.0] # distance between 1st site and all three events
 tmp[1,:] = [25.0, 25.0, 25.0] # distance between 2nd site and all three events
 tmp[2,:] = [50.0, 50.0, 50.0] # distance between 3rd site and all three events
 tmp[3,:] = [100.0, 100.0, 100.0] # distance between 4th site and all three events
-test_data['Somerville_Yilgarn_test_distance'] = tmp
+test_data['Somerville09_Yilgarn_test_distance'] = tmp
 
 tmp = zeros((4,3,12))
 tmp[0,0,:] = [0.79328,1.512,1.6554,1.9091,
@@ -475,14 +475,14 @@ tmp[3,1,:] = [0.039511,0.048677,0.055099,0.06915,
 tmp[3,2,:] = [0.043675,0.053604,0.060687,0.075898,
 0.050236,0.035942,0.022105,0.022951,
 0.0088643,0.0015393,0.0010274,0.00080483]
-test_data['Somerville_Yilgarn_test_mean'] = tmp
+test_data['Somerville09_Yilgarn_test_mean'] = tmp
 
-test_data['Somerville_Yilgarn_test_magnitude'] = [5.5, 6.4, 6.5]
+test_data['Somerville09_Yilgarn_test_magnitude'] = [5.5, 6.4, 6.5]
 
 # ***********************************************************
-# Somerville_Yilgarn Test
+# Somerville09_YilgarnNon_Cratonic Test
 
-test_data['Somerville_Non_Cratonic_test_period'] = [
+test_data['Somerville09_Non_Cratonic_test_period'] = [
     0.0, 0.02, 0.025, 0.035, 0.5, 0.7, 1.0, 1.12,3.5,7.4, 9.0, 10.0]
 
 tmp = zeros((4,3)) # initialise an array: 3 events/mags and distance to 2 sites
@@ -490,7 +490,7 @@ tmp[0,:] = [0.0, 0.0, 0.0] # distance between 1st site and all three events
 tmp[1,:] = [25.0, 25.0, 25.0] # distance between 2nd site and all three events
 tmp[2,:] = [50.0, 50.0, 50.0] # distance between 3rd site and all three events
 tmp[3,:] = [100.0, 100.0, 100.0] # distance between 4th site and all three events
-test_data['Somerville_Non_Cratonic_test_distance'] = tmp
+test_data['Somerville09_Non_Cratonic_test_distance'] = tmp
 
 # results in g.
 tmp = zeros((4,3,12))
@@ -530,9 +530,9 @@ tmp[3,1,:] = [0.02675,0.027051,0.027491,0.02899,
 tmp[3,2,:] = [0.029648,0.02997,0.030437,0.032034,
 0.057482,0.04032,0.01891,0.0163,
 0.0037893,0.0014006,0.00099592,0.0008057]
-test_data['Somerville_Non_Cratonic_test_mean'] = tmp
+test_data['Somerville09_Non_Cratonic_test_mean'] = tmp
 
-test_data['Somerville_Non_Cratonic_test_magnitude'] = [5.5, 6.4, 6.5]
+test_data['Somerville09_Non_Cratonic_test_magnitude'] = [5.5, 6.4, 6.5]
 
 ################################################################################
 # Liang_2008 Test
