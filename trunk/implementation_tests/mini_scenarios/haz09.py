@@ -41,7 +41,7 @@ atten_models = ['Allen','AllenSEA06','Gaull_1990_WA',
                           'Youngs_97_intraslab',
                           'Combo_Sadigh_Youngs_M8',
                           'Somerville09_Yilgarn',
-                          'Somerville_Non_Cratonic']
+                          'Somerville09_Non_Cratonic']
 atten_model_weights = len(atten_models)*[1.0/len(atten_models)]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = None
