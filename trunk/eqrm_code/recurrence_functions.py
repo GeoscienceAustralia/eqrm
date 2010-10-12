@@ -20,14 +20,12 @@ from eqrm_code.test_distance_functions import azimuths
 #ma.core import sin
 
 
-def calc_event_activity(event_set, source_model,
-                        prob_number_of_mag_sample_bins):
+def calc_event_activity(event_set, source_model):
     """
     event_set - Event_Set instance - this function uses Mw and rupture_centroid
                                and returns a subset of event_set
     source_model - The source_model - holds a list of source_zone_polygons.
-    prob_number_of_mag_sample_bins - number of magnitude sample bins.
-
+   
     when analysis uses this function, the weight used is a constant of [1.0]
     EQRM can currently only handle one source model.
     A source model has many source polygons.
