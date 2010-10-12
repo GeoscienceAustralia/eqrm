@@ -172,7 +172,22 @@ class Test_Log_normal_distribution(unittest.TestCase):
         
         actual = exp(log_mean + variate*log_sigma)
         self.assert_(allclose(sample_values, actual))
-        self.assert_(actual.shape == dim)
+        self.assert_(sample_values.shape == dim)
+
+    def test_DLN_monte_carlo3(self):
+        # dimensions (2,1,3,4) = 24 elements
+        dim = (1,2,3)
+        count_up = arange(0,6,1)
+        log_mean = resize(count_up*10, dim)
+        log_sigma = resize(count_up, dim)
+        count_up_2 = arange(1,48,2)
+        var_method = 2
+        
+        dist = Distribution_Log_Normal(var_method)
+        sample_values = dist._monte_carlo(log_mean,log_sigma)
+
+        # Can not check result, it's random 
+        self.assert_(sample_values.shape == dim)
 
 
     def test_DLN_no_variability(self):
@@ -300,6 +315,6 @@ class Test_Log_normal_distribution(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Log_normal_distribution,'test')
-    #suite = unittest.makeSuite(Test_Log_normal_distribution,'test_spawning')
+    #suite = unittest.makeSuite(Test_Log_normal_distribution,'test_DLN_monte_carlo')
     runner = unittest.TextTestRunner()
     runner.run(suite)
