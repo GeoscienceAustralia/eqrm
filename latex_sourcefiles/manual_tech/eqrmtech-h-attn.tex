@@ -100,14 +100,13 @@ different attenuation model (see
 \subsection{Implementation}
 \label{attn:implementation}
 
-In the EQRM application the attenuation calculations are conducted
-within the main driving function \typefunc{do}{\_ana}{lysis} which
-computes the attenuation for one site at a time for all events and
-all fundamental (or building) periods. That is, for each site
-there exists a large matrix of modelled $S_a(T_o,r_m,R)$ (this
-matrix is \typevar{S}{}{A} or \typevar{SA}{ro}{ck} in the code)
-whose rows correspond to the events (i.e. an $r_m$-$R$ pair) and
-whose columns correspond to the $T_o$. That is
+The EQRM application conducts a loop over all of the sites. Some
+preparatory work is conducted before this loop 9see belwo for more
+details). Inside the loop, the EQRM computes the GMPE for one site
+at a time for all events and all fundamental (or RSA) periods. That
+is, for each site there exists a large matrix of modelled
+$S_a(T_o,r_m,R)$ whose rows correspond to the events (i.e. an
+$r_m$-$R$ pair) and whose columns correspond to the $T_o$. That is
 
 \begin{math}
 %\label{fig:attn-sa-matrix}
@@ -120,24 +119,23 @@ S_a(T_{o,1},r_{m,N_s},R_{N_s}) & S_a(T_{o,2},r_{m,N_s},R_{N_s}) & \hdots & S_a(T
 \end{math}
 
 where $N_s$ refers to the number of events and $N_T$ refers to the
-number of periods. Note that the $r_m$-$R$ pair comes from the
-event catalogue (see \sref{sec:event-catalogue}) and a calculation
-of distance (see \sref{sec:attn-dist}). The $T_o$ are determined
-by the user-defined vector parameter \typepar{per}{io}{ds} in
-\typeself{set}{da}{ta}. Computationally the above calculation of
-attenuation is conducted in two parts as follows:
+number of periods. Note that the $r_m$-$R$ pair comes from the event
+catalogue (see \sref{sec:event-catalogue}) and a calculation of
+distance (see \sref{sec:attn-dist}). The $T_o$ are determined by the
+user-defined vector parameter \typepar{atten}{\_peri}{ods} in the
+EQRM controlfile. Computationally the above calculation of GMPE is
+conducted in two parts as follows:
 \begin{enumerate}
 \item The preparation of the attenuation coefficients
-(\typefunc{prep}{\_at}{tn}) conducted before entering a loop over
-sites. This preparation involves interpolating the attenuation
-coefficients to the fundamental periods defined by
-\typepar{per}{io}{ds}. \item The computation of the
-$S_a(T_o,r_m,R)$ at each site (\typefunc{do}{\_atten}{uation})
-conducted site-by-site within a loop over sites.
+conducted before entering a loop over sites. This preparation
+involves interpolating the attenuation coefficients to the
+fundamental periods defined by \typepar{atten}{\_peri}{ods}. \item
+The computation of the $S_a(T_o,r_m,R)$ at each site conducted
+site-by-site within a loop over sites.
 \end{enumerate}
 
 
-Each attenuation model returns an estimate of:
+Each GMPE returns an estimate of:
 \begin{enumerate}
 \item the mean of $log(S_a(T_o,r_m,R))$ (equivalent to the
 logarithm of the median of $S_a(T_o,r_m,R)$) and hereafter denoted
@@ -146,76 +144,69 @@ and \item the standard deviation of $log(S_a(T_o,r_m,R))$,
 hereafter denoted by \newline $\sigma_{log(S_a)}(T_o,r_m,R)$ or
 $\sigma_{log(S_a)}$ for brevity.
 \end{enumerate}
-Note that the $\sigma_{log(S_a)}$ returned by the different
-attenuation models differ in the sense that they consider the
-variability resulting from a range of different `causes'. A brief
-discussion of these subtleties is left to the relevant section of
-each attenuation model (see below). A more detailed explanation of
-the subtleties can be found in the relevant literature.
+Note that the $\sigma_{log(S_a)}$ returned by the different GMPEs
+differ in the sense that they consider the variability resulting
+from a range of different `causes'. A brief discussion of these
+subtleties is left to the relevant section of each GMPE (see below).
+A more detailed explanation of the subtleties can be found in the
+relevant literature.
 
 The distance between a site and all the events in the earthquake
-catalogue is computed by \typefunc{do}{\_all}{dist}. Recall that
-in the description of an event (see \tref{tab:evntdb-columns})
-there was no mention of an event hypocentre or epicentre. Note
-that the hypocentre of an actual event is defined as the point at
-which a rupture begins \citep{dr_Kramer96a} and hence is rarely
-located in the centre of the rupture plane (as illustrated in
-Figure 2 by \citet{dr_Sibson03a}). There are two obvious
-techniques that could be used to approximate $\Repi$ and $\Rhyp$.
-The first technique approximates $\Repi$ and $\Rhyp$ using $\Rjb$
-and $\Rrup$ respectively. This technique is conservative since
-\mbox{$\Repi \geq \Rjb$} and \mbox{$\Rhyp \geq \Rrup$}. The second
-technique involves approximating $\Rhyp$ by using the distance to
-the rupture centroid and $\Repi$ with the distance to the vertical
-surface projection of the rupture centroid. The
-\typeself{E}{QR}{M} application currently uses the first (i.e.
-conservative) technique. However, it should be noted that this
-introduces a bias in the results, particularly since the
-attenuation models themselves are most likely determined from
-events that have been located as point sources. It is recommended
-that the technique for such distance approximation is
-re-considered in the future. In particular, \citet{dr_Bommer05a}
-provide a good discussion of problems associated with using
-multiple attenuation formulae in PSHA and \citet{dr_Scherbaum04a}
-provide distance metric conversion formulae that may be used to
-overcome the bias issues discussed above.
+catalogue is computed by ........... Recall that in the description
+of an event (see \tref{tab:evntdb-columns}) there was no mention of
+an event hypocentre or epicentre. Note that the hypocentre of an
+actual event is defined as the point at which a rupture initiates
+\citep{dr_Kramer96a} and is hence rarely located in the centre of
+the rupture plane (as illustrated in Figure 2 by
+\citet{dr_Sibson03a}). There are two obvious techniques that could
+be used to approximate $\Repi$ and $\Rhyp$. The first technique
+approximates $\Repi$ and $\Rhyp$ using $\Rjb$ and $\Rrup$
+respectively. This technique is conservative since \mbox{$\Repi \geq
+\Rjb$} and \mbox{$\Rhyp \geq \Rrup$}. The second technique involves
+approximating $\Rhyp$ by using the distance to the rupture centroid
+and $\Repi$ with the distance to the vertical surface projection of
+the rupture centroid. The EQRM application currently uses the first
+(i.e. conservative) technique. However, it should be noted that this
+introduces a bias in the results, particularly since the GMPEs
+themselves are most likely determined from events that have been
+located as point sources. It is recommended that the technique for
+such distance approximation is re-considered in the future. In
+particular, \citet{dr_Bommer05a} provide a good discussion of
+problems associated with using multiple GMPE formulae in PSHA and
+\citet{dr_Scherbaum04a} provide distance metric conversion formulae
+that may be used to overcome the bias issues discussed above.
 
 
-\section{Attenuation formulae}
+\section{Ground Motion Prediction Equations}
 \label{attn:atten-formula}
 
 
-There are many attenuation formulae described in the literature.
-\citet{dr_Campbell03a} provides an overview of many common
-attenuation models. A handful of these are available for use
-within the EQRM application. Analogous to the use of source
-models, the EQRM allows the user to use one or more attenuation
-models. This section discusses the individual attenuation
-formulae. The sampling of attenuation model probability density
+There are many GMPE described in the literature. A subset of these
+are available for use within the EQRM application. Analogous to the
+use of source models, the EQRM allows the user to use one or more
+attenuation models. This section discusses the individual
+attenuation formulae. The sampling of GMPE probability density
 function (aleatory uncertainty) is discussed in
-\sref{attn:uncertainty} and the use of multiple attenuation models
-is described in \sref{sec:attn-multi-attnmodels}.
+\sref{attn:uncertainty} and the use of multiple GMPEs is described
+in \sref{sec:attn-multi-attnmodels}.
 
 
-\subsection{Toro attenuation formula}
+\subsection{Toro97 GMPE}
 
-The \citet{dr_Toro97a} attenuation relation used in the EQRM code
-is based on the Joyner-Boore distance $\Rjb$ and moment-magnitude.
-Note that this reference largely describes the variability and not
-how the coefficients were derived. \citet{dr_EPRI93a} describes
-how the coefficients were derived.
+The \citet{dr_Toro97a} GMPE used in the EQRM code is based on the
+Joyner-Boore distance $\Rjb$ and moment-magnitude. Note that this
+reference largely describes the variability and not how the
+coefficients were derived. \citet{dr_EPRI93a} describes how the
+coefficients were derived.
 
-The \citet{dr_Toro97a} attenuation model divides North America
-into two regions (Gulf and Mid-Continent) and can  be used with
-two different measures of magnitude (local and moment). Currently
-the EQRM can only use the Mid-Continent -- moment magnitude
-version of the attenuation model. This version of the attenuation
-model is used because the earthquake mechanism in Mid-Continent
-USA is believed to be similar to that in Australia (i.e. both are
-intraplate settings). It is possible to incorporate the other
-options for the \cite{dr_Toro97a} attenuation model in the future
-by using the \typeself{set}{da}{ta} parameter
-\typepar{attn}{\_reg}{ion} (see \tref{tab:attn-flags}).
+The \citet{dr_Toro97a} GMPE divides North America into two regions
+(Gulf and Mid-Continent) and can  be used with two different
+measures of magnitude (local and moment). Currently the EQRM can
+only use the Mid-Continent -- moment magnitude version of the
+attenuation model. This version of the attenuation model is used
+because the earthquake mechanism in Mid-Continent USA is believed to
+be similar to that in Australia (i.e. both are intraplate settings).
+
 
 The attenuation formula is
 \begin{equation}
@@ -230,13 +221,7 @@ where
 \end{equation}
 
 The coefficients used in the code, $C_1,\ldots,C_7$, are functions
-of $T_o$ and are tabulated in \citet[Table 2]{dr_Toro97a} and in
-the file \typeparfile{attn\_toro}{\_midcontinent}{\_momag}{.txt}
-(for the mid-continent region). The preparation of coefficients is
-undertaken by \typefunc{attn}{\_prepcoeff}{\_toro} (called by
-\typefunc{prep}{\_at}{tn}) and the attenuation computed by
-\typefunc{attn}{\_allper}{vec\_toro} (called by
-\typefunc{do}{\_atten}{uation}).
+of $T_o$ and are tabulated in \citet[Table 2]{dr_Toro97a}.
 
 The `uncertainty parameter' ($\sigma_{log(S_a)}$) can be
 decomposed as follows:
@@ -245,12 +230,10 @@ decomposed as follows:
  \sqrt{\sigma_a(T_o,r_m,\Rjb)+\sigma_e(r_m)}.
 \end{equation}
 
-The aleatory or random uncertainty $\sigma_a$ can be separated
-into a source dependant component $\sigma_{a,r_m}$ (see
-\citet[Table 3]{dr_Toro97a} or
-\typefunc{attn}{\_preptoro}{\_aleatory1}) and a path dependant
-component $\sigma_{a,\Rjb}$ (see \citet[Table 4]{dr_Toro97a} or
-\typefunc{attn}{\_preptoro}{\_aleatory2}) as follows:
+The aleatory or random uncertainty $\sigma_a$ can be separated into
+a source dependant component $\sigma_{a,r_m}$ (see \citet[Table
+3]{dr_Toro97a} and a path dependant component $\sigma_{a,\Rjb}$ (see
+\citet[Table 4]{dr_Toro97a} as follows:
 \begin{equation}
 \label{eq:attn-toro-aleat} \sigma_a =
 \sqrt{\sigma_{a,r_m}^2(T_o,r_m) + \sigma_{a,\Rjb}^2(T_o,\Rjb)}.
@@ -258,41 +241,33 @@ component $\sigma_{a,\Rjb}$ (see \citet[Table 4]{dr_Toro97a} or
 The EQRM uses the aleatory uncertainty as defined by
 \eref{eq:attn-toro-aleat}.
 
-The epistemic or knowledge uncertainty $\sigma_e$ is dependant
-upon source only, that is \mbox{$\sigma_e =\sigma_{e,r_m}$} (see
-\citet[Page 48]{dr_Toro97a} or
-\typefunc{attn}{\_preptoro}{\_epistemic}). Note that
-$\sigma_{a,r_m}$ is a function of $T_o$ and $r_m$;
-$\sigma_{a,\Rjb}$ is a function of $T_o$ and $\Rjb$; and
-$\sigma_{e,r_m}$ is a function of $r_m$ only.
+The epistemic or knowledge uncertainty $\sigma_e$ is dependant upon
+source only, that is \mbox{$\sigma_e =\sigma_{e,r_m}$} (see
+\citet[Page 48]{dr_Toro97a}. Note that $\sigma_{a,r_m}$ is a
+function of $T_o$ and $r_m$; $\sigma_{a,\Rjb}$ is a function of
+$T_o$ and $\Rjb$; and $\sigma_{e,r_m}$ is a function of $r_m$ only.
 
-\subsection{Gaull attenuation formula}
+\subsection{Gaull90}
 \label{attn:atten-formula-Gaull}
 
-
-The \citet{dr_Gaull90a} attenuation relation, as used in the EQRM
-code, is based on hypocentral distance $\Rhyp$ and local magnitude
-$r_{m_l}$.The Gaull attenuation model can be used to compute (i)
-the mean of the logarithm of PGA $\mu_{log(PGA)}$ or (ii) the mean
-of the logarithm of the Modified Mercalli Intensity
-$\mu_{log(\Imm)}$. The formula is based on empirical intensity
-data in the Australian region and the PGA extension created using
-Papua New Guinea data. For the purpose of this attenuation model
-the Australian region is divided into four sub-regions, Western
-Australia, Southeastern Australia, Northeastern Australia and
-Indonesia. In the EQRM application the selection of the Gaull
-region is controlled by the flag \typepar{attn}{\_reg}{ion} whose
-functionality is described by \sref{sec:attn-multi-attnmodels} and
-\tref{tab:attn-regions}. The attenuation formulae is:
+The \citet{dr_Gaull90a} GMPE, as used in the EQRM code, is based on
+hypocentral distance $\Rhyp$ and local magnitude $r_{m_l}$. In the
+paper it can be used to compute (i) the mean of the logarithm of PGA
+$\mu_{log(PGA)}$ or (ii) the mean of the logarithm of the Modified
+Mercalli Intensity $\mu_{log(\Imm)}$. Only the PGA is coded in the
+EQRM at this stage. The formula is based on empirical intensity data
+in the Australian region and the PGA extension created using Papua
+New Guinea data. For the purpose of this GMPE the Australian region
+is divided into four sub-regions, Western Australia, Southeastern
+Australia, Northeastern Australia and Indonesia. Only the WA region
+is available in the EQRM at this stage. The attenuation formulae is:
 \begin{equation}
 lnY = \ln a-c\ln \Rhyp + br_{m_l}
 \end{equation}
 where $a$, $b$ and $c$ are constants, $r_{m_l}$ is the local
 magnitude of the rupture and $lnY$ represents $\mu_{log(PGA)}$ or
 $\mu_{log(MMI)}$ depending on the value of the constants. The
-constants are tabulated in \citet[Table 4]{dr_Gaull90a} and are in
-the file \typefunc{attn}{\_allpervec}{\_gaull} (for the $PGA$
-case) and \typefunc{attn}{\_mmi}{\_gaull} (for the $\Imm$ case).
+constants are tabulated in \citet[Table 4]{dr_Gaull90a}.
 
 Note that in the case of the \citet{dr_Gaull90a} attenuation model
 (PGA version) there is no need to prepare the attenuation
@@ -300,10 +275,7 @@ coefficients because the attenuation model is only defined for
 $T_o=0 sec$ (PGA). To compute $S_a(T_o,r_m,R)$ (more specifically,
 $\mu_{log(S_a)}$), we can extend the $PGA$ estimate using the
 Australian Standard Response Spectral Acceleration
-\citep{dr_Standards93a}. The actual computation of the
-\citet{dr_Gaull90a} attenuation model is undertaken by
-\typefunc{attn}{\_allpervec}{\_gaull} and the `extension' to a
-complete $S_a$ is undertaken by \typefunc{aus}{\_pesh}{new}.
+\citep{dr_Standards93a}.
 
 \citet[Table 4]{dr_Gaull90a} tabulate the `uncertainty
 parameter(s)' ($\sigma_{log(Y)}$) and indicate that they do not
@@ -319,35 +291,30 @@ PGA) and 0.925 (for $\Imm$) should be used in preference to the
 published values of 0.28 and 0.37 respectively.
 
 
-\subsection{Atkinson and Boore attenuation formula}
+\subsection{Atkinson97}
 
-The \cite{dr_Atkinson97a} attenuation relation, as used in the
-EQRM code, is based on hypocentral distance $\Rhyp$ and moment
-magnitude $r_m$. The formula is
+The \cite{dr_Atkinson97a} GMPE, as used in the EQRM code, is based
+on hypocentral distance $\Rhyp$ and moment magnitude $r_m$. The
+formula is
 \begin{equation}
 \mu_{log(S_a)}(T_o,r_m,\Rhyp) = C_1 + C_2(r_m-6) + C_3(r_m-6)^2
 -ln(\Rhyp)-C_4\Rhyp.
 \end{equation}
 The coefficients used in the code, $C_1,\ldots,C_7$, are functions
-of $T_o$ and are tabulated in \citet[Table 1]{dr_Atkinson97a} and
-in the file \typeparfile{attn}{\_atkboore}{\_momag}{.txt}. The
-preparation of coefficients is undertaken by
-\typefunc{attn}{\_prepcoeff}{\_atkboore} and the attenuation
-computed by \typefunc{attn}{\_allpervec}{\_atkboore}.
+of $T_o$ and are tabulated in \citet[Table 1]{dr_Atkinson97a}.
 
 The uncertainty is dependant on $T_o$ only and is defined by
 \citet{dr_Atkinson95b}. It represents aleatory uncertainty,
 $\sigma_a$ and no attempt is made to separate it into into source
-and path components (see \citealt[Table 2]{dr_Atkinson95b}, or
-\typefunc{attn\_prep}{\_atkboore}{\_aleatory}).
+and path components (see \citealt[Table 2]{dr_Atkinson95b}).
 
 
-\subsection{Sadigh attenuation formula}
+\subsection{Sadigh97}
 
-The \cite{dr_Sadigh97a} attenuation relation, as used in the EQRM
-code, is based on rupture distance $\Rrup$ and moment-magnitude
-$r_m$. Using the convention defined by \citet{dr_Campbell03a} (in
-accompanying appendix), the attenuation formula is
+The \cite{dr_Sadigh97a} GMPE, as used in the EQRM code, is based on
+rupture distance $\Rrup$ and moment-magnitude $r_m$. Using the
+convention defined by \citet{dr_Campbell03a} (in accompanying
+appendix), the GMPE is
 \begin{equation}
 \begin{split}
 \mu_{log(S_a)}(T_o,r_m,\Rrup) & = C_1F +C_2 + C_3r_m
@@ -358,14 +325,7 @@ C_rln(r_{rup}+2),
 where the parameter $F$ is hard wired in the EQRM to 1 (hence
 assuming reverse faulting). The coefficients used in the code,
 $C_1,\ldots,C_7$, are functions of $T_o$ and $ r_m$. They are
-tabulated in \citet[Table 2]{dr_Sadigh97a} and they are located in
-the files
-\typeparfile{attn\_sadigh}{\_coeff\_momag}{\_less65}{.txt} and
-\typeparfile{attn\_sadigh}{\_coeff}{\_momag\_great65}{.txt} for
-\mbox{$r_m \leq 6.5$} and \mbox{$r_m > 6.5$} respectively. The
-preparation of coefficients is undertaken by
-\typefunc{attn}{\_prepcoeff}{\_sadigh} and the attenuation
-computed by \typefunc{attn}{\_allpervec}{\_sadigh}.
+tabulated in \citet[Table 2]{dr_Sadigh97a}.
 
 \cite{dr_Sadigh97a} define a magnitude $r_m$ and period $T_o$
 dependant `standard error' $\sigma(r_m,T_o)$ (see \citealt[Table
@@ -376,101 +336,79 @@ C_{10}-C_{11}r_m & \textrm{for $0<r_m<7.21$} \\
 c_{12} & \textrm{for $r_m \geq 7.21$} \\
 \end{array} \right.
 \end{equation}
-where the coefficients $C_{10}$, $C_{11}$ and $C_{12}$ are
-functions of $T_o$, and are defined in \cite[Table
-A-14]{dr_Campbell03a}. The coefficients are also included in
-\typeparfile{attn\_sadigh}{\_coeff\_momag}{\_less65}{.txt} and
-\typeparfile{attn\_sadigh}{\_coeff}{\_momag\_great65}{.txt}. The
-preparation of the coefficients is conducted by
-\typefunc{attn\_prep}{\_sadigh}{\_uncertainty}. For the purpose of
-consistency, $\sigma(r_m,T_o)$ is assumed to be the aleatory
-uncertainty $\sigma_a$.
+where the coefficients $C_{10}$, $C_{11}$ and $C_{12}$ are functions
+of $T_o$, and are defined in \cite[Table A-14]{dr_Campbell03a}. For
+the purpose of consistency, $\sigma(r_m,T_o)$ is assumed to be the
+aleatory uncertainty $\sigma_a$.
 
 
-\subsection{Somerville attenuation formula}
-The \citet{dr_Somerville01a} attenuation relation, as used in the
-EQRM code, is based on Joyner--Boore distance $R_{jb}$ and moment
-magnitude $r_m$. The \citet{dr_Somerville01a} attenuation model
-can be used for rift or nonrift zones and for vertical or
-horizontal shaking (i.e. four seperate versions). The default
-setting in the EQRM is nonrift -- horizontal however this can be
-modified by changing \typepar{attn}{\_reg}{ion} (see
-\sref{sec:attn-multi-attnmodels} and \tref{tab:attn-regions}).
+\subsection{Somerville09}
+\textbf{David to complete this section}
+\begin{itemize}
+\item decsribe the two options available (NonCratonic and Yilgarn)
+\item cite the report
+\item create table with the NonCratonic coeeficients (i.e.
+\tref{tab:Somerville09_Non_Cratonic})
+\end{itemize}
+
+\begin{table}
+\caption{Coeeficients for \texttt{Somerville09\_Non\_Cratonic}. The
+Non-Cratonic model represents an everage model for all non cratonic
+regions of Australia (\textbf{update citation}. For all practical
+purposes it can be used in all regions except the Yilgran Craton.
+The complete table of coefficients is include here because it was
+omitted from the original publication where it should have been
+table 7-3g.} \label{tab:Coeff-Somerville09_Non_Cratonic}
+\footnotesize
+\begin{tabular}{ccccccccc}
+ \hline
+Period  & $C_1$    & $C_2$     & $C_3$     & $C_4$     & $C_5$    & $C_6$    & $C_7$    & $C_8$ \\
+\hline
+PGA     & 1.03780  & -0.03970  & -0.79430  & 0.14450   & -0.00618 & -0.72540 & -0.03590 & -0.09730 \\
+0.010   & 1.05360  & -0.04190  & -0.79390  & 0.14450   & -0.00619 & -0.72660 & -0.03940 & -0.09740 \\
+0.020   & 1.05680  & -0.03920  & -0.79680  & 0.14550   & -0.00617 & -0.73230 & -0.03930 & -0.09600 \\
+0.030   & 1.13530  & -0.04790  & -0.80920  & 0.15000   & -0.00610 & -0.76410 & -0.05710 & -0.09210 \\
+0.040   & 1.30000  & -0.07020  & -0.83150  & 0.15920   & -0.00599 & -0.82850 & -0.09810 & -0.08530 \\
+0.050   & 1.47680  & -0.09310  & -0.83330  & 0.15600   & -0.00606 & -0.86740 & -0.12740 & -0.09130 \\
+0.075   & 1.70220  & -0.05160  & -0.80720  & 0.14560   & -0.00655 & -0.87690 & -0.10970 & -0.08690 \\
+0.100   & 1.65720  & 0.15080   & -0.77590  & 0.13100   & -0.00708 & -0.77830 & 0.01690  & -0.05980 \\
+0.150   & 1.94440  & -0.09620  & -0.75000  & 0.11670   & -0.00698 & -0.69490 & -0.13320 & -0.12530 \\
+0.200   & 1.82720  & -0.06230  & -0.73430  & 0.11940   & -0.00677 & -0.64380 & -0.09570 & -0.11920 \\
+0.250   & 1.74380  & -0.02530  & -0.72480  & 0.11950   & -0.00646 & -0.63740 & -0.06250 & -0.11650 \\
+0.3003  & 1.80560  & -0.27020  & -0.73190  & 0.13490   & -0.00606 & -0.66440 & -0.17470 & -0.14340 \\
+0.400   & 1.88750  & -0.37820  & -0.70580  & 0.09960   & -0.00589 & -0.58770 & -0.24420 & -0.21890 \\
+0.500   & 2.03760  & -0.79590  & -0.69730  & 0.11470   & -0.00565 & -0.59990 & -0.48670 & -0.29690 \\
+0.750   & 1.93060  & -0.80280  & -0.74510  & 0.11220   & -0.00503 & -0.59460 & -0.50120 & -0.34990 \\
+1.000   & 1.60380  & -0.47800  & -0.86950  & 0.07320   & -0.00569 & -0.41590 & 0.06360  & -0.33730 \\
+1.4993  & 0.47740  & 0.90960   & -1.02440  & 0.11060   & -0.00652 & -0.19000 & 1.09610  & -0.10660 \\
+2.000   & -0.25810 & 1.37770   & -1.01000  & 0.10310   & -0.00539 & -0.27340 & 1.50330  & -0.04530 \\
+3.0003  & -0.96360 & 1.14690   & -0.88530  & 0.10380   & -0.00478 & -0.40420 & 1.54130  & -0.11020 \\
+4.000   & -1.46140 & 1.07950   & -0.80490  & 0.10960   & -0.00395 & -0.46040 & 1.41960  & -0.14700 \\
+5.000   & -1.61160 & 0.74860   & -0.78100  & 0.09650   & -0.00307 & -0.46490 & 1.24090  & -0.22170 \\
+7.5019  & -2.35310 & 0.35190   & -0.64340  & 0.09590   & -0.00138 & -0.68260 & 0.92880  & -0.31230 \\
+10.000  & -3.26140 & 0.69730   & -0.62760  & 0.12920   & -0.00155 & -0.61980 & 1.01050  & -0.24550 \\
+PGV     & 5.07090  & 0.52780   & -0.85740  & 0.17700   & -0.00501 & -0.61190 & 0.80660  & -0.03800 \\
+\hline
+\end{tabular}
+\end{table}
 
 
-
-The attenuation formula is
-\begin{equation}
-\begin{split}
-\mu_{log(S_a)}(T_o,r_m,\Rjb) &= C_1 + C_2(r_m-6.4) + C_3ln(R_M) + C_4(r_m-6.4))\ln(R_M) \\
-       &\quad  + C_5 \Rjb+ C_7(8.5-r_m)^2,
-\end{split}
-\end{equation}
-for $\Rjb<50$, and
-\begin{equation}
-\begin{split}
-\mu_{log(S_a)}(T_o,r_m,\Rjb) &= C_1 + C_2(r_m-6.4) + C_3ln(R_M) + C_4(r_m-6.4))\ln(R_M) \\
-       &\quad  + C_5 \Rjb + C_6(ln(R_M)-ln\sqrt{2536}) +    C_7(8.5-r_m)^2,
-\end{split}
-\end{equation}
-for $\Rjb \geq 50$, where
-\begin{equation}
- R_M = \sqrt{ \Rjb + 6^2 }.
-\end{equation}
-
-The coefficients used in the code, $C_1,\ldots,C_7$, are functions
-of $T_o$ and are tabulated in \citet[Table 9]{dr_Somerville01a}
-and in the file \typeparfile{attn\_somer}{\_nonrift}{\_hori}{.txt}
-(for the Nonrift -- Horizontal case). The preparation of
-coefficients is undertaken by
-\typefunc{attn}{\_prepcoeff}{\_somerville} (called by
-\typefunc{prep}{\_at}{tn}) and the attenuation computed by
-\typefunc{attn}{\_allpervec}{\_somerville} (called by
-\typefunc{do}{\_atten}{uation}).
-
-\cite{dr_Somerville01a} describe five types of uncertainty as
-follows:
-
-\begin{supertabular}{ll}
-$\sigma_{\mu}$ & uncertainty in the median attenuation = 0.2. \\
-$\sigma_{\sigma}$ & uncertainty in the scatter about median attenuation = 0.15. \\
-$\sigma_{modeling}(T_o)$ & representing the discrepancy between
-actual
-physical processes \\
-  & and the simplified representation of the model.\\
-$\sigma_a(T_o)$ & arising from parameters varied in the study of \\
- & \cite{dr_Somerville01a}. \\
-$\sigma_b(T_o)$ & arising from earlier studies by the same
-authors.\\
-\end{supertabular}
-
-The terms $\sigma_{\mu}$ and $\sigma_{\sigma}$ are clearly
-epistemic uncertainty. \cite{dr_Somerville01a} then define
-$\sigma_{modeling}(T_o)$, $\sigma_a(T_o)$ and $\sigma_b(T_o)$ as
-contributions to the scatter and as such the aleatory uncertainty
-is taken to be:
-\begin{equation}
-\sigma_{a,log(S_a)}(T_o) = \sqrt{
-\sigma_{modeling}^2(T_o)+\sigma_a^2(T_o)+\sigma_b^2(T_o) }.
-\end{equation}
-
-\
+\normalsize
 
 \section{Incorporating aleatory uncertainty}
 \label{attn:uncertainty}
 
 Incorporating uncertainty is a critical component of any PSHA. The
 inclusion of aleatory uncertainty in the EQRM for attenuation
- is facilitated by the flag
-\typepar{var}{\_attn}{\_flag}. The aleatory uncertainty is based
-on estimations of $\sigma_{log(S_a)}$ (see
-\sreftwo{attn:atten-formula}{attn:implementation}) and is
-incorporated within \typefunc{do}{\_atten}{uation}.
+ is facilitated by the EQRM controlfile parameter
+ \typepar{atten}{\_variability}{\_method}.
+ The aleatory uncertainty is based on estimations of
+$\sigma_{log(S_a)}$ (see
+\sreftwo{attn:atten-formula}{attn:implementation}).
 \sreftwo{attn:uncert-randomchoice}{attn:uncert-pdfchoice} describe
 two of the most commonly used techniques for incorporating
-attenuation aleatory uncertainty when using the EQRM. The flag to
-control the uncertainty method is \typepar{var}{\_attn}{\_method}
-and \tref{tab:attn-varmethods} illustrates all of the aleatory
+attenuation aleatory uncertainty when using the EQRM.
+\tref{tab:attn-varmethods} illustrates all of the aleatory
 uncertainty options that are available with the EQRM.
 \begin{table}
 \caption{Different techniques for incorporating attenuation
@@ -479,7 +417,9 @@ variability in the EQRM.} \vspace{0.8em}
 \begin{centering}
 \begin{tabular}{c|p{0.7\textwidth}}
 \typeparcaption{var}{\_attn}{\_method} & Description \\
-\hline 1 & PDF sampling or spawning (see \sref{attn:uncert-pdfchoice}) when \typeparcaption{src}{\_eps}{\_switch} is 1 0 $-1$ \\
+\hline
+None & No sampling \\
+1 & PDF sampling or spawning (see \sref{attn:uncert-pdfchoice}) \\
 2 & random sampling (see \sref{attn:uncert-randomchoice}) \\
 3 & $+2\sigma$ from median\\
 4 & $+\sigma$ from median\\
@@ -522,35 +462,33 @@ about random selection:
 \item Two sites that are close to one another may give
 dramatically different estimates of ground motion for the same
 event. Earthquake hazard and risk values that are computed using
-random sampling exhibit a low level of spatial correlation. \item
+random sampling exhibit a low level of spatial correlation.
+\item
 The number $n_{rand}$ can theoretically take on any value between
-$\pm \infty$. Therefore it is possible that estimates of $S_a$
-using \eref{attn:attn-var} can be unrealistically large.
-\cite{dr_Dhu02b} overcame this problem by re-scaling the
-excessively large $S_a$ to some acceptable level. The re-scaling
-was performed by the function \typefunc{pga}{\_cut}{off} which
-computes a re-scaling parameter $R_{scale}$ as follows
+$\pm \infty$. Therefore it is possible that estimates of $S_a$ using
+\eref{attn:attn-var} can be unrealistically large. The EQRM
+overcomes this problem by introducing a scaling factor
+\typepar{atten}{\_pga}{\_scaling cutoff} which is applied to the RSA
+as follows:
 \begin{equation}
+if PGA > \typepar{atten}{\_pga}{\_scaling\_cutoff}\\
 R_{scale} =
-\frac{\textrm{\typepar{pga}{\_cut}{off}}}{log(A_{S_a}(0,r_m,R))}.
-\end{equation}
-The re-scaling parameter is then applied to the entire $S_a$ as
-follows
-\begin{equation}
-log(A_{S_a,new}(T_o,r_m,R)) = R_{scale} \times
+\frac{\textrm{\typepar{atten}{\_pga}{\_scaling\_cutoff}}}{log(A_{S_a}(0,r_m,R))}
+\\
+ log(A_{S_a,new}(T_o,r_m,R)) = R_{scale} \times
 log(A_{S_a,old}(T_o,r_m,R)).
 \end{equation}
 \item There is no effort to account for the likelihood (or
-probability) of selecting a particular $n_{rand}$ i.e. a
-particular value of the $S_a$ is not weighted against its
-likelihood. It can be argued that if enough earthquakes are
-simulated a range of different $n_{rand}$ will be taken (high and
-low) and the overall hazard and/or risk values will converge to
-the true ones.
+probability) of selecting a particular $n_{rand}$ i.e. a particular
+value of the $S_a$ is not weighted against its likelihood. It can be
+argued that if enough earthquakes are simulated a range of different
+$n_{rand}$ will be taken (high and low) and the overall hazard
+and/or risk values will converge to the true ones.
 \end{enumerate}
 
 
-\subsection{Sampling the probability density function of the response spectral acceleration\index{response spectral acceleration} (spawning)}
+\subsection{Sampling the probability density function of
+the response spectral acceleration\index{response spectral acceleration} (spawning)}
 \label{attn:uncert-pdfchoice}
 
 
@@ -773,6 +711,14 @@ illustrated procedure is repeated for $N_s$ events in the event
 catalogue and the techniques of \cref{ch:risk} used to assess the
 hazard or risk.} \label{fig:attn-treecollapse}
 \end{figure}
+
+\subsection{Recomendation for sampling GMPE aleatory Uncertainty}
+
+\textbf{David to complete this section}
+\begin{itemize}
+\item use spawning for hazard - exaplin why
+\item use random sampling for risk - exaplain why
+\end{itemize}
 
 \section{Using multiple attenuation models - Incorporating epistemic uncertainty}
 \label{sec:attn-multi-attnmodels}
