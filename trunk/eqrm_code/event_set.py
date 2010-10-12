@@ -828,7 +828,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
             #print "magnitude.dtype.name", magnitude.dtype.name
         eqrmlog.debug('Memory: event set lists have been combined')
         eqrmlog.resource_usage()
-
+        source.set_event_set_indexes(range(start,end))
         source_zone_id[start:end] = [i]*num
         start = end
     
