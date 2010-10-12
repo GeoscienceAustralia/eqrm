@@ -23,6 +23,8 @@ from scipy import (asarray, transpose, array, r_, concatenate, sin, cos, pi,
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
+from eqrm_code.conversions import calc_fault_area, calc_fault_width,\
+    calc_fault_length, get_new_ll, Wells_and_Coppersmith_94, azimuth_of_trace
 from eqrm_code.projections import projections
 from eqrm_code.generation_polygon import polygons_from_xml
 from eqrm_code.projections import azimuthal_orthographic_ll_to_xy as ll_to_xy
@@ -197,11 +199,13 @@ class Event_Set(object):
             ML = asarray(ML)
         if Mw is not None:
             Mw = asarray(Mw)
+        # finish turning into arrays
 
         if Mw is None:
             Mw = conversions.Johnston_89_Mw(ML)
         if ML is None:
             ML = conversions.Johnston_01_ML(Mw)
+            
         area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
         # finish turning into arrays arrays
                 
@@ -710,8 +714,151 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     
     (fsg_list, magnitude_type) = xml_fault_generators(fault_xml_file, 
                                                       prob_min_mag_cutoff)
-    return create_fault_sources(event_control_file, fsg_list)
 
+    source_list = create_fault_sources(event_control_file, fsg_list)
+    
+    prob_number_of_events_in_faults = zeros((len(source_list)),
+                                                   dtype=EVENT_INT)
+                
+    for i,fault in enumerate(fsg_list):
+        prob_number_of_events_in_faults[i] = fault.number_of_events
+        
+        
+    num_events = sum(prob_number_of_events_in_faults)
+    rupture_centroid_lat = zeros((num_events), dtype=EVENT_FLOAT)
+    rupture_centroid_lon = zeros((num_events), dtype=EVENT_FLOAT)
+    depth_top_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
+    depth_bottom_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
+    azimuth = zeros((num_events), dtype=EVENT_FLOAT)
+    dip = zeros((num_events), dtype=EVENT_FLOAT)
+    magnitude = zeros((num_events), dtype=EVENT_FLOAT)
+    source_zone_id = zeros((num_events), dtype=EVENT_INT)
+    start=0
+
+    for i,fault in enumerate(fsg_list):
+        
+        #change to use index
+        source = source_list[i]
+        scaling_rule = source.scaling['scaling_rule']
+        scaling_event_type = source.scaling['scaling_event_type']
+        num = fault.number_of_events
+        end = start + num
+        fault_dip =fault.dip_dist['mean']
+        depth_top =fault.depth_top_seismogenic_dist['mean']
+        depth_bottom=fault.depth_bottom_seismogenic_dist['mean']
+        
+        fault_width=calc_fault_width(depth_top, 
+                                     depth_bottom,
+                                     fault_dip)
+        
+        fault_length=calc_fault_length(fault.trace_start_lat,
+                                       fault.trace_start_lon,
+                                       fault.trace_end_lat,
+                                       fault.trace_end_lon)
+        
+        fault_area= fault_width * fault_length
+        fault_magnitude = fault.populate_magnitude(num)
+        magnitude[start:end] = fault_magnitude  
+        fault_magnitude = asarray(fault_magnitude)
+        (rup_width,rup_length)=Wells_and_Coppersmith_94(scaling_event_type,
+                                                        fault_magnitude,
+                                                        fault_width,
+                                                        fault_length)
+        fault_azimuth=azimuth_of_trace(fault.trace_start_lat,
+                                       fault.trace_start_lon,
+                                       fault.trace_end_lat,
+                                       fault.trace_end_lon)
+        
+        #fault_azimuth=20
+        
+        random_scalar=fault.populate_range(num)
+        Ds = (fault_length-rup_length) * random_scalar
+        (r_start_lat,r_start_lon) = get_new_ll(fault.trace_start_lat,
+                                                fault.trace_start_lon, 
+                                                fault_azimuth, 
+                                                Ds)
+        
+        #Not sure why we bother calculating this, doesn't seem to be used
+        (r_end_lat,r_end_lon) = get_new_ll(r_start_lat,
+                                               r_start_lon, 
+                                               fault_azimuth, 
+                                               rup_length)
+        
+        r_depth_min= depth_top + (0.5*rup_width)*sin(math.radians(fault_dip))
+        r_depth_max= depth_bottom - (0.5*rup_width)*sin(math.radians(fault_dip))
+        
+        r_depth_centroid = (r_depth_max-r_depth_min) *random_scalar
+        
+        r_depth_top = r_depth_centroid - ((0.5*rup_width) * 
+                                           sin(math.radians(fault_dip)))
+                         
+        r_depth_bottom = r_depth_centroid + ((0.5*rup_width)* 
+                                              sin(math.radians(fault_dip)))
+        
+        r_y_centroid=  r_depth_centroid *((cos(math.radians(fault_dip)))/
+                                         (sin(math.radians(fault_dip))))
+        
+        r_x_centroid= rup_length/2
+        
+        (r_centroid_lat,r_centroid_lon) = xy_to_ll(r_x_centroid,
+                                                   r_y_centroid,
+                                                   r_start_lat,
+                                                   r_start_lon, 
+                                                   fault_azimuth)
+        
+            #FIXME DSG-EQRM the events will not to randomly placed,
+            # Due to  lat, lon being spherical coords and popolate
+            # working in x,y (flat 2D).
+        #(lat, lon) = array(fault.populate(num)).swapaxes(0, 1) 
+        eqrmlog.debug('Memory: lat,lon created')
+        eqrmlog.resource_usage()
+            
+            #attach the current polygons generated attributes
+        
+        rupture_centroid_lat[start:end] = r_centroid_lat
+        rupture_centroid_lon[start:end] = r_centroid_lon
+            
+        depth_top_seismogenic[start:end] = r_depth_top
+        depth_bottom_seismogenic[start:end] = r_depth_bottom
+        azimuth[start:end] = fault_azimuth
+        fault_dip = fault.populate_dip(num)
+        dip[start:end] = fault_dip
+        #magnitude[start:end] = polygon_magnitude
+            #number_of_mag_sample_bins[start:end] = mag_sample_bins
+            #print "magnitude.dtype.name", magnitude.dtype.name
+        eqrmlog.debug('Memory: event set lists have been combined')
+        eqrmlog.resource_usage()
+
+        source_zone_id[start:end] = [i]*num
+        start = end
+    
+    new_ML=None
+    new_Mw=None
+    if magnitude_type == 'ML':
+        new_ML=magnitude
+    elif magnitude_type == 'Mw':
+        new_Mw=magnitude
+    else:
+        raise Exception('Magnitudes not set')
+    event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
+                                 rupture_centroid_lon=rupture_centroid_lon,
+                                 azimuth=azimuth,
+                                 dip=dip,
+                                 ML=new_ML,
+                                 Mw=new_Mw,
+                                 depth_top_seismogenic=depth_top_seismogenic,
+                                 depth_bottom_seismogenic=
+                                 depth_bottom_seismogenic)
+    event.source_zone_id = asarray(source_zone_id)
+        #print "event.source_zone_id", event.source_zone_id
+    eqrmlog.debug('Memory: finished generating events')
+    eqrmlog.resource_usage()
+
+    #return create_fault_sources(event_control_file, fsg_list)
+
+    return event, source_list
+   
+    
     
 class Pseudo_Event_Set(Event_Set):
     """
