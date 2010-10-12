@@ -102,7 +102,8 @@ class Distribution_Log_Normal(object):
         """      
         if variate_site is None:
             # size sets the shape of the returned array
-            variate_site=self.rvs(size=log_sigma.size)
+            variate_site = self.rvs(size=log_sigma.size)
+            variate_site = variate_site.reshape(log_sigma.shape)
         sample_values = exp(log_mean + variate_site * log_sigma)        
         return sample_values
 
