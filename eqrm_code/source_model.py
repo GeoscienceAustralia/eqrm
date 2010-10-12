@@ -361,7 +361,7 @@ def event_control_from_xml(filename):
     return eg_list
 
 def create_fault_sources(event_control_file, fsg_list):
-    """Takes an FSG list and an event contro file and creates a list
+    """Takes an FSG list and an event control file and creates a list
     of Source objects.
 
     event_control_file  path to an <event_type_controlfile> XML file
