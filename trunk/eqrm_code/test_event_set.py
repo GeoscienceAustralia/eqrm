@@ -886,9 +886,9 @@ class Test_Event_Set(unittest.TestCase):
 
         prob_min_mag_cutoff = 4.0
 
-        src_list = generate_synthetic_events_fault(fault_xml_file,
-                                                   event_control_file,
-                                                   prob_min_mag_cutoff)
+        (event_set, src_list) = generate_synthetic_events_fault(fault_xml_file,
+                                                  event_control_file,
+                                                  prob_min_mag_cutoff)
 
 #        # dump the SRC objects
 #        for src in src_list:
