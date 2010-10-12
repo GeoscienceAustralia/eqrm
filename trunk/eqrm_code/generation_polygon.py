@@ -103,7 +103,8 @@ class Generation_Polygon(polygon_object):
 class Fault_Source_Generator(object):
     """Class encapsulating fault source data from the new-format XML files."""
 
-    # dictionary containing param name to type map
+    # Dictionary containing param name to type mapping.
+    # Anything not here is assumed to be type 'str'.
     name_type_map = {'dip': float,
                      'out_of_dip_theta': float,
                      'delta_theta': float,
@@ -133,29 +134,29 @@ class Fault_Source_Generator(object):
         recurrence_model_dict  dictionary of all <recurrence_model> data
 
         The *_dict parameters contain exactly what was in the XML and must be
-        checked for required data.  We ignore extra unrecognized parameters.
+        checked for required data.  We ignore extra parameters.
 
         The returned object will have the following data attributes:
-            dip_dist
-            out_of_dip_theta_dist
-            depth_top_seismogenic_dist
-            depth_bottom_seismogenic_dist
-            slab_width
-            trace_start_lat
-            trace_start_lon
-            trace_end_lat
-            trace_end_lon
-            azimuth_dist
-            distribution
-            recurrence_min_mag
-            recurrence_max_mag
-            b
-            slip_rate
-            A_min
-            generation_min_mag
-            number_of_mag_sample_bins
-            number_of_events
-            magnitude_dist
+            .dip_dist
+            .out_of_dip_theta_dist
+            .depth_top_seismogenic_dist
+            .depth_bottom_seismogenic_dist
+            .slab_width
+            .trace_start_lat
+            .trace_start_lon
+            .trace_end_lat
+            .trace_end_lon
+            .azimuth_dist
+            .distribution
+            .recurrence_min_mag
+            .recurrence_max_mag
+            .b
+            .slip_rate
+            .A_min
+            .generation_min_mag
+            .number_of_mag_sample_bins
+            .number_of_events
+            .magnitude_dist
         """
 
         # save generic fault information
@@ -225,6 +226,20 @@ class Fault_Source_Generator(object):
                                            'recurrence_max_mag')
         self.b = self.n2t(recurrence_model_dict, 'b')
 
+        # TODO: Only save A_min, convert from slip_rate if required
+#        slip_rate = self.n2t(recurrence_model_dict, 'slip_rate')
+#        self.A_min = self.n2t(recurrence_model_dict, 'A_min')
+#        if ((slip_rate and A_min) or (not slip_rate and self.A_min)):
+#            msg = ("Badly formed XML in file %s: expected exactly one of "
+#                   "'slip_rate' and 'A_min' attributes in fault '%s'"
+#                   % (filename, fault_name))
+#            raise Exception(msg)
+#        if not A_min:
+#            convert = distribution_to_converter.get(self.distribution,
+#                                                    self.bad_convert)
+#            area_kms = ????
+#            self.A_min = convert(self.b, mMin, mMax, slip_rate, area_kms)
+       
         self.slip_rate = self.n2t(recurrence_model_dict, 'slip_rate')
         self.A_min = self.n2t(recurrence_model_dict, 'A_min')
         if ((self.slip_rate and self.A_min) or
@@ -253,12 +268,14 @@ class Fault_Source_Generator(object):
         d     data dictionary value with 'name' defined
         name  name of value in data dictionary 'd'
 
+        self.name_type_map is the type mapping dictionary.
+
         If 'name' is not found in the data dictionary, assume a None value.
-        If 'name' not found in type dictionary, assume 'str'.
+        If 'name' not found in type dictionary, assume 'str' type.
         """
 
         try:
-            val = d[name]
+            val = d[name]	# can only get KeyError exception here
             t = self.name_type_map.get(name, str)
             result = t(val)
         except KeyError:
