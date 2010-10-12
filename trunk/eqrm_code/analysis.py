@@ -338,7 +338,7 @@ def main(parameter_handle,
     else:
         bedrock_SA_all = None
         
-    if THE_PARAM_T.use_amplification is True and \
+    if THE_PARAM_T.save_motion is True and \
            THE_PARAM_T.use_amplification is True:
         soil_SA_all = zeros((array_size, num_events * num_spawning,
                              len(THE_PARAM_T.atten_periods)),
