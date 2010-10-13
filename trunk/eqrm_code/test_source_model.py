@@ -16,6 +16,10 @@ from eqrm_code.util import reset_seed, determine_eqrm_path
 
 #***************************************************************
 
+class Dummy:
+    def __init__(self):
+        pass
+    
 class Test_Source_model(unittest.TestCase):
     
     def setUp(self):
@@ -280,7 +284,7 @@ class Test_Source_model(unittest.TestCase):
             file_name,
             prob_min_mag_cutoff,
             source_model,
-            prob_number_of_events_in_zones)
+            prob_number_of_events_in_zones=prob_number_of_events_in_zones)
         
         event_activity = Obsolete_Event_Activity(len(events))
         new_event_set = source_model.calculate_recurrence(
@@ -539,11 +543,53 @@ class Test_Source_model(unittest.TestCase):
 
         self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
 
+    def test_add_event_type_atts_to_sources(self):
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(
+            ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<event_type_controlfile>'
+             '  <event_group event_type = "ham">'
+             '    <GMPE fault_type = "more_ham">'
+             '      <branch model = "food" weight = "1.0"/>'
+             '    </GMPE>'
+             '    <scaling scaling_rule = "y" />'
+             '  </event_group>'
+             '  <event_group event_type = "eggs">'
+             '    <GMPE fault_type = "more_eggs">'
+             '      <branch model = "Camp" weight = "1.0"/>'
+             '    </GMPE>'
+             '    <scaling scaling_rule = "e" />'
+             '  </event_group>'
+             '</event_type_controlfile>'])
+
+        handle.write(sample)
+        handle.close()
+
+        
+        event_type = ['ham', 'eggs', 'ham', 'eggs', 'eggs']
+        dummy_list = []
+        for name in event_type:
+            d = Dummy()
+            d.event_type = name
+        source_mod = Source_Model(dummy_list, 'Mw')
+        source_mod.add_event_type_atts_to_sources(file_name)
+
+        for s in source_mod:
+            if s.event_type == 'ham':
+                self.failUnlessEqual(s.fault_type, "more_ham")
+            else:
+                self.failUnlessEqual(s.fault_type, "more_eggs")
+            
+        os.remove(file_name)
+        
 
 ################################################################################
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Source_model,'test')
-    #suite = unittest.makeSuite(Test_Source_model,'test_Source_mini_check_gong')
+    #suite = unittest.makeSuite(Test_Source_model,'test_add_event_type_atts_to_sources')
     runner = unittest.TextTestRunner()
     runner.run(suite)
