@@ -10,6 +10,7 @@ from numpy import arange,exp
 from eqrm_code.event_set import Event_Set
 from eqrm_code.source_model import Source_Model, Source_Zone_Polygon        
 from eqrm_code.recurrence_functions import *
+from eqrm_code.conversions import *
 
 class Test_Sliprate_functions(unittest.TestCase):
     
@@ -30,7 +31,15 @@ class Test_Sliprate_functions(unittest.TestCase):
         bin_centroids = make_bins(prob_min_mag_cutoff,max_magnitude,prob_number_of_mag_sample_bins)
         event_bins=r_[0:prob_number_of_mag_sample_bins]
         event_bins=sorted(event_bins)
-    
+        (width,length)=Wells_and_Coppersmith_94("normal", bin_centroids, 15, 30)
+        
+        lon1=144
+        lat1=(0,45,60,85)
+        
+        for i in range(4):
+            print "azimuth of line from (", lat1[i],"," ,lon1,") to (" ,lat1[i]+1,"," ,lon1+1,") =" , calc_azimuth2(lat1[i], lon1, lat1[i]+1, lon1+1)
+        #print "azimuth 3: ",calc_azimuth3(lat1, lon1, lat2, lon2)
+        
         print "Params: \n \
         max_magnitude = ",max_magnitude, "\n \
         prob_min_mag_cutoff = ",prob_min_mag_cutoff," \n \

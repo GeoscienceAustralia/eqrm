@@ -298,6 +298,10 @@ class Fault_Source_Generator(object):
     def populate_magnitude(self,n):
         return self.populate_distribution(self.magnitude_dist,n)
     
+    def populate_range(self,n):
+        dist= {'distribution': 'uniform', 'minimum': 0, 'maximum': 1}
+        return self.populate_distribution(dist,n)
+    
     def populate_distribution(self,distribution_args,n):
         """
         Use the distribution specifed in pdf_dict to
