@@ -1,6 +1,6 @@
 <source_model_zone magnitude_type="Mw">
     <zone area = "5054.035"
-  event_type = "scenario">
+  event_type = "TS_haz03">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -30,7 +30,7 @@
     
     
     <zone area = "57731.425"
-  event_type = "scenario">
+  event_type = "TS_haz03">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -64,7 +64,7 @@
     
     
     <zone area = "56703.105"
-  event_type = "scenario">
+  event_type = "TS_haz03">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -99,7 +99,7 @@
     
     
     <zone area = "3046.615"
-  event_type = "scenario">
+  event_type = "TS_haz03">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -129,7 +129,7 @@
     
     
     <zone area = "72204.957"
-  event_type = "scenario">
+  event_type = "TS_haz03">
     <geometry 
     dip = "35"
     delta_dip = "0"
@@ -164,7 +164,7 @@
     
     
     <zone area = "44149.044"
-  event_type = "scenario">
+  event_type = "TS_haz03">
     <geometry 
     dip = "35"
     delta_dip = "0"
