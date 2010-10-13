@@ -18,6 +18,7 @@ from eqrm_code.polygon import populate_polygon
 from eqrm_code.polygon_class import polygon_object
 from eqrm_code.xml_interface import Xml_Interface
 from eqrm_code.conversions import azimuth_of_trace
+from eqrm_code.recurrence_functions import calc_A_min_from_slip_rate
 
 ##############################################################################
 
@@ -182,12 +183,12 @@ class Fault_Source_Generator(object):
         self.out_of_dip_theta_dist = {'distribution': 'uniform', 
                                       'minimum': out_of_dip_theta - delta_theta,
                                       'maximum': out_of_dip_theta + delta_theta}
-        self.depth_top_seismogenic_dist = \
-                {'distribution': 'constant', 
-                 'mean': self.n2t(geometry_dict, 'depth_top_seismogenic')}
-        self.depth_bottom_seismogenic_dist = \
-                {'distribution': 'constant',
-                 'mean': self.n2t(geometry_dict, 'depth_bottom_seismogenic')}
+        depth_top = self.n2t(geometry_dict, 'depth_top_seismogenic')
+        self.depth_top_seismogenic_dist = {'distribution': 'constant', 
+                                           'mean': depth_top}
+        depth_bottom = self.n2t(geometry_dict, 'depth_bottom_seismogenic')
+        self.depth_bottom_seismogenic_dist = {'distribution': 'constant',
+                                              'mean': depth_bottom}
         self.slab_width = self.n2t(geometry_dict, 'slab_width')
 
         # now unpack the <trace> dictionary
@@ -226,29 +227,27 @@ class Fault_Source_Generator(object):
                                            'recurrence_max_mag')
         self.b = self.n2t(recurrence_model_dict, 'b')
 
-        # TODO: Only save A_min, convert from slip_rate if required
-#        slip_rate = self.n2t(recurrence_model_dict, 'slip_rate')
-#        self.A_min = self.n2t(recurrence_model_dict, 'A_min')
-#        if ((slip_rate and A_min) or (not slip_rate and self.A_min)):
-#            msg = ("Badly formed XML in file %s: expected exactly one of "
-#                   "'slip_rate' and 'A_min' attributes in fault '%s'"
-#                   % (filename, fault_name))
-#            raise Exception(msg)
-#        if not A_min:
-#            convert = distribution_to_converter.get(self.distribution,
-#                                                    self.bad_convert)
-#            area_kms = ????
-#            self.A_min = convert(self.b, mMin, mMax, slip_rate, area_kms)
-       
-        self.slip_rate = self.n2t(recurrence_model_dict, 'slip_rate')
+        # only save A_min, convert from slip_rate if required
+        slip_rate = self.n2t(recurrence_model_dict, 'slip_rate')
         self.A_min = self.n2t(recurrence_model_dict, 'A_min')
-        if ((self.slip_rate and self.A_min) or
-               (not self.slip_rate and not self.A_min)):
+        if ((slip_rate and self.A_min) or (not slip_rate and not self.A_min)):
             msg = ("Badly formed XML in file %s: expected exactly one of "
                    "'slip_rate' and 'A_min' attributes in fault '%s'"
                    % (filename, fault_name))
             raise Exception(msg)
-
+        if slip_rate:
+            self.A_min = calc_A_min_from_slip_rate(self.b,
+                                                   self.recurrence_min_mag,
+                                                   self.recurrence_max_mag,
+                                                   slip_rate,
+                                                   self.distribution,
+                                                   self.trace_start_lat,
+                                                   self.trace_start_lon,
+                                                   self.trace_end_lat,
+                                                   self.trace_end_lon,
+                                                   depth_top, depth_bottom,
+                                                   dip)
+       
         # now unpack the <event_generation> dictionary
         eg_dict = recurrence_model_dict['event_generation']
         self.generation_min_mag = self.n2t(eg_dict, 'generation_min_mag')
@@ -268,7 +267,7 @@ class Fault_Source_Generator(object):
         d     data dictionary value with 'name' defined
         name  name of value in data dictionary 'd'
 
-        self.name_type_map is the type mapping dictionary.
+        self.name_type_map is the class global type mapping dictionary.
 
         If 'name' is not found in the data dictionary, assume a None value.
         If 'name' not found in type dictionary, assume 'str' type.
