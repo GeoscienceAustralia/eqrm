@@ -46,8 +46,8 @@ EVENT_INT = int64 #int32
 # This is used in the Chiou08 model.
 ######
 FaultTypeDictionary = {'reverse': 0,
-                          'normal': 1,
-                          'strikeslip': 2}
+                       'normal': 1,
+                       'strikeslip': 2}
 
 
 class Dummy:
@@ -146,7 +146,8 @@ class Event_Set(object):
     def create(cls, rupture_centroid_lat, rupture_centroid_lon, azimuth,
                dip=None, ML=None, Mw=None, depth=None, fault_width=None,
                depth_top_seismogenic=None, # Need for generate synthetic events
-               depth_bottom_seismogenic=None):
+               depth_bottom_seismogenic=None,
+               fault_type=None):
         """generate a scenario event set or a synthetic event set.
         Args:
           rupture_centroid_lat: Latitude of rupture centriod
@@ -224,10 +225,10 @@ class Event_Set(object):
         # calculate depth_to_top from depth, width, dip
         depth_to_top = conversions.calc_depth_to_top(depth, width, dip)
 
-        # manufacture an array of 'fault_type' with dimensions of 'depth'
-        # should accept a fault type and use that instead of hardcoded 'reverse'
-        fault_type = ones(
-            depth.shape, dtype=int) * FaultTypeDictionary['reverse']
+        # Default 'fault_type' to 'reverse'
+        if fault_type is None:
+            fault_type = ones(
+                depth.shape, dtype=int) * FaultTypeDictionary['reverse']
 
         # Add function conversions
         length = area/width
@@ -257,7 +258,9 @@ class Event_Set(object):
                         dip,
                         ML,
                         Mw,
-                        depth, depth_to_top, fault_type,
+                        depth,
+                        depth_to_top,
+                        fault_type,
                         width,
                         length,
                         area,
@@ -715,7 +718,8 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     (fsg_list, magnitude_type) = xml_fault_generators(fault_xml_file, 
                                                       prob_min_mag_cutoff)
 
-    source_list = create_fault_sources(event_control_file, fsg_list)
+    source_list = create_fault_sources(event_control_file, fsg_list,
+                                       magnitude_type)
     
     prob_number_of_events_in_faults = zeros((len(source_list)),
                                                    dtype=EVENT_INT)

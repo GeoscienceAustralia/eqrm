@@ -188,7 +188,8 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
+            THE_PARAM_T.dip,
+            THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
