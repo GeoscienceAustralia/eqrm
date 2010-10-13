@@ -183,10 +183,11 @@ CONV_NEW = [{'order': 10.0,
             {'order': 50.0,
              'title': '\n# Attenuation\n'},
             {'order': 50.01,
-             'new_para': 'atten_models'},
+             'new_para': 'atten_models',
+             'default': None},
             {'order': 50.02,
              'new_para': 'atten_model_weights',
-             'default': [1]},
+             'default': None},
             {'order': 50.03,
              'new_para': 'atten_collapse_Sa_of_atten_models',
              'default': False},
@@ -600,16 +601,18 @@ def att_value_fixes(THE_PARAM_T):
     if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_scenario == 0:
             raise ValueError('do not save motion for a generated event')
 
+    # FIXME this should happen to the weights from sources as well. 
     weights = THE_PARAM_T.atten_model_weights    
     # test if attenuation weights are close to 1 (with 0.01 absolute tolerance)
-    # this means that 3 weights with 0.33 should pass
-    if not allclose(weights.sum(),1.0,atol=0.01):
-        print 'weights=',weight
-        raise ValueError
+    # this means that 3 weights with 0.33 should pass    
+    if weights is not None:
+        if not allclose(weights.sum(),1.0,atol=0.01):
+            print 'weights=',weight
+            raise ValueError
     
-    # Re-normalise weights so they do sum to 1
-    weights=weights/abs(weights.sum()) # normalize
-    THE_PARAM_T['atten_model_weights'] = [x for x in weights]
+        # Re-normalise weights so they do sum to 1
+        weights=weights/abs(weights.sum()) # normalize
+        THE_PARAM_T['atten_model_weights'] = [x for x in weights]
 
     
     # if periods is collapsed (into a scalar), turn it into a vector
@@ -679,24 +682,6 @@ def verify_THE_PARAM_T(THE_PARAM_T):
         raise ParameterSyntaxError(
             "Syntax Error: Period values are not ascending")
 
-    # Hacky stuff if the NGA attenuation model BA08 (Boore_08 )is used.
-    # It does not work with EQRM's amplification model.
-    # FIXME This info is in more than one place. (It is also in analysis)
-    # This is bad.
-    if 'Boore_08' in THE_PARAM_T.atten_models:
-        is_ba08 = True
-    else:
-        is_ba08 = False
-        
-    if is_ba08:
-        if len(THE_PARAM_T.atten_models) > 1:
-            raise ParameterSyntaxError(
-                "Parameter file error: Boore_08 attenuation model can not " +
-                "be used with other attenuation models.")
-        if THE_PARAM_T.use_amplification != 0:
-            raise ParameterSyntaxError(
-                "When using BA09 attenuation model" +
-                " do not use amplification.")
                 
 #     if THE_PARAM_T.save_motion == True and THE_PARAM_T.is_scenario == True \
 #             and THE_PARAM_T.scenario_number_of_events > 1:

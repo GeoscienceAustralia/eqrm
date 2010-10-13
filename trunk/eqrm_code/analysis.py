@@ -199,6 +199,10 @@ def main(parameter_handle,
             fid_event_types = None
         if fid_event_types is not None:
             source_mods[0].add_event_type_atts_to_sources(fid_event_types)
+            # This is a hack, until
+            # gm splitting is working
+            THE_PARAM_T['atten_models'] = source_mods[0][0].atten_models
+            THE_PARAM_T['atten_model_weights'] = source_mods[0][0].atten_model_weights
             
         if THE_PARAM_T.atten_models is not None and \
            THE_PARAM_T.atten_model_weights is not None:
