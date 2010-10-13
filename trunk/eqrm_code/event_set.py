@@ -57,7 +57,7 @@ class Dummy:
     
 class Event_Set(object):
     def __init__(self, azimuth, dip, ML, Mw,
-                 depth, depth_to_top, faulting_type,
+                 depth, depth_to_top, fault_type,
                  width, length, area, fault_width,
                  source_zone_id,
                  trace_start_lat, trace_start_lon,
@@ -83,7 +83,7 @@ class Event_Set(object):
     depth                 depths - scalar or n-vector, depth to event , km
                           range (0:large], ie [5,5,10,...]
     depth_top             depth to top of rupture - scalar or n-vector, km
-    faulting_type         index (0, 1 or 2) from the FaultingTypeDictionary
+    fault_type            index (0, 1 or 2) from the FaultingTypeDictionary
                           above, depending on fault type key
     Mw                    moment magnitudes - scalar or n-vector
                           range (-large:+large) in practice ~(0:9)
@@ -121,7 +121,7 @@ class Event_Set(object):
         self.Mw = Mw
         self.depth = depth
         self.depth_to_top = depth_to_top
-        self.faulting_type = faulting_type
+        self.fault_type = fault_type
         self.width = width
         self.length = length
         self.area = area
@@ -224,9 +224,9 @@ class Event_Set(object):
         # calculate depth_to_top from depth, width, dip
         depth_to_top = conversions.calc_depth_to_top(depth, width, dip)
 
-        # manufacture an array of 'faulting_type' with dimensions of 'depth'
+        # manufacture an array of 'fault_type' with dimensions of 'depth'
         # should accept a fault type and use that instead of hardcoded 'reverse'
-        faulting_type = ones(
+        fault_type = ones(
             depth.shape, dtype=int) * FaultingTypeDictionary['reverse']
 
         # Add function conversions
@@ -257,7 +257,7 @@ class Event_Set(object):
                         dip,
                         ML,
                         Mw,
-                        depth, depth_to_top, faulting_type,
+                        depth, depth_to_top, fault_type,
                         width,
                         length,
                         area,
@@ -604,7 +604,7 @@ class Event_Set(object):
                              self.Mw[key],
                              self.depth[key],
                              self.depth_to_top[key],
-                             self.faulting_type[key],
+                             self.fault_type[key],
                              self.width[key],
                              self.length[key],
                              self.area[key],

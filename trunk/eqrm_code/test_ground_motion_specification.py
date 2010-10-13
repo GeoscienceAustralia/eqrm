@@ -698,7 +698,7 @@ del tmp
 #
 ## num_events = 2
 ## 'reverse' fault type index is 0
-#test_data['Chiou08_test_faulting_type'] = [0, 0]
+#test_data['Chiou08_test_fault_type'] = [0, 0]
 #
 ## num_periods = 4
 #test_data['Chiou08_test_period'] = [0.01, 0.20, 1.00, 3.00]
@@ -736,7 +736,7 @@ test_data['Chiou08_test_depth_to_top'] = [0.0, 0.0]
 
 # num_events = 2
 # 'reverse' fault type index is 0
-test_data['Chiou08_test_faulting_type'] = [0, 0]
+test_data['Chiou08_test_fault_type'] = [0, 0]
 
 # num_periods = 4
 test_data['Chiou08_test_period'] = [0.01, 0.20, 1.00, 3.00]
@@ -863,7 +863,7 @@ test_data['Campbell08_test_depth_to_top'] = [5.0, 0.0, 5.0, 0.0]
 
 # num_events = 4
 # 'strikeslip' fault type index is 2, 'reverse' is 0
-test_data['Campbell08_test_faulting_type'] = [2, 2, 0, 0]
+test_data['Campbell08_test_fault_type'] = [2, 2, 0, 0]
 
 # num_periods = 4
 test_data['Campbell08_test_period'] = [0.01, 0.20, 1.00, 3.00]
@@ -993,7 +993,7 @@ test_data['Abrahamson08_test_depth_to_top'] = [0.0, 0.0]
 
 # num_events = 2
 # 'reverse' fault type index is 0
-test_data['Abrahamson08_test_faulting_type'] = [0, 0]
+test_data['Abrahamson08_test_fault_type'] = [0, 0]
 
 # num_periods = 4
 test_data['Abrahamson08_test_period'] = [0.01, 0.20, 1.00, 3.00]
@@ -1085,13 +1085,13 @@ def data2atts(model_name):
     # params not there for every model (usually return None if not there)
     depths = test_data.get(model_name+'_test_depth', None)
     depth_to_top = test_data.get(model_name+'_test_depth_to_top', None)
-    faulting_type = test_data.get(model_name+'_test_faulting_type', None)
+    fault_type = test_data.get(model_name+'_test_fault_type', None)
     dip = array(test_data.get(model_name+'_test_dip', None))
     Z25 = array(test_data.get(model_name+'_test_Z25', None))
     test_sigma = test_data.get(model_name+'_test_sigma', None)
 
     return (distances, magnitudes, test_mean, test_sigma, periods, depths, vs30,
-            depth_to_top, faulting_type, Z25, dip)
+            depth_to_top, fault_type, Z25, dip)
 
 def ground_motion_interface_conformance(GM_class, model_name):
     """
@@ -1100,7 +1100,7 @@ def ground_motion_interface_conformance(GM_class, model_name):
     """
 
     (distances, magnitudes, test_mean, test_sigma, periods, depths, vs30,
-     depth_to_top, faulting_type, Z25, dip) = data2atts(model_name)
+     depth_to_top, fault_type, Z25, dip) = data2atts(model_name)
 
     if GM_class is Ground_motion_calculator:
         gm = GM_class(model_name, periods)
@@ -1108,7 +1108,7 @@ def ground_motion_interface_conformance(GM_class, model_name):
             gm.distribution_function(distances, magnitudes, periods=periods,
                                      depth=depths, vs30=vs30,
                                      depth_to_top=depth_to_top,
-                                     faulting_type=faulting_type, Z25=Z25,
+                                     fault_type=fault_type, Z25=Z25,
                                      dip=dip)
     elif GM_class is Multiple_ground_motion_calculator:
         model_weights = [1]
@@ -1118,7 +1118,7 @@ def ground_motion_interface_conformance(GM_class, model_name):
             gm._distribution_function(distances, magnitudes, periods=periods,
                                       depth=depths, vs30=vs30,
                                       depth_to_top=depth_to_top,
-                                      faulting_type=faulting_type, Z25=Z25,
+                                      fault_type=fault_type, Z25=Z25,
                                       dip=dip)
 
     return (exp(log_mean), test_mean, log_sigma, test_sigma)

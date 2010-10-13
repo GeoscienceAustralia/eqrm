@@ -165,7 +165,7 @@ class Test_Source_model(unittest.TestCase):
     </recurrence_model>
     
     <ground_motion_models 
-       faulting_type = "normal" 
+       fault_type = "normal" 
        ground_motion_selection = "crustal fault" />   
   </zone>
 </source_model_zone>
