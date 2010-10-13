@@ -262,7 +262,7 @@ def event_control_from_xml(filename):
             branch_list   a list of dictionaries {'model': '...',
                                                   'weight': '0.5'}
             scaling_dict  a dictionary {'scaling_rule': '...',
-                                        'scaling_event_type': '...'}
+                                        'scaling_fault_type': '...'}
 
             The constructed object will have the following attributes:
                 .event_type          - event type string
@@ -270,7 +270,7 @@ def event_control_from_xml(filename):
                 .branch_models       - list of branch models
                 .branch_weights      - list of branch wrights
                 .scaling_rule        - event scaling rule string
-                .scaling_event_type  - event scaling type string
+                .scaling_fault_type  - event scaling type string
             """
 
             self.event_type = event_type

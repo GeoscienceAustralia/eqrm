@@ -8,7 +8,7 @@
       <branch model = "Sadigh_97" weight = "0.3"/> 
     </GMPE>
     <scaling scaling_rule = "WellsCoppersmith94" 
-    scaling_event_type = "unspecified" />
+    scaling_fault_type = "unspecified" />
   </event_group>
   
   <event_group
@@ -19,7 +19,7 @@
       <branch model = "Boore08" weight = "0.2"/>
     </GMPE>
     <scaling scaling_rule = "WellsCoppersmith94" 
-    scaling_event_type = "reverse" />
+    scaling_fault_type = "reverse" />
   </event_group>
 	
   
@@ -31,7 +31,7 @@
       <branch model = "Atkinson03_interface" weight = "0.5"/> 
     </GMPE>
     <scaling scaling_rule = "WellsCoppersmith94" 
-    scaling_event_type = "reverse" />
+    scaling_fault_type = "reverse" />
   </event_group>
   
   <event_group
@@ -42,7 +42,7 @@
       <branch model = "Atkinson03_inslab" weight = "0.5"/> 
     </GMPE>
     <scaling scaling_rule = "WellsCoppersmith94" 
-    scaling_event_type = "unspecified" />
+    scaling_fault_type = "unspecified" />
   </event_group>	
   
 </event_type_controlfile>
