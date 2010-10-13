@@ -346,18 +346,11 @@ class Event_Set(object):
         
         Args:
           fid_genpolys: The full path name of the source polygon xml file
-          fault_width: Maximum width along virtual fault, km
-          azi: Predominant azimuth of events, degrees *
-          dazi: Azimuth range of events (azi +/- dazi) *
-          fault_dip: dip of virtual faults, degrees * 
-          * = can be a single value or a vector with differnet elements
-              for each source zone          
           prob_min_mag_cutoff: Mimimum magnitude below which hazard is not
-            considered
-          override_xml: Boolean means the above arguments override the
-            arguments in the xml file.  Analysis uses True
+            considered.
           prob_number_of_events_in_zones: Vector whose elements represent
             the number of events for each generation.  Can be None.
+            This overrides the info in the xml file.
           
         Returns: An event_set instance.
         

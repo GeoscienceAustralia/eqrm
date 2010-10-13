@@ -425,12 +425,6 @@ class Test_Event_Set(unittest.TestCase):
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
-        
-        # I don't know what this is A_min="1.0"
-        # But I added it so the tests would pass
-        # Another example file at
-        # Q:\python_eqrm\implementation_tests\input\newc_source_polygon.xml
-        #  polygon is a small square
 
         
         sample = """<source_model_zone magnitude_type='Mw'>
@@ -460,6 +454,31 @@ class Test_Event_Set(unittest.TestCase):
         handle.write(sample)
         handle.close()
 
+
+        (handle, et_file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        et_handle = open(et_file_name,'w')
+
+        sample = '\n'.join(
+            ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<event_type_controlfile>'
+             '  <event_group event_type = "crustal fault">'
+             '    <GMPE fault_type = "more_crustal fault">'
+             '      <branch model = "food" weight = "1.0"/>'
+             '    </GMPE>'
+             '    <scaling scaling_rule = "y" />'
+             '  </event_group>'
+             '  <event_group event_type = "eggs">'
+             '    <GMPE fault_type = "more_eggs">'
+             '      <branch model = "Camp" weight = "1.0"/>'
+             '    </GMPE>'
+             '    <scaling scaling_rule = "e" />'
+             '  </event_group>'
+             '</event_type_controlfile>'])
+
+        et_handle.write(sample)
+        
+
         source_mod = Dummy()
         #file_name = os.path.join('..','implementation_tests','input','newc_source_polygon.xml')
         #return
@@ -468,7 +487,7 @@ class Test_Event_Set(unittest.TestCase):
             file_name,
             prob_min_mag_cutoff,
             source_mod,
-            prob_number_of_events_in_zones)
+            prob_number_of_events_in_zones=prob_number_of_events_in_zones)
 #         print "events.trace_start_lat", events.trace_start_lat
 #         print " events.trace_start_lon", events.trace_start_lon
 #         print "events.trace_end_lat", events.trace_end_lat
@@ -483,7 +502,9 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(events.rupture_centroid_lat >= -32.05)
         self.assert_(events.rupture_centroid_lon <= 151.05)
         self.assert_(events.rupture_centroid_lon >= 151.0)
+        
         os.remove(file_name)
+        os.remove(et_file_name)
 
 
     def test_generate_synthetic_events_horspool(self):
@@ -594,7 +615,7 @@ class Test_Event_Set(unittest.TestCase):
             file_name,
             prob_min_mag_cutoff,
             source_mod,
-            prob_number_of_events_in_zones)
+            prob_number_of_events_in_zones=prob_number_of_events_in_zones)
         
         
         self.assert_(len(events)==3)
