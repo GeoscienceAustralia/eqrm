@@ -741,7 +741,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         #change to use index
         source = source_list[i]
         scaling_rule = source.scaling['scaling_rule']
-        scaling_event_type = source.scaling['scaling_event_type']
+        scaling_event_type = source.scaling['scaling_fault_type']
         num = fault.number_of_events
         end = start + num
         fault_dip =fault.dip_dist['mean']
