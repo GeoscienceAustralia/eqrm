@@ -2627,7 +2627,7 @@ Ch_faulting_flags = {'reverse':    (1, 0),
 # generate 'Ch_fault_type' from the dictionary above and event_set data
 tmp = []
 for (k, v) in Ch_faulting_flags.iteritems():
-    index = event_set.FaultingTypeDictionary[k]
+    index = event_set.FaultTypeDictionary[k]
     tmp.append((index, v))
 
 # sort and make array in correct index order
@@ -2983,7 +2983,7 @@ Campbell08_faulting_flags = {'reverse':    (1, 0),
 # generate 'Campbell08_fault_type' from the dictionary above
 tmp = []
 for (k, v) in Campbell08_faulting_flags.iteritems():
-    index = event_set.FaultingTypeDictionary[k]
+    index = event_set.FaultTypeDictionary[k]
     tmp.append((index, v))
 
 # sort and make array in correct index order
