@@ -154,7 +154,6 @@ class Source_Model(object):
                 msg = ("Didn't find event_type '%s' in XML file '%s'"
                    % (source.event_type, event_control_file))
                 raise Exception(msg)
-
             # attach appropriate ETC attributes to Source object
             source.fault_type = etc.fault_type
             source.atten_models = etc.branch_models
