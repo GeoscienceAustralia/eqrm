@@ -698,7 +698,8 @@ def _calc_attenuation_logic_split(GM_models, model_weights,
             attenuation_ids, attenuation_weights)
 
 def generate_synthetic_events_fault(fault_xml_file, event_control_file,
-                                    prob_min_mag_cutoff):
+                                    prob_min_mag_cutoff, 
+                                    prob_number_of_events_in_faults=None):
     """Create Source objects from XML files for faults and events.
 
     fault_xml_file       path to the fault source generator (FSG) XML file
@@ -714,12 +715,15 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     source_list = create_fault_sources(event_control_file, fsg_list,
                                        magnitude_type)
     
-    prob_number_of_events_in_faults = zeros((len(source_list)),
-                                                   dtype=EVENT_INT)
-                
-    for i,fault in enumerate(fsg_list):
-        prob_number_of_events_in_faults[i] = fault.number_of_events
-        
+    if prob_number_of_events_in_faults is None:  
+        prob_number_of_events_in_faults = zeros((len(source_list)),
+                                                   dtype=EVENT_INT)      
+        for i,fault in enumerate(fsg_list):
+            prob_number_of_events_in_faults[i] = fault.number_of_events
+    
+    assert len(prob_number_of_events_in_faults) == len(source_list)
+    assert len(fsg_list) == len(source_list)
+       
         
     num_events = sum(prob_number_of_events_in_faults)
     rupture_centroid_lat = zeros((num_events), dtype=EVENT_FLOAT)
@@ -739,7 +743,9 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         source = source_list[i]
         scaling_rule = source.scaling['scaling_rule']
         scaling_event_type = source.scaling['scaling_fault_type']
-        num = fault.number_of_events
+        num = prob_number_of_events_in_faults[i]
+        if num == 0:
+            continue
         end = start + num
         fault_dip =fault.dip_dist['mean']
         depth_top =fault.depth_top_seismogenic_dist['mean']
