@@ -17,6 +17,7 @@
 from scipy import (vectorize, sqrt, sin, minimum, pi, where, asarray,
                    exp, log, power, cos, arccos, arcsin, arctan2)
 import math
+from eqrm_code.projections import azimuthal_orthographic_xy_to_ll
 
 def Johnston_01_ML(Mw):
     """
@@ -220,7 +221,8 @@ def calc_fault_area(lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip):
     return fault_area
 
 def calc_fault_width(depth_top,depth_bottom,dip):
-    """Calculate the width of a fault in kms given the dip and depth top and bottom.
+    """Calculate the width of a fault in kms given the dip and depth top and 
+    bottom.
 
     
     depth_top     depth to the top of the seismogenic zone
@@ -246,7 +248,20 @@ def calc_fault_length(lat1,lon1,lat2,lon2):
     fault_length = calc_ll_dist(lat1,lon1,lat2,lon2)
     return fault_length
 
+def get_new_ll(lat1,lon1,azimuth,distance_kms):
+    """Calculate the lat, lon coords a spefied distance along a fault trace, 
+    given the start coords the azimuth and the distance along the trace.
 
+    lat1          latitude of start point
+    lon1          longitude of start point
+    azimuth       azimuth
+    distance_kms  distance in kms
+    
+    Returns the lat, lon coords a spefied distance along a fault trace.
+    """
+    x = distance_kms #cos(azimuth)*distance_kms
+    y = 0#sin(azimuth)*distance_kms
+    return azimuthal_orthographic_xy_to_ll(x,y,lat1,lon1,azimuth)
 
 def obsolete_calc_azimuth(lat1,lon1,lat2,lon2):
     """NOT USED
@@ -264,7 +279,8 @@ def obsolete_calc_azimuth(lat1,lon1,lat2,lon2):
     lat2 = math.radians(lat2) 
     lon2 = math.radians(lon2)
     numerator = sin(lon1 -lon2) * cos(lat2)
-    denominator = sin(arccos((sin(lat2)*sin(lat1))+(cos(lat1)*cos(lat2)*cos(lon2-lon1))))
+    denominator = sin(arccos((sin(lat2)*sin(lat1))+(cos(lat1)*cos(lat2)* 
+                                                    cos(lon2-lon1))))
     azimuth = math.degrees(arcsin(numerator/denominator))  
     return azimuth
 
