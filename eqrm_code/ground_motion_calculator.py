@@ -98,7 +98,7 @@ class Ground_motion_calculator(object):
 
 
     def distribution_function(self, dist_object, mag_dict, periods=None,
-                              depth=None, depth_to_top=None, faulting_type=None,
+                              depth=None, depth_to_top=None, fault_type=None,
                               vs30=None, dist_type=None, mag_type=None,
                               Z25=None, dip=None, event_activity=None,
                               event_id=None):
@@ -123,8 +123,8 @@ class Ground_motion_calculator(object):
             depth = asarray(depth)
 
         (mag, depth, depth_to_top,
-         faulting_type) = self.resize_mag_depth(mag, depth, depth_to_top,
-                                                faulting_type)
+         fault_type) = self.resize_mag_depth(mag, depth, depth_to_top,
+                                                fault_type)
         dist = self.resize_dist(dist, mag.size)
 
         # This is calling the distribution functions described in the
@@ -138,7 +138,7 @@ class Ground_motion_calculator(object):
                                       coefficient=self.coefficient,
                                       sigma_coefficient=self.sigma_coefficient,
                                       depth=depth, depth_to_top=depth_to_top,
-                                      faulting_type=faulting_type, vs30=vs30,
+                                      fault_type=fault_type, vs30=vs30,
                                       Z25=Z25, dip=dip, periods=periods)
 
         # FIXME when will this fail?  Maybe let it fail then?
@@ -153,7 +153,7 @@ class Ground_motion_calculator(object):
 
         return (log_mean, log_sigma)
 
-    def resize_mag_depth(self, mag, depth, depth_to_top, faulting_type):
+    def resize_mag_depth(self, mag, depth, depth_to_top, fault_type):
         """
         Warning, Toro_1997_midcontinent_distribution assumes
         that this occurs.  So if resizing is changed,
@@ -166,8 +166,8 @@ class Ground_motion_calculator(object):
                 depth = depth.reshape([1]) # Don't know if we have to do this
             if depth_to_top is not None:
                 depth_to_top = depth_to_top.reshape([1])
-            if faulting_type is not None:
-                faulting_type = faulting_type.reshape([1])
+            if fault_type is not None:
+                fault_type = fault_type.reshape([1])
 
         # resize depth, depth_to_top, etc
         if depth is not None:
@@ -177,14 +177,14 @@ class Ground_motion_calculator(object):
         if depth_to_top is not None:
             depth_to_top = array(depth_to_top)[newaxis,:,newaxis]
 
-        if faulting_type is not None:
-            faulting_type = array(faulting_type)[newaxis,:,newaxis]
+        if fault_type is not None:
+            fault_type = array(fault_type)[newaxis,:,newaxis]
 
         assert len(mag.shape) == 1
 
         mag = mag[newaxis,:,newaxis]
 
-        return (mag, depth, depth_to_top, faulting_type)
+        return (mag, depth, depth_to_top, fault_type)
 
     def resize_dist(self, dist, mag_size):
         """
@@ -253,7 +253,7 @@ class Multiple_ground_motion_calculator(object):
             distances, magnitudes,
             depth=event_set.depth,
             depth_to_top=event_set.depth_to_top,
-            faulting_type=event_set.faulting_type,
+            fault_type=event_set.fault_type,
             vs30=vs30, Z25=None, dip=None,
             event_activity=event_activity,
             event_id=event_id,
@@ -265,7 +265,7 @@ class Multiple_ground_motion_calculator(object):
 
     def _distribution_function(self, dist_object, mag_dict, periods=None,
                                depth=None, depth_to_top=None,
-                               faulting_type=None, vs30=None, Z25=None,
+                               fault_type=None, vs30=None, Z25=None,
                                dip=None, event_activity=None, event_id=None):
         """
         The event_activity and event_id are not used currently.
@@ -286,7 +286,7 @@ class Multiple_ground_motion_calculator(object):
             (log_mean, log_sigma) = GM_model.distribution_function(
                 dist_object, mag_dict, periods=periods,
                 depth=depth, depth_to_top=depth_to_top,
-                faulting_type=faulting_type, vs30=vs30,
+                fault_type=fault_type, vs30=vs30,
                 Z25=Z25, dip=dip,
                 dist_type=GM_model.GM_spec.distance_type,
                 mag_type=GM_model.GM_spec.magnitude_type)

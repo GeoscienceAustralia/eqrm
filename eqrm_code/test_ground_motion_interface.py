@@ -1099,7 +1099,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ML = numpy.array([[[7.5]]])
         R = numpy.array([[[20.0]]])
         vs30 = numpy.array([[[520.0]]])
-        faulting_type = numpy.array([[[0]]], dtype=int)
+        fault_type = numpy.array([[[0]]], dtype=int)
         Ztor = numpy.array([[[0.0]]])
 
         # get coeffs for this period
@@ -1122,7 +1122,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         (log_mean,
              log_sigma) = Chiou08_distribution(mag=ML, distance=R,
-                                               faulting_type=faulting_type,
+                                               fault_type=fault_type,
                                                depth_to_top=Ztor, vs30=vs30,
                                                coefficient=coeffs,
                                                sigma_coefficient=sigma_coeffs)
@@ -1155,7 +1155,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ML = numpy.array([[[7.5]]])
         R = numpy.array([[[20.0]]])
         vs30 = numpy.array([[[520.0]]])
-        faulting_type = numpy.array([[[0]]], dtype=int)
+        fault_type = numpy.array([[[0]]], dtype=int)
         Ztor = numpy.array([[[0.0]]])
 
         # get coeffs for this period
@@ -1178,7 +1178,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         (log_mean,
              log_sigma) = model.distribution(mag=ML, distance=R,
-                                             faulting_type=faulting_type,
+                                             fault_type=fault_type,
                                              depth_to_top=Ztor, vs30=vs30,
                                              coefficient=coeffs,
                                              sigma_coefficient=sigma_coeffs)
@@ -1273,7 +1273,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ML = numpy.array([[[5.0]]])
         depth = numpy.array([[[5.0]]])
         dip = numpy.array([[[90.0]]])
-        faulting_type = numpy.array([[[2]]], dtype=int)	# SS
+        fault_type = numpy.array([[[2]]], dtype=int)	# SS
         Vs30 = numpy.array([[[760.0]]])
         Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
 
@@ -1297,7 +1297,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
                                                    mag=ML, periods=periods,
                                                    depth_to_top=depth,
-                                                   faulting_type=faulting_type,
+                                                   fault_type=fault_type,
                                                    dip=dip,
                                                    vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
@@ -1348,7 +1348,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ML = numpy.array([[[5.0]]])
         depth = numpy.array([[[5.0]]])
         dip = numpy.array([[[90.0]]])
-        faulting_type = numpy.array([[[2]]], dtype=int)	# SS
+        fault_type = numpy.array([[[2]]], dtype=int)	# SS
         Vs30 = numpy.array([[[760.0]]])
         Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
 
@@ -1372,7 +1372,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
                                                    mag=ML, periods=periods,
                                                    depth_to_top=depth,
-                                                   faulting_type=faulting_type,
+                                                   fault_type=fault_type,
                                                    dip=dip,
                                                    vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
@@ -1423,7 +1423,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ML = numpy.array([[[7.0]]])
         depth = numpy.array([[[0.0]]])
         dip = numpy.array([[[90.0]]])
-        faulting_type = numpy.array([[[2]]], dtype=int)	# SS
+        fault_type = numpy.array([[[2]]], dtype=int)	# SS
         Vs30 = numpy.array([[[760.0]]])
         Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
 
@@ -1447,7 +1447,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
                                                    mag=ML, periods=periods,
                                                    depth_to_top=depth,
-                                                   faulting_type=faulting_type,
+                                                   fault_type=fault_type,
                                                    dip=dip,
                                                    vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
@@ -1498,7 +1498,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         M = numpy.array([[[5.0]]])
         depth = numpy.array([[[5.0]]])
         dip = numpy.array([[[45.0]]])
-        faulting_type = numpy.array([[[0]]], dtype=int)	# RV
+        fault_type = numpy.array([[[0]]], dtype=int)	# RV
         Vs30 = numpy.array([[[760.0]]])
         Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
 
@@ -1522,7 +1522,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
                                                    mag=M, periods=periods,
                                                    depth_to_top=depth,
-                                                   faulting_type=faulting_type,
+                                                   fault_type=fault_type,
                                                    dip=dip,
                                                    vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
@@ -1573,7 +1573,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         M = numpy.array([[[7.0]]])
         depth = numpy.array([[[0.0]]])
         dip = numpy.array([[[45.0]]])
-        faulting_type = numpy.array([[[0]]], dtype=int)	# RV
+        fault_type = numpy.array([[[0]]], dtype=int)	# RV
         Vs30 = numpy.array([[[760.0]]])
         Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
 
@@ -1597,7 +1597,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
                                                    mag=M, periods=periods,
                                                    depth_to_top=depth,
-                                                   faulting_type=faulting_type,
+                                                   fault_type=fault_type,
                                                    dip=dip,
                                                    vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
@@ -1650,7 +1650,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ML = numpy.array([[[7.0], [5.0]]])
         depth = numpy.array([[[0.0]]])
         dip = numpy.array([[[90.0]]])
-        faulting_type = numpy.array([[[0]]], dtype=int)
+        fault_type = numpy.array([[[0]]], dtype=int)
         Vs30 = numpy.array([[[760.0]]])
 
         # get coeffs for this period (Vlin -> A18 from table 5)
@@ -1670,7 +1670,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
                                                    mag=ML, periods=periods,
                                                    depth_to_top=depth,
-                                                   faulting_type=faulting_type,
+                                                   fault_type=fault_type,
                                                    dip=dip, vs30=Vs30,
                                                    coefficient=coeffs,
                                                    sigma_coefficient=

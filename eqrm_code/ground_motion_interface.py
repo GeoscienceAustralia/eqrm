@@ -75,7 +75,7 @@ Description:
             sigmacoefficient   an array of model sigma coefficients
             depth              depth of the event
             depth_to_top       depth to top of rupture
-            faulting_type      type of fault
+            fault_type      type of fault
 
         Most of these parameters will be numpy arrays.
 
@@ -86,7 +86,7 @@ Description:
             sigmacoefficient.shape = (num_sigmacoefficients, 1, 1, num_periods)
             depth.shape = (site, events, 1)
             depth_to_top.shape = (site, events, 1)
-            faulting_type.shape = (site, events, 1)
+            fault_type.shape = (site, events, 1)
 
         The shapes of the returned arrays are:
             log_mean = (site, events, num_periods)
@@ -2614,7 +2614,7 @@ Ch_378_7_pow_8 = math.pow(378.7, 8)
 Ch_3_82_div_8 = 3.82/8.0
 
 ######
-# Set up a numpy array to convert a 'faulting_type' flag to an array slice
+# Set up a numpy array to convert a 'fault_type' flag to an array slice
 # that encodes the Frv/Fnm flags.
 ######
 
@@ -2624,7 +2624,7 @@ Ch_faulting_flags = {'reverse':    (1, 0),
                      'normal':     (0, 1),
                      'strikeslip': (0, 0)}
 
-# generate 'Ch_faulting_type' from the dictionary above and event_set data
+# generate 'Ch_fault_type' from the dictionary above and event_set data
 tmp = []
 for (k, v) in Ch_faulting_flags.iteritems():
     index = event_set.FaultingTypeDictionary[k]
@@ -2635,7 +2635,7 @@ tmp2 = []
 tmp.sort()
 for (_, flags) in tmp:
     tmp2.append(flags)
-Ch_faulting_type = array(tmp2)
+Ch_fault_type = array(tmp2)
 del tmp, tmp2
 
 ######
@@ -2646,7 +2646,7 @@ def Chiou08_distribution(**kwargs):
     """The Chiou08 model.
 
     kwargs  dictionary of parameters, expect:
-                mag, distance, faulting_type, depth_to_top, vs30, dip,
+                mag, distance, fault_type, depth_to_top, vs30, dip,
                 coefficient, sigma_coefficient
 
     The algorithm here is taken from [1], pages 193 and 194  and returns results
@@ -2661,7 +2661,7 @@ def Chiou08_distribution(**kwargs):
     # get args
     M = kwargs['mag']				# event-specific
     Rrup = kwargs['distance']			# event-site-specific
-    faulting_type = kwargs['faulting_type']	# event-specific
+    fault_type = kwargs['fault_type']	# event-specific
     Ztor = kwargs['depth_to_top']		# event-specific
     Vs30 = kwargs['vs30']			# site-specific
     coefficient = kwargs['coefficient']
@@ -2680,9 +2680,9 @@ def Chiou08_distribution(**kwargs):
     (C1, C1a, C1b, Cn, CM, C5, C6, C7, C7a, C9, C9a, C10, Cgamma1, Cgamma2,
          phi1, phi2, phi3, phi4, phi5, phi6, phi7, phi8) = coefficient
 
-    # get flag values from 'faulting_type'
-    Frv = Ch_faulting_type[:,0][faulting_type]
-    Fnm = Ch_faulting_type[:,1][faulting_type]
+    # get flag values from 'fault_type'
+    Frv = Ch_fault_type[:,0][fault_type]
+    Fnm = Ch_fault_type[:,1][fault_type]
 
     # precalculate some common expressions
     M_min_Ch_Chm = M - Ch_Chm
@@ -2970,7 +2970,7 @@ Campbell08_ElnPGA = 0.478	# ElnY for PGA, table 3, page 149
 Campbell08_exp_min_075 = math.exp(-0.75)
 
 ######
-# Set up a numpy array to convert a 'faulting_type' flag to an array slice
+# Set up a numpy array to convert a 'fault_type' flag to an array slice
 # that encodes the Frv/Fnm flags.
 ######
 
@@ -2980,7 +2980,7 @@ Campbell08_faulting_flags = {'reverse':    (1, 0),
                              'normal':     (0, 1),
                              'strikeslip': (0, 0)}
 
-# generate 'Campbell08_faulting_type' from the dictionary above
+# generate 'Campbell08_fault_type' from the dictionary above
 tmp = []
 for (k, v) in Campbell08_faulting_flags.iteritems():
     index = event_set.FaultingTypeDictionary[k]
@@ -2991,7 +2991,7 @@ tmp2 = []
 tmp.sort()
 for (_, flags) in tmp:
     tmp2.append(flags)
-Campbell08_faulting_type = array(tmp2)
+Campbell08_fault_type = array(tmp2)
 del tmp, tmp2
 
 ######
@@ -3014,7 +3014,7 @@ def Campbell08_distribution(**kwargs):
     Ztor = kwargs['depth_to_top']		# event-specific
     Vs30 = kwargs['vs30']			# site-specific
     delta = kwargs['dip']			# event-specific
-    faulting_type = kwargs['faulting_type']	# event-specific
+    fault_type = kwargs['fault_type']	# event-specific
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
@@ -3040,9 +3040,9 @@ def Campbell08_distribution(**kwargs):
     Rrup = dist_object.Rupture()
     Rjb = dist_object.Joyner_Boore()
 
-    # get flag values from 'faulting_type'
-    Frv = Campbell08_faulting_type[:,0][faulting_type]
-    Fnm = Campbell08_faulting_type[:,1][faulting_type]
+    # get flag values from 'fault_type'
+    Frv = Campbell08_fault_type[:,0][fault_type]
+    Fnm = Campbell08_fault_type[:,1][fault_type]
 
     # unpack coefficients
     (C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,K1,K2,K3) = coefficient
