@@ -105,7 +105,7 @@ class Source_Model(object):
     an extra attribute magnitude_type though
     
     """
-    def __init__(self, sources, magnitude_type):
+    def __init__(self, sources, magnitude_type='Mw'):
         self._sources = sources
         #print "sources in __init__", sources
         self._magnitude_type=magnitude_type
@@ -160,6 +160,20 @@ class Source_Model(object):
             source.atten_model_weights = etc.branch_weights
             source.scaling = etc.scaling_dict
 
+
+    @classmethod
+    def create_scenario_source_model(cls):
+        # FIXME this is highlighting that source is beting used for two activities
+        # calculating an event activity and associating an event with
+        # a ground motion model.  So split this class into two classes sometime
+        source = Source(min_magnitude=None,
+                        max_magnitude=None,
+                        prob_min_mag_cutoff=None,
+                        A_min=None, b=None, number_of_mag_sample_bins=None,
+                        event_type=None)
+        source_model = cls(source)
+        return source_model
+
             
 class Source(object):
     """A class that combines fault source generator data with that from the 
@@ -193,6 +207,15 @@ class Source(object):
         # indexes to the event sets in this source zone
         self.event_set_indexes = None
 
+        # The Att's that come from event type control file
+        self.fault_type = None
+        self.atten_models = None
+        self.atten_model_weights = None
+        self.scaling = None
+
+        # A Multiple_ground_motion_calculator representing the attenuation models
+        self.ground_motion_calculator = None
+
     def set_event_set_indexes(self, event_indexes):
         """Add event integer indices list as an attribute.
 
@@ -219,6 +242,13 @@ class Source(object):
         if weight_sum != 1.0:
             msg = 'Model weights should sum to 1.0, got %f' %  weight_sum
             raise Exception(msg)
+
+    def set_ground_motion_calculator(periods):
+        
+        self.ground_motion_calculator = Multiple_ground_motion_calculator(
+            self.atten_models,
+            periods,
+            self.atten_model_weights)
 
 
         
