@@ -189,9 +189,21 @@ def main(parameter_handle,
         source_mods = Source_Models(THE_PARAM_T.prob_min_mag_cutoff, [1.0],
                                     THE_PARAM_T.prob_number_of_mag_sample_bins,
                                     fid_sourcepolys)
-        source_mods[0].set_attenuation(THE_PARAM_T.atten_models,
-                                    THE_PARAM_T.atten_model_weights)
-        
+
+        # Once the event control file is 'fully operational'
+        # remove the try.
+        try:
+            fid_event_types = get_source_file_handle(THE_PARAM_T,
+                                                 source_file_type='event_type')
+        except IOError:
+            fid_event_types = None
+        if fid_event_types is not None:
+            source_mods[0].add_event_type_atts_to_sources(fid_event_types)
+            
+        if THE_PARAM_T.atten_models is not None and \
+           THE_PARAM_T.atten_model_weights is not None:
+            source_mods[0].set_attenuation(THE_PARAM_T.atten_models,
+                                           THE_PARAM_T.atten_model_weights)
         log.debug('Memory: source_mods created')
         log.resource_usage()
 

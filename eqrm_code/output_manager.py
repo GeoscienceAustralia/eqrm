@@ -912,7 +912,7 @@ def get_source_file_handle(THE_PARAM_T, source_file_type='zone'):
     elif source_file_type == 'zone':
         source_tag = THE_PARAM_T.zone_source_tag
         file_end = ZONE_SOURCE_FILE_ENDING
-    elif source_file_type == 'control':
+    elif source_file_type == 'event_type':
         source_tag = THE_PARAM_T.event_control_tag
         file_end = EVENT_CONTROL_FILE_ENDING
     else:

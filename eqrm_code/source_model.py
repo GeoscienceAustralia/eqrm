@@ -33,9 +33,8 @@ class Source_Models(object):
         self.weight = weight
         source_models=[]
         for fid_sourcepolys in filenames:
-            source_model=source_model_from_xml(fid_sourcepolys.name,
-                                               prob_min_mag_cutoff,
-                                               number_of_mag_sample_bins)
+            source_model = source_model_from_xml(fid_sourcepolys.name,
+                                               prob_min_mag_cutoff)
             source_models.append(source_model)
         self.source_models=source_models
         
@@ -100,7 +99,7 @@ class Source_Model(object):
     """
     This is now a wrapper for a loop over self.sources.
     
-    sources is a list of Source_Zone_Polygon instances.
+    sources is a list of Source instances.
     
     FIXME DSG: Let's push this classes methods back. - It does have
     an extra attribute magnitude_type though
@@ -230,6 +229,7 @@ class Source_Zone_Polygon(Source, polygon_object):
                  prob_min_mag_cutoff,
                  A_min,b,
                  number_of_mag_sample_bins,
+                 event_type,
                  recurrence_model_distribution='bounded_gutenberg_richter'):
         """
         boundary is a list of points that forms a polygon
@@ -243,12 +243,16 @@ class Source_Zone_Polygon(Source, polygon_object):
         And where are it's methods? recurrence_functions might have 1.
         """
         polygon_object.__init__(self,boundary,exclude)
-        Source.__init__(self,min_magnitude,max_magnitude,
-                 prob_min_mag_cutoff,
-                 A_min,b,
-                 number_of_mag_sample_bins,
-                 recurrence_model_distribution)
-
+        Source.__init__(self,
+                        min_magnitude=min_magnitude,
+                        max_magnitude=max_magnitude,
+                        prob_min_mag_cutoff=prob_min_mag_cutoff,
+                        A_min=A_min,
+                        b=b,
+                        number_of_mag_sample_bins=number_of_mag_sample_bins,
+                        event_type=event_type,
+                        recurrence_model_distribution=recurrence_model_distribution)
+                 
     def determine_event_set_indexes(self, event_set):
         contains_point=[self.contains_point((lat,lon), use_cach=False) \
                         for lat,lon in zip(
@@ -376,6 +380,7 @@ def event_control_from_xml(filename):
 
     return eg_list
 
+
 def create_fault_sources(event_control_file, fsg_list, magnitude_type):
     """Takes an FSG list and an event control file and creates a list
     of Source objects.
@@ -410,53 +415,9 @@ def create_fault_sources(event_control_file, fsg_list, magnitude_type):
     return source_model
 
 
-def source_model_from_xml(filename,prob_min_mag_cutoff,
-                              number_of_mag_sample_bins):
+def source_model_from_xml(filename, prob_min_mag_cutoff):
     doc=Xml_Interface(filename=filename)
-    if not doc['Source_Model'] == []:
-        source_model = source_model_from_xml_row(
-            doc, prob_min_mag_cutoff,
-            number_of_mag_sample_bins)
-    else:
-        source_model = source_model_from_xml_horspool(
-            doc, prob_min_mag_cutoff)
-    return source_model
-
-
-def source_model_from_xml_row(doc, prob_min_mag_cutoff,
-                              number_of_mag_sample_bins):
-    xml_source_model=doc['Source_Model'][0]
-    magnitude_type=xml_source_model.attributes['magnitude_type']
     
-    source_zone_polygons=[]
-    xml_polygons = doc['polygon']
-    for xml_polygon in xml_polygons:
-        boundary = xml_polygon['boundary'][0].array
-        recurrence = xml_polygon['recurrence'][0].attributes
-        
-        min_magnitude=float(recurrence['min_magnitude'])
-        max_magnitude=float(recurrence['max_magnitude'])
-        #prob_min_mag_cutoff=float(recurrence['prob_min_mag_cutoff'])
-        A_min=float(recurrence['A_min'])
-        b=float(recurrence['b'])
-        
-        area = float(xml_polygon.attributes['area'])
-        exclude=[]
-        for exclusion_zone in xml_polygon['exclude']:
-            exclude.append(exclusion_zone.array)
-        #print 'LAMBDAMIN 1 ',A_min
-        source_zone_polygon = Source_Zone_Polygon(boundary,exclude,
-                                                  min_magnitude,max_magnitude,
-                                                  prob_min_mag_cutoff,
-                                                  A_min,b,
-                                                  number_of_mag_sample_bins)
-        source_zone_polygons.append(source_zone_polygon)
-        
-    doc.unlink()
-    return Source_Model(source_zone_polygons,magnitude_type)
-
-
-def source_model_from_xml_horspool(doc, prob_min_mag_cutoff):
     xml_source_model=doc['source_model_zone'][0]
     magnitude_type=xml_source_model.attributes['magnitude_type']
     
@@ -466,14 +427,15 @@ def source_model_from_xml_horspool(doc, prob_min_mag_cutoff):
         geometry = xml_polygon['geometry'][0]
         boundary = geometry['boundary'][0].array
         recurrence = xml_polygon['recurrence_model'][0].attributes
-        
-        min_magnitude=float(recurrence['recurrence_min_mag'])
-        max_magnitude=float(recurrence['recurrence_max_mag'])
+        recurrence_model_distribution = recurrence['distribution']
+        min_magnitude = float(recurrence['recurrence_min_mag'])
+        max_magnitude = float(recurrence['recurrence_max_mag'])
         #prob_min_mag_cutoff=float(recurrence['prob_min_mag_cutoff'])
         A_min=float(recurrence['A_min'])
         b=float(recurrence['b'])
         
         area = float(xml_polygon.attributes['area'])
+        event_type = xml_polygon.attributes['event_type']
 
         event_gen = xml_polygon['recurrence_model'][0]['event_generation']
         number_of_mag_sample_bins = int(event_gen[0].attributes[
@@ -491,7 +453,9 @@ def source_model_from_xml_horspool(doc, prob_min_mag_cutoff):
             max_magnitude,
             prob_min_mag_cutoff,
             A_min,b,
-            number_of_mag_sample_bins)
+            number_of_mag_sample_bins,
+            event_type,
+            recurrence_model_distribution=recurrence_model_distribution)
         source_zone_polygons.append(source_zone_polygon)
         
     doc.unlink()

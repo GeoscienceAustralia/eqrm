@@ -88,11 +88,15 @@ def calc_event_activity(event_set, source_model):
                 grpdf = m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
                 
             
-            if source.recurrence_model_distribution=='characteristic':
+            elif source.recurrence_model_distribution=='characteristic':
                 grpdf=calc_activities_from_slip_rate_Characteristic(
                     mag_bin_centroids, 
                     zone_b, zone_mlow,
                     zone_mhgh)
+            else:
+                raise IOError(source.recurrence_model_distribution,
+                              " is not a valid recurrence model distribution.")
+                
                 
         
             event_activity_source = array( [(A_mlow*grpdf[z]/(sum(where(
