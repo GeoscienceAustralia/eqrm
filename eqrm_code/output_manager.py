@@ -905,10 +905,8 @@ def get_source_file_handle(THE_PARAM_T, source_file_type='zone'):
     """
     Return a file handle of a source xml file.
     """
-    if source_file_type == 'control':
-        source_tag = THE_PARAM_T.event_control_tag
-        file_end = EVENT_CONTROL_FILE_ENDING
-    elif source_file_type == 'fault':
+    
+    if source_file_type == 'fault':
         source_tag = THE_PARAM_T.fault_source_tag
         file_end = FAULT_SOURCE_FILE_ENDING
     else:

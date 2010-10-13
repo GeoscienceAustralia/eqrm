@@ -889,7 +889,11 @@ class Test_Event_Set(unittest.TestCase):
         (event_set, src_list) = generate_synthetic_events_fault(fault_xml_file,
                                                   event_control_file,
                                                   prob_min_mag_cutoff)
-
+        #check event_set check sourcelist
+        
+        #calc event activity
+        
+        #check activities
 #        # dump the SRC objects
 #        for src in src_list:
 #            print('-'*50)
