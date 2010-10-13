@@ -733,6 +733,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     dip = zeros((num_events), dtype=EVENT_FLOAT)
     magnitude = zeros((num_events), dtype=EVENT_FLOAT)
     source_zone_id = zeros((num_events), dtype=EVENT_INT)
+    faulting_type=zeros((num_events), dtype=EVENT_INT)
     start=0
 
     for i,fault in enumerate(fsg_list):
@@ -823,6 +824,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         azimuth[start:end] = fault_azimuth
         fault_dip = fault.populate_dip(num)
         dip[start:end] = fault_dip
+        faulting_type[start:end]=FaultingTypeDictionary[source.fault_type]
         #magnitude[start:end] = polygon_magnitude
             #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
@@ -850,6 +852,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                  depth_bottom_seismogenic=
                                  depth_bottom_seismogenic)
     event.source_zone_id = asarray(source_zone_id)
+    
         #print "event.source_zone_id", event.source_zone_id
     eqrmlog.debug('Memory: finished generating events')
     eqrmlog.resource_usage()
