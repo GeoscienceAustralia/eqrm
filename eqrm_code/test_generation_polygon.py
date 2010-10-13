@@ -264,8 +264,8 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnlessEqual(fault.recurrence_min_mag, 4.0)
         self.failUnlessEqual(fault.recurrence_max_mag, 7.0)
         self.failUnlessEqual(fault.b, 1.0)
-        self.failUnlessEqual(fault.slip_rate, 2.0)
-        self.failUnlessEqual(fault.A_min, None)
+        # A_min not supplied above, should be there (converted from slip_rate)
+        self.failUnless(not fault.A_min is None)
         self.failUnlessEqual(fault.generation_min_mag, 4.0)
         self.failUnlessEqual(fault.number_of_mag_sample_bins, 15)
         self.failUnlessEqual(fault.number_of_events, 1500)
@@ -282,7 +282,6 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnlessEqual(fault.event_type, 'intraplate')
         expected = {'distribution': 'constant', 'mean': 20.0}
         self.failUnlessEqual(fault.dip_dist, expected)
-        self.failUnlessEqual(fault.slip_rate, None)
         self.failUnlessEqual(fault.A_min, 0.58)
         self.failUnlessEqual(fault.number_of_events, 3000)
 
