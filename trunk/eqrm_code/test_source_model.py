@@ -261,7 +261,7 @@ class Test_Source_model(unittest.TestCase):
         
         eqrm_dir = determine_eqrm_path()
         file_name = join(eqrm_dir, 'implementation_tests', 'input',
-                         'newc_source_polygon.xml')
+                         'newc_zone_source.xml')
         fid_sourcepolys = open(file_name)
         
         prob_min_mag_cutoff = 4.5
@@ -318,7 +318,7 @@ class Test_Source_model(unittest.TestCase):
         
         eqrm_dir = determine_eqrm_path()
         file_name = join(eqrm_dir, 'implementation_tests', 'input',
-                         'newc_source_polygon.xml')
+                         'newc_zone_source.xml')
         fid_sourcepolys = open(file_name)
         
         prob_min_mag_cutoff = 4.5
