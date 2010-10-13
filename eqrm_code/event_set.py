@@ -45,7 +45,7 @@ EVENT_INT = int64 #int32
 # Define the mapping from fault type NAME to integer INDEX.
 # This is used in the Chiou08 model.
 ######
-FaultingTypeDictionary = {'reverse': 0,
+FaultTypeDictionary = {'reverse': 0,
                           'normal': 1,
                           'strikeslip': 2}
 
@@ -83,7 +83,7 @@ class Event_Set(object):
     depth                 depths - scalar or n-vector, depth to event , km
                           range (0:large], ie [5,5,10,...]
     depth_top             depth to top of rupture - scalar or n-vector, km
-    fault_type            index (0, 1 or 2) from the FaultingTypeDictionary
+    fault_type            index (0, 1 or 2) from the FaultTypeDictionary
                           above, depending on fault type key
     Mw                    moment magnitudes - scalar or n-vector
                           range (-large:+large) in practice ~(0:9)
@@ -227,7 +227,7 @@ class Event_Set(object):
         # manufacture an array of 'fault_type' with dimensions of 'depth'
         # should accept a fault type and use that instead of hardcoded 'reverse'
         fault_type = ones(
-            depth.shape, dtype=int) * FaultingTypeDictionary['reverse']
+            depth.shape, dtype=int) * FaultTypeDictionary['reverse']
 
         # Add function conversions
         length = area/width
@@ -824,7 +824,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         azimuth[start:end] = fault_azimuth
         fault_dip = fault.populate_dip(num)
         dip[start:end] = fault_dip
-        faulting_type[start:end]=FaultingTypeDictionary[source.fault_type]
+        faulting_type[start:end]=FaultTypeDictionary[source.fault_type]
         #magnitude[start:end] = polygon_magnitude
             #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
