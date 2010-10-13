@@ -182,7 +182,7 @@ def main(parameter_handle,
         # (i.e. is_scenario is False) generate a probablistic event set
         # (using THE_PARAM_T.source_filename)
 
-        fid_sourcepolys = get_source_file_handle(THE_PARAM_T)
+        fid_sourcepolys = get_source_file_handle(THE_PARAM_T, source_file_type='zone')
 
 
         # tell event set which source models to calculate activity with
@@ -191,6 +191,7 @@ def main(parameter_handle,
                                     fid_sourcepolys)
         source_mods[0].set_attenuation(THE_PARAM_T.atten_models,
                                     THE_PARAM_T.atten_model_weights)
+        
         log.debug('Memory: source_mods created')
         log.resource_usage()
 

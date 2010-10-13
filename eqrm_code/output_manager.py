@@ -26,7 +26,7 @@ from csv_interface import csv2dict
 EXTENSION = '.txt'
 FILE_TAG_DELIMITER = '-'
 FAULT_SOURCE_FILE_ENDING = '_fault_source.xml' #'_fault_source.xml'
-ZONE_SOURCE_FILE_ENDING = '_source_polygon.xml' #'_zone_source.xml'
+ZONE_SOURCE_FILE_ENDING = '_zone_source.xml' #'_zone_source.xml'
 EVENT_CONTROL_FILE_ENDING = '_event_control.xml'
 
 class myGzipFile(GzipFile):
