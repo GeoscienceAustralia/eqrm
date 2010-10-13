@@ -98,31 +98,31 @@ class Source_Models(object):
 
 class Source_Model(object):
     """
-    This is now a wrapper for a loop over self.source_zone_polygons.
+    This is now a wrapper for a loop over self.sources.
     
-    source_zone_polygons is a list of Source_Zone_Polygon instances.
+    sources is a list of Source_Zone_Polygon instances.
     
     FIXME DSG: Let's push this classes methods back. - It does have
     an extra attribute magnitude_type though
     
     """
-    def __init__(self, source_zone_polygons,magnitude_type):
-        self._source_zone_polygons = source_zone_polygons
-        #print "source_zone_polygons in __init__", source_zone_polygons
+    def __init__(self, sources, magnitude_type):
+        self._sources = sources
+        #print "sources in __init__", sources
         self._magnitude_type=magnitude_type
 
     def __len__(self):
-        return len(self._source_zone_polygons)
+        return len(self._sources)
 
     def __getitem__(self,key):
-        return self._source_zone_polygons[key]
+        return self._sources[key]
     
     def __repr__(self):
         n='\n'
         s = 'Source_Model:'+n
-        s = s+'# of source_zone_polygons = '+ \
-            str(len(self._source_zone_polygons))+n
-        s = s+'source_zone_polygons = '+str(self._source_zone_polygons)+n
+        s = s+'# of sources = '+ \
+            str(len(self._sources))+n
+        s = s+'sources = '+str(self._sources)+n
         s = s+'magnitude_type = '+str(self._magnitude_type)+n
         return s
 
@@ -135,6 +135,33 @@ class Source_Model(object):
         for poly_zone in self:
             poly_zone.set_atten_models_and_weights(atten_models,
                                                    atten_model_weights)
+
+            
+    def add_event_type_atts_to_sources(self, event_control_file):
+        """
+        Given an xml event control file, add attributes from the file
+        to the source models.
+        """
+        
+        # get list of ETC objects from XML file
+        etc_list = event_control_from_xml(event_control_file)
+
+        for source in self:
+            # find event in ETC list matching SOURCE event_type
+            for etc in etc_list:
+                if etc.event_type == source.event_type:
+                    break
+            else:
+                msg = ("Didn't find event_type '%s' in XML file '%s'"
+                   % (source.event_type, event_control_file))
+                raise Exception(msg)
+
+            # attach appropriate ETC attributes to Source object
+            source.fault_type = etc.fault_type
+            source.atten_models = etc.branch_models
+            source.atten_model_weights = etc.branch_weights
+            source.scaling = etc.scaling_dict
+
             
 class Source(object):
     """A class that combines fault source generator data with that from the 
@@ -259,8 +286,7 @@ def event_control_from_xml(filename):
                 .fault_type          - fault type string
                 .branch_models       - list of branch models
                 .branch_weights      - list of branch wrights
-                .scaling_rule        - event scaling rule string
-                .scaling_fault_type  - event scaling type string
+                .scaling_dict        - event scaling information
             """
 
             self.event_type = event_type
@@ -350,20 +376,18 @@ def event_control_from_xml(filename):
 
     return eg_list
 
-def create_fault_sources(event_control_file, fsg_list):
+def create_fault_sources(event_control_file, fsg_list, magnitude_type):
     """Takes an FSG list and an event control file and creates a list
     of Source objects.
 
     event_control_file  path to an <event_type_controlfile> XML file
     fsg_list            list of Fault_Source_Generator objects
 
-    Returns a list of Source objects containing attributes from each
-    FSG object and attributes from the appropriate event in the
-    event_control_file.
+    Returns a source_model which is basically a list of Source objects
+    containing attributes from each FSG object and attributes from the
+    appropriate event in the event_control_file.
+    
     """
-
-    # get list of ETC objects from XML file
-    etc_list = event_control_from_xml(event_control_file)
 
     # for each FSG object, create a Source object from FSG and ETC attributes
     source_list = []
@@ -377,25 +401,14 @@ def create_fault_sources(event_control_file, fsg_list):
                         fsg.number_of_mag_sample_bins, fsg.event_type,
                         recurrence_model_distribution=fsg.distribution)
 
-        # find event in ETC list matching FSG event_type
-        for etc in etc_list:
-            if etc.event_type == fsg.event_type:
-                break
-        else:
-            msg = ("Didn't find event_type '%s' in XML file '%s'"
-                   % (fsg.event_type, event_control_file))
-            raise Exception(msg)
-
-        # attach appropriate ETC attributes to Source object
-        source.fault_type = etc.fault_type
-        source.atten_models = etc.branch_models
-        source.atten_model_weights = etc.branch_weights
-        source.scaling = etc.scaling_dict
-
         # add new source to result list
         source_list.append(source)
+        
+    source_model = Source_Model(source_list, magnitude_type)
+    source_model.add_event_type_atts_to_sources(event_control_file)
+        
+    return source_model
 
-    return source_list
 
 def source_model_from_xml(filename,prob_min_mag_cutoff,
                               number_of_mag_sample_bins):

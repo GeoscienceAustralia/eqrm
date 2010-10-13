@@ -103,7 +103,7 @@ class Test_Source_model(unittest.TestCase):
                                   A_min,b,
                                   number_of_mag_sample_bins)
         #print "source_zone_polygon.polygon_object", szp._linestring
-        result = source_model._source_zone_polygons[0]
+        result = source_model._sources[0]
         self.failUnless( result._linestring==szp._linestring,
             'Failed!')
         self.failUnless( result.min_magnitude==szp.min_magnitude,
@@ -197,7 +197,7 @@ class Test_Source_model(unittest.TestCase):
                                   A_min,b,
                                   number_of_mag_sample_bins)
         #print "source_zone_polygon.polygon_object", szp._linestring
-        result = source_model._source_zone_polygons[0]
+        result = source_model._sources[0]
         self.failUnless( result._linestring==szp._linestring,
             'Failed!')
         self.failUnless( result.min_magnitude==szp.min_magnitude,
