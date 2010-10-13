@@ -17,6 +17,7 @@ from math import radians, degrees,atan
 
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 from eqrm_code.test_distance_functions import azimuths
+from eqrm_code.conversions import calc_fault_area
 #ma.core import sin
 
 
@@ -184,8 +185,30 @@ def grscale(b,max_magnitude,new_min,min_magnitude):
     return numerator/denominator
 
 
-def calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,area_kms,dist_model):
-    if dist_model == 'characteristic':
+def calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,recurr_dist,
+                              lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip):
+    """Calculate the the A_min for a fault using slip rate.
+       to calculate the A_min you also need a reccurance distribution and the 
+       area of a fault in kms.  To calculate area you need:  coords of the 
+       trace, the dip and the depth top and bottom.
+    b             b
+    mMin          recurrance_min_mag
+    mMax          recurrance_max_mag
+    slip_rate_mm  slip_rate of fault in mm
+    recurr_dist   recurrance model distribution ('characteristic' or 
+                                                 'bounded_gutenberg_richter')
+    lat1          latitude of start point eg trace_start_lat
+    lon1          longitude of start point
+    lat2          latitude of end point
+    lon2          longitude of end point
+    depth_top     depth to the top of the seismogenic zone
+    depth_bottom  depth to the bottom of the seismogenic zone
+    dip           angle of dip of the fault in decimal degrees
+
+    Returns area of fault in kms.
+    """
+    area_kms=calc_fault_area(lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip)
+    if recurr_dist == 'characteristic':
         A_min = calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,
                                                          slip_rate_mm,area_kms)
     else:
