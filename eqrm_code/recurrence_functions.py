@@ -179,6 +179,14 @@ def grscale(b,max_magnitude,new_min,min_magnitude):
     denominator=1-exp(-beta*(max_magnitude-min_magnitude))
     return numerator/denominator
 
+def calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,area_kms,dist_model):
+    if dist_model == 'characteristic':
+        A_min = calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,
+                                                         slip_rate_mm,area_kms)
+    else:
+        A_min = calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate_mm,area_kms)
+    return A_min
+
 def calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate_mm,area_kms):
     c=1.5
     d=16.1
