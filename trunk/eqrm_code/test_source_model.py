@@ -318,6 +318,8 @@ class Test_Source_model(unittest.TestCase):
                     'scaling_fault_type': 'reverse'}
         self.failUnlessEqual(etc.scaling_dict,  expected)
 
+        os.remove(file_name)
+
     def test_Source2(self):
         """Test various expected exceptions for XML errors."""
 
@@ -335,6 +337,8 @@ class Test_Source_model(unittest.TestCase):
 
         self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
 
+        os.remove(file_name)
+
         # missing <event_type_controlfile> tag
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
@@ -348,6 +352,8 @@ class Test_Source_model(unittest.TestCase):
         handle.close()
 
         self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        os.remove(file_name)
 
         # missing <event_group> tag
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
@@ -365,6 +371,8 @@ class Test_Source_model(unittest.TestCase):
 
         self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
 
+        os.remove(file_name)
+
         # 0 occurrences of <GMPE> tag
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
@@ -381,6 +389,8 @@ class Test_Source_model(unittest.TestCase):
         handle.close()
 
         self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        os.remove(file_name)
 
         # >1 occurrence of <GMPE> tag
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
@@ -407,6 +417,8 @@ class Test_Source_model(unittest.TestCase):
 
         self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
 
+        os.remove(file_name)
+
         # 0 occurrence of <branch> tag
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
@@ -425,6 +437,8 @@ class Test_Source_model(unittest.TestCase):
         handle.close()
 
         self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        os.remove(file_name)
 
         # sum of <branch weight> attributes != 1.0
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
@@ -446,6 +460,8 @@ class Test_Source_model(unittest.TestCase):
         handle.close()
 
         self.failUnlessRaises(Exception, event_control_from_xml, (file_name,))
+
+        os.remove(file_name)
 
     def test_add_event_type_atts_to_sources(self):
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
