@@ -66,8 +66,7 @@ class Source_Models(object):
                 
         event_activity_matrix = calc_event_activity(
             event_set,
-            source_models[0],
-            prob_number_of_mag_sample_bins)
+            source_models[0])
         # Assuming only 1 source model
         event_activity.set_event_activity(event_activity_matrix)
         
@@ -173,6 +172,8 @@ class Source(object):
         """Add event integer indices list as an attribute.
 
         The integers are indexes into an event set.
+        
+        event_indexes  list of integers that are indexes into an event set.
         """
 
         self.event_set_indexes = event_indexes
@@ -193,6 +194,7 @@ class Source(object):
         if weight_sum != 1.0:
             msg = 'Model weights should sum to 1.0, got %f' %  weight_sum
             raise Exception(msg)
+
 
         
 class Source_Zone_Polygon(Source, polygon_object):
@@ -229,18 +231,6 @@ class Source_Zone_Polygon(Source, polygon_object):
         
         self.set_event_set_indexes(poly_ind)
         
-    def set_event_set_indexes(self, event_indexes):
-        """
-        Input an array of integers which represent the events in a zone source.
-        The intergers are indexes into an event set.
-        """
-        self.event_set_indexes = event_indexes
-
-
-    def set_atten_models_and_weights(self, atten_models,
-                                     atten_model_weights):
-        self.atten_models = atten_models
-        self.atten_model_weights = atten_model_weights
 
 
 def event_control_from_xml(filename):
