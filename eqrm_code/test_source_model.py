@@ -359,28 +359,28 @@ class Test_Source_model(unittest.TestCase):
                             '      <branch model = "Atkinson_Boore_97" weight = "0.4"/>'
                             '      <branch model = "Sadigh_97" weight = "0.3"/>'
                             '    </GMPE>'
-                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_fault_type = "unspecified" />'
                             '  </event_group>'
                             '  <event_group event_type = "crustal fault">'
                             '    <GMPE fault_type = "reverse">'
                             '      <branch model = "Campbell08" weight = "0.8"/>'
                             '      <branch model = "Boore08" weight = "0.2"/>'
                             '    </GMPE>'
-                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "reverse" />'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_fault_type = "reverse" />'
                             '  </event_group>'
                             '  <event_group event_type = "interface">'
                             '    <GMPE fault_type = "reverse">'
                             '      <branch model = "Zhao06_crustalinterface" weight = "0.5"/>'
                             '      <branch model = "Atkinson03_interface" weight = "0.5"/>'
                             '    </GMPE>'
-                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "reverse" />'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_fault_type = "reverse" />'
                             '  </event_group>'
                             '  <event_group event_type = "intraslab">'
                             '    <GMPE fault_type = "reverse">'
                             '      <branch model = "Zhao06_slab" weight = "0.5"/>'
                             '      <branch model = "Atkinson03_inslab" weight = "0.5"/>'
                             '    </GMPE>'
-                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_fault_type = "unspecified" />'
                             '  </event_group>'
                             '</event_type_controlfile>'])
 
@@ -407,7 +407,7 @@ class Test_Source_model(unittest.TestCase):
         expected = [0.80000000000000004, 0.20000000000000001]
         self.failUnlessEqual(etc.branch_weights, expected)
         expected = {'scaling_rule': 'WellsCoppersmith94',
-                    'scaling_event_type': 'reverse'}
+                    'scaling_fault_type': 'reverse'}
         self.failUnlessEqual(etc.scaling_dict,  expected)
 
     def test_Source2(self):
@@ -465,7 +465,7 @@ class Test_Source_model(unittest.TestCase):
         sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
                             '<event_type_controlfile>'
                             '  <event_group event_type = "background">'
-                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_fault_type = "unspecified" />'
                             '  </event_group>'
                             '</event_type_controlfile>'])
 
@@ -490,7 +490,7 @@ class Test_Source_model(unittest.TestCase):
                             '      <branch model = "Zhao06_slab" weight = "0.5"/>'
                             '      <branch model = "Atkinson03_inslab" weight = "0.5"/>'
                             '    </GMPE>'
-                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_fault_type = "unspecified" />'
                             '  </event_group>'
                             '</event_type_controlfile>'])
 
@@ -509,7 +509,7 @@ class Test_Source_model(unittest.TestCase):
                             '  <event_group event_type = "background">'
                             '    <GMPE fault_type = "reverse">'
                             '    </GMPE>'
-                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_fault_type = "unspecified" />'
                             '  </event_group>'
                             '</event_type_controlfile>'])
 
@@ -530,7 +530,7 @@ class Test_Source_model(unittest.TestCase):
                             '      <branch model = "Zhao06_slab" weight = "0.6"/>'
                             '      <branch model = "Atkinson03_inslab" weight = "0.5"/>'
                             '    </GMPE>'
-                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_event_type = "unspecified" />'
+                            '    <scaling scaling_rule = "WellsCoppersmith94" scaling_fault_type = "unspecified" />'
                             '  </event_group>'
                             '</event_type_controlfile>'])
 
