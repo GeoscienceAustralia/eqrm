@@ -219,7 +219,8 @@ def main(parameter_handle,
             # Generating the event set (i.e. a synthetic event catalogue)
             #  - see manual for details
             # FIXME DSG-DSG
-            #generate_synthetic_events and Obsolete_Source_Models seem too connected.
+            #generate_synthetic_events and Obsolete_Source_Models seem too 
+            # connected.
             # They both need fid_sourcepolys and prob_min_mag_cutoff.
             # Yet can these values be different?
             event_set = Event_Set.generate_synthetic_events(
@@ -250,7 +251,7 @@ def main(parameter_handle,
                                     THE_PARAM_T.prob_min_mag_cutoff, 
                                     THE_PARAM_T.prob_number_of_events_in_faults)
             
-            
+         
             
         # event activity is calculated here and the event_set are subsampled.
         num_spawning = 1
