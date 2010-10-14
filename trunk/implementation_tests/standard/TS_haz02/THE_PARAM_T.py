@@ -27,6 +27,8 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\current\TS_haz02/" 
 use_site_indexes = True
 site_indexes = [2255, 11511]
+zone_source_tag = 'Gaull_1990_WA'
+event_control_tag = 'use'
 
 # Scenario input
 

@@ -1,0 +1,80 @@
+ <event_type_controlfile>
+  <event_group
+     event_type = "Atkinson_Boore_97">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "Atkinson_Boore_97" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "not_used" />
+  </event_group>
+  
+  <event_group
+     event_type = "Gaull_1990_WA">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "Gaull_1990_WA" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "not_used" />
+  </event_group>
+	
+  <event_group
+     event_type = "'Sadigh_97">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "'Sadigh_97" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "not_used" />
+  </event_group>
+  
+  <event_group
+     event_type = "Toro_1997_midcontinent">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "Toro_1997_midcontinent" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "not_used" />
+  </event_group>
+
+  <event_group
+     event_type = "Somerville09_Yilgarn">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "Somerville09_Yilgarn" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "not_used" />
+  </event_group>
+	
+	
+  <event_group
+     event_type = "mean_10_sigma_1">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "mean_10_sigma_1" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "not_used" />
+  </event_group>
+	
+  <event_group
+     event_type = "3_mods_TAS">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "Toro_1997_midcontinent" weight = "0.333333333333333333333"/> 
+      <branch model = "Atkinson_Boore_97" weight = "0.3333333333333333333333333333"/> 
+      <branch model = "'Sadigh_97" weight = "0.3333333333333333333333333333333"/> 
+    </GMPE>
+    <scaling scaling_rule = "not_used" />
+  </event_group>
+	
+  <event_group
+     event_type = "Boore_08">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "Boore_08" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "not_used" />
+  </event_group>
+	
+  
+</event_type_controlfile>
+			
+	
