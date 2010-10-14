@@ -916,16 +916,16 @@ class Test_Event_Set(unittest.TestCase):
                                                   prob_min_mag_cutoff,
                                                   prob_number_of_events_in_faults)
         
-        (event_set,source_mod)= Event_Set.MergeEventsAndSources(event_set_zone,
-                                                                event_set_fault,
-                                                                source_mod_zone, 
-                                                                source_mod_fault
-                                                                )
+        #(event_set,source_mod)= Event_Set.MergeEventsAndSources(event_set_zone,
+         #                                                       event_set_fault,
+          #                                                      source_mod_zone, 
+           #                                                     source_mod_fault
+            #                                                    )
         
-        event_activity = Event_Activity(len(event_set))
-        source_mod.calculate_recurrence(
-            event_set,
-            event_activity)
+        #event_activity = Event_Activity(len(event_set))
+        #source_mod.calculate_recurrence(
+         #   event_set,
+          #  event_activity)
         
         #print event_set.__len__()
 
