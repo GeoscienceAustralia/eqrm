@@ -477,7 +477,7 @@ class Test_Event_Set(unittest.TestCase):
              '</event_type_controlfile>'])
 
         et_handle.write(sample)
-        
+        et_handle.close()
 
         source_mod = Dummy()
         #file_name = os.path.join('..','implementation_tests','input','newc_source_polygon.xml')
