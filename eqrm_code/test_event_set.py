@@ -905,17 +905,29 @@ class Test_Event_Set(unittest.TestCase):
         prob_min_mag_cutoff = 4.0
         prob_number_of_events_in_faults =[15,15]
 
-        (event_set, source_mod) = generate_synthetic_events_fault(fault_xml_file,
+        (event_set_zone, source_mod_zone) = generate_synthetic_events_fault(fault_xml_file,
+                                                  event_control_file,
+                                                  prob_min_mag_cutoff,
+                                                  prob_number_of_events_in_faults)
+        prob_min_mag_cutoff = 3.0
+        prob_number_of_events_in_faults =[10,10]
+        (event_set_fault, source_mod_fault) = generate_synthetic_events_fault(fault_xml_file,
                                                   event_control_file,
                                                   prob_min_mag_cutoff,
                                                   prob_number_of_events_in_faults)
         
-        event_activity = Event_Activity(len(event_set))
-       # source_mod.calculate_recurrence(
-            #event_set,
-            #event_activity)
+        (event_set,source_mod)= Event_Set.MergeEventsAndSources(event_set_zone,
+                                                                event_set_fault,
+                                                                source_mod_zone, 
+                                                                source_mod_fault
+                                                                )
         
-        print event_set.__len__()
+        event_activity = Event_Activity(len(event_set))
+        source_mod.calculate_recurrence(
+            event_set,
+            event_activity)
+        
+        #print event_set.__len__()
 
         #check event_set check sourcelist
         
