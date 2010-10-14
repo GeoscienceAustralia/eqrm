@@ -46,8 +46,7 @@ class Source_Models(object):
     def __getitem__(self,key):
         return self.source_models[key]
     
-    def calculate_recurrence(self, event_set, prob_number_of_mag_sample_bins,
-                             event_activity):
+    def calculate_recurrence(self, event_set, event_activity):
         """
         Calculate the normalized recurrence of the event set.
 

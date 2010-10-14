@@ -226,12 +226,13 @@ def main(parameter_handle,
 
         log.debug('Memory: event_set created')
         log.resource_usage()
+        #call gen_syn_events_fault
+        
         # event activity is calculated here and the event_set are subsampled.
         num_spawning = 1
         event_activity = Event_Activity(len(event_set))
         source_mods.calculate_recurrence(
             event_set,
-            THE_PARAM_T.prob_number_of_mag_sample_bins,
             event_activity)
 
         log.debug('Memory: event activity has been calculated')
