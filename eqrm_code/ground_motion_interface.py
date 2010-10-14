@@ -191,6 +191,8 @@ def Allen_distribution(**kwargs):
 Allen_magnitude_type='Mw'
 Allen_distance_type='Hypocentral'
 
+Allen_uses_Vs30 = False
+
 Allen_args=[
     Allen_distribution,
     Allen_magnitude_type,
@@ -202,7 +204,9 @@ Allen_args=[
     
     Allen_sigma_coefficient,
     Allen_sigma_coefficient_period,
-    Allen_interpolation]
+    Allen_interpolation,
+
+    Allen_uses_Vs30]
 
 gound_motion_init['Allen'] = Allen_args
 
@@ -291,6 +295,8 @@ def Gaull_1990_WA_coefficient_interpolation(new_period,c,old_period):
     
 Gaull_1990_WA_sigma_coefficient_interpolation=linear_interpolation
 
+Gaull_1990_WA_uses_Vs30 = False
+
 Gaull_1990_WA_args=[
     Gaull_1990_WA_distribution,
     Gaull_1990_WA_magnitude_type,
@@ -302,7 +308,9 @@ Gaull_1990_WA_args=[
     
     Gaull_1990_WA_sigma_coefficient,
     Gaull_1990_WA_sigma_coefficient_period,
-    Gaull_1990_WA_sigma_coefficient_interpolation]
+    Gaull_1990_WA_sigma_coefficient_interpolation,
+
+    Gaull_1990_WA_uses_Vs30]
 
 gound_motion_init['Gaull_1990_WA'] = Gaull_1990_WA_args
 
@@ -577,6 +585,8 @@ Toro_1997_midcontinent_test_mean=[[[ 0.32568276,  0.16652828],
 # [[0.83083586    0.40776479]
 #  [3.314829E-03  7.898408E-04]]]
 
+Toro_1997_midcontinent_uses_Vs30 = False
+
 Toro_1997_midcontinent_args=[
     Toro_1997_midcontinent_distribution,
     Toro_1997_midcontinent_magnitude_type,
@@ -588,7 +598,9 @@ Toro_1997_midcontinent_args=[
     
     Toro_1997_midcontinent_sigma_coefficient,
     Toro_1997_midcontinent_coefficient_period,
-    Toro_1997_midcontinent_sigma_coefficient_interpolation]
+    Toro_1997_midcontinent_sigma_coefficient_interpolation,
+
+    Toro_1997_midcontinent_uses_Vs30]
 
 gound_motion_init['Toro_1997_midcontinent'] = Toro_1997_midcontinent_args
 
@@ -757,6 +769,8 @@ def AllenSEA06_distribution(**kwargs):
     log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
     return log_mean,log_sigma
 
+AllenSEA06_uses_Vs30 = False
+
 AllenSEA06_args=[
     AllenSEA06_distribution,
     AllenSEA06_magnitude_type,
@@ -768,7 +782,9 @@ AllenSEA06_args=[
     
     AllenSEA06_sigma_coefficient,
     AllenSEA06_sigma_coefficient_period,
-    AllenSEA06_sigma_coefficient_interpolation]
+    AllenSEA06_sigma_coefficient_interpolation,
+
+    AllenSEA06_uses_Vs30]
 
 gound_motion_init['AllenSEA06'] = AllenSEA06_args
 
@@ -879,6 +895,8 @@ def Atkinson_Boore_97_distribution(**kwargs):
 Atkinson_Boore_97_distance_type='Rupture'
 Atkinson_Boore_97_magnitude_type='Mw'
 
+Atkinson_Boore_97_uses_Vs30 = False
+
 Atkinson_Boore_97_args=[
     Atkinson_Boore_97_distribution,
     Atkinson_Boore_97_magnitude_type,
@@ -890,7 +908,9 @@ Atkinson_Boore_97_args=[
     
     Atkinson_Boore_97_sigma_coefficient,
     Atkinson_Boore_97_sigma_coefficient_period,
-    Atkinson_Boore_97_sigma_coefficient_interpolation
+    Atkinson_Boore_97_sigma_coefficient_interpolation,
+
+    Atkinson_Boore_97_uses_Vs30
     ]
 
 
@@ -1220,6 +1240,8 @@ def Sadigh_97_distribution(**kwargs):
 Sadigh_97_distance_type='Rupture'
 Sadigh_97_magnitude_type='Mw'
 
+Sadigh_97_uses_Vs30 = False
+
 Sadigh_97_args=[
     Sadigh_97_distribution,
     Sadigh_97_magnitude_type,
@@ -1231,7 +1253,9 @@ Sadigh_97_args=[
     
     Sadigh_97_sigma_coefficient,
     Sadigh_97_sigma_coefficient_period,
-    Sadigh_97_sigma_coefficient_interpolation]
+    Sadigh_97_sigma_coefficient_interpolation,
+
+    Sadigh_97_uses_Vs30]
 
 gound_motion_init['Sadigh_97'] = Sadigh_97_args
 
@@ -1336,6 +1360,8 @@ def Youngs_97_distribution_python(**kwargs):
 Youngs_97_distance_type='Rupture'
 Youngs_97_magnitude_type='Mw'
 
+Youngs_97_uses_Vs30 = False
+
 #***************  End of Youngs_97 MODEL common block  ************
 
 #***************  Start of Youngs_97 interface MODEL  ************
@@ -1357,7 +1383,9 @@ Youngs_97_interface_args=[
     
     Youngs_97_sigma_coefficient,
     Youngs_97_sigma_coefficient_period,
-    Youngs_97_sigma_coefficient_interpolation]
+    Youngs_97_sigma_coefficient_interpolation,
+
+    Youngs_97_uses_Vs30]
 
 gound_motion_init['Youngs_97_interface'] = Youngs_97_interface_args
 
@@ -1382,7 +1410,9 @@ Youngs_97_intraslab_args=[
     
     Youngs_97_sigma_coefficient,
     Youngs_97_sigma_coefficient_period,
-    Youngs_97_sigma_coefficient_interpolation]
+    Youngs_97_sigma_coefficient_interpolation,
+
+    Youngs_97_uses_Vs30]
 
 gound_motion_init['Youngs_97_intraslab'] = Youngs_97_intraslab_args
 
@@ -1449,6 +1479,8 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
 Youngs_97_distance_type='Rupture'
 Youngs_97_magnitude_type='Mw'
 
+Combo_Sadigh_Youngs_M8_uses_Vs30 = False
+
 Combo_Sadigh_Youngs_M8_args=[
     Combo_Sadigh_Youngs_M8_distribution_python,
     Youngs_97_magnitude_type,
@@ -1460,7 +1492,9 @@ Combo_Sadigh_Youngs_M8_args=[
  
     Combo_Sadigh_Youngs_M8_sigma_coeff,
     Sadigh_97_sigma_coefficient_period,
-    linear_interpolation]
+    linear_interpolation,
+
+    Combo_Sadigh_Youngs_M8_uses_Vs30]
 
 gound_motion_init['Combo_Sadigh_Youngs_M8'] = Combo_Sadigh_Youngs_M8_args
 
@@ -1630,6 +1664,8 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
 Youngs_97_distance_type='Rupture'
 Youngs_97_magnitude_type='Mw'
 
+Youngs_97_uses_Vs30 = False
+
 Combo_Sadigh_Youngs_M8_args=[
     Combo_Sadigh_Youngs_M8_distribution_python,
     Youngs_97_magnitude_type,
@@ -1639,7 +1675,8 @@ Combo_Sadigh_Youngs_M8_args=[
     linear_interpolation,   
     Combo_Sadigh_Youngs_M8_sigma_coeff,
     Sadigh_97_sigma_coefficient_period,
-    linear_interpolation]
+    linear_interpolation,
+    Youngs_97_uses_Vs30]
 
 gound_motion_init['Combo_Sadigh_Youngs_M8'] = Combo_Sadigh_Youngs_M8_args
 
@@ -1880,6 +1917,8 @@ def fs_Boore_08(blin, pga4nl, bnl, vs30):
 Boore_08_distance_type='Joyner_Boore'
 Boore_08_magnitude_type='Mw'
 
+Boore_08_uses_Vs30 = True
+
 Boore_08_args=[
     Boore_08_distribution,
     Boore_08_magnitude_type,
@@ -1891,7 +1930,9 @@ Boore_08_args=[
     
     Boore_08_sigma_coefficient,
     Boore_08_sigma_coefficient_period,
-    Boore_08_sigma_coefficient_interpolation]
+    Boore_08_sigma_coefficient_interpolation,
+
+    Boore_08_uses_Vs30]
 
 gound_motion_init['Boore_08'] = Boore_08_args
 
@@ -2020,6 +2061,8 @@ Somerville09_Yilgarn_sigma_coefficient_period=[
 #print "len(Somerville_Yilgarn_sigma_coefficient_period)", len(Somerville_Yilgarn_sigma_coefficient_period)
 
 
+Somerville09_Yilgarn_uses_Vs30 = False
+
 Somerville09_Yilgarn_args=[
     Somerville09_distribution,
     Somerville09_magnitude_type,
@@ -2031,7 +2074,9 @@ Somerville09_Yilgarn_args=[
     
     Somerville09_Yilgarn_sigma_coefficient,
     Somerville09_Yilgarn_sigma_coefficient_period,
-    Somerville09_sigma_coefficient_interpolation]
+    Somerville09_sigma_coefficient_interpolation,
+
+    Somerville09_Yilgarn_uses_Vs30]
 
 gound_motion_init['Somerville09_Yilgarn'] = Somerville09_Yilgarn_args
 #***************  End of Somerville_Yilgarn MODEL   ************
@@ -2080,6 +2125,8 @@ Somerville09_Non_Cratonic_sigma_coefficient_period=[
    0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3003,
    0.4, 0.5, 0.75, 1., 1.4993, 2., 3.003, 4., 5., 7.5019, 10.,]
 
+Somerville09_Non_Cratonic_uses_Vs30 = False
+
 Somerville09_Non_Cratonic_args=[
     Somerville09_distribution,
     Somerville09_magnitude_type,
@@ -2091,7 +2138,9 @@ Somerville09_Non_Cratonic_args=[
     
     Somerville09_Non_Cratonic_sigma_coefficient,
     Somerville09_Non_Cratonic_sigma_coefficient_period,
-    Somerville09_sigma_coefficient_interpolation]
+    Somerville09_sigma_coefficient_interpolation,
+
+    Somerville09_Non_Cratonic_uses_Vs30]
 
 gound_motion_init['Somerville09_Non_Cratonic'] = Somerville09_Non_Cratonic_args
 #***************  End of Somerville_Non_Cratonic MODEL   ************
@@ -2199,6 +2248,8 @@ Liang_2008_sigma_coefficient_period = [0.0, 1.0]
 
 Liang_2008_interpolation = linear_interpolation
 
+Liang_2008_uses_Vs30 = False
+
 Liang_2008_args = [Liang_2008_distribution,
                    Liang_2008_magnitude_type,
                    Liang_2008_distance_type,
@@ -2207,7 +2258,8 @@ Liang_2008_args = [Liang_2008_distribution,
                    Liang_2008_interpolation,
                    Liang_2008_sigma_coefficient,
                    Liang_2008_sigma_coefficient_period,
-                   Liang_2008_interpolation]
+                   Liang_2008_interpolation,
+                   Liang_2008_uses_Vs30]
 
 gound_motion_init['Liang_2008'] = Liang_2008_args
 
@@ -2553,6 +2605,8 @@ sigma = 0.30
 Atkinson06_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
 Atkinson06_sigma_coefficient_period = [0.0, 1.0]
 
+Atkinson06_hard_bedrock_uses_Vs30 = False
+
 gound_motion_init['Atkinson06_hard_bedrock'] = \
                         [Atkinson06_hard_bedrock_distribution,
                          Atkinson06_magnitude_type,
@@ -2562,7 +2616,10 @@ gound_motion_init['Atkinson06_hard_bedrock'] = \
                          Atkinson06_interpolation,
                          Atkinson06_sigma_coefficient,
                          Atkinson06_sigma_coefficient_period,
-                         Atkinson06_interpolation]
+                         Atkinson06_interpolation,
+                         Atkinson06_hard_bedrock_uses_Vs30]
+
+Atkinson06_soil_uses_Vs30 = True
 
 gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
                                         Atkinson06_magnitude_type,
@@ -2572,7 +2629,10 @@ gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
                                         Atkinson06_interpolation,
                                         Atkinson06_sigma_coefficient,
                                         Atkinson06_sigma_coefficient_period,
-                                        Atkinson06_interpolation]
+                                        Atkinson06_interpolation,
+                                        Atkinson06_soil_uses_Vs30]
+
+Atkinson06_bc_boundary_bedrock_uses_Vs30 = False
 
 gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
                         [Atkinson06_bc_boundary_bedrock,
@@ -2583,7 +2643,8 @@ gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
                          Atkinson06_interpolation,
                          Atkinson06_sigma_coefficient,
                          Atkinson06_sigma_coefficient_period,
-                         Atkinson06_interpolation]
+                         Atkinson06_interpolation,
+                         Atkinson06_bc_boundary_bedrock_uses_Vs30]
 
 #############################  End of Atkinson06  ##############################
 
@@ -2799,6 +2860,8 @@ Chiou08_sigma_coefficient_period = [0.0, 1.0]
 
 Chiou08_interpolation = linear_interpolation
 
+Chiou08_uses_Vs30 = True
+
 gound_motion_init['Chiou08'] = [Chiou08_distribution,
                                 Chiou08_magnitude_type,
                                 Chiou08_distance_type,
@@ -2807,7 +2870,8 @@ gound_motion_init['Chiou08'] = [Chiou08_distribution,
                                 Chiou08_interpolation,
                                 Chiou08_sigma_coefficient,
                                 Chiou08_sigma_coefficient_period,
-                                Chiou08_interpolation]
+                                Chiou08_interpolation,
+                                Chiou08_uses_Vs30]
 
 ###########################  End of Chiou08 model  #############################
 
@@ -2933,6 +2997,8 @@ Campbell03_sigma_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
 
 Campbell03_interpolation = linear_interpolation
 
+Campbell03_uses_Vs30 = False
+
 gound_motion_init['Campbell03'] = [Campbell03_distribution,
                                    Campbell03_magnitude_type,
                                    Campbell03_distance_type,
@@ -2941,7 +3007,8 @@ gound_motion_init['Campbell03'] = [Campbell03_distribution,
                                    Campbell03_interpolation,
                                    Campbell03_sigma_coefficient,
                                    Campbell03_sigma_coefficient_period,
-                                   Campbell03_interpolation]
+                                   Campbell03_interpolation,
+                                   Campbell03_uses_Vs30]
 
 del Campbell03_Table6
 
@@ -3283,6 +3350,8 @@ Campbell08_magnitude_type = 'Mw'
 Campbell08_distance_type = 'Rupture'
 Campbell08_interpolation = linear_interpolation
 
+Campbell08_uses_Vs30 = True
+
 gound_motion_init['Campbell08'] = [Campbell08_distribution,
                                    Campbell08_magnitude_type,
                                    Campbell08_distance_type,
@@ -3291,7 +3360,8 @@ gound_motion_init['Campbell08'] = [Campbell08_distribution,
                                    Campbell08_interpolation,
                                    Campbell08_sigma_coefficient,
                                    Campbell08_sigma_coefficient_period,
-                                   Campbell08_interpolation]
+                                   Campbell08_interpolation,
+                                   Campbell08_uses_Vs30]
 
 del Campbell08_Table2, Campbell08_Table3
 
@@ -3334,6 +3404,8 @@ def mean_10_sigma_1_distribution(**kwargs):
 mean_10_sigma_1_sigma_coefficient_interpolation = linear_interpolation
 mean_10_sigma_1_coefficient_interpolation = linear_interpolation
 
+mean_10_sigma_1_uses_Vs30 = False
+
 mean_10_sigma_1_args=[
     mean_10_sigma_1_distribution,
     mean_10_sigma_1_magnitude_type,
@@ -3345,7 +3417,9 @@ mean_10_sigma_1_args=[
     
     mean_10_sigma_1_sigma_coefficient,
     mean_10_sigma_1_sigma_coefficient_period,
-    mean_10_sigma_1_sigma_coefficient_interpolation]
+    mean_10_sigma_1_sigma_coefficient_interpolation,
+
+    mean_10_sigma_1_uses_Vs30]
 
 gound_motion_init['mean_10_sigma_1'] = mean_10_sigma_1_args
 
@@ -3388,6 +3462,8 @@ def mean_20_sigma_2_distribution(**kwargs):
 mean_20_sigma_2_sigma_coefficient_interpolation=linear_interpolation
 mean_20_sigma_2_coefficient_interpolation = linear_interpolation
 
+mean_20_sigma_2_uses_Vs30 = False
+
 mean_20_sigma_2_args=[
     mean_20_sigma_2_distribution,
     mean_20_sigma_2_magnitude_type,
@@ -3399,7 +3475,9 @@ mean_20_sigma_2_args=[
     
     mean_20_sigma_2_sigma_coefficient,
     mean_20_sigma_2_sigma_coefficient_period,
-    mean_20_sigma_2_sigma_coefficient_interpolation]
+    mean_20_sigma_2_sigma_coefficient_interpolation,
+
+    mean_20_sigma_2_uses_Vs30]
 
 gound_motion_init['mean_20_sigma_2'] = mean_20_sigma_2_args
 

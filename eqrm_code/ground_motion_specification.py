@@ -49,7 +49,8 @@ class Ground_motion_specification(object):
                               coefficient,coefficient_period,
                               coefficient_interpolation,
                               sigma_coefficient,sigma_coefficient_period,
-                              sigma_coefficient_interpolation):
+                              sigma_coefficient_interpolation,
+                              uses_Vs30):
         
         self.distribution = distribution
         self.magnitude_type = magnitude_type
@@ -60,9 +61,10 @@ class Ground_motion_specification(object):
         self.coefficient_interpolation = coefficient_interpolation
         
         self.sigma_coefficient = asarray(sigma_coefficient)
-        self.sigma_coefficient_period = asarray(
-            sigma_coefficient_period)
+        self.sigma_coefficient_period = asarray(sigma_coefficient_period)
         self.sigma_coefficient_interpolation = sigma_coefficient_interpolation
+
+        self.uses_Vs30 = uses_Vs30
            
     
     def calc_coefficient(self, periods):
