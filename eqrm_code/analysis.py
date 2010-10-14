@@ -178,9 +178,9 @@ def main(parameter_handle,
         event_activity = Event_Activity(len(event_set))
         event_activity.set_scenario_event_activity()
         event_set.scenario_setup()
-        source_model_zone = Source_Model.create_scenario_source_model(
+        source_model = Source_Model.create_scenario_source_model(
             len(event_set))
-        source_model_zone.set_attenuation(THE_PARAM_T.atten_models,
+        source_model.set_attenuation(THE_PARAM_T.atten_models,
                                           THE_PARAM_T.atten_model_weights)
     else:
         # (i.e. is_scenario is False) generate a probablistic event set
@@ -256,11 +256,14 @@ def main(parameter_handle,
                                     THE_PARAM_T.prob_number_of_events_in_faults)
             
          
-            
+        # add the two event sets and source models together
+
+        source_model = source_model_zone
+        
         # event activity is calculated here and the event_set are subsampled.
         num_spawning = 1
         event_activity = Event_Activity(len(event_set))
-        source_model_zone.calculate_recurrence(
+        source_model.calculate_recurrence(
             event_set,
             event_activity)
 
