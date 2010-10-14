@@ -503,6 +503,11 @@ class Test_Source_model(unittest.TestCase):
             
         os.remove(file_name)
         
+    def test_create_scenario_source_model(self):
+
+        source_model = Source_Model.create_scenario_source_model(3)
+        self.failUnless(allclose(source_model[0].event_set_indexes,
+                                     array([0,1,2])))
 
 ################################################################################
 

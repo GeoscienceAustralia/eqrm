@@ -34,7 +34,7 @@ from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
      Regolith_amplification_model, load_site_class2vs30
-from eqrm_code.source_model import source_model_from_xml
+from eqrm_code.source_model import source_model_from_xml, Source_Model
 from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
          save_event_set, save_hazard, save_structures, save_val, \
          save_ecloss, join_parallel_files, join_parallel_files_column, \
@@ -178,6 +178,10 @@ def main(parameter_handle,
         event_activity = Event_Activity(len(event_set))
         event_activity.set_scenario_event_activity()
         event_set.scenario_setup()
+        source_model_zone = Source_Model.create_scenario_source_model(
+            len(event_set))
+        source_model_zone.set_attenuation(THE_PARAM_T.atten_models,
+                                          THE_PARAM_T.atten_model_weights)
     else:
         # (i.e. is_scenario is False) generate a probablistic event set
         # (using THE_PARAM_T.source_filename)
