@@ -29,7 +29,7 @@ from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
 from eqrm_code.parse_in_parameters import  \
     ParameterSyntaxError, create_parameter_data, convert_THE_PARAM_T_to_py
 from eqrm_code.event_set import Event_Set, Pseudo_Event_Set, Event_Activity, \
-     Obsolete_Event_Activity
+     Obsolete_Event_Activity, generate_synthetic_events_fault
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
@@ -181,53 +181,77 @@ def main(parameter_handle,
     else:
         # (i.e. is_scenario is False) generate a probablistic event set
         # (using THE_PARAM_T.source_filename)
-
-        fid_sourcepolys = get_source_file_handle(THE_PARAM_T, source_file_type='zone')
-
-
-        # tell event set which source models to calculate activity with
-        source_mods = Source_Models(THE_PARAM_T.prob_min_mag_cutoff, [1.0],
-                                    THE_PARAM_T.prob_number_of_mag_sample_bins,
-                                    fid_sourcepolys)
-
-        # Once the event control file is 'fully operational'
+ # Once the event control file is 'fully operational'
         # remove the try.
         try:
             fid_event_types = get_source_file_handle(THE_PARAM_T,
                                                  source_file_type='event_type')
         except IOError:
             fid_event_types = None
-        if fid_event_types is not None:
-            source_mods[0].add_event_type_atts_to_sources(fid_event_types)
-            # This is a hack, until
-            # gm splitting is working
-            THE_PARAM_T['atten_models'] = source_mods[0][0].atten_models
-            THE_PARAM_T['atten_model_weights'] = source_mods[0][0].atten_model_weights
+        try:
+            fid_sourcepolys = get_source_file_handle(THE_PARAM_T, 
+                                                     source_file_type='zone')
+        except IOError:
+            fid_sourcepolys = None
+      
+        # tell event set which source models to calculate activity with
+        if fid_sourcepolys is not None:
+            source_mods = Source_Models(THE_PARAM_T.prob_min_mag_cutoff, [1.0],
+                                    THE_PARAM_T.prob_number_of_mag_sample_bins,
+                                    fid_sourcepolys)
+
+       
+            if fid_event_types is not None:
+                source_mods[0].add_event_type_atts_to_sources(fid_event_types)
+                # This is a hack, until
+                # gm splitting is working
+                THE_PARAM_T['atten_models'] = source_mods[0][0].atten_models
+                THE_PARAM_T['atten_model_weights'] = source_mods[0][0].atten_model_weights
             
-        if THE_PARAM_T.atten_models is not None and \
-           THE_PARAM_T.atten_model_weights is not None:
-            source_mods[0].set_attenuation(THE_PARAM_T.atten_models,
+            if THE_PARAM_T.atten_models is not None and \
+                THE_PARAM_T.atten_model_weights is not None:
+                source_mods[0].set_attenuation(THE_PARAM_T.atten_models,
                                            THE_PARAM_T.atten_model_weights)
-        log.debug('Memory: source_mods created')
-        log.resource_usage()
+            log.debug('Memory: source_mods created')
+            log.resource_usage()
 
-        # Generating the event set (i.e. a synthetic event catalogue)
-        #  - see manual for details
-        # FIXME DSG-DSG
-        #generate_synthetic_events and Source_Models seem too connected.
-        # They both need fid_sourcepolys and prob_min_mag_cutoff.
-        # Yet can these values be different?
-        event_set = Event_Set.generate_synthetic_events(
-            fid_genpolys=fid_sourcepolys,
-            prob_min_mag_cutoff=THE_PARAM_T.prob_min_mag_cutoff,
-            source_models=source_mods,
-            prob_number_of_events_in_zones= \
-            THE_PARAM_T.prob_number_of_events_in_zones)
+            # Generating the event set (i.e. a synthetic event catalogue)
+            #  - see manual for details
+            # FIXME DSG-DSG
+            #generate_synthetic_events and Source_Models seem too connected.
+            # They both need fid_sourcepolys and prob_min_mag_cutoff.
+            # Yet can these values be different?
+            event_set = Event_Set.generate_synthetic_events(
+                                        fid_genpolys=fid_sourcepolys,
+                                        prob_min_mag_cutoff=
+                                        THE_PARAM_T.prob_min_mag_cutoff,
+                                        source_models=source_mods,
+                                        prob_number_of_events_in_zones=\
+                                        THE_PARAM_T.prob_number_of_events_in_zones)
 
-        log.debug('Memory: event_set created')
-        log.resource_usage()
-        #call gen_syn_events_fault
+            log.debug('Memory: event_set_zone created')
+            log.resource_usage()
+
         
+        
+        #generate event set and source_models for the fault sources
+        
+        try:
+            fid_sourcefaults = get_source_file_handle(THE_PARAM_T, 
+                                                 source_file_type='fault')
+        except IOError:
+            fid_sourcefaults = None
+            log.debug('No fault source XML file found')
+        if (fid_event_types is not None) and (fid_sourcefaults is not None):
+            (event_set_fault,source_model_fault)\
+                                    =generate_synthetic_events_fault(
+                                    fid_sourcefaults, 
+                                    fid_event_types,
+                                    THE_PARAM_T.prob_min_mag_cutoff, 
+                                    THE_PARAM_T.prob_number_of_events_in_faults)
+            
+            
+            
         # event activity is calculated here and the event_set are subsampled.
         num_spawning = 1
         event_activity = Event_Activity(len(event_set))

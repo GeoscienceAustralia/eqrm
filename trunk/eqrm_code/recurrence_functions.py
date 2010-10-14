@@ -188,7 +188,7 @@ def grscale(b,max_magnitude,new_min,min_magnitude):
 def calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,recurr_dist,
                               lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip):
     """Calculate the the A_min for a fault using slip rate.
-       to calculate the A_min you also need a reccurance distribution and the 
+       to calculate the A_min you also need a reccurence distribution and the 
        area of a fault in kms.  To calculate area you need:  coords of the 
        trace, the dip and the depth top and bottom.
     b             b
@@ -216,6 +216,16 @@ def calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,recurr_dist,
     return A_min
 
 def calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate_mm,area_kms):
+    """Calculate the the A_min for a fault using slip rate using the 
+       bounded_gutenberg_richter reccurence distribution.  
+       b             b
+       mMin          recurrance_min_mag
+       mMax          recurrance_max_mag
+       slip_rate_mm  slip_rate of fault in mm
+       area_kms      area in kms of the fault
+    
+    Returns A_min for a fault.
+    """
     c=1.5
     d=16.1
     beta=log(10)*b
@@ -230,6 +240,16 @@ def calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate_mm,area_kms):
 
 
 def calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,slip_rate_mm,area_kms):
+    """Calculate the the A_min for a fault using slip rate using the 
+       characteristic reccurence distribution.  
+       b             b
+       mMin          recurrance_min_mag
+       mMax          recurrance_max_mag
+       slip_rate_mm  slip_rate of fault in mm
+       area_kms      area in kms of the fault
+    
+    Returns A_min for a fault.
+    """
     c=1.5
     d=16.1
     beta=log(10)*b
@@ -251,6 +271,7 @@ def calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,slip_rate_mm,area_kms):
     return lambda_m
 
 def calc_activities_from_slip_rate_Characteristic(magnitudes,b,m0,mMax):
+    
     pdfs_tmp =asarray([calc_activity_from_slip_rate_Characteristic(m,b,m0,mMax)
                   for m in magnitudes])
     pdfs=pdfs_tmp/sum(pdfs_tmp)
