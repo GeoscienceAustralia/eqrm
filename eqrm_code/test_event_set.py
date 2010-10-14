@@ -479,14 +479,12 @@ class Test_Event_Set(unittest.TestCase):
         et_handle.write(sample)
         et_handle.close()
 
-        source_mod = Dummy()
         #file_name = os.path.join('..','implementation_tests','input','newc_source_polygon.xml')
         #return
         # need to fix
         events = Event_Set.generate_synthetic_events(
             file_name,
             prob_min_mag_cutoff,
-            source_mod,
             prob_number_of_events_in_zones=prob_number_of_events_in_zones)
 #         print "events.trace_start_lat", events.trace_start_lat
 #         print " events.trace_start_lon", events.trace_start_lon
@@ -609,12 +607,10 @@ class Test_Event_Set(unittest.TestCase):
         prob_number_of_events_in_zones = None
         prob_min_mag_cutoff = 0.1
         
-        source_mod = Dummy()
         
         events = Event_Set.generate_synthetic_events(
             file_name,
             prob_min_mag_cutoff,
-            source_mod,
             prob_number_of_events_in_zones=prob_number_of_events_in_zones)
         
         
@@ -936,6 +932,6 @@ class Test_Event_Set(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Event_Set,'test')
-    #suite = unittest.makeSuite(Test_Event_Set,'test_generate_synthetic_events')
+    #suite = unittest.makeSuite(Test_Event_Set,'test_')
     runner = unittest.TextTestRunner()
     runner.run(suite)

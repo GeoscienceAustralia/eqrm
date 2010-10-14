@@ -226,7 +226,6 @@ def main(parameter_handle,
                 fid_genpolys=fid_sourcepolys,
                 prob_min_mag_cutoff=
                 THE_PARAM_T.prob_min_mag_cutoff,
-                source_models=None,
                 prob_number_of_events_in_zones=\
                 THE_PARAM_T.prob_number_of_events_in_zones)
 
@@ -245,7 +244,7 @@ def main(parameter_handle,
             log.debug('No fault source XML file found')
         if (fid_event_types is not None) and (fid_sourcefaults is not None):
             (event_set_fault,source_model_fault)\
-                                    =generate_synthetic_events_fault(
+                                    =_fault(
                                     fid_sourcefaults, 
                                     fid_event_types,
                                     THE_PARAM_T.prob_min_mag_cutoff, 
