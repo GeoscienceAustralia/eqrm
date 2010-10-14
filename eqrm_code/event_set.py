@@ -712,17 +712,17 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     (fsg_list, magnitude_type) = xml_fault_generators(fault_xml_file, 
                                                       prob_min_mag_cutoff)
 
-    source_list = create_fault_sources(event_control_file, fsg_list,
+    source_mods = create_fault_sources(event_control_file, fsg_list,
                                        magnitude_type)
     
     if prob_number_of_events_in_faults is None:  
-        prob_number_of_events_in_faults = zeros((len(source_list)),
+        prob_number_of_events_in_faults = zeros((len(source_mods)),
                                                    dtype=EVENT_INT)      
         for i,fault in enumerate(fsg_list):
             prob_number_of_events_in_faults[i] = fault.number_of_events
     
-    assert len(prob_number_of_events_in_faults) == len(source_list)
-    assert len(fsg_list) == len(source_list)
+    assert len(prob_number_of_events_in_faults) == len(source_mods)
+    assert len(fsg_list) == len(source_mods)
        
         
     num_events = sum(prob_number_of_events_in_faults)
@@ -740,7 +740,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     for i,fault in enumerate(fsg_list):
         
         #change to use index
-        source = source_list[i]
+        source = source_mods[i]
         scaling_rule = source.scaling['scaling_rule']
         scaling_event_type = source.scaling['scaling_fault_type']
         num = prob_number_of_events_in_faults[i]
@@ -863,7 +863,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
 
     #return create_fault_sources(event_control_file, fsg_list)
 
-    return event, source_list
+    return event, source_mods
    
     
     
