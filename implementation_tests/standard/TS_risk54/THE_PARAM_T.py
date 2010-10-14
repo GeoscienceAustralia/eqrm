@@ -27,6 +27,8 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\current\TS_risk54/" 
 use_site_indexes = True
 site_indexes = [291, 2372]
+zone_source_tag = "Toro_1997_midcontinent" 
+event_control_tag = "use" 
 
 # Scenario input
 
@@ -35,11 +37,9 @@ prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [500, 100, 100, 300, 100, 100]
 
 # Attenuation
-atten_models = ['Toro_1997_midcontinent']
-atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 4
-atten_periods = [0.0,  1.0526, 3.0]
+atten_periods = [0.0, 1.0526, 3.0]
 atten_threshold_distance = 400
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False

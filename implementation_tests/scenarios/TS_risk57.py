@@ -27,6 +27,8 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\current\TS_risk57/" 
 use_site_indexes = True
 site_indexes = 3541
+zone_source_tag = "3_mods_TAS" 
+event_control_tag = "use" 
 
 # Scenario input
 
@@ -35,8 +37,6 @@ prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [0, 0, 0, 0, 0, 1]
 
 # Attenuation
-atten_models = ['Toro_1997_midcontinent', 'Atkinson_Boore_97', 'Sadigh_97']
-atten_model_weights = [0.33333333333333331, 0.33333333333333331, 0.33333333333333331]
 atten_collapse_Sa_of_atten_models = False
 atten_variability_method = 4
 atten_periods = [0.0, 1.0526, 3.0]

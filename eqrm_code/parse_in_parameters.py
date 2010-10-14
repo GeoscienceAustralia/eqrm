@@ -894,8 +894,26 @@ def convert_attribute_dic_to_set_data_py(py_file_name, attribute_dic):
         elif attribute_dic.has_key(para_dic['new_para']):
             line = [para_dic['new_para']]
             val = attribute_dic[para_dic['new_para']]
+#             if not attribute_dic['is_scenario'] and \
+#                    (para_dic['new_para'] == 'atten_models' or
+#                     para_dic['new_para'] == 'atten_model_weights'):
+#                 pass
+#             else:
             line.append(val)
             paras2print.append(line)
+            # Hack to add zone source tag
+            if False and not attribute_dic['is_scenario']:
+                print "not a scenario" 
+                if para_dic['new_para'] == 'atten_models':
+                    if len(val)  == 1:
+                        line = ['zone_source_tag', val[0]]
+                    else:
+                        line = ['zone_source_tag', '3_mods_TAS']
+                    print "doing zone_source_tag" 
+                    paras2print.append(line)
+                    line = ['event_control_tag',  "use" ]
+                    paras2print.append(line)
+                    
   
     writer = Write_no_instance_python_par_file(py_file_name)
     writer.write_top()
