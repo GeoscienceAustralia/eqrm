@@ -19,7 +19,7 @@ from eqrm_code.xml_interface import Xml_Interface
 
 
 
-class Source_Models(object):
+class Obsolete_Source_Models(object):
     """
     Class to handle multiple Source Models.
 
