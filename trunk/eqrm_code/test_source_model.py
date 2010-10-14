@@ -187,7 +187,6 @@ class Test_Source_model(unittest.TestCase):
         events = Event_Set.generate_synthetic_events(
             file_name,
             prob_min_mag_cutoff,
-            source_model,
             prob_number_of_events_in_zones=prob_number_of_events_in_zones)
         
         event_activity = Obsolete_Event_Activity(len(events))

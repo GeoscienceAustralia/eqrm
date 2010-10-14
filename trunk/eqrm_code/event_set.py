@@ -336,7 +336,6 @@ class Event_Set(object):
     @classmethod
     def generate_synthetic_events(cls, fid_genpolys,
                                   prob_min_mag_cutoff,
-                                  source_models,
                                   prob_number_of_events_in_zones=None):
         """Randomly generate the event_set parameters.
 
