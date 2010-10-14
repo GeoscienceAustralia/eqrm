@@ -34,7 +34,7 @@ from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
      Regolith_amplification_model, load_site_class2vs30
-from eqrm_code.source_model import Source_Models
+from eqrm_code.source_model import source_model_from_xml
 from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
          save_event_set, save_hazard, save_structures, save_val, \
          save_ecloss, join_parallel_files, join_parallel_files_column, \
@@ -196,37 +196,37 @@ def main(parameter_handle,
       
         # tell event set which source models to calculate activity with
         if fid_sourcepolys is not None:
-            source_mods = Source_Models(THE_PARAM_T.prob_min_mag_cutoff, [1.0],
-                                    THE_PARAM_T.prob_number_of_mag_sample_bins,
-                                    fid_sourcepolys)
+            source_model_zone = source_model_from_xml(
+                fid_sourcepolys.name,
+                THE_PARAM_T.prob_min_mag_cutoff)
 
        
             if fid_event_types is not None:
-                source_mods[0].add_event_type_atts_to_sources(fid_event_types)
+                source_model_zone.add_event_type_atts_to_sources(fid_event_types)
                 # This is a hack, until
                 # gm splitting is working
-                THE_PARAM_T['atten_models'] = source_mods[0][0].atten_models
+                THE_PARAM_T['atten_models'] = source_model_zone[0].atten_models
                 THE_PARAM_T['atten_model_weights'] = \
-                    source_mods[0][0].atten_model_weights
+                    source_model_zone[0].atten_model_weights
             
             if THE_PARAM_T.atten_models is not None and \
                 THE_PARAM_T.atten_model_weights is not None:
-                source_mods[0].set_attenuation(THE_PARAM_T.atten_models,
+                source_model_zone.set_attenuation(THE_PARAM_T.atten_models,
                                            THE_PARAM_T.atten_model_weights)
-            log.debug('Memory: source_mods created')
+            log.debug('Memory: source_model_zone created')
             log.resource_usage()
 
             # Generating the event set (i.e. a synthetic event catalogue)
             #  - see manual for details
             # FIXME DSG-DSG
-            #generate_synthetic_events and Source_Models seem too connected.
+            #generate_synthetic_events and Obsolete_Source_Models seem too connected.
             # They both need fid_sourcepolys and prob_min_mag_cutoff.
             # Yet can these values be different?
             event_set = Event_Set.generate_synthetic_events(
                 fid_genpolys=fid_sourcepolys,
                 prob_min_mag_cutoff=
                 THE_PARAM_T.prob_min_mag_cutoff,
-                source_models=source_mods,
+                source_models=None,
                 prob_number_of_events_in_zones=\
                 THE_PARAM_T.prob_number_of_events_in_zones)
 
@@ -256,7 +256,7 @@ def main(parameter_handle,
         # event activity is calculated here and the event_set are subsampled.
         num_spawning = 1
         event_activity = Event_Activity(len(event_set))
-        source_mods.calculate_recurrence(
+        source_model_zone.calculate_recurrence(
             event_set,
             event_activity)
 
