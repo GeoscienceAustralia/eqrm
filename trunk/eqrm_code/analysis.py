@@ -206,7 +206,8 @@ def main(parameter_handle,
                 # This is a hack, until
                 # gm splitting is working
                 THE_PARAM_T['atten_models'] = source_mods[0][0].atten_models
-                THE_PARAM_T['atten_model_weights'] = source_mods[0][0].atten_model_weights
+                THE_PARAM_T['atten_model_weights'] = \
+                    source_mods[0][0].atten_model_weights
             
             if THE_PARAM_T.atten_models is not None and \
                 THE_PARAM_T.atten_model_weights is not None:
@@ -222,12 +223,12 @@ def main(parameter_handle,
             # They both need fid_sourcepolys and prob_min_mag_cutoff.
             # Yet can these values be different?
             event_set = Event_Set.generate_synthetic_events(
-                                        fid_genpolys=fid_sourcepolys,
-                                        prob_min_mag_cutoff=
-                                        THE_PARAM_T.prob_min_mag_cutoff,
-                                        source_models=source_mods,
-                                        prob_number_of_events_in_zones=\
-                                        THE_PARAM_T.prob_number_of_events_in_zones)
+                fid_genpolys=fid_sourcepolys,
+                prob_min_mag_cutoff=
+                THE_PARAM_T.prob_min_mag_cutoff,
+                source_models=source_mods,
+                prob_number_of_events_in_zones=\
+                THE_PARAM_T.prob_number_of_events_in_zones)
 
             log.debug('Memory: event_set_zone created')
             log.resource_usage()
