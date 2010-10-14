@@ -11,7 +11,7 @@
   
   Copyright 2007 by Geoscience Australia
 """
-from scipy import zeros, where
+from scipy import zeros, where, arange
 
 from eqrm_code.recurrence_functions import calc_event_activity
 from eqrm_code.polygon_class import polygon_object
@@ -116,13 +116,13 @@ class Source_Model(object):
 
     def set_attenuation(self, atten_models, atten_model_weights):
         """
-
+        Set the models and weights to be the same for all sources
         atten_model_weights must sum to 1.0.
         """
         
-        for poly_zone in self:
-            poly_zone.set_atten_models_and_weights(atten_models,
-                                                   atten_model_weights)
+        for source in self:
+            source.set_atten_models_and_weights(atten_models,
+                                                atten_model_weights)
 
             
     def add_event_type_atts_to_sources(self, event_control_file):
@@ -172,8 +172,9 @@ class Source_Model(object):
 
         
     @classmethod
-    def create_scenario_source_model(cls):
-        # FIXME this is highlighting that source is beting used for two activities
+    def create_scenario_source_model(cls, num_events):
+        # FIXME this is highlighting that source is beting used for two
+        # activities
         # calculating an event activity and associating an event with
         # a ground motion model.  So split this class into two classes sometime
         source = Source(min_magnitude=None,
@@ -181,7 +182,8 @@ class Source_Model(object):
                         prob_min_mag_cutoff=None,
                         A_min=None, b=None, number_of_mag_sample_bins=None,
                         event_type=None)
-        source_model = cls(source)
+        source.set_event_set_indexes(arange(0, num_events))
+        source_model = cls([source])
         return source_model
 
             
