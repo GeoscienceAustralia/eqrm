@@ -55,18 +55,8 @@ class Source_Models(object):
 
         This function is used by analysis
         """
-        #print "event_set", event_set
-        source_models = self.source_models
-
-        for szp in source_models[0]:
-            if szp.event_set_indexes is None:
-                szp.determine_event_set_indexes(event_set)
-                
-        event_activity_matrix = calc_event_activity(
-            event_set,
-            source_models[0])
-        # Assuming only 1 source model
-        event_activity.set_event_activity(event_activity_matrix)
+        self.source_models[0].calculate_recurrence(event_set, event_activity)
+        
         
     
     def stratify_source_models_obsolete(self,independent_polygons = None):
@@ -160,6 +150,27 @@ class Source_Model(object):
             source.scaling = etc.scaling_dict
 
 
+    def calculate_recurrence(self, event_set, event_activity):
+        """
+        Calculate the normalized recurrence of the event set.
+
+        weight is the weight assigned to the respective models in
+        event_set.source_models.
+
+        This function is used by analysis
+        """
+
+        for szp in self._sources:
+            if szp.event_set_indexes is None:
+                szp.determine_event_set_indexes(event_set)
+                
+        event_activity_matrix = calc_event_activity(
+            event_set,
+            self._sources)
+        
+        event_activity.set_event_activity(event_activity_matrix)
+
+        
     @classmethod
     def create_scenario_source_model(cls):
         # FIXME this is highlighting that source is beting used for two activities
