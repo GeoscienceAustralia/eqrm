@@ -193,7 +193,6 @@ class Test_Source_model(unittest.TestCase):
         event_activity = Obsolete_Event_Activity(len(events))
         new_event_set = source_model.calculate_recurrence(
             events,
-            prob_number_of_mag_sample_bins,
             event_activity)
         event_activity_calc = events.event_activity
         # Warning - this is just the results from running

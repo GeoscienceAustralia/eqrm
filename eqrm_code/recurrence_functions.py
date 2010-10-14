@@ -205,7 +205,7 @@ def calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,recurr_dist,
     depth_bottom  depth to the bottom of the seismogenic zone
     dip           angle of dip of the fault in decimal degrees
 
-    Returns area of fault in kms.
+    Returns A_min .
     """
     area_kms=calc_fault_area(lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip)
     if recurr_dist == 'characteristic':
