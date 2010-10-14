@@ -27,6 +27,8 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\mini_current\haz19/" 
 use_site_indexes = True
 site_indexes = [2997, 2657, 3004, 3500]
+zone_source_tag = "Gaull_1990_WA" 
+event_control_tag = "use" 
 
 # Scenario input
 scenario_azimuth = 340
@@ -40,8 +42,6 @@ scenario_number_of_events = 1
 # Probabilistic input
 
 # Attenuation
-atten_models = ['Gaull_1990_WA']
-atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = None
 atten_periods = [0.0, 0.17544000000000001, 0.35088000000000003, 0.52632000000000001, 0.70174999999999998, 0.87719000000000003, 1.0526, 1.2281, 1.4035, 1.5789, 1.7544, 1.9298, 2.1053000000000002, 2.2806999999999999, 2.4561000000000002, 2.6316000000000002, 2.8069999999999999, 2.9824999999999999, 3.1579000000000002, 3.3332999999999999]

@@ -18,10 +18,10 @@
   </event_group>
 	
   <event_group
-     event_type = "'Sadigh_97">
+     event_type = "Sadigh_97">
     <GMPE 
        fault_type = "reverse">
-      <branch model = "'Sadigh_97" weight = "1.0"/> 
+      <branch model = "Sadigh_97" weight = "1.0"/> 
     </GMPE>
     <scaling scaling_rule = "not_used" />
   </event_group>
@@ -60,7 +60,7 @@
        fault_type = "reverse">
       <branch model = "Toro_1997_midcontinent" weight = "0.333333333333333333333"/> 
       <branch model = "Atkinson_Boore_97" weight = "0.3333333333333333333333333333"/> 
-      <branch model = "'Sadigh_97" weight = "0.3333333333333333333333333333333"/> 
+      <branch model = "Sadigh_97" weight = "0.3333333333333333333333333333333"/> 
     </GMPE>
     <scaling scaling_rule = "not_used" />
   </event_group>

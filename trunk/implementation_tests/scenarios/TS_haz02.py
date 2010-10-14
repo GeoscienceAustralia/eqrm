@@ -27,8 +27,8 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\current\TS_haz02/" 
 use_site_indexes = True
 site_indexes = [2255, 11511]
-zone_source_tag = 'Gaull_1990_WA'
-event_control_tag = 'use'
+zone_source_tag = "Gaull_1990_WA" 
+event_control_tag = "use" 
 
 # Scenario input
 
@@ -36,8 +36,6 @@ event_control_tag = 'use'
 prob_min_mag_cutoff = 4.5
 
 # Attenuation
-atten_models = ['Gaull_1990_WA']
-atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 4
 atten_periods = [0.0, 0.30303000000000002, 1.0]

@@ -27,6 +27,8 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\current\TS_haz04/" 
 use_site_indexes = True
 site_indexes = [2255, 11511]
+zone_source_tag = "Sadigh_97" 
+event_control_tag = "use" 
 
 # Scenario input
 
@@ -35,8 +37,6 @@ prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [500, 10, 10, 3, 10, 10]
 
 # Attenuation
-atten_models = ['Sadigh_97']
-atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 4
 atten_periods = [0.0, 0.30303000000000002, 1.0]
