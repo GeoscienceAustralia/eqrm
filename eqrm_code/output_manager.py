@@ -25,9 +25,10 @@ from csv_interface import csv2dict
 
 EXTENSION = '.txt'
 FILE_TAG_DELIMITER = '-'
-FAULT_SOURCE_FILE_ENDING = '_fault_source.xml' #'_fault_source.xml'
-ZONE_SOURCE_FILE_ENDING = '_zone_source.xml' #'_zone_source.xml'
-EVENT_CONTROL_FILE_ENDING = '_event_control.xml'
+FAULT_SOURCE_FILE = '_fault_source' #'_fault_source.xml'
+ZONE_SOURCE_FILE = '_zone_source' #'_zone_source.xml'
+EVENT_CONTROL_FILE = '_event_control'
+
 
 class myGzipFile(GzipFile):
     def __init__(self,name,mode='r'):
@@ -908,20 +909,20 @@ def get_source_file_handle(THE_PARAM_T, source_file_type='zone'):
     
     if source_file_type == 'fault':
         source_tag = THE_PARAM_T.fault_source_tag
-        file_end = FAULT_SOURCE_FILE_ENDING
+        file_constant = FAULT_SOURCE_FILE
     elif source_file_type == 'zone':
         source_tag = THE_PARAM_T.zone_source_tag
-        file_end = ZONE_SOURCE_FILE_ENDING
+        file_constant = ZONE_SOURCE_FILE
     elif source_file_type == 'event_type':
         source_tag = THE_PARAM_T.event_control_tag
-        file_end = EVENT_CONTROL_FILE_ENDING
+        file_constant = EVENT_CONTROL_FILE
     else:
          raise IOError(source_file_type, " is not a valid source file type.")
     if source_tag is None:
-        source_file = THE_PARAM_T.site_tag + file_end
+        source_file = THE_PARAM_T.site_tag + file_constant + '.xml'
     else:
-        source_file = THE_PARAM_T.site_tag + '_' \
-                      + source_tag + file_end
+        source_file = THE_PARAM_T.site_tag  + file_constant + '_' \
+                      + source_tag + '.xml'
     source_file = os.path.join(THE_PARAM_T.input_dir, source_file)
     return open(source_file)
     
