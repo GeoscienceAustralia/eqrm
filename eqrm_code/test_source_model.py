@@ -8,7 +8,7 @@ import types
 from scipy import array, allclose
 
 from source_model import *
-from source_model import Source_Zone_Polygon
+from source_model import Source_Zone
 from eqrm_code.event_set import Event_Set, Obsolete_Event_Activity
 from eqrm_code.util import reset_seed, determine_eqrm_path
 
@@ -97,7 +97,7 @@ class Test_Source_model(unittest.TestCase):
         A_min = 0.568
         number_of_mag_sample_bins = 15
         event_type = 'fish'
-        szp = Source_Zone_Polygon(boundary,exclude,
+        szp = Source_Zone(boundary,exclude,
                                   min_magnitude,max_magnitude,
                                   prob_min_mag_cutoff,
                                   A_min,b,
@@ -123,7 +123,7 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless(result.number_of_mag_sample_bins== 15,'Failed!')
 
     
-    def test_Source_Zone_Polygon(self):
+    def test_Source_Zone(self):
         prob_min_mag_cutoff = 1.0
         boundary = [(0, 0.0), (100., 0.0), (100., 100.0), (0., 100.0) ]
         exclude = [[(10., 10.0),  (20., 10.0),(20., 20.0),(10., 20.0)]]
@@ -133,7 +133,7 @@ class Test_Source_model(unittest.TestCase):
         A_min = 0.5
         number_of_mag_sample_bins = 15
         event_type = 'fish'
-        szp = Source_Zone_Polygon(boundary,exclude,
+        szp = Source_Zone(boundary,exclude,
                                   min_magnitude,max_magnitude,
                                   prob_min_mag_cutoff,
                                   A_min,b,

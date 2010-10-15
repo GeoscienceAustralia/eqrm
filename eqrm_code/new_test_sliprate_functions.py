@@ -8,7 +8,7 @@ import matplotlib.pylab as plt
 from numpy import arange,exp
 
 from eqrm_code.event_set import Event_Set
-from eqrm_code.source_model import Source_Model, Source_Zone_Polygon        
+from eqrm_code.source_model import Source_Model, Source_Zone        
 from eqrm_code.recurrence_functions import *
 from eqrm_code.conversions import *
 

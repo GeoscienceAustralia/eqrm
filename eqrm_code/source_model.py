@@ -264,7 +264,7 @@ class Source(object):
 
 
         
-class Source_Zone_Polygon(Source, polygon_object):
+class Source_Zone(Source, polygon_object):
     def __init__(self,boundary,exclude,
                  min_magnitude,max_magnitude,
                  prob_min_mag_cutoff,
@@ -487,7 +487,7 @@ def source_model_from_xml(filename, prob_min_mag_cutoff):
             exclude.append(exclusion_zone.array)
         #print 'LAMBDAMIN 1 ',A_min
         
-        source_zone_polygon = Source_Zone_Polygon(
+        source_zone_polygon = Source_Zone(
             boundary,
             exclude,
             min_magnitude,
