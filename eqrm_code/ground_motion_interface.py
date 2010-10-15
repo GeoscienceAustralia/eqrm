@@ -105,8 +105,8 @@ from eqrm_code.ground_motion_misc import (linear_interpolation,
                                           Australian_standard_model,
                                           Australian_standard_model_interpolation)
 from eqrm_code import util 
-import event_set
-import conversions
+from eqrm_code import conversions
+from eqrm_code import ground_motion_misc
 
 LOG10E = math.log10(math.e)
 
@@ -2685,10 +2685,10 @@ Ch_faulting_flags = {'reverse':    (1, 0),
                      'normal':     (0, 1),
                      'strikeslip': (0, 0)}
 
-# generate 'Ch_fault_type' from the dictionary above and event_set data
+# generate 'Ch_fault_type' from the dictionary above 
 tmp = []
 for (k, v) in Ch_faulting_flags.iteritems():
-    index = event_set.FaultTypeDictionary[k]
+    index = ground_motion_misc.FaultTypeDictionary[k]
     tmp.append((index, v))
 
 # sort and make array in correct index order
@@ -3050,7 +3050,7 @@ Campbell08_faulting_flags = {'reverse':    (1, 0),
 # generate 'Campbell08_fault_type' from the dictionary above
 tmp = []
 for (k, v) in Campbell08_faulting_flags.iteritems():
-    index = event_set.FaultTypeDictionary[k]
+    index = ground_motion_misc.FaultTypeDictionary[k]
     tmp.append((index, v))
 
 # sort and make array in correct index order

@@ -31,8 +31,8 @@ from eqrm_code.projections import azimuthal_orthographic_ll_to_xy as ll_to_xy
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
 from eqrm_code.generation_polygon import xml_fault_generators
 from eqrm_code.ANUGA_utilities import log as eqrmlog
-from eqrm_code.source_model import create_fault_sources
-
+from eqrm_code import source_model #import create_fault_sources
+from eqrm_code import ground_motion_misc
 
 # This specifies the dtypes used in  event set.
 # This is used to save memory
@@ -40,14 +40,6 @@ from eqrm_code.source_model import create_fault_sources
 # therefore let's not use it.
 EVENT_FLOAT = float64 #float32
 EVENT_INT = int64 #int32
-
-######
-# Define the mapping from fault type NAME to integer INDEX.
-# This is used in the Chiou08 model.
-######
-FaultTypeDictionary = {'reverse': 0,
-                       'normal': 1,
-                       'strikeslip': 2}
 
 
 class Dummy:
@@ -228,7 +220,8 @@ class Event_Set(object):
         # Default 'fault_type' to 'reverse'
         if fault_type is None:
             fault_type = ones(
-                depth.shape, dtype=int) * FaultTypeDictionary['reverse']
+                depth.shape, dtype=int) * \
+                ground_motion_misc.FaultTypeDictionary['reverse']
 
         # Add function conversions
         length = area/width
@@ -711,8 +704,9 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     (fsg_list, magnitude_type) = xml_fault_generators(fault_xml_file, 
                                                       prob_min_mag_cutoff)
 
-    source_mods = create_fault_sources(event_control_file, fsg_list,
-                                       magnitude_type)
+    source_mods = source_model.create_fault_sources(
+        event_control_file, fsg_list,
+        magnitude_type)
     
     if prob_number_of_events_in_faults is None:  
         prob_number_of_events_in_faults = zeros((len(source_mods)),
@@ -826,7 +820,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         azimuth[start:end] = fault_azimuth
         fault_dip = fault.populate_dip(num)
         dip[start:end] = fault_dip
-        fault_type[start:end]=FaultTypeDictionary[source.fault_type]
+        fault_type[start:end] = ground_motion_misc.FaultTypeDictionary[source.fault_type]
         #magnitude[start:end] = polygon_magnitude
             #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
