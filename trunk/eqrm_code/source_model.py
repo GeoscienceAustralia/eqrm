@@ -11,13 +11,14 @@
   
   Copyright 2007 by Geoscience Australia
 """
-from scipy import zeros, where, arange
+from scipy import zeros, where, arange, asarray
 
 from eqrm_code.recurrence_functions import calc_event_activity
 from eqrm_code.polygon_class import polygon_object
 from eqrm_code.xml_interface import Xml_Interface
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
+from eqrm_code import parse_in_parameters
 
 
 class Obsolete_Source_Models(object):
@@ -249,12 +250,8 @@ class Source(object):
         """
 
         self.atten_models = atten_models
-        self.atten_model_weights = atten_model_weights
-
-        weight_sum = sum(atten_model_weights)
-        if weight_sum != 1.0:
-            msg = 'Model weights should sum to 1.0, got %f' %  weight_sum
-            raise Exception(msg)
+        self.atten_model_weights = parse_in_parameters.check_sum_1_normalise(
+            atten_model_weights)
 
     def set_ground_motion_calcs(periods):
         
@@ -344,6 +341,9 @@ def event_control_from_xml(filename):
                 self.branch_models.append(b['model'])
                 weight = float(b['weight'])
                 self.branch_weights.append(weight)
+            self.branch_weights = asarray(self.branch_weights)
+            self.branch_weights = parse_in_parameters.check_sum_1_normalise(
+                self.branch_weights)
             if sum(self.branch_weights) != 1.0:
                 msg = ("XML file %s: weights for event group '%s' should sum "
                        "to 1.0, got %.1f"

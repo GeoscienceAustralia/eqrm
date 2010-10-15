@@ -180,9 +180,10 @@ class Fault_Source_Generator(object):
         self.dip_dist = {'distribution': 'constant', 'mean': dip}
         out_of_dip_theta = self.n2t(geometry_dict, 'out_of_dip_theta')
         delta_theta = self.n2t(geometry_dict, 'delta_theta')
-        self.out_of_dip_theta_dist = {'distribution': 'uniform', 
-                                      'minimum': out_of_dip_theta - delta_theta,
-                                      'maximum': out_of_dip_theta + delta_theta}
+        self.out_of_dip_theta_dist = {
+            'distribution': 'uniform', 
+            'minimum': out_of_dip_theta - delta_theta,
+            'maximum': out_of_dip_theta + delta_theta}
         depth_top = self.n2t(geometry_dict, 'depth_top_seismogenic')
         self.depth_top_seismogenic_dist = {'distribution': 'constant', 
                                            'mean': depth_top}

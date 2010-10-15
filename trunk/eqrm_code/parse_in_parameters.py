@@ -602,17 +602,10 @@ def att_value_fixes(THE_PARAM_T):
             raise ValueError('do not save motion for a generated event')
 
     # FIXME this should happen to the weights from sources as well. 
-    weights = THE_PARAM_T.atten_model_weights    
-    # test if attenuation weights are close to 1 (with 0.01 absolute tolerance)
-    # this means that 3 weights with 0.33 should pass    
-    if weights is not None:
-        if not allclose(weights.sum(),1.0,atol=0.01):
-            print 'weights=',weight
-            raise ValueError
+    weights = THE_PARAM_T.atten_model_weights
     
-        # Re-normalise weights so they do sum to 1
-        weights=weights/abs(weights.sum()) # normalize
-        THE_PARAM_T['atten_model_weights'] = [x for x in weights]
+    if weights is not None:        
+        THE_PARAM_T['atten_model_weights'] = check_sum_1_normalise(weights)
 
     
     # if periods is collapsed (into a scalar), turn it into a vector
@@ -626,9 +619,29 @@ def att_value_fixes(THE_PARAM_T):
         THE_PARAM_T['input_dir'] = THE_PARAM_T.input_dir+ '/'
     THE_PARAM_T['output_dir'] = change_slashes(THE_PARAM_T.output_dir)
     THE_PARAM_T['input_dir'] = change_slashes(THE_PARAM_T.input_dir)
+
+    
+def check_sum_1_normalise(weights):
+    """
+    
+    Check that a list or array basically sums to one.Normalise so it
+    exactly sums to one.
+
+    return a 1D array that sums to one.
+    """
+
+    
+    # test if attenuation weights are close to 1 (with 0.01 absolute tolerance)
+    # this means that 3 weights with 0.33 should pass  
+    if not allclose(weights.sum(),1.0,atol=0.01):
+        msg =  'weights=',weight
+        raise ValueError(msg)
+    
+    # Re-normalise weights so they do sum to 1
+    return weights/abs(weights.sum()) # normalize
     
 
-
+        
 def isscalar(x):
     if isinstance(x,int) or isinstance(x,float):
         return True

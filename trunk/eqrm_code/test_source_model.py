@@ -311,7 +311,7 @@ class Test_Source_model(unittest.TestCase):
         expected = ['Campbell08', 'Boore08']
         self.failUnlessEqual(etc.branch_models, expected)
         expected = [0.80000000000000004, 0.20000000000000001]
-        self.failUnlessEqual(etc.branch_weights, expected)
+        self.failUnless(allclose(etc.branch_weights, expected))
         expected = {'scaling_rule': 'WellsCoppersmith94',
                     'scaling_fault_type': 'reverse'}
         self.failUnlessEqual(etc.scaling_dict,  expected)
