@@ -7,7 +7,7 @@ from scipy import exp, log, array, sum, allclose, r_
 
 
 from eqrm_code.event_set import Event_Set
-from eqrm_code.source_model import Source_Model, Source_Zone_Polygon        
+from eqrm_code.source_model import Source_Model, Source_Zone        
 from eqrm_code.recurrence_functions import *
 
 class Test_Recurrence_functions(unittest.TestCase):
