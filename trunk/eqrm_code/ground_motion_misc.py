@@ -17,6 +17,16 @@ Ground motion functions that have not found a good home
 from scipy import asarray
 from interp import interp
 
+
+######
+# Define the mapping from fault type NAME to integer INDEX.
+# This is used in the Chiou08 model.
+######
+FaultTypeDictionary = {'reverse': 0,
+                       'normal': 1,
+                       'strikeslip': 2}
+
+
 def linear_interpolation(new_period,coefficients,old_period):
     """
     linearly interpolate (or extrapolate) coefficients as a function of period

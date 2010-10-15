@@ -16,7 +16,8 @@ from scipy import zeros, where, arange
 from eqrm_code.recurrence_functions import calc_event_activity
 from eqrm_code.polygon_class import polygon_object
 from eqrm_code.xml_interface import Xml_Interface
-
+from eqrm_code.ground_motion_calculator import \
+     Multiple_ground_motion_calculator
 
 
 class Obsolete_Source_Models(object):
@@ -255,7 +256,7 @@ class Source(object):
             msg = 'Model weights should sum to 1.0, got %f' %  weight_sum
             raise Exception(msg)
 
-    def set_ground_motion_calculator(periods):
+    def set_ground_motion_calcs(periods):
         
         self.ground_motion_calculator = Multiple_ground_motion_calculator(
             self.atten_models,
