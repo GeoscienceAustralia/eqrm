@@ -529,16 +529,18 @@ class Test_Output_manager(unittest.TestCase):
         THE_PARAM_T.site_tag = "site_tag"
         THE_PARAM_T.atten_periods = [0.3, 0.5, 0.9]
         motion_name = "motion_name"
-        motion = array([[[4,5]],[[2,7,]]])# sites,event.periods
-        save_motion(motion_name,THE_PARAM_T,motion)
+        motion = array([[[[4,5]],[[2,7,]]]])# spawn,sites,event.periods
+        save_motion(motion_name, THE_PARAM_T, motion)
         # Check the file output
-        for i in range(motion.shape[1]):
+        for i in range(motion.shape[2]):
             file_name = THE_PARAM_T.output_dir+THE_PARAM_T.site_tag+ '_' \
-                   + motion_name+'_motion_'+str(i)+'.txt'
+                   + motion_name + '_motion_' + \
+                   str(i) + '_spawn_0.txt'
             file_h=open(file_name,'r')
 
             text = file_h.read().splitlines()
             # ditch the comment lines
+            text.pop(0)
             text.pop(0)
             text.pop(0)
             # Convert a space separated text line into a numeric float array
@@ -548,7 +550,7 @@ class Test_Output_manager(unittest.TestCase):
 
             for line_i,line in enumerate(text):
                 num_f = array([float(ix) for ix in line.split(' ')])
-                self.assert_ (allclose( num_f, motion[line_i,:,:]))
+                self.assert_ (allclose( num_f, motion[0,line_i,0,:]))
             file_h.close()
             os.remove(file_name)
         os.rmdir(THE_PARAM_T.output_dir)
@@ -1100,8 +1102,8 @@ def write_test_bridges_file(filename, attributes=None):
 ################################################################################
 
 if __name__ == "__main__":
-    #suite = unittest.makeSuite(Test_Output_manager, 'test')
-    suite=unittest.makeSuite(Test_Output_manager,'test_save_bridges')
+    suite = unittest.makeSuite(Test_Output_manager, 'test')
+    #suite=unittest.makeSuite(Test_Output_manager,'test_save_bridges')
     #suite=unittest.makeSuite(Test_Output_manager,'test_save_eclossII')
     runner = unittest.TextTestRunner()  #verbosity=2) #verbosity=2
     runner.run(suite)

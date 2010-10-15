@@ -628,9 +628,7 @@ def check_sum_1_normalise(weights, msg=None):
     exactly sums to one.
 
     return a 1D array that sums to one.
-    """
-
-    
+    """   
     # test if attenuation weights are close to 1 (with 0.01 absolute tolerance)
     # this means that 3 weights with 0.33 should pass  
     if not allclose(weights.sum(),1.0,atol=0.01):
