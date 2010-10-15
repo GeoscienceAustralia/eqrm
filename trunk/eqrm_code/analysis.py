@@ -310,6 +310,9 @@ def main(parameter_handle,
         THE_PARAM_T.atten_variability_method,
         THE_PARAM_T.atten_spawn_bins)
     event_activity.spawn(ground_motion_distribution.spawn_weights)
+
+    # Add the ground motion models to the source
+    source_model.set_ground_motion_calcs(THE_PARAM_T.atten_periods)
     
     # Initialise the ground motion object
     # Tasks here include
@@ -382,7 +385,7 @@ def main(parameter_handle,
     log.debug('Memory: hazard_map array created')
     log.resource_usage() 
     if THE_PARAM_T.save_motion is True:
-        bedrock_SA_all = zeros((array_size, num_events * num_spawning,
+        bedrock_SA_all = zeros((num_spawning, array_size, num_events,
                                 len(THE_PARAM_T.atten_periods)),
                                dtype=float)        
     else:
@@ -390,7 +393,7 @@ def main(parameter_handle,
         
     if THE_PARAM_T.save_motion is True and \
            THE_PARAM_T.use_amplification is True:
-        soil_SA_all = zeros((array_size, num_events * num_spawning,
+        soil_SA_all = zeros((num_spawning, array_size, num_events,
                              len(THE_PARAM_T.atten_periods)),
                             dtype=float)
     else:
@@ -782,6 +785,8 @@ def calc_and_save_SA(THE_PARAM_T,
         (_, bedrock_SA, _) = \
                         ground_motion_distribution.sample_for_eqrm(
             log_mean_extend_GM, log_sigma_extend_GM)
+
+        # bedrock_SA shape (spawn, GM_model, sites, events, periods)
         
         soil_SA = None
         #print 'ENDING Calculating attenuation'
@@ -854,13 +859,11 @@ def calc_and_save_SA(THE_PARAM_T,
             # Put into arrays
             # combining the site and spawning dimensions
             assert collapsed_bedrock_SA.shape[1] == 1 # only one site
-            coll_fold_bedrock_SA = collapsed_bedrock_SA.reshape(
-                (-1, len(THE_PARAM_T.atten_periods)))
-            bedrock_SA_all[rel_site_index] = coll_fold_bedrock_SA
+            coll_fold_bedrock_SA = collapsed_bedrock_SA[:,0,:,:]
+            bedrock_SA_all[:,rel_site_index,:,:] = coll_fold_bedrock_SA
             if soil_SA is not None:
-                coll_fold_soil_SA = collapsed_soil_SA.reshape(
-                    (-1, len(THE_PARAM_T.atten_periods)))
-                soil_SA_all[rel_site_index] = coll_fold_soil_SA
+                coll_fold_soil_SA = collapsed_soil_SA[:,0,:,:]
+                soil_SA_all[:,rel_site_index,:,:] = coll_fold_soil_SA
 
         # Compute hazard if desired
         if THE_PARAM_T.save_hazard_map is True:

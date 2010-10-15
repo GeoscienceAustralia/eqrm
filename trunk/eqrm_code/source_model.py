@@ -172,6 +172,23 @@ class Source_Model(object):
         
         event_activity.set_event_activity(event_activity_matrix)
 
+    def set_ground_motion_calcs(self, periods):
+        """
+        Given the attenuation periods of interest, set the
+        ground motion calculators for each region.
+        """
+        for source in self._sources:
+            source.set_ground_motion_calcs(periods)
+
+    def is_consistant(num_events):
+        """
+        See if the event indexes in this source model are all unique
+        and that every event is covered by this source model.
+
+        Do we really need this?
+        """
+        pass
+
         
     @classmethod
     def create_scenario_source_model(cls, num_events):
@@ -253,7 +270,7 @@ class Source(object):
         self.atten_model_weights = parse_in_parameters.check_sum_1_normalise(
             atten_model_weights)
 
-    def set_ground_motion_calcs(periods):
+    def set_ground_motion_calcs(self, periods):
         
         self.ground_motion_calculator = Multiple_ground_motion_calculator(
             self.atten_models,
