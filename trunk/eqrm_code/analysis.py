@@ -879,7 +879,7 @@ def calc_and_save_SA(THE_PARAM_T,
                 else: # assuming 4 dimensions
                     bedrock_SA_events = collapsed_bedrock_SA[:,:,:,j].reshape(
                         1,-1)
-                bedrock_hazard[site_index,j] = \
+                bedrock_hazard[site_index,j,:] = \
                         hzd_do_value(bedrock_SA_events,
                                      event_act_d_events,
                                      1.0/array(THE_PARAM_T.return_periods))
@@ -889,7 +889,7 @@ def calc_and_save_SA(THE_PARAM_T,
                     else: # assuming 4 dimensions
                         soil_SA_events = collapsed_soil_SA[:,:,:,j].reshape(
                             (-1))
-                    soil_hazard[site_index,j] = \
+                    soil_hazard[site_index,j,:] = \
                         hzd_do_value(soil_SA_events,
                                      event_act_d_events,
                                      1.0/array(THE_PARAM_T.return_periods))
