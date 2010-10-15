@@ -621,7 +621,7 @@ def att_value_fixes(THE_PARAM_T):
     THE_PARAM_T['input_dir'] = change_slashes(THE_PARAM_T.input_dir)
 
     
-def check_sum_1_normalise(weights):
+def check_sum_1_normalise(weights, msg=None):
     """
     
     Check that a list or array basically sums to one.Normalise so it
@@ -634,7 +634,8 @@ def check_sum_1_normalise(weights):
     # test if attenuation weights are close to 1 (with 0.01 absolute tolerance)
     # this means that 3 weights with 0.33 should pass  
     if not allclose(weights.sum(),1.0,atol=0.01):
-        msg =  'weights=',weight
+        if msg == None:
+            msg =  'Weights should sum to 1.0, got ',weight
         raise ValueError(msg)
     
     # Re-normalise weights so they do sum to 1

@@ -342,18 +342,17 @@ def event_control_from_xml(filename):
                 weight = float(b['weight'])
                 self.branch_weights.append(weight)
             self.branch_weights = asarray(self.branch_weights)
-            self.branch_weights = parse_in_parameters.check_sum_1_normalise(
-                self.branch_weights)
-            if sum(self.branch_weights) != 1.0:
-                msg = ("XML file %s: weights for event group '%s' should sum "
+            msg = ("XML file %s: weights for event group '%s' should sum "
                        "to 1.0, got %.1f"
                        % (filename, event_type, sum(self.branch_weights)))
-                raise Exception(msg)
+            self.branch_weights = parse_in_parameters.check_sum_1_normalise(
+                self.branch_weights, msg)
 
             try:
                 _ = scaling_dict['scaling_rule']
             except KeyError:
-                msg = ("XML file %s: missing 'scaling_rule' attribute in event group '%s'"
+                msg = ("XML file %s: missing 'scaling_rule' attribute"
+                       " in event group '%s'"
                        % (filename, event_type))
                 raise Exception(msg)
             self.scaling_dict = scaling_dict
