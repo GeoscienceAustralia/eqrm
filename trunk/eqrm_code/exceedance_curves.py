@@ -26,17 +26,21 @@ def do_collapse_logic_tree(data, event_num, weights,
     """
     if len(data.shape) >= 4:
         # Assume the extra dimension is the ground motion model
-        new_data = _collapse_att_model_dimension(data,
-                                                 weights)
+        if THE_PARAM_T.atten_collapse_Sa_of_atten_models is True:
+            new_data = _collapse_att_model_dimension(data,
+                                                     weights)
+        else:       
+            new_data = data 
+            
     else:
         
         # if there is only one attenuation model.
         no_attn_collapse = (
-            (len(THE_PARAM_T.atten_models) == 1) or
+            (len(weights) == 1) or
             THE_PARAM_T.atten_collapse_Sa_of_atten_models is False)
         
         if no_attn_collapse:        
-            new_data=data 
+            new_data = data 
         else:
             weights = asarray(weights)
             num_of_att_models = int(len(event_num)/(max(event_num) + 1))
