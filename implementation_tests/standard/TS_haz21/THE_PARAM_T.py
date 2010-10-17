@@ -37,7 +37,7 @@ prob_number_of_events_in_zones = [0, 0, 0, 0, 0, 2]
 
 # Attenuation
 atten_collapse_Sa_of_atten_models = True
-atten_variability_method = None
+atten_variability_method = 1
 atten_periods = [0.0, 1.0526, 2.0]
 atten_spawn_bins = 2
 atten_override_RSA_shape = None
