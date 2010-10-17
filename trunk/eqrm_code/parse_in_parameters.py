@@ -619,6 +619,9 @@ def att_value_fixes(THE_PARAM_T):
         THE_PARAM_T['input_dir'] = THE_PARAM_T.input_dir+ '/'
     THE_PARAM_T['output_dir'] = change_slashes(THE_PARAM_T.output_dir)
     THE_PARAM_T['input_dir'] = change_slashes(THE_PARAM_T.input_dir)
+    
+    if THE_PARAM_T.atten_variability_method == None:
+        THE_PARAM_T.atten_spawn_bins = None
 
     
 def check_sum_1_normalise(weights, msg=None):
@@ -709,14 +712,18 @@ def verify_THE_PARAM_T(THE_PARAM_T):
       raise ParameterSyntaxError(
       'Cannot save the RSA values unless you are doing a scenario.')
 
-    if THE_PARAM_T.amp_variability_method == 1 and \
+    if THE_PARAM_T.atten_variability_method == 1 and \
            THE_PARAM_T.run_type == 'risk':
       raise ParameterSyntaxError(
       'Cannot use spawning when doing a risk simulation.')
 
+    if THE_PARAM_T.amp_variability_method == 1:
+      raise ParameterSyntaxError(
+      'Cannot spawn on amplification.')
+  
     # need to change some array sizes, e.g. bedrock_SA_all
 #     if THE_PARAM_T.save_motion == True and \
-#            THE_PARAM_T.amp_variability_method == 1:
+#            THE_PARAM_T.atten_variability_method == 1:
 #       raise ParameterSyntaxError(
 #       'Cannot save the RSA values and spawn.')
 
