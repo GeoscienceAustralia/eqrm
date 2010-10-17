@@ -265,8 +265,6 @@ def main(parameter_handle,
         source_model = source_model_zone
         
         # event activity is calculated here and the event_set are subsampled.
-        num_spawning = 1
-        
         if THE_PARAM_T.atten_spawn_bins == None:
             num_spawning = 1
         else:
@@ -315,9 +313,12 @@ def main(parameter_handle,
     log.debug(msg)
     log.debug('Memory: Pseudo Event Set created')
     log.resource_usage()
+    print "THE_PARAM_T.atten_variability_method,", THE_PARAM_T.atten_variability_method,
+    print "THE_PARAM_T.atten_spawn_bins", THE_PARAM_T.atten_spawn_bins
     ground_motion_distribution = Distribution_Log_Normal(
         THE_PARAM_T.atten_variability_method,
         THE_PARAM_T.atten_spawn_bins)
+    print "ground_motion_distribution.spawn_weights)", ground_motion_distribution.spawn_weights
     event_activity.spawn(ground_motion_distribution.spawn_weights)
 
     # Add the ground motion models to the source
@@ -471,9 +472,12 @@ def main(parameter_handle,
         # To remove loop over sites, just disable the loop
         # and remove the 'sites=all_sites[i:i+1]'.
         # and change NUM_SITES_PER_SITE_LOOP
+        num_spawning = 1
+        
         # CAUTIONS:
         #  1.  this will run out of memory if sites*events is large.
         #  2.  this has not been tested recently
+        #  3.  it absolutely will not work
         
         soil_SA, bedrock_SA = calc_and_save_SA(
             THE_PARAM_T,
@@ -544,7 +548,8 @@ def main(parameter_handle,
                 total_structure_damage[rel_i,:] = damage.structure_state
 
             # accumulate days to complete           
-            if THE_PARAM_T.bridges_functional_percentages is not None and have_bridge_data:
+            if THE_PARAM_T.bridges_functional_percentages is not None \
+                   and have_bridge_data:
                 saved_days_to_complete[rel_i,:,:] = days_to_complete
 
             #print 'ENDING building damage calculations'
@@ -669,8 +674,9 @@ def main(parameter_handle,
         column_files_that_parallel_splits.append(file)
 
         file = save_val(THE_PARAM_T,
-                        sum(all_sites.cost_breakdown( \
-                           ci=THE_PARAM_T.loss_regional_cost_index_multiplier)),
+                        sum(
+            all_sites.cost_breakdown(
+            ci=THE_PARAM_T.loss_regional_cost_index_multiplier)),
                         '_bval',
                         compress=THE_PARAM_T.compress_output,
                         parallel_tag=parallel.file_tag)
@@ -797,11 +803,11 @@ def calc_and_save_SA(THE_PARAM_T,
     else:
         num_spawn = THE_PARAM_T.atten_spawn_bins
     
-    collapsed_bedrock_SA_all = zeros((num_spawn, len(sites), len(event_set),
+    coll_rock_SA_all_events = zeros((num_spawn, len(sites), len(event_set),
                                    len(THE_PARAM_T.atten_periods)),
                                   dtype=float)
     if THE_PARAM_T.use_amplification is True:
-        collapsed_soil_SA_all = zeros((num_spawn, len(sites), len(event_set),
+        coll_soil_SA_all_events = zeros((num_spawn, len(sites), len(event_set),
                                        len(THE_PARAM_T.atten_periods)),
                                       dtype=float)
     # collapsed_bedrock_SA shape (spawn, sites, events, periods)
@@ -897,35 +903,36 @@ def calc_and_save_SA(THE_PARAM_T,
                 soil_SA_all[:,rel_site_index,event_inds,:] = coll_soil_SA
         if THE_PARAM_T.save_hazard_map is True:
             # Build collapsed_bedrock_SA for all events
-            pass 
+            # before getting out of the loop
+            # collapsed_bedrock_SA shape (spawn, sites, events, periods)
+            coll_rock_SA_all_events[:,:,event_inds,:] = collapsed_bedrock_SA
             if soil_SA is not None:
                 # Build collapsed_soil_SA for all events
+                coll_soil_SA_all_events[:,:,event_inds,:] = \
+                                                          collapsed_soil_SA
                 pass 
 
     # Compute hazard if desired
     if THE_PARAM_T.save_hazard_map is True:
+        print "event_activity.shape", event_activity.event_activity.shape
+        print "coll_rock_SA_all_events.shape", coll_rock_SA_all_events.shape
         event_act_d_events = event_activity.event_activity.reshape(-1)
-        assert collapsed_bedrock_SA.shape[1] == 1 # only one site
+        assert coll_rock_SA_all_events.shape[1] == 1 # only one site
         for j in range(len(THE_PARAM_T.atten_periods)):
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
             # into the events dimension.
-            if collapsed_bedrock_SA.ndim == 3:
-                bedrock_SA_events = collapsed_bedrock_SA[:,:,j].reshape(
-                    1,-1)
-            else: # assuming 4 dimensions
-                bedrock_SA_events = collapsed_bedrock_SA[:,:,:,j].reshape(
-                    1,-1)
+            bedrock_SA_events = coll_rock_SA_all_events[:,:,:,j].reshape(
+                1,-1)
+            print "bedrock_SA_events.shape", bedrock_SA_events.shape
+            print "event_act_d_events.shape", event_act_d_events.shape
             bedrock_hazard[site_index,j,:] = \
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,
                                       1.0/array(THE_PARAM_T.return_periods))
             if soil_SA is not None:
-                if collapsed_bedrock_SA.ndim == 3:
-                    soil_SA_events = collapsed_soil_SA[:,:,j].reshape((-1))
-                else: # assuming 4 dimensions
-                    soil_SA_events = collapsed_soil_SA[:,:,:,j].reshape(
-                        (-1))
+                soil_SA_events = coll_soil_SA_all_events[:,:,:,j].reshape(
+                    (-1))
                 soil_hazard[site_index,j,:] = \
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
