@@ -313,12 +313,9 @@ def main(parameter_handle,
     log.debug(msg)
     log.debug('Memory: Pseudo Event Set created')
     log.resource_usage()
-    print "THE_PARAM_T.atten_variability_method,", THE_PARAM_T.atten_variability_method,
-    print "THE_PARAM_T.atten_spawn_bins", THE_PARAM_T.atten_spawn_bins
     ground_motion_distribution = Distribution_Log_Normal(
         THE_PARAM_T.atten_variability_method,
         THE_PARAM_T.atten_spawn_bins)
-    print "ground_motion_distribution.spawn_weights)", ground_motion_distribution.spawn_weights
     event_activity.spawn(ground_motion_distribution.spawn_weights)
 
     # Add the ground motion models to the source
@@ -914,8 +911,6 @@ def calc_and_save_SA(THE_PARAM_T,
 
     # Compute hazard if desired
     if THE_PARAM_T.save_hazard_map is True:
-        print "event_activity.shape", event_activity.event_activity.shape
-        print "coll_rock_SA_all_events.shape", coll_rock_SA_all_events.shape
         event_act_d_events = event_activity.event_activity.reshape(-1)
         assert coll_rock_SA_all_events.shape[1] == 1 # only one site
         for j in range(len(THE_PARAM_T.atten_periods)):
@@ -924,8 +919,6 @@ def calc_and_save_SA(THE_PARAM_T,
             # into the events dimension.
             bedrock_SA_events = coll_rock_SA_all_events[:,:,:,j].reshape(
                 1,-1)
-            print "bedrock_SA_events.shape", bedrock_SA_events.shape
-            print "event_act_d_events.shape", event_act_d_events.shape
             bedrock_hazard[site_index,j,:] = \
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,
