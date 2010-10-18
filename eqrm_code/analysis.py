@@ -210,7 +210,8 @@ def main(parameter_handle,
 
        
             if fid_event_types is not None:
-                source_model_zone.add_event_type_atts_to_sources(fid_event_types)
+                source_model_zone.add_event_type_atts_to_sources(
+                    fid_event_types)
                 # This is a hack, until
                 # gm splitting is working
                 THE_PARAM_T['atten_models'] = source_model_zone[0].atten_models
@@ -829,7 +830,6 @@ def calc_and_save_SA(THE_PARAM_T,
             log_mean_extend_GM, log_sigma_extend_GM)
 
         # bedrock_SA shape (spawn, GM_model, sites, events, periods)
-        
         soil_SA = None
         #print 'ENDING Calculating attenuation'
 
