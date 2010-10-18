@@ -764,9 +764,9 @@ class Test_Event_Set(unittest.TestCase):
         event_indexes = array([0,2])
         event_activities = array([10, 20])
         ea.set_event_activity(event_activities, event_indexes)
-        self.assert_(allclose(ea.event_activity[0,0], 10))
-        self.assert_(allclose(ea.event_activity[0,1], 0))
-        self.assert_(allclose(ea.event_activity[0,2], 20))
+        self.assert_(allclose(ea.event_activity[0,0,0], 10))
+        self.assert_(allclose(ea.event_activity[0,0,1], 0))
+        self.assert_(allclose(ea.event_activity[0,0,2], 20))
 
         
     def test_Event_Activity_set_event_activity(self):
@@ -774,9 +774,9 @@ class Test_Event_Set(unittest.TestCase):
         ea = Event_Activity(num_events)
         event_activities = array([0, 10, 20])
         ea.set_event_activity(event_activities)
-        self.assert_(allclose(ea.event_activity[0,0], 0))
-        self.assert_(allclose(ea.event_activity[0,1], 10))
-        self.assert_(allclose(ea.event_activity[0,2], 20))
+        self.assert_(allclose(ea.event_activity[0,0,0], 0))
+        self.assert_(allclose(ea.event_activity[0,0,1], 10))
+        self.assert_(allclose(ea.event_activity[0,0,2], 20))
 
         
     def test_Event_Activity_spawn(self):
@@ -786,18 +786,83 @@ class Test_Event_Set(unittest.TestCase):
         ea.set_event_activity(event_activities)
         w = array([0.2, 0.8])
         ea.spawn(w)
-        self.assert_(allclose(ea.event_activity[0,0], 0.2))
-        self.assert_(allclose(ea.event_activity[0,1], 2))
-        self.assert_(allclose(ea.event_activity[0,2], 20))
-        self.assert_(allclose(ea.event_activity[1,0], 0.8))
-        self.assert_(allclose(ea.event_activity[1,1], 8))
-        self.assert_(allclose(ea.event_activity[1,2], 80))
+        self.assert_(allclose(ea.event_activity[0,0,0], 0.2))
+        self.assert_(allclose(ea.event_activity[0,0,1], 2))
+        self.assert_(allclose(ea.event_activity[0,0,2], 20))
+        self.assert_(allclose(ea.event_activity[1,0,0], 0.8))
+        self.assert_(allclose(ea.event_activity[1,0,1], 8))
+        self.assert_(allclose(ea.event_activity[1,0,2], 80))
 
         event = ea.event_activity.reshape(-1)
         # this should 'stack' so it goes [0,0 0,1 0,2 1,0 1,1 1,2]
         # with the numbers representing the indexes from the 2D array
         self.assert_(allclose(event[1], 2))
         self.assert_(allclose(event[4], 8))
+
+        
+    def test_Event_Activity_ground_motion_model_logic_split(self):      
+        num_events = 6
+        max_weights = 5
+        ea = Event_Activity(num_events)
+        indexes = arange(6)
+        activity = indexes*10
+        
+        ea.set_event_activity(activity, indexes)
+        atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
+        a = Dummy()
+        b = Dummy()
+        source_model = [a, b]
+        #event_set_indexes = [array([0,1,3]), array([2,4])]
+        event_set_indexes = [[0,1,3], [2,4]]
+        for sp, esi, amw in map(None, source_model, event_set_indexes,
+                                atten_model_weights):
+            sp.atten_model_weights = amw
+            sp.event_set_indexes = esi
+        ea.ground_motion_model_logic_split(source_model, apply_weights=True)   
+        self.assert_(allclose(sum(ea.event_activity), sum(activity)))
+        self.assert_(allclose(ea.event_activity[0,0,3], 12.))
+        self.assert_(allclose(ea.event_activity[0,0,4], 4.))
+
+
+    def test_apply_spawn(self):      
+        num_events = 6
+        max_weights = 5
+        ea = Event_Activity(num_events)
+        indexes = arange(6)
+        activity = indexes*10
+        
+        ea.set_event_activity(activity, indexes)
+        atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
+        a = Dummy()
+        b = Dummy()
+        source_model = [a, b]
+        #event_set_indexes = [array([0,1,3]), array([2,4])]
+        event_set_indexes = [[0,1,3], [2,4]]
+        for sp, esi, amw in map(None, source_model, event_set_indexes,
+                                atten_model_weights):
+            sp.atten_model_weights = amw
+            sp.event_set_indexes = esi
+        ea.ground_motion_model_logic_split(source_model, apply_weights=True)   
+        self.assert_(allclose(sum(ea.event_activity), sum(activity)))
+        self.assert_(allclose(ea.event_activity[0,0,3], 12.))
+        self.assert_(allclose(ea.event_activity[0,0,4], 4.))
+        
+        w = array([0.25,
+                   0.75])
+        ea.spawn(w)
+        self.assert_(allclose(ea.event_activity[0,0,3], 3.))
+        self.assert_(allclose(ea.event_activity[1,0,3], 9.))
+        self.assert_(allclose(ea.event_activity[0,0,4], 1.))
+        self.assert_(allclose(ea.event_activity[1,0,4], 3.))
+        
+        self.assert_(allclose(ea.event_activity[0,1,1], 6./4.))
+        self.assert_(allclose(ea.event_activity[1,1,1], 6.*0.75))
+        
+        event = ea.event_activity.reshape(-1)
+        # this should 'stack' so it goes [0,0,0 0,0,1 0,2 1,0 1,1 1,2]
+        # with the numbers representing the indexes from the 2D array
+        self.assert_(allclose(event[3], 3))
+        self.assert_(allclose(event[7], 6./4.))
         
     def test_generate_synthetic_events_fault(self):
         def dump_src(etc):
@@ -944,6 +1009,7 @@ class Test_Event_Set(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Event_Set,'test')
-    #suite = unittest.makeSuite(Test_Event_Set,'test_')
+    #suite = unittest.makeSuite(Test_Event_Set,'test_apply_spawn')
+    
     runner = unittest.TextTestRunner()
     runner.run(suite)
