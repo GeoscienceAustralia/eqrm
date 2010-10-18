@@ -3367,59 +3367,46 @@ del Campbell08_Table2, Campbell08_Table3
 
 #########################  End of Campbell08 model  ##########################
 
+
+
+#************  values to use in test ground motion models   ************
+mean_model_magnitude_type='ML'
+mean_model_distance_type='Rupture'
+mean_model_coefficient=[[0.28,0.28],[0.28,0.28]]
+mean_model_coefficient_period=[0.0,1.0]
+mean_model_sigma_coefficient=[[0.28,0.28],[0.28,0.28]]
+mean_model_sigma_coefficient_period=[0.0,1.0]
+mean_model_sigma_coefficient_interpolation = linear_interpolation
+mean_model_coefficient_interpolation = linear_interpolation
+mean_model_uses_Vs30 = False
 #***************  START OF mean_10_sigma_1  ****************************
 
-mean_10_sigma_1_magnitude_type='ML'
-mean_10_sigma_1_distance_type='Rupture'
-mean_10_sigma_1_coefficient=[[0.28,0.28],[0.28,0.28]]
-mean_10_sigma_1_coefficient_period=[0.0,1.0]
-mean_10_sigma_1_sigma_coefficient=[[0.28,0.28],[0.28,0.28]]
-mean_10_sigma_1_sigma_coefficient_period=[0.0,1.0]
 
-def mean_10_sigma_1_distribution(**kwargs):    
-    """
+def mean_10_sigma_1_distribution(**kwargs):
     
-    This is a dummy ground motion model used for testing.
-    The parameter distance and coefficient are used, to get the returned
-    shape right.
-
-    
-    distance.shape = (site, events, 1)
-    coefficient.shape = (num_coefficients, 1, 1, num_periods)
-    
-        The shapes of the returned arrays are:
-            log_mean = (site, events, num_periods)
-            log_sigma = (site, events, num_periods)
-    """
     num_sites =  kwargs['distance'].shape[0]
     num_events =  kwargs['distance'].shape[1]
     num_periods = kwargs['coefficient'].shape[3]
 
-    # exp(0) = 1
-    log_sigma = ones((num_sites, num_events, num_periods))
     log_mean = ones((num_sites, num_events, num_periods))*10
+    log_sigma = ones((num_sites, num_events, num_periods))
     return log_mean, log_sigma
 
 
-mean_10_sigma_1_sigma_coefficient_interpolation = linear_interpolation
-mean_10_sigma_1_coefficient_interpolation = linear_interpolation
-
-mean_10_sigma_1_uses_Vs30 = False
-
 mean_10_sigma_1_args=[
     mean_10_sigma_1_distribution,
-    mean_10_sigma_1_magnitude_type,
-    mean_10_sigma_1_distance_type,
+    mean_model_magnitude_type,
+    mean_model_distance_type,
     
-    mean_10_sigma_1_coefficient,
-    mean_10_sigma_1_coefficient_period,
-    mean_10_sigma_1_coefficient_interpolation,
+    mean_model_coefficient,
+    mean_model_coefficient_period,
+    mean_model_coefficient_interpolation,
     
-    mean_10_sigma_1_sigma_coefficient,
-    mean_10_sigma_1_sigma_coefficient_period,
-    mean_10_sigma_1_sigma_coefficient_interpolation,
+    mean_model_sigma_coefficient,
+    mean_model_sigma_coefficient_period,
+    mean_model_sigma_coefficient_interpolation,
 
-    mean_10_sigma_1_uses_Vs30]
+    mean_model_uses_Vs30]
 
 gound_motion_init['mean_10_sigma_1'] = mean_10_sigma_1_args
 
@@ -3427,58 +3414,94 @@ gound_motion_init['mean_10_sigma_1'] = mean_10_sigma_1_args
 
 #***************  START OF mean_20_sigma_2  ****************************
 
-mean_20_sigma_2_magnitude_type='ML'
-mean_20_sigma_2_distance_type='Rupture'
-mean_20_sigma_2_coefficient=[[0.28,0.28],[0.28,0.28]]
-mean_20_sigma_2_coefficient_period=[0.0,10.0]
-mean_20_sigma_2_sigma_coefficient=[[0.28,0.28],[0.28,0.28]]
-mean_20_sigma_2_sigma_coefficient_period=[0.0,10.0]
-
-def mean_20_sigma_2_distribution(**kwargs):    
-    """
+def mean_20_sigma_2_distribution(**kwargs):
     
-    This is a dummy ground motion model used for testing.
-    The parameter distance and coefficient are used, to get the returned
-    shape right.
-
-    
-    distance.shape = (site, events, 1)
-    coefficient.shape = (num_coefficients, 1, 1, num_periods)
-    
-        The shapes of the returned arrays are:
-            log_mean = (site, events, num_periods)
-            log_sigma = (site, events, num_periods)
-    """
     num_sites =  kwargs['distance'].shape[0]
     num_events =  kwargs['distance'].shape[1]
     num_periods = kwargs['coefficient'].shape[3]
 
-    # exp(0) = 1
+    log_mean = ones((num_sites, num_events, num_periods))*20
     log_sigma = ones((num_sites, num_events, num_periods))*2
-    log_mean = ones((num_sites, num_events, num_periods))*10
     return log_mean, log_sigma
-
-
-mean_20_sigma_2_sigma_coefficient_interpolation=linear_interpolation
-mean_20_sigma_2_coefficient_interpolation = linear_interpolation
-
-mean_20_sigma_2_uses_Vs30 = False
 
 mean_20_sigma_2_args=[
     mean_20_sigma_2_distribution,
-    mean_20_sigma_2_magnitude_type,
-    mean_20_sigma_2_distance_type,
+    mean_model_magnitude_type,
+    mean_model_distance_type,
     
-    mean_20_sigma_2_coefficient,
-    mean_20_sigma_2_coefficient_period,
-    mean_20_sigma_2_coefficient_interpolation,
+    mean_model_coefficient,
+    mean_model_coefficient_period,
+    mean_model_coefficient_interpolation,
     
-    mean_20_sigma_2_sigma_coefficient,
-    mean_20_sigma_2_sigma_coefficient_period,
-    mean_20_sigma_2_sigma_coefficient_interpolation,
+    mean_model_sigma_coefficient,
+    mean_model_sigma_coefficient_period,
+    mean_model_sigma_coefficient_interpolation,
 
-    mean_20_sigma_2_uses_Vs30]
+    mean_model_uses_Vs30]
 
 gound_motion_init['mean_20_sigma_2'] = mean_20_sigma_2_args
+
+#***************  End of Gaull 1990 WA MODEL  ****************************
+
+#***************  START OF mean_10_sigma_1  ****************************
+
+
+def mean_1_sigma_0pt5_distribution(**kwargs):
+    
+    num_sites =  kwargs['distance'].shape[0]
+    num_events =  kwargs['distance'].shape[1]
+    num_periods = kwargs['coefficient'].shape[3]
+
+    log_mean = ones((num_sites, num_events, num_periods))
+    log_sigma = ones((num_sites, num_events, num_periods))*0.5
+    return log_mean, log_sigma
+
+
+mean_1_sigma_0pt5_args=[
+    mean_1_sigma_0pt5_distribution,
+    mean_model_magnitude_type,
+    mean_model_distance_type,
+    
+    mean_model_coefficient,
+    mean_model_coefficient_period,
+    mean_model_coefficient_interpolation,
+    
+    mean_model_sigma_coefficient,
+    mean_model_sigma_coefficient_period,
+    mean_model_sigma_coefficient_interpolation,
+
+    mean_model_uses_Vs30]
+
+gound_motion_init['mean_1_sigma_0pt5'] = mean_1_sigma_0pt5_args
+
+#***************  End of mean_1_sigma_0pt5 ****************************
+#***************  START OF mean_2_sigma_1  ****************************
+
+def mean_2_sigma_1_distribution(**kwargs):
+    
+    num_sites =  kwargs['distance'].shape[0]
+    num_events =  kwargs['distance'].shape[1]
+    num_periods = kwargs['coefficient'].shape[3]
+
+    log_mean = ones((num_sites, num_events, num_periods))*2
+    log_sigma = ones((num_sites, num_events, num_periods))
+    return log_mean, log_sigma
+
+mean_2_sigma_1_args=[
+    mean_2_sigma_1_distribution,
+    mean_model_magnitude_type,
+    mean_model_distance_type,
+    
+    mean_model_coefficient,
+    mean_model_coefficient_period,
+    mean_model_coefficient_interpolation,
+    
+    mean_model_sigma_coefficient,
+    mean_model_sigma_coefficient_period,
+    mean_model_sigma_coefficient_interpolation,
+
+    mean_model_uses_Vs30]
+
+gound_motion_init['mean_2_sigma_1'] = mean_2_sigma_1_args
 
 #***************  End of Gaull 1990 WA MODEL  ****************************
