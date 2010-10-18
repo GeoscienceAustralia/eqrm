@@ -279,7 +279,10 @@ def main(parameter_handle,
         log.resource_usage()
         
     
-
+    event_activity.ground_motion_model_logic_split(
+        source_model,
+        not THE_PARAM_T.atten_collapse_Sa_of_atten_models)
+    
     msg = 'Event set created. Number of events=' + str(len(event_set.depth))
     log.info(msg)
     log.debug('Memory: Event Set created')

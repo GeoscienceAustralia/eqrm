@@ -17,9 +17,10 @@ import copy
 import xml.dom.minidom
 import math
 
-from scipy import (asarray, transpose, array, r_, concatenate, sin, cos, pi, 
-     ndarray, absolute, allclose, zeros, ones, float32, int32, float64, int64,
-                   reshape, arange)
+import scipy
+from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
+     ndarray, absolute, allclose, zeros, ones, float32, int32, \
+     float64, int64, reshape, arange
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
@@ -979,6 +980,10 @@ class Pseudo_Event_Set(Event_Set):
         return cls(event_set_instance, event_num, event_activity,
                    attenuation_ids, attenuation_weights)
 
+# dimensions
+SPAWN_D = 0
+GMMODEL = 1
+EVENTS = 2
 class Event_Activity(object):
     """
     Class to manipulate the event activity value.
@@ -989,16 +994,16 @@ class Event_Activity(object):
 
 
     The dimensions of the event_activity are;
-      (num_spawns, num_events)
+      (num_spawns, num_gm_models, num_events)
     """
     def __init__(self, num_events):
         """
         num_events is number of events
         """
-        self.event_activity = zeros((1,num_events),
+        self.event_activity = zeros((1,1,num_events),
                                     dtype=EVENT_FLOAT)
         self.num_events = num_events
-        
+         
 
     def set_scenario_event_activity(self):
         event_indexes = arange(self.num_events)
@@ -1015,24 +1020,71 @@ class Event_Activity(object):
           event activities
           
         """
-        assert self.event_activity.shape[0] == 1
+
+        # Make sure spawning has not already occured.
+        assert self.event_activity.shape[SPAWN_D] == 1
+        
         if event_indexes == None:
             event_indexes = arange(self.num_events)
         assert len(event_indexes) == len(event_activities)
-        self.event_activity[0, event_indexes] = event_activities
+        self.event_activity[0,0, event_indexes] = event_activities
 
     def spawn(self, weights):
         """
         Spawn the event activity.
+        Do this after attenuation weighing.
         
         weights is a 1D array that sums to one.
         
         """
         # currently set up to only spawn once
-        assert self.event_activity.shape[0] == 1
+        assert self.event_activity.shape[SPAWN_D] == 1
         wea_transposed = self.event_activity.T * weights
-        self.event_activity = wea_transposed.T
+        self.event_activity = wea_transposed.T        
+
+    def ground_motion_model_logic_split(self, source_model,
+                                        apply_weights=True):
+        """
+        Given a source model, apply the attenuation weights to logically
+        split the event activities.
+
+        This must be called before any other splitting.
+        This must only be called once.
+
+        Source_model is a collection of Source's.
+        """
         
+        if apply_weights is False:
+            pass
+        else:
+            assert self.event_activity.shape[SPAWN_D] == 1
+            assert self.event_activity.shape[GMMODEL] == 1
+
+            max_num_models = 1 
+            for source in source_model:
+                if len(source.atten_model_weights) > max_num_models:
+                    max_num_models = len(source.atten_model_weights)
+            new_event_activity = zeros((1, max_num_models,
+                                        self.num_events),
+                                       dtype=EVENT_FLOAT)
+            # this is so activities are not lost for events
+            # which sources do not cover.
+            new_event_activity[0,0,:] = self.event_activity[0,0,:]
+            
+            for szp in source_model:
+                assert sum(szp.atten_model_weights) == 1
+                #self.event_activity[szp.event_set_indexes] =
+                sub_activity = self.event_activity[0,0,szp.event_set_indexes]
+                # going from e.g. [0.2, 0.8] to [0.2, 0.8, 0.0]
+                maxed_weights = zeros((max_num_models))
+                maxed_weights[0:len(szp.atten_model_weights)] = \
+                                                 szp.atten_model_weights
+                activities = sub_activity * reshape(maxed_weights, (-1,1))
+                overwrite = new_event_activity[0,:,szp.event_set_indexes]
+                new_event_activity[0,:,szp.event_set_indexes] = activities.T
+            assert allclose(scipy.sum(new_event_activity, axis=GMMODEL),
+                            self.event_activity)
+            self.event_activity = new_event_activity
 
     
 class Obsolete_Event_Activity(object):
