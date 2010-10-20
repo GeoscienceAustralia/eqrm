@@ -1086,6 +1086,14 @@ class Event_Activity(object):
                             self.event_activity)
             self.event_activity = new_event_activity
 
+
+    def get_num_spawn(self):
+        return self.event_activity.shape[SPAWN_D]
+
+    
+    def get_num_gmm(self):
+        return self.event_activity.shape[GMMODEL]
+
     
 class Obsolete_Event_Activity(object):
     """

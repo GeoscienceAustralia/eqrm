@@ -81,7 +81,7 @@ def _collapse_att_model_dimension(data, weights):
     To collapse it, multiply the data by the weights and sum.
 
     Parameters:
-      data:  3 or more dimensions; with ground motion model being the
+      data:  4 or more dimensions; with ground motion model being the
         third last dimension e.g.
       (ground motion model, site, events, periods)
       (spawn, ground motion model, site, events, periods)
@@ -98,6 +98,44 @@ def _collapse_att_model_dimension(data, weights):
     sum = scipy.sum(weighted_data, gmm_index_from_start)
     
     return sum    
+
+    
+def collapse_att_model(data, weights, do_collapse):
+    """
+    
+    If do_collapse is True, collapse the data so the attenuation model
+    dimension length is one.  To collapse it, multiply the data by the
+    weights and sum, across the ground motion model dimension.
+
+    Parameters:
+      data:  5 dimensions; 
+      (spawn, ground motion model, site, events, periods)
+        Site is 1. What the data is changes. Sometimes its SA, sometimes
+        it's cost.
+      weights: The weight to apply to each ground motion model 'layer'
+    
+    """
+    if do_collapse:
+        new_data_shape = data.shape
+        new_weight_shape = ones((data.ndim))
+        gmm_index_from_end = -4
+        gmm_index_from_start = data.ndim - 4
+        new_weight_shape[gmm_index_from_end] = -1
+
+        # the new data shape will be just like data,
+        # but the length of the gmm dimension will be 1.
+        new_data_shape = list(data.shape)
+        new_data_shape[gmm_index_from_end] = 1
+        
+        weighted_data = data * reshape(weights, new_weight_shape) 
+        data = scipy.sum(weighted_data, gmm_index_from_start)
+
+        # Put the gmm dimension back
+        data = data.reshape(new_data_shape)
+
+    
+    return data
+
 
 def hzd_do_value(sa, r_nu, rtrn_rte): #,hack=[0]):
     """

@@ -863,6 +863,8 @@ class Test_Event_Set(unittest.TestCase):
         # with the numbers representing the indexes from the 2D array
         self.assert_(allclose(event[3], 3))
         self.assert_(allclose(event[7], 6./4.))
+
+        self.assert_(ea.get_num_spawn() == 2)
         
     def test_generate_synthetic_events_fault(self):
         def dump_src(etc):

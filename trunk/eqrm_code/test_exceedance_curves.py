@@ -482,13 +482,49 @@ class Test_Exceedance(unittest.TestCase):
         self.assert_ (allclose(sum, sum_act))
         self.assert_ (sum[0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
         
+  
+    def test_collapse_att_model(self):
+        spawn = 1
+        gmm = 3
+        site = 1
+        events = 2
+        periods = 4
+        size = spawn * gmm * site * events * periods
+        data = arange(0, size, 1)
+        data = reshape(data, (spawn, gmm, site, events, periods))
+        weights = [0.2, 0.3, 0.5]
+        sum = collapse_att_model(data, weights, True)
+
+        actual = zeros((spawn, gmm, site, events, periods))
+        for i in [0,1,2]:
+            actual[0,i,:,:,:] = data[0,i, :, :, :] * weights[i]
+        sum_act = scipy.sum(actual, 1)
+        sum_act = sum_act.reshape((1,1, site, events, periods))
+
+        self.assert_ (allclose(sum, sum_act))
+        self.assert_ (sum[0,0,0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
+        
             
+    def test_collapse_att_model2(self):
+        spawn = 2
+        gmm = 3
+        site = 1
+        events = 1
+        periods = 1
+        data = array([[100, 10, 1.],[200, 20, 2]])
+        data = reshape(data, (spawn, gmm, site, events, periods))
+        weights = [1., 2., 3.]
+        sum = collapse_att_model(data, weights, True)
+        actual = array([[123.],[246.]])
+        actual = reshape(actual, (spawn, 1, site, events, periods))
+        self.assert_ (allclose(sum, actual))
+                  
         
         
         
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Exceedance,'test')
-    #suite = unittest.makeSuite(Test_Exceedance,'test_exceedance_curve8')
+    #suite = unittest.makeSuite(Test_Exceedance,'test_collapse_att_model')
     runner = unittest.TextTestRunner()
     runner.run(suite)
