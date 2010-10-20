@@ -1618,7 +1618,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
-    def Xtest_Abrahamson08(self):
+    def test_Abrahamson08(self):
         """Test the Abrahamson08 model.
 
         Compare with data from Abrahamson08_check.py.
@@ -1650,46 +1650,57 @@ class Test_ground_motion_interface(unittest.TestCase):
         ML = numpy.array([[[7.0], [5.0]]])
         depth = numpy.array([[[0.0]]])
         dip = numpy.array([[[90.0]]])
-        fault_type = numpy.array([[[0]]], dtype=int)
+        fault_type = numpy.array([[[2]]], dtype=int)	# strikeslip
         Vs30 = numpy.array([[[760.0]]])
+        width = numpy.array([[[10.0]]])
 
-        # get coeffs for this period (Vlin -> A18 from table 5)
-        coeffs = numpy.array([[[[ 748.2]]], [[[-2.188]]], [[[1.687]]],
-                              [[[-0.9700]]], [[[-0.0396]]], [[[2.0773]]],
-                              [[[0.0309]]], [[[-0.0600]]], [[[1.1274]]],
-                              [[[-0.3500]]], [[[0.9000]]], [[[-0.0083]]]])
+        # get coeffs for this period
+        coeffs = numpy.array([[[[6.75]]],[[[4.5]]],[[[0.265]]],[[[-0.231]]],
+                              [[[-0.398]]],[[[1.18]]],[[[1.88]]],[[[50.0]]],
+                              [[[748.2]]],[[[-2.188]]], [[[1.6870]]],
+                              [[[-0.9700]]],[[[-0.0396]]], [[[2.0773]]],
+                              [[[0.0309]]],[[[-0.0600]]],[[[1.1274]]],
+                              [[[-0.3500]]], [[[0.9000]]],[[[-0.0083]]]])
 
         # sigma coefficients for this period (S1 -> rho from table 6)
-        sigma_coeffs = numpy.array([[[[0.630]]], [[[0.514]]], [[[0.520]]],
-                                    [[[0.329]]], [[[0.874]]]])
+        sigma_coeffs = numpy.array([[[[0.630]]],[[[0.514]]],[[[0.614]]],
+                                    [[[0.495]]],[[[0.520]]],[[[0.329]]],
+                                    [[[0.874]]]])
 
         # expected values from Abrahamson08_check.py
-        log_mean_expected = numpy.array([[[-2.64143177533], [-4.97495805631]]])
-        log_sigma_expected = numpy.array([[[6.8e-1], [8.7e-1]]])
+        log_mean_expected = numpy.array([[[6.909E-02], [6.699E-03]]])
+        log_sigma_expected = numpy.array([[[6.103E-01], [8.169E-01]]])
 
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
                                                    mag=ML, periods=periods,
                                                    depth_to_top=depth,
+                                                   width=width,
                                                    fault_type=fault_type,
-                                                   dip=dip, vs30=Vs30,
+                                                   dip=dip, Vs30=Vs30,
                                                    coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
 
         # tests for equality should be quite tight as we check against
         # Abrahamson08_check.py
+        msg = ('Shape error:\nlog_mean.shape=%s\nexpected.shape=%s' %
+               (str(log_mean.shape), str(log_mean_expected.shape)))
+        self.failUnlessEqual(log_mean.shape, log_mean_expected.shape, msg)
         msg = ('\nT=%.2f, Rrup=%.1f, ML=\n%s\nlog_mean=\n%s\nexpected=\n%s' %
                (period, Rrup, str(ML), str(log_mean), str(log_mean_expected)))
-        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
-                                         rtol=5.0e-3, atol=5.0e-3),
-                                 msg)
+        self.failUnless(allclose(log_mean, log_mean_expected,
+                                 rtol=1.0e-4, atol=1.0e-4),
+                        msg)
 
+        msg = ('Shape error:\nlog_sigma.shape=%s\nexpected.shape=%s' %
+               (str(log_sigma.shape), str(log_sigma_expected.shape)))
+        self.failUnlessEqual(log_sigma.shape, log_sigma_expected.shape, msg)
         msg = ('\nT=%.2f, Rrup=%.1f, ML=\n%s\nlog_sigma=\n%s\nexpected=\n%s'
                % (period, Rrup, str(ML), str(log_sigma),
                   str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
-                                         rtol=5.0e-3, atol=5.0e-3),
-                                 msg)
+                                 rtol=1.0e-4, atol=1.0e-4),
+                        msg)
 
     def test_mean_10_sigma_1(self):
         model_name = 'mean_10_sigma_1'

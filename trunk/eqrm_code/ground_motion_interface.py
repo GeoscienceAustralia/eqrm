@@ -99,7 +99,8 @@ import math
 from copy import  deepcopy
 from scipy import (where, sqrt, array, asarray, exp, log, newaxis, zeros,
                    log10, isfinite, weave, ones, shape, reshape, concatenate,
-                   cosh, power, shape, tile)
+                   cosh, power, shape, tile, cos, pi, copy, resize,
+                   logical_and, logical_or, sum)
  
 from eqrm_code.ground_motion_misc import (linear_interpolation,
                                           Australian_standard_model,
@@ -3505,3 +3506,629 @@ mean_2_sigma_1_args=[
 gound_motion_init['mean_2_sigma_1'] = mean_2_sigma_1_args
 
 #***************  End of Gaull 1990 WA MODEL  ****************************
+
+########################  Start of Abrahamson08 model  #########################
+
+def Abrahamson08_distribution(**kwargs):
+    """The Abrahamson08 model function.
+
+    kwargs  dictionary os parameters, expect:
+                mag, distance, coefficient, sigma_coefficient
+
+    The algorithm here is described in [1], but the code is copied from the
+    FORTRAN in [tp://www.daveboore.com/nga_gm_tmr/nga_gm_tmr_zips.zip].
+
+    [1] Abrahamson N., Silva W., "Summary of the Abrahamson & Silva NGA
+        Ground-Motion Relations", Earthquake Spectra, Volume 24, No. 1,
+        pp 67-97, February 2008
+    """
+
+    # get args
+    Per = kwargs['periods']
+    Mw = kwargs['mag']
+    dist_object = kwargs['dist_object'] 
+    fault_type = kwargs['fault_type']
+    Ztor = kwargs['depth_to_top']
+    Dip = kwargs['dip']
+    W = kwargs['width']
+    Vs30 = kwargs['Vs30']
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
+
+    # check some shapes (num_periods should be 1 below)
+    num_periods = coefficient.shape[3]
+    msg = ('Expected shape (20, 1, 1, %d), got %s'
+           % (num_periods, str(coefficient.shape)))
+    assert coefficient.shape == (20, 1, 1, 1), msg
+    msg = ('Expected shape (7, 1, 1, %d), got %s'
+           % (num_periods, str(sigma_coefficient.shape)))
+    assert sigma_coefficient.shape == (7, 1, 1, 1), msg
+
+    # get required distance arrays
+    Rrup = dist_object.Rupture()
+    Rjb = dist_object.Joyner_Boore()
+    Rx = dist_object.Horizontal()
+
+    # get flag values from 'fault_type'
+    Frv = AS08_fault_type[:,0][fault_type]
+    Fnm = AS08_fault_type[:,1][fault_type]
+
+    # 'aftershock' flag is assumed 'not aftershock'
+    Fas = 0
+
+#######
+    Fhw = 0		# assumed for now
+#######
+
+    # set correct shape for params
+
+    # get Z1.0 value from Vs30
+    Z10 = conversions.convert_Vs30_to_Z10(Vs30)		# TODO - check function is array-safe
+
+    # unpack coefficients
+    (c1T, c4T, a3T, a4T, a5T, nT, cT, c2T, VlinT, bT,
+     a1T, a2T, a8T, a10T, a12T, a13T, a14T, a15T, a16T, a18T) = coefficient
+
+    (s1estT, s2estT, s1meaT, s2meaT, s3T, s4T, rhoT) = sigma_coefficient
+
+    # unpack PGA coefficients
+    (AS08_PGA_c1, AS08_PGA_c4, AS08_PGA_a3, AS08_PGA_a4, AS08_PGA_a5,
+     AS08_PGA_n, AS08_PGA_c, AS08_PGA_c2, AS08_PGA_Vlin, AS08_PGA_b,
+     AS08_PGA_a1, AS08_PGA_a2, AS08_PGA_a8, AS08_PGA_a10, AS08_PGA_a12,
+     AS08_PGA_a13, AS08_PGA_a14, AS08_PGA_a15, AS08_PGA_a16,
+     AS08_PGA_a18) = AS08_PGA_coefficients
+    
+    (AS08_PGA_s1est, AS08_PGA_s2est, AS08_PGA_s1mea, AS08_PGA_s2mea,
+     AS08_PGA_s3, AS08_PGA_s4, AS08_PGA_rho) = AS08_PGA_sigma_coefficients
+
+    #####
+    # CALCULATE ROCK PGA (Per = 0, Vs30 = 1100 m/sec)
+    #####
+
+    R = sqrt(Rrup**2 + AS08_PGA_c4**2)
+
+    f_1 = (AS08_PGA_a1 + AS08_PGA_a5*(Mw-AS08_PGA_c1) + 
+           AS08_PGA_a8*(8.5-Mw)**2 + 
+           (AS08_PGA_a2 + AS08_PGA_a3*(Mw-AS08_PGA_c1))*log(R))
+
+    f_1 = where(Mw <= AS08_PGA_c1,
+                AS08_PGA_a1 + AS08_PGA_a4*(Mw-AS08_PGA_c1) +
+                    AS08_PGA_a8*(8.5-Mw)**2 +
+                    (AS08_PGA_a2 + AS08_PGA_a3*(Mw-AS08_PGA_c1))*log(R),
+                f_1)
+
+    #####
+    # Hanging-Wall Term
+    #####
+
+    RxTest = W*cos(Dip*pi/180.0)
+
+    T1 = zeros(Rjb.shape)
+    T1 = where(Rjb < 30.0, 1.0 - Rjb/30.0, T1)
+
+    T2 = 0.5 + Rx/(2.0*RxTest)
+    T2 = where(logical_or(Rx > RxTest, Dip == 90.0), 1.0, T2)
+
+    T3 = Rx/Ztor
+    T3 = where(Rx >= Ztor, 1.0, T3)
+
+    T4 = ones(Mw.shape)
+    T4 = where(Mw < 7.0, Mw - 6.0, T4)
+    T4 = where(Mw <= 6.0, 0.0, T4)
+
+    T5 = ones(Dip.shape)
+    T5 = where(Dip >= 30.0, 1.0 - (Dip - 30.0)/60.0, T5)
+
+    f_4 = AS08_PGA_a14*T1*T2*T3*T4*T5
+
+    #####
+    # Shallow Site Response Term (Vs30 = 1100 m/sec)
+    #####
+
+    f_5 = (AS08_PGA_a10 + AS08_PGA_b*AS08_PGA_n)*log(1100/AS08_PGA_Vlin)
+
+    # depth to top of rupture term
+
+    f_6 = ones(Ztor.shape) * AS08_PGA_a16
+    f_6 = where(Ztor < 10.0, AS08_PGA_a16*Ztor/10.0, f_6)
+
+    # large distance term
+
+    T6 = ones(Mw.shape) * 0.5
+    T6 = where(Mw <= 6.5, 0.5*(6.5 - Mw) + 0.5, T6)
+    T6 = where(Mw < 5.5, 1.0, T6)
+
+    f_8 = AS08_PGA_a18*(Rrup - 100.0)*T6
+    f_8 = where(Rrup < 100.0, 0.0, f_8)
+
+    # PGA value for rock
+
+    PGA_1100 = exp(f_1 + AS08_PGA_a12*Frv + AS08_PGA_a13*Fnm + AS08_PGA_a15*Fas + f_5  + Fhw*f_4 + f_6 + f_8)
+
+    # determine index of period for constant displacement calculation
+
+    Td = 10.0**(-1.25 + 0.3*Mw)
+
+    # get indices of periods either side of the Td value
+
+    num_T = Abrahamson08_coefficient_period.shape[0]
+    num_Td = Td.shape[1]
+
+    T = copy(Abrahamson08_coefficient_period)
+    Tbig = resize(T, (num_Td, num_T))
+    Tdbig = copy(Td)[0,:,0]
+    Tdbig = resize(Tdbig, (num_T, num_Td)).transpose()
+    iTd2 = sum(where(Tdbig > Tbig, 1, 0), axis=1)
+    iTd1 = iTd2 - 1
+
+    # unpack coefficients for the bracket periods
+
+    (c1_iTd1, c4_iTd1, a3_iTd1, a4_iTd1, a5_iTd1, n_iTd1, c_iTd1, c2_iTd1,
+     Vlin_iTd1, b_iTd1, a1_iTd1, a2_iTd1, a8_iTd1, a10_iTd1, a12_iTd1,
+     a13_iTd1, a14_iTd1, a15_iTd1,
+     a16_iTd1, a18_iTd1) = AS08_coeff[:,1:21].transpose()[:,iTd1]
+
+    c1_iTd1 = c1_iTd1[newaxis,:,newaxis]	# must reshape to get right results
+    c4_iTd1 = c4_iTd1[newaxis,:,newaxis]
+    a3_iTd1 = a3_iTd1[newaxis,:,newaxis]
+    a4_iTd1 = a4_iTd1[newaxis,:,newaxis]
+    a5_iTd1 = a5_iTd1[newaxis,:,newaxis]
+    n_iTd1 = n_iTd1[newaxis,:,newaxis]
+    c_iTd1 = c_iTd1[newaxis,:,newaxis]
+    c2_iTd1 = c2_iTd1[newaxis,:,newaxis]
+    Vlin_iTd1 = Vlin_iTd1[newaxis,:,newaxis]
+    b_iTd1 = b_iTd1[newaxis,:,newaxis]
+    a1_iTd1 = a1_iTd1[newaxis,:,newaxis]
+    a2_iTd1 = a2_iTd1[newaxis,:,newaxis]
+    a8_iTd1 = a8_iTd1[newaxis,:,newaxis]
+    a10_iTd1 = a10_iTd1[newaxis,:,newaxis]
+    a12_iTd1 = a12_iTd1[newaxis,:,newaxis]
+    a13_iTd1 = a13_iTd1[newaxis,:,newaxis]
+    a14_iTd1 = a14_iTd1[newaxis,:,newaxis]
+    a15_iTd1 = a15_iTd1[newaxis,:,newaxis]
+    a16_iTd1 = a16_iTd1[newaxis,:,newaxis]
+    a18_iTd1 = a18_iTd1[newaxis,:,newaxis]
+
+    (s1est_iTd1, s2est_iTd1, s1mea_iTd1, s2mea_iTd1,
+     s3_iTd1, s4_iTd1, rho_iTd1) = AS08_coeff[:,21:28].transpose()[:,iTd1]
+
+    s1est_iTd1 = s1est_iTd1[newaxis,:,newaxis]
+    s2est_iTd1 = s2est_iTd1[newaxis,:,newaxis]
+    s1mea_iTd1 = s1mea_iTd1[newaxis,:,newaxis]
+    s2mea_iTd1 = s2mea_iTd1[newaxis,:,newaxis]
+    s3_iTd1 = s3_iTd1[newaxis,:,newaxis]
+    s4_iTd1 = s4_iTd1[newaxis,:,newaxis]
+    rho_iTd1 = rho_iTd1[newaxis,:,newaxis]
+
+    (c1_iTd2, c4_iTd2, a3_iTd2, a4_iTd2, a5_iTd2, n_iTd2, c_iTd2, c2_iTd2,
+     Vlin_iTd2, b_iTd2, a1_iTd2, a2_iTd2, a8_iTd2, a10_iTd2, a12_iTd2,
+     a13_iTd2, a14_iTd2, a15_iTd2,
+     a16_iTd2, a18_iTd2) = AS08_coeff[:,1:21].transpose()[:,iTd2]
+
+    c1_iTd2 = c1_iTd2[newaxis,:,newaxis]
+    c4_iTd2 = c4_iTd2[newaxis,:,newaxis]
+    a3_iTd2 = a3_iTd2[newaxis,:,newaxis]
+    a4_iTd2 = a4_iTd2[newaxis,:,newaxis]
+    a5_iTd2 = a5_iTd2[newaxis,:,newaxis]
+    n_iTd2 = n_iTd2[newaxis,:,newaxis]
+    c_iTd2 = c_iTd2[newaxis,:,newaxis]
+    c2_iTd2 = c2_iTd2[newaxis,:,newaxis]
+    Vlin_iTd2 = Vlin_iTd2[newaxis,:,newaxis]
+    b_iTd2 = b_iTd2[newaxis,:,newaxis]
+    a1_iTd2 = a1_iTd2[newaxis,:,newaxis]
+    a2_iTd2 = a2_iTd2[newaxis,:,newaxis]
+    a8_iTd2 = a8_iTd2[newaxis,:,newaxis]
+    a10_iTd2 = a10_iTd2[newaxis,:,newaxis]
+    a12_iTd2 = a12_iTd2[newaxis,:,newaxis]
+    a13_iTd2 = a13_iTd2[newaxis,:,newaxis]
+    a14_iTd2 = a14_iTd2[newaxis,:,newaxis]
+    a15_iTd2 = a15_iTd2[newaxis,:,newaxis]
+    a16_iTd2 = a16_iTd2[newaxis,:,newaxis]
+    a18_iTd2 = a18_iTd2[newaxis,:,newaxis]
+
+    (s1est_iTd2, s2est_iTd2, s1mea_iTd2, s2mea_iTd2,
+     s3_iTd2, s4_iTd2, rho_iTd2) = AS08_coeff[:,21:28].transpose()[:,iTd2]
+
+    s1est_iTd2 = s1est_iTd2[newaxis,:,newaxis]
+    s2est_iTd2 = s2est_iTd2[newaxis,:,newaxis]
+    s1mea_iTd2 = s1mea_iTd2[newaxis,:,newaxis]
+    s2mea_iTd2 = s2mea_iTd2[newaxis,:,newaxis]
+    s3_iTd2 = s3_iTd2[newaxis,:,newaxis]
+    s4_iTd2 = s4_iTd2[newaxis,:,newaxis]
+    rho_iTd2 = rho_iTd2[newaxis,:,newaxis]
+
+    T_iTd1 = AS08_coeff[:,0].transpose()[:,iTd1]
+    T_iTd2 = AS08_coeff[:,0].transpose()[:,iTd2]
+
+    T_iTd1 = T_iTd1[newaxis,:,newaxis]
+    T_iTd2 = T_iTd2[newaxis,:,newaxis]
+
+    ######
+    # Magnitude and Distance Terms
+    ######
+
+    R = sqrt(Rrup**2 + c4T**2)
+
+    f_1 = a1T + a5T*(Mw-c1T) + a8T*(8.5-Mw)**2 + (a2T + a3T*(Mw-c1T))*log(R)
+    f_1 = where(Mw <= c1T,
+                a1T + a4T*(Mw-c1T) + a8T*(8.5-Mw)**2 +
+                    (a2T + a3T*(Mw-c1T))*log(R),
+                f_1)
+
+    # Calculation for Constant Displacement
+
+    RTd1 = sqrt(Rrup**2 + c4_iTd1**2)
+
+    f_1Td1 = (a1_iTd1 + a5_iTd1*(Mw-c1_iTd1) + a8_iTd1*(8.5-Mw)**2 +
+              (a2_iTd1 + a3_iTd1*(Mw-c1_iTd1)) * log(RTd1))
+    f_1Td1 = where(Mw <= c1_iTd1,
+                   a1_iTd1 + a4_iTd1*(Mw-c1_iTd1) + a8_iTd1*(8.5-Mw)**2 +
+                       (a2_iTd1 + a3_iTd1*(Mw-c1_iTd1)) * log(RTd1),
+                   f_1Td1)
+
+    RTd2 = sqrt(Rrup**2 + c4_iTd2**2)
+
+    f_1Td2 = (a1_iTd2 + a5_iTd2*(Mw-c1_iTd2) + a8_iTd2*(8.5-Mw)**2 +
+              (a2_iTd2 + a3_iTd2*(Mw-c1_iTd2)) * log(RTd2))
+    f_1Td2 = where(Mw <= c1_iTd2,
+                   a1_iTd2 + a4_iTd2*(Mw-c1_iTd2) + a8_iTd2*(8.5-Mw)**2 +
+                       (a2_iTd2 + a3_iTd2*(Mw-c1_iTd2)) * log(RTd2),
+                   f_1Td2)
+
+    ######
+    # Hanging-Wall Term
+    ######
+
+    RxTest = W*cos(Dip*pi/180.0)
+
+    T1 = zeros(Rjb.shape)
+    T1 = where(Rjb < 30.0, 1.0 - Rjb/30.0, T1)
+
+    T2 = 0.5 + Rx/(2.0*RxTest)
+    test = logical_or(Rx > RxTest, Dip == 90.0)
+    T2 = where(test, 1.0, T2)		# DANGER!
+
+    T3 = Rx/Ztor
+    T3 = where(Rx >= Ztor, 1.0, T3)
+
+    T4 = ones(Mw.shape)
+    T4 = where(Mw < 7.0, Mw - 6.0, T4)
+    T4 = where(Mw <= 6.0, 0.0, T4)
+
+    T5 = ones(Dip.shape)
+    T5 = where(Dip >= 30.0, 1.0 - (Dip - 30.0)/60.0, T5)
+
+    f_4 = a14T*T1*T2*T3*T4*T5
+ 
+    # Calculation for Constant Displacement
+
+    f_4Td1 = a14_iTd1*T1*T2*T3*T4*T5
+    f_4Td2 = a14_iTd2*T1*T2*T3*T4*T5
+
+    ######
+    # Shallow Site Response Term for Rock (Vs30 = 1100 m/sec)
+    ######
+
+    V1 = ones(Per.shape) * 700.0
+    V1 = where(Per < 2.0, exp(6.76 - 0.297*log(Per)), V1)
+    V1 = where(Per <= 1.0, exp(8.0 - 0.795*log(Per/0.21)), V1)
+    V1 = where(Per <= 0.5, 1500.0, V1)
+
+    V30 = V1
+    V30 = where(1100.0 < V1, Vs30, V30)
+
+    f_5 = (a10T + bT*nT)*log(V30/VlinT)
+
+    # Calculation for Constant Displacement
+
+    V1Td1 = ones(T_iTd1.shape) * 700.0
+    V1Td1 = where(T_iTd1 < 2.0, exp(6.76 - 0.297*log(T_iTd1)), V1Td1)
+    V1Td1 = where(T_iTd1 <= 1.0, exp(8.0 - 0.795*log(T_iTd1/0.21)), V1Td1)
+    V1Td1 = where(T_iTd1 <= 0.5, 1500.0, V1Td1)
+
+    V30Td1 = ones(Vs30.shape) * V1Td1
+    V30Td1 = where(1100.0 < V1Td1, Vs30, V30Td1)
+
+    f_5Td1 = (a10_iTd1 + b_iTd1*n_iTd1)*log(V30Td1/Vlin_iTd1)
+
+    V1Td2 = ones(T_iTd2.shape) * 700.0
+    V1Td2 = where(T_iTd2 < 2.0, exp(6.76 - 0.297*log(T_iTd2)), V1Td2)
+    V1Td2 = where(T_iTd2 <= 1.0, exp(8.0 - 0.795*log(T_iTd2/0.21)), V1Td2)
+    V1Td2 = where(T_iTd2 <= 0.5, 1500.0, V1Td2)
+
+    V30Td2 = V1Td2
+    V30Td2 = where(1100.0 < V1Td2, Vs30, V30Td2)
+
+    f_5Td2 = (a10_iTd2 + b_iTd2*n_iTd2)*log(V30Td2/Vlin_iTd2)
+
+    ######
+    # Depth to top of Rupture Term
+    ######
+
+    f_6 = ones(Ztor.shape) * a16T
+    f_6 = where(Ztor < 10.0, a16T*Ztor/10.0, f_6)
+
+    # Calcuation for Constant Dispalcement
+
+    f_6Td1 = ones(Ztor.shape) * a16_iTd1
+    f_6Td1 = where(Ztor < 10.0, a16_iTd1*Ztor/10.0, f_6Td1)
+
+    f_6Td2 = ones(Ztor.shape) * a16_iTd2
+    f_6Td2 = where(Ztor < 10.0, a16_iTd2*Ztor/10.0, f_6Td2)
+
+    ######
+    # Large Distance Term
+    ######
+
+    T6 = ones(Mw.shape) * 0.5
+    T6 = where(Mw <= 6.5, 0.5*(6.5 - Mw) + 0.5, T6)
+    T6 = where(Mw < 5.5, 1.0, T6)
+
+    f_8 = a18T*(Rrup - 100.0)*T6
+    f_8 = where(Rrup < 100.0, 0.0, f_8)
+
+    # Calculation for Constant Displacement
+
+    f_8Td1 = a18_iTd1*(Rrup - 100.0)*T6
+    f_8Td1 = where(Rrup < 100.0, 0.0, f_8Td1)
+
+    f_8Td2 = a18_iTd2*(Rrup - 100.0)*T6
+    f_8Td2 = where(Rrup < 100.0, 0.0, f_8Td2)
+
+    #####
+    # Ground Motion on Rock Before Constant Displacement Adjustment
+    #####
+
+    Y_1100 = exp(f_1 + a12T*Frv + a13T*Fnm + a15T*Fas + f_5 +
+                     Fhw*f_4 + f_6 + f_8)
+
+    Y_1100Td1 = exp(f_1Td1 + a12_iTd1*Frv + a13_iTd1*Fnm +
+                    a15_iTd1*Fas + f_5Td1 + Fhw*f_4Td1 + f_6Td1 + f_8Td1)
+
+    Y_1100Td2 = exp(f_1Td2 + a12_iTd2*Frv + a13_iTd2*Fnm +
+                    a15_iTd2*Fas + f_5Td2 + Fhw*f_4Td2 + f_6Td2 + f_8Td2)
+
+    #####
+    # Ground Motion on Rock After Constant Displacement Adjustment
+    #####
+
+    Y_1100Td0 = exp(log(Y_1100Td2/Y_1100Td1) /
+                    log(T_iTd2/T_iTd1) *
+                    log(Td/T_iTd1) + log(Y_1100Td1))
+
+    Y_1100Td = Y_1100Td0*(Td/Per)**2
+    Y_1100Td = where(Per <= Td, Y_1100, Y_1100Td)
+
+    #####
+    # Ground Motion on Local Site Conditions
+    #####
+
+    Y = exp(log(Y_1100Td) - f_5)
+
+    # Shallow Site Response Term
+
+    V1 = ones(Per.shape) * 700.0
+    V1 = where(Per < 2.0, exp(6.76 - 0.297*math.log(Per)), V1)
+    V1 = where(Per <= 1.0, exp(8.0 - 0.795*log(Per/0.21)), V1)
+    V1 = where(Per <= 0.5, 1500.0, V1)
+
+    V30 = V1
+    V30 = where(Vs30 < V1, Vs30, V1)
+
+    f_5 = (a10T + bT*nT)*log(V30/VlinT)
+    f_5 = where(Vs30 < VlinT,
+                a10T*log(V30/VlinT) - bT*log(PGA_1100 + cT) +
+                    bT*log(PGA_1100 + cT*(V30/VlinT)**nT),
+                f_5)
+
+    # Soil Depth Term
+
+    Z10_med = exp(5.394 - 4.48*log(Vs30/500.0))
+    Z10_med = where(Vs30 <= 500.0, exp(6.745 - 1.35*log(Vs30/180.0)), Z10_med)
+    Z10_med = where(Vs30 < 180.0, exp(6.745), Z10_med)
+
+    e2 = ones(Per.shape) * -0.25*log(Vs30/1000.0)*log(2.0/0.35)
+    e2 = where(Per <= 2.0, -0.25*log(Vs30/1000.0)*log(Per/0.35), e2)
+    test = logical_or(Per < 0.35, Vs30 > 1000.0)
+    e2 = where(test, 0.0, e2)			# DANGER!
+
+    a22 = ones(Per.shape) * 0.0625*(Per - 2.0)
+    a22 = where(Per < 2.0, 0.0, a22)
+
+    a21Test = ((a10T + bT*nT)*log(V30/min(V1,1000.0)) +
+               e2*log((Z10+c2T)/(Z10_med+c2T)))
+
+    a21 = e2
+    a21 = where(a21Test < 0.0,
+                -(a10T + bT*nT) *
+                    log(V30/min(V1,1000.0))/log((Z10+c2T)/(Z10_med+c2T)),
+                a21)
+    a21 = where(Vs30 >= 1000.0, 0.0, a21)
+
+    f_10 = a21*log((Z10+c2T)/(Z10_med+c2T))
+    f_10 = where(Z10 >= 200.0,
+                 a21*log((Z10+c2T)/(Z10_med+c2T)) + a22*log(Z10/200.0),
+                 f_10)
+    #####
+    # Value of Ground Motion Parameter
+    #####
+
+    Y = exp(log(Y) + f_5 + f_10)
+
+    #####
+    # CALCULATE ALEATORY UNCERTAINTY
+    # Partial Derivative of ln f_5 With Respect to ln PGA
+    #####
+
+    Alpha = zeros(V30.shape)
+    Alpha = where(Vs30 < VlinT,
+                  bT*PGA_1100 * (1.0/(PGA_1100 + cT*(V30/VlinT)**nT) -
+                                 1.0/(PGA_1100 + cT)),
+                  Alpha)
+    
+    #####
+    # Intra-Event Standard Deviation
+    #####
+
+    slnAF = 0.3
+
+    # Estimated Vs30
+
+    s0Aest = ones(Mw.shape) * AS08_PGA_s2est
+    s0Aest = where(Mw <= 7.0, AS08_PGA_s1est + (AS08_PGA_s2est-AS08_PGA_s1est)*(Mw-5.0)/2.0, s0Aest)
+    s0Aest = where(Mw < 5.0, AS08_PGA_s1est, s0Aest)
+
+    s0Yest = ones(Mw.shape) * s2estT
+    s0Yest = where(Mw <= 7.0, s1estT + (s2estT-s1estT)*(Mw-5.0)/2.0, s0Yest)
+    s0Yest = where(Mw < 5.0, s1estT, s0Yest)
+
+    sBAest = sqrt(s0Aest**2 - slnAF**2)
+    sBYest = sqrt(s0Yest**2 - slnAF**2)
+
+    # Measured Vs30
+
+    s0Amea = ones(Mw.shape) * AS08_PGA_s2mea
+    s0Amea = where(Mw <= 7.0, (AS08_PGA_s1mea + AS08_PGA_s2mea-AS08_PGA_s1mea)*(Mw-5.0)/2.0, s0Amea)
+    s0Amea = where(Mw < 5.0, AS08_PGA_s1mea, s0Amea)
+
+    s0Ymea = ones(Mw.shape) * s2meaT
+    s0Ymea = where(Mw <= 7.0, s1meaT + (s2meaT-s1meaT)*(Mw-5.0)/2.0, s0Ymea)
+    s0Ymea = where(Mw < 5.0, s1meaT, s0Ymea)
+
+    sBAmea = sqrt(s0Amea**2 - slnAF**2)
+    sBYmea = sqrt(s0Ymea**2 - slnAF**2)
+
+    #####
+    # Inter-Event Standard Deviation
+    #####
+
+    tau0A = ones(Mw.shape) * AS08_PGA_s4
+    tau0A = where(Mw <= 7.0, AS08_PGA_s3 + (AS08_PGA_s4-AS08_PGA_s3)*(Mw-5.0)/2.0, tau0A)
+    tau0A = where(Mw < 5.0, AS08_PGA_s3, tau0A)
+
+    tau0Y = ones(Mw.shape) * s4T
+    tau0Y = where(Mw <= 7.0, s3T + (s4T-s3T)*(Mw-5.0)/2.0, tau0Y)
+    tau0Y = where(Mw < 5.0, s3T, tau0Y)
+
+    tauBA = tau0A
+    tauBY = tau0Y
+
+    #####
+    # Standard Deviation of Geometric Mean of ln Y
+    #####
+
+    Tau = sqrt(tau0Y**2 + (Alpha**2)*(tauBA**2) + 2.0*Alpha*rhoT*tauBY*tauBA)
+
+    # Estimated Vs30
+
+    Sigest = sqrt(sBYest**2 + slnAF**2 + (Alpha**2)*(sBAest**2) + 2.0*Alpha*rhoT*sBYest*sBAest)
+
+    SigTest = sqrt(Sigest**2 + Tau**2)
+
+    # Measured Vs30
+
+    Sigmea = sqrt(sBYmea**2 + slnAF**2 + (Alpha**2)*(sBAmea**2) + 2.0*Alpha*rhoT*sBYmea*sBAmea)
+
+    SigTmea = sqrt(Sigmea**2 + Tau**2)
+
+    return (Y, SigTest)
+
+
+######
+# Set up a numpy array to convert a 'fault_type' flag to an array slice
+# that encodes the Frv/Fnm flags.
+######
+
+# faulting type flag encodings
+#                      'type':     (Frv, Fnm)
+AS08_faulting_flags = {'reverse':    (1, 0),
+                       'normal':     (0, 1),
+                       'strikeslip': (0, 0)}
+
+# generate 'AS08_fault_type' from the dictionary above
+tmp = []
+for (k, v) in AS08_faulting_flags.iteritems():
+    index = event_set.FaultTypeDictionary[k]
+    tmp.append((index, v))
+
+# sort and make array in correct index order
+tmp2 = []
+tmp.sort()
+for (_, flags) in tmp:
+    tmp2.append(flags)
+AS08_fault_type = array(tmp2)
+del tmp, tmp2
+
+# Tables 4. 5a, 5b and 6
+# Abrahamson and Silva (2008); Final Model; Earthquake Spectra, Vol. 24, p. 67-97 (2008)
+# Coefficients for the Average Horizontal Component of Ground Motion
+
+AS08_coeff = array([
+#T(s)  c1   c4  a3     a4     a5    n    c    c2    VLIN   b      a1      a2      a8      a10    a12     a13    a14     a15     a16     a18    s1est s2est s1mea s2mea s3    s4    rho
+[0.000,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 865.1,-1.186, 0.8040,-0.9679,-0.0372, 0.9445,0.0000,-0.0600,1.0800,-0.3500, 0.9000,-0.0067,0.590,0.470,0.576,0.453,0.470,0.300,1.000],
+[0.010,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 865.1,-1.186, 0.8110,-0.9679,-0.0372, 0.9445,0.0000,-0.0600,1.0800,-0.3500, 0.9000,-0.0067,0.590,0.470,0.576,0.453,0.420,0.300,1.000],
+[0.020,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 865.1,-1.219, 0.8550,-0.9774,-0.0372, 0.9834,0.0000,-0.0600,1.0800,-0.3500, 0.9000,-0.0067,0.590,0.470,0.576,0.453,0.420,0.300,1.000],
+[0.030,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 907.8,-1.273, 0.9620,-1.0024,-0.0372, 1.0471,0.0000,-0.0600,1.1331,-0.3500, 0.9000,-0.0067,0.605,0.478,0.591,0.461,0.462,0.305,0.991],
+[0.040,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 994.5,-1.308, 1.0370,-1.0289,-0.0315, 1.0884,0.0000,-0.0600,1.1708,-0.3500, 0.9000,-0.0067,0.615,0.483,0.602,0.466,0.492,0.309,0.982],
+[0.050,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0,1053.5,-1.346, 1.1330,-1.0508,-0.0271, 1.1333,0.0000,-0.0600,1.2000,-0.3500, 0.9000,-0.0076,0.623,0.488,0.610,0.471,0.515,0.312,0.973],
+[0.075,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0,1085.7,-1.471, 1.3750,-1.0810,-0.0191, 1.2808,0.0000,-0.0600,1.2000,-0.3500, 0.9000,-0.0093,0.630,0.495,0.617,0.479,0.550,0.317,0.952],
+[0.100,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0,1032.5,-1.624, 1.5630,-1.0833,-0.0166, 1.4613,0.0000,-0.0600,1.2000,-0.3500, 0.9000,-0.0093,0.630,0.501,0.617,0.485,0.550,0.321,0.929],
+[0.150,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 877.6,-1.931, 1.7160,-1.0357,-0.0254, 1.8071,0.0181,-0.0600,1.1683,-0.3500, 0.9000,-0.0093,0.630,0.509,0.616,0.491,0.550,0.326,0.896],
+[0.200,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 748.2,-2.188, 1.6870,-0.9700,-0.0396, 2.0773,0.0309,-0.0600,1.1274,-0.3500, 0.9000,-0.0083,0.630,0.514,0.614,0.495,0.520,0.329,0.874],
+[0.250,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 654.3,-2.381, 1.6460,-0.9202,-0.0539, 2.2794,0.0409,-0.0600,1.0956,-0.3500, 0.9000,-0.0069,0.630,0.518,0.612,0.497,0.497,0.332,0.856],
+[0.300,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 587.1,-2.518, 1.6010,-0.8974,-0.0656, 2.4201,0.0491,-0.0600,1.0697,-0.3500, 0.9000,-0.0057,0.630,0.522,0.611,0.499,0.479,0.335,0.841],
+[0.400,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 503.0,-2.657, 1.5110,-0.8677,-0.0807, 2.5510,0.0619,-0.0600,1.0288,-0.3500, 0.8423,-0.0039,0.630,0.527,0.608,0.501,0.449,0.338,0.818],
+[0.500,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 456.6,-2.669, 1.3970,-0.8475,-0.0924, 2.5395,0.0719,-0.0600,0.9971,-0.3191, 0.7458,-0.0025,0.630,0.532,0.606,0.504,0.426,0.341,0.783],
+[0.750,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 410.5,-2.401, 1.1370,-0.8206,-0.1137, 2.1493,0.0800,-0.0600,0.9395,-0.2629, 0.5704, 0.0000,0.630,0.539,0.602,0.506,0.385,0.346,0.680],
+[1.000,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0,-1.955, 0.9150,-0.8088,-0.1289, 1.5705,0.0800,-0.0600,0.8985,-0.2230, 0.4460, 0.0000,0.630,0.545,0.594,0.503,0.350,0.350,0.607],
+[1.500,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0,-1.025, 0.5100,-0.7995,-0.1534, 0.3991,0.0800,-0.0600,0.8409,-0.1668, 0.2707, 0.0000,0.615,0.552,0.566,0.497,0.350,0.350,0.504],
+[2.000,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0,-0.299, 0.1920,-0.7960,-0.1708,-0.6072,0.0800,-0.0600,0.8000,-0.1270, 0.1463, 0.0000,0.604,0.558,0.544,0.491,0.350,0.350,0.431],
+[3.000,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0, 0.000,-0.2800,-0.7960,-0.1954,-0.9600,0.0800,-0.0600,0.4793,-0.0708,-0.0291, 0.0000,0.589,0.565,0.527,0.500,0.350,0.350,0.328],
+[4.000,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0, 0.000,-0.6390,-0.7960,-0.2128,-0.9600,0.0800,-0.0600,0.2518,-0.0309,-0.1535, 0.0000,0.578,0.570,0.515,0.505,0.350,0.350,0.255],
+[5.000,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0, 0.000,-0.9360,-0.7960,-0.2263,-0.9208,0.0800,-0.0600,0.0754, 0.0000,-0.2500, 0.0000,0.570,0.587,0.510,0.529,0.350,0.350,0.200],
+[7.500,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0, 0.000,-1.5270,-0.7960,-0.2509,-0.7700,0.0800,-0.0600,0.0000, 0.0000,-0.2500, 0.0000,0.611,0.618,0.572,0.579,0.350,0.350,0.200],
+[10.00,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0, 0.000,-1.9930,-0.7960,-0.2683,-0.6630,0.0800,-0.0600,0.0000, 0.0000,-0.2500, 0.0000,0.640,0.640,0.612,0.612,0.350,0.350,0.200]])
+
+
+# dim = (#coefficients, #periods)
+Abrahamson08_coefficient = AS08_coeff[:,1:21].transpose()
+
+# dim = (period,)
+Abrahamson08_coefficient_period = AS08_coeff[:,0]
+
+# dim = (sigmacoefficient, period)
+Abrahamson08_sigma_coefficient = AS08_coeff[:,21:28].transpose()
+
+# dim = (period,)
+Abrahamson08_sigma_coefficient_period = AS08_coeff[:,0]
+
+AS08_PGA_coefficients = AS08_coeff[0,1:21]
+
+AS08_PGA_sigma_coefficients = AS08_coeff[0,21:28]
+
+# number of periods
+AS08_nper = len(Abrahamson08_coefficient_period)
+
+Abrahamson08_magnitude_type='ML'
+Abrahamson08_distance_type='Epicentral'
+Abrahamson08_interpolation = linear_interpolation
+Abrahamson08_uses_Vs30 = True
+
+
+Abrahamson08_args = [Abrahamson08_distribution,
+                     Abrahamson08_magnitude_type,
+                     Abrahamson08_distance_type,
+
+                     Abrahamson08_coefficient,
+                     Abrahamson08_coefficient_period,
+                     Abrahamson08_interpolation,
+
+                     Abrahamson08_sigma_coefficient,
+                     Abrahamson08_sigma_coefficient_period,
+                     Abrahamson08_interpolation,
+
+                     Abrahamson08_uses_Vs30]
+
+gound_motion_init['Abrahamson08'] = Abrahamson08_args
+
+#########################  End of Abrahamson08 model  ##########################
