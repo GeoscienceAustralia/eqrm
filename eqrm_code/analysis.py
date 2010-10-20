@@ -816,7 +816,7 @@ def calc_and_save_SA(THE_PARAM_T,
     num_gmm_after_collapsing = event_activity.get_num_gmm()
 
     
-    num_gmm = len(fake_source_model.atten_models)
+    num_gmm = len(source_model[0].atten_models)
     
     num_sites = len(sites)
     num_events = len(event_set)
@@ -841,12 +841,14 @@ def calc_and_save_SA(THE_PARAM_T,
     else:
         soil_SA_overloaded = None
     
-    for source in fake_source_models:
+    for source in source_model:
         event_inds = source.event_set_indexes
+        if len(event_inds) == 0:
+            continue
         sub_event_set = event_set[event_inds]
         atten_models = source.atten_models
         atten_model_weights = source.atten_model_weights
-        ground_motion_calc = fake_source_model.ground_motion_calc
+        ground_motion_calc = source.ground_motion_calculator
         
         results = ground_motion_calc.distribution(
             event_set=sub_event_set,
@@ -859,7 +861,6 @@ def calc_and_save_SA(THE_PARAM_T,
         (_, bedrock_SA, _) = \
                         ground_motion_distribution.sample_for_eqrm(
             log_mean_extend_GM, log_sigma_extend_GM)
-
         # bedrock_SA shape (spawn, GM_model, sites, events, periods)
         soil_SA = None
         #print 'ENDING Calculating attenuation'
@@ -1024,7 +1025,9 @@ def apply_threshold_distance(sites,
     Haznull, _ = where(distances > atten_threshold_distance)
     #print "Haznull", Haznull
     # Assuming one site=
+    # error here?  the problem is usually bedrock_SA, not Haznull.
     if True:
+        #print "bedrock_SA", bedrock_SA
         bedrock_SA[:,:,:, Haznull,:] = 0
         if use_amplification is True:
             soil_SA[:,:,:, Haznull,:] = 0
