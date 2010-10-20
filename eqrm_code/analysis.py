@@ -43,7 +43,8 @@ from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
 from ground_motion_distribution import Distribution_Log_Normal
 from eqrm_code.structures import Structures, build_par_file
-from eqrm_code.exceedance_curves import do_collapse_logic_tree, hzd_do_value
+from eqrm_code.exceedance_curves import do_collapse_logic_tree, hzd_do_value, \
+     collapse_att_model
 from eqrm_code.sites import Sites, truncate_sites_for_test
 from eqrm_code.damage_model import calc_total_loss
 from eqrm_code.parallel import Parallel
@@ -799,19 +800,17 @@ def calc_and_save_SA(THE_PARAM_T,
     fake_source_model.ground_motion_calc = ground_motion_calc
 
     # Build some arrays to save into.
-    if THE_PARAM_T.atten_spawn_bins == None:
-        num_spawn = 1
-    else:
-        num_spawn = THE_PARAM_T.atten_spawn_bins
-    
-    coll_rock_SA_all_events = zeros((num_spawn, len(sites), len(event_set),
-                                   len(THE_PARAM_T.atten_periods)),
-                                  dtype=float)
+    num_spawn = event_activity.get_num_spawn()
+    num_gmm = event_activity.get_num_gmm()
+    coll_rock_SA_all_events = zeros(
+        (num_spawn, num_gmm, len(sites), len(event_set),
+         len(THE_PARAM_T.atten_periods)),
+        dtype=float)
     if THE_PARAM_T.use_amplification is True:
-        coll_soil_SA_all_events = zeros((num_spawn, len(sites), len(event_set),
-                                       len(THE_PARAM_T.atten_periods)),
-                                      dtype=float)
-    # collapsed_bedrock_SA shape (spawn, sites, events, periods)
+        coll_soil_SA_all_events = zeros(
+            (num_spawn, num_gmm, len(sites), len(event_set),
+             len(THE_PARAM_T.atten_periods)),
+            dtype=float)
     
     for source in [fake_source_model]:
         event_inds = source.event_set_indexes
@@ -872,62 +871,61 @@ def calc_and_save_SA(THE_PARAM_T,
             THE_PARAM_T.atten_threshold_distance,
             THE_PARAM_T.use_amplification, event_set,
             bedrock_SA, soil_SA)
-        
         # collapse  multiple attenuation models 
-        # collapsed_bedrock_SA shape (spawn, sites, events, periods)
+        # collapsed_bedrock_SA shape (spawn, gmm, sites, events, periods)
+        # gmm is 1 if its collapsed
         if (THE_PARAM_T.save_motion is True or
             THE_PARAM_T.save_hazard_map is True):           
-            (collapsed_bedrock_SA, _, _) = do_collapse_logic_tree(
+            collapsed_bedrock_SA = collapse_att_model(
                 bedrock_SA,
-                [1],
                 atten_model_weights,
-                THE_PARAM_T) # Only for atten_collapse_Sa_of_atten_models
+                THE_PARAM_T.atten_collapse_Sa_of_atten_models)
             
             if soil_SA is not None:               
-                (collapsed_soil_SA, _, _) = do_collapse_logic_tree(
-                    soil_SA, [1],
+                collapsed_soil_SA = collapse_att_model(
+                    soil_SA,
                     atten_model_weights,
-                    THE_PARAM_T)
-
-
+                    THE_PARAM_T.atten_collapse_Sa_of_atten_models)
+                
         # saving RSA - only generally done for Ground Motion Simulation
         # (not for probabilistic hazard or if doing risk/secnario loss)
         if THE_PARAM_T.save_motion is True:
             # Put into arrays
-            # combining the site and spawning dimensions
-            assert collapsed_bedrock_SA.shape[1] == 1 # only one site
-            coll_bedrock_SA = collapsed_bedrock_SA[:,0,:,:]
+            assert collapsed_bedrock_SA.shape[2] == 1 # only one site
+            assert collapsed_bedrock_SA.shape[1] == 1 # collapse on atten
+            coll_bedrock_SA = collapsed_bedrock_SA[:,0,0,:,:]
             bedrock_SA_all[:,rel_site_index,event_inds,:] = coll_bedrock_SA
             if soil_SA is not None:
-                coll_soil_SA = collapsed_soil_SA[:,0,:,:]
+                coll_soil_SA = collapsed_soil_SA[:,0,0,:,:]
                 soil_SA_all[:,rel_site_index,event_inds,:] = coll_soil_SA
         if THE_PARAM_T.save_hazard_map is True:
             # Build collapsed_bedrock_SA for all events
             # before getting out of the loop
-            # collapsed_bedrock_SA shape (spawn, sites, events, periods)
-            coll_rock_SA_all_events[:,:,event_inds,:] = collapsed_bedrock_SA
+            # collapsed_bedrock_SA shape (spawn, gmm, sites, events, periods)
+            coll_rock_SA_all_events[:,:,:,event_inds,:] = collapsed_bedrock_SA
             if soil_SA is not None:
                 # Build collapsed_soil_SA for all events
-                coll_soil_SA_all_events[:,:,event_inds,:] = \
+                coll_soil_SA_all_events[:,:,:,event_inds,:] = \
                                                           collapsed_soil_SA
                 pass 
-
+    #End source loop
+    
     # Compute hazard if desired
     if THE_PARAM_T.save_hazard_map is True:
         event_act_d_events = event_activity.event_activity.reshape(-1)
-        assert coll_rock_SA_all_events.shape[1] == 1 # only one site
+        assert coll_rock_SA_all_events.shape[2] == 1 # only one site
         for j in range(len(THE_PARAM_T.atten_periods)):
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
             # into the events dimension.
-            bedrock_SA_events = coll_rock_SA_all_events[:,:,:,j].reshape(
+            bedrock_SA_events = coll_rock_SA_all_events[:,:,:,:,j].reshape(
                 1,-1)
             bedrock_hazard[site_index,j,:] = \
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,
                                       1.0/array(THE_PARAM_T.return_periods))
             if soil_SA is not None:
-                soil_SA_events = coll_soil_SA_all_events[:,:,:,j].reshape(
+                soil_SA_events = coll_soil_SA_all_events[:,:,:,:,j].reshape(
                     (-1))
                 soil_hazard[site_index,j,:] = \
                          hzd_do_value(soil_SA_events,
