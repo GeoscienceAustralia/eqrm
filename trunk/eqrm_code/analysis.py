@@ -788,39 +788,68 @@ def calc_and_save_SA(THE_PARAM_T,
                      amp_distribution,
                      event_activity,
                      source_model):
-    #if True: # turn this into the ground-motion splitting loop
-        # evaluate the mean and sigma from the attenuation models at the
-        # site of interest note that this is not the RSA that is used
-        # - it comes later based on sampling mu and sigma
-        # note that we also compute the distance between source and site here
+    
     fake_source_model = Dummy()
     fake_source_model.atten_models = THE_PARAM_T.atten_models
     fake_source_model.atten_model_weights = THE_PARAM_T.atten_model_weights
-    fake_source_model.event_set_indexes = arange(0, len(event_set))
+    fake_source_model.event_set_indexes = array([0])
     fake_source_model.ground_motion_calc = ground_motion_calc
 
+    fake_source_model2 = Dummy()
+    fake_source_model2.atten_models = THE_PARAM_T.atten_models
+    fake_source_model2.atten_model_weights = THE_PARAM_T.atten_model_weights
+    fake_source_model2.event_set_indexes = arange(1, len(event_set))
+    fake_source_model2.ground_motion_calc = ground_motion_calc
+
+    if len(fake_source_model2.event_set_indexes) == 0:
+        fake_source_models = [fake_source_model]
+    else:
+        fake_source_models = [fake_source_model, fake_source_model2]
+
+    if True: # False: # 
+        fake_source_model.event_set_indexes = arange(0, len(event_set))
+        fake_source_models = [fake_source_model]    
     # Build some arrays to save into.
     num_spawn = event_activity.get_num_spawn()
-    num_gmm = event_activity.get_num_gmm()
+
+    # WARNING - this only works if the event activity is not collapsed.
+    num_gmm_after_collapsing = event_activity.get_num_gmm()
+
+    
+    num_gmm = len(fake_source_model.atten_models)
+    
+    num_sites = len(sites)
+    num_events = len(event_set)
+    num_periods = len(THE_PARAM_T.atten_periods)
     coll_rock_SA_all_events = zeros(
-        (num_spawn, num_gmm, len(sites), len(event_set),
-         len(THE_PARAM_T.atten_periods)),
+        (num_spawn, num_gmm_after_collapsing,
+         num_sites, num_events, num_periods),
         dtype=float)
+    rock_SA_overloaded = zeros((num_sites,
+                                num_gmm*num_events,
+                                num_periods),
+                               dtype=float)
     if THE_PARAM_T.use_amplification is True:
         coll_soil_SA_all_events = zeros(
-            (num_spawn, num_gmm, len(sites), len(event_set),
+            (num_spawn, num_gmm_after_collapsing, num_sites, num_events,
              len(THE_PARAM_T.atten_periods)),
             dtype=float)
+        soil_SA_overloaded = zeros((num_sites,
+                                    num_gmm*num_events,
+                                    num_periods),
+                                   dtype=float)
+    else:
+        soil_SA_overloaded = None
     
-    for source in [fake_source_model]:
+    for source in fake_source_models:
         event_inds = source.event_set_indexes
-        event_set = event_set[event_inds]
+        sub_event_set = event_set[event_inds]
         atten_models = source.atten_models
         atten_model_weights = source.atten_model_weights
         ground_motion_calc = fake_source_model.ground_motion_calc
         
         results = ground_motion_calc.distribution(
-            event_set=event_set,
+            event_set=sub_event_set,
             sites=sites)
         _ , log_mean_extend_GM, log_sigma_extend_GM = results 
         # *_extend_GM has shape of (GM_model, sites, events, periods)
@@ -842,7 +871,7 @@ def calc_and_save_SA(THE_PARAM_T,
         if THE_PARAM_T.use_amplification is True:
             soil_SA = get_soil_SA(bedrock_SA,
                                   sites.attributes['SITE_CLASS'],
-                                  event_set.Mw, THE_PARAM_T.atten_periods,
+                                  sub_event_set.Mw, THE_PARAM_T.atten_periods,
                                   soil_amplification_model,
                                   amp_distribution, ground_motion_calc)
                 
@@ -856,7 +885,6 @@ def calc_and_save_SA(THE_PARAM_T,
                     THE_PARAM_T.amp_max_factor,
                     soil_SA,
                     bedrock_SA)
-
             # PGA cutoff
             assert isfinite(soil_SA).all()
             soil_SA = cutoff_pga(soil_SA,
@@ -869,13 +897,13 @@ def calc_and_save_SA(THE_PARAM_T,
         bedrock_SA, soil_SA = apply_threshold_distance(
             sites,
             THE_PARAM_T.atten_threshold_distance,
-            THE_PARAM_T.use_amplification, event_set,
+            THE_PARAM_T.use_amplification, sub_event_set,
             bedrock_SA, soil_SA)
         # collapse  multiple attenuation models 
         # collapsed_bedrock_SA shape (spawn, gmm, sites, events, periods)
         # gmm is 1 if its collapsed
         if (THE_PARAM_T.save_motion is True or
-            THE_PARAM_T.save_hazard_map is True):           
+            THE_PARAM_T.save_hazard_map is True):
             collapsed_bedrock_SA = collapse_att_model(
                 bedrock_SA,
                 atten_model_weights,
@@ -907,8 +935,19 @@ def calc_and_save_SA(THE_PARAM_T,
                 # Build collapsed_soil_SA for all events
                 coll_soil_SA_all_events[:,:,:,event_inds,:] = \
                                                           collapsed_soil_SA
-                pass 
+        # Set up the arrays to pass to risk
+        # Assume no spawning
+        # assume one site
+        for i in arange(bedrock_SA.shape[1]): # loop over gmm
+            i_overloaded = i * num_events + event_inds
+            # rock_SA_overloaded dim (sites, events * gmm, period)
+            rock_SA_overloaded[0, i_overloaded, :] = bedrock_SA[0,i,0,:,:]
+            if soil_SA is not None:
+                soil_SA_overloaded[0, i_overloaded, :] = soil_SA[0,i,0,:,:]
+            
     #End source loop
+    # End the Ground motion splitting loop
+    # Build the SA, soil, if we did it.  If not, Bedrock.
     
     # Compute hazard if desired
     if THE_PARAM_T.save_hazard_map is True:
@@ -932,8 +971,6 @@ def calc_and_save_SA(THE_PARAM_T,
                                       event_act_d_events,
                                       1.0/array(THE_PARAM_T.return_periods))
                     
-    # End the Ground motion splitting loop
-    # Build the SA, soil, if we did it.  If not, Bedrock.
     
     # Change dimensions.  Put the ground motion model dimension
     # and spawning dimension into the event dimension
@@ -941,27 +978,28 @@ def calc_and_save_SA(THE_PARAM_T,
     # Assume the SA's have
     # 3 or more dimensions; with ground motion model being the
     # third last dimension e.g.
-    # (ground motion model, site, events, periods)
+    # (ground motion model, site, events, periods) (this is obsolete)
     # (spawn, ground motion model, site, events, periods)
-    last_4_dims = bedrock_SA.shape[-4:]
-    num_gmm = last_4_dims[0]
-    num_sites = last_4_dims[1]
-    num_events = last_4_dims[2]
-    num_periods = last_4_dims[3]
-    if bedrock_SA.ndim == 4:
-        event_overloaded = num_events * num_gmm
-    else:  # assume 5 dimensions
-        num_spawn = bedrock_SA.shape[0]
-        event_overloaded = num_events * num_gmm * num_spawn
-    if soil_SA is not None:
-        soil_SA = reshape(soil_SA, (num_sites,
-                                    event_overloaded,
-                                        num_periods))  
-    bedrock_SA = reshape(bedrock_SA, (num_sites,
-                                      event_overloaded,
-                                      num_periods ))  
-    
-    return soil_SA, bedrock_SA
+#     Last_4_dims = bedrock_SA.shape[-4:]
+#     num_gmm = last_4_dims[0]
+#     num_sites = last_4_dims[1]
+#     num_events = last_4_dims[2]
+#     num_periods = last_4_dims[3]
+#     if bedrock_SA.ndim == 4:
+#         event_overloaded = num_events * num_gmm
+#     else:  # assume 5 dimensions
+#         num_spawn = bedrock_SA.shape[0]
+#         event_overloaded = num_events * num_gmm * num_spawn
+#     if soil_SA is not None:
+#         soil_SA = reshape(soil_SA, (num_sites,
+#                                     event_overloaded,
+#                                         num_periods))
+#         print "soil_SA.shape", soil_SA.shape
+#     bedrock_SA = reshape(bedrock_SA, (num_sites,
+#                                       event_overloaded,
+#                                       num_periods ))
+
+    return soil_SA_overloaded, rock_SA_overloaded
 
 
 def apply_threshold_distance(sites,
@@ -982,26 +1020,14 @@ def apply_threshold_distance(sites,
         # FIXME do this earlier, and reduce the distribution calcs to do.
     distances = sites.distances_from_event_set(event_set). \
                 distance('Joyner_Boore')
-    # distances.shape = (site, event)
-    Haznull = where(distances > atten_threshold_distance)
-    if bedrock_SA.ndim == 3:
+    #atten_threshold_distance = 0.1
+    Haznull, _ = where(distances > atten_threshold_distance)
+    #print "Haznull", Haznull
+    # Assuming one site=
+    if True:
+        bedrock_SA[:,:,:, Haznull,:] = 0
         if use_amplification is True:
-            bedrock_SA[Haznull[0], Haznull[1],:] = 0
-            soil_SA[Haznull[0], Haznull[1],:] = 0
-        else:
-            bedrock_SA[Haznull[0], Haznull[1],:] = 0
-    elif bedrock_SA.ndim == 4:
-        if use_amplification is True:
-            bedrock_SA[:,Haznull[0], Haznull[1],:] = 0
-            soil_SA[:,Haznull[0], Haznull[1],:] = 0
-        else:
-            bedrock_SA[:,Haznull[0], Haznull[1],:] = 0
-    elif bedrock_SA.ndim == 5:
-        if use_amplification is True:
-            bedrock_SA[:,:,Haznull[0], Haznull[1],:] = 0
-            soil_SA[:,:,Haznull[0], Haznull[1],:] = 0
-        else:
-            bedrock_SA[:,:,Haznull[0], Haznull[1],:] = 0
+            soil_SA[:,:,:, Haznull,:] = 0
         
         
     return bedrock_SA, soil_SA
