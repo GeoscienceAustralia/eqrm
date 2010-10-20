@@ -343,7 +343,7 @@ aleatory uncertainty $\sigma_a$.
 
 
 \subsection{Somerville09}
-\textbf{David to complete this section}
+\textbf{Complete this section}
 \begin{itemize}
 \item decsribe the two options available (NonCratonic and Yilgarn)
 \item cite the report
@@ -595,138 +595,17 @@ It is important to note the following about spawning:
 \begin{enumerate}
 \item Sub-sampling the PDF provides a smoother (and repeatable)
 estimate of the $S_a$ than random selection
-(\sref{attn:uncert-randomchoice}). This equates to a high level of
-spatial correlation. \item The range of possible $S_a$ values is
-bounded by the $n_\sigma$. \item Estimates of all $S_a$ are
-weighted against an event activity $r_\nu$ that accounts for the
-likelihood of a particular attenuation being observed. \item The
-nature of spawning means that the synthetic event catalogue is
-copied a number of times and hence requires more computation time
-and memory.
+(\sref{attn:uncert-randomchoice}). \item The range of possible $S_a$
+values is bounded by the $n_\sigma$. \item Estimates of all $S_a$
+are weighted against an event activity $r_\nu$ that accounts for the
+likelihood of a particular ground motion being observed. \item The
+nature of spawning means that there are more evaluations of the
+GMPE. This means that it is typically slower and more memory
+intesive since the $S_a$ array is larger.
 \end{enumerate}
 
-\sref{source:spawning} stated that event spawning is conducted
-when \typepar{src}{\_eps}{\_switch} is 1 or $2$. When
-\typepar{src}{\_eps}{\_switch}$=2$ the spawned values are treated
-separately throughout the hazard or risk assessment. When
-\typepar{src}{\_eps}{\_switch}$=1$ however, the spawned values are
-aggregated again before the hazard or risk assessment is made.
-This idea is illustrated in \fref{fig:attn-treecollapse}.
-
-\begin{figure}
- \setlength{\unitlength}{1mm}
-(a)  % This is the hazard tree for multi attenuation with collapse
-
-\hspace{4em} \begin{centering}
-\begin{picture}(70,30)
-% middle branch
-\put(0,12){$E_{ij}$} \put(7,13){\vector(1,0){15}}
-\put(24,12){$Sa_{ij}^{(2)}$} \put(33,13){\vector(1,0){15}}
-\put(50,12){$\widetilde{Sa_{ij}^{(2)}}$} \put(12,14){$w_2$}
-% upper branch
-\put(7,14){\vector(3,2){15}} \put(24,23){$Sa_{ij}^{(1)}$}
-\put(33,24){\vector(1,0){15}}
-\put(50,23){$\widetilde{Sa_{ij}^{(1)}}$}
-\put(11,20){\rotatebox{30}{$w_1$}}
-% lower branch
-\put(7,12){\vector(3,-2){15}} \put(24,0){$Sa_{ij}^{(3)}$}
-\put(33,1){\vector(1,0){15}}
-\put(50,0){$\widetilde{Sa_{ij}^{(3)}}$}
-\put(11,5){\rotatebox{-30}{$w_3$}}
-% concatenation at end
-\put(61,5){\scalebox{1.2}[6.5]{\}}} \put(65,12){$ {\displaystyle
-\widetilde{Sa_{ij}} = \sum_{k=1}^{3}w_k\widetilde{Sa_k} } $}
-\end{picture}
-\end{centering}
-
-\vspace{0.8em}
-(b) % This is the hazard tree for multi attenuation with NO collapse
-
-\hspace{4em} \begin{centering}
-\begin{picture}(70,30)
-% middle branch
-\put(0,12){$E_{ij}$} \put(7,13){\vector(1,0){15}}
-\put(24,12){$Sa_{ij}^{(2)}$} \put(33,13){\vector(1,0){15}}
-\put(50,12){$\widetilde{Sa_{ij}^{(2)}}$} \put(12,14){$w_2$}
-% upper branch
-\put(7,14){\vector(3,2){15}} \put(24,23){$Sa_{ij}^{(1)}$}
-\put(33,24){\vector(1,0){15}}
-\put(50,23){$\widetilde{Sa_{ij}^{(1)}}$}
-\put(11,20){\rotatebox{30}{$w_1$}}
-% lower branch
-\put(7,12){\vector(3,-2){15}} \put(24,0){$Sa_{ij}^{(3)}$}
-\put(33,1){\vector(1,0){15}}
-\put(50,0){$\widetilde{Sa_{ij}^{(3)}}$}
-\put(11,5){\rotatebox{-30}{$w_3$}}
-\end{picture}
-\end{centering}
-
-\vspace{0.8em}
-(c) % This is the risk tree for multi attenuation with collapse
-
-\hspace{4em} \begin{centering}
-\begin{picture}(70,30)
-% middle branch
-\put(0,12){$E_{ij}$} \put(7,13){\vector(1,0){15}}
-\put(24,12){$Sa_{ij}^{(2)}$} \put(33,13){\vector(1,0){15}}
-\put(50,12){$\widetilde{Sa_{ij}^{(2)}}$} \put(12,14){$w_2$}
-\put(60,13){\vector(1,0){15}} \put(77,12){$L_{ij}^{(2)}$}
-% upper branch
-\put(7,14){\vector(3,2){15}} \put(24,23){$Sa_{ij}^{(1)}$}
-\put(33,24){\vector(1,0){15}}
-\put(50,23){$\widetilde{Sa_{ij}^{(1)}}$}
-\put(11,20){\rotatebox{30}{$w_1$}} \put(60,24){\vector(1,0){15}}
-\put(77,23){$L_{ij}^{(1)}$}
-% lower branch
-\put(7,12){\vector(3,-2){15}} \put(24,0){$Sa_{ij}^{(3)}$}
-\put(33,1){\vector(1,0){15}}
-\put(50,0){$\widetilde{Sa_{ij}^{(3)}}$}
-\put(11,5){\rotatebox{-30}{$w_3$}} \put(60,1){\vector(1,0){15}}
-\put(77,0){$L_{ij}^{(3)}$}
-% concatenation at end
-\put(86,5){\scalebox{1.2}[6.5]{\}}} \put(90,12){$ {\displaystyle
- L_{ij} = \sum_{k=1}^{3}w_kL_k } $}
-\end{picture}
-\end{centering}
-
-\vspace{0.8em}
-(d)  % This is the risk tree for multi attenuation with NO collapse
 
 
-\hspace{4em}\begin{picture}(70,30)
-\begin{centering}
-% middle branch
-\put(0,12){$E_{ij}$} \put(7,13){\vector(1,0){15}}
-\put(24,12){$Sa_{ij}^{(2)}$} \put(33,13){\vector(1,0){15}}
-\put(50,12){$\widetilde{Sa_{ij}^{(2)}}$} \put(12,14){$w_2$}
-\put(60,13){\vector(1,0){15}} \put(77,12){$L_{ij}^{(2)}$}
-% upper branch
-\put(7,14){\vector(3,2){15}} \put(24,23){$Sa_{ij}^{(1)}$}
-\put(33,24){\vector(1,0){15}}
-\put(50,23){$\widetilde{Sa_{ij}^{(1)}}$}
-\put(11,20){\rotatebox{30}{$w_1$}} \put(60,24){\vector(1,0){15}}
-\put(77,23){$L_{ij}^{(1)}$}
-% lower branch
-\put(7,12){\vector(3,-2){15}} \put(24,0){$Sa_{ij}^{(3)}$}
-\put(33,1){\vector(1,0){15}}
-\put(50,0){$\widetilde{Sa_{ij}^{(3)}}$}
-\put(11,5){\rotatebox{-30}{$w_3$}} \put(60,1){\vector(1,0){15}}
-\put(77,0){$L_{ij}^{(3)}$}
-\end{centering}
-\end{picture}
-
-
-\caption{The application of spawning to a single synthetic
-earthquake $E_{ij}$;(a) the collapse of spawned samples for hazard
-(\typeparcaption{src}{\_eps}{\_switch}$=1$); (b) hazard spawning
-without collapse (\typeparcaption{src}{\_eps}{\_switch}$=2$); (c)
-the collapse of spawned samples for risk
-(\typeparcaption{src}{\_eps}{\_switch}$=1$); and (d) risk spawning
-without collapse (\typeparcaption{src}{\_eps}{\_switch}$=2$). The
-illustrated procedure is repeated for $N_s$ events in the event
-catalogue and the techniques of \cref{ch:risk} used to assess the
-hazard or risk.} \label{fig:attn-treecollapse}
-\end{figure}
 
 \subsection{Recomendation for sampling GMPE aleatory Uncertainty}
 
@@ -762,54 +641,8 @@ all negative and
 \begin{equation}
 \left|\sum_{i=1}^{n}w_{a,i}\right| = 1.
 \end{equation}
-\begin{table}
-\caption{Pointers to attenuation models for use in the first row
-of \typeparcaption{atten}{uation}{\_flag}.} \vspace{0.8em}
-\label{tab:attn-flags}
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline \textbf{Motion} & \textbf{pointer} & \textbf{model} \\
-\hline
- & 0 & \cite{dr_Gaull90a} PGA with $S_a$ extension\\
- & 1 & \cite{dr_Toro97a} \\
-$S_a$ & 2 & \cite{dr_Atkinson97a} \\
- & 3 & \cite{dr_Sadigh97a} \\
- & 4 & \cite{dr_Somerville01a} \\
-\hline
- $\Imm$ & 100 & \cite{dr_Gaull90a} \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
 
-\begin{table}
-\caption{Attenuation region (\typeparcaption{attn}{\_reg}{ion})
-options for each of the attenuation models.} \vspace{0.8em}
-\label{tab:attn-regions}
-\begin{center}
-\begin{tabular}{|c|c|l|}
-\hline \textbf{attenuation} & \textbf{attenuation} & \textbf{\texttt{attn\_region}} \\
-\textbf{pointer} & \textbf{model} & \textbf{} \\
-\hline
-0   &  & 1 $\Rightarrow$ Western Australia  \\
-or & \cite{dr_Gaull90a} & 2 $\Rightarrow$ Northeastern Australia\\
-100 & & 3 $\Rightarrow$ Indonesia\\
- & & 4 $\Rightarrow$ Southeastern Australia\\
-\hline
-1 & \cite{dr_Toro97a} & 1 $\Rightarrow$ Mid-Continent $M_o$ \\
-\hline
-2 & \cite{dr_Atkinson97a} & 1 $\Rightarrow$ No published options \\
-\hline
-3 & \cite{dr_Sadigh97a} & 1 $\Rightarrow$ No published options \\
-\hline
- &  & 1 $\Rightarrow$ Nonrift - Horizontal\\
-4 & \cite{dr_Somerville01a} & 2 $\Rightarrow$ Rift -- Horizontal\\
- & & 3 $\Rightarrow$ Nonrift -- Vertical\\
- & & 4 $\Rightarrow$ Rift --Vertical\\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
+
 
 The mechanism for using more than one attenuation model is similar
 to the mechanism used for spawning (see
@@ -824,8 +657,132 @@ notion of logic tree collapse is described by
 \fref{fig:attn-treecollapse}.
 
 
+\section{Collapse versus no-collapse}
+
+The techniques adopted for incorporating spawning (see \sref
+{attn:uncert-pdfchoice}) and using multiple ground motion models are
+similar in the sense that they require multiple evaluations of
+ground motion for each event. These are carried through the various
+stages of an EQRM simulation such as amplification, building damage
+and loss calculation (see following chapters). At the end of the
+simulation these values can then be collapsed back to a single `best
+estimate' or kept in a un-collapsed form and used to determine the
+hazard and/or risk curve (see \cref{ch:risk}). These two options are
+illustrated in \fref{fig:attn-treecollapse} for both a hazrd and
+risk simulation. Note that when collapsing the samples the extreme
+values are removed from the hazard or risk curves. For this reason
+we recomend the no-collapse option.
+
+\begin{figure}
+ \setlength{\unitlength}{1mm}
+(a)  % This is the hazard tree for multi attenuation with collapse
+
+\hspace{4em} \begin{centering}
+\begin{picture}(70,30)
+% middle branch
+\put(0,12){$E_{ij}$} \put(7,13){\vector(1,0){15}}
+\put(24,12){$Sa_{ij}^{(2)}$} \put(33,13){\vector(1,0){15}}
+\put(50,12){$\widetilde{Sa_{ij}^{(2)}}$} \put(12,14){$w_2$}
+% upper branch
+\put(7,14){\vector(3,2){15}} \put(24,23){$Sa_{ij}^{(1)}$}
+\put(33,24){\vector(1,0){15}}
+\put(50,23){$\widetilde{Sa_{ij}^{(1)}}$}
+\put(11,20){\rotatebox{30}{$w_1$}}
+% lower branch
+\put(7,12){\vector(3,-2){15}} \put(24,0){$Sa_{ij}^{(3)}$}
+\put(33,1){\vector(1,0){15}} \put(50,0){$\widetilde{Sa_{ij}^{(3)}}$}
+\put(11,5){\rotatebox{-30}{$w_3$}}
+% concatenation at end
+\put(61,5){\scalebox{1.2}[6.5]{\}}} \put(65,12){$ {\displaystyle
+\widetilde{Sa_{ij}} = \sum_{k=1}^{3}w_k\widetilde{Sa_k} } $}
+\end{picture}
+\end{centering}
+
+\vspace{0.8em}
+(b) % This is the hazard tree for multi attenuation with NO collapse
+
+\hspace{4em} \begin{centering}
+\begin{picture}(70,30)
+% middle branch
+\put(0,12){$E_{ij}$} \put(7,13){\vector(1,0){15}}
+\put(24,12){$Sa_{ij}^{(2)}$} \put(33,13){\vector(1,0){15}}
+\put(50,12){$\widetilde{Sa_{ij}^{(2)}}$} \put(12,14){$w_2$}
+% upper branch
+\put(7,14){\vector(3,2){15}} \put(24,23){$Sa_{ij}^{(1)}$}
+\put(33,24){\vector(1,0){15}}
+\put(50,23){$\widetilde{Sa_{ij}^{(1)}}$}
+\put(11,20){\rotatebox{30}{$w_1$}}
+% lower branch
+\put(7,12){\vector(3,-2){15}} \put(24,0){$Sa_{ij}^{(3)}$}
+\put(33,1){\vector(1,0){15}} \put(50,0){$\widetilde{Sa_{ij}^{(3)}}$}
+\put(11,5){\rotatebox{-30}{$w_3$}}
+\end{picture}
+\end{centering}
+
+\vspace{0.8em}
+(c) % This is the risk tree for multi attenuation with collapse
+
+\hspace{4em} \begin{centering}
+\begin{picture}(70,30)
+% middle branch
+\put(0,12){$E_{ij}$} \put(7,13){\vector(1,0){15}}
+\put(24,12){$Sa_{ij}^{(2)}$} \put(33,13){\vector(1,0){15}}
+\put(50,12){$\widetilde{Sa_{ij}^{(2)}}$} \put(12,14){$w_2$}
+\put(60,13){\vector(1,0){15}} \put(77,12){$L_{ij}^{(2)}$}
+% upper branch
+\put(7,14){\vector(3,2){15}} \put(24,23){$Sa_{ij}^{(1)}$}
+\put(33,24){\vector(1,0){15}}
+\put(50,23){$\widetilde{Sa_{ij}^{(1)}}$}
+\put(11,20){\rotatebox{30}{$w_1$}} \put(60,24){\vector(1,0){15}}
+\put(77,23){$L_{ij}^{(1)}$}
+% lower branch
+\put(7,12){\vector(3,-2){15}} \put(24,0){$Sa_{ij}^{(3)}$}
+\put(33,1){\vector(1,0){15}} \put(50,0){$\widetilde{Sa_{ij}^{(3)}}$}
+\put(11,5){\rotatebox{-30}{$w_3$}} \put(60,1){\vector(1,0){15}}
+\put(77,0){$L_{ij}^{(3)}$}
+% concatenation at end
+\put(86,5){\scalebox{1.2}[6.5]{\}}} \put(90,12){$ {\displaystyle
+ L_{ij} = \sum_{k=1}^{3}w_kL_k } $}
+\end{picture}
+\end{centering}
+
+\vspace{0.8em}
+(d)  % This is the risk tree for multi attenuation with NO collapse
 
 
+\hspace{4em}\begin{picture}(70,30)
+\begin{centering}
+% middle branch
+\put(0,12){$E_{ij}$} \put(7,13){\vector(1,0){15}}
+\put(24,12){$Sa_{ij}^{(2)}$} \put(33,13){\vector(1,0){15}}
+\put(50,12){$\widetilde{Sa_{ij}^{(2)}}$} \put(12,14){$w_2$}
+\put(60,13){\vector(1,0){15}} \put(77,12){$L_{ij}^{(2)}$}
+% upper branch
+\put(7,14){\vector(3,2){15}} \put(24,23){$Sa_{ij}^{(1)}$}
+\put(33,24){\vector(1,0){15}}
+\put(50,23){$\widetilde{Sa_{ij}^{(1)}}$}
+\put(11,20){\rotatebox{30}{$w_1$}} \put(60,24){\vector(1,0){15}}
+\put(77,23){$L_{ij}^{(1)}$}
+% lower branch
+\put(7,12){\vector(3,-2){15}} \put(24,0){$Sa_{ij}^{(3)}$}
+\put(33,1){\vector(1,0){15}} \put(50,0){$\widetilde{Sa_{ij}^{(3)}}$}
+\put(11,5){\rotatebox{-30}{$w_3$}} \put(60,1){\vector(1,0){15}}
+\put(77,0){$L_{ij}^{(3)}$}
+\end{centering}
+\end{picture}
+
+
+\caption{The application of spawning to a single synthetic
+earthquake $E_{ij}$;(a) the collapse of spawned samples for hazard
+(\typeparcaption{src}{\_eps}{\_switch}$=1$); (b) hazard spawning
+without collapse (\typeparcaption{src}{\_eps}{\_switch}$=2$); (c)
+the collapse of spawned samples for risk
+(\typeparcaption{src}{\_eps}{\_switch}$=1$); and (d) risk spawning
+without collapse (\typeparcaption{src}{\_eps}{\_switch}$=2$). The
+illustrated procedure is repeated for $N_s$ events in the event
+catalogue and the techniques of \cref{ch:risk} used to assess the
+hazard or risk.} \label{fig:attn-treecollapse}
+\end{figure}
 
 
 
