@@ -108,6 +108,8 @@ from eqrm_code.ground_motion_misc import (linear_interpolation,
 from eqrm_code import util 
 from eqrm_code import conversions
 from eqrm_code import ground_motion_misc
+from eqrm_code import event_set
+
 
 LOG10E = math.log10(math.e)
 
