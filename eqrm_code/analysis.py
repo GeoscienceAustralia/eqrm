@@ -788,28 +788,7 @@ def calc_and_save_SA(THE_PARAM_T,
                      amp_distribution,
                      event_activity,
                      source_model):
-    
-    fake_source_model = Dummy()
-    fake_source_model.atten_models = THE_PARAM_T.atten_models
-    fake_source_model.atten_model_weights = THE_PARAM_T.atten_model_weights
-    fake_source_model.event_set_indexes = array([0])
-    fake_source_model.ground_motion_calc = ground_motion_calc
-
-    fake_source_model2 = Dummy()
-    fake_source_model2.atten_models = THE_PARAM_T.atten_models
-    fake_source_model2.atten_model_weights = THE_PARAM_T.atten_model_weights
-    fake_source_model2.event_set_indexes = arange(1, len(event_set))
-    fake_source_model2.ground_motion_calc = ground_motion_calc
-
-    if len(fake_source_model2.event_set_indexes) == 0:
-        fake_source_models = [fake_source_model]
-    else:
-        fake_source_models = [fake_source_model, fake_source_model2]
-
-    if True: # False: # 
-        fake_source_model.event_set_indexes = arange(0, len(event_set))
-        fake_source_models = [fake_source_model]    
-    # Build some arrays to save into.
+     
     num_spawn = event_activity.get_num_spawn()
 
     # WARNING - this only works if the event activity is not collapsed.
@@ -820,6 +799,8 @@ def calc_and_save_SA(THE_PARAM_T,
     num_sites = len(sites)
     num_events = len(event_set)
     num_periods = len(THE_PARAM_T.atten_periods)
+    
+    # Build some arrays to save into.
     coll_rock_SA_all_events = zeros(
         (num_spawn, num_gmm_after_collapsing,
          num_sites, num_events, num_periods),
