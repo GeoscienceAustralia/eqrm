@@ -785,7 +785,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         r_depth_min= depth_top + (0.5*rup_width)*sin(math.radians(fault_dip))
         r_depth_max= depth_bottom - (0.5*rup_width)*sin(math.radians(fault_dip))
         
-        r_depth_centroid = (r_depth_max-r_depth_min) *random_scalar
+        r_depth_centroid = (r_depth_max-r_depth_min) *random_scalar + r_depth_min
         
         r_depth_top = r_depth_centroid - ((0.5*rup_width) * 
                                            sin(math.radians(fault_dip)))
@@ -840,15 +840,16 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     else:
         raise Exception('Magnitudes not set')
     event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
-                                 rupture_centroid_lon=rupture_centroid_lon,
-                                 azimuth=azimuth,
-                                 dip=dip,
-                                 ML=new_ML,
-                                 Mw=new_Mw,
-                                 depth_top_seismogenic=depth_top_seismogenic,
-                                 depth_bottom_seismogenic=
-                                 depth_bottom_seismogenic,
-                                 fault_type=fault_type)
+                             rupture_centroid_lon=rupture_centroid_lon,
+                             azimuth=azimuth,
+                             dip=dip,
+                             ML=new_ML,
+                             Mw=new_Mw,
+                             depth_top_seismogenic=depth_top_seismogenic,
+                             depth_bottom_seismogenic=
+                             depth_bottom_seismogenic,
+                             fault_type=fault_type,
+                             depth=r_depth_centroid)
     event.source_zone_id = asarray(source_zone_id)
     
         #print "event.source_zone_id", event.source_zone_id
