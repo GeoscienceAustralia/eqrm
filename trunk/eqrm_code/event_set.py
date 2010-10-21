@@ -728,7 +728,8 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     dip = zeros((num_events), dtype=EVENT_FLOAT)
     magnitude = zeros((num_events), dtype=EVENT_FLOAT)
     source_zone_id = zeros((num_events), dtype=EVENT_INT)
-    fault_type=zeros((num_events), dtype=EVENT_INT)
+    fault_type = zeros((num_events), dtype=EVENT_INT)
+    depth = zeros((num_events), dtype=EVENT_FLOAT)
     start=0
 
     for i,fault in enumerate(fsg_list):
@@ -741,35 +742,36 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         if num == 0:
             continue
         end = start + num
-        fault_dip =fault.dip_dist['mean']
-        depth_top =fault.depth_top_seismogenic_dist['mean']
-        depth_bottom=fault.depth_bottom_seismogenic_dist['mean']
+        fault_dip = fault.dip_dist['mean']
+        depth_top = fault.depth_top_seismogenic_dist['mean']
+        depth_bottom = fault.depth_bottom_seismogenic_dist['mean']
         
-        fault_width=calc_fault_width(depth_top, 
+        fault_width = calc_fault_width(depth_top, 
                                      depth_bottom,
                                      fault_dip)
         
-        fault_length=calc_fault_length(fault.trace_start_lat,
+        fault_length = calc_fault_length(fault.trace_start_lat,
                                        fault.trace_start_lon,
                                        fault.trace_end_lat,
                                        fault.trace_end_lon)
         
-        fault_area= fault_width * fault_length
+        fault_area = fault_width * fault_length
         fault_magnitude = fault.populate_magnitude(num)
         magnitude[start:end] = fault_magnitude  
         fault_magnitude = asarray(fault_magnitude)
-        (rup_width,rup_length)=Wells_and_Coppersmith_94(scaling_event_type,
-                                                        fault_magnitude,
-                                                        fault_width,
-                                                        fault_length)
-        fault_azimuth=azimuth_of_trace(fault.trace_start_lat,
-                                       fault.trace_start_lon,
-                                       fault.trace_end_lat,
-                                       fault.trace_end_lon)
+        (rup_width,rup_length) = Wells_and_Coppersmith_94(
+            scaling_event_type,
+            fault_magnitude,
+            fault_width,
+            fault_length)
+        fault_azimuth = azimuth_of_trace(fault.trace_start_lat,
+                                         fault.trace_start_lon,
+                                         fault.trace_end_lat,
+                                         fault.trace_end_lon)
         
         #fault_azimuth=20
         
-        random_scalar=fault.populate_range(num)
+        random_scalar = fault.populate_range(num)
         Ds = (fault_length-rup_length) * random_scalar
         (r_start_lat,r_start_lon) = get_new_ll(fault.trace_start_lat,
                                                 fault.trace_start_lon, 
@@ -782,19 +784,21 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                                fault_azimuth, 
                                                rup_length)
         
-        r_depth_min= depth_top + (0.5*rup_width)*sin(math.radians(fault_dip))
-        r_depth_max= depth_bottom - (0.5*rup_width)*sin(math.radians(fault_dip))
+        r_depth_min = depth_top + (0.5*rup_width) * sin(math.radians(fault_dip))
+        r_depth_max = depth_bottom - (0.5*rup_width) * \
+                      sin(math.radians(fault_dip))
         
-        r_depth_centroid = (r_depth_max-r_depth_min) *random_scalar + r_depth_min
+        r_depth_centroid = (r_depth_max-r_depth_min) * random_scalar \
+                           + r_depth_min
         
         r_depth_top = r_depth_centroid - ((0.5*rup_width) * 
                                            sin(math.radians(fault_dip)))
                          
-        r_depth_bottom = r_depth_centroid + ((0.5*rup_width)* 
+        r_depth_bottom = r_depth_centroid + ((0.5*rup_width) * 
                                               sin(math.radians(fault_dip)))
         
-        r_y_centroid=  r_depth_centroid *((cos(math.radians(fault_dip)))/
-                                         (sin(math.radians(fault_dip))))
+        r_y_centroid=  r_depth_centroid * ((cos(math.radians(fault_dip)))/
+                                           (sin(math.radians(fault_dip))))
         
         r_x_centroid= rup_length/2
         
@@ -822,6 +826,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         fault_dip = fault.populate_dip(num)
         dip[start:end] = fault_dip
         fault_type[start:end] = ground_motion_misc.FaultTypeDictionary[source.fault_type]
+        depth[start:end] = r_depth_centroid
         #magnitude[start:end] = polygon_magnitude
             #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
@@ -849,7 +854,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                              depth_bottom_seismogenic=
                              depth_bottom_seismogenic,
                              fault_type=fault_type,
-                             depth=r_depth_centroid)
+                             depth=depth)
     event.source_zone_id = asarray(source_zone_id)
     
         #print "event.source_zone_id", event.source_zone_id
