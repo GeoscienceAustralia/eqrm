@@ -108,7 +108,6 @@ from eqrm_code.ground_motion_misc import (linear_interpolation,
 from eqrm_code import util 
 from eqrm_code import conversions
 from eqrm_code import ground_motion_misc
-from eqrm_code import event_set
 
 
 LOG10E = math.log10(math.e)
@@ -4050,7 +4049,7 @@ AS08_faulting_flags = {'reverse':    (1, 0),
 # generate 'AS08_fault_type' from the dictionary above
 tmp = []
 for (k, v) in AS08_faulting_flags.iteritems():
-    index = event_set.FaultTypeDictionary[k]
+    index = ground_motion_misc.FaultTypeDictionary[k]
     tmp.append((index, v))
 
 # sort and make array in correct index order
