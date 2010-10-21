@@ -17,8 +17,8 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-                          'Chiou08', 'Campbell03', 'Campbell08')
-#                          'Chiou08', 'Campbell03', 'Campbell08', 'Abrahamson08')
+#                          'Chiou08', 'Campbell03', 'Campbell08')
+                          'Chiou08', 'Campbell03', 'Campbell08', 'Abrahamson08')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -980,7 +980,7 @@ test_data['Campbell08_test_sigma'] = tmp
 del tmp
 
 ################################################################################
-# Abrahamson08 Tests - test against data values from [openSHA.org].
+# Abrahamson08 Tests - test against data values from the 'check' code.
 
 # num_events = 2
 test_data['Abrahamson08_test_magnitude'] = [5.0, 7.0]
@@ -1013,25 +1013,25 @@ test_data['Abrahamson08_test_distance'] = tmp
 
 # result values, in 'g'
 tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
-# period:     0.01     0.20     1.00     3.00
-tmp[0,0,:] = [0.14523, 0.33164, 0.04562, 0.00593] # R=  5.0, ML=5.0
-tmp[0,1,:] = [0.34456, 0.81772, 0.27475, 0.06944] # R=  5.0, ML=7.0
-tmp[1,0,:] = [0.02974, 0.06711, 0.01105, 0.00146] # R= 20.0, ML=5.0
-tmp[1,1,:] = [0.12817, 0.29870, 0.12011, 0.03079] # R= 20.0, ML=7.0
-tmp[2,0,:] = [0.00308, 0.00691, 0.00147, 0.00020] # R=100.0, ML=5.0
-tmp[2,1,:] = [0.03093, 0.07126, 0.03700, 0.00968] # R=100.0, ML=7.0
+# period:     0.01                 0.20                 1.00                 3.00
+tmp[0,0,:] = [math.exp(1.462E-01), math.exp(3.215E-01), math.exp(4.251E-02), math.exp(5.188E-03)] # R=  5.0, ML=5.0
+tmp[0,1,:] = [math.exp(3.470E-01), math.exp(7.928E-01), math.exp(2.560E-01), math.exp(6.410E-02)] # R=  5.0, ML=7.0
+tmp[1,0,:] = [math.exp(2.995E-02), math.exp(6.507E-02), math.exp(1.030E-02), math.exp(1.273E-03)] # R= 20.0, ML=5.0
+tmp[1,1,:] = [math.exp(1.291E-01), math.exp(2.896E-01), math.exp(1.119E-01), math.exp(2.842E-02)] # R= 20.0, ML=7.0
+tmp[2,0,:] = [math.exp(3.100E-03), math.exp(6.699E-03), math.exp(1.369E-03), math.exp(1.722E-04)] # R=100.0, ML=5.0
+tmp[2,1,:] = [math.exp(3.114E-02), math.exp(6.909E-02), math.exp(3.448E-02), math.exp(8.935E-03)] # R=100.0, ML=7.0
 test_data['Abrahamson08_test_mean'] = tmp
 del tmp
 
-# sigma values, in 'g' (ie, not log()) - this data from opensha.org
+# sigma values
 tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
-# period:     0.01    0.20    1.00    3.00
-tmp[0,0,:] = [7.0e-1, 8.0e-1, 6.8e-1, 6.2e-1] # R=  5.0, ML=5.0
-tmp[0,1,:] = [5.2e-1, 5.9e-1, 6.1e-1, 6.0e-1] # R=  5.0, ML=7.0
-tmp[1,0,:] = [7.0e-1, 8.0e-1, 6.8e-1, 6.2e-1] # R= 20.0, ML=5.0
-tmp[1,1,:] = [5.3e-1, 5.9e-1, 6.1e-1, 6.0e-1] # R= 20.0, ML=7.0
-tmp[2,0,:] = [7.1e-1, 8.0e-1, 6.8e-1, 6.2e-1] # R=100.0, ML=5.0
-tmp[2,1,:] = [5.3e-1, 5.9e-1, 6.1e-1, 6.0e-1] # R=100.0, ML=7.0
+# period:     0.01       0.20       1.00       3.00
+tmp[0,0,:] = [7.171E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0
+tmp[0,1,:] = [5.486E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0
+tmp[1,0,:] = [7.226E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0
+tmp[1,1,:] = [5.536E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0
+tmp[2,0,:] = [7.241E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0
+tmp[2,1,:] = [5.565E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0
 test_data['Abrahamson08_test_sigma'] = tmp
 del tmp
 

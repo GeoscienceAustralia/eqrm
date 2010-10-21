@@ -3443,7 +3443,7 @@ mean_20_sigma_2_args=[
 
 gound_motion_init['mean_20_sigma_2'] = mean_20_sigma_2_args
 
-#***************  End of Gaull 1990 WA MODEL  ****************************
+#***************  End of mean_20_sigma_2 ****************************
 
 #***************  START OF mean_10_sigma_1  ****************************
 
@@ -3562,13 +3562,13 @@ def Abrahamson08_distribution(**kwargs):
 #######
 
     # set correct shape for params
-    #Rrup = Rrup[:,:,newaxis]
-    #Rjb = Rjb[:,:,newaxis]
-    #Rx = Rx[:,:,newaxis]
+    Rrup = Rrup[:,:,newaxis]
+    Rjb = Rjb[:,:,newaxis]
+    Rx = Rx[:,:,newaxis]
     Per = array(Per)[newaxis,newaxis,:]
-    #Vs30 = array(Vs30)[:,newaxis,newaxis]
-    #Dip = array(Dip)[newaxis,:,newaxis]
-    #W = array(W)[newaxis,:,newaxis]
+    Vs30 = array(Vs30)[:,newaxis,newaxis]
+    Dip = array(Dip)[newaxis,:,newaxis]
+    W = array(W)[newaxis,:,newaxis]
 
     # get Z1.0 value from Vs30
     Z10 = conversions.convert_Vs30_to_Z10(Vs30)		# TODO - check function is array-safe
