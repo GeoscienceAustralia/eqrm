@@ -927,8 +927,6 @@ def calc_and_save_SA(THE_PARAM_T,
                 soil_SA_overloaded[0, i_overloaded, :] = soil_SA[0,i,0,:,:]
             
     #End source loop
-    # End the Ground motion splitting loop
-    # Build the SA, soil, if we did it.  If not, Bedrock.
     
     # Compute hazard if desired
     if THE_PARAM_T.save_hazard_map is True:
@@ -951,35 +949,6 @@ def calc_and_save_SA(THE_PARAM_T,
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
                                       1.0/array(THE_PARAM_T.return_periods))
-                    
-    
-    # Change dimensions.  Put the ground motion model dimension
-    # and spawning dimension into the event dimension
-    # for the risk calculations
-    # Assume the SA's have
-    # 3 or more dimensions; with ground motion model being the
-    # third last dimension e.g.
-    # (ground motion model, site, events, periods) (this is obsolete)
-    # (spawn, ground motion model, site, events, periods)
-#     Last_4_dims = bedrock_SA.shape[-4:]
-#     num_gmm = last_4_dims[0]
-#     num_sites = last_4_dims[1]
-#     num_events = last_4_dims[2]
-#     num_periods = last_4_dims[3]
-#     if bedrock_SA.ndim == 4:
-#         event_overloaded = num_events * num_gmm
-#     else:  # assume 5 dimensions
-#         num_spawn = bedrock_SA.shape[0]
-#         event_overloaded = num_events * num_gmm * num_spawn
-#     if soil_SA is not None:
-#         soil_SA = reshape(soil_SA, (num_sites,
-#                                     event_overloaded,
-#                                         num_periods))
-#         print "soil_SA.shape", soil_SA.shape
-#     bedrock_SA = reshape(bedrock_SA, (num_sites,
-#                                       event_overloaded,
-#                                       num_periods ))
-
     return soil_SA_overloaded, rock_SA_overloaded
 
 
