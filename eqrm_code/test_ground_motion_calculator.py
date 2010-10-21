@@ -44,7 +44,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         
         model_name = 'Toro_1997_midcontinent'
         (distances, magnitudes, test_mean,
-         test_sigma, periods, depths, _, _, _, _, _) = data2atts(model_name)
+         test_sigma, periods, depths, _, _, _, _, _, _) = data2atts(model_name)
         
         event_activity = 0.5
         
@@ -62,7 +62,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         model_name = 'Boore_08'
         
         (distances, magnitudes, test_mean, test_sigma,
-         periods, depths, _, _, _, _, _) = data2atts('Toro_1997_midcontinent')
+         periods, depths, _, _, _, _, _, _) = data2atts('Toro_1997_midcontinent')
         event_activity = 0.5
         periods = array([0.015, 0.45, 4.5 ])
         
@@ -83,7 +83,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         model_name = 'Somerville09_Yilgarn'
         
         (distances, magnitudes, test_mean, test_sigma,
-         periods, depths, _, _, _, _, _) = data2atts('Toro_1997_midcontinent')
+         periods, depths, _, _, _, _, _, _) = data2atts('Toro_1997_midcontinent')
         event_activity = 1
         periods = array([0.010, 0.045, 1.0 ])
         
@@ -106,11 +106,11 @@ class Test_ground_motion_calculator(unittest.TestCase):
         
         model_name = 'Combo_Sadigh_Youngs_M8_trimmed'        
         (distances, magnitudes, test_mean,
-         test_sigma, periods, depths, _, _, _, _, _) = data2atts(model_name)
+         test_sigma, periods, depths, _, _, _, _, _, _) = data2atts(model_name)
 
         model_name2 = 'Youngs_97_interface'        
         (dist2 , mag2, test_mean2,
-         test_sigma2, periods2, depths2, _, _, _, _, _) = data2atts(model_name2)
+         test_sigma2, periods2, depths2, _, _, _, _, _, _) = data2atts(model_name2)
 
         self.assert_(allclose(distances.distance(None), dist2.distance(None)))
         self.assert_(magnitudes == mag2)
@@ -143,7 +143,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         model_name = 'Toro_1997_midcontinent'
         
         (distances, magnitudes, test_mean,
-         test_sigma, periods, depths, _, _, _, _, _) = data2atts(model_name)
+         test_sigma, periods, depths, _, _, _, _, _, _) = data2atts(model_name)
         model_weights = [1]
         gm = Multiple_ground_motion_calculator([model_name], periods,
                                                model_weights)

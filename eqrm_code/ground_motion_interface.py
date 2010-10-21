@@ -100,7 +100,7 @@ from copy import  deepcopy
 from scipy import (where, sqrt, array, asarray, exp, log, newaxis, zeros,
                    log10, isfinite, weave, ones, shape, reshape, concatenate,
                    cosh, power, shape, tile, cos, pi, copy, resize,
-                   logical_and, logical_or, sum)
+                   logical_and, logical_or, sum, minimum)
  
 from eqrm_code.ground_motion_misc import (linear_interpolation,
                                           Australian_standard_model,
@@ -3532,7 +3532,7 @@ def Abrahamson08_distribution(**kwargs):
     Ztor = kwargs['depth_to_top']
     Dip = kwargs['dip']
     W = kwargs['width']
-    Vs30 = kwargs['Vs30']
+    Vs30 = kwargs['vs30']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
@@ -3540,10 +3540,10 @@ def Abrahamson08_distribution(**kwargs):
     num_periods = coefficient.shape[3]
     msg = ('Expected shape (20, 1, 1, %d), got %s'
            % (num_periods, str(coefficient.shape)))
-    assert coefficient.shape == (20, 1, 1, 1), msg
+    assert coefficient.shape == (20, 1, 1, num_periods), msg
     msg = ('Expected shape (7, 1, 1, %d), got %s'
            % (num_periods, str(sigma_coefficient.shape)))
-    assert sigma_coefficient.shape == (7, 1, 1, 1), msg
+    assert sigma_coefficient.shape == (7, 1, 1, num_periods), msg
 
     # get required distance arrays
     Rrup = dist_object.Rupture()
@@ -3554,7 +3554,7 @@ def Abrahamson08_distribution(**kwargs):
     Frv = AS08_fault_type[:,0][fault_type]
     Fnm = AS08_fault_type[:,1][fault_type]
 
-    # 'aftershock' flag is assumed 'not aftershock'
+    # 'aftershock' flag is assumed to be 'not aftershock'
     Fas = 0
 
 #######
@@ -3562,6 +3562,13 @@ def Abrahamson08_distribution(**kwargs):
 #######
 
     # set correct shape for params
+    Rrup = Rrup[:,:,newaxis]
+    Rjb = Rjb[:,:,newaxis]
+    Rx = Rx[:,:,newaxis]
+    Per = array(Per)[newaxis,newaxis,:]
+    #Vs30 = array(Vs30)[:,newaxis,newaxis]
+    #Dip = array(Dip)[newaxis,:,newaxis]
+    #W = array(W)[newaxis,:,newaxis]
 
     # get Z1.0 value from Vs30
     Z10 = conversions.convert_Vs30_to_Z10(Vs30)		# TODO - check function is array-safe
@@ -3667,7 +3674,7 @@ def Abrahamson08_distribution(**kwargs):
     (c1_iTd1, c4_iTd1, a3_iTd1, a4_iTd1, a5_iTd1, n_iTd1, c_iTd1, c2_iTd1,
      Vlin_iTd1, b_iTd1, a1_iTd1, a2_iTd1, a8_iTd1, a10_iTd1, a12_iTd1,
      a13_iTd1, a14_iTd1, a15_iTd1,
-     a16_iTd1, a18_iTd1) = AS08_coeff[:,1:21].transpose()[:,iTd1]
+     a16_iTd1, a18_iTd1) = Abrahamson08_coefficient[:,iTd1]
 
     c1_iTd1 = c1_iTd1[newaxis,:,newaxis]	# must reshape to get right results
     c4_iTd1 = c4_iTd1[newaxis,:,newaxis]
@@ -3691,7 +3698,7 @@ def Abrahamson08_distribution(**kwargs):
     a18_iTd1 = a18_iTd1[newaxis,:,newaxis]
 
     (s1est_iTd1, s2est_iTd1, s1mea_iTd1, s2mea_iTd1,
-     s3_iTd1, s4_iTd1, rho_iTd1) = AS08_coeff[:,21:28].transpose()[:,iTd1]
+     s3_iTd1, s4_iTd1, rho_iTd1) = Abrahamson08_sigma_coefficient[:,iTd1]
 
     s1est_iTd1 = s1est_iTd1[newaxis,:,newaxis]
     s2est_iTd1 = s2est_iTd1[newaxis,:,newaxis]
@@ -3704,7 +3711,7 @@ def Abrahamson08_distribution(**kwargs):
     (c1_iTd2, c4_iTd2, a3_iTd2, a4_iTd2, a5_iTd2, n_iTd2, c_iTd2, c2_iTd2,
      Vlin_iTd2, b_iTd2, a1_iTd2, a2_iTd2, a8_iTd2, a10_iTd2, a12_iTd2,
      a13_iTd2, a14_iTd2, a15_iTd2,
-     a16_iTd2, a18_iTd2) = AS08_coeff[:,1:21].transpose()[:,iTd2]
+     a16_iTd2, a18_iTd2) = Abrahamson08_coefficient[:,iTd2]
 
     c1_iTd2 = c1_iTd2[newaxis,:,newaxis]
     c4_iTd2 = c4_iTd2[newaxis,:,newaxis]
@@ -3728,7 +3735,7 @@ def Abrahamson08_distribution(**kwargs):
     a18_iTd2 = a18_iTd2[newaxis,:,newaxis]
 
     (s1est_iTd2, s2est_iTd2, s1mea_iTd2, s2mea_iTd2,
-     s3_iTd2, s4_iTd2, rho_iTd2) = AS08_coeff[:,21:28].transpose()[:,iTd2]
+     s3_iTd2, s4_iTd2, rho_iTd2) = Abrahamson08_sigma_coefficient[:,iTd2]
 
     s1est_iTd2 = s1est_iTd2[newaxis,:,newaxis]
     s2est_iTd2 = s2est_iTd2[newaxis,:,newaxis]
@@ -3738,8 +3745,8 @@ def Abrahamson08_distribution(**kwargs):
     s4_iTd2 = s4_iTd2[newaxis,:,newaxis]
     rho_iTd2 = rho_iTd2[newaxis,:,newaxis]
 
-    T_iTd1 = AS08_coeff[:,0].transpose()[:,iTd1]
-    T_iTd2 = AS08_coeff[:,0].transpose()[:,iTd2]
+    T_iTd1 = Abrahamson08_coefficient_period[:,iTd1]
+    T_iTd2 = Abrahamson08_coefficient_period[:,iTd2]
 
     T_iTd1 = T_iTd1[newaxis,:,newaxis]
     T_iTd2 = T_iTd2[newaxis,:,newaxis]
@@ -3786,8 +3793,7 @@ def Abrahamson08_distribution(**kwargs):
     T1 = where(Rjb < 30.0, 1.0 - Rjb/30.0, T1)
 
     T2 = 0.5 + Rx/(2.0*RxTest)
-    test = logical_or(Rx > RxTest, Dip == 90.0)
-    T2 = where(test, 1.0, T2)		# DANGER!
+    T2 = where(logical_or(Rx > RxTest, Dip == 90.0), 1.0, T2)
 
     T3 = Rx/Ztor
     T3 = where(Rx >= Ztor, 1.0, T3)
@@ -3909,7 +3915,7 @@ def Abrahamson08_distribution(**kwargs):
     # Shallow Site Response Term
 
     V1 = ones(Per.shape) * 700.0
-    V1 = where(Per < 2.0, exp(6.76 - 0.297*math.log(Per)), V1)
+    V1 = where(Per < 2.0, exp(6.76 - 0.297*log(Per)), V1)
     V1 = where(Per <= 1.0, exp(8.0 - 0.795*log(Per/0.21)), V1)
     V1 = where(Per <= 0.5, 1500.0, V1)
 
@@ -3930,19 +3936,18 @@ def Abrahamson08_distribution(**kwargs):
 
     e2 = ones(Per.shape) * -0.25*log(Vs30/1000.0)*log(2.0/0.35)
     e2 = where(Per <= 2.0, -0.25*log(Vs30/1000.0)*log(Per/0.35), e2)
-    test = logical_or(Per < 0.35, Vs30 > 1000.0)
-    e2 = where(test, 0.0, e2)			# DANGER!
+    e2 = where(logical_or(Per < 0.35, Vs30 > 1000.0), 0.0, e2)
 
     a22 = ones(Per.shape) * 0.0625*(Per - 2.0)
     a22 = where(Per < 2.0, 0.0, a22)
 
-    a21Test = ((a10T + bT*nT)*log(V30/min(V1,1000.0)) +
+    a21Test = ((a10T + bT*nT)*log(V30/minimum(V1,1000.0)) +
                e2*log((Z10+c2T)/(Z10_med+c2T)))
 
     a21 = e2
     a21 = where(a21Test < 0.0,
                 -(a10T + bT*nT) *
-                    log(V30/min(V1,1000.0))/log((Z10+c2T)/(Z10_med+c2T)),
+                    log(V30/minimum(V1,1000.0))/log((Z10+c2T)/(Z10_med+c2T)),
                 a21)
     a21 = where(Vs30 >= 1000.0, 0.0, a21)
 
@@ -4131,5 +4136,7 @@ Abrahamson08_args = [Abrahamson08_distribution,
                      Abrahamson08_uses_Vs30]
 
 gound_motion_init['Abrahamson08'] = Abrahamson08_args
+
+del AS08_coeff
 
 #########################  End of Abrahamson08 model  ##########################
