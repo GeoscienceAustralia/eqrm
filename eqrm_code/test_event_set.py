@@ -972,16 +972,19 @@ class Test_Event_Set(unittest.TestCase):
         prob_min_mag_cutoff = 4.0
         prob_number_of_events_in_faults =[15,15]
 
-        (event_set_zone, source_mod_zone) = generate_synthetic_events_fault(fault_xml_file,
-                                                  event_control_file,
-                                                  prob_min_mag_cutoff,
-                                                  prob_number_of_events_in_faults)
+        (event_set_zone, source_mod_zone) = generate_synthetic_events_fault(
+            fault_xml_file,
+            event_control_file,
+            prob_min_mag_cutoff,
+            prob_number_of_events_in_faults)
+        
         prob_min_mag_cutoff = 3.0
         prob_number_of_events_in_faults =[10,10]
-        (event_set_fault, source_mod_fault) = generate_synthetic_events_fault(fault_xml_file,
-                                                  event_control_file,
-                                                  prob_min_mag_cutoff,
-                                                  prob_number_of_events_in_faults)
+        (event_set_fault, source_mod_fault) = generate_synthetic_events_fault(
+            fault_xml_file,
+            event_control_file,
+            prob_min_mag_cutoff,
+            prob_number_of_events_in_faults)
         
         #(event_set,source_mod)= Event_Set.MergeEventsAndSources(event_set_zone,
          #                                                       event_set_fault,
