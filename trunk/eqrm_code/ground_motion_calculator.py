@@ -100,8 +100,8 @@ class Ground_motion_calculator(object):
     def distribution_function(self, dist_object, mag_dict, periods=None,
                               depth=None, depth_to_top=None, fault_type=None,
                               vs30=None, dist_type=None, mag_type=None,
-                              Z25=None, dip=None, event_activity=None,
-                              event_id=None):
+                              Z25=None, dip=None, width=None,
+                              event_activity=None, event_id=None):
         """
         dist_object must give distance info if dist_object.distance(dist_type)
         is called.  The distance info must be an array.
@@ -139,7 +139,8 @@ class Ground_motion_calculator(object):
                                       sigma_coefficient=self.sigma_coefficient,
                                       depth=depth, depth_to_top=depth_to_top,
                                       fault_type=fault_type, vs30=vs30,
-                                      Z25=Z25, dip=dip, periods=periods)
+                                      Z25=Z25, dip=dip, width=width,
+                                      periods=periods)
 
         # FIXME when will this fail?  Maybe let it fail then?
         # If it does not fail here it fails in analysis.py"
@@ -266,7 +267,8 @@ class Multiple_ground_motion_calculator(object):
     def _distribution_function(self, dist_object, mag_dict, periods=None,
                                depth=None, depth_to_top=None,
                                fault_type=None, vs30=None, Z25=None,
-                               dip=None, event_activity=None, event_id=None):
+                               dip=None, width=None,
+                               event_activity=None, event_id=None):
         """
         The event_activity and event_id are not used currently.
         But if we spawn they will be.
@@ -287,7 +289,7 @@ class Multiple_ground_motion_calculator(object):
                 dist_object, mag_dict, periods=periods,
                 depth=depth, depth_to_top=depth_to_top,
                 fault_type=fault_type, vs30=vs30,
-                Z25=Z25, dip=dip,
+                Z25=Z25, dip=dip, width=width,
                 dist_type=GM_model.GM_spec.distance_type,
                 mag_type=GM_model.GM_spec.magnitude_type)
             if mod_i == 0:
