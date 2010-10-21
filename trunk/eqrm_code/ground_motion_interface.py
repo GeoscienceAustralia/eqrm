@@ -3562,9 +3562,9 @@ def Abrahamson08_distribution(**kwargs):
 #######
 
     # set correct shape for params
-    Rrup = Rrup[:,:,newaxis]
-    Rjb = Rjb[:,:,newaxis]
-    Rx = Rx[:,:,newaxis]
+    #Rrup = Rrup[:,:,newaxis]
+    #Rjb = Rjb[:,:,newaxis]
+    #Rx = Rx[:,:,newaxis]
     Per = array(Per)[newaxis,newaxis,:]
     #Vs30 = array(Vs30)[:,newaxis,newaxis]
     #Dip = array(Dip)[newaxis,:,newaxis]
