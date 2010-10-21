@@ -14,8 +14,8 @@ from scipy import array, allclose, asarray, arange, sum
 #import conversions
 
 from eqrm_code.event_set import * #Event_Set, Pseudo_Event_Set
-#import matplotlib.pylab as plt
-#from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pylab as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 
@@ -122,32 +122,34 @@ if __name__ == "__main__":
     length=event_set_fault.length
     depth=event_set_fault.depth
     
-# plt.figure()
-# plt.plot(mag,area,'ro')
-# plt.savefig('mag_vs_area.png')
+plt.figure()
+plt.plot(mag,area,'ro')
+plt.savefig('mag_vs_area.png')
 
-# plt.figure()
-# plt.hist(mag,30)
-# plt.savefig('mag_hist.png')
+plt.figure()
+plt.hist(mag,30)
+plt.savefig('mag_hist.png')
 
-# plt.figure()
-# plt.plot(mag,width,'ro')
-# plt.savefig('mag_vs_width.png')
+plt.figure()
+plt.plot(mag,width,'ro')
+plt.savefig('mag_vs_width.png')
    
-# plt.figure()
-# plt.plot(mag,length,'ro')
-# plt.savefig('mag_vs_length.png')   
+plt.figure()
+plt.plot(mag,length,'ro')
+plt.savefig('mag_vs_length.png')   
 
-# plt.figure()
-# plt.plot(mag,depth,'ro')
-# plt.savefig('mag_vs_depth.png')   
+plt.figure()
+plt.plot(mag,depth,'ro')
+plt.plot(mag,width/2.*sin(math.radians(30.))+10.,'go')
+plt.plot(mag,30-width/2.*sin(math.radians(30.)),'bo')
+plt.savefig('mag_vs_depth.png')   
 
-# plt.figure()
-# plt.scatter(width,length,c=mag)
-# plt.savefig('width_vs_length.png')   
+plt.figure()
+plt.scatter(width,length,c=mag)
+plt.savefig('width_vs_length.png')   
 
-# plt.figure()
-# plt.scatter(area,depth,c=mag)
-# plt.savefig('area_depth_mag.png') 
+plt.figure()
+plt.scatter(area,depth,c=mag)
+plt.savefig('area_depth_mag.png') 
   
      
