@@ -1091,7 +1091,13 @@ class Event_Activity(object):
         return self.event_activity.shape[SPAWN_D]
 
     
-    def get_num_gmm(self):
+    def get_gmm_dimensions(self):
+        """
+        Get the ground motion model dimension length.
+        This will be the max number of ground motion models across all
+        sources if atten is not collapsed.
+        WARNING, if 
+        """
         return self.event_activity.shape[GMMODEL]
 
     

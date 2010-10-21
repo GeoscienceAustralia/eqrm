@@ -813,10 +813,9 @@ def calc_and_save_SA(THE_PARAM_T,
     num_spawn = event_activity.get_num_spawn()
 
     # WARNING - this only works if the event activity is not collapsed.
-    num_gmm_after_collapsing = event_activity.get_num_gmm()
+    num_gmm_after_collapsing = event_activity.get_gmm_dimensions()
 
-    
-    num_gmm = len(source_model[0].atten_models)
+    num_gmm_max = source_model.get_max_num_atten_models()
     
     num_sites = len(sites)
     num_events = len(event_set)
@@ -826,7 +825,7 @@ def calc_and_save_SA(THE_PARAM_T,
          num_sites, num_events, num_periods),
         dtype=float)
     rock_SA_overloaded = zeros((num_sites,
-                                num_gmm*num_events,
+                                num_gmm_max * num_events,
                                 num_periods),
                                dtype=float)
     if THE_PARAM_T.use_amplification is True:
@@ -835,7 +834,7 @@ def calc_and_save_SA(THE_PARAM_T,
              len(THE_PARAM_T.atten_periods)),
             dtype=float)
         soil_SA_overloaded = zeros((num_sites,
-                                    num_gmm*num_events,
+                                    num_gmm_max * num_events,
                                     num_periods),
                                    dtype=float)
     else:

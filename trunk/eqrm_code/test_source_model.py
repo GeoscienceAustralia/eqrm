@@ -477,7 +477,8 @@ class Test_Source_model(unittest.TestCase):
              '  </event_group>'
              '  <event_group event_type = "eggs">'
              '    <GMPE fault_type = "more_eggs">'
-             '      <branch model = "Camp" weight = "1.0"/>'
+             '      <branch model = "Camp" weight = "0.33"/>'
+             '      <branch model = "Tongs" weight = ".66"/>'
              '    </GMPE>'
              '    <scaling scaling_rule = "e" />'
              '  </event_group>'
@@ -492,7 +493,8 @@ class Test_Source_model(unittest.TestCase):
         for name in event_type:
             d = Dummy()
             d.event_type = name
-        source_mod = Source_Model(dummy_list, 'Mw')
+            dummy_list.append(d)
+            source_mod = Source_Model(dummy_list, 'Mw')
         source_mod.add_event_type_atts_to_sources(file_name)
 
         for s in source_mod:
@@ -502,6 +504,9 @@ class Test_Source_model(unittest.TestCase):
                 self.failUnlessEqual(s.fault_type, "more_eggs")
             
         os.remove(file_name)
+        max_num_atten_models = source_mod.get_max_num_atten_models()
+        self.failUnlessEqual(max_num_atten_models, 2)
+        
         
     def test_create_scenario_source_model(self):
 
