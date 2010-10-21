@@ -1618,7 +1618,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
-    def Xtest_Abrahamson08(self):
+    def test_Abrahamson08(self):
         """Test the Abrahamson08 model.
 
         Compare with data from Abrahamson08_check.py.
