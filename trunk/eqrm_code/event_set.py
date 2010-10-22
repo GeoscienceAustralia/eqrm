@@ -1105,7 +1105,7 @@ class Event_Activity(object):
         Get the ground motion model dimension length.
         This will be the max number of ground motion models across all
         sources if atten is not collapsed.
-        WARNING, if 
+        WARNING, if attenuation is collapsed this will be 1.
         """
         return self.event_activity.shape[GMMODEL]
 
