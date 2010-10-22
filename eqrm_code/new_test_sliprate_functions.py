@@ -28,7 +28,8 @@ class Test_Sliprate_functions(unittest.TestCase):
         area_kms= float(30*10)
         prob_number_of_mag_sample_bins=200
         b = 1.
-        bin_centroids = make_bins(prob_min_mag_cutoff,max_magnitude,prob_number_of_mag_sample_bins)
+        bin_centroids = make_bins(prob_min_mag_cutoff,max_magnitude,
+                                  prob_number_of_mag_sample_bins)
         event_bins=r_[0:prob_number_of_mag_sample_bins]
         event_bins=sorted(event_bins)
         (width,length)=Wells_and_Coppersmith_94("normal", bin_centroids, 15, 30)
@@ -37,7 +38,9 @@ class Test_Sliprate_functions(unittest.TestCase):
         lat1=(0,45,60,85)
         
         for i in range(4):
-            print "azimuth of line from (", lat1[i],"," ,lon1,") to (" ,lat1[i]+1,"," ,lon1+1,") =" , calc_azimuth2(lat1[i], lon1, lat1[i]+1, lon1+1)
+            print "azimuth of line from (", lat1[i],"," ,lon1,") to \
+            (" ,lat1[i]+1,"," ,lon1+1,") =" , obsolete_calc_azimuth2(lat1[i], \
+            lon1, lat1[i]+1, lon1+1)
         #print "azimuth 3: ",calc_azimuth3(lat1, lon1, lat2, lon2)
         
         print "Params: \n \
@@ -63,7 +66,14 @@ class Test_Sliprate_functions(unittest.TestCase):
                                                               prob_min_mag_cutoff, 
                                                               max_magnitude)
         #print "\npdfs  from -slip rate Characteristic: ", pdfs
-         
+        print "calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,recurr_dist,\
+                              lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip ",\
+                              (calc_A_min_from_slip_rate(b,prob_min_mag_cutoff,\
+                                                         max_magnitude,slip_rate_mm,
+                                                         'characteristic',
+                                                        0,144.5,0,144.8,10,15,30))
+
+
         event_activity_source = array(
                 [(A_minCharacteristic*pdfs[z]/(sum(where(
                 event_bins == z, 1,0)))) for z in event_bins])
