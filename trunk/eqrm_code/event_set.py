@@ -21,6 +21,7 @@ import scipy
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, \
      float64, int64, reshape, arange
+from numpy import random
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
@@ -771,7 +772,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         
         #fault_azimuth=20
         
-        random_scalar = fault.populate_range(num)
+        random_scalar = random.random_sample(size=num)
         Ds = (fault_length-rup_length) * random_scalar
         (r_start_lat,r_start_lon) = get_new_ll(fault.trace_start_lat,
                                                 fault.trace_start_lon, 
@@ -787,7 +788,9 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         r_depth_min = depth_top + (0.5*rup_width) * sin(math.radians(fault_dip))
         r_depth_max = depth_bottom - (0.5*rup_width) * \
                       sin(math.radians(fault_dip))
+
         
+        random_scalar = random.random_sample(size=num)
         r_depth_centroid = (r_depth_max-r_depth_min) * random_scalar \
                            + r_depth_min
         
