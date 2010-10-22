@@ -54,11 +54,11 @@ use_amplification = False
 # Loss
 
 # Save
-save_hazard_map = True
+save_hazard_map = False
 save_total_financial_loss = False
 save_building_loss = False
 save_contents_loss = False
-save_motion = False
+save_motion = True
 save_prob_structural_damage = None
 
 # If this file is executed the simulation will start.
