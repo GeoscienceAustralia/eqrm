@@ -383,26 +383,32 @@ def save_motion(motion_name,THE_PARAM_T,motion,compress=False,
     if parallel_tag is None:
         parallel_tag = ''
     base_names = []
-    for i_spawn in range(motion.shape[0]):
-        for i in range(motion.shape[2]):
-            # for all events
-            base_name =  THE_PARAM_T.output_dir + THE_PARAM_T.site_tag+ '_' + \
-                        motion_name + '_motion_' + str(i) + '_spawn_' + \
-                        str(i_spawn) + '.txt'
-            name = base_name + parallel_tag
-            base_names.append(base_name)
-            f=open(name,'w')
-            if write_title:
-                f.write('% Event = '+str(i)+'\n')
-                f.write('% Spawn = '+str(i_spawn)+'\n')
-                f.write('% First row are rsa periods, then rows are sites'
-                        '\n')
-                f.write(' '.join([str(p) for p in THE_PARAM_T.atten_periods]) \
-                        + '\n')
-            for j in range(motion.shape[1]):
-                mi=motion[i_spawn,j,i,:] # sites,event,periods           
-                f.write(' '.join(['%.10g'%(m) for m in mi])+ '\n')
-            f.close()
+    for i_spawn in range(motion.shape[0]): # spawn
+        for i_gmm in range(motion.shape[1]): # ground motion model
+            for i in range(motion.shape[3]): # events
+                # for all events
+                base_name =  THE_PARAM_T.output_dir + THE_PARAM_T.site_tag + \
+                            '_' + \
+                            motion_name + '_motion_' + str(i) + '_spawn_' + \
+                            str(i_spawn) + '_gmm_' + \
+                            str(i_gmm)+ '.txt'
+                
+                name = base_name + parallel_tag
+                base_names.append(base_name)
+                f=open(name,'w')
+                if write_title:
+                    f.write('% Event = '+str(i)+'\n')
+                    f.write('% Spawn = '+str(i_spawn)+'\n')
+                    f.write('% ground motion model = '+str(i_gmm)+'\n')
+                    f.write('% First row are rsa periods, then rows are sites'
+                            '\n')
+                    f.write(
+                        ' '.join([str(p) for p in THE_PARAM_T.atten_periods]) \
+                            + '\n')
+                for j in range(motion.shape[2]):
+                    mi=motion[i_spawn,i_gmm,j,i,:] # sites,event,periods 
+                    f.write(' '.join(['%.10g'%(m) for m in mi])+ '\n')
+                f.close()
     return base_names
 
 

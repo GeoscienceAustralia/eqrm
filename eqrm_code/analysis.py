@@ -395,9 +395,11 @@ def main(parameter_handle,
     else:
         soil_hazard = None     
     log.debug('Memory: hazard_map array created')
-    log.resource_usage() 
+    log.resource_usage()
+    num_gmm_dimensions = event_activity.get_gmm_dimensions()
     if THE_PARAM_T.save_motion is True:
-        bedrock_SA_all = zeros((num_spawning, array_size, num_events,
+        bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions,
+                                array_size, num_events,
                                 len(THE_PARAM_T.atten_periods)),
                                dtype=float)        
     else:
@@ -405,7 +407,8 @@ def main(parameter_handle,
         
     if THE_PARAM_T.save_motion is True and \
            THE_PARAM_T.use_amplification is True:
-        soil_SA_all = zeros((num_spawning, array_size, num_events,
+        soil_SA_all = zeros((num_spawning, num_gmm_dimensions,
+                             array_size, num_events,
                              len(THE_PARAM_T.atten_periods)),
                             dtype=float)
     else:
@@ -901,12 +904,11 @@ def calc_and_save_SA(THE_PARAM_T,
         if THE_PARAM_T.save_motion is True:
             # Put into arrays
             assert collapsed_bedrock_SA.shape[2] == 1 # only one site
-            assert collapsed_bedrock_SA.shape[1] == 1 # collapse on atten
             coll_bedrock_SA = collapsed_bedrock_SA[:,0,0,:,:]
-            bedrock_SA_all[:,rel_site_index,event_inds,:] = coll_bedrock_SA
+            bedrock_SA_all[:,:,rel_site_index,event_inds,:] = coll_bedrock_SA
             if soil_SA is not None:
                 coll_soil_SA = collapsed_soil_SA[:,0,0,:,:]
-                soil_SA_all[:,rel_site_index,event_inds,:] = coll_soil_SA
+                soil_SA_all[:,:,rel_site_index,event_inds,:] = coll_soil_SA
         if THE_PARAM_T.save_hazard_map is True:
             # Build collapsed_bedrock_SA for all events
             # before getting out of the loop

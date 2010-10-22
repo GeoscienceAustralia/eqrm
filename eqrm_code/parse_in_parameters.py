@@ -598,9 +598,6 @@ def att_value_fixes(THE_PARAM_T):
             THE_PARAM_T.prob_delta_azimuth_in_zones,
             len_prob_number_of_events_in_zones)
     
-    if THE_PARAM_T.save_motion == 1 and THE_PARAM_T.is_scenario == 0:
-            raise ValueError('do not save motion for a generated event')
-
     # FIXME this should happen to the weights from sources as well. 
     weights = THE_PARAM_T.atten_model_weights
     
@@ -708,9 +705,9 @@ def verify_THE_PARAM_T(THE_PARAM_T):
       raise ParameterSyntaxError(
       'Cannot save the hazard map for a scenario.')
   
-    if THE_PARAM_T.save_motion == True and THE_PARAM_T.is_scenario == False:
-      raise ParameterSyntaxError(
-      'Cannot save the RSA values unless you are doing a scenario.')
+#     if THE_PARAM_T.save_motion == True and THE_PARAM_T.is_scenario == False:
+#       raise ParameterSyntaxError(
+#       'Cannot save the RSA values unless you are doing a scenario.')
 
     if THE_PARAM_T.atten_variability_method == 1 and \
            THE_PARAM_T.run_type == 'risk':
