@@ -703,16 +703,45 @@ def _calc_attenuation_logic_split(GM_models, model_weights,
             attenuation_ids, attenuation_weights)
     
     
-def merge_events_and_sources(event_set_zone,event_set_fault,
-                              source_model_zone,source_model_fault):
+def merge_events_and_sources(event_set_zone, event_set_fault,
+                              source_model_zone, source_model_fault):
+    """
+    Merge two event sets and two source models.
+    The order of the events and sources passed in is important.
+    
+    """
     # add's event_set_fault to the end of event_set_zone
+    source_model_zone_event_set_length = len(event_set_zone)
     event_set_merged = event_set_zone + event_set_fault
     # assumes event_set_fault is at the end of event_set_zone
-    source_model_merged = source_model_zone.add(source_model_fault,
-                                                len(event_set_fault))
+    source_model_merged = _add_sources(source_model_zone,
+                                      source_model_fault,
+                                      source_model_zone_event_set_length)
    
     return event_set_merged, source_model_merged
 
+def _add_sources(source_model_zone, source_model_fault,
+                source_model_zone_event_set_length):
+    """
+    Need to know the length of the event set which must also be added.
+    Increase the index on the other event set ids.
+    """
+    assert source_model_zone._magnitude_type == \
+           source_model_fault._magnitude_type
+    source_list = []
+    for source in source_model_fault:
+        # array add, adds the others_event_set_length to all the elements
+        source.event_set_indexes=(source.event_set_indexes + \
+                                  source_model_zone_event_set_length)
+        source_list.append(source)
+    
+    # list add concatenates
+    mergedSourceMod = source_model.Source_Model(
+        source_model_zone._sources + source_list,
+        source_model_zone._magnitude_type)
+    
+    return mergedSourceMod
+    
 def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                     prob_min_mag_cutoff, 
                                     prob_number_of_events_in_faults=None):
@@ -854,7 +883,8 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         azimuth[start:end] = fault_azimuth
         fault_dip = fault.populate_dip(num)
         dip[start:end] = fault_dip
-        fault_type[start:end] = ground_motion_misc.FaultTypeDictionary[source.fault_type]
+        fault_type[start:end] = ground_motion_misc.FaultTypeDictionary[
+            source.fault_type]
         depth[start:end] = r_depth_centroid
         fault_w[start:end] = fault_width
         area[start:end] = rup_width*rup_length
@@ -1101,10 +1131,7 @@ class Event_Activity(object):
             assert self.event_activity.shape[SPAWN_D] == 1
             assert self.event_activity.shape[GMMODEL] == 1
 
-            max_num_models = 1 
-            for source in source_model:
-                if len(source.atten_model_weights) > max_num_models:
-                    max_num_models = len(source.atten_model_weights)
+            max_num_models = source_model.get_max_num_atten_models()
             new_event_activity = zeros((1, max_num_models,
                                         self.num_events),
                                        dtype=EVENT_FLOAT)
@@ -1233,8 +1260,7 @@ class Obsolete_Event_Activity(object):
         """
         pass
     
-################################################################################
-
+####################################################################
 # this will run if this is called from DOS prompt or double clicked
 if __name__ == '__main__':
     event_num = 10  #00*1000
