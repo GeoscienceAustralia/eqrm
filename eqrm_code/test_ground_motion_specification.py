@@ -17,7 +17,6 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-#                          'Chiou08', 'Campbell03', 'Campbell08')
                           'Chiou08', 'Campbell03', 'Campbell08', 'Abrahamson08')
 
 # Atkinson_Boore_97 is out.  It has no test data.
@@ -982,24 +981,25 @@ del tmp
 ################################################################################
 # Abrahamson08 Tests - test against data values from the 'check' code.
 
-# num_events = 2/4
-test_data['Abrahamson08_test_magnitude'] = [5.0, 7.0, 5.0, 7.0]
+# num_events = 8
+test_data['Abrahamson08_test_magnitude'] = [5.0, 7.0, 5.0, 7.0, 5.0, 7.0, 5.0, 7.0]
 
-# num_events = 2/4
-test_data['Abrahamson08_test_dip'] = [90.0, 90.0, 90.0, 90.0]
+# num_events = 8
+test_data['Abrahamson08_test_dip'] = [90.0, 90.0, 90.0, 90.0, 90.0, 90.0, 60.0, 60.0]
 
-# num_events = 2/4
-test_data['Abrahamson08_test_width'] = [10.0, 10.0, 10.0, 10.0]
+# num_events = 8
+test_data['Abrahamson08_test_width'] = [10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0]
 
-# num_events = 2/4
-#                                              SS   SS   RV   RV
-test_data['Abrahamson08_test_depth_to_top'] = [0.0, 0.0, 0.0, 0.0]
+# num_events = 8
+#                                              SS   SS   RV   RV   NM   NM   RV   RV
+test_data['Abrahamson08_test_depth_to_top'] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 5.0]
 
-# num_events = 2/4
+# num_events = 8
 # 'reverse' fault type index is 0
+# 'normal' fault type index is 1
 # 'strikeslip' fault type index is 2
-#                                            SS SS RV RV
-test_data['Abrahamson08_test_fault_type'] = [2, 2, 0, 0]
+#                                            SS SS RV RV NM NM RV RV
+test_data['Abrahamson08_test_fault_type'] = [2, 2, 0, 0, 1, 1, 0, 0]
 
 # num_periods = 4
 test_data['Abrahamson08_test_period'] = [0.01, 0.20, 1.00, 3.00]
@@ -1008,46 +1008,70 @@ test_data['Abrahamson08_test_period'] = [0.01, 0.20, 1.00, 3.00]
 test_data['Abrahamson08_test_vs30'] = [760.0, 760.0, 760.0]
 
 # num_sites = 3
-tmp = zeros((3,4)) # initialise an array: (num_sites, num_events)
-#              SS     SS     RV     RV
-tmp[0,:] = [  5.0,   5.0,   5.0,   5.0] # distance - 1st site and all 4 events
-tmp[1,:] = [ 20.0,  20.0,  20.0,  20.0] # distance - 2nd site and all 4 events
-tmp[2,:] = [100.0, 100.0, 100.0, 100.0] # distance - 3rd site and all 4 events
+tmp = zeros((3,8)) # initialise an array: (num_sites, num_events)
+#              SS     SS     RV     RV     NM     NM     RV     RV
+tmp[0,:] = [  5.0,   5.0,   5.0,   5.0,   5.0,   5.0,   5.0,   5.0] # distance - 1st site, 8 events
+tmp[1,:] = [ 20.0,  20.0,  20.0,  20.0,  20.0,  20.0,  20.0,  20.0] # distance - 2nd site, 8 events
+tmp[2,:] = [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0] # distance - 3rd site, 8 events
 test_data['Abrahamson08_test_distance'] = tmp
 
 # result values, in 'g'
-tmp = zeros((3,4,4))		# num_sites, num_events, num_periods
+tmp = zeros((3,8,4))		# num_sites, num_events, num_periods
 # period:     0.01                 0.20                 1.00                 3.00
-tmp[0,0,:] = [math.exp(1.462E-01), math.exp(3.215E-01), math.exp(4.251E-02), math.exp(5.188E-03)] # R=  5.0, ML=5.0, SS
-tmp[0,1,:] = [math.exp(3.470E-01), math.exp(7.928E-01), math.exp(2.560E-01), math.exp(6.410E-02)] # R=  5.0, ML=7.0, SS
-tmp[0,2,:] = [math.exp(1.462E-01), math.exp(3.316E-01), math.exp(4.605E-02), math.exp(5.621E-03)] # R=  5.0, ML=5.0, RV
-tmp[0,3,:] = [math.exp(3.470E-01), math.exp(8.177E-01), math.exp(2.560E-01), math.exp(6.944E-02)] # R=  5.0, ML=7.0, RV
-tmp[1,0,:] = [math.exp(2.995E-02), math.exp(6.507E-02), math.exp(1.030E-02), math.exp(1.273E-03)] # R= 20.0, ML=5.0, SS
-tmp[1,1,:] = [math.exp(1.291E-01), math.exp(2.896E-01), math.exp(1.119E-01), math.exp(2.842E-02)] # R= 20.0, ML=7.0, SS
-tmp[1,2,:] = [math.exp(2.995E-02), math.exp(6.711E-02), math.exp(1.115E-02), math.exp(1.379E-03)] # R= 20.0, ML=5.0, RV
-tmp[1,3,:] = [math.exp(1.291E-01), math.exp(2.987E-01), math.exp(1.119E-01), math.exp(3.079E-02)] # R= 20.0, ML=7.0, RV
-tmp[2,0,:] = [math.exp(3.100E-03), math.exp(6.699E-03), math.exp(1.369E-03), math.exp(1.722E-04)] # R=100.0, ML=5.0, SS
-tmp[2,1,:] = [math.exp(3.114E-02), math.exp(6.909E-02), math.exp(3.448E-02), math.exp(8.935E-03)] # R=100.0, ML=7.0, SS
-tmp[2,2,:] = [math.exp(3.100E-03), math.exp(6.909E-03), math.exp(1.482E-03), math.exp(1.866E-04)] # R=100.0, ML=5.0, RV
-tmp[2,3,:] = [math.exp(3.114E-02), math.exp(7.126E-02), math.exp(3.448E-02), math.exp(9.680E-03)] # R=100.0, ML=7.0, RV
+tmp[0,0,:] = [math.exp(1.462E-01), math.exp(3.215E-01), math.exp(4.251E-02), math.exp(5.188E-03)] # R=  5.0, ML=5.0, Vs30=760 SS
+tmp[0,1,:] = [math.exp(3.470E-01), math.exp(7.928E-01), math.exp(2.560E-01), math.exp(6.410E-02)] # R=  5.0, ML=7.0, Vs30=760 SS
+tmp[0,2,:] = [math.exp(1.462E-01), math.exp(3.316E-01), math.exp(4.605E-02), math.exp(5.621E-03)] # R=  5.0, ML=5.0, Vs30=760 RV
+tmp[0,3,:] = [math.exp(3.470E-01), math.exp(8.177E-01), math.exp(2.560E-01), math.exp(6.944E-02)] # R=  5.0, ML=7.0, Vs30=760 RV
+tmp[0,4,:] = [math.exp(1.378E-01), math.exp(3.028E-01), math.exp(4.003E-02), math.exp(4.886E-03)] # R=  5.0, ML=5.0, Vs30=760 NM
+tmp[0,5,:] = [math.exp(3.272E-01), math.exp(7.467E-01), math.exp(2.411E-01), math.exp(6.036E-02)] # R=  5.0, ML=7.0, Vs30=760 NM
+tmp[0,6,:] = [math.exp(2.279E-01), math.exp(5.201E-01), math.exp(5.755E-02), math.exp(6.203E-03)] # R=  5.0, ML=5.0, Vs30=760 RV Ztor=5.0
+tmp[0,7,:] = [math.exp(5.377E-01), math.exp(1.282E+00), math.exp(3.466E-01), math.exp(6.843E-02)] # R=  5.0, ML=7.0, Vs30=760 RV Ztor=5.0
+tmp[1,0,:] = [math.exp(2.995E-02), math.exp(6.507E-02), math.exp(1.030E-02), math.exp(1.273E-03)] # R= 20.0, ML=5.0, Vs30=760 SS
+tmp[1,1,:] = [math.exp(1.291E-01), math.exp(2.896E-01), math.exp(1.119E-01), math.exp(2.842E-02)] # R= 20.0, ML=7.0, Vs30=760 SS
+tmp[1,2,:] = [math.exp(2.995E-02), math.exp(6.711E-02), math.exp(1.115E-02), math.exp(1.379E-03)] # R= 20.0, ML=5.0, Vs30=760 RV
+tmp[1,3,:] = [math.exp(1.291E-01), math.exp(2.987E-01), math.exp(1.119E-01), math.exp(3.079E-02)] # R= 20.0, ML=7.0, Vs30=760 RV
+tmp[1,4,:] = [math.exp(2.821E-02), math.exp(6.128E-02), math.exp(9.696E-03), math.exp(1.199E-03)] # R= 20.0, ML=5.0, Vs30=760 NM
+tmp[1,5,:] = [math.exp(1.216E-01), math.exp(2.727E-01), math.exp(1.054E-01), math.exp(2.677E-02)] # R= 20.0, ML=7.0, Vs30=760 NM
+tmp[1,6,:] = [math.exp(4.690E-02), math.exp(1.053E-01), math.exp(1.394E-02), math.exp(1.521E-03)] # R= 20.0, ML=5.0, Vs30=760 RV Ztor=5.0
+tmp[1,7,:] = [math.exp(2.013E-01), math.exp(4.685E-01), math.exp(1.515E-01), math.exp(3.035E-02)] # R= 20.0, ML=7.0, Vs30=760 RV Ztor=5.0
+tmp[2,0,:] = [math.exp(3.100E-03), math.exp(6.699E-03), math.exp(1.369E-03), math.exp(1.722E-04)] # R=100.0, ML=5.0, Vs30=760 SS
+tmp[2,1,:] = [math.exp(3.114E-02), math.exp(6.909E-02), math.exp(3.448E-02), math.exp(8.935E-03)] # R=100.0, ML=7.0, Vs30=760 SS
+tmp[2,2,:] = [math.exp(3.100E-03), math.exp(6.909E-03), math.exp(1.482E-03), math.exp(1.866E-04)] # R=100.0, ML=5.0, Vs30=760 RV
+tmp[2,3,:] = [math.exp(3.114E-02), math.exp(7.126E-02), math.exp(3.448E-02), math.exp(9.680E-03)] # R=100.0, ML=7.0, Vs30=760 RV
+tmp[2,4,:] = [math.exp(2.920E-03), math.exp(6.308E-03), math.exp(1.289E-03), math.exp(1.622E-04)] # R=100.0, ML=5.0, Vs30=760 NM
+tmp[2,5,:] = [math.exp(2.934E-02), math.exp(6.507E-02), math.exp(3.247E-02), math.exp(8.415E-03)] # R=100.0, ML=7.0, Vs30=760 NM
+tmp[2,6,:] = [math.exp(4.862E-03), math.exp(1.084E-02), math.exp(1.853E-03), math.exp(2.059E-04)] # R=100.0, ML=5.0, Vs30=760 RV Ztor=5.0
+tmp[2,7,:] = [math.exp(4.877E-02), math.exp(1.118E-01), math.exp(4.668E-02), math.exp(9.540E-03)] # R=100.0, ML=7.0, Vs30=760 RV Ztor=5.0
 test_data['Abrahamson08_test_mean'] = tmp
 del tmp
 
 # sigma values
-tmp = zeros((3,4,4))		# num_sites, num_events, num_periods
+tmp = zeros((3,8,4))		# num_sites, num_events, num_periods
 # period:     0.01       0.20       1.00       3.00
-tmp[0,0,:] = [7.171E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0, SS
-tmp[0,1,:] = [5.486E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0, SS
-tmp[0,2,:] = [7.171E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0, RV
-tmp[0,3,:] = [5.486E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0, RV
-tmp[1,0,:] = [7.226E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0, SS
-tmp[1,1,:] = [5.536E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0, SS
-tmp[1,2,:] = [7.226E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0, RV
-tmp[1,3,:] = [5.536E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0, RV
-tmp[2,0,:] = [7.241E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0, SS
-tmp[2,1,:] = [5.565E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0, SS
-tmp[2,2,:] = [7.241E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0, RV
-tmp[2,3,:] = [5.565E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0, RV
+tmp[0,0,:] = [7.171E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0, Vs30=760 SS
+tmp[0,1,:] = [5.486E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0, Vs30=760 SS
+tmp[0,2,:] = [7.171E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0, Vs30=760 RV
+tmp[0,3,:] = [5.486E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0, Vs30=760 RV
+tmp[0,4,:] = [7.175E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0, Vs30=760 NM
+tmp[0,5,:] = [5.490E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0, Vs30=760 NM
+tmp[0,6,:] = [7.139E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0, Vs30=760 RV Ztor=5.0
+tmp[0,7,:] = [5.456E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0, Vs30=760 RV Ztor=5.0
+tmp[1,0,:] = [7.226E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0, Vs30=760 SS
+tmp[1,1,:] = [5.536E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0, Vs30=760 SS
+tmp[1,2,:] = [7.226E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0, Vs30=760 RV
+tmp[1,3,:] = [5.536E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0, Vs30=760 RV
+tmp[1,4,:] = [7.227E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0, Vs30=760 NM
+tmp[1,5,:] = [5.538E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0, Vs30=760 NM
+tmp[1,6,:] = [7.217E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0, Vs30=760 RV Ztor=5.0
+tmp[1,7,:] = [5.517E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0, Vs30=760 RV Ztor=5.0
+tmp[2,0,:] = [7.241E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0, Vs30=760 SS
+tmp[2,1,:] = [5.565E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0, Vs30=760 SS
+tmp[2,2,:] = [7.241E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0, Vs30=760 RV
+tmp[2,3,:] = [5.565E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0, Vs30=760 RV
+tmp[2,4,:] = [7.241E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0, Vs30=760 NM
+tmp[2,5,:] = [5.566E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0, Vs30=760 NM
+tmp[2,6,:] = [7.240E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0, Vs30=760 RV Ztor=5.0
+tmp[2,7,:] = [5.560E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0, Vs30=760 RV Ztor=5.0
 test_data['Abrahamson08_test_sigma'] = tmp
 del tmp
 
@@ -1158,7 +1182,7 @@ class Test_ground_motion_specification(unittest.TestCase):
 
 
         msg = 'median=\n%s\ntest_median=\n%s' % (str(median), str(test_mean))
-#        msg = 'diff=\n%s' % str(median-test_mean)
+        msg = 'diff=\n%s' % str(median-test_mean)
         self.assert_(allclose(median, test_mean, rtol=0.05, atol=1.0e-5),
                      "%s did not pass assert:\n%s" % (model_name, msg))
 
