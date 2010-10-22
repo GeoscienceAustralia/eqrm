@@ -25,7 +25,7 @@ site_db_tag = ""
 return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
 input_dir = r".\input/" 
 output_dir = r".\output\scen_gm/" 
-use_site_indexes = True
+use_site_indexes = False
 site_indexes = [2997, 2657, 3004, 3500]
 
 # Scenario input
@@ -33,7 +33,7 @@ scenario_azimuth = 340
 scenario_depth = 11.5
 scenario_latitude = -32.95
 scenario_longitude = 151.61
-scenario_magnitude = 4.8
+scenario_magnitude = 5.5
 scenario_dip = 35
 scenario_number_of_events = 1
 

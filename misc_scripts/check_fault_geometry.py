@@ -195,8 +195,8 @@ for i in xrange(len(mag)):
     elif mag[i] >= 7:
         col='red'
 
-#    x1=r_lon[i] - ((length[i]/2) / 106.)
-#    x2=r_lon[i] + ((length[i]/2) / 106.)
+#   x1=r_lon[i] - ((length[i]/2) / 106.)
+#   x2=r_lon[i] + ((length[i]/2) / 106.)
     x1=s_lon[i]
     x2=e_lon[i]
     y1=depth[i] - (width[i]/2)

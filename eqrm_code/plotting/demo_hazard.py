@@ -14,7 +14,7 @@ from eqrm_code.eqrm_filesystem import Demo_Output_PlotProbHaz_Path
 input_dir = Demo_Output_PlotProbHaz_Path
 site_tag = 'newc'
 
-soil_amp = True
+soil_amp = False
 return_period = 7500
 period = 1.0
 
