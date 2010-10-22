@@ -982,21 +982,24 @@ del tmp
 ################################################################################
 # Abrahamson08 Tests - test against data values from the 'check' code.
 
-# num_events = 2
-test_data['Abrahamson08_test_magnitude'] = [5.0, 7.0]
+# num_events = 2/4
+test_data['Abrahamson08_test_magnitude'] = [5.0, 7.0, 5.0, 7.0]
 
-# num_events = 2
-test_data['Abrahamson08_test_dip'] = [90.0, 90.0]
+# num_events = 2/4
+test_data['Abrahamson08_test_dip'] = [90.0, 90.0, 90.0, 90.0]
 
-# num_events = 2
-test_data['Abrahamson08_test_width'] = [10.0, 10.0]
+# num_events = 2/4
+test_data['Abrahamson08_test_width'] = [10.0, 10.0, 10.0, 10.0]
 
-# num_events = 2
-test_data['Abrahamson08_test_depth_to_top'] = [0.0, 0.0]
+# num_events = 2/4
+#                                              SS   SS   RV   RV
+test_data['Abrahamson08_test_depth_to_top'] = [0.0, 0.0, 0.0, 0.0]
 
-# num_events = 2
+# num_events = 2/4
+# 'reverse' fault type index is 0
 # 'strikeslip' fault type index is 2
-test_data['Abrahamson08_test_fault_type'] = [2, 2]
+#                                            SS SS RV RV
+test_data['Abrahamson08_test_fault_type'] = [2, 2, 0, 0]
 
 # num_periods = 4
 test_data['Abrahamson08_test_period'] = [0.01, 0.20, 1.00, 3.00]
@@ -1005,33 +1008,46 @@ test_data['Abrahamson08_test_period'] = [0.01, 0.20, 1.00, 3.00]
 test_data['Abrahamson08_test_vs30'] = [760.0, 760.0, 760.0]
 
 # num_sites = 3
-tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
-tmp[0,:] = [  5.0,   5.0] # distance - 1st site and all 2 events
-tmp[1,:] = [ 20.0,  20.0] # distance - 2nd site and all 2 events
-tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
+tmp = zeros((3,4)) # initialise an array: (num_sites, num_events)
+#              SS     SS     RV     RV
+tmp[0,:] = [  5.0,   5.0,   5.0,   5.0] # distance - 1st site and all 4 events
+tmp[1,:] = [ 20.0,  20.0,  20.0,  20.0] # distance - 2nd site and all 4 events
+tmp[2,:] = [100.0, 100.0, 100.0, 100.0] # distance - 3rd site and all 4 events
 test_data['Abrahamson08_test_distance'] = tmp
 
 # result values, in 'g'
-tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+tmp = zeros((3,4,4))		# num_sites, num_events, num_periods
 # period:     0.01                 0.20                 1.00                 3.00
-tmp[0,0,:] = [math.exp(1.462E-01), math.exp(3.215E-01), math.exp(4.251E-02), math.exp(5.188E-03)] # R=  5.0, ML=5.0
-tmp[0,1,:] = [math.exp(3.470E-01), math.exp(7.928E-01), math.exp(2.560E-01), math.exp(6.410E-02)] # R=  5.0, ML=7.0
-tmp[1,0,:] = [math.exp(2.995E-02), math.exp(6.507E-02), math.exp(1.030E-02), math.exp(1.273E-03)] # R= 20.0, ML=5.0
-tmp[1,1,:] = [math.exp(1.291E-01), math.exp(2.896E-01), math.exp(1.119E-01), math.exp(2.842E-02)] # R= 20.0, ML=7.0
-tmp[2,0,:] = [math.exp(3.100E-03), math.exp(6.699E-03), math.exp(1.369E-03), math.exp(1.722E-04)] # R=100.0, ML=5.0
-tmp[2,1,:] = [math.exp(3.114E-02), math.exp(6.909E-02), math.exp(3.448E-02), math.exp(8.935E-03)] # R=100.0, ML=7.0
+tmp[0,0,:] = [math.exp(1.462E-01), math.exp(3.215E-01), math.exp(4.251E-02), math.exp(5.188E-03)] # R=  5.0, ML=5.0, SS
+tmp[0,1,:] = [math.exp(3.470E-01), math.exp(7.928E-01), math.exp(2.560E-01), math.exp(6.410E-02)] # R=  5.0, ML=7.0, SS
+tmp[0,2,:] = [math.exp(1.462E-01), math.exp(3.316E-01), math.exp(4.605E-02), math.exp(5.621E-03)] # R=  5.0, ML=5.0, RV
+tmp[0,3,:] = [math.exp(3.470E-01), math.exp(8.177E-01), math.exp(2.560E-01), math.exp(6.944E-02)] # R=  5.0, ML=7.0, RV
+tmp[1,0,:] = [math.exp(2.995E-02), math.exp(6.507E-02), math.exp(1.030E-02), math.exp(1.273E-03)] # R= 20.0, ML=5.0, SS
+tmp[1,1,:] = [math.exp(1.291E-01), math.exp(2.896E-01), math.exp(1.119E-01), math.exp(2.842E-02)] # R= 20.0, ML=7.0, SS
+tmp[1,2,:] = [math.exp(2.995E-02), math.exp(6.711E-02), math.exp(1.115E-02), math.exp(1.379E-03)] # R= 20.0, ML=5.0, RV
+tmp[1,3,:] = [math.exp(1.291E-01), math.exp(2.987E-01), math.exp(1.119E-01), math.exp(3.079E-02)] # R= 20.0, ML=7.0, RV
+tmp[2,0,:] = [math.exp(3.100E-03), math.exp(6.699E-03), math.exp(1.369E-03), math.exp(1.722E-04)] # R=100.0, ML=5.0, SS
+tmp[2,1,:] = [math.exp(3.114E-02), math.exp(6.909E-02), math.exp(3.448E-02), math.exp(8.935E-03)] # R=100.0, ML=7.0, SS
+tmp[2,2,:] = [math.exp(3.100E-03), math.exp(6.909E-03), math.exp(1.482E-03), math.exp(1.866E-04)] # R=100.0, ML=5.0, RV
+tmp[2,3,:] = [math.exp(3.114E-02), math.exp(7.126E-02), math.exp(3.448E-02), math.exp(9.680E-03)] # R=100.0, ML=7.0, RV
 test_data['Abrahamson08_test_mean'] = tmp
 del tmp
 
 # sigma values
-tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+tmp = zeros((3,4,4))		# num_sites, num_events, num_periods
 # period:     0.01       0.20       1.00       3.00
-tmp[0,0,:] = [7.171E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0
-tmp[0,1,:] = [5.486E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0
-tmp[1,0,:] = [7.226E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0
-tmp[1,1,:] = [5.536E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0
-tmp[2,0,:] = [7.241E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0
-tmp[2,1,:] = [5.565E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0
+tmp[0,0,:] = [7.171E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0, SS
+tmp[0,1,:] = [5.486E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0, SS
+tmp[0,2,:] = [7.171E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=  5.0, ML=5.0, RV
+tmp[0,3,:] = [5.486E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=  5.0, ML=7.0, RV
+tmp[1,0,:] = [7.226E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0, SS
+tmp[1,1,:] = [5.536E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0, SS
+tmp[1,2,:] = [7.226E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R= 20.0, ML=5.0, RV
+tmp[1,3,:] = [5.536E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R= 20.0, ML=7.0, RV
+tmp[2,0,:] = [7.241E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0, SS
+tmp[2,1,:] = [5.565E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0, SS
+tmp[2,2,:] = [7.241E-01, 8.169E-01, 7.207E-01, 6.851E-01] # R=100.0, ML=5.0, RV
+tmp[2,3,:] = [5.565E-01, 6.103E-01, 6.477E-01, 6.646E-01] # R=100.0, ML=7.0, RV
 test_data['Abrahamson08_test_sigma'] = tmp
 del tmp
 

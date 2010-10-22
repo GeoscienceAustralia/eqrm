@@ -3536,7 +3536,7 @@ def Abrahamson08_distribution(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
-    # check some shapes (num_periods should be 1 below)
+    # check some shapes
     num_periods = coefficient.shape[3]
     msg = ('Expected shape (20, 1, 1, %d), got %s'
            % (num_periods, str(coefficient.shape)))
