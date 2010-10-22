@@ -108,24 +108,6 @@ class Source_Model(object):
     def __getitem__(self,key):
         return self._sources[key]
     
-    def add(self,other, others_event_set_length):
-        """
-        Need to know the length of the event set which must also be added.
-        Increase the index on the other event set ids.
-        """
-        assert self._magnitude_type == other._magnitude_type
-        source_list = []
-        for source in other:
-            # array add, adds the others_event_set_length to all the elements
-            source.event_set_indexes=(source.event_set_indexes + \
-                                      others_event_set_length)
-            source_list.append(source)
-        self._sources
-        # list add concatenates
-        mergedSourceMod = Source_Model(self._sources + source_list,
-                                       self._magnitude_type)
-        
-        return mergedSourceMod
     
     def __repr__(self):
         n='\n'
@@ -279,7 +261,8 @@ class Source(object):
         self.atten_model_weights = None
         self.scaling = None
 
-        # A Multiple_ground_motion_calculator representing the attenuation models
+        # A Multiple_ground_motion_calculator representing the
+        # ground motion models
         self.ground_motion_calculator = None
 
     def set_event_set_indexes(self, event_indexes):
@@ -342,13 +325,14 @@ class Source_Zone(Source, polygon_object):
                         b=b,
                         number_of_mag_sample_bins=number_of_mag_sample_bins,
                         event_type=event_type,
-                        recurrence_model_distribution=recurrence_model_distribution)
+                        recurrence_model_distribution=
+                        recurrence_model_distribution)
                  
     def determine_event_set_indexes(self, event_set):
-        contains_point=[self.contains_point((lat,lon), use_cach=False) \
+        contains_point=[self.contains_point((lat,lon), use_cach=False) 
                         for lat,lon in zip(
-        event_set.rupture_centroid_lat,
-        event_set.rupture_centroid_lon)]
+            event_set.rupture_centroid_lat,
+            event_set.rupture_centroid_lon)]
         poly_ind=where(contains_point)[0]
         
         self.set_event_set_indexes(poly_ind)
@@ -365,7 +349,8 @@ def event_control_from_xml(filename):
     class Event_Group(object):
         """Class to hold event group data as attributes."""
 
-        def __init__(self, filename, event_type, fault_type, branch_list, scaling_dict):
+        def __init__(self, filename, event_type, fault_type,
+                     branch_list, scaling_dict):
             """Construct an object from event group data.
 
             filename      name of file we are reading (for debug)

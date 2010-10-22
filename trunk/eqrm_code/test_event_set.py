@@ -11,7 +11,7 @@ import tempfile
 from scipy import array, allclose, asarray, arange, sum
 
 from xml_interface import Xml_Interface
-from source_model import source_model_from_xml
+from source_model import source_model_from_xml, Source_Model
 import conversions
 
 from eqrm_code.event_set import * #Event_Set, Pseudo_Event_Set
@@ -740,6 +740,7 @@ class Test_Event_Set(unittest.TestCase):
                                 atten_model_weights):
             sp.atten_model_weights = amw
             sp.event_set_indexes = esi
+        source_model = Source_Model(source_model) 
         ea.attenuation_logic_split(source_model)   
         self.assert_(allclose(sum(ea.event_activity), sum(activity)))
         self.assert_(ea.event_activity[3,0,0], 12.)
@@ -818,6 +819,8 @@ class Test_Event_Set(unittest.TestCase):
                                 atten_model_weights):
             sp.atten_model_weights = amw
             sp.event_set_indexes = esi
+        source_model = Source_Model(source_model) 
+            
         ea.ground_motion_model_logic_split(source_model, apply_weights=True)   
         self.assert_(allclose(sum(ea.event_activity), sum(activity)))
         self.assert_(allclose(ea.event_activity[0,0,3], 12.))
@@ -842,6 +845,7 @@ class Test_Event_Set(unittest.TestCase):
                                 atten_model_weights):
             sp.atten_model_weights = amw
             sp.event_set_indexes = esi
+        source_model = Source_Model(source_model)    
         ea.ground_motion_model_logic_split(source_model, apply_weights=True)   
         self.assert_(allclose(sum(ea.event_activity), sum(activity)))
         self.assert_(allclose(ea.event_activity[0,0,3], 12.))
@@ -986,11 +990,12 @@ class Test_Event_Set(unittest.TestCase):
             prob_min_mag_cutoff,
             prob_number_of_events_in_faults)
         
-        (event_set, source_mod)= merge_events_and_sources(event_set_zone,
-                                                                event_set_fault,
-                                                                source_mod_zone, 
-                                                                source_mod_fault
-                                                               )
+        (event_set, source_mod)= merge_events_and_sources(
+            event_set_zone,
+            event_set_fault,
+            source_mod_zone, 
+            source_mod_fault
+            )
         
         #event_activity = Event_Activity(len(event_set))
         #source_mod.calculate_recurrence(
@@ -1010,11 +1015,57 @@ class Test_Event_Set(unittest.TestCase):
 #            print('%s:' % src.event_type)
 #            dump_src(src)
 
+
+    def test_merge_events_and_sources(self):
+        para = array([0, 1., 2.])
+        para_list = [para]*23
+        events_zone = Event_Set(*para_list)
+        para = array([3., 4., 5., 6.])
+        para_list = [para]*23
+        events_fault = Event_Set(*para_list)
+
+        atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
+        a = Dummy()
+        b = Dummy()
+        source_model = [a, b]
+        event_set_indexes = [array([0]), array([1])]
+        for sp, esi, amw in map(None, source_model, event_set_indexes,
+                                atten_model_weights):
+            sp.atten_model_weights = amw
+            sp.event_set_indexes = esi
+        source_zone = Source_Model(source_model)
+        
+        atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
+        a = Dummy()
+        b = Dummy()
+        source_model = [a, b]
+        event_set_indexes = [array([0,1]), array([2,3])]
+        for sp, esi, amw in map(None, source_model, event_set_indexes,
+                                atten_model_weights):
+            sp.atten_model_weights = amw
+            sp.event_set_indexes = esi
+        source_fault = Source_Model(source_model)
+
+        event_set_merged, source_model_merged = merge_events_and_sources(
+            events_zone, events_fault,
+            source_zone, source_fault)
+
+        self.assert_(len(event_set_merged) == 7)
+        answers = array([0, 1., 2., 3., 4., 5., 6.])
+        self.assert_(allclose(event_set_merged.Mw, answers))
+        source_answers = [array([0]), array([1]),
+                          array([3,4]), array([5,6])]
+        for smm, ans in map(None, source_model_merged, source_answers):
+            self.assert_(allclose(
+                smm.event_set_indexes, ans))
+            
+        
+        
         
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Event_Set,'test')
-    #suite = unittest.makeSuite(Test_Event_Set,'test_apply_spawn')
+    #suite = unittest.makeSuite(Test_Event_Set,'test_merge_events_and_sources')
     
     runner = unittest.TextTestRunner()
     runner.run(suite)
