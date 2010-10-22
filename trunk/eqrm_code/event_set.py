@@ -16,11 +16,11 @@
 import copy
 import xml.dom.minidom
 import math
-
 import scipy
+
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
-     ndarray, absolute, allclose, zeros, ones, float32, int32, \
-     float64, int64, reshape, arange
+     ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
+     int64, reshape, arange, append
 from numpy import random
 
 from eqrm_code.ANUGA_utilities import log
@@ -141,7 +141,7 @@ class Event_Set(object):
                dip=None, ML=None, Mw=None, depth=None, fault_width=None,
                depth_top_seismogenic=None, # Need for generate synthetic events
                depth_bottom_seismogenic=None,
-               fault_type=None):
+               fault_type=None,area=None, width=None, length=None):
         """generate a scenario event set or a synthetic event set.
         Args:
           rupture_centroid_lat: Latitude of rupture centriod
@@ -201,15 +201,16 @@ class Event_Set(object):
         if ML is None:
             ML = conversions.Johnston_01_ML(Mw)
             
-        area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
+        if area is None:
+            area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
         # finish turning into arrays arrays
                 
         if fault_width is None:
             fault_width = (depth_bottom_seismogenic \
                            - depth_top_seismogenic)/ \
                            sin(dip*math.pi/180.)
-                              
-        width = conversions.\
+        if width is None:
+            width = conversions.\
                 modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
                                                         fault_width)
         if depth is None:
@@ -226,7 +227,8 @@ class Event_Set(object):
                 ground_motion_misc.FaultTypeDictionary['reverse']
 
         # Add function conversions
-        length = area/width
+        if length is None:
+            length = area/width
 
         # Calculate the distance of the origin from the centroid
         rad = pi/180.
@@ -486,7 +488,7 @@ class Event_Set(object):
 
         return event
 
-
+    
     def scenario_setup(self):
         """make the event activity a vector
         
@@ -545,7 +547,7 @@ class Event_Set(object):
                         msg+= "\nArguments size should be: "+str(n)
                         msg+= "\n"+key+" size = "+str(argument.size)
                         msg+= "\n Arguments = "+str(arguments.keys())
-                        raise msg
+                        IOError( msg)
                     n = argument.size
         return n
     
@@ -617,6 +619,15 @@ class Event_Set(object):
    
     def __len__(self):
         return len(self.rupture_centroid_lat)
+    
+    def __add__(self, other):
+        atts=self.introspect_attributes()
+        for att in atts:
+            b=getattr(self, att)
+            newValues=append(getattr(self, att),getattr(other, att))
+            setattr(self,att,newValues)      
+            c =getattr(self, att)
+        return self
 
     def __repr__(self):
         return ('Event Set:\n'
@@ -690,6 +701,17 @@ def _calc_attenuation_logic_split(GM_models, model_weights,
     #FIXME Why aren't these arrays?
     return (new_event_activity, new_event_num,
             attenuation_ids, attenuation_weights)
+    
+    
+def merge_events_and_sources(event_set_zone,event_set_fault,
+                              source_model_zone,source_model_fault):
+    # add's event_set_fault to the end of event_set_zone
+    event_set_merged = event_set_zone + event_set_fault
+    # assumes event_set_fault is at the end of event_set_zone
+    source_model_merged = source_model_zone.add(source_model_fault,
+                                                len(event_set_fault))
+   
+    return event_set_merged, source_model_merged
 
 def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                     prob_min_mag_cutoff, 
@@ -731,6 +753,10 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     source_zone_id = zeros((num_events), dtype=EVENT_INT)
     fault_type = zeros((num_events), dtype=EVENT_INT)
     depth = zeros((num_events), dtype=EVENT_FLOAT)
+    fault_w=zeros((num_events), dtype=EVENT_FLOAT)
+    area =zeros((num_events), dtype=EVENT_FLOAT)
+    width =zeros((num_events), dtype=EVENT_FLOAT)
+    length =zeros((num_events), dtype=EVENT_FLOAT)
     start=0
 
     for i,fault in enumerate(fsg_list):
@@ -830,12 +856,16 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         dip[start:end] = fault_dip
         fault_type[start:end] = ground_motion_misc.FaultTypeDictionary[source.fault_type]
         depth[start:end] = r_depth_centroid
+        fault_w[start:end] = fault_width
+        area[start:end] = rup_width*rup_length
+        width[start:end] = rup_width
+        length[start:end] = rup_length
         #magnitude[start:end] = polygon_magnitude
             #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
         eqrmlog.debug('Memory: event set lists have been combined')
         eqrmlog.resource_usage()
-        source.set_event_set_indexes(range(start,end))
+        source.set_event_set_indexes(asarray(range(start,end),dtype=EVENT_INT))
         source_zone_id[start:end] = [i]*num
         start = end
     
@@ -848,16 +878,18 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     else:
         raise Exception('Magnitudes not set')
     event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
-                             rupture_centroid_lon=rupture_centroid_lon,
-                             azimuth=azimuth,
-                             dip=dip,
-                             ML=new_ML,
-                             Mw=new_Mw,
-                             depth_top_seismogenic=depth_top_seismogenic,
-                             depth_bottom_seismogenic=
-                             depth_bottom_seismogenic,
-                             fault_type=fault_type,
-                             depth=depth)
+                                 rupture_centroid_lon=rupture_centroid_lon,
+                                 azimuth=azimuth,
+                                 dip=dip,
+                                 ML=new_ML,
+                                 Mw=new_Mw,
+                                 depth_top_seismogenic=depth_top_seismogenic,
+                                 depth_bottom_seismogenic=
+                                 depth_bottom_seismogenic,
+                                 fault_type=fault_type,
+                                 fault_width=fault_w,
+                                 area= area, width =width,
+                                 length=length, depth=depth)
     event.source_zone_id = asarray(source_zone_id)
     
         #print "event.source_zone_id", event.source_zone_id
