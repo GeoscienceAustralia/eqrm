@@ -54,7 +54,7 @@ def test_generate_synthetic_events_fault():
                             '    </geometry>',
                             '    <recurrence_model distribution="bounded_gutenberg_richter"',
                             '                      recurrence_min_mag="4.0"',
-                            '                      recurrence_max_mag="7.8"',
+                            '                      recurrence_max_mag="8.5"',
                             '                      slip_rate="2.0" b="1">',
                             '      <event_generation generation_min_mag="4.0"',
                             '                        number_of_mag_sample_bins="15"',
@@ -127,6 +127,8 @@ if __name__ == "__main__":
     r_x=event_set_fault.rupture_x
     s_lon=event_set_fault.trace_start_lon
     e_lon=event_set_fault.trace_end_lon
+    s_lat=event_set_fault.trace_start_lat
+    e_lat=event_set_fault.trace_end_lat
     
     
 plt.figure()
@@ -147,8 +149,8 @@ plt.savefig('mag_vs_length.png')
 
 plt.figure()
 plt.scatter(mag,depth,s=mag**2,c=mag)
-plt.plot(mag,width/2.*sin(math.radians(10.))+10.,'g.')
-plt.plot(mag,50-width/2.*sin(math.radians(10.)),'b.')
+plt.plot(mag,width/2.*sin(math.radians(80.))+10.,'g.')
+plt.plot(mag,50-width/2.*sin(math.radians(80.)),'b.')
 plt.xlabel('Magnitude')
 plt.ylabel('Depth')
 plt.ylim(plt.ylim()[::-1])
@@ -164,8 +166,10 @@ plt.savefig('area_depth_mag.png')
   
 plt.figure()
 plt.scatter(r_lon,r_lat,s=mag**2,c=mag)
-plt.xlim([109,112])
-plt.ylim([-19,-16])
+plt.scatter([110.,111],[-17.,-17],s=50,c='k')
+plt.plot([110.,111],[-17.,-17], 'k--')
+plt.xlim([109.5,111.5])
+plt.ylim([-18,-16.5])
 #plt.ylim(plt.ylim()[::-1])
 plt.savefig('depth_locn.png') 
 
@@ -195,10 +199,10 @@ for i in xrange(len(mag)):
     elif mag[i] >= 7:
         col='red'
 
-#   x1=r_lon[i] - ((length[i]/2) / 106.)
-#   x2=r_lon[i] + ((length[i]/2) / 106.)
-    x1=s_lon[i]
-    x2=e_lon[i]
+    x1=r_lon[i] - ((length[i]/2) / 106.)
+    x2=r_lon[i] + ((length[i]/2) / 106.)
+#    x1=s_lon[i]
+#    x2=e_lon[i]
     y1=depth[i] - (width[i]/2)
     y2=depth[i] + (width[i]/2)
 
@@ -208,3 +212,5 @@ for i in xrange(len(mag)):
 #plt.scatter(r_lon,depth, c=mag,s=mag**2)
 plt.ylim(plt.ylim()[::-1])
 plt.savefig('depth_lon_boxes.png')
+
+
