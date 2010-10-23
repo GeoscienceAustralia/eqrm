@@ -155,8 +155,8 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless(szp.number_of_mag_sample_bins== \
                         number_of_mag_sample_bins,'Failed!')
 
-        
-    def test_Source_mini_check_gong(self):
+    # This test is only testing obsolete code 
+    def fix_test_Source_mini_check_gong(self):
         # Might start off hacky
 
         # this failed using the polygon contains point in shapely 1.03

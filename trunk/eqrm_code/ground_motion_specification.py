@@ -43,6 +43,7 @@ class Ground_motion_specification(object):
                   'Invalid ground motion model name: %s' \
                   %ground_motion_model_name
         self._set_interface_values(*gm_args)
+        self.ground_motion_model_name = ground_motion_model_name
         
     def _set_interface_values(self,distribution,magnitude_type,
                               distance_type,

@@ -345,6 +345,7 @@ class Event_Set(object):
           fid_genpolys: The full path name of the source polygon xml file
           prob_min_mag_cutoff: Mimimum magnitude below which hazard is not
             considered.
+          source_model: Basically a list of sources.
           prob_number_of_events_in_zones: Vector whose elements represent
             the number of events for each generation.  Can be None.
             This overrides the info in the xml file.
@@ -382,7 +383,7 @@ class Event_Set(object):
              magnitude_type) = polygons_from_xml(fid_genpolys,
                                                  prob_min_mag_cutoff)
         num_polygons = len(generation_polygons)
-
+        assert num_polygons == len(source_model)
         
         if prob_number_of_events_in_zones is None:
             prob_number_of_events_in_zones = zeros((len(generation_polygons)),
@@ -413,15 +414,20 @@ class Event_Set(object):
 
         #print "magnitude.dtype.name", magnitude.dtype.name
         start = 0
-        for i in xrange(num_polygons):
+        for i, source in enumerate(source_model):
             gp = generation_polygons[i]
-            #ep = event polygon
+            
             num = prob_number_of_events_in_zones[i]
+            end = start + num
+            
+            source.set_event_set_indexes(arange(start, end))
+            
             if num == 0:
                 continue
 
             #populate the polygons
-            polygon_depth_top_seismogenic = gp.populate_depth_top_seismogenic(num)
+            polygon_depth_top_seismogenic = gp.populate_depth_top_seismogenic(
+                num)
             eqrmlog.debug('Memory: populate_depth_top_seismogenic created')
             eqrmlog.resource_usage()
             polygon_azimuth = gp.populate_azimuth(num)
@@ -435,9 +441,6 @@ class Event_Set(object):
             eqrmlog.debug('Memory: populate_magnitude created')
             eqrmlog.resource_usage()
             polygon_depth_bottom = gp.populate_depth_bottom_seismogenic(num)
-            #mag_sample_bins = gp.populate_number_of_mag_sample_bins(num)
-            #eqrmlog.debug('Memory: populate_number_of_mag_sample_bins')
-            #eqrmlog.resource_usage()
 
             #FIXME DSG-EQRM the events will not to randomly placed,
             # Due to  lat, lon being spherical coords and popolate
@@ -447,7 +450,6 @@ class Event_Set(object):
             eqrmlog.resource_usage()
             
             #attach the current polygons generated attributes
-            end = start + num
             rupture_centroid_lat[start:end] = lat
             rupture_centroid_lon[start:end] = lon
             
@@ -460,12 +462,14 @@ class Event_Set(object):
             #print "magnitude.dtype.name", magnitude.dtype.name
             eqrmlog.debug('Memory: event set lists have been combined')
             eqrmlog.resource_usage()
+
             
             # Does this mean source zone objects know nothing about
             # their id?
             source_zone_id[start:end] = [i]*num
+            
+            
             start = end
-
         new_ML=None
         new_Mw=None
         if magnitude_type == 'ML':
