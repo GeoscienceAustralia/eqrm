@@ -281,9 +281,18 @@ def main(parameter_handle,
         
 #         for smz in source_model:
 #             print "**************************************"
-#             print "a285 smz.atten_models", smz.atten_models
-#             print "a285 smz.atten_model_weights", smz.atten_model_weights
+#             #print "a285 smz.atten_models", smz.atten_models
+#             #print "a285 smz.atten_model_weights", smz.atten_model_weights
 #             print "a285 smz.event_set_indexes", smz.event_set_indexes
+#             try:
+#                 print "a285 smz.new_event_set_indexes", smz.new_event_set_indexes
+#                 if not allclose(smz.new_event_set_indexes,
+#                                 smz.event_set_indexes):
+#                     print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+#             except AttributeError:
+#                 if not len(smz.event_set_indexes) == 0:
+#                     print "!!!!!!!!!!!!!!!???????????????????"
+            
         log.debug('Memory: event activity has been calculated')
         log.resource_usage()
         
@@ -841,6 +850,10 @@ def calc_and_save_SA(THE_PARAM_T,
         atten_models = source.atten_models
         atten_model_weights = source.atten_model_weights
         ground_motion_calc = source.ground_motion_calculator
+#         print "************************************************************" 
+#         print "a 853  source.atten_model_weights",  source.atten_model_weights
+#         for mod in ground_motion_calc.GM_models:
+#             print "gmm", mod.GM_spec.ground_motion_model_name
         
         results = ground_motion_calc.distribution(
             event_set=sub_event_set,
@@ -854,6 +867,7 @@ def calc_and_save_SA(THE_PARAM_T,
                         ground_motion_distribution.sample_for_eqrm(
             log_mean_extend_GM, log_sigma_extend_GM)
         # bedrock_SA shape (spawn, GM_model, sites, events, periods)
+        #print "bedrock_SA", bedrock_SA
         soil_SA = None
         #print 'ENDING Calculating attenuation'
 
@@ -913,11 +927,14 @@ def calc_and_save_SA(THE_PARAM_T,
         if THE_PARAM_T.save_motion is True:
             # Put into arrays
             assert collapsed_bedrock_SA.shape[2] == 1 # only one site
-            coll_bedrock_SA = collapsed_bedrock_SA[:,0,0,:,:]
-            bedrock_SA_all[:,:,rel_site_index,event_inds,:] = coll_bedrock_SA
+            gmm_n = collapsed_bedrock_SA.shape[1]
+            coll_bedrock_SA = collapsed_bedrock_SA[:,:,0,:,:]
+            bedrock_SA_all[:,:gmm_n,rel_site_index,event_inds,:] = \
+                                                                coll_bedrock_SA
             if soil_SA is not None:
-                coll_soil_SA = collapsed_soil_SA[:,0,0,:,:]
-                soil_SA_all[:,:,rel_site_index,event_inds,:] = coll_soil_SA
+                coll_soil_SA = collapsed_soil_SA[:,:,0,:,:]
+                soil_SA_all[:,:gmm_n,rel_site_index,event_inds,:] = \
+                                                                 coll_soil_SA
         if THE_PARAM_T.save_hazard_map is True:
             # Build collapsed_bedrock_SA for all events
             # before getting out of the loop
