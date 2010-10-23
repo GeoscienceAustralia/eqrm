@@ -453,6 +453,8 @@ class Test_Event_Set(unittest.TestCase):
 """
         handle.write(sample)
         handle.close()
+        # 1 zone therefore 1 source
+        source_model = [Dummy()]
 
 
         (handle, et_file_name) = tempfile.mkstemp('.xml', __name__+'_')
@@ -485,6 +487,7 @@ class Test_Event_Set(unittest.TestCase):
         events = Event_Set.generate_synthetic_events(
             file_name,
             prob_min_mag_cutoff,
+            source_model,
             prob_number_of_events_in_zones=prob_number_of_events_in_zones)
 #         print "events.trace_start_lat", events.trace_start_lat
 #         print " events.trace_start_lon", events.trace_start_lon
@@ -599,6 +602,9 @@ class Test_Event_Set(unittest.TestCase):
         handle.write(sample)
         handle.close()
 
+        
+        source_model = [Dummy(), Dummy()]
+
         fault_width = None
         azi = None
         dazi = None
@@ -611,6 +617,7 @@ class Test_Event_Set(unittest.TestCase):
         events = Event_Set.generate_synthetic_events(
             file_name,
             prob_min_mag_cutoff,
+            source_model,
             prob_number_of_events_in_zones=prob_number_of_events_in_zones)
         
         
@@ -1065,7 +1072,7 @@ class Test_Event_Set(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Event_Set,'test')
-    #suite = unittest.makeSuite(Test_Event_Set,'test_merge_events_and_sources')
+    #suite = unittest.makeSuite(Test_Event_Set,'test_generate_synthetic_events')
     
     runner = unittest.TextTestRunner()
     runner.run(suite)

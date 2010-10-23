@@ -333,6 +333,7 @@ class Event_Set(object):
     @classmethod
     def generate_synthetic_events(cls, fid_genpolys,
                                   prob_min_mag_cutoff,
+                                  source_model,
                                   prob_number_of_events_in_zones=None):
         """Randomly generate the event_set parameters.
 
@@ -381,6 +382,7 @@ class Event_Set(object):
              magnitude_type) = polygons_from_xml(fid_genpolys,
                                                  prob_min_mag_cutoff)
         num_polygons = len(generation_polygons)
+
         
         if prob_number_of_events_in_zones is None:
             prob_number_of_events_in_zones = zeros((len(generation_polygons)),

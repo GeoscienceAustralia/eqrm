@@ -88,8 +88,7 @@
      event_type = "mean_1_sigma_0pt5">
     <GMPE 
        fault_type = "reverse">
-      <branch model = "mean_1_sigma_0pt5" weight = "0.9"/> 
-      <branch model = "mean_1_sigma_0pt5" weight = "0.1"/> 
+      <branch model = "mean_1_sigma_0pt5" weight = "1.0"/>
     </GMPE>
     <scaling scaling_rule = "not_used" />
   </event_group>
@@ -98,8 +97,7 @@
      event_type = "mean_2_sigma_1">
     <GMPE 
        fault_type = "reverse">
-      <branch model = "mean_2_sigma_1" weight = "0.9"/> 
-      <branch model = "mean_2_sigma_1" weight = "0.1"/> 
+      <branch model = "mean_2_sigma_1" weight = "1.0"/> 
     </GMPE>
     <scaling scaling_rule = "not_used" />
   </event_group>

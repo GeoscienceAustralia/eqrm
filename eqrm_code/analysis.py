@@ -213,11 +213,13 @@ def main(parameter_handle,
             if fid_event_types is not None:
                 source_model_zone.add_event_type_atts_to_sources(
                     fid_event_types)
+
                 # This is a hack, until
                 # gm splitting is working
-                THE_PARAM_T['atten_models'] = source_model_zone[0].atten_models
-                THE_PARAM_T['atten_model_weights'] = \
-                    source_model_zone[0].atten_model_weights
+                if False:
+                    THE_PARAM_T['atten_models'] = source_model_zone[0].atten_models
+                    THE_PARAM_T['atten_model_weights'] = \
+                                                       source_model_zone[0].atten_model_weights
             
             if THE_PARAM_T.atten_models is not None and \
                 THE_PARAM_T.atten_model_weights is not None:
@@ -237,6 +239,7 @@ def main(parameter_handle,
                 fid_genpolys=fid_sourcepolys,
                 prob_min_mag_cutoff=
                 THE_PARAM_T.prob_min_mag_cutoff,
+                source_model=source_model_zone,
                 prob_number_of_events_in_zones=\
                 THE_PARAM_T.prob_number_of_events_in_zones)
 
@@ -275,7 +278,12 @@ def main(parameter_handle,
         source_model.calculate_recurrence(
             event_set,
             event_activity)
-
+        
+#         for smz in source_model:
+#             print "**************************************"
+#             print "a285 smz.atten_models", smz.atten_models
+#             print "a285 smz.atten_model_weights", smz.atten_model_weights
+#             print "a285 smz.event_set_indexes", smz.event_set_indexes
         log.debug('Memory: event activity has been calculated')
         log.resource_usage()
         
@@ -304,13 +312,14 @@ def main(parameter_handle,
     log.debug('Memory: Sites created')
     log.resource_usage()
 
+    # FIXME this 'removes' gmm splitting for risk
     pseudo_event_set = Pseudo_Event_Set.split_logic_tree(
         event_set,
-        THE_PARAM_T.atten_models,
-        THE_PARAM_T.atten_model_weights)
+        source_model[0].atten_models,
+        source_model[0].atten_model_weights)
 
     num_events = len(event_set)
-    num_psudo_events = len(THE_PARAM_T.atten_models) * num_events * \
+    num_psudo_events = len(source_model[0].atten_models) * num_events * \
                        num_spawning
     
     msg = ('Pseudo event set created. Number of pseudo_events=' +
@@ -330,9 +339,9 @@ def main(parameter_handle,
     # Tasks here include
     #  - interpolation of coefficients to periods of interest
     ground_motion_calc = Multiple_ground_motion_calculator(
-        THE_PARAM_T.atten_models,
+        source_model[0].atten_models,
         periods=THE_PARAM_T.atten_periods,
-        model_weights=THE_PARAM_T.atten_model_weights)
+        model_weights=source_model[0].atten_model_weights)
 
 
     # load in soil amplifications factors
@@ -1120,17 +1129,15 @@ def load_data(THE_PARAM_T):
     if sites is None:
         raise RuntimeError("Couldn't find BUILDING or BRIDGE data?")
 
-    # Load the site_class 2 vs30 mapping, if it is needed
-    if (THE_PARAM_T.use_amplification is False and
-        (THE_PARAM_T.atten_models[0] == 'Boore_08')):
-        amp_factor_file = 'site_class2vs30.csv'
-        amp_factor_file = get_local_or_default(amp_factor_file,
-                                               THE_PARAM_T.default_input_dir,
-                                               THE_PARAM_T.input_dir)
-        # Load vs30 mapping
-        site_class2vs30 = load_site_class2vs30(amp_factor_file)
-        # Use the mapping to add vs30 info to add vs30 info to structures
-        sites.set_vs30(site_class2vs30)
+    # Load the site_class 2 vs30 mapping
+    amp_factor_file = 'site_class2vs30.csv'
+    amp_factor_file = get_local_or_default(amp_factor_file,
+                                           THE_PARAM_T.default_input_dir,
+                                           THE_PARAM_T.input_dir)
+    # Load vs30 mapping
+    site_class2vs30 = load_site_class2vs30(amp_factor_file)
+    # Use the mapping to add vs30 info to add vs30 info to structures
+    sites.set_vs30(site_class2vs30)
 
     return (sites, bridge_data)
 
