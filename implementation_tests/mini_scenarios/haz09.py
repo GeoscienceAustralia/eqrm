@@ -35,13 +35,11 @@ prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [1, 2, 1, 0, 0, 0]
 
 # Attenuation
-atten_models = ['Allen','AllenSEA06','Gaull_1990_WA',
-                          'Toro_1997_midcontinent',
-                          'Sadigh_97', 'Youngs_97_interface',
-                          'Youngs_97_intraslab',
-                          'Combo_Sadigh_Youngs_M8',
-                          'Somerville09_Yilgarn',
-                          'Somerville09_Non_Cratonic']
+atten_models = ['Allen', 'AllenSEA06', 'Gaull_1990_WA',
+                'Toro_1997_midcontinent', 'Sadigh_97', 'Youngs_97_interface',
+                'Youngs_97_intraslab', 'Combo_Sadigh_Youngs_M8',
+                'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
+                'Abrahamson08']
 atten_model_weights = len(atten_models)*[1.0/len(atten_models)]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = None
