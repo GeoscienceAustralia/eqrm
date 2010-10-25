@@ -714,6 +714,7 @@ def merge_events_and_sources(event_set_zone, event_set_fault,
     """
     Merge two event sets and two source models.
     The order of the events and sources passed in is important.
+    Fault info is concatenated to the end of zone info.
     
     """
     # add's event_set_fault to the end of event_set_zone
