@@ -10,16 +10,14 @@ from eqrm_code.ground_motion_misc import \
 from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
      Multiple_ground_motion_calculator
 
-#classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
-#                          'Toro_1997_midcontinent', 'Sadigh_97',
-#                          'Youngs_97_interface', 'Youngs_97_intraslab',
-#                          'Combo_Sadigh_Youngs_M8', 'Boore_08',
-#                          'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
-#                          'Liang_2008', 'Atkinson06_hard_bedrock',
-#                          'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-#                          'Chiou08', 'Campbell03', 'Campbell08', 'Abrahamson08')
-
-classes_with_test_data = ('Abrahamson08',)
+classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
+                          'Toro_1997_midcontinent', 'Sadigh_97',
+                          'Youngs_97_interface', 'Youngs_97_intraslab',
+                          'Combo_Sadigh_Youngs_M8', 'Boore_08',
+                          'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
+                          'Liang_2008', 'Atkinson06_hard_bedrock',
+                          'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
+                          'Chiou08', 'Campbell03', 'Campbell08', 'Abrahamson08')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -811,19 +809,13 @@ del tmp
 
 class Campbell08_distance_object(object):
     def __init__(self, Rrup, Rjb):
-        self.Rrup = Rrup
-        self.Rjb = Rjb
-
-    def Rupture(self):
-        return self.Rrup
-
-    def Joyner_Boore(self):
-        return self.Rjb
+        self.Rupture = Rrup
+        self.Joyner_Boore = Rjb
 
     def distance(self, type):
         """We *must* define a 'distance' method, results unused."""
 
-        return self.Rrup
+        return self.Rupture
 
 # Rrup distances - num_sites = 7
 tmp = zeros((7,4)) # initialise an array: (num_sites, num_events)
@@ -1087,18 +1079,21 @@ class Distance_stub(object):
 
     def __init__(self,dist):
         self.dist = asarray(dist)
+        self.Rupture = self.dist
+        self.Joyner_Boore = self.dist
+        self.Horizontal = self.dist
 
     def distance(self, dummy):
         return self.dist
 
-    def Rupture(self):
-        return self.dist
-
-    def Joyner_Boore(self):
-        return self.dist
-
-    def Horizontal(self):
-        return self.dist
+#    def Rupture(self):
+#        return self.dist
+#
+#    def Joyner_Boore(self):
+#        return self.dist
+#
+#    def Horizontal(self):
+#        return self.dist
 
 def mag2dict(mag):
     # when using multiple_g_m_calc the mag_type is determined from

@@ -3106,8 +3106,8 @@ def Campbell08_distribution(**kwargs):
     Z25 = Z25[:,newaxis,newaxis]
 
     # get required distance arrays
-    Rrup = dist_object.Rupture()
-    Rjb = dist_object.Joyner_Boore()
+    Rrup = dist_object.Rupture
+    Rjb = dist_object.Joyner_Boore
 
     # get flag values from 'fault_type'
     Frv = Campbell08_fault_type[:,0][fault_type]
@@ -3546,9 +3546,9 @@ def Abrahamson08_distribution(**kwargs):
     assert sigma_coefficient.shape == (7, 1, 1, num_periods), msg
 
     # get required distance arrays
-    Rrup = dist_object.Rupture()
-    Rjb = dist_object.Joyner_Boore()
-    Rx = dist_object.Horizontal()
+    Rrup = dist_object.Rupture
+    Rjb = dist_object.Joyner_Boore
+    Rx = dist_object.Horizontal
 
     # get flag values from 'fault_type'
     Frv = AS08_fault_type[:,0][fault_type]
