@@ -1,7 +1,7 @@
 <source_model_fault magnitude_type="Mw">
   <fault 
-  name = "Newie South Fault"
-  event_type = "crustal fault">
+  name = "Newie South Fault crustal fault"
+  event_type = "mean_1_sigma_0pt5">
   
     <geometry 
         dip= "45" 
@@ -20,19 +20,19 @@
        distribution = "bounded_gutenberg_richter"
        recurrence_min_mag = "3.5" 
        recurrence_max_mag = "6.5" 
-       slip_rate = "10.0" 
+       A_min = "0.001" 
        b = "1">
       <event_generation 
         generation_min_mag = "3.5"
         number_of_mag_sample_bins = "15" 
-        number_of_events = "1500" />
+        number_of_events = "1" />
     </recurrence_model>
            
   </fault>
   
   <fault 
-  name = "Newie North Fault"
-  event_type = "crustal fault">
+  name = "Newie North Fault crustal fault"
+  event_type = "mean_2_sigma_1">
   
     <geometry 
         dip= "45" 
@@ -51,19 +51,19 @@
        distribution = "characteristic"
        recurrence_min_mag = "3.5" 
        recurrence_max_mag = "6.5" 
-       slip_rate = "10.0" 
+       A_min = "0.01" 
        b = "1">
       <event_generation 
         generation_min_mag = "3.5"
         number_of_mag_sample_bins = "15" 
-        number_of_events = "1500" />
+        number_of_events = "1" />
     </recurrence_model>
            
   </fault>
 
   <fault 
   name = "Newie Subduction Zone"
-  event_type = "subduction interface">
+  event_type = "mean_1_and_2">
   
     <geometry 
         dip= "30" 
@@ -82,12 +82,12 @@
        distribution = "bounded_gutenberg_richter"
        recurrence_min_mag = "4.0" 
        recurrence_max_mag = "8.5" 
-       A_min = "10" 
+       A_min = "0.1" 
        b = "1">
       <event_generation 
         generation_min_mag = "4.0"
         number_of_mag_sample_bins = "25" 
-        number_of_events = "2000" />
+        number_of_events = "1" />
     </recurrence_model>
            
   </fault>  

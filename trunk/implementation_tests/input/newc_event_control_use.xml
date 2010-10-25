@@ -81,7 +81,8 @@
       <branch model = "mean_1_sigma_0pt5" weight = "0.75"/> 
       <branch model = "mean_2_sigma_1" weight = "0.25"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "WellsCoppersmith94" 
+    scaling_fault_type = "reverse"  />
   </event_group>	
 	
   <event_group
@@ -90,7 +91,8 @@
        fault_type = "reverse">
       <branch model = "mean_1_sigma_0pt5" weight = "1.0"/>
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "WellsCoppersmith94" 
+    scaling_fault_type = "reverse"  />
   </event_group>
 	
   <event_group
@@ -99,7 +101,8 @@
        fault_type = "reverse">
       <branch model = "mean_2_sigma_1" weight = "1.0"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "WellsCoppersmith94" 
+    scaling_fault_type = "reverse"  />
   </event_group>
   
 </event_type_controlfile>
