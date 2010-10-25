@@ -242,13 +242,25 @@ class Multiple_ground_motion_calculator(object):
                                                            periods))
 
     def distribution(self, sites, event_set, event_activity=None,
-                     event_id=None):
+                     event_id=None, vs30=None):
+        """
+        Calculate the ground motion shaking at a site, given an array of
+        events.
+
+        sites
+        event_set, an event_set object.  The shape of the attributes of this
+          instance will be equal to the shape of the returned arrays.
+        v330 - the vs30 value used if the gmm needs it.  If none is given the
+          site vs30 value is used.
+        
+        """
         # get distances, etc
         distances = sites.\
                     distances_from_event_set(event_set,
                                              event_set_trace_starts=True)
         magnitudes = {'Mw': event_set.Mw, 'ML': event_set.ML}
-        vs30 = sites.attributes.get('VS30', None)
+        if vs30 is None:
+            vs30 = sites.attributes.get('VS30', None)
 
         results=self._distribution_function(
             distances, magnitudes,
