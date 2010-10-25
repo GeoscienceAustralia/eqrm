@@ -872,7 +872,7 @@ def calc_and_save_SA(THE_PARAM_T,
             log_mean_extend_GM, log_sigma_extend_GM)
         # bedrock_SA shape (spawn, GM_model, sites, events, periods)
         #print "bedrock_SA", bedrock_SA
-        soil_SA = None
+        
         #print 'ENDING Calculating attenuation'
 
         # Setup for amplification  model
