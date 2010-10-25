@@ -32,6 +32,7 @@ from eqrm_code.event_set import Event_Set, Pseudo_Event_Set, Event_Activity, \
      generate_synthetic_events_fault, merge_events_and_sources
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
+from eqrm_code.ground_motion_interface import BEDROCKVS30
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
      Regolith_amplification_model, load_site_class2vs30
 from eqrm_code.source_model import source_model_from_xml, Source_Model
@@ -859,7 +860,8 @@ def calc_and_save_SA(THE_PARAM_T,
         
         results = ground_motion_calc.distribution(
             event_set=sub_event_set,
-            sites=sites)
+            sites=sites,
+            vs30=BEDROCKVS30)
         _ , log_mean_extend_GM, log_sigma_extend_GM = results 
         # *_extend_GM has shape of (GM_model, sites, events, periods)
         

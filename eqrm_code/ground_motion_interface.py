@@ -111,6 +111,7 @@ from eqrm_code import ground_motion_misc
 
 
 LOG10E = math.log10(math.e)
+BEDROCKVS30 = 760. # m/s
 
 # A dictionary of all the info specified bellow.
 # This is used by ground_motion_specification.
