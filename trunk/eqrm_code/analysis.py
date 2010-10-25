@@ -29,7 +29,7 @@ from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
 from eqrm_code.parse_in_parameters import  \
     ParameterSyntaxError, create_parameter_data, convert_THE_PARAM_T_to_py
 from eqrm_code.event_set import Event_Set, Pseudo_Event_Set, Event_Activity, \
-     Obsolete_Event_Activity, generate_synthetic_events_fault
+     generate_synthetic_events_fault
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
@@ -228,20 +228,16 @@ def main(parameter_handle,
             log.debug('Memory: source_model_zone created')
             log.resource_usage()
 
-            # Generating the event set (i.e. a synthetic event catalogue)
-            #  - see manual for details
-            # FIXME DSG-DSG
-            #generate_synthetic_events and Obsolete_Source_Models seem too 
-            # connected.
-            # They both need fid_sourcepolys and prob_min_mag_cutoff.
-            # Yet can these values be different?
-            event_set = Event_Set.generate_synthetic_events(
-                fid_genpolys=fid_sourcepolys,
-                prob_min_mag_cutoff=
-                THE_PARAM_T.prob_min_mag_cutoff,
-                source_model=source_model_zone,
-                prob_number_of_events_in_zones=\
-                THE_PARAM_T.prob_number_of_events_in_zones)
+            if fid_sourcepolys is not None:
+                event_set_zone = Event_Set.generate_synthetic_events(
+                    fid_genpolys=fid_sourcepolys,
+                    prob_min_mag_cutoff=
+                    THE_PARAM_T.prob_min_mag_cutoff,
+                    source_model=source_model_zone,
+                    prob_number_of_events_in_zones=\
+                    THE_PARAM_T.prob_number_of_events_in_zones)
+            else:
+                event_set_zone = None
 
             log.debug('Memory: event_set_zone created')
             log.resource_usage()
@@ -256,18 +252,25 @@ def main(parameter_handle,
         except IOError:
             fid_sourcefaults = None
             log.debug('No fault source XML file found')
-        if (fid_event_types is not None) and (fid_sourcefaults is not None):
-            (event_set_fault,source_model_fault)\
-                                    =_fault(
-                                    fid_sourcefaults, 
-                                    fid_event_types,
-                                    THE_PARAM_T.prob_min_mag_cutoff, 
-                                    THE_PARAM_T.prob_number_of_events_in_faults)
-            
+        if (fid_event_types is not None) and (fid_sourcefaults is not None) \
+        and False:
+            results = generate_synthetic_events_fault(
+                fid_sourcefaults, 
+                fid_event_types,
+                THE_PARAM_T.prob_min_mag_cutoff, 
+                THE_PARAM_T.prob_number_of_events_in_faults)
+            (event_set_fault, source_model_fault) = results
+        else:
+            event_set_fault = None
+            source_model_fault = None
          
         # add the two event sets and source models together
-
-        source_model = source_model_zone
+        if event_set_fault is None: # assume no fault sources
+            event_set = event_set_zone
+            source_model = source_model_zone
+        elif event_set_zone is None: # assume no zone aources
+            event_set = event_set_fault
+            source_model = source_model_fault
         
         # event activity is calculated here and the event_set are subsampled.
         if THE_PARAM_T.atten_spawn_bins == None:

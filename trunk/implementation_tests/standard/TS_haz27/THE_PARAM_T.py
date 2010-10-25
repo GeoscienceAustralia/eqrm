@@ -21,40 +21,31 @@ run_type = "hazard"
 is_scenario = False
 max_width = 15
 site_tag = "newc" 
-site_db_tag = "" 
-return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
+return_periods = [120.0, 2000.0]
 input_dir = r".\implementation_tests\input/" 
-output_dir = r".\implementation_tests\mini_current\haz09/" 
+output_dir = r".\implementation_tests\current\TS_haz27/" 
 use_site_indexes = True
-site_indexes = [2255, 11511, 10963, 686, 1026]
+site_indexes = [2997, 2657, 3004, 3500]
+zone_source_tag = "TS_haz27" 
+event_control_tag = "use" 
 
 # Scenario input
 
 # Probabilistic input
 prob_min_mag_cutoff = 4.5
-prob_number_of_events_in_zones = [1, 2, 1, 0, 0, 0]
+prob_number_of_events_in_zones = [1, 1, 1, 1, 1, 1]
 
 # Attenuation
-atten_models = ['Allen', 'AllenSEA06', 'Gaull_1990_WA',
-                'Toro_1997_midcontinent', 'Sadigh_97', 'Youngs_97_interface',
-                'Youngs_97_intraslab', 'Combo_Sadigh_Youngs_M8',
-                'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
-                'Abrahamson08']
-atten_model_weights = len(atten_models)*[1.0/len(atten_models)]
-atten_collapse_Sa_of_atten_models = True
+atten_collapse_Sa_of_atten_models = False
 atten_variability_method = None
-atten_periods = [0.0, 0.30303000000000002, 1.0]
-atten_threshold_distance = 400
+atten_periods = [0.0, 1.0526, 2.0]
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
-atten_pga_scaling_cutoff = 2
+atten_pga_scaling_cutoff = 999999
 atten_smooth_spectral_acceleration = None
 
 # Amplification
-use_amplification = True
-amp_variability_method = None
-amp_min_factor = 0.6
-amp_max_factor = 10000
+use_amplification = False
 
 # Buildings
 
@@ -63,7 +54,12 @@ amp_max_factor = 10000
 # Loss
 
 # Save
-save_hazard_map = True
+save_hazard_map = False
+save_total_financial_loss = False
+save_building_loss = False
+save_contents_loss = False
+save_motion = True
+save_prob_structural_damage = None
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 
