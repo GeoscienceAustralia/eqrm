@@ -1253,13 +1253,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # assume Rrup=200 and Rjb=199.9
         class DistObj(object):
             def __init__(self):
-                pass
-
-            def Rupture(self):
-                return numpy.array([[[2.0000e+2]]])
-
-            def Joyner_Boore(self):
-                return numpy.array([[[1.9990e+2]]])
+                self.Rupture = numpy.array([[[2.0000e+2]]])
+                self.Joyner_Boore = numpy.array([[[1.9990e+2]]])
 
         ######
         # period = 0.01, ML=5.0, Rrup=200.0, Rjb=1.999
@@ -1328,13 +1323,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # assume Rrup=200 and Rjb=199.9
         class DistObj(object):
             def __init__(self):
-                pass
-
-            def Rupture(self):
-                return numpy.array([[[2.0000e+2]]])
-
-            def Joyner_Boore(self):
-                return numpy.array([[[1.9990e+2]]])
+                self.Rupture = numpy.array([[[2.0000e+2]]])
+                self.Joyner_Boore = numpy.array([[[1.9990e+2]]])
 
         ######
         # period = 0.01, ML=5.0, Rrup=200.0, Rjb=1.999
@@ -1405,13 +1395,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # a fake dist_object class
         class DistObj(object):
             def __init__(self):
-                pass
-
-            def Rupture(self):
-                return numpy.array([[[Rrup]]])
-
-            def Joyner_Boore(self):
-                return numpy.array([[[Rjb]]])
+                self.Rupture = numpy.array([[[Rrup]]])
+                self.Joyner_Boore = numpy.array([[[Rjb]]])
 
         ######
         # period = 0.2, ML=7.0
@@ -1480,13 +1465,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # a fake dist_object class
         class DistObj(object):
             def __init__(self):
-                pass
-
-            def Rupture(self):
-                return numpy.array([[[Rrup]]])
-
-            def Joyner_Boore(self):
-                return numpy.array([[[Rjb]]])
+                self.Rupture = numpy.array([[[Rrup]]])
+                self.Joyner_Boore = numpy.array([[[Rjb]]])
 
         ######
         # period = 0.01, M=5.0
@@ -1555,13 +1535,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # a fake dist_object class
         class DistObj(object):
             def __init__(self):
-                pass
-
-            def Rupture(self):
-                return numpy.array([[[Rrup]]])
-
-            def Joyner_Boore(self):
-                return numpy.array([[[Rjb]]])
+                self.Rupture = numpy.array([[[Rrup]]])
+                self.Joyner_Boore = numpy.array([[[Rjb]]])
 
         ######
         # period = 0.01, M=7.0
@@ -1631,16 +1606,9 @@ class Test_ground_motion_interface(unittest.TestCase):
         # it can be this simple since delta=90 and Ztor=0.0
         class DistObj(object):
             def __init__(self, distance):
-                self.distance = distance
-
-            def Rupture(self):
-                return self.distance
-
-            def Joyner_Boore(self):
-                return self.distance
-
-            def Horizontal(self):
-                return self.distance
+                self.Rupture = distance
+                self.Joyner_Boore = distance
+                self.Horizontal = distance
 
         # Test various scenarios for period=0.2
         period = 0.2

@@ -255,7 +255,8 @@ class Multiple_ground_motion_calculator(object):
             depth=event_set.depth,
             depth_to_top=event_set.depth_to_top,
             fault_type=event_set.fault_type,
-            vs30=vs30, Z25=None, dip=None,
+            vs30=vs30, Z25=None, dip=event_set.dip,
+            width=event_set.width,
             event_activity=event_activity,
             event_id=event_id,
             periods=self.periods)
