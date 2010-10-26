@@ -258,6 +258,7 @@ def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR):
     for dir in standard_dirs:
         result_files = listdir(join(standard_dir, dir))
         result_files = [x for x in result_files if not x[-4:] == '.lic']
+        result_files = [x for x in result_files if not x[0] == '.']
         
         #print "result_files", result_files
         try:
