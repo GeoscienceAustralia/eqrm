@@ -17,7 +17,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-                          'Chiou08', 'Campbell03', 'Campbell08', 'Abrahamson08')
+                          'Campbell03', 'Campbell08', 'Abrahamson08', 'Chiou08')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -721,56 +721,116 @@ del tmp
 #test_data['Chiou08_test_mean'] = tmp
 #del tmp
 #
+#################################################################################
+## Chiou08 Tests - Soil - compare code against 'hand' code results
+#
+## vs30 value
+#test_data['Chiou08_test_vs30'] = 310.0
+#
+## num_events = 2
+#test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
+#
+## num_events = 2
+#test_data['Chiou08_test_depth_to_top'] = [0.0, 0.0]
+#
+## num_events = 2
+## 'reverse' fault type index is 0
+#test_data['Chiou08_test_fault_type'] = [0, 0]
+#
+## num_periods = 4
+#test_data['Chiou08_test_period'] = [0.01, 0.20, 1.00, 3.00]
+#
+## num_sites = 3
+#tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
+#tmp[0,:] = [  5.0,   5.0] # distance - 1st site and all 2 events
+#tmp[1,:] = [ 20.0,  20.0] # distance - 2nd site and all 2 events
+#tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
+#test_data['Chiou08_test_distance'] = tmp
+#
+## result values, in 'g'
+#tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+## period:     0.01      0.20      1.00      3.00
+#tmp[0,0,:] = [0.292430, 0.616686, 0.196268, 0.028048] # R=  5.0, ML=5.5
+#tmp[0,1,:] = [0.515783, 1.060834, 0.651781, 0.178439] # R=  5.0, ML=7.5
+#tmp[1,0,:] = [0.081035, 0.183922, 0.047799, 0.006584] # R= 20.0, ML=5.5
+#tmp[1,1,:] = [0.260221, 0.570758, 0.283779, 0.073640] # R= 20.0, ML=7.5
+#tmp[2,0,:] = [0.007875, 0.018511, 0.007373, 0.001144] # R=100.0, ML=5.5
+#tmp[2,1,:] = [0.062533, 0.146149, 0.080264, 0.021578] # R=100.0, ML=7.5
+#test_data['Chiou08_test_mean'] = tmp
+#del tmp
+#
+### # sigma values, in 'g'
+### # data is from openSHA.org
+### tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
+### # period:     0.01    0.20    1.00    3.00
+### tmp[0,0,:] = [5.8e-1, 5.8e-1, 6.4e-1, 7.2e-1] # R=  5.0, ML=5.5
+### tmp[0,1,:] = [4.6e-1, 4.7e-1, 6.0e-1, 7.0e-1] # R=  5.0, ML=7.5
+### tmp[1,0,:] = [6.1e-1, 6.2e-1, 6.6e-1, 7.2e-1] # R= 20.0, ML=5.5
+### tmp[1,1,:] = [4.7e-1, 5.0e-1, 6.2e-1, 7.0e-1] # R= 20.0, ML=7.5
+### tmp[2,0,:] = [6.2e-1, 6.8e-1, 6.8e-1, 7.2e-1] # R=100.0, ML=5.5
+### tmp[2,1,:] = [5.0e-1, 5.4e-1, 6.3e-1, 7.0e-1] # R=100.0, ML=7.5
+### test_data['Chiou08_test_sigma'] = tmp
+### del tmp
+#
 ################################################################################
-# Chiou08 Tests - Soil - compare code against 'hand' code results
+# Chiou08 Tests - Soil - compare code against BooreFTN code results
 
-# vs30 value
-test_data['Chiou08_test_vs30'] = 310.0
+# num_periods = 3
+test_data['Chiou08_test_period'] = [0.01, 1.0, 3.0]
 
-# num_events = 2
-test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
-
-# num_events = 2
-test_data['Chiou08_test_depth_to_top'] = [0.0, 0.0]
-
-# num_events = 2
-# 'reverse' fault type index is 0
-test_data['Chiou08_test_fault_type'] = [0, 0]
-
-# num_periods = 4
-test_data['Chiou08_test_period'] = [0.01, 0.20, 1.00, 3.00]
+# num_events = 3
+test_data['Chiou08_test_magnitude'] = [4.0, 5.5, 7.0]
 
 # num_sites = 3
-tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
-tmp[0,:] = [  5.0,   5.0] # distance - 1st site and all 2 events
-tmp[1,:] = [ 20.0,  20.0] # distance - 2nd site and all 2 events
-tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
+tmp = zeros((3,3)) # initialize an array: (num_sites, num_events)
+tmp[0,:] = [  5.0,   5.0,   5.0] # distance - site 1 & all 3 events
+tmp[1,:] = [ 25.0,  25.0,  25.0] # distance - site 2 & all 3 events
+tmp[2,:] = [100.0, 100.0, 100.0] # distance - site 3 & all 3 events
 test_data['Chiou08_test_distance'] = tmp
 
-# result values, in 'g'
-tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
-# period:     0.01      0.20      1.00      3.00
-tmp[0,0,:] = [0.292430, 0.616686, 0.196268, 0.028048] # R=  5.0, ML=5.5
-tmp[0,1,:] = [0.515783, 1.060834, 0.651781, 0.178439] # R=  5.0, ML=7.5
-tmp[1,0,:] = [0.081035, 0.183922, 0.047799, 0.006584] # R= 20.0, ML=5.5
-tmp[1,1,:] = [0.260221, 0.570758, 0.283779, 0.073640] # R= 20.0, ML=7.5
-tmp[2,0,:] = [0.007875, 0.018511, 0.007373, 0.001144] # R=100.0, ML=5.5
-tmp[2,1,:] = [0.062533, 0.146149, 0.080264, 0.021578] # R=100.0, ML=7.5
-test_data['Chiou08_test_mean'] = tmp
-del tmp
+# num_events = 3
+test_data['Chiou08_test_depth_to_top'] = [0.0, 0.0, 0.0]
 
-## # sigma values, in 'g'
-## # data is from openSHA.org
-## tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
-## # period:     0.01    0.20    1.00    3.00
-## tmp[0,0,:] = [5.8e-1, 5.8e-1, 6.4e-1, 7.2e-1] # R=  5.0, ML=5.5
-## tmp[0,1,:] = [4.6e-1, 4.7e-1, 6.0e-1, 7.0e-1] # R=  5.0, ML=7.5
-## tmp[1,0,:] = [6.1e-1, 6.2e-1, 6.6e-1, 7.2e-1] # R= 20.0, ML=5.5
-## tmp[1,1,:] = [4.7e-1, 5.0e-1, 6.2e-1, 7.0e-1] # R= 20.0, ML=7.5
-## tmp[2,0,:] = [6.2e-1, 6.8e-1, 6.8e-1, 7.2e-1] # R=100.0, ML=5.5
-## tmp[2,1,:] = [5.0e-1, 5.4e-1, 6.3e-1, 7.0e-1] # R=100.0, ML=7.5
-## test_data['Chiou08_test_sigma'] = tmp
-## del tmp
+# num_events = 3
+test_data['Chiou08_test_dip'] = [90.0, 90.0, 90.0]
+
+# num_sites = 3
+test_data['Chiou08_test_vs30'] = [300.0, 300.0, 300.0]
+
+# num_events = 3
+# 'reverse' fault type index is 0
+# 'normal' fault type index is 1
+# 'strikeslip' fault type index is 2
+#                                       SS SS SS
+test_data['Chiou08_test_fault_type'] = [2, 2, 2]
+
+# mean values, in 'g'
+tmp = zeros((1,3,3))    # (num_sites, num_events, num_periods)
+tmp[0,0,0] = 5.581E-02 # Rrup=  5.0, Mw=4.0, T=0.01
+tmp[0,1,0] = 5.575E-02 # Rrup= 25.0, Mw=5.5, T=0.01
+tmp[0,2,0] = 3.701E-02 # Rrup=100.0, Mw=7.0, T=0.01
+tmp[0,0,1] = 9.876E-03 # Rrup=  5.0, Mw=4.0, T=1.00
+tmp[0,1,1] = 3.414E-02 # Rrup= 25.0, Mw=5.5, T=1.00
+tmp[0,2,1] = 4.728E-02 # Rrup=100.0, Mw=7.0, T=1.00
+tmp[0,0,2] = 8.548E-04 # Rrup=  5.0, Mw=4.0, T=3.00
+tmp[0,1,2] = 5.605E-03 # Rrup= 25.0, Mw=5.5, T=3.00
+tmp[0,2,2] = 1.415E-02 # Rrup=100.0, Mw=7.0, T=3.00
+test_data['Chiou08_test_mean'] = tmp
+
+# sigma values, in 'g'
+tmp = zeros((1,3,3))    # (num_sites, num_events, num_periods)
+tmp[0,0,0] = 6.508E-01 # Rrup=  5.0, Mw=4.0, T=0.01
+tmp[0,1,0] = 6.140E-01 # Rrup= 25.0, Mw=5.5, T=0.01
+tmp[0,2,0] = 5.090E-01 # Rrup=100.0, Mw=7.0, T=0.01
+tmp[0,0,1] = 6.931E-01 # Rrup=  5.0, Mw=4.0, T=1.00
+tmp[0,1,1] = 6.744E-01 # Rrup= 25.0, Mw=5.5, T=1.00
+tmp[0,2,1] = 6.353E-01 # Rrup=100.0, Mw=7.0, T=1.00
+tmp[0,0,2] = 7.266E-01 # Rrup=  5.0, Mw=4.0, T=3.00
+tmp[0,1,2] = 7.202E-01 # Rrup= 25.0, Mw=5.5, T=3.00
+tmp[0,2,2] = 7.024E-01 # Rrup=100.0, Mw=7.0, T=3.00
+test_data['Chiou08_test_sigma'] = tmp
+
+del tmp
 
 ################################################################################
 # Campbell03 Tests - data values from Campbell03_check.py
@@ -1109,7 +1169,7 @@ def data2atts(model_name):
     The vs30 value is defaulted to 1000 if not defined in test_data.
     """
 
-    # get params that exist for every model
+    # get params that are provided for every model
     # default Vs30 to 1000.0 if not supplied
     magnitudes = mag2dict(test_data[model_name+'_test_magnitude'])
     test_mean = test_data[model_name+'_test_mean']
@@ -1179,13 +1239,13 @@ class Test_ground_motion_specification(unittest.TestCase):
 
 
         msg = 'median=\n%s\ntest_median=\n%s' % (str(median), str(test_mean))
-#        msg = 'diff=\n%s' % str(median-test_mean)
+#        msg = 'median diff=\n%s' % str(median-test_mean)
         self.assert_(allclose(median, test_mean, rtol=0.05, atol=1.0e-5),
                      "%s did not pass assert:\n%s" % (model_name, msg))
 
         if test_sigma is not None:
             msg = 'sigma=\n%s\ntest_sigma=\n%s' % (str(sigma), str(test_sigma))
-#            msg = 'diff=\n%s' % str(sigma-test_sigma)
+#            msg = 'sigma diff=\n%s' % str(sigma-test_sigma)
             self.assert_(allclose(sigma, test_sigma, rtol=0.05, atol=1.0e-5),
                          "%s did not pass assert:\n%s" % (model_name, msg))
 
