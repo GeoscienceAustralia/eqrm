@@ -17,7 +17,8 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-                          'Campbell03', 'Campbell08', 'Abrahamson08', 'Chiou08')
+#                          'Campbell03', 'Campbell08', 'Abrahamson08', 'Chiou08')
+                          'Campbell03', 'Campbell08', 'Abrahamson08')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -1137,7 +1138,7 @@ class Distance_stub(object):
     For more complex models, this object is overridden.
     """
 
-    def __init__(self,dist):
+    def __init__(self, dist):
         self.dist = asarray(dist)
         self.Rupture = self.dist
         self.Joyner_Boore = self.dist
@@ -1176,7 +1177,7 @@ def data2atts(model_name):
     periods = test_data[model_name+'_test_period']
     vs30 = test_data.get(model_name+'_test_vs30', 1000.0)
 
-    # get distance object, if it exists, else get distances
+    # get distance object, if it exists, else use internal object
     try:
         distances = test_data[model_name+'_test_distance_object']
     except KeyError:
