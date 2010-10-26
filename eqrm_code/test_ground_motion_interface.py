@@ -1096,46 +1096,59 @@ class Test_ground_motion_interface(unittest.TestCase):
         ######
 
         period = 0.01
-        ML = numpy.array([[[7.5]]])
-        R = numpy.array([[[20.0]]])
-        vs30 = numpy.array([[[520.0]]])
-        fault_type = numpy.array([[[0]]], dtype=int)
+        ML = numpy.array([[[7.0]]])
+        R = numpy.array([[[25.0]]])
+        vs30 = numpy.array([[[300.0]]])
+        #fault_type = numpy.array([[[0]]], dtype=int)
+        fault_type = numpy.array([[[2]]], dtype=int)
         Ztor = numpy.array([[[0.0]]])
+        dip = numpy.array([[[90.0]]])
 
         # get coeffs for this period
-        coeffs = numpy.array([[[[-1.2678]]],[[[0.1]]],[[[-0.2550]]],
-                              [[[2.996]]], [[[4.1840]]], [[[6.1600]]],
-                              [[[0.4893]]], [[[0.0512]]], [[[0.0860]]],
-                              [[[0.7900]]], [[[1.5505]]], [[[-0.3218]]],
-                              [[[-0.00804]]], [[[-0.00785]]],
-                              [[[-0.4417]]], [[[-0.1417]]], [[[-0.007010]]],
-                              [[[0.102151]]], [[[0.2289]]], [[[0.14996]]],
-                              [[[580.0]]], [[[0.0700]]]])
+        coeffs = numpy.array([[[[1.06]]],[[[3.45]]],[[[-2.1]]],
+                              [[[-0.5]]],[[[50.0]]],[[[3.0]]],
+                              [[[4.0]]],[[[-1.2687]]],[[[0.1000]]],
+                              [[[-0.2550]]],[[[2.996]]],[[[4.1840]]],
+                              [[[6.1600]]],[[[0.4893]]],[[[0.0512]]],
+                              [[[0.0860]]],[[[0.7900]]],[[[1.5005]]],
+                              [[[-0.3218]]],[[[-0.00804]]],[[[-0.00785]]],
+                              [[[-0.4417]]],[[[-0.1417]]],[[[-0.007010]]],
+                              [[[0.102151]]],[[[0.2289]]],[[[0.014996]]],
+                              [[[580.0]]],[[[0.0700]]]])
 
         # sigma coefficients - these are static
-        sigma_coeffs = numpy.array([[[[-25.0]]],[[[-25.0]]]])
+        sigma_coeffs = numpy.array([[[[0.3437]]],[[[0.2637]]],[[[0.4458]]],
+                                    [[[0.3459]]],[[[0.8000]]],[[[0.0663]]]])
 
+
+        # a fake dist_object class
+        # assume Rrup & Rx = the R value
+        class DistObj(object):
+            def __init__(self):
+                self.Rupture = numpy.array([[[R]]])
+                self.Joyner_Boore = numpy.array([[[R]]])
+                self.Horizontal = numpy.array([[[R]]])
 
         # expected values from paper (sigma can be anything, make it very small)
-        log_mean_expected = numpy.array([[[-1.417078]]])
-        log_sigma_expected = numpy.array([[[-25.0]]])
+        log_mean_expected = numpy.array([[[math.log(1.565E-01)]]])
+        log_sigma_expected = numpy.array([[[4.844E-01]]])
 
         (log_mean,
-             log_sigma) = Chiou08_distribution(mag=ML, distance=R,
-                                               fault_type=fault_type,
+             log_sigma) = Chiou08_distribution(mag=ML, dist_object = DistObj(),
+                                               fault_type=fault_type, dip=dip,
                                                depth_to_top=Ztor, vs30=vs30,
                                                coefficient=coeffs,
                                                sigma_coefficient=sigma_coeffs)
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, log_mean_expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
-                                         rtol=1.0e-3, atol=1.0e-3),
+                                         rtol=1.0e-4, atol=1.0e-4),
                         msg)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, log_sigma_expected=%s'
                % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
-                                         rtol=1.0e-3, atol=1.0e-3),
+                                         rtol=1.0e-4, atol=1.0e-4),
                         msg)
 
     def test_Chiou08(self):
@@ -1152,47 +1165,59 @@ class Test_ground_motion_interface(unittest.TestCase):
         ######
 
         period = 0.01
-        ML = numpy.array([[[7.5]]])
-        R = numpy.array([[[20.0]]])
-        vs30 = numpy.array([[[520.0]]])
-        fault_type = numpy.array([[[0]]], dtype=int)
+        ML = numpy.array([[[4.0]]])
+        R = numpy.array([[[5.0]]])
+        vs30 = numpy.array([[[300.0]]])
+        #fault_type = numpy.array([[[0]]], dtype=int)
+        fault_type = numpy.array([[[2]]], dtype=int)
+        dip = numpy.array([[[90.0]]])
         Ztor = numpy.array([[[0.0]]])
 
         # get coeffs for this period
-        coeffs = numpy.array([[[[-1.2678]]],[[[0.1]]],[[[-0.2550]]],
-                              [[[2.996]]], [[[4.1840]]], [[[6.1600]]],
-                              [[[0.4893]]], [[[0.0512]]], [[[0.0860]]],
-                              [[[0.7900]]], [[[1.5505]]], [[[-0.3218]]],
-                              [[[-0.00804]]], [[[-0.00785]]],
-                              [[[-0.4417]]], [[[-0.1417]]], [[[-0.007010]]],
-                              [[[0.102151]]], [[[0.2289]]], [[[0.14996]]],
-                              [[[580.0]]], [[[0.0700]]]])
+        coeffs = numpy.array([[[[1.06]]],[[[3.45]]],[[[-2.1]]],
+                              [[[-0.5]]],[[[50.0]]],[[[3.0]]],
+                              [[[4.0]]],[[[-1.2687]]],[[[0.1000]]],
+                              [[[-0.2550]]],[[[2.996]]],[[[4.1840]]],
+                              [[[6.1600]]],[[[0.4893]]],[[[0.0512]]],
+                              [[[0.0860]]],[[[0.7900]]],[[[1.5005]]],
+                              [[[-0.3218]]],[[[-0.00804]]],[[[-0.00785]]],
+                              [[[-0.4417]]],[[[-0.1417]]],[[[-0.007010]]],
+                              [[[0.102151]]],[[[0.2289]]],[[[0.014996]]],
+                              [[[580.0]]],[[[0.0700]]]])
 
         # sigma coefficients - these are static
-        sigma_coeffs = numpy.array([[[[-25.0]]],[[[-25.0]]]])
+        sigma_coeffs = numpy.array([[[[0.3437]]],[[[0.2637]]],[[[0.4458]]],
+                                    [[[0.3459]]],[[[0.8000]]],[[[0.0663]]]])
 
+        # a fake dist_object class
+        # assume Rrup & Rx = the R value
+        class DistObj(object):
+            def __init__(self):
+                self.Rupture = numpy.array([[[R]]])
+                self.Joyner_Boore = numpy.array([[[R]]])
+                self.Horizontal = numpy.array([[[R]]])
 
         # expected values from paper (sigma can be anything, make it very small)
-        log_mean_expected = numpy.array([[[-1.417078]]])
-        log_sigma_expected = numpy.array([[[-25.0]]])
+        log_mean_expected = numpy.array([[[math.log(5.581E-02)]]])
+        log_sigma_expected = numpy.array([[[6.508E-01]]])
 
         (log_mean,
-             log_sigma) = model.distribution(mag=ML, distance=R,
-                                             fault_type=fault_type,
+             log_sigma) = model.distribution(mag=ML, dist_object=DistObj(),
+                                             fault_type=fault_type, dip=dip,
                                              depth_to_top=Ztor, vs30=vs30,
                                              coefficient=coeffs,
                                              sigma_coefficient=sigma_coeffs)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
-        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
-                                         rtol=1.0e-3, atol=1.0e-3),
+        self.failUnless(allclose(log_mean, log_mean_expected,
+                                 rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
                % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
-        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
-                                         rtol=1.0e-3, atol=1.0e-3),
+        self.failUnless(allclose(log_sigma, log_sigma_expected,
+                                 rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
     def test_Campbell03(self):
