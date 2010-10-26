@@ -69,24 +69,32 @@ Description:
             distribution_function(**kwargs)
         where the 'kwargs' is a dictionary containing keyword parameters, such
         as:
-            mag                event magnitude
-            distance           distance of the site from the event
-            coefficient        an array of model coefficients
-            sigmacoefficient   an array of model sigma coefficients
-            depth              depth of the event
-            depth_to_top       depth to top of rupture
-            fault_type      type of fault
+            mag               event magnitude
+            distance          distance of the site from the event
+            coefficient       an array of model coefficients
+            sigmacoefficient  an array of model sigma coefficients
+            depth             depth of the event
+            depth_to_top      depth to top of rupture
+            fault_type        type of fault
+            dist_object       a distance object, attributes are distances
+                              eg:  Rrup = dist_object.Rupture
 
         Most of these parameters will be numpy arrays.
 
         The shapes of each parameter are:
+            periods.shape = (num_periods,)		# 1d, is list
             mag.shape = (site, events, 1)
+            dip.shape = (site, events, 1)
             distance.shape = (site, events, 1)
-            coefficient.shape = (num_coefficients, 1, 1, num_periods)
-            sigmacoefficient.shape = (num_sigmacoefficients, 1, 1, num_periods)
             depth.shape = (site, events, 1)
             depth_to_top.shape = (site, events, 1)
             fault_type.shape = (site, events, 1)
+            Vs30.shape = (site, events, 1)
+            coefficient.shape = (num_coefficients, 1, 1, num_periods)
+            sigmacoefficient.shape = (num_sigmacoefficients, 1, 1, num_periods)
+
+        Distances obtained from the 'dist-object' via dist_object.Rupture have
+        a shape like (site, events, 1).	# wrong, getting 2D
 
         The shapes of the returned arrays are:
             log_mean = (site, events, num_periods)
@@ -97,14 +105,14 @@ Description:
 
 import math
 from copy import  deepcopy
-from scipy import (where, sqrt, array, asarray, exp, log, newaxis, zeros,
-                   log10, isfinite, weave, ones, shape, reshape, concatenate,
-                   cosh, power, shape, tile, cos, pi, copy, resize,
-                   logical_and, logical_or, sum, minimum)
+from scipy import where, sqrt, array, asarray, exp, log, newaxis, zeros, \
+                  log10, isfinite, weave, ones, shape, reshape, concatenate, \
+                  tanh, cosh, power, shape, tile, cos, pi, copy, resize, \
+                  logical_and, logical_or, sum, minimum, maximum
  
-from eqrm_code.ground_motion_misc import (linear_interpolation,
-                                          Australian_standard_model,
-                                          Australian_standard_model_interpolation)
+from eqrm_code.ground_motion_misc import linear_interpolation, \
+                                         Australian_standard_model, \
+                                         Australian_standard_model_interpolation
 from eqrm_code import util 
 from eqrm_code import conversions
 from eqrm_code import ground_motion_misc
@@ -1318,7 +1326,6 @@ Youngs_97_sigma_coefficient_interpolation=linear_interpolation
 def Youngs_97_distribution_python(**kwargs):
     """
     
-    Youngs, R.R. & s.J. Chiou, Strong Ground Motion Attenuation
     Relationships for Subduction Zone Earthquakes, 1997
     
     """
@@ -1636,7 +1643,7 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     depth = kwargs['depth']
-    
+
     y_coefficient=coefficient[:3]
     y_sigma_coefficient=sigma_coefficient[:2]
     use_y=(mag>8.0)
@@ -2653,29 +2660,9 @@ gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
 
 ##########################  Start of Chiou08 model  ############################
 
-"""Code here is based on Chiou [1].
-
-    [1] Chiou.B.S.-J., Youngs R.R., 2008 An NGA Model for the Average Horizontal
-        Component of Peak Ground Motion and Response Spectra,
-        Earthquake Spectra 24, 173-215.
+"""Code here is based on the FORTRAN file nga_gm_tmr_subs.for from
+[www.daveboore.com/nga_gm_tmr/nga_gm_tmr_zips.zip]
 """
-
-
-# constants from Chiou [1] table 1
-Ch_C2 = 1.06
-Ch_C3 = 3.45
-Ch_C4 = -2.1
-Ch_C4a = -0.5
-Ch_Crb = 50.0
-Ch_Chm = 3.0
-Ch_Cgamma3 = 4.0
-
-# precalculate constant expressions
-Ch_C2_minus_C3 = Ch_C2-Ch_C3
-Ch_Crb_square = Ch_Crb * Ch_Crb
-Ch_1130_min_360 = 1130 - 360.0
-Ch_378_7_pow_8 = math.pow(378.7, 8)
-Ch_3_82_div_8 = 3.82/8.0
 
 ######
 # Set up a numpy array to convert a 'fault_type' flag to an array slice
@@ -2713,153 +2700,487 @@ def Chiou08_distribution(**kwargs):
                 mag, distance, fault_type, depth_to_top, vs30, dip,
                 coefficient, sigma_coefficient
 
-    The algorithm here is taken from [1], pages 193 and 194  and returns results
-    that are log10 cm/s/s.  Local simplifications are applied:
-        Z1 value calculated from Vs30
-        AS = 0, results in some terms of model equation being simplified
-        eta and sigma random values assumed to be 0
-        the last term equation 13a (page 193) starting C9*Fhw... is ignored since
-            Fhw is 0 (no hanging-wall)
+    The algorithm here is taken from the code in
+        [www.daveboore.com/nga_gm_tmr/nga_gm_tmr_zips.zip]
     """
 
     # get args
-    M = kwargs['mag']				# event-specific
-    Rrup = kwargs['distance']			# event-site-specific
-    fault_type = kwargs['fault_type']	# event-specific
-    Ztor = kwargs['depth_to_top']		# event-specific
-    Vs30 = kwargs['vs30']			# site-specific
+    Mw = kwargs['mag']                   # event-specific
+    dist_object = kwargs['dist_object']
+    fault_type = kwargs['fault_type']    # event-specific
+    Ztor = kwargs['depth_to_top']        # event-specific
+    Dip = kwargs['dip']                  # event-specific
+    Vs30 = kwargs['vs30']                # site-specific
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
+    AS = 0
+    Fhw = 0
+
+    # Rrup and Rx from distance object
+    Rrup = dist_object.Rupture
+    Rjb = dist_object.Joyner_Boore
+    Rx = dist_object.Horizontal
+
     # check we have the right shapes
+    num_events = Mw.shape[1]
     num_periods = coefficient.shape[3]
-    msg = ('Expected coefficient.shape %s, got %s'
-           % (str((22, 1, 1, num_periods)), str(coefficient.shape)))
-    assert coefficient.shape == (22, 1, 1, num_periods), msg
-    msg = ('Expected sigma_coefficient.shape %s, got %s'
-           % (str((2, 1, 1, num_periods)), str(sigma_coefficient.shape)))
-    assert sigma_coefficient.shape == (2, 1, 1, num_periods), msg
+
+    msg = 'Expected %s.shape %s, got %s'
+
+    assert (Mw.shape == (1, num_events, 1),
+            msg % ('Mw', '(1,%d,1)' % num_events, str(Mw.shape)))
+    assert (Rrup.shape == (1, num_events, 1),
+            msg % ('Rrup', '(1,%d,1)' % num_events, str(Rrup.shape)))
+    assert (Rjb.shape == (1, num_events, 1),
+            msg % ('Rjb', '(1,%d,1)' % num_events, str(Rjb.shape)))
+    assert (Rx.shape == (1, num_events, 1),
+            msg % ('Rx', '(1,%d,1)' % num_events, str(Rx.shape)))
+    assert (fault_type.shape == (1, num_events, 1),
+            msg % ('fault_type', '(1,%d,1)' % num_events, str(fault_type.shape)))
+    assert (Ztor.shape == (1, num_events, 1),
+            msg % ('Ztor', '(1,%d,1)' % num_events, str(Ztor.shape)))
+    assert (Dip.shape == (1, num_events, 1),
+            msg % ('Dip', '(1,%d,1)' % num_events, str(Dip.shape)))
+###################
+    Vs30 = asarray(Vs30)		# why do we need this?
+    Vs30 = Vs30[newaxis,:,newaxis]	# look in harness code
+###################
+    assert (Vs30.shape == (1, num_events, 1),
+            msg % ('Vs30', '(1,%d,1)' % num_events, str(Vs30.shape)))
+    assert (coefficient.shape == (29, 1, 1, num_periods),
+            msg % ('coefficient', '(29,1,1,%d)' % num_periods, str(coefficient.shape)))
+    assert (sigma_coefficient.shape == (6, 1, 1, num_periods),
+            msg % ('sigma_coefficient', '(6,1,1,%d)' % num_periods, str(sigma_coefficient.shape)))
 
     # unpack coefficients
-    (C1, C1a, C1b, Cn, CM, C5, C6, C7, C7a, C9, C9a, C10, Cgamma1, Cgamma2,
-         phi1, phi2, phi3, phi4, phi5, phi6, phi7, phi8) = coefficient
+    (c2T, c3T, c4T, c4aT, crbT, chmT, cg3T, c1T, c1aT, c1bT, cnT, cmT, c5T,
+     c6T, c7T, c7aT, c9T, c9aT, c10T, cg1T, cg2T,
+     phi1T, phi2T, phi3T, phi4T, phi5T, phi6T, phi7T, phi8T) = coefficient
+
+    (tau1T, tau2T, sig1T, sig2T, sig3T, sig4T) = sigma_coefficient
 
     # get flag values from 'fault_type'
     Frv = Ch_fault_type[:,0][fault_type]
     Fnm = Ch_fault_type[:,1][fault_type]
 
-    # precalculate some common expressions
-    M_min_Ch_Chm = M - Ch_Chm
-    M_min_Ch_Cgamma3 = M - Ch_Cgamma3
+    # estimate Z10 from Vs30
+    Z10 = conversions.convert_Vs30_to_Z10(Vs30)
 
-    lnYref = (C1 + (C1a*Frv + C1b*Fnm + C7*(Ztor-4)) +
-              Ch_C2*(M-6) + (Ch_C2_minus_C3/Cn)*log(1 + exp(Cn*(CM-M))) +
-              Ch_C4*log(Rrup +
-                  C5*cosh(C6*where(M_min_Ch_Chm<0,0,M_min_Ch_Chm))) +
-              (Ch_C4a-Ch_C4)*log(sqrt(Rrup*Rrup + Ch_Crb_square)) +
-              (Cgamma1 + Cgamma2/
-                   cosh(where(M_min_Ch_Cgamma3<0,0,M_min_Ch_Cgamma3)))*Rrup)
+# C.....
+# C.....CALCULATE ROCK PSA (Vs30 = 1130 m/sec)
+# C.....
+# C.....Style-of-Faulting Term
+# C.....
+# 
+#       f_flt = c1T + (c1aT*Frv + c1bT*Fnm + c7T*(Ztor - 4.0))*(1.0 - AS)
+#      *  + (c10T + c7aT*(Ztor - 4.0))*AS
 
-    Yref = exp(lnYref)
-    Z1 = conversions.convert_Vs30_to_Z10(Vs30)
+    ######
+    # CALCULATE ROCK PSA (Vs30 = 1130 m/sec)
+    ######
 
-    # precalculate some common sub-expressions
-    log_Vs30_div_1130 = log(Vs30/1130.0)
-    min_log_Vs30_div_1130_zero = where(log_Vs30_div_1130>0,0,log_Vs30_div_1130)
-    min_Vs30_1130_min_360 = where(Vs30 > 1130.0, 1130.0, Vs30) - 360.0
-    Z1_min_phi7 = Z1 - phi7
-    max_zero_Z1_min_phi7 = where(Z1_min_phi7 < 0, 0, Z1_min_phi7)
-    Z1_min_15 = Z1 - 15.0
-    max_zero_Z1_min_15 = where(Z1_min_15 < 0, 0, Z1_min_15)
+    # Style-of-Faulting Term
+    f_flt = c1T + (c1aT*Frv + c1bT*Fnm + c7T*(Ztor - 4.0))*(1.0 - AS) + (c10T + c7aT*(Ztor - 4.0))*AS
 
-    log_mean = (lnYref + phi1*min_log_Vs30_div_1130_zero +
-                phi2*(exp(phi3*min_Vs30_1130_min_360)-exp(phi3*Ch_1130_min_360))*
-                    log((Yref+phi4)/phi4) +
-                phi5*(1.0-1.0/(cosh(phi6*max_zero_Z1_min_phi7))) + 
-                    phi8/cosh(0.15*max_zero_Z1_min_15))
+# C.....
+# C.....Magnitude Term
+# C.....
+# 
+#       f_mag = c2T*(Mw - 6.0)
+#      *  + ((c2T-c3T)/cnT)*ALOG(1.0 + EXP(cnT*(cmT - Mw)))
 
-    log_sigma = ones(log_mean.shape) * sigma_coefficient[0]
+    # Magnitude Term
+    f_mag = c2T*(Mw - 6.0) + ((c2T-c3T)/cnT)*log(1.0 + exp(cnT*(cmT - Mw)))
 
-    return (log_mean, log_sigma)
+# C.....
+# C.....Distance Term
+# C.....
+# 
+#       R = SQRT(Rrup**2 + crbT**2)
+#       f_dis = c4T*ALOG(Rrup + c5T*COSH(c6T*MAX(Mw-chmT,0.0)))
+#      *  + (c4aT-c4T)*ALOG(R)
+#      *  + (cg1T + cg2T/COSH(MAX(Mw-cg3T,0.0)))*Rrup
+
+    # Distance Term
+    R = sqrt(Rrup**2 + crbT**2)
+    f_dis = c4T*log(Rrup + c5T*cosh(c6T*maximum(Mw-chmT,0.0))) + (c4aT-c4T)*log(R) + (cg1T + cg2T/cosh(maximum(Mw-cg3T,0.0)))*Rrup
+
+# C.....
+# C.....Hanging-Wall Term
+# C.....
+# 
+#       pi = 4.0*ATAN(1.0)
+#       f_hng = c9T*Fhw*TANH(Rx*(COS(Dip*pi/180.0)**2)/c9aT)
+#      *     * (1.0 - SQRT(Rjb**2+Ztor**2)/(Rrup+0.001))
+
+    # Hanging-Wall Term
+    f_hng = c9T*Fhw*tanh(Rx*(cos(Dip*pi/180.0)**2)/c9aT) * (1.0 - sqrt(Rjb**2+Ztor**2)/(Rrup+0.001))
+
+# C.....
+# C.....Value of PSA on Rock (Vs30 = 1130 m/sec)
+# C.....
+# 
+#       Yref = EXP(f_flt + f_mag + f_dis + f_hng)
+
+    # Value of PSA on Rock (Vs30 = 1130 m/sec)
+    Yref = exp(f_flt + f_mag + f_dis + f_hng)
+
+# C.....
+# C.....CALCULATE STRONG MOTION PARAMETER
+# C.....
+# C.....Site Response Term
+# C.....
+# 
+#       a = phi1T*MIN(ALOG(Vs30/1130.0),0.0)
+#       b = phi2T*(EXP(phi3T*(MIN(Vs30,1130.0)-360.0)) - EXP(phi3T*770.0))
+#       c = phi4T
+# 
+#       f_site = a + b*ALOG((Yref+c)/c)
+
+    ######
+    # CALCULATE STRONG MOTION PARAMETER
+    ######
+
+    # Site Response Term
+    a = phi1T*minimum(log(Vs30/1130.0),0.0)
+    b = phi2T*(exp(phi3T*(minimum(Vs30,1130.0)-360.0)) - exp(phi3T*770.0))
+    c = phi4T
+
+    f_site = a + b*log((Yref+c)/c)
+
+# C.....
+# C.....Sediment Depth Term
+# C.....
+# 
+#       f_sed = phi5T*(1.0 - 1.0/COSH(phi6T*MAX(Z10-phi7T,0.0)))
+#      *  + phi8T/COSH(0.15*MIN(MAX(Z10-15.0,0.0),300.0))
+
+    # Sediment Depth Term
+    f_sed = phi5T*(1.0 - 1.0/cosh(phi6T*maximum(Z10-phi7T,0.0))) + phi8T/cosh(0.15*minimum(maximum(Z10-15.0,0.0),300.0))
+    
+# C.....
+# C.....Value of Ground Motion Parameter
+# C.....
+# 
+#       Y = EXP(ALOG(Yref) + f_site + f_sed)
+
+    # Value of Ground Motion Parameter
+    Y = exp(log(Yref) + f_site + f_sed)
+
+# C.....
+# C.....CALCULATE ALEATORY UNCERTAINTY
+# C.....
+# C.....
+# C     Standard Deviation of Geometric Mean of ln Y
+# C.....
+#
+#       NL0 = b*Yref/(Yref+c)
+#       Tau = tau1T + ((tau2T-tau1T)/2.0)*(MIN(MAX(Mw,5.0),7.0)-5.0)
+
+    ######
+    # CALCULATE ALEATORY UNCERTAINTY
+    ######
+
+    # Standard Deviation of Geometric Mean of ln Y
+
+    NL0 = b*Yref/(Yref+c)
+    Tau = tau1T + ((tau2T-tau1T)/2.0)*(minimum(maximum(Mw,5.0),7.0)-5.0)
+
+# C       Inferred Vs30
+# 
+#       Finferred = 1.0
+#       Fmeasured = 0.0
+# 
+#       SigInfer = (sig1T + ((sig2T-sig1T)/2.0)*(MIN(MAX(Mw,5.0),7.0)-5.0)
+#      *  + sig4T*AS)*SQRT(sig3T*Finferred + 0.7*Fmeasured + (1.0+NL0)**2)
+#       SigTinfer = SQRT(((1.0+NL0)**2)*Tau**2 + SigInfer**2)
+
+    # Inferred Vs30
+    Finferred = 1.0
+    Fmeasured = 0.0
+
+    SigInfer = (sig1T + ((sig2T-sig1T)/2.0)*(minimum(maximum(Mw,5.0),7.0)-5.0) + sig4T*AS)*sqrt(sig3T*Finferred + 0.7*Fmeasured + (1.0+NL0)**2)
+    SigTinfer = sqrt(((1.0+NL0)**2)*Tau**2 + SigInfer**2)
+
+# C       Measured Vs30
+# 
+#       Finferred = 0.0
+#       Fmeasured = 1.0
+# 
+#       SigMeas = (sig1T + ((sig2T-sig1T)/2.0)*(MIN(MAX(Mw,5.0),7.0)-5.0)
+#      *  + sig4T*AS)*SQRT(sig3T*Finferred + 0.7*Fmeasured + (1.0+NL0)**2)
+#       SigTmeas = SQRT(((1.0+NL0)**2)*Tau**2 + SigMeas**2)
+
+    # Measured Vs30
+    Finferred = 0.0
+    Fmeasured = 1.0
+
+    SigMeas = (sig1T + ((sig2T-sig1T)/2.0)*(minimum(maximum(Mw,5.0),7.0)-5.0) + sig4T*AS)*sqrt(sig3T*Finferred + 0.7*Fmeasured + (1.0+NL0)**2)
+    SigTmeas = sqrt(((1.0+NL0)**2)*Tau**2 + SigMeas**2)
+
+    return (log(Y), SigTmeas)
+
+
+Chiou08_combined_coeff = array([
+#T (s) c2   c3    c4   c4a crb  chm cg3  c1      c1a     c1b    cn    cm     c5     c6     c7     c7a    c9     c9a     c10     cg1      cg2      phi1    phi2    phi3     phi4     phi5   phi6     phi7   phi8   tau1   tau2   sig1   sig2   sig3   sig4
+[ 0.0, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-1.2687, 0.1000,-0.2550,2.996,4.1840,6.1600,0.4893,0.0512,0.0860,0.7900,1.5005,-0.3218,-0.00804,-0.00785,-0.4417,-0.1417,-0.007010,0.102151,0.2289,0.014996,580.0, 0.0700,0.3437,0.2637,0.4458,0.3459,0.8000,0.0663],
+[0.010,1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-1.2687, 0.1000,-0.2550,2.996,4.1840,6.1600,0.4893,0.0512,0.0860,0.7900,1.5005,-0.3218,-0.00804,-0.00785,-0.4417,-0.1417,-0.007010,0.102151,0.2289,0.014996,580.0, 0.0700,0.3437,0.2637,0.4458,0.3459,0.8000,0.0663],
+[0.020,1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-1.2515, 0.1000,-0.2550,3.292,4.1879,6.1580,0.4892,0.0512,0.0860,0.8129,1.5028,-0.3323,-0.00811,-0.00792,-0.4340,-0.1364,-0.007279,0.108360,0.2289,0.014996,580.0, 0.0699,0.3471,0.2671,0.4458,0.3459,0.8000,0.0663],
+[0.030,1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-1.1744, 0.1000,-0.2550,3.514,4.1556,6.1550,0.4890,0.0511,0.0860,0.8439,1.5071,-0.3394,-0.00839,-0.00819,-0.4177,-0.1403,-0.007354,0.119888,0.2289,0.014996,580.0, 0.0701,0.3603,0.2803,0.4535,0.3537,0.8000,0.0663],
+[0.040,1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-1.0671, 0.1000,-0.2550,3.563,4.1226,6.1508,0.4888,0.0508,0.0860,0.8740,1.5138,-0.3453,-0.00875,-0.00855,-0.4000,-0.1591,-0.006977,0.133641,0.2289,0.014996,579.9, 0.0702,0.3718,0.2918,0.4589,0.3592,0.8000,0.0663],
+[0.050,1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-0.9464, 0.1000,-0.2550,3.547,4.1011,6.1441,0.4884,0.0504,0.0860,0.8996,1.5230,-0.3502,-0.00912,-0.00891,-0.3903,-0.1862,-0.006467,0.148927,0.2290,0.014996,579.9, 0.0701,0.3848,0.3048,0.4630,0.3635,0.8000,0.0663],
+[0.075,1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-0.7051, 0.1000,-0.2540,3.448,4.0860,6.1200,0.4872,0.0495,0.0860,0.9442,1.5597,-0.3579,-0.00973,-0.00950,-0.4040,-0.2538,-0.005734,0.190596,0.2292,0.014996,579.6, 0.0686,0.3878,0.3129,0.4702,0.3713,0.8000,0.0663],
+[0.10, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-0.5747, 0.1000,-0.2530,3.312,4.1030,6.0850,0.4854,0.0489,0.0860,0.9677,1.6104,-0.3604,-0.00975,-0.00952,-0.4423,-0.2943,-0.005604,0.230662,0.2297,0.014996,579.2, 0.0646,0.3835,0.3152,0.4747,0.3769,0.8000,0.0663],
+[0.15, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-0.5309, 0.1000,-0.2500,3.044,4.1717,5.9871,0.4808,0.0479,0.0860,0.9660,1.7549,-0.3565,-0.00883,-0.00862,-0.5162,-0.3113,-0.005845,0.266468,0.2326,0.014988,577.2, 0.0494,0.3719,0.3128,0.4798,0.3847,0.8000,0.0612],
+[0.20, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-0.6352, 0.1000,-0.2449,2.831,4.2476,5.8699,0.4755,0.0471,0.0860,0.9334,1.9157,-0.3470,-0.00778,-0.00759,-0.5697,-0.2927,-0.006141,0.255253,0.2386,0.014964,573.9,-0.0019,0.3601,0.3076,0.4816,0.3902,0.8000,0.0530],
+[0.25, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-0.7766, 0.1000,-0.2382,2.658,4.3184,5.7547,0.4706,0.0464,0.0860,0.8946,2.0709,-0.3379,-0.00688,-0.00671,-0.6109,-0.2662,-0.006439,0.231541,0.2497,0.014881,568.5,-0.0479,0.3522,0.3047,0.4815,0.3946,0.7999,0.0457],
+[0.30, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-0.9278, 0.0999,-0.2313,2.505,4.3844,5.6527,0.4665,0.0458,0.0860,0.8590,2.2005,-0.3314,-0.00612,-0.00598,-0.6444,-0.2405,-0.006704,0.207277,0.2674,0.014639,560.5,-0.0756,0.3438,0.3005,0.4801,0.3981,0.7997,0.0398],
+[0.40, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-1.2176, 0.0997,-0.2146,2.261,4.4979,5.4997,0.4607,0.0445,0.0850,0.8019,2.3886,-0.3256,-0.00498,-0.00486,-0.6931,-0.1975,-0.007125,0.165464,0.3120,0.013493,540.0,-0.0960,0.3351,0.2984,0.4758,0.4036,0.7988,0.0312],
+[0.50, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-1.4695, 0.0991,-0.1972,2.087,4.5881,5.4029,0.4571,0.0429,0.0830,0.7578,2.5000,-0.3189,-0.00420,-0.00410,-0.7246,-0.1633,-0.007435,0.133828,0.3610,0.011133,512.9,-0.0998,0.3353,0.3036,0.4710,0.4079,0.7966,0.0255],
+[0.75, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-1.9278, 0.0936,-0.1620,1.812,4.7571,5.2900,0.4531,0.0387,0.0690,0.6788,2.6224,-0.2702,-0.00308,-0.00301,-0.7708,-0.1028,-0.008120,0.085153,0.4353,0.006739,441.9,-0.0765,0.3429,0.3205,0.4621,0.4157,0.7792,0.0175],
+[1.0,  1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-2.2453, 0.0766,-0.1400,1.648,4.8820,5.2480,0.4517,0.0350,0.0450,0.6196,2.6690,-0.2059,-0.00246,-0.00241,-0.7990,-0.0699,-0.008444,0.058595,0.4629,0.005749,391.8,-0.0412,0.3577,0.3419,0.4581,0.4213,0.7504,0.0133],
+[1.5,  1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-2.7307, 0.0022,-0.1184,1.511,5.0697,5.2194,0.4507,0.0280,0.0134,0.5101,2.6985,-0.0852,-0.00180,-0.00176,-0.8382,-0.0425,-0.007707,0.031787,0.4756,0.005544,348.1, 0.0140,0.3769,0.3703,0.4493,0.4213,0.7136,0.0090],
+[2.0,  1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-3.1413,-0.0591,-0.1100,1.470,5.2173,5.2099,0.4504,0.0213,0.0040,0.3917,2.7085, 0.0160,-0.00147,-0.00143,-0.8663,-0.0302,-0.004792,0.019716,0.4785,0.005521,332.5, 0.0544,0.4023,0.4023,0.4459,0.4213,0.7035,0.0068],
+[3.0,  1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-3.7413,-0.0931,-0.1040,1.456,5.4385,5.2040,0.4501,0.0106,0.0010,0.1244,2.7145, 0.1876,-0.00117,-0.00115,-0.9032,-0.0129,-0.001828,0.009643,0.4796,0.005517,324.1, 0.1232,0.4406,0.4406,0.4433,0.4213,0.7006,0.0045],
+[4.0,  1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-4.1814,-0.0982,-0.1020,1.465,5.5977,5.2020,0.4501,0.0041,0.0000,0.0086,2.7164, 0.3378,-0.00107,-0.00104,-0.9231,-0.0016,-0.001523,0.005379,0.4799,0.005517,321.7, 0.1859,0.4784,0.4784,0.4424,0.4213,0.7001,0.0034],
+[5.0,  1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-4.5187,-0.0994,-0.1010,1.478,5.7276,5.2010,0.4500,0.0010,0.0000,0.0000,2.7172, 0.4579,-0.00102,-0.00099,-0.9222, 0.0000,-0.001440,0.003223,0.4799,0.005517,320.9, 0.2295,0.5074,0.5074,0.4420,0.4213,0.7000,0.0027],
+[7.5,  1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-5.1224,-0.0999,-0.1010,1.498,5.9891,5.2000,0.4500,0.0000,0.0000,0.0000,2.7177, 0.7514,-0.00096,-0.00094,-0.8346, 0.0000,-0.001369,0.001134,0.4800,0.005517,320.3, 0.2660,0.5328,0.5328,0.4416,0.4213,0.7000,0.0018],
+[10.0, 1.06,3.45,-2.1,-0.5,50.0,3.0,4.0,-5.5872,-0.1000,-0.1000,1.502,6.1930,5.2000,0.4500,0.0000,0.0000,0.0000,2.7180, 1.1856,-0.00094,-0.00091,-0.7332, 0.0000,-0.001361,0.000515,0.4800,0.005517,320.1, 0.2682,0.5542,0.5542,0.4414,0.4213,0.7000,0.0014],
+])
+
+# dim = (#coefficients, #periods)
+Chiou08_coefficient = Chiou08_combined_coeff[:,1:30].transpose()
+
+# dim = (period,)
+Chiou08_coefficient_period = Chiou08_combined_coeff[:,0]
+
+# dim = (sigmacoefficient, period)
+Chiou08_sigma_coefficient = Chiou08_combined_coeff[:,30:].transpose()
+
+# dim = (period,)
+Chiou08_sigma_coefficient_period = Chiou08_combined_coeff[:,0]
+
+Chiou08_PGA_coefficients = Chiou08_combined_coeff[0,1:30]
+
+Chiou08_PGA_sigma_coefficients = Chiou08_combined_coeff[0,30:]
+
+# number of periods
+Chiou08_nper = len(Chiou08_coefficient_period)
 
 Chiou08_magnitude_type = 'Mw'
 Chiou08_distance_type = 'Rupture'
 
-######
-# Start building the coefficient array
-######
 
-# dimension = (#periods, #coefficients)
-Chiou08_Table2 = array([
-#  C1       C1a      C1b     Cn     CM      C5      C6      C7      C7a     C9      C9a      C10     Cgamma1   Cgamma2
-[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # pga
-[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # 0.01
-[-1.2515,  0.1,    -0.2550, 3.292, 4.1879, 6.1580, 0.4892, 0.0512, 0.0860, 0.8129, 1.5028, -0.3323, -0.00811, -0.00792],   # 0.02
-[-1.1744,  0.1,    -0.2550, 3.514, 4.1556, 6.1550, 0.4890, 0.0511, 0.0860, 0.8439, 1.5071, -0.3394, -0.00839, -0.00819],   # 0.03
-[-1.0671,  0.1,    -0.2550, 3.563, 4.1226, 6.1508, 0.4888, 0.0508, 0.0860, 0.8740, 1.5138, -0.3453, -0.00875, -0.00855],   # 0.04
-[-0.9464,  0.1,    -0.2550, 3.547, 4.1011, 6.1441, 0.4884, 0.0504, 0.0860, 0.8996, 1.5230, -0.3502, -0.00912, -0.00891],   # 0.05
-[-0.7051,  0.1,    -0.2540, 3.448, 4.0860, 6.1200, 0.4872, 0.0495, 0.0860, 0.9442, 1.5597, -0.3579, -0.00973, -0.00950],   # 0.075
-[-0.5747,  0.1,    -0.2530, 3.312, 4.1030, 6.0850, 0.4854, 0.0489, 0.0860, 0.9677, 1.6104, -0.3604, -0.00975, -0.00952],   # 0.1
-[-0.5309,  0.1,    -0.2500, 3.044, 4.1717, 5.9871, 0.4808, 0.0479, 0.0860, 0.9660, 1.7549, -0.3565, -0.00883, -0.00862],   # 0.15
-[-0.6352,  0.1,    -0.2449, 2.831, 4.2476, 5.8699, 0.4755, 0.0471, 0.0860, 0.9334, 1.9157, -0.3470, -0.00778, -0.00759],   # 0.2
-[-0.7766,  0.1,    -0.2382, 2.658, 4.3184, 5.7547, 0.4706, 0.0464, 0.0860, 0.8946, 2.0709, -0.3379, -0.00688, -0.00671],   # 0.25
-[-0.9278,  0.0999, -0.2313, 2.505, 4.3844, 5.6527, 0.4665, 0.0458, 0.0860, 0.8590, 2.2005, -0.3314, -0.00612, -0.00598],   # 0.3
-[-1.2176,  0.0997, -0.2146, 2.261, 4.4979, 5.4997, 0.4607, 0.0445, 0.0850, 0.8019, 2.3886, -0.3256, -0.00498, -0.00486],   # 0.4
-[-1.4695,  0.0991, -0.1972, 2.087, 4.5881, 5.4029, 0.4571, 0.0429, 0.0830, 0.7578, 2.5000, -0.3189, -0.00420, -0.00410],   # 0.5
-[-1.9278,  0.0936, -0.1620, 1.812, 4.7571, 5.2900, 0.4531, 0.0387, 0.0690, 0.6788, 2.6224, -0.2702, -0.00308, -0.00301],   # 0.75
-[-2.2453,  0.0766, -0.1400, 1.648, 4.8820, 5.2480, 0.4517, 0.0350, 0.0450, 0.6196, 2.6690, -0.2059, -0.00246, -0.00241],   # 1.0
-[-2.7307,  0.0022, -0.1184, 1.511, 5.0697, 5.2194, 0.4507, 0.0280, 0.0134, 0.5101, 2.6985, -0.0852, -0.00180, -0.00176],   # 1.5
-[-3.1413, -0.0591, -0.1100, 1.470, 5.2173, 5.2099, 0.4504, 0.0213, 0.0040, 0.3917, 2.7085,  0.0160, -0.00147, -0.00143],   # 2.0
-[-3.7413, -0.0931, -0.1040, 1.456, 5.4385, 5.2040, 0.4501, 0.0106, 0.0010, 0.1244, 2.7145,  0.1876, -0.00117, -0.00115],   # 3.0
-[-4.1814, -0.0982, -0.1020, 1.465, 5.5977, 5.2020, 0.4501, 0.0041, 0,      0.0086, 2.7164,  0.3378, -0.00107, -0.00104],   # 4.0
-[-4.5187, -0.0994, -0.1010, 1.478, 5.7276, 5.2010, 0.4500, 0.0010, 0,      0,      2.7172,  0.4579, -0.00102, -0.00099],   # 5.0
-[-5.1224, -0.0999, -0.1010, 1.498, 5.9891, 5.2000, 0.4500, 0,      0,      0,      2.7177,  0.7514, -0.00096, -0.00094],   # 7.5
-[-5.5872, -0.1,    -0.1000, 1.502, 6.1930, 5.2000, 0.4500, 0,      0,      0,      2.7180,  1.1856, -0.00094, -0.00091]])  # 10.0
 
-# dimension = (#periods, #coefficients)
-Chiou08_Table3 = array([
-# phi1     phi2     phi3      phi4      phi5    phi6      phi7    phi8
-[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # pga
-[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # 0.01
-[-0.4340, -0.1364, -0.007279, 0.108360, 0.2289, 0.014996, 580.0,  0.0699],  # 0.02
-[-0.4177, -0.1403, -0.007354, 0.119888, 0.2289, 0.014996, 580.0,  0.0701],  # 0.03
-[-0.4000, -0.1591, -0.006977, 0.133641, 0.2289, 0.014996, 579.9,  0.0702],  # 0.04
-[-0.3903, -0.1862, -0.006467, 0.148927, 0.2290, 0.014996, 579.9,  0.0701],  # 0.05
-[-0.4040, -0.2538, -0.005734, 0.190596, 0.2292, 0.014996, 579.6,  0.0686],  # 0.075
-[-0.4423, -0.2943, -0.005604, 0.230662, 0.2297, 0.014996, 579.2,  0.0646],  # 0.1
-[-0.5162, -0.3113, -0.005845, 0.266468, 0.2326, 0.014988, 577.2,  0.0494],  # 0.15
-[-0.5697, -0.2927, -0.006141, 0.255253, 0.2386, 0.014964, 573.9, -0.0019],  # 0.2
-[-0.6109, -0.2662, -0.006439, 0.231541, 0.2497, 0.014881, 568.5, -0.0479],  # 0.25
-[-0.6444, -0.2405, -0.006704, 0.207277, 0.2674, 0.014639, 560.5, -0.0756],  # 0.3
-[-0.6931, -0.1975, -0.007125, 0.165464, 0.3120, 0.013493, 540.0, -0.0960],  # 0.4
-[-0.7246, -0.1633, -0.007435, 0.133828, 0.3610, 0.011133, 512.9, -0.0998],  # 0.5
-[-0.7708, -0.1028, -0.008120, 0.085153, 0.4353, 0.006739, 441.9, -0.0765],  # 0.75
-[-0.7990, -0.0699, -0.008444, 0.058595, 0.4629, 0.005749, 391.8, -0.0412],  # 1.0
-[-0.8382, -0.0425, -0.007707, 0.031787, 0.4756, 0.005544, 348.1,  0.0140],  # 1.5
-[-0.8663, -0.0302, -0.004792, 0.019716, 0.4785, 0.005521, 332.5,  0.0544],  # 2.0
-[-0.9032, -0.0129, -0.001828, 0.009643, 0.4796, 0.005517, 324.1,  0.1232],  # 3.0
-[-0.9231, -0.0016, -0.001523, 0.005379, 0.4799, 0.005517, 321.7,  0.1859],  # 4.0
-[-0.9222,  0.0000, -0.001440, 0.003223, 0.4799, 0.005517, 320.9,  0.2295],  # 5.0
-[-0.8346,  0.0000, -0.001369, 0.001134, 0.4800, 0.005517, 320.3,  0.2660],  # 7.5
-[-0.7332,  0.0000, -0.001361, 0.000515, 0.4800, 0.005517, 320.1,  0.2682]]) # 10.0
 
-# join tables 2 and 3, convert to dim = (#coefficients, #periods)
-Chiou08_coefficient = concatenate((Chiou08_Table2, Chiou08_Table3), axis=1)
-Chiou08_coefficient = Chiou08_coefficient.transpose()
-
-# dim = (period,)
-Chiou08_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.040,
-                              0.050, 0.075, 0.100, 0.150, 0.200,
-                              0.250, 0.300, 0.400, 0.500, 0.750,
-                              1.000, 1.500, 2.000, 3.000, 4.000,
-                              5.000, 7.500, 10.00]
-
-# dim = (period,)
-# we want to say sigma (error) is 0, but log(0) == -infinity,
-# so we use a very small value
-sigma = math.log(1.0e-20)
-Chiou08_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
-Chiou08_sigma_coefficient_period = [0.0, 1.0]
+#"""Code here is based on Chiou [1].
+#
+#    [1] Chiou.B.S.-J., Youngs R.R., 2008 An NGA Model for the Average Horizontal
+#        Component of Peak Ground Motion and Response Spectra,
+#        Earthquake Spectra 24, 173-215.
+#"""
+#
+#
+## constants from Chiou [1] table 1
+#Ch_C2 = 1.06
+#Ch_C3 = 3.45
+#Ch_C4 = -2.1
+#Ch_C4a = -0.5
+#Ch_Crb = 50.0
+#Ch_Chm = 3.0
+#Ch_Cgamma3 = 4.0
+#
+## precalculate constant expressions
+#Ch_C2_minus_C3 = Ch_C2-Ch_C3
+#Ch_Crb_square = Ch_Crb * Ch_Crb
+#Ch_1130_min_360 = 1130 - 360.0
+#Ch_378_7_pow_8 = math.pow(378.7, 8)
+#Ch_3_82_div_8 = 3.82/8.0
+#
+#######
+## Set up a numpy array to convert a 'fault_type' flag to an array slice
+## that encodes the Frv/Fnm flags.
+#######
+#
+## faulting type flag encodings
+##                    'type':     (Frv, Fnm)
+#Ch_faulting_flags = {'reverse':    (1, 0),
+#                     'normal':     (0, 1),
+#                     'strikeslip': (0, 0)}
+#
+## generate 'Ch_fault_type' from the dictionary above 
+#tmp = []
+#for (k, v) in Ch_faulting_flags.iteritems():
+#    index = ground_motion_misc.FaultTypeDictionary[k]
+#    tmp.append((index, v))
+#
+## sort and make array in correct index order
+#tmp2 = []
+#tmp.sort()
+#for (_, flags) in tmp:
+#    tmp2.append(flags)
+#Ch_fault_type = array(tmp2)
+#del tmp, tmp2
+#
+#######
+## The model function.
+#######
+#
+#def Chiou08_distribution(**kwargs):
+#    """The Chiou08 model.
+#
+#    kwargs  dictionary of parameters, expect:
+#                mag, distance, fault_type, depth_to_top, vs30, dip,
+#                coefficient, sigma_coefficient
+#
+#    The algorithm here is taken from [1], pages 193 and 194  and returns results
+#    that are log10 cm/s/s.  Local simplifications are applied:
+#        Z1 value calculated from Vs30
+#        AS = 0, results in some terms of model equation being simplified
+#        eta and sigma random values assumed to be 0
+#        the last term equation 13a (page 193) starting C9*Fhw... is ignored since
+#            Fhw is 0 (no hanging-wall)
+#    """
+#
+#    # get args
+#    M = kwargs['mag']				# event-specific
+#    Rrup = kwargs['distance']			# event-site-specific
+#    fault_type = kwargs['fault_type']	# event-specific
+#    Ztor = kwargs['depth_to_top']		# event-specific
+#    Vs30 = kwargs['vs30']			# site-specific
+#    coefficient = kwargs['coefficient']
+#    sigma_coefficient = kwargs['sigma_coefficient']
+#
+#    # check we have the right shapes
+#    num_periods = coefficient.shape[3]
+#    msg = ('Expected coefficient.shape %s, got %s'
+#           % (str((22, 1, 1, num_periods)), str(coefficient.shape)))
+#    assert coefficient.shape == (22, 1, 1, num_periods), msg
+#    msg = ('Expected sigma_coefficient.shape %s, got %s'
+#           % (str((2, 1, 1, num_periods)), str(sigma_coefficient.shape)))
+#    assert sigma_coefficient.shape == (2, 1, 1, num_periods), msg
+#
+#    # unpack coefficients
+#    (C1, C1a, C1b, Cn, CM, C5, C6, C7, C7a, C9, C9a, C10, Cgamma1, Cgamma2,
+#         phi1, phi2, phi3, phi4, phi5, phi6, phi7, phi8) = coefficient
+#
+#    # get flag values from 'fault_type'
+#    Frv = Ch_fault_type[:,0][fault_type]
+#    Fnm = Ch_fault_type[:,1][fault_type]
+#
+#    # precalculate some common expressions
+#    M_min_Ch_Chm = M - Ch_Chm
+#    M_min_Ch_Cgamma3 = M - Ch_Cgamma3
+#
+#    lnYref = (C1 + (C1a*Frv + C1b*Fnm + C7*(Ztor-4)) +
+#              Ch_C2*(M-6) + (Ch_C2_minus_C3/Cn)*log(1 + exp(Cn*(CM-M))) +
+#              Ch_C4*log(Rrup +
+#                  C5*cosh(C6*where(M_min_Ch_Chm<0,0,M_min_Ch_Chm))) +
+#              (Ch_C4a-Ch_C4)*log(sqrt(Rrup*Rrup + Ch_Crb_square)) +
+#              (Cgamma1 + Cgamma2/
+#                   cosh(where(M_min_Ch_Cgamma3<0,0,M_min_Ch_Cgamma3)))*Rrup)
+#
+#    Yref = exp(lnYref)
+#    Z1 = conversions.convert_Vs30_to_Z10(Vs30)
+#
+#    # precalculate some common sub-expressions
+#    log_Vs30_div_1130 = log(Vs30/1130.0)
+#    min_log_Vs30_div_1130_zero = where(log_Vs30_div_1130>0,0,log_Vs30_div_1130)
+#    min_Vs30_1130_min_360 = where(Vs30 > 1130.0, 1130.0, Vs30) - 360.0
+#    Z1_min_phi7 = Z1 - phi7
+#    max_zero_Z1_min_phi7 = where(Z1_min_phi7 < 0, 0, Z1_min_phi7)
+#    Z1_min_15 = Z1 - 15.0
+#    max_zero_Z1_min_15 = where(Z1_min_15 < 0, 0, Z1_min_15)
+#
+#    log_mean = (lnYref + phi1*min_log_Vs30_div_1130_zero +
+#                phi2*(exp(phi3*min_Vs30_1130_min_360)-exp(phi3*Ch_1130_min_360))*
+#                    log((Yref+phi4)/phi4) +
+#                phi5*(1.0-1.0/(cosh(phi6*max_zero_Z1_min_phi7))) + 
+#                    phi8/cosh(0.15*max_zero_Z1_min_15))
+#
+#    log_sigma = ones(log_mean.shape) * sigma_coefficient[0]
+#
+#    return (log_mean, log_sigma)
+#
+#Chiou08_magnitude_type = 'Mw'
+#Chiou08_distance_type = 'Rupture'
+#
+#######
+## Start building the coefficient array
+#######
+#
+## dimension = (#periods, #coefficients)
+#Chiou08_Table2 = array([
+##  C1       C1a      C1b     Cn     CM      C5      C6      C7      C7a     C9      C9a      C10     Cgamma1   Cgamma2
+#[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # pga
+#[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # 0.01
+#[-1.2515,  0.1,    -0.2550, 3.292, 4.1879, 6.1580, 0.4892, 0.0512, 0.0860, 0.8129, 1.5028, -0.3323, -0.00811, -0.00792],   # 0.02
+#[-1.1744,  0.1,    -0.2550, 3.514, 4.1556, 6.1550, 0.4890, 0.0511, 0.0860, 0.8439, 1.5071, -0.3394, -0.00839, -0.00819],   # 0.03
+#[-1.0671,  0.1,    -0.2550, 3.563, 4.1226, 6.1508, 0.4888, 0.0508, 0.0860, 0.8740, 1.5138, -0.3453, -0.00875, -0.00855],   # 0.04
+#[-0.9464,  0.1,    -0.2550, 3.547, 4.1011, 6.1441, 0.4884, 0.0504, 0.0860, 0.8996, 1.5230, -0.3502, -0.00912, -0.00891],   # 0.05
+#[-0.7051,  0.1,    -0.2540, 3.448, 4.0860, 6.1200, 0.4872, 0.0495, 0.0860, 0.9442, 1.5597, -0.3579, -0.00973, -0.00950],   # 0.075
+#[-0.5747,  0.1,    -0.2530, 3.312, 4.1030, 6.0850, 0.4854, 0.0489, 0.0860, 0.9677, 1.6104, -0.3604, -0.00975, -0.00952],   # 0.1
+#[-0.5309,  0.1,    -0.2500, 3.044, 4.1717, 5.9871, 0.4808, 0.0479, 0.0860, 0.9660, 1.7549, -0.3565, -0.00883, -0.00862],   # 0.15
+#[-0.6352,  0.1,    -0.2449, 2.831, 4.2476, 5.8699, 0.4755, 0.0471, 0.0860, 0.9334, 1.9157, -0.3470, -0.00778, -0.00759],   # 0.2
+#[-0.7766,  0.1,    -0.2382, 2.658, 4.3184, 5.7547, 0.4706, 0.0464, 0.0860, 0.8946, 2.0709, -0.3379, -0.00688, -0.00671],   # 0.25
+#[-0.9278,  0.0999, -0.2313, 2.505, 4.3844, 5.6527, 0.4665, 0.0458, 0.0860, 0.8590, 2.2005, -0.3314, -0.00612, -0.00598],   # 0.3
+#[-1.2176,  0.0997, -0.2146, 2.261, 4.4979, 5.4997, 0.4607, 0.0445, 0.0850, 0.8019, 2.3886, -0.3256, -0.00498, -0.00486],   # 0.4
+#[-1.4695,  0.0991, -0.1972, 2.087, 4.5881, 5.4029, 0.4571, 0.0429, 0.0830, 0.7578, 2.5000, -0.3189, -0.00420, -0.00410],   # 0.5
+#[-1.9278,  0.0936, -0.1620, 1.812, 4.7571, 5.2900, 0.4531, 0.0387, 0.0690, 0.6788, 2.6224, -0.2702, -0.00308, -0.00301],   # 0.75
+#[-2.2453,  0.0766, -0.1400, 1.648, 4.8820, 5.2480, 0.4517, 0.0350, 0.0450, 0.6196, 2.6690, -0.2059, -0.00246, -0.00241],   # 1.0
+#[-2.7307,  0.0022, -0.1184, 1.511, 5.0697, 5.2194, 0.4507, 0.0280, 0.0134, 0.5101, 2.6985, -0.0852, -0.00180, -0.00176],   # 1.5
+#[-3.1413, -0.0591, -0.1100, 1.470, 5.2173, 5.2099, 0.4504, 0.0213, 0.0040, 0.3917, 2.7085,  0.0160, -0.00147, -0.00143],   # 2.0
+#[-3.7413, -0.0931, -0.1040, 1.456, 5.4385, 5.2040, 0.4501, 0.0106, 0.0010, 0.1244, 2.7145,  0.1876, -0.00117, -0.00115],   # 3.0
+#[-4.1814, -0.0982, -0.1020, 1.465, 5.5977, 5.2020, 0.4501, 0.0041, 0,      0.0086, 2.7164,  0.3378, -0.00107, -0.00104],   # 4.0
+#[-4.5187, -0.0994, -0.1010, 1.478, 5.7276, 5.2010, 0.4500, 0.0010, 0,      0,      2.7172,  0.4579, -0.00102, -0.00099],   # 5.0
+#[-5.1224, -0.0999, -0.1010, 1.498, 5.9891, 5.2000, 0.4500, 0,      0,      0,      2.7177,  0.7514, -0.00096, -0.00094],   # 7.5
+#[-5.5872, -0.1,    -0.1000, 1.502, 6.1930, 5.2000, 0.4500, 0,      0,      0,      2.7180,  1.1856, -0.00094, -0.00091]])  # 10.0
+#
+## dimension = (#periods, #coefficients)
+#Chiou08_Table3 = array([
+## phi1     phi2     phi3      phi4      phi5    phi6      phi7    phi8
+#[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # pga
+#[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # 0.01
+#[-0.4340, -0.1364, -0.007279, 0.108360, 0.2289, 0.014996, 580.0,  0.0699],  # 0.02
+#[-0.4177, -0.1403, -0.007354, 0.119888, 0.2289, 0.014996, 580.0,  0.0701],  # 0.03
+#[-0.4000, -0.1591, -0.006977, 0.133641, 0.2289, 0.014996, 579.9,  0.0702],  # 0.04
+#[-0.3903, -0.1862, -0.006467, 0.148927, 0.2290, 0.014996, 579.9,  0.0701],  # 0.05
+#[-0.4040, -0.2538, -0.005734, 0.190596, 0.2292, 0.014996, 579.6,  0.0686],  # 0.075
+#[-0.4423, -0.2943, -0.005604, 0.230662, 0.2297, 0.014996, 579.2,  0.0646],  # 0.1
+#[-0.5162, -0.3113, -0.005845, 0.266468, 0.2326, 0.014988, 577.2,  0.0494],  # 0.15
+#[-0.5697, -0.2927, -0.006141, 0.255253, 0.2386, 0.014964, 573.9, -0.0019],  # 0.2
+#[-0.6109, -0.2662, -0.006439, 0.231541, 0.2497, 0.014881, 568.5, -0.0479],  # 0.25
+#[-0.6444, -0.2405, -0.006704, 0.207277, 0.2674, 0.014639, 560.5, -0.0756],  # 0.3
+#[-0.6931, -0.1975, -0.007125, 0.165464, 0.3120, 0.013493, 540.0, -0.0960],  # 0.4
+#[-0.7246, -0.1633, -0.007435, 0.133828, 0.3610, 0.011133, 512.9, -0.0998],  # 0.5
+#[-0.7708, -0.1028, -0.008120, 0.085153, 0.4353, 0.006739, 441.9, -0.0765],  # 0.75
+#[-0.7990, -0.0699, -0.008444, 0.058595, 0.4629, 0.005749, 391.8, -0.0412],  # 1.0
+#[-0.8382, -0.0425, -0.007707, 0.031787, 0.4756, 0.005544, 348.1,  0.0140],  # 1.5
+#[-0.8663, -0.0302, -0.004792, 0.019716, 0.4785, 0.005521, 332.5,  0.0544],  # 2.0
+#[-0.9032, -0.0129, -0.001828, 0.009643, 0.4796, 0.005517, 324.1,  0.1232],  # 3.0
+#[-0.9231, -0.0016, -0.001523, 0.005379, 0.4799, 0.005517, 321.7,  0.1859],  # 4.0
+#[-0.9222,  0.0000, -0.001440, 0.003223, 0.4799, 0.005517, 320.9,  0.2295],  # 5.0
+#[-0.8346,  0.0000, -0.001369, 0.001134, 0.4800, 0.005517, 320.3,  0.2660],  # 7.5
+#[-0.7332,  0.0000, -0.001361, 0.000515, 0.4800, 0.005517, 320.1,  0.2682]]) # 10.0
+#
+## join tables 2 and 3, convert to dim = (#coefficients, #periods)
+#Chiou08_coefficient = concatenate((Chiou08_Table2, Chiou08_Table3), axis=1)
+#Chiou08_coefficient = Chiou08_coefficient.transpose()
+#
+## dim = (period,)
+#Chiou08_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.040,
+#                              0.050, 0.075, 0.100, 0.150, 0.200,
+#                              0.250, 0.300, 0.400, 0.500, 0.750,
+#                              1.000, 1.500, 2.000, 3.000, 4.000,
+#                              5.000, 7.500, 10.00]
+#
+## dim = (period,)
+## we want to say sigma (error) is 0, but log(0) == -infinity,
+## so we use a very small value
+#sigma = math.log(1.0e-20)
+#Chiou08_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
+#Chiou08_sigma_coefficient_period = [0.0, 1.0]
 
 Chiou08_interpolation = linear_interpolation
 
@@ -3551,7 +3872,7 @@ def Abrahamson08_distribution(**kwargs):
                 mag, distance, coefficient, sigma_coefficient
 
     The algorithm here is described in [1], but the code is copied from the
-    FORTRAN in [tp://www.daveboore.com/nga_gm_tmr/nga_gm_tmr_zips.zip].
+    FORTRAN in [www.daveboore.com/nga_gm_tmr/nga_gm_tmr_zips.zip].
 
     [1] Abrahamson N., Silva W., "Summary of the Abrahamson & Silva NGA
         Ground-Motion Relations", Earthquake Spectra, Volume 24, No. 1,
@@ -3603,6 +3924,7 @@ def Abrahamson08_distribution(**kwargs):
     Vs30 = array(Vs30)[:,newaxis,newaxis]
     Dip = array(Dip)[newaxis,:,newaxis]
     W = array(W)[newaxis,:,newaxis]
+
 
     # get Z1.0 value from Vs30
     Z10 = conversions.convert_Vs30_to_Z10(Vs30)		# TODO - check function is array-safe
@@ -4128,7 +4450,6 @@ AS08_coeff = array([
 [5.000,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0, 0.000,-0.9360,-0.7960,-0.2263,-0.9208,0.0800,-0.0600,0.0754, 0.0000,-0.2500, 0.0000,0.570,0.587,0.510,0.529,0.350,0.350,0.200],
 [7.500,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0, 0.000,-1.5270,-0.7960,-0.2509,-0.7700,0.0800,-0.0600,0.0000, 0.0000,-0.2500, 0.0000,0.611,0.618,0.572,0.579,0.350,0.350,0.200],
 [10.00,6.75,4.5,0.265,-0.231,-0.398,1.18,1.88,50.0, 400.0, 0.000,-1.9930,-0.7960,-0.2683,-0.6630,0.0800,-0.0600,0.0000, 0.0000,-0.2500, 0.0000,0.640,0.640,0.612,0.612,0.350,0.350,0.200]])
-
 
 # dim = (#coefficients, #periods)
 Abrahamson08_coefficient = AS08_coeff[:,1:21].transpose()
