@@ -1,5 +1,7 @@
 % Event = 0
-% First row are rsa periods - subsequent rows are sites
+% Spawn = 0
+% ground motion model = 0
+% First row are rsa periods, then rows are sites
 0.0 1.2281 3.0
 0.4831270116 0.2759413757 0.01848202645
 0.390162398 0.05427399825 0.007730943692
