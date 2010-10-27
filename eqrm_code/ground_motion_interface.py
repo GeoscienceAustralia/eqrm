@@ -3802,22 +3802,21 @@ gound_motion_init['mean_1_sigma_0pt5'] = mean_1_sigma_0pt5_args
 #***************  START OF return_vs30  ****************************
 
 
-def return_vs30_sigma_1_distribution(**kwargs):
+def return_vs30_distribution(**kwargs):
     
     num_sites =  kwargs['distance'].shape[0]
     num_events =  kwargs['distance'].shape[1]
     num_periods = kwargs['coefficient'].shape[3]
     Vs30 = kwargs['Vs30']
-
-    log_mean = ones((num_sites, num_events, num_periods))*Vs30
+    log_mean = ones((num_sites, num_events, num_periods))*log(Vs30)
     log_sigma = ones((num_sites, num_events, num_periods))
     return log_mean, log_sigma
 
-return_vs30_sigma_1_uses_Vs30 = True
+return_vs30_uses_Vs30 = True
 
 
-return_vs30_sigma_1_args=[
-    return_vs30_sigma_1_distribution,
+return_vs30_args=[
+    return_vs30_distribution,
     mean_model_magnitude_type,
     mean_model_distance_type,
     
@@ -3829,11 +3828,11 @@ return_vs30_sigma_1_args=[
     mean_model_sigma_coefficient_period,
     mean_model_sigma_coefficient_interpolation,
 
-    return_vs30_sigma_1_uses_Vs30]
+    return_vs30_uses_Vs30]
 
-gound_motion_init['return_vs30_sigma_1'] = return_vs30_sigma_1_args
+gound_motion_init['return_vs30'] = return_vs30_args
 
-#***************  End of return_vs30_sigma_1 ****************************
+#***************  End of return_vs30 ****************************
 #***************  START OF mean_2_sigma_1  ****************************
 
 def mean_2_sigma_1_distribution(**kwargs):
