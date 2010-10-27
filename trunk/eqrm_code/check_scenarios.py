@@ -259,6 +259,7 @@ def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR):
         result_files = listdir(join(standard_dir, dir))
         result_files = [x for x in result_files if not x[-4:] == '.lic']
         result_files = [x for x in result_files if not x[0] == '.']
+        result_files = [x for x in result_files if not x[0:3] == 'log']
         
         #print "result_files", result_files
         try:
@@ -267,6 +268,10 @@ def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR):
             pass
         try:
             result_files.remove('THE_PARAM_T.pyc')
+        except:
+            pass
+        try:
+            result_files.remove('THE_PARAM_T.txt')
         except:
             pass
         try:

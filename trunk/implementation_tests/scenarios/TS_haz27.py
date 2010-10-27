@@ -54,7 +54,7 @@ use_amplification = False
 # Loss
 
 # Save
-save_hazard_map = False
+save_hazard_map = True
 save_total_financial_loss = False
 save_building_loss = False
 save_contents_loss = False
