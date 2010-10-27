@@ -122,9 +122,9 @@ class Ground_motion_calculator(object):
         if depth is not None:
             depth = asarray(depth)
 
-        (mag, depth, depth_to_top,
-         fault_type) = self.resize_mag_depth(mag, depth, depth_to_top,
-                                                fault_type)
+        (mag, depth, depth_to_top, fault_type,
+         dip, width) = self.resize_mag_depth(mag, depth, depth_to_top,
+                                             fault_type, dip, width)
         dist = self.resize_dist(dist, mag.size)
 
         # This is calling the distribution functions described in the
@@ -154,7 +154,7 @@ class Ground_motion_calculator(object):
 
         return (log_mean, log_sigma)
 
-    def resize_mag_depth(self, mag, depth, depth_to_top, fault_type):
+    def resize_mag_depth(self, mag, depth, depth_to_top, fault_type, dip, width):
         """
         Warning, Toro_1997_midcontinent_distribution assumes
         that this occurs.  So if resizing is changed,
@@ -181,11 +181,17 @@ class Ground_motion_calculator(object):
         if fault_type is not None:
             fault_type = array(fault_type)[newaxis,:,newaxis]
 
+        if dip is not None:
+            dip = array(dip)[newaxis,:,newaxis]
+
+        if width is not None:
+            width = array(width)[newaxis,:,newaxis]
+
         assert len(mag.shape) == 1
 
         mag = mag[newaxis,:,newaxis]
 
-        return (mag, depth, depth_to_top, fault_type)
+        return (mag, depth, depth_to_top, fault_type, dip, width)
 
     def resize_dist(self, dist, mag_size):
         """
@@ -250,10 +256,11 @@ class Multiple_ground_motion_calculator(object):
         sites
         event_set, an event_set object.  The shape of the attributes of this
           instance will be equal to the shape of the returned arrays.
-        v330 - the Vs30 value used if the gmm needs it.  If none is given the
+        Vs30 - the Vs30 value used if the gmm needs it.  If none is given the
           site Vs30 value is used.
         
         """
+
         # get distances, etc
         distances = sites.\
                     distances_from_event_set(event_set,

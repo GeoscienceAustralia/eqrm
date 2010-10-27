@@ -1097,9 +1097,8 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         period = 0.01
         ML = numpy.array([[[7.0]]])
-        R = numpy.array([[[25.0]]])
-        Vs30 = numpy.array([[[300.0]]])
-        #fault_type = numpy.array([[[0]]], dtype=int)
+        R = numpy.array([[25.0]])
+        Vs30 = numpy.array([300.0])
         fault_type = numpy.array([[[2]]], dtype=int)
         Ztor = numpy.array([[[0.0]]])
         dip = numpy.array([[[90.0]]])
@@ -1125,16 +1124,19 @@ class Test_ground_motion_interface(unittest.TestCase):
         # assume Rrup & Rx = the R value
         class DistObj(object):
             def __init__(self):
-                self.Rupture = numpy.array([[[R]]])
-                self.Joyner_Boore = numpy.array([[[R]]])
-                self.Horizontal = numpy.array([[[R]]])
+                self.Rupture = numpy.array(R)
+                self.Joyner_Boore = numpy.array(R)
+                self.Horizontal = numpy.array(R)
+        distances = DistObj()
+
+        Rrup = distances.Rupture
 
         # expected values from paper (sigma can be anything, make it very small)
         log_mean_expected = numpy.array([[[math.log(1.565E-01)]]])
         log_sigma_expected = numpy.array([[[4.844E-01]]])
 
         (log_mean,
-             log_sigma) = Chiou08_distribution(mag=ML, dist_object = DistObj(),
+             log_sigma) = Chiou08_distribution(mag=ML, dist_object=distances,
                                                fault_type=fault_type, dip=dip,
                                                depth_to_top=Ztor, Vs30=Vs30,
                                                coefficient=coeffs,
@@ -1166,9 +1168,8 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         period = 0.01
         ML = numpy.array([[[4.0]]])
-        R = numpy.array([[[5.0]]])
-        Vs30 = numpy.array([[[300.0]]])
-        #fault_type = numpy.array([[[0]]], dtype=int)
+        R = numpy.array([[5.0]])
+        Vs30 = numpy.array([300.0])
         fault_type = numpy.array([[[2]]], dtype=int)
         dip = numpy.array([[[90.0]]])
         Ztor = numpy.array([[[0.0]]])
@@ -1193,16 +1194,17 @@ class Test_ground_motion_interface(unittest.TestCase):
         # assume Rrup & Rx = the R value
         class DistObj(object):
             def __init__(self):
-                self.Rupture = numpy.array([[[R]]])
-                self.Joyner_Boore = numpy.array([[[R]]])
-                self.Horizontal = numpy.array([[[R]]])
+                self.Rupture = numpy.array(R)
+                self.Joyner_Boore = numpy.array(R)
+                self.Horizontal = numpy.array(R)
+        distances = DistObj()
 
         # expected values from paper (sigma can be anything, make it very small)
         log_mean_expected = numpy.array([[[math.log(5.581E-02)]]])
         log_sigma_expected = numpy.array([[[6.508E-01]]])
 
         (log_mean,
-             log_sigma) = model.distribution(mag=ML, dist_object=DistObj(),
+             log_sigma) = model.distribution(mag=ML, dist_object=distances,
                                              fault_type=fault_type, dip=dip,
                                              depth_to_top=Ztor, Vs30=Vs30,
                                              coefficient=coeffs,
@@ -1278,8 +1280,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # assume Rrup=200 and Rjb=199.9
         class DistObj(object):
             def __init__(self):
-                self.Rupture = numpy.array([[[2.0000e+2]]])
-                self.Joyner_Boore = numpy.array([[[1.9990e+2]]])
+                self.Rupture = numpy.array([[2.0000e+2]])
+                self.Joyner_Boore = numpy.array([[1.9990e+2]])
 
         ######
         # period = 0.01, ML=5.0, Rrup=200.0, Rjb=1.999
@@ -1294,8 +1296,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         depth = numpy.array([[[5.0]]])
         dip = numpy.array([[[90.0]]])
         fault_type = numpy.array([[[2]]], dtype=int)	# SS
-        Vs30 = numpy.array([[[760.0]]])
-        Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
+        Vs30 = numpy.array([760.0])
+        Z25 = numpy.array([2.0])	# force Z25 = 2.0km
 
         # get coeffs for this period (C0 -> K3 from table 2)
         coeffs = numpy.array([[[[-1.715]]], [[[0.500]]],  [[[-0.530]]],
@@ -1348,8 +1350,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # assume Rrup=200 and Rjb=199.9
         class DistObj(object):
             def __init__(self):
-                self.Rupture = numpy.array([[[2.0000e+2]]])
-                self.Joyner_Boore = numpy.array([[[1.9990e+2]]])
+                self.Rupture = numpy.array([[2.0000e+2]])
+                self.Joyner_Boore = numpy.array([[1.9990e+2]])
 
         ######
         # period = 0.01, ML=5.0, Rrup=200.0, Rjb=1.999
@@ -1364,8 +1366,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         depth = numpy.array([[[5.0]]])
         dip = numpy.array([[[90.0]]])
         fault_type = numpy.array([[[2]]], dtype=int)	# SS
-        Vs30 = numpy.array([[[760.0]]])
-        Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
+        Vs30 = numpy.array([760.0])
+        Z25 = numpy.array([2.0])	# force Z25 = 2.0km
 
         # get coeffs for this period (C0 -> K3 from table 2)
         coeffs = numpy.array([[[[-1.715]]], [[[0.500]]],  [[[-0.530]]],
@@ -1420,8 +1422,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # a fake dist_object class
         class DistObj(object):
             def __init__(self):
-                self.Rupture = numpy.array([[[Rrup]]])
-                self.Joyner_Boore = numpy.array([[[Rjb]]])
+                self.Rupture = numpy.array([[Rrup]])
+                self.Joyner_Boore = numpy.array([[Rjb]])
 
         ######
         # period = 0.2, ML=7.0
@@ -1434,8 +1436,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         depth = numpy.array([[[0.0]]])
         dip = numpy.array([[[90.0]]])
         fault_type = numpy.array([[[2]]], dtype=int)	# SS
-        Vs30 = numpy.array([[[760.0]]])
-        Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
+        Vs30 = numpy.array([760.0])
+        Z25 = numpy.array([2.0])	# force Z25 = 2.0km
 
         # get coeffs for this period (C0 -> K3 from table 2)
         coeffs = numpy.array([[[[-0.486]]], [[[0.500]]], [[[-0.446]]],
@@ -1490,8 +1492,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # a fake dist_object class
         class DistObj(object):
             def __init__(self):
-                self.Rupture = numpy.array([[[Rrup]]])
-                self.Joyner_Boore = numpy.array([[[Rjb]]])
+                self.Rupture = numpy.array([[Rrup]])
+                self.Joyner_Boore = numpy.array([[Rjb]])
 
         ######
         # period = 0.01, M=5.0
@@ -1504,7 +1506,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         depth = numpy.array([[[5.0]]])
         dip = numpy.array([[[45.0]]])
         fault_type = numpy.array([[[0]]], dtype=int)	# RV
-        Vs30 = numpy.array([[[760.0]]])
+        Vs30 = numpy.array([760.0])
         Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
 
         # get coeffs for this period (C0 -> K3 from table 2)
@@ -1560,8 +1562,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # a fake dist_object class
         class DistObj(object):
             def __init__(self):
-                self.Rupture = numpy.array([[[Rrup]]])
-                self.Joyner_Boore = numpy.array([[[Rjb]]])
+                self.Rupture = numpy.array([[Rrup]])
+                self.Joyner_Boore = numpy.array([[Rjb]])
 
         ######
         # period = 0.01, M=7.0
@@ -1574,7 +1576,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         depth = numpy.array([[[0.0]]])
         dip = numpy.array([[[45.0]]])
         fault_type = numpy.array([[[0]]], dtype=int)	# RV
-        Vs30 = numpy.array([[[760.0]]])
+        Vs30 = numpy.array([760.0])
         Z25 = numpy.array([[[2.0]]])	# force Z25 = 2.0km
 
         # get coeffs for this period (C0 -> K3 from table 2)
@@ -1639,13 +1641,13 @@ class Test_ground_motion_interface(unittest.TestCase):
         period = 0.2
         periods = numpy.array([period])
         Rrup = 100.0
-        dist_object = DistObj(numpy.array([[[Rrup]]]))
+        dist_object = DistObj(numpy.array(numpy.array([[Rrup, Rrup]])))
         ML = numpy.array([[[7.0], [5.0]]])
-        depth = numpy.array([[0.0]])
-        dip = numpy.array([[[90.0]]])
-        fault_type = numpy.array([[[2]]], dtype=int)	# strikeslip
-        Vs30 = numpy.array([[760.0]])
-        width = numpy.array([[[10.0]]])
+        depth = numpy.array([[[0.0], [0.0]]])
+        dip = numpy.array([[[90.0], [90.0]]])
+        fault_type = numpy.array([[[2], [2]]], dtype=int)	# strikeslip
+        Vs30 = numpy.array([760.0])
+        width = numpy.array([[[10.0], [10.0]]])
 
         # get coeffs for this period
         coeffs = numpy.array([[[[6.75]]],[[[4.5]]],[[[0.265]]],[[[-0.231]]],

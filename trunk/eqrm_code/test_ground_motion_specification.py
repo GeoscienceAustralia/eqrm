@@ -17,8 +17,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-#                          'Campbell03', 'Campbell08', 'Abrahamson08', 'Chiou08')
-                          'Campbell03', 'Campbell08', 'Abrahamson08')
+                          'Campbell03', 'Campbell08', 'Abrahamson08', 'Chiou08')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -722,57 +721,6 @@ del tmp
 #test_data['Chiou08_test_mean'] = tmp
 #del tmp
 #
-#################################################################################
-## Chiou08 Tests - Soil - compare code against 'hand' code results
-#
-## Vs30 value
-#test_data['Chiou08_test_Vs30'] = 310.0
-#
-## num_events = 2
-#test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
-#
-## num_events = 2
-#test_data['Chiou08_test_depth_to_top'] = [0.0, 0.0]
-#
-## num_events = 2
-## 'reverse' fault type index is 0
-#test_data['Chiou08_test_fault_type'] = [0, 0]
-#
-## num_periods = 4
-#test_data['Chiou08_test_period'] = [0.01, 0.20, 1.00, 3.00]
-#
-## num_sites = 3
-#tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
-#tmp[0,:] = [  5.0,   5.0] # distance - 1st site and all 2 events
-#tmp[1,:] = [ 20.0,  20.0] # distance - 2nd site and all 2 events
-#tmp[2,:] = [100.0, 100.0] # distance - 3rd site and all 2 events
-#test_data['Chiou08_test_distance'] = tmp
-#
-## result values, in 'g'
-#tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
-## period:     0.01      0.20      1.00      3.00
-#tmp[0,0,:] = [0.292430, 0.616686, 0.196268, 0.028048] # R=  5.0, ML=5.5
-#tmp[0,1,:] = [0.515783, 1.060834, 0.651781, 0.178439] # R=  5.0, ML=7.5
-#tmp[1,0,:] = [0.081035, 0.183922, 0.047799, 0.006584] # R= 20.0, ML=5.5
-#tmp[1,1,:] = [0.260221, 0.570758, 0.283779, 0.073640] # R= 20.0, ML=7.5
-#tmp[2,0,:] = [0.007875, 0.018511, 0.007373, 0.001144] # R=100.0, ML=5.5
-#tmp[2,1,:] = [0.062533, 0.146149, 0.080264, 0.021578] # R=100.0, ML=7.5
-#test_data['Chiou08_test_mean'] = tmp
-#del tmp
-#
-### # sigma values, in 'g'
-### # data is from openSHA.org
-### tmp = zeros((3,2,4))		# num_sites, num_events, num_periods
-### # period:     0.01    0.20    1.00    3.00
-### tmp[0,0,:] = [5.8e-1, 5.8e-1, 6.4e-1, 7.2e-1] # R=  5.0, ML=5.5
-### tmp[0,1,:] = [4.6e-1, 4.7e-1, 6.0e-1, 7.0e-1] # R=  5.0, ML=7.5
-### tmp[1,0,:] = [6.1e-1, 6.2e-1, 6.6e-1, 7.2e-1] # R= 20.0, ML=5.5
-### tmp[1,1,:] = [4.7e-1, 5.0e-1, 6.2e-1, 7.0e-1] # R= 20.0, ML=7.5
-### tmp[2,0,:] = [6.2e-1, 6.8e-1, 6.8e-1, 7.2e-1] # R=100.0, ML=5.5
-### tmp[2,1,:] = [5.0e-1, 5.4e-1, 6.3e-1, 7.0e-1] # R=100.0, ML=7.5
-### test_data['Chiou08_test_sigma'] = tmp
-### del tmp
-#
 ################################################################################
 # Chiou08 Tests - Soil - compare code against BooreFTN code results
 
@@ -805,31 +753,94 @@ test_data['Chiou08_test_Vs30'] = [300.0, 300.0, 300.0]
 #                                       SS SS SS
 test_data['Chiou08_test_fault_type'] = [2, 2, 2]
 
+## mean values, in 'g'
+#tmp = zeros((1,3,3))    # (num_sites, num_events, num_periods)
+#tmp[0,0,0] = 5.581E-02 # Rrup=  5.0, Mw=4.0, T=0.01
+#tmp[0,1,0] = 5.575E-02 # Rrup= 25.0, Mw=5.5, T=0.01
+#tmp[0,2,0] = 3.701E-02 # Rrup=100.0, Mw=7.0, T=0.01
+#tmp[0,0,1] = 9.876E-03 # Rrup=  5.0, Mw=4.0, T=1.00
+#tmp[0,1,1] = 3.414E-02 # Rrup= 25.0, Mw=5.5, T=1.00
+#tmp[0,2,1] = 4.728E-02 # Rrup=100.0, Mw=7.0, T=1.00
+#tmp[0,0,2] = 8.548E-04 # Rrup=  5.0, Mw=4.0, T=3.00
+#tmp[0,1,2] = 5.605E-03 # Rrup= 25.0, Mw=5.5, T=3.00
+#tmp[0,2,2] = 1.415E-02 # Rrup=100.0, Mw=7.0, T=3.00
+#test_data['Chiou08_test_mean'] = tmp
+#
+## sigma values, in 'g'
+#tmp = zeros((1,3,3))    # (num_sites, num_events, num_periods)
+#tmp[0,0,0] = 6.508E-01 # Rrup=  5.0, Mw=4.0, T=0.01
+#tmp[0,1,0] = 6.140E-01 # Rrup= 25.0, Mw=5.5, T=0.01
+#tmp[0,2,0] = 5.090E-01 # Rrup=100.0, Mw=7.0, T=0.01
+#tmp[0,0,1] = 6.931E-01 # Rrup=  5.0, Mw=4.0, T=1.00
+#tmp[0,1,1] = 6.744E-01 # Rrup= 25.0, Mw=5.5, T=1.00
+#tmp[0,2,1] = 6.353E-01 # Rrup=100.0, Mw=7.0, T=1.00
+#tmp[0,0,2] = 7.266E-01 # Rrup=  5.0, Mw=4.0, T=3.00
+#tmp[0,1,2] = 7.202E-01 # Rrup= 25.0, Mw=5.5, T=3.00
+#tmp[0,2,2] = 7.024E-01 # Rrup=100.0, Mw=7.0, T=3.00
+#test_data['Chiou08_test_sigma'] = tmp
+
 # mean values, in 'g'
-tmp = zeros((1,3,3))    # (num_sites, num_events, num_periods)
+tmp = zeros((3,3,3))    # (num_sites, num_events, num_periods)
 tmp[0,0,0] = 5.581E-02 # Rrup=  5.0, Mw=4.0, T=0.01
-tmp[0,1,0] = 5.575E-02 # Rrup= 25.0, Mw=5.5, T=0.01
-tmp[0,2,0] = 3.701E-02 # Rrup=100.0, Mw=7.0, T=0.01
+tmp[1,0,0] = 6.411E-03 # Rrup= 25.0, Mw=4.0, T=0.01
+tmp[2,0,0] = 4.692E-04 # Rrup=100.0, Mw=4.0, T=0.01
+tmp[0,1,0] = 2.679E-01 # Rrup=  5.0, Mw=5.5, T=0.01
+tmp[1,1,0] = 5.575E-02 # Rrup= 25.0, Mw=5.5, T=0.01
+tmp[2,1,0] = 7.231E-03 # Rrup=100.0, Mw=5.5, T=0.01
+tmp[0,2,0] = 4.268E-01 # Rrup=  5.0, Mw=7.0, T=0.01
+tmp[1,2,0] = 1.565E-01 # Rrup= 25.0, Mw=7.0, T=0.01
+tmp[2,2,0] = 3.701E-02 # Rrup=100.0, Mw=7.0, T=0.01
 tmp[0,0,1] = 9.876E-03 # Rrup=  5.0, Mw=4.0, T=1.00
-tmp[0,1,1] = 3.414E-02 # Rrup= 25.0, Mw=5.5, T=1.00
-tmp[0,2,1] = 4.728E-02 # Rrup=100.0, Mw=7.0, T=1.00
+tmp[1,0,1] = 1.182E-03 # Rrup= 25.0, Mw=4.0, T=1.00
+tmp[2,0,1] = 1.864E-04 # Rrup=100.0, Mw=4.0, T=1.00
+tmp[0,1,1] = 1.861E-01 # Rrup=  5.0, Mw=5.5, T=1.00
+tmp[1,1,1] = 3.414E-02 # Rrup= 25.0, Mw=5.5, T=1.00
+tmp[2,1,1] = 7.010E-03 # Rrup=100.0, Mw=5.5, T=1.00
+tmp[0,2,1] = 5.130E-01 # Rrup=  5.0, Mw=7.0, T=1.00
+tmp[1,2,1] = 1.588E-01 # Rrup= 25.0, Mw=7.0, T=1.00
+tmp[2,2,1] = 4.728E-02 # Rrup=100.0, Mw=7.0, T=1.00
 tmp[0,0,2] = 8.548E-04 # Rrup=  5.0, Mw=4.0, T=3.00
-tmp[0,1,2] = 5.605E-03 # Rrup= 25.0, Mw=5.5, T=3.00
-tmp[0,2,2] = 1.415E-02 # Rrup=100.0, Mw=7.0, T=3.00
+tmp[1,0,2] = 1.064E-04 # Rrup= 25.0, Mw=4.0, T=3.00
+tmp[2,0,2] = 2.024E-05 # Rrup=100.0, Mw=4.0, T=3.00
+tmp[0,1,2] = 3.169E-02 # Rrup=  5.0, Mw=5.5, T=3.00
+tmp[1,1,2] = 5.605E-03 # Rrup= 25.0, Mw=5.5, T=3.00
+tmp[2,1,2] = 1.293E-03 # Rrup=100.0, Mw=5.5, T=3.00
+tmp[0,2,2] = 1.561E-01 # Rrup=  5.0, Mw=7.0, T=3.00
+tmp[1,2,2] = 4.511E-02 # Rrup= 25.0, Mw=7.0, T=3.00
+tmp[2,2,2] = 1.415E-02 # Rrup=100.0, Mw=7.0, T=3.00
 test_data['Chiou08_test_mean'] = tmp
 
 # sigma values, in 'g'
-tmp = zeros((1,3,3))    # (num_sites, num_events, num_periods)
+tmp = zeros((3,3,3))    # (num_sites, num_events, num_periods)
 tmp[0,0,0] = 6.508E-01 # Rrup=  5.0, Mw=4.0, T=0.01
-tmp[0,1,0] = 6.140E-01 # Rrup= 25.0, Mw=5.5, T=0.01
-tmp[0,2,0] = 5.090E-01 # Rrup=100.0, Mw=7.0, T=0.01
+tmp[1,0,0] = 6.718E-01 # Rrup= 25.0, Mw=4.0, T=0.01
+tmp[2,0,0] = 6.750E-01 # Rrup=100.0, Mw=4.0, T=0.01
+tmp[0,1,0] = 5.770E-01 # Rrup=  5.0, Mw=5.5, T=0.01
+tmp[1,1,0] = 6.140E-01 # Rrup= 25.0, Mw=5.5, T=0.01
+tmp[2,1,0] = 6.334E-01 # Rrup=100.0, Mw=5.5, T=0.01
+tmp[0,2,0] = 4.649E-01 # Rrup=  5.0, Mw=7.0, T=0.01
+tmp[1,2,0] = 4.844E-01 # Rrup= 25.0, Mw=7.0, T=0.01
+tmp[2,2,0] = 5.090E-01 # Rrup=100.0, Mw=7.0, T=0.01
 tmp[0,0,1] = 6.931E-01 # Rrup=  5.0, Mw=4.0, T=1.00
-tmp[0,1,1] = 6.744E-01 # Rrup= 25.0, Mw=5.5, T=1.00
-tmp[0,2,1] = 6.353E-01 # Rrup=100.0, Mw=7.0, T=1.00
+tmp[1,0,1] = 6.958E-01 # Rrup= 25.0, Mw=4.0, T=1.00
+tmp[2,0,1] = 6.961E-01 # Rrup=100.0, Mw=4.0, T=1.00
+tmp[0,1,1] = 6.539E-01 # Rrup=  5.0, Mw=5.5, T=1.00
+tmp[1,1,1] = 6.744E-01 # Rrup= 25.0, Mw=5.5, T=1.00
+tmp[2,1,1] = 6.817E-01 # Rrup=100.0, Mw=5.5, T=1.00
+tmp[0,2,1] = 6.063E-01 # Rrup=  5.0, Mw=7.0, T=1.00
+tmp[1,2,1] = 6.206E-01 # Rrup= 25.0, Mw=7.0, T=1.00
+tmp[2,2,1] = 6.353E-01 # Rrup=100.0, Mw=7.0, T=1.00
 tmp[0,0,2] = 7.266E-01 # Rrup=  5.0, Mw=4.0, T=3.00
-tmp[0,1,2] = 7.202E-01 # Rrup= 25.0, Mw=5.5, T=3.00
-tmp[0,2,2] = 7.024E-01 # Rrup=100.0, Mw=7.0, T=3.00
+tmp[1,0,2] = 7.268E-01 # Rrup= 25.0, Mw=4.0, T=3.00
+tmp[2,0,2] = 7.268E-01 # Rrup=100.0, Mw=4.0, T=3.00
+tmp[0,1,2] = 7.181E-01 # Rrup=  5.0, Mw=5.5, T=3.00
+tmp[1,1,2] = 7.202E-01 # Rrup= 25.0, Mw=5.5, T=3.00
+tmp[2,1,2] = 7.209E-01 # Rrup=100.0, Mw=5.5, T=3.00
+tmp[0,2,2] = 6.992E-01 # Rrup=  5.0, Mw=7.0, T=3.00
+tmp[1,2,2] = 7.007E-01 # Rrup= 25.0, Mw=7.0, T=3.00
+tmp[2,2,2] = 7.024E-01 # Rrup=100.0, Mw=7.0, T=3.00
 test_data['Chiou08_test_sigma'] = tmp
+
 
 del tmp
 
@@ -923,7 +934,7 @@ test_data['Campbell08_test_fault_type'] = [2, 2, 0, 0]
 test_data['Campbell08_test_period'] = [0.01, 0.20, 1.00, 3.00]
 
 # Z25 override - num_sites = 7
-test_data['Campbell08_test_Z25'] = [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
+test_data['Campbell08_test_Z25'] = [2.0]
 
 # Vs30 override - num_sites = 7
 test_data['Campbell08_test_Vs30'] = [760.0, 760.0, 760.0, 760.0, 760.0,
@@ -960,23 +971,6 @@ tmp[6,0,:] = [2.7675e-3, 5.2378e-3, 9.1954e-4, 1.0353e-4] # R=200.0, ML=5.0, typ
 tmp[6,1,:] = [1.8031e-2, 3.6219e-2, 1.6356e-2, 4.6234e-3] # R=200.0, ML=7.0, type=SS
 tmp[6,2,:] = [3.6614e-3, 6.9303e-3, 1.1866e-3, 1.0353e-4] # R=200.0, ML=5.0, type=RV
 tmp[6,3,:] = [1.8058e-2, 3.6272e-2, 1.6380e-2, 4.6256e-3] # R=200.0, ML=7.0, type=RV
-
-#tmp = zeros((7,2,4))		# num_sites, num_events, num_periods
-## period:     0.01       0.20       1.00       3.00
-#tmp[0,0,:] = [1.7519e-1, 3.6164e-1, 4.8140e-2, 5.4202e-3] # R=  5.0, ML=5.0, type=SS
-#tmp[0,1,:] = [3.6907e-1, 8.7425e-1, 2.6571e-1, 7.5109e-2] # R=  5.0, ML=7.0, type=SS
-#tmp[1,0,:] = [1.0306e-1, 2.3247e-1, 2.6472e-2, 2.9806e-3] # R= 10.0, ML=5.0, type=SS
-#tmp[1,1,:] = [2.5133e-1, 6.2711e-1, 1.7438e-1, 4.9290e-2] # R= 10.0, ML=7.0, type=SS
-#tmp[2,0,:] = [6.7652e-2, 1.5587e-1, 1.7386e-2, 1.9575e-3] # R= 15.0, ML=5.0, type=SS
-#tmp[2,1,:] = [1.8523e-1, 4.6434e-1, 1.2968e-1, 3.6657e-2] # R= 15.0, ML=7.0, type=SS
-#tmp[3,0,:] = [2.9958e-2, 6.7581e-2, 8.0680e-3, 9.0840e-4] # R= 30.0, ML=5.0, type=SS
-#tmp[3,1,:] = [1.0249e-1, 2.4772e-1, 7.5513e-2, 2.1345e-2] # R= 30.0, ML=7.0, type=SS
-#tmp[4,0,:] = [1.5913e-2, 3.4483e-2, 4.5128e-3, 5.0811e-4] # R= 50.0, ML=5.0, type=SS
-#tmp[4,1,:] = [6.4653e-2, 1.4937e-1, 5.0154e-2, 1.4177e-2] # R= 50.0, ML=7.0, type=SS
-#tmp[5,0,:] = [6.6525e-3, 1.3498e-2, 2.0392e-3, 2.2960e-4] # R=100.0, ML=5.0, type=SS
-#tmp[5,1,:] = [3.4220e-2, 7.3795e-2, 2.8662e-2, 8.1019e-3] # R=100.0, ML=7.0, type=SS
-#tmp[6,0,:] = [2.7675e-3, 5.2378e-3, 9.1954e-4, 1.0353e-4] # R=200.0, ML=5.0, type=SS
-#tmp[6,1,:] = [1.8031e-2, 3.6219e-2, 1.6356e-2, 4.6234e-3] # R=200.0, ML=7.0, type=SS
 
 test_data['Campbell08_test_mean'] = tmp
 del tmp
@@ -1147,15 +1141,6 @@ class Distance_stub(object):
     def distance(self, dummy):
         return self.dist
 
-#    def Rupture(self):
-#        return self.dist
-#
-#    def Joyner_Boore(self):
-#        return self.dist
-#
-#    def Horizontal(self):
-#        return self.dist
-
 def mag2dict(mag):
     # when using multiple_g_m_calc the mag_type is determined from
     # the g_m_interface, so it could be ML or Mw.
@@ -1175,7 +1160,7 @@ def data2atts(model_name):
     magnitudes = mag2dict(test_data[model_name+'_test_magnitude'])
     test_mean = test_data[model_name+'_test_mean']
     periods = test_data[model_name+'_test_period']
-    Vs30 = test_data.get(model_name+'_test_Vs30', 1000.0)
+    Vs30 = array(test_data.get(model_name+'_test_Vs30', 1000.0))
 
     # get distance object, if it exists, else use internal object
     try:
@@ -1187,8 +1172,12 @@ def data2atts(model_name):
     depths = test_data.get(model_name+'_test_depth', None)
     depth_to_top = test_data.get(model_name+'_test_depth_to_top', None)
     fault_type = test_data.get(model_name+'_test_fault_type', None)
-    dip = array(test_data.get(model_name+'_test_dip', None))
+    dip = test_data.get(model_name+'_test_dip', None)
+#    if dip is not None:
+#        dip = array(dip)[newaxis,:,newaxis]
     width = test_data.get(model_name+'_test_width', None)
+#    if width is not None:
+#        width = array(width)[newaxis,:,newaxis]
     Z25 = array(test_data.get(model_name+'_test_Z25', None))
     test_sigma = test_data.get(model_name+'_test_sigma', None)
 

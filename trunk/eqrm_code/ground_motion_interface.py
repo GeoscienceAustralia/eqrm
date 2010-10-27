@@ -69,38 +69,41 @@ Description:
             distribution_function(**kwargs)
         where the 'kwargs' is a dictionary containing keyword parameters, such
         as:
+            periods           periods of interest
             mag               event magnitude
-            distance          distance of the site from the event
+            dip               fault dip
+            depth             depth of the event
+            depth_to_top      depth to top of rupture (Ztor)
+            width             rupture width
+            fault_type        type of fault
+            distance          distance of the site from the event (deprecated)
+            dist_object       a distance object, attributes are distances,
+                              eg:  Rjb = dist_object.Joyner_Boore
+            Vs30              shear wave velocity at 30m
             coefficient       an array of model coefficients
             sigmacoefficient  an array of model sigma coefficients
-            depth             depth of the event
-            depth_to_top      depth to top of rupture
-            fault_type        type of fault
-            dist_object       a distance object, attributes are distances
-                              eg:  Rrup = dist_object.Rupture
-
-        Most of these parameters will be numpy arrays.
 
         The shapes of each parameter are:
-            periods.shape = (num_periods,)		# 1d, is list
-            mag.shape = (site, events, 1)
-            dip.shape = (site, events, 1)
-            distance.shape = (site, events, 1)
-            depth.shape = (site, events, 1)
-            depth_to_top.shape = (site, events, 1)
-            fault_type.shape = (site, events, 1)
-            Vs30.shape = (site, events, 1)
-            coefficient.shape = (num_coefficients, 1, 1, num_periods)
-            sigmacoefficient.shape = (num_sigmacoefficients, 1, 1, num_periods)
-
-        Distances obtained from the 'dist-object' via dist_object.Rupture have
-        a shape like (site, events, 1).	# wrong, getting 2D
+            periods              (periods,)
+            mag                  (sites, events, 1)
+            dip                  (sites, events, 1)
+            depth                (sites, events, 1)
+            depth_to_top         (sites, events, 1)
+            width                (sites, events, 1)
+            fault_type           (sites, events, 1)
+            distance             (sites, events, 1)   (deprecated)
+            dist_object.Rupture  (sites, events)      (etc)
+            Vs30                 (sites,)
+            coefficient          (coefficients, 1, 1, periods)
+            sigmacoefficient     (sigmacoefficients, 1, 1, periods)
 
         The shapes of the returned arrays are:
-            log_mean = (site, events, num_periods)
-            log_sigma = (site, events, num_periods)
+            log_mean             (sites, events, periods)
+            log_sigma            (sites, events, periods)
 
-        Note that the 'site' dimension above is currently 1.
+        Note that the 'sites' dimension above is the number of sites passed to
+        the model code and is currently 1.  You should not confuse this with the
+        actual number of sites being processed by EQRM.
 """
 
 import math
@@ -2717,41 +2720,50 @@ def Chiou08_distribution(**kwargs):
     AS = 0
     Fhw = 0
 
-    # Rrup and Rx from distance object
+    # Rrup, Rjb and Rx from distance object
     Rrup = dist_object.Rupture
     Rjb = dist_object.Joyner_Boore
     Rx = dist_object.Horizontal
 
     # check we have the right shapes
+    num_sites = 1
     num_events = Mw.shape[1]
     num_periods = coefficient.shape[3]
 
-    msg = 'Expected %s.shape %s, got %s'
+    msg = 'Expected %s.shape=%s, got %s'
 
-    assert (Mw.shape == (1, num_events, 1),
-            msg % ('Mw', '(1,%d,1)' % num_events, str(Mw.shape)))
-    assert (Rrup.shape == (1, num_events, 1),
-            msg % ('Rrup', '(1,%d,1)' % num_events, str(Rrup.shape)))
-    assert (Rjb.shape == (1, num_events, 1),
-            msg % ('Rjb', '(1,%d,1)' % num_events, str(Rjb.shape)))
-    assert (Rx.shape == (1, num_events, 1),
-            msg % ('Rx', '(1,%d,1)' % num_events, str(Rx.shape)))
-    assert (fault_type.shape == (1, num_events, 1),
-            msg % ('fault_type', '(1,%d,1)' % num_events, str(fault_type.shape)))
-    assert (Ztor.shape == (1, num_events, 1),
-            msg % ('Ztor', '(1,%d,1)' % num_events, str(Ztor.shape)))
-    assert (Dip.shape == (1, num_events, 1),
-            msg % ('Dip', '(1,%d,1)' % num_events, str(Dip.shape)))
-###################
-    Vs30 = asarray(Vs30)		# why do we need this?
-    Vs30 = Vs30[newaxis,:,newaxis]	# look in harness code
-###################
-    assert (Vs30.shape == (1, num_events, 1),
-            msg % ('Vs30', '(1,%d,1)' % num_events, str(Vs30.shape)))
-    assert (coefficient.shape == (29, 1, 1, num_periods),
-            msg % ('coefficient', '(29,1,1,%d)' % num_periods, str(coefficient.shape)))
-    assert (sigma_coefficient.shape == (6, 1, 1, num_periods),
-            msg % ('sigma_coefficient', '(6,1,1,%d)' % num_periods, str(sigma_coefficient.shape)))
+    assert Mw.shape == (1, num_events, 1), (msg
+               % ('Mw', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Mw.shape)))
+
+    # ignore first dimension of distances
+    assert Rrup.shape[1:] == (num_events,), (msg
+               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
+    assert Rjb.shape[1:] == (num_events,), (msg
+               % ('Rjb', '(?,%d)' % num_events, str(Rjb.shape)))
+    assert Rx.shape[1:] == (num_events,), (msg
+               % ('Rx', '(?,%d)' % num_events, str(Rx.shape)))
+
+    assert fault_type.shape == (num_sites, num_events, 1), (msg
+               % ('fault_type', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(fault_type.shape)))
+    assert Ztor.shape == (num_sites, num_events, 1), (msg
+               % ('Ztor', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Ztor.shape)))
+    assert Dip.shape == (num_sites, num_events, 1), (msg
+               % ('Dip', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Dip.shape)))
+
+    # ensure Vs30 is one-dimensional only
+    assert len(Vs30.shape) == 1, (msg
+               % ('Vs30', '(?,)', str(Vs30.shape)))
+
+    assert coefficient.shape == (29, 1, 1, num_periods), (msg
+               % ('coefficient', '(29,1,1,%d)' % num_periods,
+                  str(coefficient.shape)))
+    assert sigma_coefficient.shape == (6, 1, 1, num_periods), (msg
+               % ('sigma_coefficient', '(6,1,1,%d)' % num_periods,
+                  str(sigma_coefficient.shape)))
 
     # unpack coefficients
     (c2T, c3T, c4T, c4aT, crbT, chmT, cg3T, c1T, c1aT, c1bT, cnT, cmT, c5T,
@@ -2766,6 +2778,10 @@ def Chiou08_distribution(**kwargs):
 
     # estimate Z10 from Vs30
     Z10 = conversions.convert_Vs30_to_Z10(Vs30)
+
+    Rrup = Rrup[:,:,newaxis]
+    Rjb = Rjb[:,:,newaxis]
+    Rx = Rx[:,:,newaxis]
 
 # C.....
 # C.....CALCULATE ROCK PSA (Vs30 = 1130 m/sec)
@@ -2803,6 +2819,7 @@ def Chiou08_distribution(**kwargs):
 #      *  + (cg1T + cg2T/COSH(MAX(Mw-cg3T,0.0)))*Rrup
 
     # Distance Term
+
     R = sqrt(Rrup**2 + crbT**2)
     f_dis = c4T*log(Rrup + c5T*cosh(c6T*maximum(Mw-chmT,0.0))) + (c4aT-c4T)*log(R) + (cg1T + cg2T/cosh(maximum(Mw-cg3T,0.0)))*Rrup
 
@@ -2918,6 +2935,15 @@ def Chiou08_distribution(**kwargs):
 
     SigMeas = (sig1T + ((sig2T-sig1T)/2.0)*(minimum(maximum(Mw,5.0),7.0)-5.0) + sig4T*AS)*sqrt(sig3T*Finferred + 0.7*Fmeasured + (1.0+NL0)**2)
     SigTmeas = sqrt(((1.0+NL0)**2)*Tau**2 + SigMeas**2)
+
+    # check result has right dimensions
+    num_sites = Rrup.shape[0]
+    assert Y.shape == (num_sites, num_events, num_periods), (msg
+               % ('Y', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(Y.shape)))
+    assert SigTmeas.shape == (num_sites, num_events, num_periods), (msg
+               % ('SigTmeas', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(SigTmeas.shape)))
 
     return (log(Y), SigTmeas)
 
@@ -3405,31 +3431,61 @@ def Campbell08_distribution(**kwargs):
     Ztor = kwargs['depth_to_top']		# event-specific
     Vs30 = kwargs['Vs30']			# site-specific
     delta = kwargs['dip']			# event-specific
-    fault_type = kwargs['fault_type']	# event-specific
+    fault_type = kwargs['fault_type']	        # event-specific
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
-    # check we have the right shapes
-    num_periods = coefficient.shape[3]
-    msg = ('Expected coefficient.shape %s, got %s'
-           % (str((16, 1, 1, num_periods)), str(coefficient.shape)))
-    assert coefficient.shape == (16, 1, 1, num_periods), msg
-    msg = ('Expected sigma_coefficient.shape %s, got %s'
-           % (str((6, 1, 1, num_periods)), str(sigma_coefficient.shape)))
-    assert sigma_coefficient.shape == (6, 1, 1, num_periods), msg
+    periods = array(periods)
 
-    # if user passed us Z25, use it, else calculate from Vs30
+    # get required distances
+    Rrup = dist_object.Rupture
+    Rjb = dist_object.Joyner_Boore
+
+    # check we have the right shapes
+    num_sites = 1
+    num_events = M.shape[1]
+    num_periods = len(periods)
+
+    msg = 'Expected %s.shape=%s, got %s'
+
+    assert M.shape == (1, num_events, 1), (msg
+               % ('M', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(M.shape)))
+
+    # ignore first dimension of distances
+    assert Rrup.shape[1:] == (num_events,), (msg
+               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
+    assert Rjb.shape[1:] == (num_events,), (msg
+               % ('Rjb', '(?,%d)' % num_events, str(Rjb.shape)))
+
+    assert fault_type.shape == (num_sites, num_events, 1), (msg
+               % ('fault_type', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(fault_type.shape)))
+    assert Ztor.shape == (num_sites, num_events, 1), (msg
+               % ('Ztor', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Ztor.shape)))
+    assert delta.shape == (num_sites, num_events, 1), (msg
+               % ('delta', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(delta.shape)))
+
+    # ensure Vs30 is one-dimensional only
+    assert len(Vs30.shape) == 1, (msg
+               % ('Vs30', '(?,)', str(Vs30.shape)))
+
+    assert coefficient.shape == (16, 1, 1, num_periods), (msg
+               % ('coefficient', '(16,1,1,%d)' % num_periods,
+                  str(coefficient.shape)))
+    assert sigma_coefficient.shape == (6, 1, 1, num_periods), (msg
+               % ('sigma_coefficient', '(6,1,1,%d)' % num_periods,
+                  str(sigma_coefficient.shape)))
+
+# if user passed us Z25, use it, else calculate from Vs30
     # (we should only pass in Z25 during testing)
     Z25 = kwargs.get('Z25', None)
     if Z25 is None:
         tmp = conversions.convert_Vs30_to_Z10(Vs30)
         Z25 = conversions.convert_Z10_to_Z25(tmp)
         del tmp
-    Z25 = Z25[:,newaxis,newaxis]
-
-    # get required distance arrays
-    Rrup = dist_object.Rupture
-    Rjb = dist_object.Joyner_Boore
 
     # get flag values from 'fault_type'
     Frv = Campbell08_fault_type[:,0][fault_type]
@@ -3447,9 +3503,7 @@ def Campbell08_distribution(**kwargs):
     # massage dimensions
     Rrup = Rrup[:,:,newaxis]
     Rjb = Rjb[:,:,newaxis]
-    periods = array(periods)
-    periods = periods[newaxis,newaxis,:]
-    Vs30 = array(Vs30)
+    periods = array(periods)[newaxis,newaxis,:]
     Vs30 = Vs30[:,newaxis,newaxis]
 
     # calculate some common repeated sub-expressions
@@ -3488,7 +3542,6 @@ def Campbell08_distribution(**kwargs):
 
     Fhngd = ones(delta.shape)
     Fhngd = where(delta > 70.0, (90.0-delta)/20.0, Fhngd)
-    Fhngd = Fhngd[newaxis,:,newaxis]
 
     Fhng = pC9*Fhngr*Fhngm*Fhngz*Fhngd
 
@@ -3548,7 +3601,6 @@ def Campbell08_distribution(**kwargs):
 
     Fhngd = ones(delta.shape)
     Fhngd = where(delta > 70.0, (90.0-delta)/20.0, Fhngd)
-    Fhngd = Fhngd[newaxis,:,newaxis]
 
     Fhng = C9*Fhngr*Fhngm*Fhngz*Fhngd
 
@@ -3592,6 +3644,15 @@ def Campbell08_distribution(**kwargs):
 #
 #    # standard deviation of arbitrary horizontal component of ln(Y)
 #    sigarb = sqrt(sig*sig + Ec*Ec)
+
+    # check result has right dimensions
+    num_sites = Rrup.shape[0]
+    assert Y.shape == (num_sites, num_events, num_periods), (msg
+               % ('Y', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(Y.shape)))
+    assert sigma.shape == (num_sites, num_events, num_periods), (msg
+               % ('sigma', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(sigma.shape)))
 
     return (log(Y), log(sigma))
 
@@ -3892,19 +3953,53 @@ def Abrahamson08_distribution(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
-    # check some shapes
-    num_periods = coefficient.shape[3]
-    msg = ('Expected shape (20, 1, 1, %d), got %s'
-           % (num_periods, str(coefficient.shape)))
-    assert coefficient.shape == (20, 1, 1, num_periods), msg
-    msg = ('Expected shape (7, 1, 1, %d), got %s'
-           % (num_periods, str(sigma_coefficient.shape)))
-    assert sigma_coefficient.shape == (7, 1, 1, num_periods), msg
-
     # get required distance arrays
     Rrup = dist_object.Rupture
     Rjb = dist_object.Joyner_Boore
     Rx = dist_object.Horizontal
+
+    # check we have the right shapes
+    num_sites = 1
+    num_events = Mw.shape[1]
+    num_periods = len(Per)
+
+    msg = 'Expected %s.shape=%s, got %s'
+
+    assert Mw.shape == (1, num_events, 1), (msg
+               % ('Mw', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Mw.shape)))
+
+    # ignore first dimension of distances
+    assert Rrup.shape[1:] == (num_events,), (msg
+               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
+    assert Rjb.shape[1:] == (num_events,), (msg
+               % ('Rjb', '(?,%d)' % num_events, str(Rjb.shape)))
+    assert Rx.shape[1:] == (num_events,), (msg
+               % ('Rx', '(?,%d)' % num_events, str(Rx.shape)))
+
+    assert fault_type.shape == (num_sites, num_events, 1), (msg
+               % ('fault_type', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(fault_type.shape)))
+    assert Ztor.shape == (num_sites, num_events, 1), (msg
+               % ('Ztor', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Ztor.shape)))
+    assert Dip.shape == (num_sites, num_events, 1), (msg
+               % ('Dip', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Dip.shape)))
+    assert W.shape == (num_sites, num_events, 1), (msg
+               % ('W', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(W.shape)))
+
+    # ensure Vs30 is one-dimensional only
+    assert len(Vs30.shape) == 1, (msg
+               % ('Vs30', '(?,)', str(Vs30.shape)))
+
+    assert coefficient.shape == (20, 1, 1, num_periods), (msg
+               % ('coefficient', '(20,1,1,%d)' % num_periods,
+                  str(coefficient.shape)))
+    assert sigma_coefficient.shape == (7, 1, 1, num_periods), (msg
+               % ('sigma_coefficient', '(7,1,1,%d)' % num_periods,
+                  str(sigma_coefficient.shape)))
 
     # get flag values from 'fault_type'
     Frv = AS08_fault_type[:,0][fault_type]
@@ -3923,8 +4018,6 @@ def Abrahamson08_distribution(**kwargs):
     Rx = Rx[:,:,newaxis]
     Per = array(Per)[newaxis,newaxis,:]
     Vs30 = array(Vs30)[:,newaxis,newaxis]
-    Dip = array(Dip)[newaxis,:,newaxis]
-    W = array(W)[newaxis,:,newaxis]
 
 
     # get Z1.0 value from Vs30
@@ -4163,7 +4256,7 @@ def Abrahamson08_distribution(**kwargs):
     T5 = where(Dip >= 30.0, 1.0 - (Dip - 30.0)/60.0, T5)
 
     f_4 = a14T*T1*T2*T3*T4*T5
- 
+
     # Calculation for Constant Displacement
 
     f_4Td1 = a14_iTd1*T1*T2*T3*T4*T5
@@ -4393,6 +4486,15 @@ def Abrahamson08_distribution(**kwargs):
     Sigmea = sqrt(sBYmea**2 + slnAF**2 + (Alpha**2)*(sBAmea**2) + 2.0*Alpha*rhoT*sBYmea*sBAmea)
 
     SigTmea = sqrt(Sigmea**2 + Tau**2)
+
+    # check result has right dimensions
+    num_sites = Vs30.shape[0]
+    assert Y.shape == (num_sites, num_events, num_periods), (msg
+               % ('Y', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(Y.shape)))
+    assert SigTest.shape == (num_sites, num_events, num_periods), (msg
+               % ('SigTest', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(SigTest.shape)))
 
     return (Y, SigTest)
 
