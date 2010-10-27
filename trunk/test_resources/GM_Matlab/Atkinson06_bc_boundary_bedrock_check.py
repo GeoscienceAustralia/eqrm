@@ -34,7 +34,7 @@ def eqn_5(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, M, Rcd, S):
 
 def check_scenario(period, distance, magnitude,
                    c1, c2, c3, c4, c5, c6, c7, c8, c9, c10):
-    """Run base bedrock known case and soil for various vs30"""
+    """Run base bedrock known case and soil for various Vs30"""
 
     # run known bedrock case, compare with expected_logPSA
     S = 0.0

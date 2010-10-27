@@ -36,7 +36,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
     test_mean : the means that must be matched by verification tests
                     dimensions (sites, mag, period).  Units g.  Not log mean
 
-    test_vs30: the shear wave velocity at a depth of 30.0 meters
+    test_Vs30: the shear wave velocity at a depth of 30.0 meters
                (if not defined, will be assumed to be 1000m/s)
 """
 
@@ -422,7 +422,7 @@ test_data['Boore_08_test_mean'] = \
                                   [:,newaxis,:]
 test_data['Boore_08_test_magnitude'] = [5.4]
 
-test_data['Boore_08_test_vs30'] = 1000.0
+test_data['Boore_08_test_Vs30'] = 1000.0
 
 
 # ***********************************************************
@@ -611,8 +611,8 @@ test_data['Atkinson06_hard_bedrock_test_mean'] = tmp
 
 ################################################################################
 # Atkinson06_soil Test
-# These tests set vs30 is 1000.0 in test code below
-# That value wil be assumed if we don't define vs30 values here.
+# These tests set Vs30 is 1000.0 in test code below
+# That value wil be assumed if we don't define Vs30 values here.
 
 # num_events = 2
 test_data['Atkinson06_soil_test_magnitude'] = [5.5, 7.5]
@@ -629,7 +629,7 @@ test_data['Atkinson06_soil_test_distance'] = tmp
 
 # result values, in 'g'
 tmp = zeros((3,2,3))		# num_sites, num_events, num_periods
-# values below are from Atkinson06_soil_check.py, vs30=1000.0
+# values below are from Atkinson06_soil_check.py, Vs30=1000.0
 # period:       0.2        1.0        2.0
 #tmp[0,0,:] = [ 3.174586,  2.178382,  1.636088]	# R=  2.0, ML=5.5
 #tmp[0,1,:] = [ 3.457957,  2.714225,  2.351217]	# R=  2.0, ML=7.5
@@ -687,8 +687,8 @@ del tmp
 #################################################################################
 ## Chiou08 Tests - Rock - compare code against 'hand' code results
 #
-## vs30 value
-#test_data['Chiou08_test_vs30'] = 520.0
+## Vs30 value
+#test_data['Chiou08_test_Vs30'] = 520.0
 #
 ## num_events = 2
 #test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
@@ -725,8 +725,8 @@ del tmp
 #################################################################################
 ## Chiou08 Tests - Soil - compare code against 'hand' code results
 #
-## vs30 value
-#test_data['Chiou08_test_vs30'] = 310.0
+## Vs30 value
+#test_data['Chiou08_test_Vs30'] = 310.0
 #
 ## num_events = 2
 #test_data['Chiou08_test_magnitude'] = [5.5, 7.5]
@@ -796,7 +796,7 @@ test_data['Chiou08_test_depth_to_top'] = [0.0, 0.0, 0.0]
 test_data['Chiou08_test_dip'] = [90.0, 90.0, 90.0]
 
 # num_sites = 3
-test_data['Chiou08_test_vs30'] = [300.0, 300.0, 300.0]
+test_data['Chiou08_test_Vs30'] = [300.0, 300.0, 300.0]
 
 # num_events = 3
 # 'reverse' fault type index is 0
@@ -926,7 +926,7 @@ test_data['Campbell08_test_period'] = [0.01, 0.20, 1.00, 3.00]
 test_data['Campbell08_test_Z25'] = [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
 
 # Vs30 override - num_sites = 7
-test_data['Campbell08_test_vs30'] = [760.0, 760.0, 760.0, 760.0, 760.0,
+test_data['Campbell08_test_Vs30'] = [760.0, 760.0, 760.0, 760.0, 760.0,
                                      760.0, 760.0]
 
 # result values, in 'g' - from 'check' code
@@ -1060,7 +1060,7 @@ test_data['Abrahamson08_test_fault_type'] = [2, 2, 0, 0, 1, 1, 0, 0]
 test_data['Abrahamson08_test_period'] = [0.01, 0.20, 1.00, 3.00]
 
 # Vs30 override - num_sites = 3
-test_data['Abrahamson08_test_vs30'] = [760.0, 760.0, 300.0]
+test_data['Abrahamson08_test_Vs30'] = [760.0, 760.0, 300.0]
 
 # num_sites = 3
 tmp = zeros((3,8)) # initialise an array: (num_sites, num_events)
@@ -1167,7 +1167,7 @@ def mag2dict(mag):
 def data2atts(model_name):
     """Get attributes for a model from the test_data dictionary.
 
-    The vs30 value is defaulted to 1000 if not defined in test_data.
+    The Vs30 value is defaulted to 1000 if not defined in test_data.
     """
 
     # get params that are provided for every model
@@ -1175,7 +1175,7 @@ def data2atts(model_name):
     magnitudes = mag2dict(test_data[model_name+'_test_magnitude'])
     test_mean = test_data[model_name+'_test_mean']
     periods = test_data[model_name+'_test_period']
-    vs30 = test_data.get(model_name+'_test_vs30', 1000.0)
+    Vs30 = test_data.get(model_name+'_test_Vs30', 1000.0)
 
     # get distance object, if it exists, else use internal object
     try:
@@ -1192,7 +1192,7 @@ def data2atts(model_name):
     Z25 = array(test_data.get(model_name+'_test_Z25', None))
     test_sigma = test_data.get(model_name+'_test_sigma', None)
 
-    return (distances, magnitudes, test_mean, test_sigma, periods, depths, vs30,
+    return (distances, magnitudes, test_mean, test_sigma, periods, depths, Vs30,
             depth_to_top, fault_type, Z25, dip, width)
 
 def ground_motion_interface_conformance(GM_class, model_name):
@@ -1201,14 +1201,14 @@ def ground_motion_interface_conformance(GM_class, model_name):
     the calculated ground motion is the same as the test_ground_motion
     """
 
-    (distances, magnitudes, test_mean, test_sigma, periods, depths, vs30,
+    (distances, magnitudes, test_mean, test_sigma, periods, depths, Vs30,
      depth_to_top, fault_type, Z25, dip, width) = data2atts(model_name)
 
     if GM_class is Ground_motion_calculator:
         gm = GM_class(model_name, periods)
         (log_mean, log_sigma) = \
             gm.distribution_function(distances, magnitudes, periods=periods,
-                                     depth=depths, vs30=vs30,
+                                     depth=depths, Vs30=Vs30,
                                      depth_to_top=depth_to_top,
                                      fault_type=fault_type, Z25=Z25,
                                      dip=dip, width=width)
@@ -1218,7 +1218,7 @@ def ground_motion_interface_conformance(GM_class, model_name):
         # ignoring event_activity, event_id
         (log_mean, log_sigma, _, _) = \
             gm._distribution_function(distances, magnitudes, periods=periods,
-                                      depth=depths, vs30=vs30,
+                                      depth=depths, Vs30=Vs30,
                                       depth_to_top=depth_to_top,
                                       fault_type=fault_type, Z25=Z25,
                                       dip=dip, width=width)

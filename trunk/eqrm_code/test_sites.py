@@ -24,8 +24,8 @@ class Test_Sites(unittest.TestCase):
         latitude = [10, 20]
         longitude = [1, 2]
         sites = Sites(latitude, longitude, **attributes)
-        site_class2vs30 = {'C': 30, 'E': 40}
-        sites.set_vs30(site_class2vs30)
+        site_class2Vs30 = {'C': 30, 'E': 40}
+        sites.set_Vs30(site_class2Vs30)
 
         actual = array(latitude)
         self.assert_(allclose(sites.latitude, actual, 0.001))
@@ -35,11 +35,11 @@ class Test_Sites(unittest.TestCase):
         for (att, act) in map(None, sites.attributes['mo'], actual):
             self.assert_(att == act)
         actual = array([40, 30])
-        self.assert_(allclose(sites.attributes['VS30'], actual, 0.001))
+        self.assert_(allclose(sites.attributes['Vs30'], actual, 0.001))
 
-        site_class2vs30 = {'C': 30}
+        site_class2Vs30 = {'C': 30}
         try:
-            sites.set_vs30(site_class2vs30)
+            sites.set_Vs30(site_class2Vs30)
         except KeyError:
             pass
         else:

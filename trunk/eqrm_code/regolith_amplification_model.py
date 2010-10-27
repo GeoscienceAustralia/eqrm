@@ -241,47 +241,47 @@ def amplification_model_parameters_from_xml(filename):
 
     return pga_bins,moment_magnitude_bins,periods,log_amplifications,log_stds
 
-def load_site_class2vs30(file_name):
+def load_site_class2Vs30(file_name):
     """
-    Load the data used to convert a site class to a VS30 value.
+    Load the data used to convert a site class to a Vs30 value.
     args:
       file_name: The file to be opened, with extension, or
                  a file handle.
       
     Return:
-      class2vs30_dict: A dic of 'site_class' and 'vs30' keys.
+      class2Vs30_dict: A dic of 'site_class' and 'Vs30' keys.
 
     Raises:
       IOError if the file is not present or the file does not have
-        site_class and vs30 in the header.
+        site_class and Vs30 in the header.
     """
     csv_columns_dict, _ = csv2dict(file_name, ('vs30', 'site_class'),
                                    convert={'vs30':float})
     
-    site_class2vs30_dict = {}
-    for siteclass, vs30 in map(None, csv_columns_dict['site_class'],
+    site_class2Vs30_dict = {}
+    for siteclass, Vs30 in map(None, csv_columns_dict['site_class'],
                                csv_columns_dict['vs30']):
-        site_class2vs30_dict[siteclass] = vs30
-    return site_class2vs30_dict
+        site_class2Vs30_dict[siteclass] = Vs30
+    return site_class2Vs30_dict
     
-def load_site_class2vs30_old(file_name):
+def load_site_class2Vs30_old(file_name):
     """
-    Load the data used to convert a site class to a VS30 value.
+    Load the data used to convert a site class to a Vs30 value.
     Return:
-      class2vs30_dict: A dic of 'site_class' and 'vs30' keys.
+      class2Vs30_dict: A dic of 'site_class' and 'Vs30' keys.
 
     Raises:
       IOError if the file is not present or the file does not have
-        site_class and vs30 in the header.
+        site_class and Vs30 in the header.
     """
     from eqrm_code.csv_interface import csv2dict
-    csv_columns_dict = csv_to_arrays(file_name, ('vs30', 'site_class'))
+    csv_columns_dict = csv_to_arrays(file_name, ('Vs30', 'site_class'))
     
-    site_class2vs30_dict = {}
-    for siteclass, vs30 in map(None, csv_columns_dict['site_class'],
-                               csv_columns_dict['vs30']):
-        site_class2vs30_dict[siteclass] = vs30
-    return site_class2vs30_dict
+    site_class2Vs30_dict = {}
+    for siteclass, Vs30 in map(None, csv_columns_dict['site_class'],
+                               csv_columns_dict['Vs30']):
+        site_class2Vs30_dict[siteclass] = Vs30
+    return site_class2Vs30_dict
 
 
 def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,

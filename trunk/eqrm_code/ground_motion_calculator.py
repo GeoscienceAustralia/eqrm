@@ -99,7 +99,7 @@ class Ground_motion_calculator(object):
 
     def distribution_function(self, dist_object, mag_dict, periods=None,
                               depth=None, depth_to_top=None, fault_type=None,
-                              vs30=None, dist_type=None, mag_type=None,
+                              Vs30=None, dist_type=None, mag_type=None,
                               Z25=None, dip=None, width=None,
                               event_activity=None, event_id=None):
         """
@@ -138,7 +138,7 @@ class Ground_motion_calculator(object):
                                       coefficient=self.coefficient,
                                       sigma_coefficient=self.sigma_coefficient,
                                       depth=depth, depth_to_top=depth_to_top,
-                                      fault_type=fault_type, vs30=vs30,
+                                      fault_type=fault_type, Vs30=Vs30,
                                       Z25=Z25, dip=dip, width=width,
                                       periods=periods)
 
@@ -242,7 +242,7 @@ class Multiple_ground_motion_calculator(object):
                                                            periods))
 
     def distribution(self, sites, event_set, event_activity=None,
-                     event_id=None, vs30=None):
+                     event_id=None, Vs30=None):
         """
         Calculate the ground motion shaking at a site, given an array of
         events.
@@ -250,8 +250,8 @@ class Multiple_ground_motion_calculator(object):
         sites
         event_set, an event_set object.  The shape of the attributes of this
           instance will be equal to the shape of the returned arrays.
-        v330 - the vs30 value used if the gmm needs it.  If none is given the
-          site vs30 value is used.
+        v330 - the Vs30 value used if the gmm needs it.  If none is given the
+          site Vs30 value is used.
         
         """
         # get distances, etc
@@ -259,15 +259,15 @@ class Multiple_ground_motion_calculator(object):
                     distances_from_event_set(event_set,
                                              event_set_trace_starts=True)
         magnitudes = {'Mw': event_set.Mw, 'ML': event_set.ML}
-        if vs30 is None:
-            vs30 = sites.attributes.get('VS30', None)
+        if Vs30 is None:
+            Vs30 = sites.attributes.get('Vs30', None)
 
         results=self._distribution_function(
             distances, magnitudes,
             depth=event_set.depth,
             depth_to_top=event_set.depth_to_top,
             fault_type=event_set.fault_type,
-            vs30=vs30, Z25=None, dip=event_set.dip,
+            Vs30=Vs30, Z25=None, dip=event_set.dip,
             width=event_set.width,
             event_activity=event_activity,
             event_id=event_id,
@@ -279,7 +279,7 @@ class Multiple_ground_motion_calculator(object):
 
     def _distribution_function(self, dist_object, mag_dict, periods=None,
                                depth=None, depth_to_top=None,
-                               fault_type=None, vs30=None, Z25=None,
+                               fault_type=None, Vs30=None, Z25=None,
                                dip=None, width=None,
                                event_activity=None, event_id=None):
         """
@@ -301,7 +301,7 @@ class Multiple_ground_motion_calculator(object):
             (log_mean, log_sigma) = GM_model.distribution_function(
                 dist_object, mag_dict, periods=periods,
                 depth=depth, depth_to_top=depth_to_top,
-                fault_type=fault_type, vs30=vs30,
+                fault_type=fault_type, Vs30=Vs30,
                 Z25=Z25, dip=dip, width=width,
                 dist_type=GM_model.GM_spec.distance_type,
                 mag_type=GM_model.GM_spec.magnitude_type)

@@ -18,14 +18,14 @@ import numpy
 # Taken from AS_2008_nga.m
 ######
 
-def AS_2008_nga(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVS30):
+def AS_2008_nga(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVs30):
 
     Td = 10.0**(-1.25 + 0.3*M)
-    SaTd = AS_2008_nga_sub(M, 1100, Td, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVS30, 0.0, 0.0)
-    return AS_2008_nga_sub(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVS30, Td, SaTd)
+    SaTd = AS_2008_nga_sub(M, 1100, Td, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVs30, 0.0, 0.0)
+    return AS_2008_nga_sub(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVs30, Td, SaTd)
  
  
-def AS_2008_nga_sub(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVS30, Td, SaTd):
+def AS_2008_nga_sub(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVs30, Td, SaTd):
     """Modified a bit since T will always be a scalar and nver == 1000."""
 
     # for the given period T, get the index for the constants
@@ -34,8 +34,8 @@ def AS_2008_nga_sub(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS,
 
     Td = 10**(-1.25 + 0.3*M)
 
-    pga_rock = math.exp(calc_val(M, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, 0, 1100, get_abrahamson_silva_constants(0, 1100, FVS30)))
-    (tsigma, sigma, tau, pga_sigmaB, pga_tauB) = abrahamson_silva_sigma(M, pga_rock, Vs30,0, 0, get_abrahamson_silva_constants(0, Vs30, FVS30))
+    pga_rock = math.exp(calc_val(M, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, 0, 1100, get_abrahamson_silva_constants(0, 1100, FVs30)))
+    (tsigma, sigma, tau, pga_sigmaB, pga_tauB) = abrahamson_silva_sigma(M, pga_rock, Vs30,0, 0, get_abrahamson_silva_constants(0, Vs30, FVs30))
 
 #    nT = len(T)
     iflg = 0
@@ -51,7 +51,7 @@ def AS_2008_nga_sub(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS,
 #    
 #            for index=3:1:nperi:
 #                # get constants for the given index value
-#                V = get_abrahamson_silva_constants(index, Vs30, FVS30)
+#                V = get_abrahamson_silva_constants(index, Vs30, FVs30)
 #                if period[index] <= Td or SaTd == 0 or Vs30 < 1100.0:
 #                    Sa[index-2] = math.exp(calc_val(M, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, pga_rock, Vs30, V))
 #                else:
@@ -77,8 +77,8 @@ def AS_2008_nga_sub(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS,
                     T_hi = t
                     break
 
-            (sa_low, sigma_low, _) = AS_2008_nga_sub(M, Vs30, T_low, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVS30, Td, SaTd)
-            (sa_hi, sigma_hi, _) = AS_2008_nga_sub(M, Vs30, T_hi, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVS30, Td, SaTd)
+            (sa_low, sigma_low, _) = AS_2008_nga_sub(M, Vs30, T_low, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVs30, Td, SaTd)
+            (sa_hi, sigma_hi, _) = AS_2008_nga_sub(M, Vs30, T_hi, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVs30, Td, SaTd)
 
             # interpolate values for Sa and tsigma
             x = [math.log(T_low), math.log(T_hi)]
@@ -90,7 +90,7 @@ def AS_2008_nga_sub(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS,
             index = period.index(T)
 
             # get constants for the given index value
-            V = get_abrahamson_silva_constants(index, Vs30, FVS30);
+            V = get_abrahamson_silva_constants(index, Vs30, FVs30);
             if (period[index] <= Td) or (SaTd == 0) or (Vs30 < 1100.0):
                 Sa = math.exp(calc_val(M, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, pga_rock, Vs30, V))
             else:
@@ -207,7 +207,7 @@ class DataObj(object):
 
         self.__dict__ = kwargs
 
-def get_abrahamson_silva_constants(index,Vs30,FVS30):
+def get_abrahamson_silva_constants(index,Vs30,FVs30):
     # arrays with values by index
     period = [      0,      -1,    0.01,    0.02,    0.03,    0.04,    0.05,   0.075,     0.1,    0.15,     0.2,    0.25,     0.3,     0.4,     0.5,    0.75,       1,     1.5,       2,       3,       4,       5,     7.5,      10]
     lin    = [  865.1,   400.0,   865.1,   865.1,   907.8,   994.5,  1053.5,  1085.7,  1032.5,   877.6,   748.2,   654.3,   587.1,   503.0,   456.6,   410.5,   400.0,   400.0,   400.0,   400.0,   400.0,   400.0,   400.0,   400.0]
@@ -242,7 +242,7 @@ def get_abrahamson_silva_constants(index,Vs30,FVS30):
     c=1.88
     c2=50.0
     
-    if FVS30 == 1:
+    if FVs30 == 1:
         s1 = s1e[index]
         s2 = s2e[index]
     else:
@@ -338,10 +338,10 @@ FRV = 0
 FNM = 0
 FAS = 0
 FHW = 0
-FVS30 = 1
+FVs30 = 1
 
 for T in [0.01, 0.02, 0.03, 0.04, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 3.000E-01, 4.000E-01, 5.000E-01, 7.500E-01, 1.000E+00, 1.500E+00, 2.000E+00, 3.000E+00, 4.000E+00, 5.000E+00, 7.500E+00, 1.000E+01]:
-    (Sa, tsigma, period1) = AS_2008_nga(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVS30)
+    (Sa, tsigma, period1) = AS_2008_nga(M, Vs30, T, Rrup, Rjb, Rx, dip, Ztor, Z10, W, FRV, FNM, FAS, FHW, FVs30)
     print('M=%.1f, Vs30=%6.1f, period=%6.3f, Rrup=%5.1f, Rjb=%5.1f, Rx=%5.1f, Sa=%f, tsigma=%f' % (M, Vs30, T, Rrup, Rjb, Rx, Sa, tsigma))
     print('*'*80)
 

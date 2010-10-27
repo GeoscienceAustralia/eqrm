@@ -72,7 +72,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
             distances, magnitudes,
             depth=depths,
             event_activity=event_activity,
-            vs30=560.0)
+            Vs30=560.0)
         test_log_sigma = array([0.569, 0.609, 0.716])
         #print "log_sigma", log_sigma
         #FIXME check the shape as well

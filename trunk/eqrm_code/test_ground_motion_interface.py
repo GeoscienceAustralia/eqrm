@@ -252,7 +252,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         distance = array([[[4]]])
         mag = array([[[5.5]]])
-        vs30 = array([[[100.0]]])
+        Vs30 = array([[[100.0]]])
         
         c1 = 1.0
         c2 = 2.0
@@ -315,13 +315,13 @@ class Test_ground_motion_interface(unittest.TestCase):
         bnl = bnl_Boore_08(b1, b2, 770.)
         self.assert_(allclose(0.0, bnl))
         
-        bnl = bnl_Boore_08(b1, b2, vs30)
+        bnl = bnl_Boore_08(b1, b2, Vs30)
         self.assert_(allclose(1, bnl))
 
         bnl_local = 2
-        vs30_local = VREF_BOORE_08*100
+        Vs30_local = VREF_BOORE_08*100
         pga4nl = 0.01
-        fs = fs_Boore_08(blin, pga4nl, bnl_local, vs30_local)
+        fs = fs_Boore_08(blin, pga4nl, bnl_local, Vs30_local)
         
 
         # this has got some messy constants
@@ -329,7 +329,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         dely = bnl_local*log(0.09/0.06)
         c = (3*dely - bnl_local*delx)/delx**2
         d = -(2*dely - bnl_local*delx)/delx**3
-        flin = bnl_local*log(vs30_local/760)
+        flin = bnl_local*log(Vs30_local/760)
         
         fnl = bnl_local* log(0.06/0.1)
         fs_actual = flin + fnl        
@@ -339,13 +339,13 @@ class Test_ground_motion_interface(unittest.TestCase):
         fnl = bnl_local* log(0.06/0.1) + c*log(pga4nl/0.03)**2. + \
               d*log(pga4nl/0.03)**3.
         fs_actual = flin + fnl
-        fs = fs_Boore_08(blin, pga4nl, bnl_local, vs30_local)     
+        fs = fs_Boore_08(blin, pga4nl, bnl_local, Vs30_local)     
         self.assert_(allclose(fs_actual, fs))
         
         pga4nl = 0.1
         fnl = bnl_local* log(pga4nl/0.1)
         fs_actual = flin + fnl
-        fs = fs_Boore_08(blin, pga4nl, bnl_local, vs30_local)     
+        fs = fs_Boore_08(blin, pga4nl, bnl_local, Vs30_local)     
         self.assert_(allclose(fs_actual, fs))
 
         
@@ -356,7 +356,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         distance = array([[[4]]])
         mag = array([[[5.5]]])
-        vs30 = array([[[100.0]]])
+        Vs30 = array([[[100.0]]])
         
         c1 = 1.0
         c2 = 2.0
@@ -393,8 +393,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         fm = fm_Boore_08(e1, e5, e6, e7, mag, 6.75)
 
         pga4nl = 0.13899198 # From running gmi.
-        bnl = bnl_Boore_08(b1, b2, vs30)
-        fs = fs_Boore_08(blin, pga4nl, bnl, vs30)
+        bnl = bnl_Boore_08(b1, b2, Vs30)
+        fs = fs_Boore_08(blin, pga4nl, bnl, Vs30)
         
         log_mean_actual = fd + fm + fs
         
@@ -403,7 +403,7 @@ class Test_ground_motion_interface(unittest.TestCase):
             distance=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient,
-            vs30=vs30)
+            Vs30=Vs30)
         self.assert_(allclose(log_mean_actual, log_mean[0][0][0]))
         self.assert_(allclose(sigtu, log_sigma[0][0][0]))
    
@@ -415,8 +415,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         bnl  = array([[[1., 1., 2., 2.  ]]])
         blin = array([[[0., 0., 0., 0.]]]) # this is checked in a test above
 
-        vs30 = 760
-        fs = fs_Boore_08(blin, pga4nl, bnl, vs30)
+        Vs30 = 760
+        fs = fs_Boore_08(blin, pga4nl, bnl, Vs30)
         #pgalow = 0.06
         low = log(0.06/0.1)
         high = log(0.11/0.1)
@@ -433,7 +433,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         distance = array([[[4]]])
         mag = array([[[5.5]]])
-        vs30 = array([[[100.0]]])
+        Vs30 = array([[[100.0]]])
         
         c1 = 1.0
         c2 = 2.0
@@ -486,13 +486,13 @@ class Test_ground_motion_interface(unittest.TestCase):
             distance=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient,
-            vs30=vs30)
+            Vs30=Vs30)
         
         # From running gmi.
         pga4nl = array([[[0.13899198, 0.1389919, 0.1389919]]])
         
-        bnl = bnl_Boore_08(b1, b2, vs30)
-        fs = fs_Boore_08(blin, pga4nl, bnl, vs30)
+        bnl = bnl_Boore_08(b1, b2, Vs30)
+        fs = fs_Boore_08(blin, pga4nl, bnl, Vs30)
         
         log_mean_actual = fd + fm + fs
         
@@ -509,7 +509,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         distance = array([[[4]]])
         mag = array([[[5.5]]])
-        vs30 = array([[[100.0]]])
+        Vs30 = array([[[100.0]]])
         
         c1 = 1.0
         c2 = 2.0
@@ -641,7 +641,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         distance = array([[[4]]])
         mag = array([[[5.5]]])
-        vs30 = array([[[100.0]]])
+        Vs30 = array([[[100.0]]])
         
 
         
@@ -971,7 +971,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         """Test the Atkinson06_soil function."""
 
         # Run one scenario from Atkinson06_soil_check.py - scenario 4.
-        # period=1.0, distance=100.0, magnitude=7.5, vs30=400.0, logPSA=1.757910
+        # period=1.0, distance=100.0, magnitude=7.5, Vs30=400.0, logPSA=1.757910
 
         model_name = 'Atkinson06_soil'
         model = Ground_motion_specification(model_name)
@@ -982,14 +982,14 @@ class Test_ground_motion_interface(unittest.TestCase):
         ln_factor = math.log10(math.e)
 
         ######
-        # period = 1.0s, ML=7.5, R=100.0, vs30=400.0 - call Atkinson06_soil(),
+        # period = 1.0s, ML=7.5, R=100.0, Vs30=400.0 - call Atkinson06_soil(),
         #     returns ln g
         ######
 
         period = 1.0
         ML = numpy.array([[[7.5]]])
         R = numpy.array([[[100.0]]])
-        vs30 = numpy.array([[[400.0]]])
+        Vs30 = numpy.array([[[400.0]]])
 
         # get coeffs for this period
         coeffs = numpy.array([[[[-5.27e+0]]],[[[2.26e+0]]],[[[-1.48e-1]]],
@@ -1011,7 +1011,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                                    sigma_coefficient=\
                                                        sigma_coeffs,
                                                    mag=ML, distance=R,
-                                                   vs30=vs30)
+                                                   Vs30=Vs30)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
@@ -1098,7 +1098,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         period = 0.01
         ML = numpy.array([[[7.0]]])
         R = numpy.array([[[25.0]]])
-        vs30 = numpy.array([[[300.0]]])
+        Vs30 = numpy.array([[[300.0]]])
         #fault_type = numpy.array([[[0]]], dtype=int)
         fault_type = numpy.array([[[2]]], dtype=int)
         Ztor = numpy.array([[[0.0]]])
@@ -1136,7 +1136,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean,
              log_sigma) = Chiou08_distribution(mag=ML, dist_object = DistObj(),
                                                fault_type=fault_type, dip=dip,
-                                               depth_to_top=Ztor, vs30=vs30,
+                                               depth_to_top=Ztor, Vs30=Vs30,
                                                coefficient=coeffs,
                                                sigma_coefficient=sigma_coeffs)
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, log_mean_expected=%s'
@@ -1167,7 +1167,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         period = 0.01
         ML = numpy.array([[[4.0]]])
         R = numpy.array([[[5.0]]])
-        vs30 = numpy.array([[[300.0]]])
+        Vs30 = numpy.array([[[300.0]]])
         #fault_type = numpy.array([[[0]]], dtype=int)
         fault_type = numpy.array([[[2]]], dtype=int)
         dip = numpy.array([[[90.0]]])
@@ -1204,7 +1204,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean,
              log_sigma) = model.distribution(mag=ML, dist_object=DistObj(),
                                              fault_type=fault_type, dip=dip,
-                                             depth_to_top=Ztor, vs30=vs30,
+                                             depth_to_top=Ztor, Vs30=Vs30,
                                              coefficient=coeffs,
                                              sigma_coefficient=sigma_coeffs)
 
@@ -1319,7 +1319,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                                    depth_to_top=depth,
                                                    fault_type=fault_type,
                                                    dip=dip,
-                                                   vs30=Vs30, Z25=Z25,
+                                                   Vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -1389,7 +1389,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                                    depth_to_top=depth,
                                                    fault_type=fault_type,
                                                    dip=dip,
-                                                   vs30=Vs30, Z25=Z25,
+                                                   Vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -1459,7 +1459,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                                    depth_to_top=depth,
                                                    fault_type=fault_type,
                                                    dip=dip,
-                                                   vs30=Vs30, Z25=Z25,
+                                                   Vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -1529,7 +1529,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                                    depth_to_top=depth,
                                                    fault_type=fault_type,
                                                    dip=dip,
-                                                   vs30=Vs30, Z25=Z25,
+                                                   Vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -1599,7 +1599,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                                    depth_to_top=depth,
                                                    fault_type=fault_type,
                                                    dip=dip,
-                                                   vs30=Vs30, Z25=Z25,
+                                                   Vs30=Vs30, Z25=Z25,
                                                    coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -1669,7 +1669,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                                    depth_to_top=depth,
                                                    width=width,
                                                    fault_type=fault_type,
-                                                   dip=dip, vs30=Vs30,
+                                                   dip=dip, Vs30=Vs30,
                                                    coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)

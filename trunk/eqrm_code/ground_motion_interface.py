@@ -119,7 +119,7 @@ from eqrm_code import ground_motion_misc
 
 
 LOG10E = math.log10(math.e)
-BEDROCKVS30 = array([760.]) # m/s
+BEDROCKVs30 = array([760.]) # m/s
 
 # A dictionary of all the info specified bellow.
 # This is used by ground_motion_specification.
@@ -181,7 +181,7 @@ def Allen_distribution(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -245,7 +245,7 @@ def Gaull_1990_WA_distribution(**kwargs):
     
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -385,7 +385,7 @@ def Toro_1997_midcontinent_distribution_python(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -422,7 +422,7 @@ def Toro_1997_midcontinent_distribution(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -728,7 +728,7 @@ def AllenSEA06_distribution(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -849,7 +849,7 @@ def Atkinson_Boore_97_distribution(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -1126,7 +1126,7 @@ def Sadigh_97_distribution_python(**kwargs):
     """
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -1168,7 +1168,7 @@ def Sadigh_97_distribution(**kwargs):
     """
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -1331,7 +1331,7 @@ def Youngs_97_distribution_python(**kwargs):
     """
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -1452,7 +1452,7 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -1564,7 +1564,7 @@ def Youngs_97_distribution_python(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -1637,7 +1637,7 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -1783,15 +1783,15 @@ RECIP_LOG_V2_DIV_VREF = -1.07580561109 #1/log(V2_BOORE_08/VREF_BOORE_08)
 def Boore_08_distribution(**kwargs):
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    vs30 = kwargs['vs30']
+    Vs30 = kwargs['Vs30']
 
-    if vs30 is None:
-        raise Exception, "vs30 value unknown"       
+    if Vs30 is None:
+        raise Exception, "Vs30 value unknown"       
         
     # An expensive way of showing what the dimensions must be?
     num_sites,num_events=distance.shape[0:2]
@@ -1817,12 +1817,12 @@ def Boore_08_distribution(**kwargs):
     fm = fm_Boore_08(e1, e5, e6, e7, mag, mh)
     fm_pga = fm_Boore_08(e1_pga, e5_pga, e6_pga, e7_pga, mag, mh_pga)
     
-    bnl = bnl_Boore_08(b1, b2, vs30)
+    bnl = bnl_Boore_08(b1, b2, Vs30)
 
     pga4nl = exp(fd_pga + fm_pga)
     #print "gmi pga4nl", pga4nl
 
-    fs = fs_Boore_08(blin, pga4nl, bnl, vs30)
+    fs = fs_Boore_08(blin, pga4nl, bnl, Vs30)
     
     log_mean = fd + fm + fs    # BA08 (1)
     
@@ -1854,7 +1854,7 @@ def fm_Boore_08(e1, e5, e6, e7, mag, mh):
 # def memoize(function):
 #     b1 = None
 #     b2 = 'hear'
-#     vs30 = None
+#     Vs30 = None
 #     rv = None
 #     print "here"
 #     def wrapper(*args):
@@ -1872,22 +1872,22 @@ def fm_Boore_08(e1, e5, e6, e7, mag, mh):
 #     return wrapper
 
 #@memoize
-def bnl_Boore_08(b1, b2, vs30):
+def bnl_Boore_08(b1, b2, Vs30):
     # Should memoize the answer.
-    vs30 = float(vs30)
+    Vs30 = float(Vs30)
     # get bnl   
-    if vs30 <= V1_BOORE_08:
+    if Vs30 <= V1_BOORE_08:
         bnl = b1  # BA08 (13a)
-    elif vs30 <= V2_BOORE_08:
+    elif Vs30 <= V2_BOORE_08:
         # BA08 (13b)
-        bnl = (b1-b2)*log(vs30/V2_BOORE_08)*RECIP_LOG_V1_DIV_V2 + b2
-    elif vs30 < VREF_BOORE_08:   
-        bnl = b2*log(vs30/VREF_BOORE_08)*RECIP_LOG_V2_DIV_VREF  # BA08 (13c)
+        bnl = (b1-b2)*log(Vs30/V2_BOORE_08)*RECIP_LOG_V1_DIV_V2 + b2
+    elif Vs30 < VREF_BOORE_08:   
+        bnl = b2*log(Vs30/VREF_BOORE_08)*RECIP_LOG_V2_DIV_VREF  # BA08 (13c)
     else:
         bnl = 0.0    # BA08 (13d)
     return bnl
  
-def fs_Boore_08(blin, pga4nl, bnl, vs30):
+def fs_Boore_08(blin, pga4nl, bnl, Vs30):
     pga4nl = asarray(pga4nl)
     
     # DEPENDENT ON EACH OTHER #
@@ -1901,7 +1901,7 @@ def fs_Boore_08(blin, pga4nl, bnl, vs30):
     # DEPENDENT ON EACH OTHER #
     
     dy = bnl*LOG_A2_DIV_PGALOW  # hard code this log   # BA08 (12)
-    flin = blin * log(vs30/VREF_BOORE_08)   # BA08 (7)
+    flin = blin * log(Vs30/VREF_BOORE_08)   # BA08 (7)
 
     # Note, the +0*pga4nl below is to get the array size right
     # It does not effect the calculation.
@@ -1959,7 +1959,7 @@ def Somerville09_distribution(**kwargs):
 
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  vs30
+    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
@@ -2385,12 +2385,12 @@ def Atkinson06_calcS(pgaBC, **kwargs):
 
     pgaBC   the pgaBC value to use
     kwargs  dictionary of parameters, expect:
-                coefficient, vs30
+                coefficient, Vs30
     """
 
     # get args
     coefficient = kwargs['coefficient']
-    vs30 = kwargs['vs30']
+    Vs30 = kwargs['Vs30']
 
     # check we have the right shapes
     num_periods = coefficient.shape[3]
@@ -2403,25 +2403,25 @@ def Atkinson06_calcS(pgaBC, **kwargs):
     # we do this by calculating 4 arrays for each of 8A, 8b, 8C and 8D
     # and then filling appropriate elements of resultant Bnl.
     BnlA = B1
-    BnlB = (B1 - B2) * log(vs30/Atkinson06_V2) / Atkinson06_logV1divV2 + B2
-    BnlC = B2 * log(vs30/Atkinson06_Vref) / Atkinson06_logV2divVref
-    Bnl = 0.0	# zeros(vs30.shape)
+    BnlB = (B1 - B2) * log(Vs30/Atkinson06_V2) / Atkinson06_logV1divV2 + B2
+    BnlC = B2 * log(Vs30/Atkinson06_Vref) / Atkinson06_logV2divVref
+    Bnl = 0.0	# zeros(Vs30.shape)
 
-    Bnl = where(vs30 <= Atkinson06_Vref, BnlC, Bnl)
-    Bnl = where(vs30 <= Atkinson06_V2, BnlB, Bnl)
-    Bnl = where(vs30 <= Atkinson06_V1, BnlA, Bnl)
+    Bnl = where(Vs30 <= Atkinson06_Vref, BnlC, Bnl)
+    Bnl = where(Vs30 <= Atkinson06_V2, BnlB, Bnl)
+    Bnl = where(Vs30 <= Atkinson06_V1, BnlA, Bnl)
 
     # limit element-wise pgaBC values to be >= 60
     pgaBC = where(pgaBC < 60.0, 60.0, pgaBC)
 
     # return the S value
-    return log10(exp(Blin*log(vs30/Atkinson06_Vref) + Bnl*log(pgaBC/100)))
+    return log10(exp(Blin*log(Vs30/Atkinson06_Vref) + Bnl*log(pgaBC/100)))
 
 def Atkinson06_soil_distribution(**kwargs):
     """The Atkinson06_soil model function.
 
     kwargs  dictionary of parameters, expect:
-                mag, distance, coefficient, sigma_coefficient, vs30
+                mag, distance, coefficient, sigma_coefficient, Vs30
 
     This function just calls Atkinson06_basic() with a computed S value
     and converts the result to ln g.
@@ -2433,7 +2433,7 @@ def Atkinson06_soil_distribution(**kwargs):
         distance = kwargs['distance']
         coefficient = kwargs['coefficient']
         sigma_coefficient = kwargs['sigma_coefficient']
-        vs30 = kwargs['vs30']
+        Vs30 = kwargs['Vs30']
     except KeyError, e:
         print('kwargs dictionary to Atkinson06_soil_distribution() '
               'is missing a parameter: %s' % e)
@@ -2697,7 +2697,7 @@ def Chiou08_distribution(**kwargs):
     """The Chiou08 model.
 
     kwargs  dictionary of parameters, expect:
-                mag, distance, fault_type, depth_to_top, vs30, dip,
+                mag, distance, fault_type, depth_to_top, Vs30, dip,
                 coefficient, sigma_coefficient
 
     The algorithm here is taken from the code in
@@ -2710,7 +2710,7 @@ def Chiou08_distribution(**kwargs):
     fault_type = kwargs['fault_type']    # event-specific
     Ztor = kwargs['depth_to_top']        # event-specific
     Dip = kwargs['dip']                  # event-specific
-    Vs30 = kwargs['vs30']                # site-specific
+    Vs30 = kwargs['Vs30']                # site-specific
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
@@ -3031,7 +3031,7 @@ Chiou08_distance_type = 'Rupture'
 #    """The Chiou08 model.
 #
 #    kwargs  dictionary of parameters, expect:
-#                mag, distance, fault_type, depth_to_top, vs30, dip,
+#                mag, distance, fault_type, depth_to_top, Vs30, dip,
 #                coefficient, sigma_coefficient
 #
 #    The algorithm here is taken from [1], pages 193 and 194  and returns results
@@ -3048,7 +3048,7 @@ Chiou08_distance_type = 'Rupture'
 #    Rrup = kwargs['distance']			# event-site-specific
 #    fault_type = kwargs['fault_type']	# event-specific
 #    Ztor = kwargs['depth_to_top']		# event-specific
-#    Vs30 = kwargs['vs30']			# site-specific
+#    Vs30 = kwargs['Vs30']			# site-specific
 #    coefficient = kwargs['coefficient']
 #    sigma_coefficient = kwargs['sigma_coefficient']
 #
@@ -3403,7 +3403,7 @@ def Campbell08_distribution(**kwargs):
     M = kwargs['mag']				# event-specific
     dist_object = kwargs['dist_object']		# distance object
     Ztor = kwargs['depth_to_top']		# event-specific
-    Vs30 = kwargs['vs30']			# site-specific
+    Vs30 = kwargs['Vs30']			# site-specific
     delta = kwargs['dip']			# event-specific
     fault_type = kwargs['fault_type']	# event-specific
     coefficient = kwargs['coefficient']
@@ -3799,10 +3799,10 @@ mean_1_sigma_0pt5_args=[
 gound_motion_init['mean_1_sigma_0pt5'] = mean_1_sigma_0pt5_args
 
 #***************  End of mean_1_sigma_0pt5 ****************************
-#***************  START OF return_vs30  ****************************
+#***************  START OF return_Vs30  ****************************
 
 
-def return_vs30_distribution(**kwargs):
+def return_Vs30_distribution(**kwargs):
     
     num_sites =  kwargs['distance'].shape[0]
     num_events =  kwargs['distance'].shape[1]
@@ -3812,11 +3812,11 @@ def return_vs30_distribution(**kwargs):
     log_sigma = ones((num_sites, num_events, num_periods))
     return log_mean, log_sigma
 
-return_vs30_uses_Vs30 = True
+return_Vs30_uses_Vs30 = True
 
 
-return_vs30_args=[
-    return_vs30_distribution,
+return_Vs30_args=[
+    return_Vs30_distribution,
     mean_model_magnitude_type,
     mean_model_distance_type,
     
@@ -3828,11 +3828,11 @@ return_vs30_args=[
     mean_model_sigma_coefficient_period,
     mean_model_sigma_coefficient_interpolation,
 
-    return_vs30_uses_Vs30]
+    return_Vs30_uses_Vs30]
 
-gound_motion_init['return_vs30'] = return_vs30_args
+gound_motion_init['return_Vs30'] = return_Vs30_args
 
-#***************  End of return_vs30 ****************************
+#***************  End of return_Vs30 ****************************
 #***************  START OF mean_2_sigma_1  ****************************
 
 def mean_2_sigma_1_distribution(**kwargs):
@@ -3888,7 +3888,7 @@ def Abrahamson08_distribution(**kwargs):
     Ztor = kwargs['depth_to_top']
     Dip = kwargs['dip']
     W = kwargs['width']
-    Vs30 = kwargs['vs30']
+    Vs30 = kwargs['Vs30']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
