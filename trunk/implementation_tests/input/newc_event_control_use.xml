@@ -105,6 +105,16 @@
     scaling_fault_type = "reverse"  />
   </event_group>
   
+  <event_group
+     event_type = "return_vs30">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "return_vs30" weight = "1.0"/>
+    </GMPE>
+    <scaling scaling_rule = "WellsCoppersmith94" 
+    scaling_fault_type = "reverse"  />
+  </event_group>
+  
 </event_type_controlfile>
 			
 	
