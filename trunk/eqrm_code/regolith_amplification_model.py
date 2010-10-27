@@ -303,32 +303,17 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
         No used yet.
     """
 
-    if len(bedrock_SA.shape) == 4:
-        # this will get deleted very soon....
-        GM_model_axis = 0
-        soil_SA = zeros(bedrock_SA.shape)
-        
-        for i_gmm in arange(bedrock_SA.shape[GM_model_axis]):
-            _, log_mean, log_sigma = \
-               soil_amplification_model.distribution(
-                bedrock_SA[i_gmm,:],
-                site_classes,
-                Mw,
-                atten_periods)
-            
-            amp_distribution.set_log_mean_log_sigma_etc(
-                log_mean, log_sigma)
-            (_, sub_soil_SA, _) = \
-                amp_distribution.sample_for_eqrm()
-            soil_SA[i_gmm,:] = sub_soil_SA
-            
-    elif len(bedrock_SA.shape) == 5:
-        spawn_axis = 0
-        GM_model_axis = 1
-        soil_SA = zeros(bedrock_SA.shape)
+    spawn_axis = 0
+    GM_model_axis = 1
+    assert  bedrock_SA.shape[GM_model_axis] == len(
+        ground_motion_calc.GM_models)
+    soil_SA = zeros(bedrock_SA.shape)
 
-        for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
-            for i_gmm in arange(bedrock_SA.shape[GM_model_axis]):
+    for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
+        for i_gmm, gmm in enumerate(ground_motion_calc.GM_models):
+            if gmm.GM_spec.uses_Vs30 is True:
+                log_mean, log_sigma = log(10), log(100)
+            else:
                 _, log_mean, log_sigma = \
                    soil_amplification_model.distribution(
                     bedrock_SA[i_spawn, i_gmm,:],
@@ -336,8 +321,8 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
                     Mw,
                     atten_periods)
                 
-                (_, sub_soil_SA, _) = \
-                    amp_distribution.sample_for_eqrm(log_mean, log_sigma)
-                soil_SA[i_spawn,i_gmm,:] = sub_soil_SA
-        
+            (_, sub_soil_SA, _) = \
+                amp_distribution.sample_for_eqrm(log_mean, log_sigma)
+            soil_SA[i_spawn,i_gmm,:] = sub_soil_SA
+    
     return soil_SA
