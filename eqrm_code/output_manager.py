@@ -402,7 +402,7 @@ def save_motion(motion_name,THE_PARAM_T,motion,compress=False,
                     f.write('% ground motion model = '+str(i_gmm)+'\n')
                     f.write('% First row are rsa periods, then rows are sites'
                             '\n')
-                    #f.write('% First row are rsa periods - subsequent rows are sites\n')
+                    f.write('% First row are rsa periods - subsequent rows are sites\n')
                     f.write(
                         ' '.join([str(p) for p in THE_PARAM_T.atten_periods]) \
                             + '\n')
