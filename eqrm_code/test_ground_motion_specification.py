@@ -753,32 +753,6 @@ test_data['Chiou08_test_Vs30'] = [300.0, 300.0, 300.0]
 #                                       SS SS SS
 test_data['Chiou08_test_fault_type'] = [2, 2, 2]
 
-## mean values, in 'g'
-#tmp = zeros((1,3,3))    # (num_sites, num_events, num_periods)
-#tmp[0,0,0] = 5.581E-02 # Rrup=  5.0, Mw=4.0, T=0.01
-#tmp[0,1,0] = 5.575E-02 # Rrup= 25.0, Mw=5.5, T=0.01
-#tmp[0,2,0] = 3.701E-02 # Rrup=100.0, Mw=7.0, T=0.01
-#tmp[0,0,1] = 9.876E-03 # Rrup=  5.0, Mw=4.0, T=1.00
-#tmp[0,1,1] = 3.414E-02 # Rrup= 25.0, Mw=5.5, T=1.00
-#tmp[0,2,1] = 4.728E-02 # Rrup=100.0, Mw=7.0, T=1.00
-#tmp[0,0,2] = 8.548E-04 # Rrup=  5.0, Mw=4.0, T=3.00
-#tmp[0,1,2] = 5.605E-03 # Rrup= 25.0, Mw=5.5, T=3.00
-#tmp[0,2,2] = 1.415E-02 # Rrup=100.0, Mw=7.0, T=3.00
-#test_data['Chiou08_test_mean'] = tmp
-#
-## sigma values, in 'g'
-#tmp = zeros((1,3,3))    # (num_sites, num_events, num_periods)
-#tmp[0,0,0] = 6.508E-01 # Rrup=  5.0, Mw=4.0, T=0.01
-#tmp[0,1,0] = 6.140E-01 # Rrup= 25.0, Mw=5.5, T=0.01
-#tmp[0,2,0] = 5.090E-01 # Rrup=100.0, Mw=7.0, T=0.01
-#tmp[0,0,1] = 6.931E-01 # Rrup=  5.0, Mw=4.0, T=1.00
-#tmp[0,1,1] = 6.744E-01 # Rrup= 25.0, Mw=5.5, T=1.00
-#tmp[0,2,1] = 6.353E-01 # Rrup=100.0, Mw=7.0, T=1.00
-#tmp[0,0,2] = 7.266E-01 # Rrup=  5.0, Mw=4.0, T=3.00
-#tmp[0,1,2] = 7.202E-01 # Rrup= 25.0, Mw=5.5, T=3.00
-#tmp[0,2,2] = 7.024E-01 # Rrup=100.0, Mw=7.0, T=3.00
-#test_data['Chiou08_test_sigma'] = tmp
-
 # mean values, in 'g'
 tmp = zeros((3,3,3))    # (num_sites, num_events, num_periods)
 tmp[0,0,0] = 5.581E-02 # Rrup=  5.0, Mw=4.0, T=0.01
