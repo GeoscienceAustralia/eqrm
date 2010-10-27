@@ -2717,6 +2717,7 @@ def Chiou08_distribution(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
+    # assumed (for now) parameters
     AS = 0
     Fhw = 0
 
@@ -2779,18 +2780,10 @@ def Chiou08_distribution(**kwargs):
     # estimate Z10 from Vs30
     Z10 = conversions.convert_Vs30_to_Z10(Vs30)
 
+    # resize the distances to standard form
     Rrup = Rrup[:,:,newaxis]
     Rjb = Rjb[:,:,newaxis]
     Rx = Rx[:,:,newaxis]
-
-# C.....
-# C.....CALCULATE ROCK PSA (Vs30 = 1130 m/sec)
-# C.....
-# C.....Style-of-Faulting Term
-# C.....
-# 
-#       f_flt = c1T + (c1aT*Frv + c1bT*Fnm + c7T*(Ztor - 4.0))*(1.0 - AS)
-#      *  + (c10T + c7aT*(Ztor - 4.0))*AS
 
     ######
     # CALCULATE ROCK PSA (Vs30 = 1130 m/sec)
@@ -2799,61 +2792,19 @@ def Chiou08_distribution(**kwargs):
     # Style-of-Faulting Term
     f_flt = c1T + (c1aT*Frv + c1bT*Fnm + c7T*(Ztor - 4.0))*(1.0 - AS) + (c10T + c7aT*(Ztor - 4.0))*AS
 
-# C.....
-# C.....Magnitude Term
-# C.....
-# 
-#       f_mag = c2T*(Mw - 6.0)
-#      *  + ((c2T-c3T)/cnT)*ALOG(1.0 + EXP(cnT*(cmT - Mw)))
-
     # Magnitude Term
     f_mag = c2T*(Mw - 6.0) + ((c2T-c3T)/cnT)*log(1.0 + exp(cnT*(cmT - Mw)))
-
-# C.....
-# C.....Distance Term
-# C.....
-# 
-#       R = SQRT(Rrup**2 + crbT**2)
-#       f_dis = c4T*ALOG(Rrup + c5T*COSH(c6T*MAX(Mw-chmT,0.0)))
-#      *  + (c4aT-c4T)*ALOG(R)
-#      *  + (cg1T + cg2T/COSH(MAX(Mw-cg3T,0.0)))*Rrup
 
     # Distance Term
 
     R = sqrt(Rrup**2 + crbT**2)
     f_dis = c4T*log(Rrup + c5T*cosh(c6T*maximum(Mw-chmT,0.0))) + (c4aT-c4T)*log(R) + (cg1T + cg2T/cosh(maximum(Mw-cg3T,0.0)))*Rrup
 
-# C.....
-# C.....Hanging-Wall Term
-# C.....
-# 
-#       pi = 4.0*ATAN(1.0)
-#       f_hng = c9T*Fhw*TANH(Rx*(COS(Dip*pi/180.0)**2)/c9aT)
-#      *     * (1.0 - SQRT(Rjb**2+Ztor**2)/(Rrup+0.001))
-
     # Hanging-Wall Term
     f_hng = c9T*Fhw*tanh(Rx*(cos(Dip*pi/180.0)**2)/c9aT) * (1.0 - sqrt(Rjb**2+Ztor**2)/(Rrup+0.001))
 
-# C.....
-# C.....Value of PSA on Rock (Vs30 = 1130 m/sec)
-# C.....
-# 
-#       Yref = EXP(f_flt + f_mag + f_dis + f_hng)
-
     # Value of PSA on Rock (Vs30 = 1130 m/sec)
     Yref = exp(f_flt + f_mag + f_dis + f_hng)
-
-# C.....
-# C.....CALCULATE STRONG MOTION PARAMETER
-# C.....
-# C.....Site Response Term
-# C.....
-# 
-#       a = phi1T*MIN(ALOG(Vs30/1130.0),0.0)
-#       b = phi2T*(EXP(phi3T*(MIN(Vs30,1130.0)-360.0)) - EXP(phi3T*770.0))
-#       c = phi4T
-# 
-#       f_site = a + b*ALOG((Yref+c)/c)
 
     ######
     # CALCULATE STRONG MOTION PARAMETER
@@ -2866,34 +2817,11 @@ def Chiou08_distribution(**kwargs):
 
     f_site = a + b*log((Yref+c)/c)
 
-# C.....
-# C.....Sediment Depth Term
-# C.....
-# 
-#       f_sed = phi5T*(1.0 - 1.0/COSH(phi6T*MAX(Z10-phi7T,0.0)))
-#      *  + phi8T/COSH(0.15*MIN(MAX(Z10-15.0,0.0),300.0))
-
     # Sediment Depth Term
     f_sed = phi5T*(1.0 - 1.0/cosh(phi6T*maximum(Z10-phi7T,0.0))) + phi8T/cosh(0.15*minimum(maximum(Z10-15.0,0.0),300.0))
     
-# C.....
-# C.....Value of Ground Motion Parameter
-# C.....
-# 
-#       Y = EXP(ALOG(Yref) + f_site + f_sed)
-
     # Value of Ground Motion Parameter
     Y = exp(log(Yref) + f_site + f_sed)
-
-# C.....
-# C.....CALCULATE ALEATORY UNCERTAINTY
-# C.....
-# C.....
-# C     Standard Deviation of Geometric Mean of ln Y
-# C.....
-#
-#       NL0 = b*Yref/(Yref+c)
-#       Tau = tau1T + ((tau2T-tau1T)/2.0)*(MIN(MAX(Mw,5.0),7.0)-5.0)
 
     ######
     # CALCULATE ALEATORY UNCERTAINTY
@@ -2904,30 +2832,12 @@ def Chiou08_distribution(**kwargs):
     NL0 = b*Yref/(Yref+c)
     Tau = tau1T + ((tau2T-tau1T)/2.0)*(minimum(maximum(Mw,5.0),7.0)-5.0)
 
-# C       Inferred Vs30
-# 
-#       Finferred = 1.0
-#       Fmeasured = 0.0
-# 
-#       SigInfer = (sig1T + ((sig2T-sig1T)/2.0)*(MIN(MAX(Mw,5.0),7.0)-5.0)
-#      *  + sig4T*AS)*SQRT(sig3T*Finferred + 0.7*Fmeasured + (1.0+NL0)**2)
-#       SigTinfer = SQRT(((1.0+NL0)**2)*Tau**2 + SigInfer**2)
-
     # Inferred Vs30
     Finferred = 1.0
     Fmeasured = 0.0
 
     SigInfer = (sig1T + ((sig2T-sig1T)/2.0)*(minimum(maximum(Mw,5.0),7.0)-5.0) + sig4T*AS)*sqrt(sig3T*Finferred + 0.7*Fmeasured + (1.0+NL0)**2)
     SigTinfer = sqrt(((1.0+NL0)**2)*Tau**2 + SigInfer**2)
-
-# C       Measured Vs30
-# 
-#       Finferred = 0.0
-#       Fmeasured = 1.0
-# 
-#       SigMeas = (sig1T + ((sig2T-sig1T)/2.0)*(MIN(MAX(Mw,5.0),7.0)-5.0)
-#      *  + sig4T*AS)*SQRT(sig3T*Finferred + 0.7*Fmeasured + (1.0+NL0)**2)
-#       SigTmeas = SQRT(((1.0+NL0)**2)*Tau**2 + SigMeas**2)
 
     # Measured Vs30
     Finferred = 0.0
@@ -2996,217 +2906,6 @@ Chiou08_nper = len(Chiou08_coefficient_period)
 
 Chiou08_magnitude_type = 'Mw'
 Chiou08_distance_type = 'Rupture'
-
-
-
-
-#"""Code here is based on Chiou [1].
-#
-#    [1] Chiou.B.S.-J., Youngs R.R., 2008 An NGA Model for the Average Horizontal
-#        Component of Peak Ground Motion and Response Spectra,
-#        Earthquake Spectra 24, 173-215.
-#"""
-#
-#
-## constants from Chiou [1] table 1
-#Ch_C2 = 1.06
-#Ch_C3 = 3.45
-#Ch_C4 = -2.1
-#Ch_C4a = -0.5
-#Ch_Crb = 50.0
-#Ch_Chm = 3.0
-#Ch_Cgamma3 = 4.0
-#
-## precalculate constant expressions
-#Ch_C2_minus_C3 = Ch_C2-Ch_C3
-#Ch_Crb_square = Ch_Crb * Ch_Crb
-#Ch_1130_min_360 = 1130 - 360.0
-#Ch_378_7_pow_8 = math.pow(378.7, 8)
-#Ch_3_82_div_8 = 3.82/8.0
-#
-#######
-## Set up a numpy array to convert a 'fault_type' flag to an array slice
-## that encodes the Frv/Fnm flags.
-#######
-#
-## faulting type flag encodings
-##                    'type':     (Frv, Fnm)
-#Ch_faulting_flags = {'reverse':    (1, 0),
-#                     'normal':     (0, 1),
-#                     'strikeslip': (0, 0)}
-#
-## generate 'Ch_fault_type' from the dictionary above 
-#tmp = []
-#for (k, v) in Ch_faulting_flags.iteritems():
-#    index = ground_motion_misc.FaultTypeDictionary[k]
-#    tmp.append((index, v))
-#
-## sort and make array in correct index order
-#tmp2 = []
-#tmp.sort()
-#for (_, flags) in tmp:
-#    tmp2.append(flags)
-#Ch_fault_type = array(tmp2)
-#del tmp, tmp2
-#
-#######
-## The model function.
-#######
-#
-#def Chiou08_distribution(**kwargs):
-#    """The Chiou08 model.
-#
-#    kwargs  dictionary of parameters, expect:
-#                mag, distance, fault_type, depth_to_top, Vs30, dip,
-#                coefficient, sigma_coefficient
-#
-#    The algorithm here is taken from [1], pages 193 and 194  and returns results
-#    that are log10 cm/s/s.  Local simplifications are applied:
-#        Z1 value calculated from Vs30
-#        AS = 0, results in some terms of model equation being simplified
-#        eta and sigma random values assumed to be 0
-#        the last term equation 13a (page 193) starting C9*Fhw... is ignored since
-#            Fhw is 0 (no hanging-wall)
-#    """
-#
-#    # get args
-#    M = kwargs['mag']				# event-specific
-#    Rrup = kwargs['distance']			# event-site-specific
-#    fault_type = kwargs['fault_type']	# event-specific
-#    Ztor = kwargs['depth_to_top']		# event-specific
-#    Vs30 = kwargs['Vs30']			# site-specific
-#    coefficient = kwargs['coefficient']
-#    sigma_coefficient = kwargs['sigma_coefficient']
-#
-#    # check we have the right shapes
-#    num_periods = coefficient.shape[3]
-#    msg = ('Expected coefficient.shape %s, got %s'
-#           % (str((22, 1, 1, num_periods)), str(coefficient.shape)))
-#    assert coefficient.shape == (22, 1, 1, num_periods), msg
-#    msg = ('Expected sigma_coefficient.shape %s, got %s'
-#           % (str((2, 1, 1, num_periods)), str(sigma_coefficient.shape)))
-#    assert sigma_coefficient.shape == (2, 1, 1, num_periods), msg
-#
-#    # unpack coefficients
-#    (C1, C1a, C1b, Cn, CM, C5, C6, C7, C7a, C9, C9a, C10, Cgamma1, Cgamma2,
-#         phi1, phi2, phi3, phi4, phi5, phi6, phi7, phi8) = coefficient
-#
-#    # get flag values from 'fault_type'
-#    Frv = Ch_fault_type[:,0][fault_type]
-#    Fnm = Ch_fault_type[:,1][fault_type]
-#
-#    # precalculate some common expressions
-#    M_min_Ch_Chm = M - Ch_Chm
-#    M_min_Ch_Cgamma3 = M - Ch_Cgamma3
-#
-#    lnYref = (C1 + (C1a*Frv + C1b*Fnm + C7*(Ztor-4)) +
-#              Ch_C2*(M-6) + (Ch_C2_minus_C3/Cn)*log(1 + exp(Cn*(CM-M))) +
-#              Ch_C4*log(Rrup +
-#                  C5*cosh(C6*where(M_min_Ch_Chm<0,0,M_min_Ch_Chm))) +
-#              (Ch_C4a-Ch_C4)*log(sqrt(Rrup*Rrup + Ch_Crb_square)) +
-#              (Cgamma1 + Cgamma2/
-#                   cosh(where(M_min_Ch_Cgamma3<0,0,M_min_Ch_Cgamma3)))*Rrup)
-#
-#    Yref = exp(lnYref)
-#    Z1 = conversions.convert_Vs30_to_Z10(Vs30)
-#
-#    # precalculate some common sub-expressions
-#    log_Vs30_div_1130 = log(Vs30/1130.0)
-#    min_log_Vs30_div_1130_zero = where(log_Vs30_div_1130>0,0,log_Vs30_div_1130)
-#    min_Vs30_1130_min_360 = where(Vs30 > 1130.0, 1130.0, Vs30) - 360.0
-#    Z1_min_phi7 = Z1 - phi7
-#    max_zero_Z1_min_phi7 = where(Z1_min_phi7 < 0, 0, Z1_min_phi7)
-#    Z1_min_15 = Z1 - 15.0
-#    max_zero_Z1_min_15 = where(Z1_min_15 < 0, 0, Z1_min_15)
-#
-#    log_mean = (lnYref + phi1*min_log_Vs30_div_1130_zero +
-#                phi2*(exp(phi3*min_Vs30_1130_min_360)-exp(phi3*Ch_1130_min_360))*
-#                    log((Yref+phi4)/phi4) +
-#                phi5*(1.0-1.0/(cosh(phi6*max_zero_Z1_min_phi7))) + 
-#                    phi8/cosh(0.15*max_zero_Z1_min_15))
-#
-#    log_sigma = ones(log_mean.shape) * sigma_coefficient[0]
-#
-#    return (log_mean, log_sigma)
-#
-#Chiou08_magnitude_type = 'Mw'
-#Chiou08_distance_type = 'Rupture'
-#
-#######
-## Start building the coefficient array
-#######
-#
-## dimension = (#periods, #coefficients)
-#Chiou08_Table2 = array([
-##  C1       C1a      C1b     Cn     CM      C5      C6      C7      C7a     C9      C9a      C10     Cgamma1   Cgamma2
-#[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # pga
-#[-1.2687,  0.1,    -0.2550, 2.996, 4.1840, 6.1600, 0.4893, 0.0512, 0.0860, 0.7900, 1.5005, -0.3218, -0.00804, -0.00785],   # 0.01
-#[-1.2515,  0.1,    -0.2550, 3.292, 4.1879, 6.1580, 0.4892, 0.0512, 0.0860, 0.8129, 1.5028, -0.3323, -0.00811, -0.00792],   # 0.02
-#[-1.1744,  0.1,    -0.2550, 3.514, 4.1556, 6.1550, 0.4890, 0.0511, 0.0860, 0.8439, 1.5071, -0.3394, -0.00839, -0.00819],   # 0.03
-#[-1.0671,  0.1,    -0.2550, 3.563, 4.1226, 6.1508, 0.4888, 0.0508, 0.0860, 0.8740, 1.5138, -0.3453, -0.00875, -0.00855],   # 0.04
-#[-0.9464,  0.1,    -0.2550, 3.547, 4.1011, 6.1441, 0.4884, 0.0504, 0.0860, 0.8996, 1.5230, -0.3502, -0.00912, -0.00891],   # 0.05
-#[-0.7051,  0.1,    -0.2540, 3.448, 4.0860, 6.1200, 0.4872, 0.0495, 0.0860, 0.9442, 1.5597, -0.3579, -0.00973, -0.00950],   # 0.075
-#[-0.5747,  0.1,    -0.2530, 3.312, 4.1030, 6.0850, 0.4854, 0.0489, 0.0860, 0.9677, 1.6104, -0.3604, -0.00975, -0.00952],   # 0.1
-#[-0.5309,  0.1,    -0.2500, 3.044, 4.1717, 5.9871, 0.4808, 0.0479, 0.0860, 0.9660, 1.7549, -0.3565, -0.00883, -0.00862],   # 0.15
-#[-0.6352,  0.1,    -0.2449, 2.831, 4.2476, 5.8699, 0.4755, 0.0471, 0.0860, 0.9334, 1.9157, -0.3470, -0.00778, -0.00759],   # 0.2
-#[-0.7766,  0.1,    -0.2382, 2.658, 4.3184, 5.7547, 0.4706, 0.0464, 0.0860, 0.8946, 2.0709, -0.3379, -0.00688, -0.00671],   # 0.25
-#[-0.9278,  0.0999, -0.2313, 2.505, 4.3844, 5.6527, 0.4665, 0.0458, 0.0860, 0.8590, 2.2005, -0.3314, -0.00612, -0.00598],   # 0.3
-#[-1.2176,  0.0997, -0.2146, 2.261, 4.4979, 5.4997, 0.4607, 0.0445, 0.0850, 0.8019, 2.3886, -0.3256, -0.00498, -0.00486],   # 0.4
-#[-1.4695,  0.0991, -0.1972, 2.087, 4.5881, 5.4029, 0.4571, 0.0429, 0.0830, 0.7578, 2.5000, -0.3189, -0.00420, -0.00410],   # 0.5
-#[-1.9278,  0.0936, -0.1620, 1.812, 4.7571, 5.2900, 0.4531, 0.0387, 0.0690, 0.6788, 2.6224, -0.2702, -0.00308, -0.00301],   # 0.75
-#[-2.2453,  0.0766, -0.1400, 1.648, 4.8820, 5.2480, 0.4517, 0.0350, 0.0450, 0.6196, 2.6690, -0.2059, -0.00246, -0.00241],   # 1.0
-#[-2.7307,  0.0022, -0.1184, 1.511, 5.0697, 5.2194, 0.4507, 0.0280, 0.0134, 0.5101, 2.6985, -0.0852, -0.00180, -0.00176],   # 1.5
-#[-3.1413, -0.0591, -0.1100, 1.470, 5.2173, 5.2099, 0.4504, 0.0213, 0.0040, 0.3917, 2.7085,  0.0160, -0.00147, -0.00143],   # 2.0
-#[-3.7413, -0.0931, -0.1040, 1.456, 5.4385, 5.2040, 0.4501, 0.0106, 0.0010, 0.1244, 2.7145,  0.1876, -0.00117, -0.00115],   # 3.0
-#[-4.1814, -0.0982, -0.1020, 1.465, 5.5977, 5.2020, 0.4501, 0.0041, 0,      0.0086, 2.7164,  0.3378, -0.00107, -0.00104],   # 4.0
-#[-4.5187, -0.0994, -0.1010, 1.478, 5.7276, 5.2010, 0.4500, 0.0010, 0,      0,      2.7172,  0.4579, -0.00102, -0.00099],   # 5.0
-#[-5.1224, -0.0999, -0.1010, 1.498, 5.9891, 5.2000, 0.4500, 0,      0,      0,      2.7177,  0.7514, -0.00096, -0.00094],   # 7.5
-#[-5.5872, -0.1,    -0.1000, 1.502, 6.1930, 5.2000, 0.4500, 0,      0,      0,      2.7180,  1.1856, -0.00094, -0.00091]])  # 10.0
-#
-## dimension = (#periods, #coefficients)
-#Chiou08_Table3 = array([
-## phi1     phi2     phi3      phi4      phi5    phi6      phi7    phi8
-#[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # pga
-#[-0.4417, -0.1417, -0.007010, 0.102151, 0.2289, 0.014996, 580.0,  0.0700],  # 0.01
-#[-0.4340, -0.1364, -0.007279, 0.108360, 0.2289, 0.014996, 580.0,  0.0699],  # 0.02
-#[-0.4177, -0.1403, -0.007354, 0.119888, 0.2289, 0.014996, 580.0,  0.0701],  # 0.03
-#[-0.4000, -0.1591, -0.006977, 0.133641, 0.2289, 0.014996, 579.9,  0.0702],  # 0.04
-#[-0.3903, -0.1862, -0.006467, 0.148927, 0.2290, 0.014996, 579.9,  0.0701],  # 0.05
-#[-0.4040, -0.2538, -0.005734, 0.190596, 0.2292, 0.014996, 579.6,  0.0686],  # 0.075
-#[-0.4423, -0.2943, -0.005604, 0.230662, 0.2297, 0.014996, 579.2,  0.0646],  # 0.1
-#[-0.5162, -0.3113, -0.005845, 0.266468, 0.2326, 0.014988, 577.2,  0.0494],  # 0.15
-#[-0.5697, -0.2927, -0.006141, 0.255253, 0.2386, 0.014964, 573.9, -0.0019],  # 0.2
-#[-0.6109, -0.2662, -0.006439, 0.231541, 0.2497, 0.014881, 568.5, -0.0479],  # 0.25
-#[-0.6444, -0.2405, -0.006704, 0.207277, 0.2674, 0.014639, 560.5, -0.0756],  # 0.3
-#[-0.6931, -0.1975, -0.007125, 0.165464, 0.3120, 0.013493, 540.0, -0.0960],  # 0.4
-#[-0.7246, -0.1633, -0.007435, 0.133828, 0.3610, 0.011133, 512.9, -0.0998],  # 0.5
-#[-0.7708, -0.1028, -0.008120, 0.085153, 0.4353, 0.006739, 441.9, -0.0765],  # 0.75
-#[-0.7990, -0.0699, -0.008444, 0.058595, 0.4629, 0.005749, 391.8, -0.0412],  # 1.0
-#[-0.8382, -0.0425, -0.007707, 0.031787, 0.4756, 0.005544, 348.1,  0.0140],  # 1.5
-#[-0.8663, -0.0302, -0.004792, 0.019716, 0.4785, 0.005521, 332.5,  0.0544],  # 2.0
-#[-0.9032, -0.0129, -0.001828, 0.009643, 0.4796, 0.005517, 324.1,  0.1232],  # 3.0
-#[-0.9231, -0.0016, -0.001523, 0.005379, 0.4799, 0.005517, 321.7,  0.1859],  # 4.0
-#[-0.9222,  0.0000, -0.001440, 0.003223, 0.4799, 0.005517, 320.9,  0.2295],  # 5.0
-#[-0.8346,  0.0000, -0.001369, 0.001134, 0.4800, 0.005517, 320.3,  0.2660],  # 7.5
-#[-0.7332,  0.0000, -0.001361, 0.000515, 0.4800, 0.005517, 320.1,  0.2682]]) # 10.0
-#
-## join tables 2 and 3, convert to dim = (#coefficients, #periods)
-#Chiou08_coefficient = concatenate((Chiou08_Table2, Chiou08_Table3), axis=1)
-#Chiou08_coefficient = Chiou08_coefficient.transpose()
-#
-## dim = (period,)
-#Chiou08_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.040,
-#                              0.050, 0.075, 0.100, 0.150, 0.200,
-#                              0.250, 0.300, 0.400, 0.500, 0.750,
-#                              1.000, 1.500, 2.000, 3.000, 4.000,
-#                              5.000, 7.500, 10.00]
-#
-## dim = (period,)
-## we want to say sigma (error) is 0, but log(0) == -infinity,
-## so we use a very small value
-#sigma = math.log(1.0e-20)
-#Chiou08_sigma_coefficient = [[sigma,sigma], [sigma,sigma]]
-#Chiou08_sigma_coefficient_period = [0.0, 1.0]
 
 Chiou08_interpolation = linear_interpolation
 
@@ -3337,8 +3036,6 @@ Campbell03_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
                                  3.000, 4.000]
 
 # dim = (period,)
-# we want to say sigma (error) is 0, but log(0) == -infinity,
-# so we use a very small value
 Campbell03_sigma_coefficient = Campbell03_Table6[:,10:].transpose()
 Campbell03_sigma_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
                                        0.075, 0.100, 0.150, 0.200, 0.300,
@@ -3388,7 +3085,8 @@ Campbell08_exp_min_075 = math.exp(-0.75)
 
 ######
 # Set up a numpy array to convert a 'fault_type' flag to an array slice
-# that encodes the Frv/Fnm flags.
+# that encodes the Frv/Fnm flags.  We want a list of three elements that
+# indexes 'fault type' to a (Frv, Fnm) tuple.
 ######
 
 # faulting type flag encodings
@@ -4005,12 +3703,9 @@ def Abrahamson08_distribution(**kwargs):
     Frv = AS08_fault_type[:,0][fault_type]
     Fnm = AS08_fault_type[:,1][fault_type]
 
-    # 'aftershock' flag is assumed to be 'not aftershock'
+    # these parameters are assumed 0 (for now)
     Fas = 0
-
-#######
-    Fhw = 0		# assumed for now
-#######
+    Fhw = 0
 
     # set correct shape for params
     Rrup = Rrup[:,:,newaxis]
@@ -4021,7 +3716,7 @@ def Abrahamson08_distribution(**kwargs):
 
 
     # get Z1.0 value from Vs30
-    Z10 = conversions.convert_Vs30_to_Z10(Vs30)		# TODO - check function is array-safe
+    Z10 = conversions.convert_Vs30_to_Z10(Vs30)
 
     # unpack coefficients
     (c1T, c4T, a3T, a4T, a5T, nT, cT, c2T, VlinT, bT,
@@ -4500,7 +4195,7 @@ def Abrahamson08_distribution(**kwargs):
 
 
 ######
-# Set up a numpy array to convert a 'fault_type' flag to an array slice
+# Set up a numpy array to convert a 'fault_type' flag to an array
 # that encodes the Frv/Fnm flags.
 ######
 
