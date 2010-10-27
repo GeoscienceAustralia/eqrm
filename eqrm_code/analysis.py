@@ -32,9 +32,9 @@ from eqrm_code.event_set import Event_Set, Pseudo_Event_Set, Event_Activity, \
      generate_synthetic_events_fault, merge_events_and_sources
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
-from eqrm_code.ground_motion_interface import BEDROCKVS30
+from eqrm_code.ground_motion_interface import BEDROCKVs30
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
-     Regolith_amplification_model, load_site_class2vs30
+     Regolith_amplification_model, load_site_class2Vs30
 from eqrm_code.source_model import source_model_from_xml, Source_Model
 from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
          save_event_set, save_hazard, save_structures, save_val, \
@@ -861,7 +861,7 @@ def calc_and_save_SA(THE_PARAM_T,
         results = ground_motion_calc.distribution(
             event_set=sub_event_set,
             sites=sites,
-            vs30=BEDROCKVS30)
+            Vs30=BEDROCKVs30)
         _ , log_mean_extend_GM, log_sigma_extend_GM = results 
         # *_extend_GM has shape of (GM_model, sites, events, periods)
         
@@ -1150,15 +1150,15 @@ def load_data(THE_PARAM_T):
     if sites is None:
         raise RuntimeError("Couldn't find BUILDING or BRIDGE data?")
 
-    # Load the site_class 2 vs30 mapping
+    # Load the site_class 2 Vs30 mapping
     amp_factor_file = 'site_class2vs30.csv'
     amp_factor_file = get_local_or_default(amp_factor_file,
                                            THE_PARAM_T.default_input_dir,
                                            THE_PARAM_T.input_dir)
-    # Load vs30 mapping
-    site_class2vs30 = load_site_class2vs30(amp_factor_file)
-    # Use the mapping to add vs30 info to add vs30 info to structures
-    sites.set_vs30(site_class2vs30)
+    # Load Vs30 mapping
+    site_class2Vs30 = load_site_class2Vs30(amp_factor_file)
+    # Use the mapping to add Vs30 info to add Vs30 info to structures
+    sites.set_Vs30(site_class2Vs30)
 
     return (sites, bridge_data)
 

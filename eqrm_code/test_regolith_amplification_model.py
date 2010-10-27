@@ -243,7 +243,7 @@ CD
 
         os.remove(file_name)
 
-    def test_load_site_class2vs30(self):
+    def test_load_site_class2Vs30(self):
         a = 60.0
         b = 2.0
         title_index_dic = {
@@ -257,12 +257,12 @@ CD
         handle, file_name = tempfile.mkstemp('.csv','test_regolith_')
         os.close(handle)
         dict2csv(file_name, title_index_dic, attribute_dic)
-        results = load_site_class2vs30(file_name)
+        results = load_site_class2Vs30(file_name)
         os.remove(file_name)
         #print "results",results 
         self.failUnless(results == answer,  'Failed!')
         
-    def test_load_site_class2vs30_2(self):
+    def test_load_site_class2Vs30_2(self):
         a = 60.0
         b = 2.0
         title_index_dic = {
@@ -277,11 +277,11 @@ CD
         os.close(handle)
         dict2csv(file_name, title_index_dic, attribute_dic)
         file_handle = open(file_name,"rb")
-        results = load_site_class2vs30(file_handle)
+        results = load_site_class2Vs30(file_handle)
         os.remove(file_name)
         self.failUnless(results == answer,  'Failed!')
 
-    def test_load_site_class2vs30_bad(self):
+    def test_load_site_class2Vs30_bad(self):
         a = 60.0
         b = 2.0
         title_index_dic = {
@@ -296,7 +296,7 @@ CD
         os.close(handle)
         dict2csv(file_name, title_index_dic, attribute_dic)
         try:
-            results = load_site_class2vs30(file_name)
+            results = load_site_class2Vs30(file_name)
         except IOError:
             os.remove(file_name)
             pass

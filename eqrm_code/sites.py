@@ -102,22 +102,22 @@ class Sites(object):
 
         return Sites(self.latitude[key], self.longitude[key], **attributes)
 
-    def set_vs30(self, site_class2vs30):
-        """Given a mapping from site_class to vs30, calculate the vs30 values
+    def set_Vs30(self, site_class2Vs30):
+        """Given a mapping from site_class to Vs30, calculate the Vs30 values
         for all of the sites.
 
-        site_class2vs30    dictionary of 'site_class' and 'vs30' keys
+        site_class2Vs30    dictionary of 'site_class' and 'Vs30' keys
         """
-        # Calculate a vs30 value
-        vs30_list = []
+        # Calculate a Vs30 value
+        Vs30_list = []
         for site_class in self.attributes['SITE_CLASS']:
             try:
-                vs30_list.append(site_class2vs30[site_class])
+                Vs30_list.append(site_class2Vs30[site_class])
             except KeyError:
-                # FIXME The site class 2 VS30 mapping does not cover all
+                # FIXME The site class 2 Vs30 mapping does not cover all
                 # site classes.
                 raise KeyError
-        self.attributes['VS30'] = array(vs30_list)
+        self.attributes['Vs30'] = array(Vs30_list)
 
     #FIXME consider moving to event set
     def distances_from_event_set(self, event_set, event_set_trace_starts=True):

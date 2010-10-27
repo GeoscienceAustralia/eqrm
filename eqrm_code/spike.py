@@ -1,8 +1,8 @@
 
 class A(object):
-    def dis(self, depth, vs30):
+    def dis(self, depth, Vs30):
         self.depth = depth
-        self.vs30 = vs30
+        self.Vs30 = Vs30
         print "A done"
 
         
@@ -16,7 +16,7 @@ class B(object):
 class A1(object):
     def dis(self, **kwargs):
         self.depth = kwargs['depth']
-        self.vs30 = kwargs['vs30']
+        self.Vs30 = kwargs['Vs30']
         print "A done"
         
 class B1(object):

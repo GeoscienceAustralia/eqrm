@@ -32,41 +32,41 @@ g_factor = math.log(9.80665*100)
 # various equations from the Atkinson paper
 ######
 
-def eqn_8a(B1, B2, vs30, V1, V2):
+def eqn_8a(B1, B2, Vs30, V1, V2):
     return B1
 
-def eqn_8b(B1, B2, vs30, V1, V2):
-    return (B1-B2)*math.log(vs30/V2)/math.log(V1/V2) + B2
+def eqn_8b(B1, B2, Vs30, V1, V2):
+    return (B1-B2)*math.log(Vs30/V2)/math.log(V1/V2) + B2
 
-def eqn_8c(B1, B2, vs30, V1, V2):
-    return B2 * math.log(vs30/Vref)/math.log(V2/Vref)
+def eqn_8c(B1, B2, Vs30, V1, V2):
+    return B2 * math.log(Vs30/Vref)/math.log(V2/Vref)
 
-def eqn_8d(B1, B2, vs30, V1, V2):
+def eqn_8d(B1, B2, Vs30, V1, V2):
     return 0.0
 
-def eqn_8(B1, B2, vs30, V1, V2):
-    if vs30 <= V1:
-        Bnl = eqn_8a(B1, B2, vs30, V1, V2)
-    elif V1 < vs30 <= V2:
-        Bnl = eqn_8b(B1, B2, vs30, V1, V2)
-    elif V2 < vs30 <= Vref:
-        Bnl = eqn_8c(B1, B2, vs30, V1, V2)
+def eqn_8(B1, B2, Vs30, V1, V2):
+    if Vs30 <= V1:
+        Bnl = eqn_8a(B1, B2, Vs30, V1, V2)
+    elif V1 < Vs30 <= V2:
+        Bnl = eqn_8b(B1, B2, Vs30, V1, V2)
+    elif V2 < Vs30 <= Vref:
+        Bnl = eqn_8c(B1, B2, Vs30, V1, V2)
     else:
-        Bnl = eqn_8d(B1, B2, vs30, V1, V2)
+        Bnl = eqn_8d(B1, B2, Vs30, V1, V2)
 
     return Bnl
 
-def eqn_7a(Blin, vs30, Vref, Bnl, pgaBC):
-    return math.log10(math.exp(Blin*math.log(vs30/Vref) + Bnl*math.log(60.0/100.0)))
+def eqn_7a(Blin, Vs30, Vref, Bnl, pgaBC):
+    return math.log10(math.exp(Blin*math.log(Vs30/Vref) + Bnl*math.log(60.0/100.0)))
 
-def eqn_7b(Blin, vs30, Vref, Bnl, pgaBC):
-    return math.log10(math.exp(Blin*math.log(vs30/Vref) + Bnl*math.log(pgaBC/100.0)))
+def eqn_7b(Blin, Vs30, Vref, Bnl, pgaBC):
+    return math.log10(math.exp(Blin*math.log(Vs30/Vref) + Bnl*math.log(pgaBC/100.0)))
 
-def eqn_7(Blin, vs30, Vref, Bnl, pgaBC):
+def eqn_7(Blin, Vs30, Vref, Bnl, pgaBC):
     if pgaBC <= 60.0:
-        return eqn_7a(Blin, vs30, Vref, Bnl, pgaBC)
+        return eqn_7a(Blin, Vs30, Vref, Bnl, pgaBC)
     else:
-        return eqn_7b(Blin, vs30, Vref, Bnl, pgaBC)
+        return eqn_7b(Blin, Vs30, Vref, Bnl, pgaBC)
 
 def eqn_5(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, M, Rcd, S):
     R0 = 10.0
@@ -104,7 +104,7 @@ def same(prefix, value, expected, rtol=0.01):
 
 def check_scenario(period, distance, magnitude, expected_logPSA,
                    c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, Blin, B1, B2):
-    """Run base bedrock known case and soil for various vs30"""
+    """Run base bedrock known case and soil for various Vs30"""
 
     # run known bedrock case, compare with expected_logPSA
     S = 0.0
@@ -117,16 +117,16 @@ def check_scenario(period, distance, magnitude, expected_logPSA,
          % (period, distance, magnitude),
          logPSA, expected_logPSA, rtol=3.0e-2)
 
-    # do 3 vs30 values in [200, 1000]
-    for vs30 in (200.0, 400.0, 1000.0):
+    # do 3 Vs30 values in [200, 1000]
+    for Vs30 in (200.0, 400.0, 1000.0):
         pgaBC = eqn_5(pga_c1, pga_c2, pga_c3, pga_c4, pga_c5,
                       pga_c6, pga_c7, pga_c8, pga_c9, pga_c10,
                       magnitude, distance, 0.0)
-        Bnl = eqn_8(B1, B2, vs30, V1, V2)
-        S = eqn_7(Blin, vs30, Vref, Bnl, pgaBC)
+        Bnl = eqn_8(B1, B2, Vs30, V1, V2)
+        S = eqn_7(Blin, Vs30, Vref, Bnl, pgaBC)
         logPSA = eqn_5(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, magnitude, distance, S)
-        print('scenario, vs30=%.1f, S=%f, logPSA=%f, result=%f'
-             % (vs30, S, logPSA, logPSA/ln_factor-g_factor))
+        print('scenario, Vs30=%.1f, S=%f, logPSA=%f, result=%f'
+             % (Vs30, S, logPSA, logPSA/ln_factor-g_factor))
 
 ######
 # period = 0.2, distance = 100.0, magnitude = 7.5
