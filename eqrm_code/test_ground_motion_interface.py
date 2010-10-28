@@ -989,7 +989,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         period = 1.0
         ML = numpy.array([[[7.5]]])
         R = numpy.array([[[100.0]]])
-        Vs30 = numpy.array([[[400.0]]])
+        Vs30 = numpy.array([400.0])
 
         # get coeffs for this period
         coeffs = numpy.array([[[[-5.27e+0]]],[[[2.26e+0]]],[[[-1.48e-1]]],

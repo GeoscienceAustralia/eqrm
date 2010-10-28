@@ -111,7 +111,7 @@ from copy import  deepcopy
 from scipy import where, sqrt, array, asarray, exp, log, newaxis, zeros, \
                   log10, isfinite, weave, ones, shape, reshape, concatenate, \
                   tanh, cosh, power, shape, tile, cos, pi, copy, resize, \
-                  logical_and, logical_or, sum, minimum, maximum
+                  logical_and, logical_or, sum, minimum, maximum, ones_like
  
 from eqrm_code.ground_motion_misc import linear_interpolation, \
                                          Australian_standard_model, \
@@ -430,7 +430,6 @@ def Toro_1997_midcontinent_distribution(**kwargs):
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    #print "coefficient", coefficient                    
     num_sites,num_events=distance.shape[0:2]
     num_periods=coefficient.shape[3]
     assert coefficient.shape==(7,1,1,num_periods)
@@ -1354,19 +1353,13 @@ def Youngs_97_distribution_python(**kwargs):
     use_dist=use_dist*1.0
     use_dist2=(1-use_dist)
     distance=distance*use_dist2+10*use_dist
-    #print distance
-    #print mag
-    #print depth
-    #print Z_t
     log_mean=0.2418+1.414*mag+c1+c2*((10.0-mag)**3)+c3* \
               log(distance+1.7818*exp(0.554*mag))+0.00607*depth+0.3846*Z_t
     s1,s2=sigma_coefficient
-    #print log_mean
     use_m=(mag<8)
     use_m=use_m*1.0
     use_n=(1-use_m)
     log_sigma=s1+s2*mag*use_m+s2*8*use_n #SD uses magnitude=8 for magnitude>8
-    #print log_sigma
     assert isfinite(log_mean).all()
     return log_mean,log_sigma
 
@@ -1582,19 +1575,13 @@ def Youngs_97_distribution_python(**kwargs):
     use_dist=use_dist*1.0
     use_dist2=(1-use_dist)
     distance=distance*use_dist2+10*use_dist
-    #print distance
-    #print mag
-    #print depth
-    #print Z_t
     log_mean=0.2418+1.414*mag+c1+c2*((10.0-mag)**3)+c3* \
               log(distance+1.7818*exp(0.554*mag))+0.00607*depth+0.3846*Z_t
     s1,s2=sigma_coefficient
-    #print log_mean
     use_m=(mag<8)
     use_m=use_m*1.0
     use_n=(1-use_m)
     log_sigma=s1+s2*mag*use_m+s2*8*use_n #SD uses magnitude=8 for magnitude>8
-    #print log_sigma
     assert isfinite(log_mean).all()
     return log_mean,log_sigma
 
@@ -1823,7 +1810,6 @@ def Boore_08_distribution(**kwargs):
     bnl = bnl_Boore_08(b1, b2, Vs30)
 
     pga4nl = exp(fd_pga + fm_pga)
-    #print "gmi pga4nl", pga4nl
 
     fs = fs_Boore_08(blin, pga4nl, bnl, Vs30)
     
@@ -1975,9 +1961,6 @@ def Somerville09_distribution(**kwargs):
     #assert sigma_coefficient.shape==(3,1,1,num_periods)
     assert mag.shape==(1,num_events,1) # (num_sites,num_events,1)?
     assert distance.shape==(num_sites,num_events,1)
-#     print "num_sites", num_sites
-#     print "num_events",num_events 
-#     print "num_periods", num_periods
 
     log_mean = Somerville09_log_mean(coefficient, mag, distance)
     num_events = distance.shape[1]
@@ -1986,14 +1969,11 @@ def Somerville09_distribution(**kwargs):
     return log_mean,log_sigma
 
 def Somerville09_log_mean(coefficient, mag, distance):
-    #print "coefficient", coefficient
     c1, c2, c3, c4, c5, c6, c7, c8 = coefficient
     m1 = 6.4
     mag = asarray(mag)
     distance = asarray(distance)
-    #print "t distance", distance
     ln_R = log((distance**2 + 36.0)**0.5)
-    #print "t ln_R", ln_R
     
     mag_neg_m1 = (mag - m1)
     # Note the ( + 0*e1) is to get the index shape correct.
@@ -2005,16 +1985,9 @@ def Somerville09_log_mean(coefficient, mag, distance):
     ln_R1 = 3.9191716577785582
     # To get the index shape correct
     ln_R1 = ln_R1 + 0*distance
-    #print "c6", c6
     T6 = where(distance + 0*c6 < 50.0,
                0,
                c6*(ln_R-ln_R1))
-#     print "c3", c3
-#     print "ln_R1", ln_R1
-#     print "ln_R", ln_R
-#     print "distance", distance
-#     print "c3*ln_R", c3*ln_R
-#     print "c3*ln_R1", c3*ln_R1
     T3 = where(distance + 0*c3 < 50.0,
                c3*ln_R,
                c3*ln_R1)
@@ -2070,9 +2043,6 @@ Somerville09_Yilgarn_coefficient_period=[
 Somerville09_Yilgarn_sigma_coefficient_period=[
    0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3003,
    0.4, 0.5, 0.75, 1., 1.4993, 2., 3.003, 4., 5., 7.5019, 10.,]
-#print "len(Somerville_Yilgarn_sig_coefficient)", len(Somerville_Yilgarn_sigma_coefficient)
-#print "len(Somerville_Yilgarn_sigma_coefficient_period)", len(Somerville_Yilgarn_sigma_coefficient_period)
-
 
 Somerville09_Yilgarn_uses_Vs30 = False
 
@@ -2319,12 +2289,6 @@ def Atkinson06_basic(**kwargs):
     sigma_coefficient = kwargs['sigma_coefficient']
     S = kwargs['S']
 
-    # check we have the right shapes
-    num_periods = coefficient.shape[3]
-    msg = ('Expected coefficient.shape %s, got %s'
-           % (str((13, 1, 1, num_periods)), str(coefficient.shape)))
-    assert coefficient.shape == (13, 1, 1, num_periods), msg
-
     # intermediate calculated coefficients
     tmp = log10(Atkinson06_R0/Rcd)
     f0 = where(tmp < 0, 0, tmp)
@@ -2341,8 +2305,13 @@ def Atkinson06_basic(**kwargs):
 
     log_mean = (c1 + c2*M + c3*M*M + (c4 + c5*M)*f1 + (c6 + c7*M)*f2 +
                    (c8 + c9*M)*f0 + c10*Rcd + S)
-    num_events = M.shape[2]
-    log_sigma = tile(sigma_coefficient[0],(1,num_events,1))
+
+    # there is only a single value, just create array of required size
+    log_sigma = ones_like(log_mean) * sigma_coefficient[0,0,0,0]
+#    num_events = M.shape[1]
+#    num_sites = Rcd.shape[0]
+#    num_periods = coefficient.shape[3]
+#    log_sigma = tile(sigma_coefficient[0,0,0,0], (num_sites,num_events,num_periods))
 
     return (log_mean, log_sigma)
 
@@ -2367,12 +2336,41 @@ def Atkinson06_hard_bedrock_distribution(**kwargs):
                'is missing a parameter: %s' % e)
         raise RuntimeError(msg)
 
+    # check we have the right shapes
+    num_sites = Rcd.shape[0]
+    num_events = M.shape[1]
+    num_periods = coefficient.shape[3]
+
+    msg = 'Expected %s.shape=%s, got %s'
+
+    assert M.shape == (1, num_events, 1), (msg
+               % ('M', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(M.shape)))
+    assert Rcd.shape == (num_sites, num_events, 1), (msg
+               % ('Rcd', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Rcd.shape)))
+    assert coefficient.shape == (13, 1, 1, num_periods), (msg
+               % ('coefficient', '(13,1,1,%d)' % num_periods,
+                  str(coefficient.shape)))
+    assert sigma_coefficient.shape == (2, 1, 1, num_periods), (msg
+               % ('sigma_coefficient', '(2,1,1,%d)' % num_periods,
+                  str(sigma_coefficient.shape)))
+
     # get result in log10(cm/s/s)
     (log_mean, log_sigma) = Atkinson06_basic(S=0.0, **kwargs)
 
     # convert to g and natural log
     log_mean = log_mean/Log102Ln - LnCmss2Lng
     log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+
+    # check result has right dimensions
+    num_sites = Rcd.shape[0]
+    assert log_mean.shape == (num_sites, num_events, num_periods), (msg
+               % ('log_mean', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(log_mean.shape)))
+    assert log_sigma.shape == (num_sites, num_events, num_periods), (msg
+               % ('log_sigma', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(log_sigma.shape)))
 
     return (log_mean, log_sigma)
 
@@ -2434,17 +2432,35 @@ def Atkinson06_soil_distribution(**kwargs):
     try:
         mag = kwargs['mag']
         distance = kwargs['distance']
+        Vs30 = kwargs['Vs30']
         coefficient = kwargs['coefficient']
         sigma_coefficient = kwargs['sigma_coefficient']
-        Vs30 = kwargs['Vs30']
     except KeyError, e:
         print('kwargs dictionary to Atkinson06_soil_distribution() '
               'is missing a parameter: %s' % e)
         raise
 
+    # check we have the right shapes
+    num_sites = distance.shape[0]
+    num_events = mag.shape[1]
     num_periods = coefficient.shape[3]
-    assert coefficient.shape == (13, 1, 1, num_periods)
-    assert sigma_coefficient.shape == (2, 1, 1, num_periods)
+
+    msg = 'Expected %s.shape=%s, got %s'
+
+    assert mag.shape == (1, num_events, 1), (msg
+               % ('mag', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(mag.shape)))
+    assert distance.shape == (num_sites, num_events, 1), (msg
+               % ('distance', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(distance.shape)))
+    assert Vs30.shape == (num_sites,), (msg
+               % ('Vs30', '(%d,)' % num_sites, str(Vs30.shape)))
+    assert coefficient.shape == (13, 1, 1, num_periods), (msg
+               % ('coefficient', '(13,1,1,%d)' % num_periods,
+                  str(coefficient.shape)))
+    assert sigma_coefficient.shape == (2, 1, 1, num_periods), (msg
+               % ('sigma_coefficient', '(2,1,1,%d)' % num_periods,
+                  str(sigma_coefficient.shape)))
 
     # calculate pgaBC here, use PGA (period=0.0) coefficients
     (pgaBC, _) = Atkinson06_basic(mag=kwargs['mag'],
@@ -2465,6 +2481,15 @@ def Atkinson06_soil_distribution(**kwargs):
     # convert to g and natural log
     log_mean = log_mean/Log102Ln - LnCmss2Lng
     log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+
+    # check result has right dimensions
+    num_sites = distance.shape[0]
+    assert log_mean.shape == (num_sites, num_events, num_periods), (msg
+               % ('log_mean', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(log_mean.shape)))
+    assert log_sigma.shape == (num_sites, num_events, num_periods), (msg
+               % ('log_sigma', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(log_sigma.shape)))
 
     return (log_mean, log_sigma)
 
@@ -2492,12 +2517,41 @@ def Atkinson06_bc_boundary_bedrock(**kwargs):
                'is missing a parameter: %s' % e)
         raise RuntimeError(msg)
 
+    # check we have the right shapes
+    num_sites = Rcd.shape[0]
+    num_events = M.shape[1]
+    num_periods = coefficient.shape[3]
+
+    msg = 'Expected %s.shape=%s, got %s'
+
+    assert M.shape == (1, num_events, 1), (msg
+               % ('M', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(M.shape)))
+    assert Rcd.shape == (num_sites, num_events, 1), (msg
+               % ('Rcd', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Rcd.shape)))
+    assert coefficient.shape == (13, 1, 1, num_periods), (msg
+               % ('coefficient', '(13,1,1,%d)' % num_periods,
+                  str(coefficient.shape)))
+    assert sigma_coefficient.shape == (2, 1, 1, num_periods), (msg
+               % ('sigma_coefficient', '(2,1,1,%d)' % num_periods,
+                  str(sigma_coefficient.shape)))
+
     # get result in log10(cm/s/s)
     (log_mean, log_sigma) = Atkinson06_basic(S=0.0, **kwargs)
 
     # convert to g and natural log
     log_mean = log_mean/Log102Ln - LnCmss2Lng
     log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+
+    # check result has right dimensions
+    num_sites = Rcd.shape[0]
+    assert log_mean.shape == (num_sites, num_events, num_periods), (msg
+               % ('log_mean', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(log_mean.shape)))
+    assert log_sigma.shape == (num_sites, num_events, num_periods), (msg
+               % ('log_sigma', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(log_sigma.shape)))
 
     return (log_mean, log_sigma)
 
