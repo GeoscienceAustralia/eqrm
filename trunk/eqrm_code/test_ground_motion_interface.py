@@ -1713,6 +1713,276 @@ class Test_ground_motion_interface(unittest.TestCase):
         act_log_mean = ones((num_sites, num_events, num_periods))*10
         self.failUnless(allclose(log_mean, act_log_mean))
         self.failUnless(allclose(log_sigma, act_log_sigma))
+
+        
+    def test_Zhao_2006_intraslab(self):
+        """Test the Campbell03 model."""
+
+        model_name = 'Zhao_2006_intraslab'
+        model = Ground_motion_specification(model_name)
+
+        ######
+        # period = 0.2, ML=7.0, R=10.0,
+        # expect lnY=0.0663, sigma=0.4904 (from Campbell03_check.py)
+        ######
+
+        period = 0.0
+        ML = numpy.array([[[5.0]]])
+        R = numpy.array([[[1.0]]])
+        h = numpy.array([[[100]]])
+        Vs30 = numpy.array([[[760]]])
+        
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[1.1010]]], [[[ -0.00564]]], [[[0.0055]]],
+                              [[[1.08]]], [[[0.01412]]], [[[ 2.6070]]],
+                              [[[ -0.528]]], [[[ 0.293]]], [[[ 1.111]]],
+                              [[[1.344]]], [[[ 1.355]]], [[[ 1.420]]],
+                             [[[0.1392]]], [[[ 0.1584]]], [[[ -0.0529]]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[0.604]]], [[[0.321]]]])
+
+
+        # expected values from Campbell03_check.py
+        log_mean_expected = numpy.array([[[2.8272]]])
+        log_sigma_expected = numpy.array([[[0.6840]]])
+
+        (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
+                                                   distance=R,depth = h,
+                                                   Vs30 = Vs30,coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+##        print log_mean
+
+        # tests for equality should be quite tight as we check against
+        # Campbell03_check.py
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+
+    def test_Zhao_2006_interface(self):
+        """Test the Campbell03 model."""
+
+        model_name = 'Zhao_2006_interface'
+        model = Ground_motion_specification(model_name)
+
+        ######
+        # period = 0.2, ML=7.0, R=10.0,
+        # expect lnY=0.0663, sigma=0.4904 (from Campbell03_check.py)
+        ######
+
+        period = 0.0
+        ML = numpy.array([[[5.0]]])
+        R = numpy.array([[[1.0]]])
+        h = numpy.array([[[100]]])
+        Vs30 = numpy.array([[[760]]])
+        
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[1.1010]]], [[[ -0.00564]]], [[[0.0055]]],
+                              [[[1.08]]], [[[0.01412]]], [[[ 0]]],
+                              [[[ 0.293]]], [[[ 1.111]]],
+                              [[[1.344]]], [[[ 1.355]]], [[[ 1.420]]],
+                              [[[ 0.0]]], [[[ 0.0]]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[0.604]]], [[[0.308]]]])
+
+
+        # expected values from Campbell03_check.py
+        log_mean_expected = numpy.array([[[ 0.1255]]])
+        log_sigma_expected = numpy.array([[[0.6780]]])
+
+        (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
+                                                   distance=R,depth = h,
+                                                   Vs30 = Vs30,coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+##        print log_mean
+
+        # tests for equality should be quite tight as we check against
+        # Campbell03_check.py
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+
+    def test_Atkinson_2003_interface(self):
+        """Test the Campbell03 model."""
+
+        model_name = 'Atkinson_2003_interface'
+        model = Ground_motion_specification(model_name)
+
+        ######
+        # period = 0.2, ML=7.0, R=10.0,
+        # expect lnY=0.0663, sigma=0.4904 (from Campbell03_check.py)
+        ######
+
+        period = 0.0
+        ML = numpy.array([[[5.0]]])
+        R = numpy.array([[[10.0]]])
+        h = numpy.array([[[100]]])
+        Vs30 = numpy.array([[[760]]])
+        
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[2.9910]]], [[[ 3.1400]]], [[[2.7900]]],
+                              [[[0.03525]]], [[[0.00759]]], [[[ -0.00206]]],
+                              [[[0.1900 ]]], [[[0.2400 ]]], [[[ 0.2900]]],
+                              ])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[0.2]]], [[[0.11]]]])
+
+
+        # expected values from Campbell03_check.py
+        log_mean_expected = numpy.array([[[ -2.0876]]])
+        log_sigma_expected = numpy.array([[[0.5256]]])
+
+        (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
+                                                   distance=R,depth = h,
+                                                   Vs30 = Vs30,coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+##        print log_mean
+
+        # tests for equality should be quite tight as we check against
+        # Campbell03_check.py
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+    def test_Atkinson_2003_intraslab(self):
+        """Test the Campbell03 model."""
+
+        model_name = 'Atkinson_2003_intraslab'
+        model = Ground_motion_specification(model_name)
+
+        ######
+        # period = 0.2, ML=7.0, R=10.0,
+        # expect lnY=0.0663, sigma=0.4904 (from Campbell03_check.py)
+        ######
+
+        period = 0.0
+        ML = numpy.array([[[5.0]]])
+        R = numpy.array([[[10.0]]])
+        h = numpy.array([[[100]]])
+        Vs30 = numpy.array([[[500]]])
+        
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[-0.04713]]], [[[ 0.1]]], [[[-0.25]]],
+                              [[[0.6909]]], [[[0.0113]]], [[[ -0.00202]]],
+                              [[[0.19 ]]], [[[0.2400 ]]], [[[ 0.2900]]],
+                              ])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[0.23]]], [[[0.14]]]])
+
+
+        # expected values from Campbell03_check.py
+        log_mean_expected = numpy.array([[[ -0.6462]]])
+        log_sigma_expected = numpy.array([[[ 0.6200]]])
+
+        (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
+                                                   distance=R,depth = h,
+                                                   Vs30 = Vs30,coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+##        print log_mean
+
+        # tests for equality should be quite tight as we check against
+        # Campbell03_check.py
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+         
+    def test_Akkar_2010_crustal(self):
+        """Test the Akkar2010 model."""
+
+        model_name = 'Akkar_2010_crustal'
+        model = Ground_motion_specification(model_name)
+
+        ######
+        # period = 0.2, ML=7.0, R=10.0,
+        # expect lnY=0.0663, sigma=0.4904 (from Campbell03_check.py)
+        ######
+
+        period = 0.0
+        ML = numpy.array([[[5.0]]])
+        R = numpy.array([[[10.0]]])
+        Vs30 = numpy.array([[[760]]])
+        FT = numpy.array([[[0]]])
+        
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[1.04159]]], [[[0.91333 ]]], [[[-0.08140]]],
+                              [[[-2.92728]]], [[[0.2812]]], [[[ 7.86638]]],
+                              [[[ 0.08753]]], [[[ 0.01527]]], [[[ -0.04189]]],
+                              [[[0.08015]]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[0.261]]], [[[0.0994]]]])
+
+
+        # expected values from Campbell03_check.py
+        log_mean_expected = numpy.array([[[ -2.3456]]])
+        log_sigma_expected = numpy.array([[[0.6431]]])
+
+        (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
+                                                   distance=R,fault_type = FT,
+                                                   Vs30 = Vs30,coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                       sigma_coeffs)
+##        print log_mean
+
+        # tests for equality should be quite tight as we check against
+        # Campbell03_check.py
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
+               % (period, ML, R, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('T=%.1f, ML=%.1f, R=%.1f: log_sigma=%s, expected=%s'
+               % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)      
         
 ################################################################################
 
