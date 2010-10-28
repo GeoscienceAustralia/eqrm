@@ -587,17 +587,7 @@ test_data['Atkinson06_hard_bedrock_test_distance'] = tmp
 
 # result values, in 'g'
 tmp = zeros((4,2,4))		# num_sites, num_events, num_periods
-# period:      0.0       0.2       1.0        2.0
-#tmp[0,0,:] = [3.305149, 3.211057, 2.261813,  1.723094]	# R=  2.0, ML=5.5
-#tmp[0,1,:] = [3.559591, 3.494428, 2.797655,  2.438223]	# R=  2.0, ML=7.5
-#tmp[1,0,:] = [2.487020, 2.382475, 1.433140,  0.864280]	# R= 10.0, ML=5.5
-#tmp[1,1,:] = [3.055020, 3.053075, 2.405140,  2.074280]	# R= 10.0, ML=7.5
-#tmp[2,0,:] = [0.903974, 1.123413, 0.337253, -0.218115]	# R=100.0, ML=5.5
-#tmp[2,1,:] = [1.740715, 2.015429, 1.562782,  1.291050]	# R=100.0, ML=7.5
-#tmp[3,0,:] = [0.273531, 0.650310, 0.055971, -0.463949]	# R=300.0, ML=5.5
-#tmp[3,1,:] = [1.250613, 1.587275, 1.312415,  1.092019]	# R=300.0, ML=7.5
-
-# values above are log10 cm/s/s, converted programmatically to ln g, then g:
+# period:     0.0             0.2             1.0             2.0
 tmp[0,0,:] = [2.05886715e+00, 1.65781599e+00, 1.86334093e-01, 5.38980837e-02]
 tmp[0,1,:] = [3.69888070e+00, 3.18351811e+00, 6.39932732e-01, 2.79706349e-01]
 tmp[1,0,:] = [3.12967560e-01, 2.46010886e-01, 2.76451738e-02, 7.46035209e-03]
@@ -610,14 +600,16 @@ test_data['Atkinson06_hard_bedrock_test_mean'] = tmp
 
 ################################################################################
 # Atkinson06_soil Test
-# These tests set Vs30 is 1000.0 in test code below
-# That value wil be assumed if we don't define Vs30 values here.
+# Set Vs30 to 1000.0 for the soil test code below
 
 # num_events = 2
 test_data['Atkinson06_soil_test_magnitude'] = [5.5, 7.5]
 
 # num_periods = 3
 test_data['Atkinson06_soil_test_period'] = [0.2, 1.0, 2.0]
+
+# num_sites = 3
+test_data['Atkinson06_soil_test_Vs30'] = [1000.0, 1000.0, 1000.0]
 
 # num_sites = 3
 tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
