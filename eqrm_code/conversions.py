@@ -14,8 +14,8 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import (vectorize, sqrt, sin, minimum, pi, where, asarray,
-                   exp, log, power, cos, arccos, arcsin, arctan2)
+from scipy import (vectorize, sqrt, sin, minimum, pi, where, asarray,array,
+                   exp, log, power, cos, arccos, arcsin, arctan2, zeros, radians)
 import math
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll
 
@@ -53,7 +53,8 @@ def modified_Wells_and_Coppersmith_94_width(dip,Mw,area,fault_width=15.0):
 modified_Wells_and_Coppersmith_94_width = vectorize(
     modified_Wells_and_Coppersmith_94_width)
 
-def Wells_and_Coppersmith_94(fault_type,Mw,max_width,max_length):
+def Wells_and_Coppersmith_94(fault_type,Mw,max_width,max_length,
+                             slab_width=0, out_of_dip =None):
     
     if fault_type== "normal":
         area =10**(-2.87+(0.82*Mw))
@@ -70,11 +71,45 @@ def Wells_and_Coppersmith_94(fault_type,Mw,max_width,max_length):
     else:
         area =10**(-3.497+(0.91*Mw))
         widthWC =10**(-1.01+(0.32*Mw))
+    
+    #max_width_in_slab = max_width
 
-    width = minimum(widthWC,max_width)
+    if (slab_width > 0)and (out_of_dip is not None):
+        
+        max_width_in_slab = calc_max_width_in_slab(out_of_dip,slab_width,
+                                                   max_width)
+
+        width = minimum(widthWC,max_width,max_width_in_slab)
+    else:
+        width = minimum(widthWC,max_width)
+    
     length = minimum((area/width),max_length)
     return width,length
 
+def calc_max_width_in_slab(out_of_dip,slab_width,max_width):
+    max_width_in_slab=zeros(len(out_of_dip))
+    
+    
+    i= where(out_of_dip <= 1)
+    max_width_in_slab[i] = max_width
+    
+    i= where(((out_of_dip < 90) & (out_of_dip > 1)))
+    max_width_in_slab[i] =  slab_width/(sin(radians(out_of_dip[i])))
+    
+    i= where(out_of_dip == 90)
+    max_width_in_slab[i] = slab_width
+    
+    i= where(out_of_dip > 90)
+    max_width_in_slab[i] = slab_width/(sin(radians(180-out_of_dip)))
+    
+#    if out_of_dip < 90:
+#        max_width_in_slab = slab_width/(sin(math.radians(out_of_dip)))
+#    elif out_of_dip == 90:
+#        max_width_in_slab = slab_width
+#    else:
+#        max_width_in_slab = slab_width/(sin(math.radians(180-out_of_dip)))
+#    
+    return max_width_in_slab
 #Wells_and_Coppersmith_94 = vectorize(
     #Wells_and_Coppersmith_94)
 

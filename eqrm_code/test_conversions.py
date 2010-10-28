@@ -2,7 +2,7 @@
 import unittest
 import math
 
-from scipy import array, allclose, exp, log, power
+from scipy import array, allclose, exp, log, power, asarray
 
 from eqrm_code.conversions import conversion_functions
 from eqrm_code.xml_interface import Xml_Interface
@@ -157,8 +157,20 @@ class Test_Conversions(unittest.TestCase):
             msg = ('At %.1fN, expected azimuth of %.1f, got %.1f'
                    % (start_lat, expected, result))
             self.failUnlessAlmostEqual(result, expected, 1, msg)
+    def test_calc_max_width_in_slab(self):
         
-
+        calc_max_width_in_slab= conversion_functions['calc_max_width_in_slab']
+        out_of_dip = array([0.0, 10, 20, 30, 110.0, 0.0, 111.0, 90.0])
+        result = calc_max_width_in_slab(out_of_dip,1,30)    
+        expected = array([3.00000000e+01,   5.75877048e+00,   2.92380440e+00,   
+                          2.00000000e+00, 8.16588936e+15,   3.00000000e+01,   
+                          5.75877048e+00,   1.00000000e+00])
+        msg = ('Unexpected max_width in slab values')
+        #print (result)
+        
+        self.failUnlessAlmostEqual(result[2], expected[2], 1, msg)
+        
+        
 ################################################################################
 
 if __name__ == "__main__":
