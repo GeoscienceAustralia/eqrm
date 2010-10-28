@@ -283,7 +283,7 @@ class Multiple_ground_motion_calculator(object):
         return None, \
                log_mean_extend_GM, log_sigma_extend_GM
 
-
+    
     def _distribution_function(self, dist_object, mag_dict, periods=None,
                                depth=None, depth_to_top=None,
                                fault_type=None, Vs30=None, Z25=None,
@@ -323,6 +323,7 @@ class Multiple_ground_motion_calculator(object):
                 log_mean_extend_GM = concatenate(
                     (log_mean_extend_GM, log_mean[newaxis, :]),
                     axis=new_axis)
+                
                 log_sigma_extend_GM = concatenate(
                     (log_sigma_extend_GM, log_sigma[newaxis, :]),
                     axis=new_axis)

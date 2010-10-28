@@ -17,7 +17,8 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-                          'Campbell03', 'Campbell08', 'Abrahamson08', 'Chiou08')
+                          'Campbell03', 'Campbell08', 'Abrahamson08', 'Chiou08','Akkar_2010_crustal','Zhao_2006_interface',
+                          'Atkinson_2003_intraslab','Atkinson_2003_interface','Zhao_2006_intraslab')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -1091,7 +1092,146 @@ test_data['Abrahamson08_test_sigma'] = tmp
 del tmp
 
 ################################################################################
+################################################################################
+ #Akkar_2010_crustal Tests - data values from Matlab Code
+ #num_periods = 4
+test_data['Akkar_2010_crustal_test_period'] = [0.0, 0.2]
+test_data['Akkar_2010_crustal_test_magnitude'] = [5.0,7.0]
+test_data['Akkar_2010_crustal_test_Vs30'] = array([760])
+test_data['Akkar_2010_crustal_test_fault_type'] = [0, 0]
+tmp = zeros((1,2))
+tmp[0,:] = [   10,    100] # distance - 1st site and all 2 events
+test_data['Akkar_2010_crustal_test_distance'] = tmp
+del tmp
 
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.0958, 0.2080]
+tmp[:,1,:] = [0.0413, 0.0959] 
+
+test_data['Akkar_2010_crustal_test_mean'] = tmp
+del tmp
+
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.6431, 0.6956]
+tmp[:,1,:] = [0.6431, 0.6956] 
+
+test_data['Akkar_2010_crustal_test_sigma'] = tmp
+del tmp
+
+######################################################################################
+################################################################################
+ #Zhao_Interface Tests - data values from Matlab Code
+ #num_periods = 4
+test_data['Zhao_2006_interface_test_period'] = [0.0, 0.2]
+test_data['Zhao_2006_interface_test_magnitude'] = [5.0,7.0]
+test_data['Zhao_2006_interface_test_Vs30'] = array([500])
+test_data['Zhao_2006_interface_test_depth'] = [100, 50]
+tmp = zeros((1,2))
+tmp[0,:] = [   10,    100] # distance - 1st site and all 2 events
+test_data['Zhao_2006_interface_test_distance'] = tmp
+del tmp
+
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.2689, 0.6858]
+tmp[:,1,:] = [0.0733, 0.1940] 
+
+test_data['Zhao_2006_interface_test_mean'] = tmp
+del tmp
+
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.6780, 0.7658]
+tmp[:,1,:] = [0.6780, 0.7658] 
+
+test_data['Zhao_2006_interface_test_sigma'] = tmp
+del tmp
+
+######################################################################################
+################################################################################
+ #Zhao_2006_intraslab Tests - data values from Matlab Code
+ #num_periods = 4
+test_data['Zhao_2006_intraslab_test_period'] = [0.00, 0.2]
+test_data['Zhao_2006_intraslab_test_magnitude'] = [5.0,7.0]
+test_data['Zhao_2006_intraslab_test_depth'] = [ 100,100]
+test_data['Zhao_2006_intraslab_test_Vs30'] = array([760])
+
+tmp = zeros((1,2))
+tmp[0,:] = [   10,    10] # distance - 1st site and all 2 events
+test_data['Zhao_2006_intraslab_test_distance'] = tmp
+del tmp
+
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.9415, 1.4446]
+tmp[:,1,:] = [4.4703, 6.6522] 
+
+test_data['Zhao_2006_intraslab_test_mean'] = tmp
+del tmp
+
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.6840, 0.7641]
+tmp[:,1,:] = [0.6840, 0.7641] 
+
+test_data['Zhao_2006_intraslab_test_sigma'] = tmp
+del tmp
+
+################################################################################
+
+################################################################################
+################################################################################
+## #Atkinson_2003_interface Tests - data values from Matlab Code
+## #num_periods = 4
+test_data['Atkinson_2003_interface_test_period'] = [0.0, 0.2]
+test_data['Atkinson_2003_interface_test_magnitude'] = [5.0,7.0]
+test_data['Atkinson_2003_interface_test_depth'] = [ 100,10]
+test_data['Atkinson_2003_interface_test_Vs30'] = array([760])
+
+tmp = zeros((1,2))
+tmp[0,:] = [   10,    100] # distance - 1st site and all 2 events
+test_data['Atkinson_2003_interface_test_distance'] = tmp
+del tmp
+
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.1240, 0.1924]
+tmp[:,1,:] = [0.0382, 0.0580] 
+
+test_data['Atkinson_2003_interface_test_mean'] = tmp
+del tmp
+
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.5256, 0.6488]
+tmp[:,1,:] = [0.5256, 0.6488] 
+
+test_data['Atkinson_2003_interface_test_sigma'] = tmp
+del tmp
+
+################################################################################
+################################################################################
+ #Atkinson_2003_intraslab Tests - data values from Matlab Code
+ #num_periods = 4
+test_data['Atkinson_2003_intraslab_test_period'] = [0.0, 0.2]
+test_data['Atkinson_2003_intraslab_test_magnitude'] = [5.0,7.0]
+test_data['Atkinson_2003_intraslab_test_depth'] = [ 100,10]
+test_data['Atkinson_2003_intraslab_test_Vs30'] = array([300])
+
+tmp = zeros((1,2))
+tmp[0,:] = [   10,    100] # distance - 1st site and all 2 events
+test_data['Atkinson_2003_intraslab_test_distance'] = tmp
+del tmp
+
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.5241, 0.5373]
+tmp[:,1,:] = [0.0366, 0.1329] 
+
+test_data['Atkinson_2003_intraslab_test_mean'] = tmp
+del tmp
+
+tmp = zeros((1,2,2))
+tmp[:,0,:] = [0.6200, 0.6414]
+tmp[:,1,:] = [0.6200, 0.6414] 
+
+test_data['Atkinson_2003_intraslab_test_sigma'] = tmp
+del tmp
+
+################################################################################
 class Distance_stub(object):
     """This object is used for simple cases.
 
