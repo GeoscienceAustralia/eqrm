@@ -287,7 +287,6 @@ def load_site_class2Vs30_old(file_name):
 def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
                 soil_amplification_model, amp_distribution,
                 ground_motion_calc):
-
     """
     Determine the soil_SA.
 
@@ -312,6 +311,10 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
     for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
         for i_gmm, gmm in enumerate(ground_motion_calc.GM_models):
             if gmm.GM_spec.uses_Vs30 is True:
+                print "ram 315 use the Vs30 model" 
+#                 log_mean, log_sigma = gmm.distribution(
+#                     event_set=sub_event_set,
+#                     sites=sites)
                 log_mean, log_sigma = log(10), log(100)
             else:
                 _, log_mean, log_sigma = \

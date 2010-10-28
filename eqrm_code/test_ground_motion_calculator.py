@@ -5,13 +5,14 @@ from scipy import array, exp, log, allclose, newaxis, asarray, zeros
 
 from eqrm_code.ground_motion_specification import *
 from eqrm_code.ground_motion_interface import gound_motion_init
-from eqrm_code.ground_motion_misc import Australian_standard_model_interpolation 
-from eqrm_code.ground_motion_calculator import (Ground_motion_calculator, 
-            Multiple_ground_motion_calculator)
+from eqrm_code.ground_motion_misc import \
+     Australian_standard_model_interpolation 
+from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
+     Multiple_ground_motion_calculator
 
 
-from eqrm_code.test_ground_motion_specification import (
-            ground_motion_interface_conformance, data2atts, Distance_stub)
+from eqrm_code.test_ground_motion_specification import data2atts, \
+     ground_motion_interface_conformance, Distance_stub
 
 class Test_ground_motion_calculator(unittest.TestCase):
     def setUp(self):
@@ -83,7 +84,8 @@ class Test_ground_motion_calculator(unittest.TestCase):
         model_name = 'Somerville09_Yilgarn'
         
         (distances, magnitudes, test_mean, test_sigma,
-         periods, depths, _, _, _, _, _, _) = data2atts('Toro_1997_midcontinent')
+         periods, depths, _, _, _, _, _, _) = data2atts(
+            'Toro_1997_midcontinent')
         event_activity = 1
         periods = array([0.010, 0.045, 1.0 ])
         
@@ -98,7 +100,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         self.assert_(allclose(log_sigma, test_log_sigma, rtol=0.0000005),
                      "%s did not pass assert" %model_name )
         
-    def test_event_activityII(self):
+    def test_Multiple_ground_motion_calculatorII(self):
         """
         This checks that for the given test_distance and test_magnitudes,
         the calculated ground motion is the same as the test_ground_motion
@@ -110,7 +112,8 @@ class Test_ground_motion_calculator(unittest.TestCase):
 
         model_name2 = 'Youngs_97_interface'        
         (dist2 , mag2, test_mean2,
-         test_sigma2, periods2, depths2, _, _, _, _, _, _) = data2atts(model_name2)
+         test_sigma2, periods2, depths2, _, _, _, _, _, _) = data2atts(
+            model_name2)
 
         self.assert_(allclose(distances.distance(None), dist2.distance(None)))
         self.assert_(magnitudes == mag2)
@@ -124,14 +127,47 @@ class Test_ground_motion_calculator(unittest.TestCase):
         gm = Multiple_ground_motion_calculator(model_names, periods,
                                                model_weights)
         
-        (log_mean, log_sigma, _, _) = gm._distribution_function(distances,
-                                                                magnitudes,
-                                                                depth=depths)
+        _, _,log_mean, log_sigma = gm._distribution_function(distances,
+                                                             magnitudes,
+                                                             depth=depths)
         
         mean_out = []
         for i in range(len(distances.distance(None))):
             mean_out.append([test_mean[i][0], test_mean2[i][0]])
-
+        #print "exp(log_mean)", exp(log_mean).shape
+        #print "exp(log_mean)", exp(log_mean)
+        mean_out = asarray(mean_out).reshape(2,3,1,12)
+        #print "mean_out", mean_out.shape
+        #print "mean_out", mean_out
+        
+    def test_Multiple_ground_motion_calculatorI(self):
+        """
+        This checks that for the given test_distance and test_magnitudes,
+        the calculated ground motion is the same as the test_ground_motion
+        """
+        
+        model_name2 = 'Youngs_97_interface'        
+        (distances, magnitudes, test_mean,
+         test_sigma, periods, depths, _, _, _, _, _, _) = data2atts(
+            model_name2)
+        
+        model_names = [model_name2]
+        model_weights = array([1.0])
+        gm = Multiple_ground_motion_calculator(model_names, periods,
+                                               model_weights)
+        
+        _, _,log_mean, log_sigma = gm._distribution_function(distances,
+                                                             magnitudes,
+                                                             depth=depths)
+        
+        mean_out = []
+        for i in range(len(distances.distance(None))):
+            mean_out.append([test_mean[i][0]])
+        #print "exp(log_mean)", exp(log_mean).shape
+        #print "exp(log_mean)", exp(log_mean)
+        mean_out = asarray(mean_out).reshape(1,3,1,12)
+        #print "mean_out", mean_out.shape
+        #print "mean_out", mean_out
         self.assert_(allclose(exp(log_mean), mean_out, rtol=0.05), "Fail")
     
     def test_mult_gm(self):
@@ -149,7 +185,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
                                                model_weights)
 
         # ignoring event_activity, event_id
-        log_mean,log_sigma, _, _ =gm._distribution_function(distances,
+        _, _,log_mean,log_sigma = gm._distribution_function(distances,
                                                             magnitudes,
                                                             depth=depths)
         
@@ -193,11 +229,8 @@ class Test_ground_motion_calculator(unittest.TestCase):
             dist_object=dist_ob,
             mag_dict=magnitudes)
         
-        log_mean, log_sigma, log_mean_array, log_sigma_array = results
+        _, _, log_mean_array, log_sigma_array = results
         # When combining multiple GM's on the event axis
-        self.assert_(log_mean.shape == (num_sites, num_events*2, num_periods))
-        self.assert_(log_sigma.shape == (num_sites, num_events*2, num_periods))
-
         self.assert_(log_mean_array.shape == (
             2, num_sites, num_events, num_periods))
         self.assert_(log_sigma_array.shape == (
@@ -207,6 +240,6 @@ class Test_ground_motion_calculator(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_calculator, 'test')
-    #suite = unittest.makeSuite(Test_ground_motion_calculator,'test_multiple_GM')
+    #suite = unittest.makeSuite(Test_ground_motion_calculator,'test_Multiple_ground_motion_calculatorI)
     runner = unittest.TextTestRunner() # verbosity=2)
     runner.run(suite)
