@@ -3,7 +3,5 @@
 % ground motion model = 0
 % First row are rsa periods, then rows are sites
 0.0 1.0526 2.0
-90 90 90
-560 560 560
 560 560 560
 270 270 270
