@@ -282,20 +282,6 @@ def main(parameter_handle,
         source_model.calculate_recurrence(
             event_set,
             event_activity)
-#         for smz in source_model:
-#             print "**************************************"
-#             #print "a285 smz.atten_models", smz.atten_models
-#             #print "a285 smz.atten_model_weights", smz.atten_model_weights
-#             print "a285 smz.event_set_indexes", smz.event_set_indexes
-#             try:
-#                 print "a285 smz.new_event_set_indexes", smz.new_event_set_indexes
-#                 if not allclose(smz.new_event_set_indexes,
-#                                 smz.event_set_indexes):
-#                     print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-#             except AttributeError:
-#                 if not len(smz.event_set_indexes) == 0:
-#                     print "!!!!!!!!!!!!!!!???????????????????"
-            
         log.debug('Memory: event activity has been calculated')
         log.resource_usage()
         
@@ -853,16 +839,12 @@ def calc_and_save_SA(THE_PARAM_T,
         atten_models = source.atten_models
         atten_model_weights = source.atten_model_weights
         ground_motion_calc = source.ground_motion_calculator
-#         print "************************************************************" 
-#         print "a 853  source.atten_model_weights",  source.atten_model_weights
-#         for mod in ground_motion_calc.GM_models:
-#             print "gmm", mod.GM_spec.ground_motion_model_name
         
         results = ground_motion_calc.distribution(
             event_set=sub_event_set,
             sites=sites,
             Vs30=BEDROCKVs30)
-        _ , log_mean_extend_GM, log_sigma_extend_GM = results 
+        _ , log_mean_extend_GM, log_sigma_extend_GM = results
         # *_extend_GM has shape of (GM_model, sites, events, periods)
         
         # evaluate the RSA

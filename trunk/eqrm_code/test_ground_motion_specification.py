@@ -1311,7 +1311,7 @@ def ground_motion_interface_conformance(GM_class, model_name):
         model_weights = [1]
         gm = GM_class([model_name], periods, model_weights)
         # ignoring event_activity, event_id
-        (log_mean, log_sigma, _, _) = \
+        _, _, log_mean, log_sigma = \
             gm._distribution_function(distances, magnitudes, periods=periods,
                                       depth=depths, Vs30=Vs30,
                                       depth_to_top=depth_to_top,

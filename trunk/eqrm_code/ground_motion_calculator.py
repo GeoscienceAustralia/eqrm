@@ -248,7 +248,7 @@ class Multiple_ground_motion_calculator(object):
                                                            periods))
 
     def distribution(self, sites, event_set, event_activity=None,
-                     event_id=None, Vs30=None):
+                     event_id=None, Vs30=None, GM_models=None):
         """
         Calculate the ground motion shaking at a site, given an array of
         events.
@@ -269,7 +269,7 @@ class Multiple_ground_motion_calculator(object):
         if Vs30 is None:
             Vs30 = sites.attributes.get('Vs30', None)
 
-        results=self._distribution_function(
+        results = self._distribution_function(
             distances, magnitudes,
             depth=event_set.depth,
             depth_to_top=event_set.depth_to_top,
@@ -278,7 +278,8 @@ class Multiple_ground_motion_calculator(object):
             width=event_set.width,
             event_activity=event_activity,
             event_id=event_id,
-            periods=self.periods)
+            periods=self.periods,
+            GM_models=GM_models)
         _, _, log_mean_extend_GM, log_sigma_extend_GM = results
         return None, \
                log_mean_extend_GM, log_sigma_extend_GM
@@ -288,23 +289,21 @@ class Multiple_ground_motion_calculator(object):
                                depth=None, depth_to_top=None,
                                fault_type=None, Vs30=None, Z25=None,
                                dip=None, width=None,
-                               event_activity=None, event_id=None):
+                               event_activity=None, event_id=None,
+                               GM_models=None):
         """
         The event_activity and event_id are not used currently.
         But if we spawn they will be.
 
         returning values
-          log_mean_extend_GM the log_mean values
-            dimensions (GM_model, sites, events, periods)
-          log_sigma_extend_GM the log_sigma values
-            dimensions (GM_model, sites, events, periods)
           log_mean_extend_event the log_mean values
             dimensions (sites, events * GM_model, periods)
           log_sigma_extend_GM the log_sigma values
             dimensions (sites, events * GM_model, periods)
         """
-
-        for mod_i, GM_model in enumerate(self.GM_models):
+        if GM_models is None:
+            GM_models = self.GM_models
+        for mod_i, GM_model in enumerate(GM_models):
             (log_mean, log_sigma) = GM_model.distribution_function(
                 dist_object, mag_dict, periods=periods,
                 depth=depth, depth_to_top=depth_to_top,
@@ -315,8 +314,6 @@ class Multiple_ground_motion_calculator(object):
             if mod_i == 0:
                 log_mean_extend_GM = log_mean[newaxis,:]
                 log_sigma_extend_GM = log_sigma[newaxis,:]
-                log_mean_extend_event = log_mean
-                log_sigma_extend_event = log_sigma
             else:
                 new_axis = 0
                 event_axis = 1
@@ -327,15 +324,6 @@ class Multiple_ground_motion_calculator(object):
                 log_sigma_extend_GM = concatenate(
                     (log_sigma_extend_GM, log_sigma[newaxis, :]),
                     axis=new_axis)
-                log_mean_extend_event = concatenate(
-                    (log_mean_extend_event, log_mean), axis=event_axis)
-                log_sigma_extend_event = concatenate(
-                    (log_sigma_extend_event, log_sigma), axis=event_axis)
         
-        # dimensions of log_mean_extend_event and log_sigma_extend_event are (sites, events, periods)
-        # note, sites is currently always 1.
-        
-        return (log_mean_extend_event, log_sigma_extend_event,
-                log_mean_extend_GM, log_sigma_extend_GM)
-
+        return None, None, log_mean_extend_GM, log_sigma_extend_GM
 
