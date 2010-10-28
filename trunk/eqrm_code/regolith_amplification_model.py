@@ -286,7 +286,8 @@ def load_site_class2Vs30_old(file_name):
 
 def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
                 soil_amplification_model, amp_distribution,
-                ground_motion_calc):
+                ground_motion_calc, event_set, sites,
+                ground_motion_distribution):
     """
     Determine the soil_SA.
 
@@ -300,6 +301,8 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
       amp_distribution - an instance of Distribution_Log_Normal.
       ground_motion_calc  - an instance of Multiple_ground_motion_calculator
         No used yet.
+      event_set - needed if a gmm has to be called
+      sites - needed if a gmm has to be called
     """
 
     spawn_axis = 0
@@ -311,11 +314,13 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
     for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
         for i_gmm, gmm in enumerate(ground_motion_calc.GM_models):
             if gmm.GM_spec.uses_Vs30 is True:
-                print "ram 315 use the Vs30 model" 
-#                 log_mean, log_sigma = gmm.distribution(
-#                     event_set=sub_event_set,
-#                     sites=sites)
-                log_mean, log_sigma = log(10), log(100)
+                _, log_mean, log_sigma = ground_motion_calc.distribution(
+                    sites, event_set,
+                    GM_models=[gmm])
+                
+                (_, sub_soil_SA, _) = \
+                    ground_motion_distribution.sample_for_eqrm(
+                    log_mean, log_sigma)
             else:
                 _, log_mean, log_sigma = \
                    soil_amplification_model.distribution(
@@ -324,8 +329,8 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
                     Mw,
                     atten_periods)
                 
-            (_, sub_soil_SA, _) = \
-                amp_distribution.sample_for_eqrm(log_mean, log_sigma)
+                (_, sub_soil_SA, _) = \
+                    amp_distribution.sample_for_eqrm(log_mean, log_sigma)
             soil_SA[i_spawn,i_gmm,:] = sub_soil_SA
     
     return soil_SA

@@ -3622,7 +3622,7 @@ def return_Vs30_distribution(**kwargs):
     num_periods = kwargs['coefficient'].shape[3]
     Vs30 = kwargs['Vs30']
     log_mean = ones((num_sites, num_events, num_periods))*log(Vs30)
-    log_sigma = ones((num_sites, num_events, num_periods))
+    log_sigma = zeros((num_sites, num_events, num_periods))
     
     return log_mean, log_sigma
 

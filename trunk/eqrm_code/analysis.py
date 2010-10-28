@@ -866,7 +866,10 @@ def calc_and_save_SA(THE_PARAM_T,
                                   sites.attributes['SITE_CLASS'],
                                   sub_event_set.Mw, THE_PARAM_T.atten_periods,
                                   soil_amplification_model,
-                                  amp_distribution, ground_motion_calc)
+                                  amp_distribution, ground_motion_calc,
+                                  sub_event_set,
+                                  sites,
+                                  ground_motion_distribution)
                 
             # Amplification factor cutoffs
             # Applies a minimum and maxium acceptable amplification factor
