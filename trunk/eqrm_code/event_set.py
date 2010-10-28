@@ -20,7 +20,7 @@ import scipy
 
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
-     int64, reshape, arange, append
+     int64, reshape, arange, append, radians
 from numpy import random
 
 from eqrm_code.ANUGA_utilities import log
@@ -809,6 +809,12 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         depth_top = fault.depth_top_seismogenic_dist['mean']
         depth_bottom = fault.depth_bottom_seismogenic_dist['mean']
         
+        fault_magnitude = fault.populate_magnitude(num)
+        slab_width = fault.slab_width  
+        if slab_width > 0:
+            out_of_dip_theta = fault.populate_out_of_dip_theta(num,fault_dip)
+        else:
+            out_of_dip_theta = None
         fault_width = calc_fault_width(depth_top, 
                                      depth_bottom,
                                      fault_dip)
@@ -819,23 +825,28 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                        fault.trace_end_lon)
         
         fault_area = fault_width * fault_length
-        fault_magnitude = fault.populate_magnitude(num)
         magnitude[start:end] = fault_magnitude  
         fault_magnitude = asarray(fault_magnitude)
+        
+        # If slab_width >0 then the rupture width is limited so that it does not 
+        # etend out of the slab.
         (rup_width,rup_length) = Wells_and_Coppersmith_94(
             scaling_event_type,
             fault_magnitude,
             fault_width,
-            fault_length)
+            fault_length,
+            slab_width,
+            out_of_dip_theta)
+        
         fault_azimuth = azimuth_of_trace(fault.trace_start_lat,
                                          fault.trace_start_lon,
                                          fault.trace_end_lat,
                                          fault.trace_end_lon)
         
-        #fault_azimuth=20
         
         random_scalar = random.random_sample(size=num)
         Ds = (fault_length-rup_length) * random_scalar
+        
         (r_start_lat,r_start_lon) = get_new_ll(fault.trace_start_lat,
                                                 fault.trace_start_lon, 
                                                 fault_azimuth, 
@@ -847,9 +858,9 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                                fault_azimuth, 
                                                rup_length)
         
-        r_depth_min = depth_top + (0.5*rup_width) * sin(math.radians(fault_dip))
+        r_depth_min = depth_top + (0.5*rup_width) * sin(radians(fault_dip))
         r_depth_max = depth_bottom - (0.5*rup_width) * \
-                      sin(math.radians(fault_dip))
+                      sin(radians(fault_dip))
 
         
         random_scalar = random.random_sample(size=num)
@@ -857,13 +868,13 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                            + r_depth_min
         
         r_depth_top = r_depth_centroid - ((0.5*rup_width) * 
-                                           sin(math.radians(fault_dip)))
+                                           sin(radians(fault_dip)))
                          
         r_depth_bottom = r_depth_centroid + ((0.5*rup_width) * 
-                                              sin(math.radians(fault_dip)))
+                                              sin(radians(fault_dip)))
         
-        r_y_centroid=  r_depth_centroid * ((cos(math.radians(fault_dip)))/
-                                           (sin(math.radians(fault_dip))))
+        r_y_centroid=  r_depth_centroid * ((cos(radians(fault_dip)))/
+                                           (sin(radians(fault_dip))))
         
         r_x_centroid= rup_length/2
         
@@ -873,6 +884,37 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                                    r_start_lon, 
                                                    fault_azimuth)
         
+        
+        if ((slab_width > 0)&(out_of_dip_theta is not None)):
+            rupture_dip = out_of_dip_theta + fault_dip
+            r_x_start = 0
+            r_y_start = r_y_centroid -(r_depth_centroid * 
+                                      ((cos(radians(rupture_dip)))/
+                                      (sin(radians(rupture_dip)))))
+            
+            r_x_end = rup_length
+            r_y_end = r_y_start
+            (r_start_lat,r_start_lon) = xy_to_ll( r_x_start, r_y_start,
+                                                  r_start_lat, r_start_lon, 
+                                                  fault_azimuth, 
+                                                  R=6367.0)
+        
+       
+            (r_end_lat,r_end_lon) = xy_to_ll( r_x_end, r_y_end,
+                                              r_start_lat, r_start_lon, 
+                                                fault_azimuth, 
+                                                R=6367.0)
+            r_x_centroid = rup_length/2
+            r_y_centroid = (r_depth_centroid *((cos(radians(rupture_dip)))/
+                                      (sin(radians(rupture_dip)))))
+            
+            (r_centroid_lat,r_centroid_lon) = xy_to_ll(r_x_centroid,
+                                                   r_y_centroid,
+                                                   r_start_lat,
+                                                   r_start_lon, 
+                                                   fault_azimuth)
+            
+            
             #FIXME DSG-EQRM the events will not to randomly placed,
             # Due to  lat, lon being spherical coords and popolate
             # working in x,y (flat 2D).
@@ -881,7 +923,9 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         eqrmlog.resource_usage()
             
             #attach the current polygons generated attributes
-        
+        #if slab_width > 0:
+      
+            
         rupture_centroid_lat[start:end] = r_centroid_lat
         rupture_centroid_lon[start:end] = r_centroid_lon
             

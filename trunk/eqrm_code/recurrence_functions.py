@@ -12,8 +12,7 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import exp, log, sum, zeros, newaxis, where, array, asarray, r_,sin,cos,sqrt,arctan2,unique,arcsin,arccos
-from math import radians, degrees,atan
+from scipy import (exp, log, sum, zeros, newaxis, where, array, r_, unique)
 
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 from eqrm_code.test_distance_functions import azimuths
@@ -270,10 +269,9 @@ def calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,slip_rate_mm,area_kms):
         
     return lambda_m
 
-def calc_activities_from_slip_rate_Characteristic(magnitudes,b,m0,mMax):
+def calc_activities_from_slip_rate_Characteristic(magnitude,b,m0,mMax):
     
-    pdfs_tmp =asarray([calc_activity_from_slip_rate_Characteristic(m,b,m0,mMax)
-                  for m in magnitudes])
+    pdfs_tmp =calc_activity_from_slip_rate_Characteristic(magnitude,b,m0,mMax)          
     pdfs=pdfs_tmp/sum(pdfs_tmp)
     return pdfs
 
@@ -283,10 +281,17 @@ def calc_activity_from_slip_rate_Characteristic(magnitude,b,m0,mMax):
     beta=log(10)*b
     m_c=mMax-m2
     C=((beta*exp(-beta*(mMax-m0-m1-m2)))*m2)/(1-exp(-beta*(mMax-m0-m2)))
-    if magnitude <=m_c:
-        pdf=(beta*exp(-beta*(magnitude-m0)))/((1-1*exp(-beta*(mMax-m0-m2)))*(1+C)) 
-    if magnitude >m_c:
-        pdf=(beta*exp(-beta*(mMax-m0-m1-m2)))/((1-1*exp(-beta*(mMax-m0-m2)))*(1+C))
+    pdf=zeros(len(magnitude))
+    
+    
+    i= where(magnitude <=m_c)
+    pdf[i] = ((beta*exp(-beta*(magnitude[i]-m0)))/
+             ((1-1*exp(-beta*(mMax-m0-m2)))*(1+C)))
+    
+    i= where(magnitude >m_c)
+    pdf[i] =((beta*exp(-beta*(mMax-m0-m1-m2)))/
+             ((1-1*exp(-beta*(mMax-m0-m2)))*(1+C)))
+    
     return pdf
         
 

@@ -12,6 +12,7 @@
 
 import os
 import math
+from scipy import where, asarray
 
 from eqrm_code.distributions import distribution_functions
 from eqrm_code.polygon import populate_polygon
@@ -295,6 +296,38 @@ class Fault_Source_Generator(object):
     def populate_dip(self,n):
         return self.populate_distribution(self.dip_dist,n)
 
+    def populate_out_of_dip_theta(self,n,dip):
+        
+        out_of_dip = asarray(self.populate_distribution(
+                                            self.out_of_dip_theta_dist,n))
+        
+        
+        #temp   = array( [where((out_of_dip > (175-dip) and out_of_dip < 
+        #                        (185-dip)), 1,0) for z in out_of_dip])
+        
+        numErr = sum(where(((out_of_dip > (175-dip)) & 
+                          (out_of_dip < (185-dip))),1,0))
+        
+        if numErr > 0:
+            errorIndexes=where((out_of_dip > (175-dip)) &
+                                     (out_of_dip < (185-dip)))
+            for i in errorIndexes:
+                if ((out_of_dip(i) > (175-dip)) & (out_of_dip(i) < (185-dip))):
+                    blnBadNum =True
+                    count=0
+                    while blnBadNum:
+                        newNum=self.populate_distribution(
+                                                     self.out_of_dip_theta_dist)
+                        if ((newNum <= (175-dip)) | (newNum >= (185-dip))):
+                            newNum=False
+                        count = count +1
+                        if count>1000:
+                            msg = "Bad out of dip theta range in fault \
+                                     source file"
+                            raise IOError(msg)
+                    out_of_dip[i]=newNum
+        
+        return out_of_dip
     def populate_magnitude(self,n):
         return self.populate_distribution(self.magnitude_dist,n)
     
