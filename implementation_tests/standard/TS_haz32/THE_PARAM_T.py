@@ -25,7 +25,7 @@ return_periods = [10., 11., 19., 50.0, 55., 58., 15.0, 100.]
 input_dir = r".\implementation_tests\input/" 
 output_dir = r".\implementation_tests\current\TS_haz32/" 
 use_site_indexes = True
-site_indexes = [2997, 2657, 3004, 3500]
+site_indexes = [1, 166] # site classes C (vs30 560) then D (vs30 270)
 zone_source_tag = "TS_haz32" 
 event_control_tag = "use" 
 
@@ -54,7 +54,7 @@ use_amplification = True
 # Loss
 
 # Save
-save_hazard_map = True
+save_hazard_map = False
 save_total_financial_loss = False
 save_building_loss = False
 save_contents_loss = False
