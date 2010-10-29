@@ -467,7 +467,7 @@ def main(parameter_handle,
         raise RuntimeError(msg)
 
     for i in range(array_size):
-        msg = 'do site ' + str(i+1) + ' of ' + str(num_sites)
+        msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + str(array_size)
         log.info(msg)
         rel_i = i #- parallel.lo
 
@@ -771,6 +771,7 @@ def main(parameter_handle,
            parallel.node,
            str(datetime.timedelta(seconds=real_time_taken_overall)) )
     log.info(msg)
+    parallel.finalize()
     del parallel
     log.debug('Memory: End')
     log.resource_usage()
