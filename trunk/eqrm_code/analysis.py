@@ -286,6 +286,12 @@ def main(parameter_handle,
         log.resource_usage()
         
     
+    if parallel.rank == 0 and False:		
+        # So just get one process to write these files.
+        save_event_set_new(THE_PARAM_T, event_set, None,
+                       compress=THE_PARAM_T.compress_output)
+        
+         #  event_activity.event_activity[drop down to one dimension],
     event_activity.ground_motion_model_logic_split(
         source_model,
         not THE_PARAM_T.atten_collapse_Sa_of_atten_models)
