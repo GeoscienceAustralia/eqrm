@@ -40,9 +40,12 @@ atten_models = ['Allen', 'AllenSEA06', 'Gaull_1990_WA',
                 'Youngs_97_intraslab', 'Combo_Sadigh_Youngs_M8',
                 'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                 'Chiou08', 'Campbell08', 'Abrahamson08', 'Liang_2008',
-                'Campbell03', 'Abrahamson08','Zhao_2006_intraslab',
-                'Atkinson_2003_interface','Akkar_2010_crustal',
-                'Zhao_2006_interface','Atkinson_2003_intraslab']
+                'Campbell03', 'Atkinson06_hard_bedrock', 'Atkinson06_soil',
+                'Atkinson06_bc_boundary_bedrock', 'Abrahamson08',
+                'Zhao_2006_intraslab', 'Atkinson_2003_interface',
+                'Akkar_2010_crustal', 'Zhao_2006_interface',
+                'Atkinson_2003_intraslab']
+
 atten_model_weights = len(atten_models)*[1.0/len(atten_models)]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = None
