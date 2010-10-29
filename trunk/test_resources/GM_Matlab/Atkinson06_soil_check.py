@@ -77,19 +77,6 @@ def eqn_5(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, M, Rcd, S):
     F1 = min(math.log10(Rcd), math.log10(R1))
     F2 = max(math.log10(Rcd/R2), 0.0)
 
-    print('c1=%f' % c1)
-    tmp = c2*M; print('c2*M=%f' % tmp)
-    tmp = c3*M*M; print('c3*M*M=%f' % tmp)
-    tmp = (c4 + c5*M)*F1; print('(c4 + c5*M)*F1=%f' % tmp)
-    tmp = (c6 + c7*M)*F2; print('(c6 + c7*M)*F2=%f' % tmp)
-    tmp = (c8 + c9*M)*F0; print('(c8 + c9*M)*F0=%f' % tmp)
-    tmp = c10*Rcd; print('c10*Rcd=%f' % tmp)
-    print('S=%f' % S)
-
-    print('log_mean=%f'
-          % (c1 + c2*M + c3*M*M + (c4 + c5*M)*F1 + (c6 + c7*M)*F2 + 
-               (c8 + c9*M)*F0 + c10*Rcd + S))
-
     return c1 + c2*M + c3*M*M + (c4 + c5*M)*F1 + (c6 + c7*M)*F2 + \
                (c8 + c9*M)*F0 + c10*Rcd + S
 
@@ -110,8 +97,6 @@ def check_scenario(period, distance, magnitude, expected_logPSA,
     S = 0.0
     logPSA = eqn_5(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10,
                    magnitude, distance, S)
-
-    print('logPSA=%f' % logPSA)
 
     same('bedrock, logPSA (period=%.1f, distance=%.1f, M=%.1f)'
          % (period, distance, magnitude),
