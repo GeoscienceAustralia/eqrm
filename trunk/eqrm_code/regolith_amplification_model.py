@@ -293,7 +293,6 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
 
     Parameters:
       bedrock_SA - spectral acceleration, in g. dimensions
-        (GM_model, sites, events, periods)  OR
         (spawn, GM_model, sites, events, periods)
       site_classes dimensions (site) = 1
       Mw - dimensions (events)
@@ -310,18 +309,11 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
     assert  bedrock_SA.shape[GM_model_axis] == len(
         ground_motion_calc.GM_models)
     soil_SA = zeros(bedrock_SA.shape)
+    #    print "bedrock_SA.shape", bedrock_SA.shape
 
-    for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
-        for i_gmm, gmm in enumerate(ground_motion_calc.GM_models):
-            if gmm.GM_spec.uses_Vs30 is True:
-                _, log_mean, log_sigma = ground_motion_calc.distribution(
-                    sites, event_set,
-                    GM_models=[gmm])
-                
-                (_, sub_soil_SA, _) = \
-                    ground_motion_distribution.sample_for_eqrm(
-                    log_mean, log_sigma)
-            else:
+    if True:
+        for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
+            for i_gmm in arange(bedrock_SA.shape[GM_model_axis]):
                 _, log_mean, log_sigma = \
                    soil_amplification_model.distribution(
                     bedrock_SA[i_spawn, i_gmm,:],
@@ -329,8 +321,50 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
                     Mw,
                     atten_periods)
                 
+                #print "log_mean", log_mean
+                #print "log_sigma", log_sigma
+                #print "i_spawn", i_spawn
+                #print "i_gmm", i_gmm
                 (_, sub_soil_SA, _) = \
                     amp_distribution.sample_for_eqrm(log_mean, log_sigma)
-            soil_SA[i_spawn,i_gmm,:] = sub_soil_SA
-    
-    return soil_SA
+#                 print "************ old school ************"
+#                 print "sub_soil_SA", sub_soil_SA
+#                 print "sub_soil_SA.shape", sub_soil_SA.shape
+                soil_SA[i_spawn,i_gmm,:,:,:] = sub_soil_SA
+    if True:
+        soil_SA_new = zeros(bedrock_SA.shape)
+        for i_gmm, gmm in enumerate(ground_motion_calc.GM_models):
+            if gmm.GM_spec.uses_Vs30 is True:
+                _, log_mean, log_sigma = ground_motion_calc.distribution(
+                    sites, event_set,
+                    GM_models=[gmm])
+                (_, sub_soil_SA, _) = \
+                    ground_motion_distribution.sample_for_eqrm(
+                    log_mean, log_sigma)
+#                 print "************ Vs30 is True ************"
+#                 print "log_mean.shape", log_mean.shape
+#                 print "sub_soil_SA.shape", sub_soil_SA.shape
+#                 print "i_gmm", i_gmm
+#                 print "soil_SA_new.shape", soil_SA_new.shape
+#                 print "soil_SA_new[:,i_gmm,:,:,:]", soil_SA_new[:,i_gmm,:,:,:]
+#                 print "soil_SA_new[:,i_gmm,:,:,:].shape", soil_SA_new[:,i_gmm,:,:,:].shape
+                soil_SA_new[:,i_gmm,:,:,:] = sub_soil_SA[:,0,:,:,:]
+            else:
+                for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
+                    _, log_mean, log_sigma = \
+                       soil_amplification_model.distribution(
+                        bedrock_SA[i_spawn, i_gmm,:],
+                        site_classes,
+                        Mw,
+                        atten_periods)
+                    (_, sub_soil_SA, _) = \
+                        amp_distribution.sample_for_eqrm(log_mean, log_sigma)
+#                     print "log_mean", log_mean
+#                     print "log_sigma", log_sigma
+#                     print "i_spawn", i_spawn
+#                     print "i_gmm", i_gmm
+#                     print "sub_soil_SA", sub_soil_SA
+                    soil_SA_new[i_spawn,i_gmm,:,:,:] = sub_soil_SA
+#     print "soil_SA_new", soil_SA_new
+#     print "soil_SA", soil_SA
+    return soil_SA_new
