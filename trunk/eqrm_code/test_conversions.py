@@ -157,6 +157,36 @@ class Test_Conversions(unittest.TestCase):
             msg = ('At %.1fN, expected azimuth of %.1f, got %.1f'
                    % (start_lat, expected, result))
             self.failUnlessAlmostEqual(result, expected, 1, msg)
+    def test_Wells_and_Coppersmith_94(self):
+        Wells_and_Copper_94= conversion_functions['Wells_and_Coppersmith_94']
+        fault_type ='reverse'
+        max_width=15
+        max_length =20
+        Mw = array([4.1,5.2,6.3,5.3,5.0,6.0,3.3, 7])
+        (width,length)= Wells_and_Copper_94(fault_type,Mw,max_width,max_length,
+                             slab_width=0, out_of_dip =None)
+        
+        msg = ('Unexpected width or length values')
+        self.failUnlessAlmostEqual(length[2], 16.25548756, 1, msg)
+        self.failUnlessAlmostEqual(width[2], 9.39723311, 1, msg)
+        
+        #print Mw
+        #print length
+        #print width
+        slab_width=8
+        out_of_dip = array([0.0, 10, 90, 30, 110.0, 0.0, 111.0, 90.0])
+        (width,length)= Wells_and_Copper_94(fault_type,Mw,max_width,max_length,
+                             slab_width, out_of_dip)
+        #print Mw
+        #print length
+        #print width
+       
+      
+        
+        self.failUnlessAlmostEqual(length[2], 19.09457573, 1, msg)
+        self.failUnlessAlmostEqual(width[2], 8., 1, msg)
+        
+        
     def test_calc_max_width_in_slab(self):
         
         calc_max_width_in_slab= conversion_functions['calc_max_width_in_slab']
