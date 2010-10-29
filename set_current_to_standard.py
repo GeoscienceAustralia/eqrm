@@ -59,4 +59,9 @@ def current2standard(current_dir, standard_dir):
 
 #-------------------------------------------------------------
 if __name__ == "__main__":
-    main()
+     main()
+#     if sys.platform == 'linux2':  #Windows
+#         main()
+#     else:
+#         print 'Run set current to standard in Linux.'
+#         print 'To avoid checking in EOL system differences.'
