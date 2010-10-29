@@ -2831,13 +2831,14 @@ def Chiou08_distribution(**kwargs):
     Frv = Ch_fault_type[:,0][fault_type]
     Fnm = Ch_fault_type[:,1][fault_type]
 
-    # estimate Z10 from Vs30
-    Z10 = conversions.convert_Vs30_to_Z10(Vs30)
-
-    # resize the distances to standard form
+    # resize to standard form
     Rrup = Rrup[:,:,newaxis]
     Rjb = Rjb[:,:,newaxis]
     Rx = Rx[:,:,newaxis]
+    Vs30 = Vs30[:,newaxis,newaxis]
+
+    # estimate Z10 from Vs30
+    Z10 = conversions.convert_Vs30_to_Z10(Vs30)
 
     ######
     # CALCULATE ROCK PSA (Vs30 = 1130 m/sec)
