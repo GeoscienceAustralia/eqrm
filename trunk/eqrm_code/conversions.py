@@ -53,9 +53,23 @@ def modified_Wells_and_Coppersmith_94_width(dip,Mw,area,fault_width=15.0):
 modified_Wells_and_Coppersmith_94_width = vectorize(
     modified_Wells_and_Coppersmith_94_width)
 
+
 def Wells_and_Coppersmith_94(fault_type,Mw,max_width,max_length,
                              slab_width=0, out_of_dip =None):
+    """Calculate the widths and lengths for ruptures; given fault_type and
+    magnitude. The widths and lengths are limited by the fault width and length.
+    In addition if the ruptures are within a slab, the slab width, and the 
+    out of dip angle also limit the rupture width.
     
+    fault_type     fault type eg 'reverse'
+    Mw             magnitudes of the ruptures
+    max_width      width of the fault
+    max_length     length of the fault
+    slab_width     width of slab in kms
+    out_of_dip     out of dip angle in Degrees
+
+    Returns the max width of ruptures within a slab in kms.
+    """
     if fault_type== "normal":
         area =10**(-2.87+(0.82*Mw))
         widthWC =10**(-1.14+(0.35*Mw))
@@ -78,17 +92,29 @@ def Wells_and_Coppersmith_94(fault_type,Mw,max_width,max_length,
         
         max_width_in_slab = calc_max_width_in_slab(out_of_dip,slab_width,
                                                    max_width)
-
-        width = minimum(widthWC,max_width,max_width_in_slab)
+        
+        max_width = minimum(max_width,max_width_in_slab)
+        width = minimum(widthWC,max_width)
     else:
         width = minimum(widthWC,max_width)
     
     length = minimum((area/width),max_length)
     return width,length
 
+   
 def calc_max_width_in_slab(out_of_dip,slab_width,max_width):
-    max_width_in_slab=zeros(len(out_of_dip))
+    """Calculate the max width of a rupture within a slab in kms; given 
+    the slab width, and the out of dip angle.  the returned max width values
+    are compared to the calculated width and the fault width, and then 
+    the mimium value of the 3 is used as the rupture width.
     
+    out_of_dip     out of dip angle in Degrees
+    slab_width     width of slab in kms
+    max_width      width of the fault
+
+    Returns the max width of ruptures within a slab in kms.
+    """
+    max_width_in_slab=zeros(len(out_of_dip))
     
     i= where(out_of_dip <= 1)
     max_width_in_slab[i] = max_width
@@ -102,13 +128,6 @@ def calc_max_width_in_slab(out_of_dip,slab_width,max_width):
     i= where(out_of_dip > 90)
     max_width_in_slab[i] = slab_width/(sin(radians(180-out_of_dip)))
     
-#    if out_of_dip < 90:
-#        max_width_in_slab = slab_width/(sin(math.radians(out_of_dip)))
-#    elif out_of_dip == 90:
-#        max_width_in_slab = slab_width
-#    else:
-#        max_width_in_slab = slab_width/(sin(math.radians(180-out_of_dip)))
-#    
     return max_width_in_slab
 #Wells_and_Coppersmith_94 = vectorize(
     #Wells_and_Coppersmith_94)
