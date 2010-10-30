@@ -1118,6 +1118,16 @@ def load_data(THE_PARAM_T):
                 sites = bridges
             del bridges
 
+        # Load the site_class 2 Vs30 mapping
+        amp_factor_file = 'site_class2vs30.csv'
+        amp_factor_file = get_local_or_default(amp_factor_file,
+                                               THE_PARAM_T.default_input_dir,
+                                               THE_PARAM_T.input_dir)
+        # Load Vs30 mapping
+        site_class2Vs30 = load_site_class2Vs30(amp_factor_file)
+        # Use the mapping to add Vs30 info to add Vs30 info to structures
+        sites.set_Vs30(site_class2Vs30)
+        
     elif THE_PARAM_T.run_type == "hazard":
         #raise RuntimeError('run_type "hazard" not yet modified for Bridges')
 
@@ -1133,7 +1143,9 @@ def load_data(THE_PARAM_T):
         # i.e. searches input_dir then defaultdir
         name = get_local_or_default(name, THE_PARAM_T.default_input_dir,
                                     THE_PARAM_T.input_dir)
-        sites = Sites.from_csv(name, SITE_CLASS=str)
+        sites = Sites.from_csv(name, SITE_CLASS=str, VS30=float)
+        # FIXME this is a bit of a hack.  re Vs30 and VS30.
+        sites.attributes['Vs30'] = sites.attributes['VS30']
     else:
         raise ValueError('Got bad value for THE_PARAM_T.run_type: %s'
                          % THE_PARAM_T.run_type)
@@ -1142,15 +1154,16 @@ def load_data(THE_PARAM_T):
     if sites is None:
         raise RuntimeError("Couldn't find BUILDING or BRIDGE data?")
 
-    # Load the site_class 2 Vs30 mapping
-    amp_factor_file = 'site_class2vs30.csv'
-    amp_factor_file = get_local_or_default(amp_factor_file,
-                                           THE_PARAM_T.default_input_dir,
-                                           THE_PARAM_T.input_dir)
-    # Load Vs30 mapping
-    site_class2Vs30 = load_site_class2Vs30(amp_factor_file)
-    # Use the mapping to add Vs30 info to add Vs30 info to structures
-    sites.set_Vs30(site_class2Vs30)
+    if False:
+        # Load the site_class 2 Vs30 mapping
+        amp_factor_file = 'site_class2vs30.csv'
+        amp_factor_file = get_local_or_default(amp_factor_file,
+                                               THE_PARAM_T.default_input_dir,
+                                               THE_PARAM_T.input_dir)
+        # Load Vs30 mapping
+        site_class2Vs30 = load_site_class2Vs30(amp_factor_file)
+        # Use the mapping to add Vs30 info to add Vs30 info to structures
+        sites.set_Vs30(site_class2Vs30)
 
     return (sites, bridge_data)
 
