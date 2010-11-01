@@ -20,13 +20,14 @@ import scipy
 
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
-     int64, reshape, arange, append, radians
+     int64, reshape, arange, append, radians, where
 from numpy import random
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
 from eqrm_code.conversions import calc_fault_area, calc_fault_width,\
-    calc_fault_length, get_new_ll, Wells_and_Coppersmith_94, azimuth_of_trace
+    calc_fault_length, get_new_ll, Wells_and_Coppersmith_94, azimuth_of_trace,\
+    switch_coords
 from eqrm_code.projections import projections
 from eqrm_code.generation_polygon import polygons_from_xml
 from eqrm_code.projections import azimuthal_orthographic_ll_to_xy as ll_to_xy
@@ -793,6 +794,15 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     area =zeros((num_events), dtype=EVENT_FLOAT)
     width =zeros((num_events), dtype=EVENT_FLOAT)
     length =zeros((num_events), dtype=EVENT_FLOAT)
+    trace_start_lat =zeros((num_events), dtype=EVENT_FLOAT)
+    trace_start_lon =zeros((num_events), dtype=EVENT_FLOAT)
+    trace_end_lat =zeros((num_events), dtype=EVENT_FLOAT)
+    trace_end_lon =zeros((num_events), dtype=EVENT_FLOAT)
+    trace_start_x =zeros((num_events), dtype=EVENT_FLOAT)
+    trace_start_y =zeros((num_events), dtype=EVENT_FLOAT)
+    rupture_x =zeros((num_events), dtype=EVENT_FLOAT)
+    rupture_y =zeros((num_events), dtype=EVENT_FLOAT)
+    
     start=0
 
     for i,fault in enumerate(fsg_list):
@@ -806,6 +816,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
             continue
         end = start + num
         fault_dip = fault.dip_dist['mean']
+        rupture_dip = fault_dip
         depth_top = fault.depth_top_seismogenic_dist['mean']
         depth_bottom = fault.depth_bottom_seismogenic_dist['mean']
         
@@ -838,12 +849,13 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
             slab_width,
             out_of_dip_theta)
         
-        fault_azimuth = azimuth_of_trace(fault.trace_start_lat,
+        fault_azimuth = zeros((num), dtype=EVENT_FLOAT)
+        fault_azimuth[0:num] = azimuth_of_trace(fault.trace_start_lat,
                                          fault.trace_start_lon,
                                          fault.trace_end_lat,
                                          fault.trace_end_lon)
         
-        
+       
         random_scalar = random.random_sample(size=num)
         Ds = (fault_length-rup_length) * random_scalar
         
@@ -883,18 +895,22 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                                    r_start_lat,
                                                    r_start_lon, 
                                                    fault_azimuth)
+        r_x_start = 0
+        r_y_start = r_y_centroid -(r_depth_centroid * 
+                                      ((cos(radians(fault_dip)))/
+                                      (sin(radians(fault_dip)))))
         
         
         if ((slab_width > 0)&(out_of_dip_theta is not None)):
             rupture_dip = out_of_dip_theta + fault_dip
-            r_x_start = 0
+            r_x_start = 0.0
             r_y_start = r_y_centroid -(r_depth_centroid * 
                                       ((cos(radians(rupture_dip)))/
                                       (sin(radians(rupture_dip)))))
-            
+
             r_x_end = rup_length
             r_y_end = r_y_start
-            (r_start_lat,r_start_lon) = xy_to_ll( r_x_start, r_y_start,
+            (r_start_lat_temp,r_start_lon_temp) = xy_to_ll( r_x_start, r_y_start,
                                                   r_start_lat, r_start_lon, 
                                                   fault_azimuth, 
                                                   R=6367.0)
@@ -904,18 +920,41 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                               r_start_lat, r_start_lon, 
                                                 fault_azimuth, 
                                                 R=6367.0)
-            r_x_centroid = rup_length/2
-            r_y_centroid = (r_depth_centroid *((cos(radians(rupture_dip)))/
-                                      (sin(radians(rupture_dip)))))
+           
+            r_start_lat= r_start_lat_temp
+            r_start_lon= r_start_lon_temp
             
-            (r_centroid_lat,r_centroid_lon) = xy_to_ll(r_x_centroid,
-                                                   r_y_centroid,
-                                                   r_start_lat,
-                                                   r_start_lon, 
-                                                   fault_azimuth)
-            
-            
-            #FIXME DSG-EQRM the events will not to randomly placed,
+            #Now flip the rupture trace for those events with dip >90 Degrees
+            k= where(rupture_dip>90)
+            fault_azimuth[k]=fault_azimuth[k]+180
+            rupture_dip[k] = 180- rupture_dip[k]
+            (r_start_lat[k],r_start_lon[k],r_end_lat[k],r_end_lon[k]) = \
+                                   switch_coords(r_start_lat[k],r_start_lon[k],
+                                                 r_end_lat[k],r_end_lon[k])
+#           
+#        
+
+         # Calculate the distance of the origin from the centroid
+        
+        rad = pi/180.
+        x = rup_length/2.
+        y = r_depth_centroid*cos(rupture_dip*rad)/sin(rupture_dip*rad)
+        r_x_centroid = x
+        r_y_centroid = y
+
+        r_x_start = -x
+        r_y_start = -y
+
+        (r_start_lat,
+         r_start_lon) = xy_to_ll(r_x_start,r_y_start,
+                                     r_centroid_lat,r_centroid_lon,
+                                     fault_azimuth)
+
+        (r_end_lat,
+         r_end_lon) = xy_to_ll(-r_x_start,r_y_start,
+                                   r_centroid_lat,r_centroid_lon,
+                                   fault_azimuth)  
+          #FIXME DSG-EQRM the events will not to randomly placed,
             # Due to  lat, lon being spherical coords and popolate
             # working in x,y (flat 2D).
         #(lat, lon) = array(fault.populate(num)).swapaxes(0, 1) 
@@ -933,7 +972,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         depth_bottom_seismogenic[start:end] = r_depth_bottom
         azimuth[start:end] = fault_azimuth
         fault_dip = fault.populate_dip(num)
-        dip[start:end] = fault_dip
+        dip[start:end] = rupture_dip
         fault_type[start:end] = ground_motion_misc.FaultTypeDictionary[
             source.fault_type]
         depth[start:end] = r_depth_centroid
@@ -941,6 +980,14 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         area[start:end] = rup_width*rup_length
         width[start:end] = rup_width
         length[start:end] = rup_length
+        trace_start_lat[start:end] = r_start_lat
+        trace_start_lon[start:end] = r_start_lon
+        trace_end_lat[start:end] = r_end_lat
+        trace_end_lon[start:end] = r_end_lon
+        trace_start_x[start:end] = r_x_start
+        trace_start_y[start:end] = r_y_start
+        rupture_x[start:end] = r_x_centroid
+        rupture_y[start:end] = r_y_centroid
         #magnitude[start:end] = polygon_magnitude
             #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
@@ -950,27 +997,57 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         source_zone_id[start:end] = [i]*num
         start = end
     
-    new_ML=None
-    new_Mw=None
+    ML=None
+    Mw=None
     if magnitude_type == 'ML':
-        new_ML=magnitude
+        ML=magnitude
     elif magnitude_type == 'Mw':
-        new_Mw=magnitude
+        Mw=magnitude
     else:
         raise Exception('Magnitudes not set')
-    event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
-                                 rupture_centroid_lon=rupture_centroid_lon,
-                                 azimuth=azimuth,
-                                 dip=dip,
-                                 ML=new_ML,
-                                 Mw=new_Mw,
-                                 depth_top_seismogenic=depth_top_seismogenic,
-                                 depth_bottom_seismogenic=
-                                 depth_bottom_seismogenic,
-                                 fault_type=fault_type,
-                                 fault_width=fault_w,
-                                 area= area, width =width,
-                                 length=length, depth=depth)
+    if Mw is None:
+        Mw = conversions.Johnston_89_Mw(ML)
+    if ML is None:
+        ML = conversions.Johnston_01_ML(Mw)
+     #should use rupture_top
+     # calculate depth_to_top from depth, width, dip
+    #depth_to_top = conversions.calc_depth_to_top(depth, width, dip)
+    #assert (depth_to_top == depth_top_seismogenic)
+    event = Event_Set(azimuth,
+                        dip,
+                        ML,
+                        Mw,
+                        depth,
+                        depth_top_seismogenic,
+                        fault_type,
+                        width,
+                        length,
+                        area,
+                        fault_w,
+                        None, #source_zone_id
+                        trace_start_lat,
+                        trace_start_lon,
+                        trace_end_lat,
+                        trace_end_lon,
+                        trace_start_x,
+                        trace_start_y,
+                        rupture_x,
+                        rupture_y,
+                        rupture_centroid_lat,
+                        rupture_centroid_lon)
+#    event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
+#                                 rupture_centroid_lon=rupture_centroid_lon,
+#                                 azimuth=azimuth,
+#                                 dip=dip,
+#                                 ML=ML,
+#                                 Mw=Mw,
+#                                 depth_top_seismogenic=depth_top_seismogenic,
+#                                 depth_bottom_seismogenic=
+#                                 depth_bottom_seismogenic,
+#                                 fault_type=fault_type,
+#                                 fault_width=fault_w,
+#                                 area= area, width =width,
+#                                 length=length, depth=depth)
     event.source_zone_id = asarray(source_zone_id)
     
         #print "event.source_zone_id", event.source_zone_id
