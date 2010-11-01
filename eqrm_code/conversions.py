@@ -314,8 +314,20 @@ def get_new_ll(lat1,lon1,azimuth,distance_kms):
     Returns the lat, lon coords a spefied distance along a fault trace.
     """
     x = distance_kms #cos(azimuth)*distance_kms
-    y = 0#sin(azimuth)*distance_kms
+    y = 0.0#sin(azimuth)*distance_kms
     return azimuthal_orthographic_xy_to_ll(x,y,lat1,lon1,azimuth)
+
+def switch_coords(start_lat,start_lon,end_lat,end_lon):
+    """flips the start and end coords of a trace.
+
+    start_lat          latitude of start point
+    start_lon          longitude of start point
+    end_lat            latitude of end point
+    end_lon            longitude of end point
+    
+    Returns the lat, lon of the coords in the reverse order.
+    """
+    return(end_lat,end_lon,start_lat,start_lon)
 
 def obsolete_calc_azimuth(lat1,lon1,lat2,lon2):
     """NOT USED
