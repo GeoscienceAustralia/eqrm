@@ -3020,13 +3020,24 @@ def Campbell03_distribution(**kwargs):
     sigma_coefficient = kwargs['sigma_coefficient']
 
     # check we have the right shapes
+    num_sites = Rrup.shape[0]
+    num_events = Mw.shape[1]
     num_periods = coefficient.shape[3]
-    msg = ('Expected coefficient.shape %s, got %s'
-           % (str((10, 1, 1, num_periods)), str(coefficient.shape)))
-    assert coefficient.shape == (10, 1, 1, num_periods), msg
-    msg = ('Expected sigma_coefficient.shape %s, got %s'
-           % (str((3, 1, 1, num_periods)), str(sigma_coefficient.shape)))
-    assert sigma_coefficient.shape == (3, 1, 1, num_periods), msg
+
+    msg = 'Expected %s.shape=%s, got %s'
+
+    assert Mw.shape == (1, num_events, 1), (msg
+               % ('Mw', '(%d,%d,%d)' % (1, num_events, 1),
+                  str(Mw.shape)))
+    assert Rrup.shape == (num_sites, num_events, 1), (msg
+               % ('Rrup', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Rrup.shape)))
+    assert coefficient.shape == (10, 1, 1, num_periods), (msg
+               % ('coefficient', '(10,1,1,%d)' % num_periods,
+                  str(coefficient.shape)))
+    assert sigma_coefficient.shape == (3, 1, 1, num_periods), (msg
+               % ('sigma_coefficient', '(3,1,1,%d)' % num_periods,
+                  str(sigma_coefficient.shape)))
 
     # unpack coefficients
     (C1, C2, C3, C4, C5, C6, C7, C8, C9, C10) = coefficient
@@ -3050,6 +3061,14 @@ def Campbell03_distribution(**kwargs):
 
     # calculate sigma values
     log_sigma = where(Mw < Ca_M1, C11+C12*Mw, C13)
+
+    # check result has right dimensions
+    assert log_mean.shape == (num_sites, num_events, num_periods), (msg
+               % ('log_mean', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(log_mean.shape)))
+    assert log_sigma.shape[1:] == (num_events, num_periods), (msg
+               % ('log_sigma', '(?,%d,%d)' % (num_events, num_periods),
+                  str(log_sigma.shape)))
 
     return (log_mean, log_sigma)
 
@@ -3304,7 +3323,9 @@ def Campbell08_distribution(**kwargs):
     # basin response term
     Fsed = zeros(Z25.shape)				# Z25 <= 3.0
     Fsed = where(Z25 < 1.0, pC11*(Z25-1.0), Fsed)	# Z25 < 1.0
-    Fsed = where(Z25 > 3.0, pC12*pK3*Campbell08_exp_min_075*(1.0-exp(-0.25*(Z25-3.0))), Fsed)
+    Fsed = where(Z25 > 3.0,
+                 pC12*pK3*Campbell08_exp_min_075*(1.0-exp(-0.25*(Z25-3.0))),
+                 Fsed)
 
     # PGA on rock
     A1100 = exp(Fmag + Fdis + Fflt + Fhng + Fsite + Fsed)
@@ -3312,7 +3333,9 @@ def Campbell08_distribution(**kwargs):
     # PGA on local site conditions
     PGA = exp(log(A1100) - Fsite)
 
-    Fsite = pC10*log(Vs30/pK1) + pK2*(log(A1100+Campbell08_C*power((Vs30/pK1), Campbell08_N)) - log(A1100+Campbell08_C))
+    Fsite = (pC10*log(Vs30/pK1) +
+             pK2*(log(A1100+Campbell08_C*power((Vs30/pK1), Campbell08_N)) -
+             log(A1100+Campbell08_C)))
     Fsite = where(Vs30 >= pK1, (pC10 + pK2*Campbell08_N)*log(Vs30/pK1), Fsite)
     Fsite = where(Vs30 >= 1100.0, (pC10 + pK2*Campbell08_N)*log(1100.0/pK1), Fsite)
 
@@ -3358,15 +3381,20 @@ def Campbell08_distribution(**kwargs):
     Fhng = C9*Fhngr*Fhngm*Fhngz*Fhngd
 
     # shallow site response term (Vs30 = 1100)
-    Fsite = ones(Rrup.shape) * (C10+K2*Campbell08_N)*log(1100.0/K1)	# Vs30 >= 1100.0
+    Fsite = ones(Rrup.shape) * (C10+K2*Campbell08_N)*log(1100.0/K1)
     Fsite = where(Vs30 < 1100.0, (C10 + K2*Campbell08_N)*log(Vs30/K1), Fsite)
-    Fsite = where(Vs30 < K1, C10*log(Vs30/K1) + K2*(log(A1100+Campbell08_C*power((Vs30/K1), Campbell08_N)) - log(A1100+Campbell08_C)),
-                             Fsite)
+    Fsite = where(Vs30 < K1,
+                  C10*log(Vs30/K1) +
+                      K2*(log(A1100+Campbell08_C*power((Vs30/K1), Campbell08_N)) -
+                      log(A1100+Campbell08_C)),
+                  Fsite)
 
     # basin response term
     Fsed = zeros(Z25.shape)				# Z25 <= 3.0
     Fsed = where(Z25 < 1.0, C11*(Z25-1.0), Fsed)	# Z25 < 1.0
-    Fsed = where(Z25 > 3.0, C12*K3*Campbell08_exp_min_075*(1.0-exp(-0.25*(Z25-3.0))), Fsed)
+    Fsed = where(Z25 > 3.0,
+                 C12*K3*Campbell08_exp_min_075*(1.0-exp(-0.25*(Z25-3.0))),
+                 Fsed)
 
     # calculate ground motion parameter
     Y = exp(Fmag + Fdis + Fflt + Fhng + Fsite + Fsed)
@@ -3381,7 +3409,10 @@ def Campbell08_distribution(**kwargs):
 
     # linearized relationship between Fsite and ln(PGA)
     alpha = zeros(A1100.shape)
-    alpha = where(Vs30 < K1, K2*A1100*(1.0/(A1100+Campbell08_C*power((Vs30/K1), Campbell08_N)) - 1.0/(A1100+Campbell08_C)), alpha)
+    alpha = where(Vs30 < K1,
+                  K2*A1100*(1.0/(A1100+Campbell08_C*power((Vs30/K1), Campbell08_N)) -
+                            1.0/(A1100+Campbell08_C)),
+                  alpha)
 
     # intra-event standard deviation at base of site profile
     slnYB = sqrt(ElnY*ElnY - Campbell08_ElnAF*Campbell08_ElnAF)
@@ -4182,7 +4213,9 @@ def Abrahamson08_distribution(**kwargs):
     # Estimated Vs30
 
     s0Aest = ones(Mw.shape) * AS08_PGA_s2est
-    s0Aest = where(Mw <= 7.0, AS08_PGA_s1est + (AS08_PGA_s2est-AS08_PGA_s1est)*(Mw-5.0)/2.0, s0Aest)
+    s0Aest = where(Mw <= 7.0,
+                   AS08_PGA_s1est + (AS08_PGA_s2est-AS08_PGA_s1est)*(Mw-5.0)/2.0,
+                   s0Aest)
     s0Aest = where(Mw < 5.0, AS08_PGA_s1est, s0Aest)
 
     s0Yest = ones(Mw.shape) * s2estT
@@ -4195,7 +4228,9 @@ def Abrahamson08_distribution(**kwargs):
     # Measured Vs30
 
     s0Amea = ones(Mw.shape) * AS08_PGA_s2mea
-    s0Amea = where(Mw <= 7.0, (AS08_PGA_s1mea + AS08_PGA_s2mea-AS08_PGA_s1mea)*(Mw-5.0)/2.0, s0Amea)
+    s0Amea = where(Mw <= 7.0,
+                   (AS08_PGA_s1mea + AS08_PGA_s2mea-AS08_PGA_s1mea)*(Mw-5.0)/2.0,
+                   s0Amea)
     s0Amea = where(Mw < 5.0, AS08_PGA_s1mea, s0Amea)
 
     s0Ymea = ones(Mw.shape) * s2meaT
@@ -4210,7 +4245,9 @@ def Abrahamson08_distribution(**kwargs):
     #####
 
     tau0A = ones(Mw.shape) * AS08_PGA_s4
-    tau0A = where(Mw <= 7.0, AS08_PGA_s3 + (AS08_PGA_s4-AS08_PGA_s3)*(Mw-5.0)/2.0, tau0A)
+    tau0A = where(Mw <= 7.0,
+                  AS08_PGA_s3 + (AS08_PGA_s4-AS08_PGA_s3)*(Mw-5.0)/2.0,
+                  tau0A)
     tau0A = where(Mw < 5.0, AS08_PGA_s3, tau0A)
 
     tau0Y = ones(Mw.shape) * s4T
@@ -4228,13 +4265,15 @@ def Abrahamson08_distribution(**kwargs):
 
     # Estimated Vs30
 
-    Sigest = sqrt(sBYest**2 + slnAF**2 + (Alpha**2)*(sBAest**2) + 2.0*Alpha*rhoT*sBYest*sBAest)
+    Sigest = sqrt(sBYest**2 + slnAF**2 + (Alpha**2)*(sBAest**2) +
+                  2.0*Alpha*rhoT*sBYest*sBAest)
 
     SigTest = sqrt(Sigest**2 + Tau**2)
 
     # Measured Vs30
 
-    Sigmea = sqrt(sBYmea**2 + slnAF**2 + (Alpha**2)*(sBAmea**2) + 2.0*Alpha*rhoT*sBYmea*sBAmea)
+    Sigmea = sqrt(sBYmea**2 + slnAF**2 + (Alpha**2)*(sBAmea**2) +
+                  2.0*Alpha*rhoT*sBYmea*sBAmea)
 
     SigTmea = sqrt(Sigmea**2 + Tau**2)
 
