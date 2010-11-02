@@ -849,7 +849,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
             )
         if (slab_width > 0)and (out_of_dip_theta is not None):
             max_width_in_slab = calc_max_width_in_slab(out_of_dip_theta,
-                                                       slab_width,rup_width)
+                                                       slab_width,fault_width)
             rup_width = minimum(rup_width,max_width_in_slab)
             
         rup_length = minimum((rup_area/rup_width),fault_length)

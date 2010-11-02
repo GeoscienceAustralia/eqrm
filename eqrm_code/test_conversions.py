@@ -163,7 +163,7 @@ class Test_Conversions(unittest.TestCase):
         fault_type ='reverse'
         max_width=15
         max_length =20
-        Mw = array([4.1,5.2,6.3,5.3,5.0,6.0,3.3, 7])
+        Mw = array([4.1,5.2,6.3,5.3,9.5,6.0,3.3, 7])
         (area, width)= Wells_and_Copper_94(fault_type,Mw,max_width)
         length=minimum((area/width), max_length)
         msg = ('Unexpected width or length values')
@@ -176,7 +176,7 @@ class Test_Conversions(unittest.TestCase):
         slab_width=8
         out_of_dip = array([0.0, 10, 90, 30, 110.0, 0.0, 111.0, 90.0])
         (area, width)= Wells_and_Copper_94(fault_type,Mw,max_width)
-        width=minimum(calc_max_width_in_slab(out_of_dip,slab_width,width),
+        width=minimum(calc_max_width_in_slab(out_of_dip,slab_width,max_width),
                       width)
         length=minimum((area/width), max_length)
         #print Mw
