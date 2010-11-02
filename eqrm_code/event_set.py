@@ -20,14 +20,14 @@ import scipy
 
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
-     int64, reshape, arange, append, radians, where
+     int64, reshape, arange, append, radians, where, minimum
 from numpy import random
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
 from eqrm_code.conversions import calc_fault_area, calc_fault_width,\
     calc_fault_length, get_new_ll, Wells_and_Coppersmith_94, azimuth_of_trace,\
-    switch_coords
+    switch_coords, calc_max_width_in_slab
 from eqrm_code.projections import projections
 from eqrm_code.generation_polygon import polygons_from_xml
 from eqrm_code.projections import azimuthal_orthographic_ll_to_xy as ll_to_xy
@@ -840,14 +840,19 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         fault_magnitude = asarray(fault_magnitude)
         
         # If slab_width >0 then the rupture width is limited so that it does not 
-        # etend out of the slab.
-        (rup_width,rup_length) = Wells_and_Coppersmith_94(
+        # etxend out of the slab.
+        
+        (rup_area,rup_width) = Wells_and_Coppersmith_94(
             scaling_event_type,
             fault_magnitude,
-            fault_width,
-            fault_length,
-            slab_width,
-            out_of_dip_theta)
+            fault_width
+            )
+        if (slab_width > 0)and (out_of_dip_theta is not None):
+            max_width_in_slab = calc_max_width_in_slab(out_of_dip_theta,
+                                                       slab_width,rup_width)
+            rup_width = minimum(rup_width,max_width_in_slab)
+            
+        rup_length = minimum((rup_area/rup_width),fault_length)
         
         fault_azimuth = zeros((num), dtype=EVENT_FLOAT)
         fault_azimuth[0:num] = azimuth_of_trace(fault.trace_start_lat,
@@ -935,7 +940,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
 #        
 
          # Calculate the distance of the origin from the centroid
-        
+        #HACK
         rad = pi/180.
         x = rup_length/2.
         y = r_depth_centroid*cos(rupture_dip*rad)/sin(rupture_dip*rad)
@@ -1035,19 +1040,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                         rupture_y,
                         rupture_centroid_lat,
                         rupture_centroid_lon)
-#    event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
-#                                 rupture_centroid_lon=rupture_centroid_lon,
-#                                 azimuth=azimuth,
-#                                 dip=dip,
-#                                 ML=ML,
-#                                 Mw=Mw,
-#                                 depth_top_seismogenic=depth_top_seismogenic,
-#                                 depth_bottom_seismogenic=
-#                                 depth_bottom_seismogenic,
-#                                 fault_type=fault_type,
-#                                 fault_width=fault_w,
-#                                 area= area, width =width,
-#                                 length=length, depth=depth)
+
     event.source_zone_id = asarray(source_zone_id)
     
         #print "event.source_zone_id", event.source_zone_id

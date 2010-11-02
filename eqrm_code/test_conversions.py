@@ -2,7 +2,7 @@
 import unittest
 import math
 
-from scipy import array, allclose, exp, log, power, asarray
+from scipy import array, allclose, exp, log, power, asarray, minimum
 
 from eqrm_code.conversions import conversion_functions
 from eqrm_code.xml_interface import Xml_Interface
@@ -159,13 +159,13 @@ class Test_Conversions(unittest.TestCase):
             self.failUnlessAlmostEqual(result, expected, 1, msg)
     def test_Wells_and_Coppersmith_94(self):
         Wells_and_Copper_94= conversion_functions['Wells_and_Coppersmith_94']
+        calc_max_width_in_slab=conversion_functions['calc_max_width_in_slab']
         fault_type ='reverse'
         max_width=15
         max_length =20
         Mw = array([4.1,5.2,6.3,5.3,5.0,6.0,3.3, 7])
-        (width,length)= Wells_and_Copper_94(fault_type,Mw,max_width,max_length,
-                             slab_width=0, out_of_dip =None)
-        
+        (area, width)= Wells_and_Copper_94(fault_type,Mw,max_width)
+        length=minimum((area/width), max_length)
         msg = ('Unexpected width or length values')
         self.failUnlessAlmostEqual(length[2], 16.25548756, 1, msg)
         self.failUnlessAlmostEqual(width[2], 9.39723311, 1, msg)
@@ -175,8 +175,10 @@ class Test_Conversions(unittest.TestCase):
         #print width
         slab_width=8
         out_of_dip = array([0.0, 10, 90, 30, 110.0, 0.0, 111.0, 90.0])
-        (width,length)= Wells_and_Copper_94(fault_type,Mw,max_width,max_length,
-                             slab_width, out_of_dip)
+        (area, width)= Wells_and_Copper_94(fault_type,Mw,max_width)
+        width=minimum(calc_max_width_in_slab(out_of_dip,slab_width,width),
+                      width)
+        length=minimum((area/width), max_length)
         #print Mw
         #print length
         #print width
