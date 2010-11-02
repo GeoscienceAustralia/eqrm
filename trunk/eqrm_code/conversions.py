@@ -54,21 +54,16 @@ modified_Wells_and_Coppersmith_94_width = vectorize(
     modified_Wells_and_Coppersmith_94_width)
 
 
-def Wells_and_Coppersmith_94(fault_type,Mw,max_width,max_length,
-                             slab_width=0, out_of_dip =None):
-    """Calculate the widths and lengths for ruptures; given fault_type and
-    magnitude. The widths and lengths are limited by the fault width and length.
-    In addition if the ruptures are within a slab, the slab width, and the 
-    out of dip angle also limit the rupture width.
+def Wells_and_Coppersmith_94(fault_type,Mw,max_width):
+    """Calculate the area and widths for ruptures; given fault_type and
+    magnitude. The widths are limited by the fault width.
+    
     
     fault_type     fault type eg 'reverse'
     Mw             magnitudes of the ruptures
     max_width      width of the fault
-    max_length     length of the fault
-    slab_width     width of slab in kms
-    out_of_dip     out of dip angle in Degrees
 
-    Returns the max width of ruptures within a slab in kms.
+    Returns an area for the rupture and the max width of rupture.
     """
     if fault_type== "normal":
         area =10**(-2.87+(0.82*Mw))
@@ -85,21 +80,9 @@ def Wells_and_Coppersmith_94(fault_type,Mw,max_width,max_length,
     else:
         area =10**(-3.497+(0.91*Mw))
         widthWC =10**(-1.01+(0.32*Mw))
-    
-    #max_width_in_slab = max_width
 
-    if (slab_width > 0)and (out_of_dip is not None):
-        
-        max_width_in_slab = calc_max_width_in_slab(out_of_dip,slab_width,
-                                                   max_width)
-        
-        max_width = minimum(max_width,max_width_in_slab)
-        width = minimum(widthWC,max_width)
-    else:
-        width = minimum(widthWC,max_width)
-    
-    length = minimum((area/width),max_length)
-    return width,length
+    width = minimum(widthWC,max_width)
+    return area, width
 
    
 def calc_max_width_in_slab(out_of_dip,slab_width,max_width):
