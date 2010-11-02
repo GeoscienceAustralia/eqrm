@@ -936,7 +936,8 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
             (r_start_lat[k],r_start_lon[k],r_end_lat[k],r_end_lon[k]) = \
                                    switch_coords(r_start_lat[k],r_start_lon[k],
                                                  r_end_lat[k],r_end_lon[k])
-#           
+            k = where(fault_azimuth >= 360)
+            fault_azimuth[k]=fault_azimuth[k]-360
 #        
 
          # Calculate the distance of the origin from the centroid
