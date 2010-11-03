@@ -24,7 +24,7 @@ from interp import interp
 ######
 FaultTypeDictionary = {'reverse': 0,
                        'normal': 1,
-                       'strikeslip': 2}
+                       'strike_slip': 2}
 
 
 def linear_interpolation(new_period,coefficients,old_period):

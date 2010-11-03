@@ -748,7 +748,7 @@ del tmp
 ## num_events = 3
 ## 'reverse' fault type index is 0
 ## 'normal' fault type index is 1
-## 'strikeslip' fault type index is 2
+## 'strike_slip' fault type index is 2
 ##                                       SS SS SS
 #test_data['Chiou08_test_fault_type'] = [2, 2, 2]
 #
@@ -900,7 +900,7 @@ test_data['Campbell08_test_dip'] = [90.0, 90.0, 45.0, 45.0]
 test_data['Campbell08_test_depth_to_top'] = [5.0, 0.0, 5.0, 0.0]
 
 # num_events = 4
-# 'strikeslip' fault type index is 2, 'reverse' is 0
+# 'strike_slip' fault type index is 2, 'reverse' is 0
 test_data['Campbell08_test_fault_type'] = [2, 2, 0, 0]
 
 # num_periods = 4
@@ -1019,7 +1019,7 @@ test_data['Abrahamson08_test_depth_to_top'] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0
 # num_events = 8
 # 'reverse' fault type index is 0
 # 'normal' fault type index is 1
-# 'strikeslip' fault type index is 2
+# 'strike_slip' fault type index is 2
 #                                            SS SS RV RV NM NM RV RV
 test_data['Abrahamson08_test_fault_type'] = [2, 2, 0, 0, 1, 1, 0, 0]
 
