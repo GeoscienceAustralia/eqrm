@@ -26,7 +26,7 @@ from numpy import random
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
 from eqrm_code.conversions import calc_fault_area, calc_fault_width,\
-    calc_fault_length, get_new_ll, Wells_and_Coppersmith_94, azimuth_of_trace,\
+    calc_fault_length, get_new_ll, azimuth_of_trace,\
     switch_coords, calc_max_width_in_slab
 from eqrm_code.projections import projections
 from eqrm_code.generation_polygon import polygons_from_xml
@@ -843,21 +843,16 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         # If slab_width >0 then the rupture width is limited so that it does not 
         # etxend out of the slab.
         
-        (rup_area,rup_width) = Wells_and_Coppersmith_94(
-            scaling_event_type,
-            fault_magnitude,
-            fault_width
-            )
-        rup_area_new = scaling.scaling_calc_rup_area(
+        
+        rup_area = scaling.scaling_calc_rup_area(
             fault_magnitude, source.scaling)
-        rup_width_new = scaling.scaling_calc_rup_width(
+        rup_width = scaling.scaling_calc_rup_width(
             fault_magnitude, source.scaling, fault_dip,
-                               rup_area=rup_area, max_rup_width=fault_width)
-        assert allclose(rup_area, rup_area_new)
-        assert allclose(rup_width, rup_width_new)
+            rup_area=rup_area, max_rup_width=fault_width)
         if (slab_width > 0)and (out_of_dip_theta is not None):
-            max_width_in_slab = calc_max_width_in_slab(out_of_dip_theta,
-                                                       slab_width,fault_width)
+            max_width_in_slab = calc_max_width_in_slab(
+                out_of_dip_theta,
+                slab_width,fault_width)
             rup_width = minimum(rup_width,max_width_in_slab)
             
         rup_length = minimum((rup_area/rup_width),fault_length)
