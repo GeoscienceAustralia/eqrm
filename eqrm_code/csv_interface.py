@@ -79,9 +79,13 @@ def quick_convert_csv_to_arrays(f, **attributes):
 
     reader = csv.DictReader(f)
     keys = attributes.keys()
-
-    data = [[attributes[key](row[key].strip(' ')) for key in keys]
+    if True:
+        data = [[attributes[key](row[key].strip(' ')) for key in keys]
                 for row in reader]
+    else:
+        data = []
+        for row in reader:
+            data.append([attributes[key](row[key].strip(' ')) for key in keys])
 
     answer = {}
     for (i, key) in enumerate(keys):
