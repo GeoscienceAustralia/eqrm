@@ -215,6 +215,7 @@ class Event_Set(object):
             width = conversions.\
                 modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
                                                         fault_width)
+            width
         if depth is None:
             depth = conversions.depth(depth_top_seismogenic,
                                       dip, Mw, fault_width)
