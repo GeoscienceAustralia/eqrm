@@ -848,13 +848,13 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
             fault_magnitude,
             fault_width
             )
-        # rup_area_new = scaling.scaling_calc_rup_area(
-#             fault_magnitude, source.scaling)
-#         rup_width_new = scaling.scaling_calc_rup_width(
-#             fault_magnitude, source.scaling, fault_dip,
-#                                rup_area=rup_area, max_rup_width=fault_width)
-#         assert allclose(rup_area, rup_area_new)
-#         assert allclose(rup_width, rup_width_new)
+        rup_area_new = scaling.scaling_calc_rup_area(
+            fault_magnitude, source.scaling)
+        rup_width_new = scaling.scaling_calc_rup_width(
+            fault_magnitude, source.scaling, fault_dip,
+                               rup_area=rup_area, max_rup_width=fault_width)
+        assert allclose(rup_area, rup_area_new)
+        assert allclose(rup_width, rup_width_new)
         if (slab_width > 0)and (out_of_dip_theta is not None):
             max_width_in_slab = calc_max_width_in_slab(out_of_dip_theta,
                                                        slab_width,fault_width)

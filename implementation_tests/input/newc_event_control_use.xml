@@ -81,7 +81,7 @@
       <branch model = "mean_1_sigma_0pt5" weight = "0.75"/> 
       <branch model = "mean_2_sigma_1" weight = "0.25"/> 
     </GMPE>
-    <scaling scaling_rule = "WellsCoppersmith94" 
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
     scaling_fault_type = "reverse"  />
   </event_group>	
 	
@@ -91,7 +91,7 @@
        fault_type = "reverse">
       <branch model = "mean_1_sigma_0pt5" weight = "1.0"/>
     </GMPE>
-    <scaling scaling_rule = "WellsCoppersmith94" 
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
     scaling_fault_type = "reverse"  />
   </event_group>
 	
@@ -101,7 +101,7 @@
        fault_type = "reverse">
       <branch model = "mean_2_sigma_1" weight = "1.0"/> 
     </GMPE>
-    <scaling scaling_rule = "WellsCoppersmith94" 
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
     scaling_fault_type = "reverse"  />
   </event_group>
   
@@ -111,7 +111,7 @@
        fault_type = "reverse">
       <branch model = "return_Vs30" weight = "1.0"/>
     </GMPE>
-    <scaling scaling_rule = "WellsCoppersmith94" 
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
     scaling_fault_type = "reverse"  />
   </event_group>
   
@@ -122,7 +122,7 @@
       <branch model = "mean_1_sigma_0pt5" weight = "0.5"/>
       <branch model = "return_Vs30" weight = "0.5"/>
     </GMPE>
-    <scaling scaling_rule = "WellsCoppersmith94" 
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
     scaling_fault_type = "reverse"  />
   </event_group>
   
