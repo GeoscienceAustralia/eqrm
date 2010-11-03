@@ -97,6 +97,9 @@ def calc_max_width_in_slab(out_of_dip,slab_width,max_width):
     """
     max_width_in_slab=zeros(len(out_of_dip))
     
+    i= where(out_of_dip >= 180)
+    out_of_dip[i] = out_of_dip[i]-180
+    
     i= where(out_of_dip <= 1)
     max_width_in_slab[i] = max_width
     
@@ -106,8 +109,13 @@ def calc_max_width_in_slab(out_of_dip,slab_width,max_width):
     k= where(out_of_dip == 90)
     max_width_in_slab[k] = slab_width
     
-    k= where(out_of_dip > 90)
+    k= where((out_of_dip > 90) & (out_of_dip < 179))
     max_width_in_slab[k] = slab_width/(sin(radians(180-out_of_dip[k])))
+    
+    i= where(out_of_dip >= 179)
+    max_width_in_slab[i] = max_width
+    
+    
    
     return max_width_in_slab
 #Wells_and_Coppersmith_94 = vectorize(
