@@ -5,7 +5,6 @@ import math
 from scipy import array, allclose, exp, log, power, asarray, minimum
 
 from eqrm_code.conversions import conversion_functions
-from eqrm_code.xml_interface import Xml_Interface
 
 """
 Some of the values in event_set (such as fault length)
@@ -24,7 +23,8 @@ class Test_Conversions(unittest.TestCase):
         area=array([4.16869383e+02,3.09029543e+00,1.77827941e+01,
                     3.89045145e+01,2.39883292e+02])
         dip = array([ 35. , 35. , 35. , 35. , 35. ])
-        width = width_function(dip,Mw,area)
+        fault_width = array([ 15. , 15. , 15. , 15. , 15. ])
+        width = width_function(dip, Mw, area, fault_width)
         assert allclose([ 15,1.75792361,4.21696503,\
                           6.05476637,12.97166415],width)
         
@@ -157,6 +157,7 @@ class Test_Conversions(unittest.TestCase):
             msg = ('At %.1fN, expected azimuth of %.1f, got %.1f'
                    % (start_lat, expected, result))
             self.failUnlessAlmostEqual(result, expected, 1, msg)
+            
     def test_Wells_and_Coppersmith_94(self):
         Wells_and_Copper_94= conversion_functions['Wells_and_Coppersmith_94']
         calc_max_width_in_slab=conversion_functions['calc_max_width_in_slab']
@@ -167,8 +168,8 @@ class Test_Conversions(unittest.TestCase):
         (area, width)= Wells_and_Copper_94(fault_type,Mw,max_width)
         length=minimum((area/width), max_length)
         msg = ('Unexpected width or length values')
-        self.failUnlessAlmostEqual(length[2], 16.25548756, 1, msg)
-        self.failUnlessAlmostEqual(width[2], 9.39723311, 1, msg)
+        self.failUnlessAlmostEqual(length[2], 16.25548756, 7, msg)
+        self.failUnlessAlmostEqual(width[2], 9.39723311, 7, msg)
         
         #print Mw
         #print length
