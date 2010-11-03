@@ -3,7 +3,7 @@
 
   Author:  Peter Row, peter.row@ga.gov.au
 
-  Description: Relations between various earthquake parameters - Mw to length,
+  Description: Relations between various earthquake parameters - Mw to length,  
   ML to Mw, etc.
 
 
@@ -14,8 +14,8 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import (vectorize, sqrt, sin, minimum, pi, where, asarray,array,
-                   exp, log, power, cos, arccos, arcsin, arctan2, zeros, radians)
+from scipy import vectorize, sqrt, sin, minimum, pi, where, asarray,array, \
+         exp, log, power, cos, arccos, arcsin, arctan2, zeros, radians
 import math
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll
 
@@ -33,15 +33,13 @@ def Johnston_01_ML(Mw):
 def Johnston_89_Mw(ML):
     return 3.45-0.473*ML+0.145*(ML**2)
 
-def Wells_and_Coppersmith_94_length(Mw):
+def obsolete_Wells_and_Coppersmith_94_length(Mw):
     return 10.**(0.69*Mw - 3.22)
 
 def modified_Wells_and_Coppersmith_94_area(Mw):
     return 10.**(Mw-4.02)
 
-def modified_Wells_and_Coppersmith_94_width(dip,Mw,area,fault_width=15.0):
-    #FIXME DSG-EQRM Does it make sence to have a default width value?
-    # based on Wells_and_Coppersmith 94 with modification
+def modified_Wells_and_Coppersmith_94_width(dip, Mw, area, fault_width):
     if Mw > 5.5:
         f=sqrt(sqrt(1+2*(Mw-5.5)*sin(dip*pi/180.)))**-1
     else: f=1.0
@@ -354,6 +352,7 @@ def obsolete_calc_azimuth2(lat1,lon1,lat2,lon2):
     else:
         azimuth=math.degrees(arctan2(x,y))
     return azimuth
+
 def obsolete_calc_azimuth3(lat1,lon1,lat2,lon2):
     """NOT USED
        Calculate a trace azimuth given start and end positions.
@@ -375,6 +374,7 @@ def obsolete_calc_azimuth3(lat1,lon1,lat2,lon2):
     else:
         azimuth=math.degrees(arctan2(x,y))
     return azimuth
+
 ###################
 # END OF FUNCTIONS#
 ###################

@@ -36,9 +36,10 @@ from eqrm_code.generation_polygon import xml_fault_generators
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 from eqrm_code import source_model #import create_fault_sources
 from eqrm_code import ground_motion_misc
+from eqrm_code import scaling
 
 # This specifies the dtypes used in  event set.
-# This is used to save memory
+# This was investigated to save memory
 # Float32 gives differnet results between windows and linux
 # therefore let's not use it.
 EVENT_FLOAT = float64 #float32
@@ -847,6 +848,13 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
             fault_magnitude,
             fault_width
             )
+        # rup_area_new = scaling.scaling_calc_rup_area(
+#             fault_magnitude, source.scaling)
+#         rup_width_new = scaling.scaling_calc_rup_width(
+#             fault_magnitude, source.scaling, fault_dip,
+#                                rup_area=rup_area, max_rup_width=fault_width)
+#         assert allclose(rup_area, rup_area_new)
+#         assert allclose(rup_width, rup_width_new)
         if (slab_width > 0)and (out_of_dip_theta is not None):
             max_width_in_slab = calc_max_width_in_slab(out_of_dip_theta,
                                                        slab_width,fault_width)
