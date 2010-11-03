@@ -2730,7 +2730,7 @@ gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
 #                    'type':     (Frv, Fnm)
 Ch_faulting_flags = {'reverse':    (1, 0),
                      'normal':     (0, 1),
-                     'strikeslip': (0, 0)}
+                     'strike_slip': (0, 0)}
 
 # generate 'Ch_fault_type' from the dictionary above 
 tmp = []
@@ -3167,7 +3167,7 @@ Campbell08_exp_min_075 = math.exp(-0.75)
 #                            'type':     (Frv, Fnm)
 Campbell08_faulting_flags = {'reverse':    (1, 0),
                              'normal':     (0, 1),
-                             'strikeslip': (0, 0)}
+                             'strike_slip': (0, 0)}
 
 # generate 'Campbell08_fault_type' from the dictionary above
 tmp = []
@@ -4298,7 +4298,7 @@ def Abrahamson08_distribution(**kwargs):
 #                      'type':     (Frv, Fnm)
 AS08_faulting_flags = {'reverse':    (1, 0),
                        'normal':     (0, 1),
-                       'strikeslip': (0, 0)}
+                       'strike_slip': (0, 0)}
 
 # generate 'AS08_fault_type' from the dictionary above
 tmp = []

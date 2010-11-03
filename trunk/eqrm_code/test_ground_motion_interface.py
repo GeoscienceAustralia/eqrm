@@ -1271,7 +1271,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                  msg)
 
     def test_Campbell08_SS1(self):
-        """Test the Campbell08 model - StrikeSlip fault."""
+        """Test the Campbell08 model - strike_slip fault."""
 
         model_name = 'Campbell08'
         model = Ground_motion_specification(model_name)
@@ -1341,7 +1341,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                  msg)
 
     def test_Campbell08_SS1(self):
-        """Test the Campbell08 model - StrikeSlip fault."""
+        """Test the Campbell08 model - strike_slip fault."""
 
         model_name = 'Campbell08'
         model = Ground_motion_specification(model_name)
@@ -1411,7 +1411,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                  msg)
 
     def test_Campbell08_SS2(self):
-        """Test the Campbell08 model - StrikeSlip fault."""
+        """Test the Campbell08 model - strike_slip fault."""
 
         model_name = 'Campbell08'
         model = Ground_motion_specification(model_name)
@@ -1645,7 +1645,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         ML = numpy.array([[[7.0], [5.0]]])
         depth = numpy.array([[[0.0], [0.0]]])
         dip = numpy.array([[[90.0], [90.0]]])
-        fault_type = numpy.array([[[2], [2]]], dtype=int)	# strikeslip
+        fault_type = numpy.array([[[2], [2]]], dtype=int)	# strike_slip
         Vs30 = numpy.array([760.0])
         width = numpy.array([[[10.0], [10.0]]])
 
