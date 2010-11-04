@@ -13,7 +13,7 @@ from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
 classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Toro_1997_midcontinent', 'Sadigh_97',
                           'Youngs_97_interface', 'Youngs_97_intraslab',
-                          'Combo_Sadigh_Youngs_M8', 'Boore_08',
+                          'Combo_Sadigh_Youngs_M8',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
@@ -23,7 +23,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Zhao_2006_intraslab')
 
 # Atkinson_Boore_97 is out.  It has no test data.
-
+#  'Boore_08',  Boore_08 is out.  Results using fault_type have to be made.
 
 """
     test_distance : the set of distances used by verification tests
