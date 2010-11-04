@@ -54,6 +54,7 @@ class Test_scaling(unittest.TestCase):
                         width)
         
     def test_Wells_and_Coppersmith_94_rup_area(self):
+        # Mw = 1.87/0.82 gives a width of 0.1 
         # 0.1 = 10**-1 = 10**(-2.87+1.87) = 10**(-2.87+(0.82*1.87/0.82))
         Mw = array([1.87/0.82])
         scaling_dic = {'scaling_rule':'Wells_and_Coppersmith_94',
@@ -85,8 +86,8 @@ class Test_scaling(unittest.TestCase):
         
     def test_Wells_and_Coppersmith_94_rup_width(self):
         # Try and get an answer of 0.1
-        # 0.1 = 10**-1 = 10**(-1.14+0.14) = 10**(-1.14+(0.35*0.14/0.35))
         # Mw = 0.14/0.35 gives a width of 0.1 
+        # 0.1 = 10**-1 = 10**(-1.14+0.14) = 10**(-1.14+(0.35*0.14/0.35))
         Mw = array([0.14/0.35])
         scaling_dic = {'scaling_rule':'Wells_and_Coppersmith_94',
                        'scaling_fault_type':"normal"}
