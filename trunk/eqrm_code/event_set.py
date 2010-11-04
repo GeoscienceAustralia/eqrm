@@ -205,17 +205,34 @@ class Event_Set(object):
             
         if area is None:
             area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
+        #print "Mw", Mw
+#        area_old = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
+#        assert allclose(area, area_old)
+            
         # finish turning into arrays arrays
                 
         if fault_width is None:
             fault_width = (depth_bottom_seismogenic \
                            - depth_top_seismogenic)/ \
                            sin(dip*math.pi/180.)
+#         fault_width_old = (depth_bottom_seismogenic \
+#                            - depth_top_seismogenic)/ \
+#                            sin(dip*math.pi/180.)
+#         assert allclose(fault_width, fault_width_old)
         if width is None:
             width = conversions.\
                 modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
                                                         fault_width)
-            
+#         print "dip", dip
+#         print "Mw", Mw
+#         print "area", area
+#         print "fault_width", fault_width
+#        Width_old = conversions.\
+#                modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
+#                                                        fault_width)
+#        print "width", width
+#        print "width_old", width_old
+#        assert allclose(width, width_old)
         if depth is None:
             depth = conversions.depth(depth_top_seismogenic,
                                       dip, Mw, fault_width)
@@ -412,6 +429,7 @@ class Event_Set(object):
         dip = zeros((num_events), dtype=EVENT_FLOAT)
         area = zeros((num_events), dtype=EVENT_FLOAT)
         width = zeros((num_events), dtype=EVENT_FLOAT)
+        fault_width = zeros((num_events), dtype=EVENT_FLOAT)
         magnitude = zeros((num_events), dtype=EVENT_FLOAT)
         source_zone_id = zeros((num_events), dtype=EVENT_INT)
         
@@ -465,8 +483,19 @@ class Event_Set(object):
             magnitude[start:end] = polygon_magnitude
             #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
+            fault_width[start:end] = (depth_bottom_seismogenic[start:end] \
+                           - depth_top_seismogenic[start:end])/ \
+                           sin(dip[start:end]*math.pi/180.)
             area[start:end] = scaling.scaling_calc_rup_area(
                 magnitude[start:end], source.scaling)
+            #print "source.scaling", source.scaling
+            #print "magnitude[start:end]", magnitude[start:end]
+            #print "dip[start:end]", dip[start:end]
+            #print "rup_area=area[start:end", area[start:end]
+            #print "max_rup_width=fault_width[start:end]", fault_width[start:end]
+            width[start:end] = scaling.scaling_calc_rup_width(
+                magnitude[start:end], source.scaling, dip[start:end],
+                rup_area=area[start:end], max_rup_width=fault_width[start:end])
             eqrmlog.debug('Memory: event set lists have been combined')
             eqrmlog.resource_usage()
 
@@ -493,7 +522,10 @@ class Event_Set(object):
                                  Mw=new_Mw,
                                  depth_top_seismogenic=depth_top_seismogenic,
                                  depth_bottom_seismogenic=
-                                 depth_bottom_seismogenic)
+                                 depth_bottom_seismogenic,
+                                 fault_width=fault_width,
+                                 area=area,
+                                 width=width)
         event.source_zone_id = asarray(source_zone_id)
         #print "event.source_zone_id", event.source_zone_id
         eqrmlog.debug('Memory: finished generating events')
@@ -815,8 +847,6 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         
         #change to use index
         source = source_mods[i]
-        scaling_rule = source.scaling['scaling_rule']
-        scaling_event_type = source.scaling['scaling_fault_type']
         num = prob_number_of_events_in_faults[i]
         if num == 0:
             continue
