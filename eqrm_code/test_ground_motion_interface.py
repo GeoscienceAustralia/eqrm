@@ -253,6 +253,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         distance = array([[[4]]])
         mag = array([[[5.5]]])
         Vs30 = array([[[100.0]]])
+        fault_type = array([[[0]]]) # 'reverse' -> use e4 value, of 4.
         
         c1 = 1.0
         c2 = 2.0
@@ -291,17 +292,19 @@ class Test_ground_motion_interface(unittest.TestCase):
         fd = fd_Boore_08(c1, c2, c3, distance, h, mag)
         self.assert_(allclose(fd_actual, fd))
 
-        fm = fm_Boore_08(e1, e5, e6, e7, 6.75, 6.75)
-        self.assert_(allclose(1, fm))
+        # M-mh = 0
+        # Fm = e4 = 4
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, 6.75, 6.75, fault_type)
+        self.assert_(allclose(4, fm))
 
         # m-mh = -2  mh = 6.75     
-        fm_actual = 1+5*-2+6*4
-        fm = fm_Boore_08(e1, e5, e6, e7, 4.75, 6.75)
+        fm_actual = 4+5*-2+6*4
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, 4.75, 6.75, fault_type)
         self.assert_(allclose(fm_actual, fm))
         
         # m-mh = 2       
-        fm_actual = 1+7*2
-        fm = fm_Boore_08(e1, e5, e6, e7, 8.75, 6.75)
+        fm_actual = 4+7*2
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, 8.75, 6.75, fault_type)
         self.assert_(allclose(fm_actual, fm))
 
         bnl = bnl_Boore_08(b1, b2, 100)        
@@ -357,6 +360,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         distance = array([[[4]]])
         mag = array([[[5.5]]])
         Vs30 = array([[[100.0]]])
+        fault_type = array([[[0]]]) # 'reverse' -> use e4 value, of 4.
+        
         
         c1 = 1.0
         c2 = 2.0
@@ -390,9 +395,9 @@ class Test_ground_motion_interface(unittest.TestCase):
         sigma_coefficient = array([[[[3.0]]]])
 
         fd = fd_Boore_08(c1, c2, c3, distance, h, mag)
-        fm = fm_Boore_08(e1, e5, e6, e7, mag, 6.75)
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, 6.75, fault_type)
 
-        pga4nl = 0.13899198 # From running gmi.
+        pga4nl =  0.14298736 #0.13899198 # From running gmi.
         bnl = bnl_Boore_08(b1, b2, Vs30)
         fs = fs_Boore_08(blin, pga4nl, bnl, Vs30)
         
@@ -403,7 +408,8 @@ class Test_ground_motion_interface(unittest.TestCase):
             distance=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient,
-            Vs30=Vs30)
+            Vs30=Vs30,
+            fault_type=fault_type)
         self.assert_(allclose(log_mean_actual, log_mean[0][0][0]))
         self.assert_(allclose(sigtu, log_sigma[0][0][0]))
    
@@ -434,6 +440,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         distance = array([[[4]]])
         mag = array([[[5.5]]])
         Vs30 = array([[[100.0]]])
+        fault_type = array([[[0]]]) # 'reverse' -> use e4 value, of 4.
+        
         
         c1 = 1.0
         c2 = 2.0
@@ -479,17 +487,18 @@ class Test_ground_motion_interface(unittest.TestCase):
         mh = array([6.75, 6.75, 4.75])
         
         fd = fd_Boore_08(c1, c2, c3, distance, h, mag)
-        fm = fm_Boore_08(e1, e5, e6, e7, mag, 6.75)
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, 6.75, fault_type)
         
         log_mean,log_sigma=model.distribution(
             mag=mag,
             distance=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient,
-            Vs30=Vs30)
+            Vs30=Vs30,
+            fault_type=fault_type)
         
         # From running gmi.
-        pga4nl = array([[[0.13899198, 0.1389919, 0.1389919]]])
+        pga4nl = array([[[ 0.14298736,  0.14298736,  0.14298736]]])
         
         bnl = bnl_Boore_08(b1, b2, Vs30)
         fs = fs_Boore_08(blin, pga4nl, bnl, Vs30)
@@ -510,6 +519,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         distance = array([[[4]]])
         mag = array([[[5.5]]])
         Vs30 = array([[[100.0]]])
+        fault_type = array([[[0]]]) # 'reverse' -> use e4 value, of 4.
+        
         
         c1 = 1.0
         c2 = 2.0
@@ -556,18 +567,18 @@ class Test_ground_motion_interface(unittest.TestCase):
         mag = array([6.75, 4.75, 8.75])
         
         # m-mh = -2  mh = 6.75  fm_actual = 1+5*-2+6*4
-        # m-mh = 2  fm_actual = 1+7*2
+        # m-mh = 2  fm_actual = 4+7*2 = 18
         
-        fm = fm_Boore_08(e1, e5, e6, e7, mag, mh)
-        self.assert_(allclose([1, 1+5*-2+6*4, 15], fm))
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, mh, fault_type)
+        self.assert_(allclose([4, 4+5*-2+6*4, 18], fm))
 
         mh = array([60.75, 60.75, 60.75])
         mag = array([60.75, 58.75, 62.75])
         
-        # m-mh = -2  mh = 6.75  fm_actual = 1+5*-2+6*4
-        # m-mh = 2  fm_actual = 1+7*2        
-        fm = fm_Boore_08(e1, e5, e6, e7, mag, mh)
-        self.assert_(allclose([1, 1+5*-2+6*4, 15], fm))
+        # m-mh = -2  mh = 6.75  fm_actual = 4+5*-2+6*4
+        # m-mh = 2  fm_actual = 4+7*2        
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, mh, fault_type)
+        self.assert_(allclose([4, 4+5*-2+6*4, 18], fm))
 
 
     def test_Somerville09_Yilgarn_distribution(self):

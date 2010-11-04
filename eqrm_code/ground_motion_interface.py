@@ -1688,9 +1688,8 @@ gound_motion_init['Combo_Sadigh_Youngs_M8'] = Combo_Sadigh_Youngs_M8_args
 # %T c1 c2 c3 h e1 e2 e3 e4 e5 e6 e7 mh sig tu sigtu tm sigtm blin b1 b2
 # PGV -0.87370 0.10060 -0.00334 2.54 5.00121 5.04727 4.63188 5.08210 0.18322 -0.12736 0.00000 8.50 0.500 0.286 0.576 0.256 0.560 -0.600 -0.500 -0.06
 
-# The axis for this are wrong
-# This is period, coefficient
-# It has to be coefficient, period
+# The axis for this is period, coefficient
+# It has to be coefficient, period.  So there is a transpose at the end.
 Boore_08_coefficient_raw = array([
     [ -0.66050,0.11970,-0.01151,1.35,-0.53804,-0.50350,-0.75472,-0.50970,
       0.28805,-0.10164,0.00000,6.75,0.502,0.265,0.566,0.260,0.564,-0.360,
@@ -1770,6 +1769,27 @@ RECIP_LOG_V1_DIV_V2 =  -1.95761518897 # 1/log(v1/v2)
 RECIP_LOG_V2_DIV_VREF = -1.07580561109 #1/log(V2_BOORE_08/VREF_BOORE_08)
 # DEPENDENT ON EACH OTHER #
 
+
+# faulting type flag encodings
+#                            'type':     (e2, e3, e4)
+Boore_08_faulting_flags = {'reverse':    (0, 0, 1),
+                             'normal':     (0, 1, 0),
+                             'strike_slip': (1, 0, 0)}
+
+# generate 'Boore_08_fault_type' from the dictionary above
+tmp = []
+for (k, v) in Boore_08_faulting_flags.iteritems():
+    index = ground_motion_misc.FaultTypeDictionary[k]
+    tmp.append((index, v))
+
+# sort and make array in correct index order
+tmp2 = []
+tmp.sort()
+for (_, flags) in tmp:
+    tmp2.append(flags)
+Boore_08_fault_type = array(tmp2)
+del tmp, tmp2
+
 def Boore_08_distribution(**kwargs):
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
@@ -1779,6 +1799,7 @@ def Boore_08_distribution(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     Vs30 = kwargs['Vs30']
+    fault_type = kwargs['fault_type']	        # event-specific
 
     if Vs30 is None:
         raise Exception, "Vs30 value unknown"       
@@ -1791,26 +1812,29 @@ def Boore_08_distribution(**kwargs):
     assert mag.shape==(1,num_events,1) # (num_sites,num_events,1)?
     assert distance.shape==(num_sites,num_events,1)
 
-    c1, c2, c3, h, e1, e2, e3, e4, e5, e6, e7 = coefficient[:11]
+    c1, c2, c3, h, e1 = coefficient[:5]
+    e2, e3, e4 = coefficient[5:8]
+    e5, e6, e7 = coefficient[8:11]
     mh, sig, tu, sigtu, tm, sigtm, blin, b1, b2 = coefficient[11:]
 
     c1_pga, c2_pga, c3_pga, h_pga = Boore_08_coefficient_raw[PGA_BA08][0:4]
-    e1_pga, e2_pga, e3_pga, e4_pga = Boore_08_coefficient_raw[PGA_BA08][4:8]
+    e1_pga = Boore_08_coefficient_raw[PGA_BA08][4:5]
+    e2_pga, e3_pga, e4_pga = Boore_08_coefficient_raw[PGA_BA08][5:8]
     e5_pga, e6_pga, e7_pga = Boore_08_coefficient_raw[PGA_BA08][8:11]
     mh_pga, sig_pga = Boore_08_coefficient_raw[PGA_BA08][11:13]
     tu_pga, sigtu_pga = Boore_08_coefficient_raw[PGA_BA08][13:15]
     tm_pga, sigtm_pga, blin_pga = Boore_08_coefficient_raw[PGA_BA08][15:18]
     b1_pga, b2_pga = Boore_08_coefficient_raw[PGA_BA08][18:20]
     fd = fd_Boore_08(c1, c2, c3, distance, h, mag)
-    fd_pga = fd_Boore_08(c1_pga, c2_pga, c3_pga, distance, h, mag)  
+    fd_pga = fd_Boore_08(c1_pga, c2_pga, c3_pga, distance, h, mag)
 
-    fm = fm_Boore_08(e1, e5, e6, e7, mag, mh)
-    fm_pga = fm_Boore_08(e1_pga, e5_pga, e6_pga, e7_pga, mag, mh_pga)
+    fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, mh, fault_type)
+    fm_pga = fm_Boore_08(e1_pga, e2_pga, e3_pga, e4_pga,
+                         e5_pga, e6_pga, e7_pga, mag, mh_pga, fault_type)
     
     bnl = bnl_Boore_08(b1, b2, Vs30)
 
     pga4nl = exp(fd_pga + fm_pga)
-
     fs = fs_Boore_08(blin, pga4nl, bnl, Vs30)
     
     log_mean = fd + fm + fs    # BA08 (1)
@@ -1825,17 +1849,20 @@ def fd_Boore_08(c1, c2, c3, distance, h, mag):
     fd = (c1 + c2*(mag - mref))* log(r/rref) + c3*(r - rref) # BA08 (4)
     return fd
 
-def fm_Boore_08(e1, e5, e6, e7, mag, mh):
-    
+def fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, mh, fault_type):    
     mag = asarray(mag)
     # Note, no distance, so it is the same for all sites.
     # Cache to speed this.
-
+    # get flag values from 'fault_type'
+    E2 = Boore_08_fault_type[:,0][fault_type]
+    E3 = Boore_08_fault_type[:,1][fault_type]
+    E4 = Boore_08_fault_type[:,2][fault_type]
+    temp = E2*e2+E3*e3+E4*e4
     # BA08 (5a) & (5b) mod.
     # Note the ( + 0*e1) is to get the index shape correct.
     fm = where(mag + 0*e1<= mh,
-               e1 + e5*(mag - mh) + e6*(mag - mh)**2,
-               e1 + e7*(mag - mh)) 
+               temp + e5*(mag - mh) + e6*(mag - mh)**2,
+               temp + e7*(mag - mh)) 
     # *u + e2*ss + e3*ns + e4*rs for future work
                
     return fm
