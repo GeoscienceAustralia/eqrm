@@ -30,7 +30,7 @@
     
     
     <zone area = "57731.425"
-  event_type = "Gaull_1990_WA">
+  event_type = "Gaull_1990_WA_Wells_not_modified">
     <geometry 
     dip = "35"
     delta_dip = "0"
