@@ -2,7 +2,7 @@
 
   <fault 
   name = "Newie Subduction Zone"
-  event_type = "mean_1_and_2_no_mod">
+  event_type = "mean_1_and_2">
   
     <geometry 
         dip= "30" 
