@@ -215,7 +215,7 @@ class Event_Set(object):
             width = conversions.\
                 modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
                                                         fault_width)
-            width
+            
         if depth is None:
             depth = conversions.depth(depth_top_seismogenic,
                                       dip, Mw, fault_width)
@@ -410,6 +410,8 @@ class Event_Set(object):
         depth_bottom_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
         azimuth = zeros((num_events), dtype=EVENT_FLOAT)
         dip = zeros((num_events), dtype=EVENT_FLOAT)
+        area = zeros((num_events), dtype=EVENT_FLOAT)
+        width = zeros((num_events), dtype=EVENT_FLOAT)
         magnitude = zeros((num_events), dtype=EVENT_FLOAT)
         source_zone_id = zeros((num_events), dtype=EVENT_INT)
         
@@ -463,6 +465,8 @@ class Event_Set(object):
             magnitude[start:end] = polygon_magnitude
             #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
+            area[start:end] = scaling.scaling_calc_rup_area(
+                magnitude[start:end], source.scaling)
             eqrmlog.debug('Memory: event set lists have been combined')
             eqrmlog.resource_usage()
 

@@ -27,6 +27,7 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\mini_current\haz09/" 
 use_site_indexes = True
 site_indexes = [2255, 11511, 10963, 686, 1026]
+event_control_tag = "use" 
 
 # Scenario input
 
