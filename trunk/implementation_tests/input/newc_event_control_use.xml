@@ -5,7 +5,8 @@
        fault_type = "reverse">
       <branch model = "Atkinson_Boore_97" weight = "1.0"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  />
   </event_group>
   
   <event_group
@@ -14,7 +15,8 @@
        fault_type = "reverse">
       <branch model = "Gaull_1990_WA" weight = "1.0"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  />
   </event_group>
 	
   <event_group
@@ -23,7 +25,8 @@
        fault_type = "reverse">
       <branch model = "Sadigh_97" weight = "1.0"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  />
   </event_group>
   
   <event_group
@@ -32,7 +35,8 @@
        fault_type = "reverse">
       <branch model = "Toro_1997_midcontinent" weight = "1.0"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  />
   </event_group>
 
   <event_group
@@ -41,7 +45,8 @@
        fault_type = "reverse">
       <branch model = "Somerville09_Yilgarn" weight = "1.0"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  />
   </event_group>
 	
 	
@@ -51,18 +56,20 @@
        fault_type = "reverse">
       <branch model = "mean_10_sigma_1" weight = "1.0"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  />
   </event_group>
 	
   <event_group
      event_type = "3_mods_TAS">
     <GMPE 
        fault_type = "reverse">
-      <branch model = "Toro_1997_midcontinent" weight = "0.333333333333333333333"/> 
-      <branch model = "Atkinson_Boore_97" weight = "0.3333333333333333333333333333"/> 
-      <branch model = "Sadigh_97" weight = "0.3333333333333333333333333333333"/> 
+      <branch model = "Toro_1997_midcontinent" weight = "0.33"/> 
+      <branch model = "Atkinson_Boore_97" weight = "0.33"/> 
+      <branch model = "Sadigh_97" weight = "0.33"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  />
   </event_group>
 	
   <event_group
@@ -71,7 +78,8 @@
        fault_type = "reverse">
       <branch model = "Boore_08" weight = "1.0"/> 
     </GMPE>
-    <scaling scaling_rule = "not_used" />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  /> 
   </event_group>
 	 
   <event_group
@@ -126,6 +134,15 @@
     scaling_fault_type = "reverse"  />
   </event_group>
   
+  <event_group
+     event_type = "crustal fault">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "not used" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  />
+  </event_group>
 </event_type_controlfile>
 			
 	

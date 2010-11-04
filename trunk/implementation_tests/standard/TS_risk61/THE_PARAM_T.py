@@ -27,6 +27,7 @@ input_dir = r".\implementation_tests\input_bridges/"
 output_dir = r".\implementation_tests\current\TS_risk61/" 
 use_site_indexes = True
 site_indexes = 6315
+event_control_tag = "use" 
 
 # Scenario input
 scenario_azimuth = 340

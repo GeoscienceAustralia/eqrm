@@ -456,7 +456,9 @@ class Test_Event_Set(unittest.TestCase):
         handle.write(sample)
         handle.close()
         # 1 zone therefore 1 source
-        source_model = [Dummy()]
+        source = Dummy()
+        source.scaling = {'scaling_rule':'modified_Wells_and_Coppersmith_94'}
+        source_model = [source]
 
 
         (handle, et_file_name) = tempfile.mkstemp('.xml', __name__+'_')
@@ -605,7 +607,9 @@ class Test_Event_Set(unittest.TestCase):
         handle.close()
 
         
-        source_model = [Dummy(), Dummy()]
+        source = Dummy()
+        source.scaling = {'scaling_rule':'modified_Wells_and_Coppersmith_94'}
+        source_model = [source, source]
 
         fault_width = None
         azi = None

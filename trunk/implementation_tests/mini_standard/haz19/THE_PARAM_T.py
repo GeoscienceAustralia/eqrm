@@ -27,6 +27,7 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\mini_current\haz19/" 
 use_site_indexes = True
 site_indexes = [2997, 2657, 3004, 3500]
+event_control_tag = "use" 
 
 # Scenario input
 scenario_azimuth = 340

@@ -27,6 +27,7 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\mini_current\risk57/" 
 use_site_indexes = True
 site_indexes = 3541
+event_control_tag = "use" 
 
 # Scenario input
 
