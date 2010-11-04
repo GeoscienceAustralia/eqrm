@@ -25,6 +25,7 @@
 
 from eqrm_code import scaling_functions
 import string
+import copy
 
 NAME_BEGINNING = {'WEL':'Wells_and_Coppersmith_94',
                   'MOD':'modified_Wells_and_Coppersmith_94'}
@@ -69,12 +70,12 @@ def scaling_calc_rup_width(Mw, scaling_dic, dip, rup_area=None,
     """
 
     func_name = scaling_dic['scaling_rule'] + '_rup_width'
-    scaling_dic['Mw'] = Mw
-    scaling_dic['dip'] = dip
-    scaling_dic['area'] = rup_area
-    scaling_dic['max_rup_width'] = max_rup_width
+    para_dic = copy.copy(scaling_dic)
+    para_dic['Mw'] = Mw
+    para_dic['dip'] = dip
+    para_dic['area'] = rup_area
+    para_dic['max_rup_width'] = max_rup_width
     func_pointer = getattr(scaling_functions, func_name)
-    rup_width = apply(func_pointer, [], scaling_dic)
-    #rup_width = apply(func_pointer, [dip, Mw, rup_area, max_rup_width], scaling_dic)
+    rup_width = apply(func_pointer, [], para_dic)
     return rup_width
 

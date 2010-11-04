@@ -92,6 +92,16 @@
       <branch model = "mean_1_sigma_0pt5" weight = "0.75"/> 
       <branch model = "mean_2_sigma_1" weight = "0.25"/> 
     </GMPE>
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" /> 
+  </event_group>	
+	
+  <event_group
+     event_type = "mean_1_and_2_no_mod">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "mean_1_sigma_0pt5" weight = "0.75"/> 
+      <branch model = "mean_2_sigma_1" weight = "0.25"/> 
+    </GMPE>
     <scaling scaling_rule = "Wells_and_Coppersmith_94" 
     scaling_fault_type = "reverse"  />
   </event_group>	
@@ -102,12 +112,30 @@
        fault_type = "reverse">
       <branch model = "mean_1_sigma_0pt5" weight = "1.0"/>
     </GMPE>
-    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
-    scaling_fault_type = "reverse"  />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" /> 
   </event_group>
 	
   <event_group
+     event_type = "mean_1_sigma_0pt5_no_mod">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "mean_1_sigma_0pt5" weight = "1.0"/>
+    </GMPE>
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse"  />
+  </event_group>
+  
+  <event_group
      event_type = "mean_2_sigma_1">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "mean_2_sigma_1" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" /> 
+  </event_group>
+  
+  <event_group
+     event_type = "mean_2_sigma_1_no_mod">
     <GMPE 
        fault_type = "reverse">
       <branch model = "mean_2_sigma_1" weight = "1.0"/> 
@@ -122,12 +150,21 @@
        fault_type = "reverse">
       <branch model = "return_Vs30" weight = "1.0"/>
     </GMPE>
-    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
-    scaling_fault_type = "reverse"  />
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" />
   </event_group>
   
   <event_group
      event_type = "mean_1_and_return_Vs30">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "mean_1_sigma_0pt5" weight = "0.5"/>
+      <branch model = "return_Vs30" weight = "0.5"/>
+    </GMPE>
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" /> 
+  </event_group>
+  
+  <event_group
+     event_type = "mean_1_and_return_Vs30_no_mod">
     <GMPE 
        fault_type = "reverse">
       <branch model = "mean_1_sigma_0pt5" weight = "0.5"/>
