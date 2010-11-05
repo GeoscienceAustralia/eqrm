@@ -610,9 +610,13 @@ class Test_Output_manager(unittest.TestCase):
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_event_set_subset') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
-        file_full_name = save_event_set(THE_PARAM_T,set, event_activity)
-        out = load_event_set_subset(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
-        self.assert_ (allclose(out['Mw'], set.Mw))
+        file_full_name = save_event_set_new(THE_PARAM_T,set, event_activity)
+        out = load_event_set_subset_new(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
+        msg = 'loaded Mw=%s, expected Mw=%s' % (str(out['Mw']), str(set.Mw))
+        #self.failUnless(allclose(out['Mw'], set.Mw), msg)
+        #self.assert_ (allclose(out['Mw'], set.Mw)), msg
+        msg = 'loaded event_activity=%s, expected event_activity=%s' % (str(out['event_activity']), str(asarray(event_activity)))
+        self.failUnless(allclose(out['event_activity'], asarray(event_activity)), msg)
         self.assert_ (allclose(out['event_activity'], asarray(event_activity)))
 
         os.remove(file_full_name)

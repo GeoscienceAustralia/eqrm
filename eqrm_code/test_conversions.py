@@ -119,7 +119,8 @@ class Test_Conversions(unittest.TestCase):
 
         # internal reimplementation of the convert_Vs30_to_Z10() function
         def fudge(Vs30):
-            return exp(28.5 - (3.82/8.0)*log(power(Vs30, 8) + power(378.7, 8)))
+            return exp(28.5 - (3.82/8.0)*log(power(Vs30, 8) \
+                                             + power(378.7, 8)))/1000.
 
         # test a scalar value
         Vs30 = 1000.0

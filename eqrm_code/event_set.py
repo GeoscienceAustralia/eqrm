@@ -527,7 +527,6 @@ class Event_Set(object):
                                  area=area,
                                  width=width)
         event.source_zone_id = asarray(source_zone_id)
-        #print "event.source_zone_id", event.source_zone_id
         eqrmlog.debug('Memory: finished generating events')
         eqrmlog.resource_usage()
 
@@ -615,52 +614,57 @@ class Event_Set(object):
         return att_values
     
     def __getitem__(self, key):
-        # This is used when events are subsetted in recurrence functions.
+        """Get slice of this Event_Set.
+
+        Returns a new Event_Set object containing the sliced data.
+        Additional attributes aren't carried over. eg event_id, activity.
+        """
+
+        # 'key' has to be an array.
         if isinstance(key, int):
             key = [key]
-        if key == None or ((isinstance(key,ndarray)) and
-                           (key.shape==(len(self.depth),)) and
-                           (key==r_[0:len(self.depth)]).all()):
-            return self
-        else:
-            #print "self.source_zone_id", self.source_zone_id #[key]
-            #print "key", key
-            #print "self.source_zone_id[key]", self.source_zone_id[key]
-            if self.fault_width.shape == tuple():
-                fault_width = self.fault_width + 0*self.width
-            else:
-                fault_width = self.fault_width
 
-            if self.event_activity == None:
-                event_activity = None
-            else:
-                event_activity = self.event_activity[key] 
-            return Event_Set(self.azimuth[key],
-                             self.dip[key],
-                             self.ML[key],
-                             self.Mw[key],
-                             self.depth[key],
-                             self.depth_to_top[key],
-                             self.fault_type[key],
-                             self.width[key],
-                             self.length[key],
-                             self.area[key],
-                             fault_width[key],
-                             self.source_zone_id[key],
-                             self.trace_start_lat[key],
-                             self.trace_start_lon[key],
-                             self.trace_end_lat[key],
-                             self.trace_end_lon[key],
-                             self.trace_start_x[key],
-                             self.trace_start_y[key],
-                             self.rupture_x[key],
-                             self.rupture_y[key],
-                             self.rupture_centroid_lat[key],
-                             self.rupture_centroid_lon[key],
-                             event_activity)
-        # self.source_zone_id[key] has to be an array.
-        # eg array([0])
-        # additional attributes aren't carried over. eg event_id, activity.
+        # if key is None or key would slice whole of object, return self
+        if key is None or (isinstance(key, ndarray) and
+                           (key.shape == (len(self.depth),)) and
+                           (key == r_[0:len(self.depth)]).all()):
+            return self
+
+        # special handling for some data
+        if self.fault_width.shape == tuple():
+            fault_width = self.fault_width + 0*self.width
+        else:
+            fault_width = self.fault_width
+
+        if self.event_activity == None:
+            event_activity = None
+        else:
+            event_activity = self.event_activity[key] 
+
+        # create and return a slice of the Event_Set data values
+        return Event_Set(self.azimuth[key],
+                         self.dip[key],
+                         self.ML[key],
+                         self.Mw[key],
+                         self.depth[key],
+                         self.depth_to_top[key],
+                         self.fault_type[key],
+                         self.width[key],
+                         self.length[key],
+                         self.area[key],
+                         fault_width[key],
+                         self.source_zone_id[key],
+                         self.trace_start_lat[key],
+                         self.trace_start_lon[key],
+                         self.trace_end_lat[key],
+                         self.trace_end_lon[key],
+                         self.trace_start_x[key],
+                         self.trace_start_y[key],
+                         self.rupture_x[key],
+                         self.rupture_y[key],
+                         self.rupture_centroid_lat[key],
+                         self.rupture_centroid_lon[key],
+                         event_activity)
    
     def __len__(self):
         return len(self.rupture_centroid_lat)
@@ -793,9 +797,10 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                     prob_number_of_events_in_faults=None):
     """Create Source objects from XML files for faults and events.
 
-    fault_xml_file       path to the fault source generator (FSG) XML file
-    event_control_file   path to event type control XML (ETC) file
-    prob_min_mag_cutoff  mimimum magnitude below which hazard is not considered
+    fault_xml_file                   path to the FSG XML file
+    event_control_file               path to the ETC XML file
+    prob_min_mag_cutoff              min mag below which hazard not considered
+    prob_number_of_events_in_faults  ?
     """      
 
     log.info('generating events')

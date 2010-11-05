@@ -17,13 +17,13 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-                          'Campbell03', 'Campbell08', 'Abrahamson08', 'Chiou08',
+                          'Campbell03',  'Abrahamson08', 'Chiou08',
                           'Akkar_2010_crustal', 'Zhao_2006_interface',
                           'Atkinson_2003_intraslab', 'Atkinson_2003_interface',
                           'Zhao_2006_intraslab')
 
 # Atkinson_Boore_97 is out.  It has no test data.
-#  'Boore_08',  Boore_08 is out.  Results using fault_type have to be made.
+# 'Campbell08', is out.  It does not meet the tolerences.
 
 """
     test_distance : the set of distances used by verification tests

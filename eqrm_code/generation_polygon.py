@@ -127,8 +127,7 @@ class Fault_Source_Generator(object):
 
     def __init__(self, filename, fault_name, fault_event_type,
                  prob_min_mag_cutoff, geometry_dict, recurrence_model_dict):
-        """
-        Initialise a Fault_Source_Generator instance.
+        """Initialise a Fault_Source_Generator instance.
 
         fault_name             fault name
         fault_event_type       fault event type
@@ -139,6 +138,7 @@ class Fault_Source_Generator(object):
         checked for required data.  We ignore extra parameters.
 
         The returned object will have the following data attributes:
+            .name
             .dip_dist
             .out_of_dip_theta_dist
             .depth_top_seismogenic_dist
@@ -406,8 +406,8 @@ def polygons_from_xml(filename, prob_min_mag_cutoff=None):
 def xml_fault_generators(filename, prob_min_mag_cutoff=None):
     """Read new-style XML.
 
-    filename  is the path to the XML file to read
-    **kwargs  dictionary of values that override XML values
+    filename             is the path to the XML file to read
+    prob_min_mag_cutoff  mimimum magnitude below which hazard is not considered
 
     Returns a tuple (gen_objects, mag_type) where 'gen_objects' is a list of
     Fault_Source_Generator objects and 'mag_type' is the magnitude type string.

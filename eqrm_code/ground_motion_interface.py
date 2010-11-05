@@ -1806,6 +1806,7 @@ def Boore_08_distribution(**kwargs):
         
     # An expensive way of showing what the dimensions must be?
     num_sites,num_events=distance.shape[0:2]
+
     num_periods=coefficient.shape[3]
     assert coefficient.shape==(20,1,1,num_periods)
     #assert sigma_coefficient.shape==(3,1,1,num_periods)
@@ -2864,8 +2865,8 @@ def Chiou08_distribution(**kwargs):
     Rx = Rx[:,:,newaxis]
     Vs30 = Vs30[:,newaxis,newaxis]
 
-    # estimate Z10 from Vs30
-    Z10 = conversions.convert_Vs30_to_Z10(Vs30)
+    # estimate Z10 (m) from Vs30
+    Z10 = conversions.convert_Vs30_to_Z10(Vs30) * 1000.0
 
     ######
     # CALCULATE ROCK PSA (Vs30 = 1130 m/sec)
@@ -3171,7 +3172,8 @@ del Campbell03_Table6
         Linear Elastic Response Spectra for Periods Ranging from 0.01 to 10s
         Earthquake Spectra, Volume 24, No. 1, pp 139-171.
 
-    The FORTRAN code by Campbell & Bozorgnia was the basis for below.
+    The FORTRAN code from the Boore website 
+    [www.daveboore.com/nga_gm_tmr/nga_gm_tmr_zips.zip] was used as a basis.
 """
 
 # some constants from the paper
@@ -3225,11 +3227,11 @@ def Campbell08_distribution(**kwargs):
 
     # get args
     periods = kwargs['periods']			# site-specific
-    M = kwargs['mag']				# event-specific
+    Mw = kwargs['mag']				# event-specific
     dist_object = kwargs['dist_object']		# distance object
     Ztor = kwargs['depth_to_top']		# event-specific
     Vs30 = kwargs['Vs30']			# site-specific
-    delta = kwargs['dip']			# event-specific
+    Dip = kwargs['dip']				# event-specific
     fault_type = kwargs['fault_type']	        # event-specific
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
@@ -3242,14 +3244,14 @@ def Campbell08_distribution(**kwargs):
 
     # check we have the right shapes
     num_sites = 1
-    num_events = M.shape[1]
+    num_events = Mw.shape[1]
     num_periods = len(periods)
 
     msg = 'Expected %s.shape=%s, got %s'
 
-    assert M.shape == (1, num_events, 1), (msg
-               % ('M', '(%d,%d,%d)' % (num_sites, num_events, 1),
-                  str(M.shape)))
+    assert Mw.shape == (1, num_events, 1), (msg
+               % ('Mw', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Mw.shape)))
 
     # ignore first dimension of distances
     assert Rrup.shape[1:] == (num_events,), (msg
@@ -3263,22 +3265,22 @@ def Campbell08_distribution(**kwargs):
     assert Ztor.shape == (num_sites, num_events, 1), (msg
                % ('Ztor', '(%d,%d,%d)' % (num_sites, num_events, 1),
                   str(Ztor.shape)))
-    assert delta.shape == (num_sites, num_events, 1), (msg
-               % ('delta', '(%d,%d,%d)' % (num_sites, num_events, 1),
-                  str(delta.shape)))
+    assert Dip.shape == (num_sites, num_events, 1), (msg
+               % ('Dip', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Dip.shape)))
 
     # ensure Vs30 is one-dimensional only
     assert len(Vs30.shape) == 1, (msg
                % ('Vs30', '(?,)', str(Vs30.shape)))
 
-    assert coefficient.shape == (16, 1, 1, num_periods), (msg
-               % ('coefficient', '(16,1,1,%d)' % num_periods,
+    assert coefficient.shape == (18, 1, 1, num_periods), (msg
+               % ('coefficient', '(18,1,1,%d)' % num_periods,
                   str(coefficient.shape)))
-    assert sigma_coefficient.shape == (6, 1, 1, num_periods), (msg
-               % ('sigma_coefficient', '(6,1,1,%d)' % num_periods,
+    assert sigma_coefficient.shape == (5, 1, 1, num_periods), (msg
+               % ('sigma_coefficient', '(5,1,1,%d)' % num_periods,
                   str(sigma_coefficient.shape)))
 
-# if user passed us Z25, use it, else calculate from Vs30
+    # if user passed us Z25, use it, else calculate from Vs30 (result in km)
     # (we should only pass in Z25 during testing)
     Z25 = kwargs.get('Z25', None)
     if Z25 is None:
@@ -3290,262 +3292,488 @@ def Campbell08_distribution(**kwargs):
     Frv = Campbell08_fault_type[:,0][fault_type]
     Fnm = Campbell08_fault_type[:,1][fault_type]
 
-    # unpack coefficients
-    (C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,K1,K2,K3) = coefficient
-    (ElnY, TlnY, Ec, Et, Earb, rho) = sigma_coefficient
-
-    # unpack the PGA coefficients
-    (pC0,pC1,pC2,pC3,pC4,pC5,pC6,pC7,
-     pC8,pC9,pC10,pC11,pC12,pK1,pK2,pK3) = Campbell08_PGA_coefficient
-    (pElnY, ptaulnY, pEC, pET, pEArb, prho) = Campbell08_PGA_sigma_coefficient
-
-    # massage dimensions
+    # set correct shape for params
     Rrup = Rrup[:,:,newaxis]
     Rjb = Rjb[:,:,newaxis]
-    periods = array(periods)[newaxis,newaxis,:]
-    Vs30 = Vs30[:,newaxis,newaxis]
+    Vs30 = array(Vs30)[:,newaxis,newaxis]
 
-    # calculate some common repeated sub-expressions
-    Rjb2 = Rjb * Rjb
-    Rrup2 = Rrup * Rrup
+    # unpack coefficients
+    (c0T,c1T,c2T,c3T,c4T,c5T,c6T,c7T,c8T,c9T,c10T,c11T,c12T,k1T,k2T,k3T,cT,nT) = coefficient
+    (slnYT,tlnYT,slnAFT,sigCT,rhoT) = sigma_coefficient
 
-    ######
-    # Calculate the rock PGA
-    ######
+    # unpack the PGA coefficients
+    (c0_22,c1_22,c2_22,c3_22,c4_22,c5_22,c6_22,c7_22,c8_22,c9_22,c10_22,c11_22,c12_22,k1_22,k2_22,k3_22,c_22,n_22) = Campbell08_PGA_coefficient
+    (slnY_22,tlnY_22,slnAF_22,sigC_22,rho_22) = Campbell08_PGA_sigma_coefficient
 
-    # magnitude term
-    Fmag = pC0 + pC1*M							# M <= 5.5
-    Fmag = where(M > 5.5, pC0+pC1*M+pC2*(M-5.5), Fmag)			# 5.5 < M <= 6.5
-    Fmag = where(M > 6.5, pC0+pC1*M+pC2*(M-5.5)+pC3*(M-6.5), Fmag)	# M > 6.5
-
-    # distance term
-    Fdis = (pC4 + pC5*M)*log(sqrt(Rrup2 + pC6*pC6))
-
-    # style-of-faulting term
-    Fflt = pC7*Frv*where(Ztor < 1.0, Ztor, 1.0) + pC8*Fnm
-
-    # hanging wall term
-    sqrt_Rjb2_1 = sqrt(Rjb2 + 1.0)
-    Rmax = where(Rrup > sqrt_Rjb2_1, Rrup, sqrt_Rjb2_1)	# max(Rrup, sqrt(Rjb*Rjb+1))
-
-    Fhngr = ones(Rrup.shape) * (Rmax-Rjb)/Rmax		# Ztor < 1.0
-    Fhngr = where(Ztor >= 1.0, (Rrup-Rjb)/Rrup, Fhngr)	# Ztor >= 1.0
-    Fhngr = where(Rjb == 0.0, 1.0, Fhngr)		# Rjb == 0.0
-
-    Fhngm = zeros(M.shape)			# M <= 6.0
-    Fhngm = where(M > 6.0, 2*(M-6.0), Fhngm)	# 6.0 < M < 6.5
-    Fhngm = where(M >= 6.5, 1.0, Fhngm)		# M >= 6.5
-
-    Fhngz = zeros(Ztor.shape)
-    Fhngz = where(Ztor < 20.0, (20.0-Ztor)/20.0, 0.0)
-
-    Fhngd = ones(delta.shape)
-    Fhngd = where(delta > 70.0, (90.0-delta)/20.0, Fhngd)
-
-    Fhng = pC9*Fhngr*Fhngm*Fhngz*Fhngd
-
-    # shallow site response term (Vs30 = 1100)
-    Fsite = ones(Rrup.shape) * (pC10+pK2*Campbell08_N) * log(1100.0/pK1)
-
-    # basin response term
-    Fsed = zeros(Z25.shape)				# Z25 <= 3.0
-    Fsed = where(Z25 < 1.0, pC11*(Z25-1.0), Fsed)	# Z25 < 1.0
-    Fsed = where(Z25 > 3.0,
-                 pC12*pK3*Campbell08_exp_min_075*(1.0-exp(-0.25*(Z25-3.0))),
-                 Fsed)
-
-    # PGA on rock
-    A1100 = exp(Fmag + Fdis + Fflt + Fhng + Fsite + Fsed)
-
-    # PGA on local site conditions
-    PGA = exp(log(A1100) - Fsite)
-
-    Fsite = (pC10*log(Vs30/pK1) +
-             pK2*(log(A1100+Campbell08_C*power((Vs30/pK1), Campbell08_N)) -
-             log(A1100+Campbell08_C)))
-    Fsite = where(Vs30 >= pK1, (pC10 + pK2*Campbell08_N)*log(Vs30/pK1), Fsite)
-    Fsite = where(Vs30 >= 1100.0, (pC10 + pK2*Campbell08_N)*log(1100.0/pK1), Fsite)
-
-    PGA = exp(log(PGA) + Fsite)
-
-    # standard deviation of ln PGA
-    slnPGA = pElnY
-    tlnPGA = ptaulnY
-
-    ######
-    # Now calculate the strong motion parameter
-    ######
-
-    # magnitude term
-    Fmag = C0 + C1*M						# M <= 5.5
-    Fmag = where(M > 5.5, C0+C1*M+C2*(M-5.5), Fmag)		# 5.5 < M <= 6.5
-    Fmag = where(M > 6.5, C0+C1*M+C2*(M-5.5)+C3*(M-6.5), Fmag)	# M > 6.5
-
-    # distance term
-    Fdis = (C4 + C5*M)*log(sqrt(Rrup2 + C6*C6))
-
-    # style-of-faulting term
-    Fflt = C7*Frv*where(Ztor < 1.0, Ztor, 1.0) + C8*Fnm
-
-    # hanging wall term
-    sqrt_Rjb2_1 = sqrt(Rjb2 + 1.0)
-    Rmax = where(Rrup > sqrt_Rjb2_1, Rrup, sqrt_Rjb2_1)	# max(Rrup, sqrt(Rjb*Rjb+1))
-
-    Fhngr = ones(Rrup.shape) * (Rmax-Rjb)/Rmax		# Ztor < 1.0
-    Fhngr = where(Ztor >= 1.0, (Rrup-Rjb)/Rrup, Fhngr)	# Ztor >= 1.0
-    Fhngr = where(Rjb == 0.0, 1.0, Fhngr)		# Rjb == 0.0
-
-    Fhngm = zeros(M.shape)			# M <= 6.0
-    Fhngm = where(M > 6.0, 2*(M-6.0), Fhngm)	# 6.0 < M < 6.5
-    Fhngm = where(M >= 6.5, 1.0, Fhngm)		# M >= 6.5
-
-    Fhngz = zeros(Ztor.shape)
-    Fhngz = where(Ztor < 20.0, (20.0-Ztor)/20.0, 0.0)
-
-    Fhngd = ones(delta.shape)
-    Fhngd = where(delta > 70.0, (90.0-delta)/20.0, Fhngd)
-
-    Fhng = C9*Fhngr*Fhngm*Fhngz*Fhngd
-
-    # shallow site response term (Vs30 = 1100)
-    Fsite = ones(Rrup.shape) * (C10+K2*Campbell08_N)*log(1100.0/K1)
-    Fsite = where(Vs30 < 1100.0, (C10 + K2*Campbell08_N)*log(Vs30/K1), Fsite)
-    Fsite = where(Vs30 < K1,
-                  C10*log(Vs30/K1) +
-                      K2*(log(A1100+Campbell08_C*power((Vs30/K1), Campbell08_N)) -
-                      log(A1100+Campbell08_C)),
-                  Fsite)
-
-    # basin response term
-    Fsed = zeros(Z25.shape)				# Z25 <= 3.0
-    Fsed = where(Z25 < 1.0, C11*(Z25-1.0), Fsed)	# Z25 < 1.0
-    Fsed = where(Z25 > 3.0,
-                 C12*K3*Campbell08_exp_min_075*(1.0-exp(-0.25*(Z25-3.0))),
-                 Fsed)
-
-    # calculate ground motion parameter
-    Y = exp(Fmag + Fdis + Fflt + Fhng + Fsite + Fsed)
-
-    # check if Y < PGA at short periods
-    max_Y_PGA =  where(Y < PGA, PGA, Y)
-    Y = where(periods <= 0.25, max_Y_PGA, Y)
-
-    ######
-    # calculate aleatory uncertainty
-    ######
-
-    # linearized relationship between Fsite and ln(PGA)
-    alpha = zeros(A1100.shape)
-    alpha = where(Vs30 < K1,
-                  K2*A1100*(1.0/(A1100+Campbell08_C*power((Vs30/K1), Campbell08_N)) -
-                            1.0/(A1100+Campbell08_C)),
-                  alpha)
-
-    # intra-event standard deviation at base of site profile
-    slnYB = sqrt(ElnY*ElnY - Campbell08_ElnAF*Campbell08_ElnAF)
-    slnAB = sqrt(slnPGA*slnPGA - Campbell08_ElnAF*Campbell08_ElnAF)
-
-    # standard deviation of geometric mean of ln(Y)
-    sigma = sqrt(slnYB*slnYB + Campbell08_ElnAF*Campbell08_ElnAF +
-                 alpha*alpha*slnAB*slnAB + 2.0*alpha*rho*slnYB*slnAB)
-
-#    # extra terms - not used
-#    tau = taulnY
-#    sig = sqrt(sigma*sigma + tau*tau)
+#C     Y      = Ground motion parameter: PGA and PSA (g), PGV (cm/sec), PGD (cm)
+#C     SigT   = Total standard deviation of geometric mean of ln Y
 #
-#    # standard deviation of arbitrary horizontal component of ln(Y)
-#    sigarb = sqrt(sig*sig + Ec*Ec)
+#C.....
+#C.....CALCULATE ROCK PGA (Per = 0; Vs30 = 1100 m/sec)
+#C.....
+#C.....Magnitude Term
+#C.....
+#
+#      IF (Mw .LE. 5.5) THEN
+#        f_mag = c0(22) + c1(22)*Mw
+#      ELSEIF (Mw .LE. 6.5) THEN
+#        f_mag = c0(22) + c1(22)*Mw + c2(22)*(Mw-5.5)
+#      ELSE
+#        f_mag = c0(22) + c1(22)*Mw + c2(22)*(Mw-5.5) + c3(22)*(Mw-6.5)
+#      ENDIF
+
+    ######
+    # CALCULATE ROCK PGA (Per = 0; Vs30 = 1100 m/sec)
+    ######
+
+    # Magnitude Term
+    f_mag = ones(Mw.shape) * c0_22 + c1_22*Mw + c2_22*(Mw-5.5) + c3_22*(Mw-6.5)
+    f_mag = where(Mw <= 6.5, c0_22 + c1_22*Mw + c2_22*(Mw-5.5), f_mag)
+    f_mag = where(Mw <= 5.5, c0_22 + c1_22*Mw, f_mag)
+
+#C.....
+#C.....Distance Term
+#C.....
+#
+#      R = SQRT(Rrup**2 + c6(22)**2)
+#      f_dis = (c4(22) + c5(22)*Mw)*ALOG(R)
+
+    # Distance Term
+    R = sqrt(Rrup**2 + c6_22**2)
+    f_dis = (c4_22 + c5_22*Mw)*log(R)
+
+#C.....
+#C.....Style-of-Faulting (Fault Mechanism) Term
+#C.....
+#
+#      IF (Ztor .LT. 1.0) THEN
+#        f_fltZ = Ztor
+#      ELSE
+#        f_fltZ = 1.0
+#      ENDIF
+#
+#      f_flt = c7(22)*Frv*f_fltZ + c8(22)*Fnm
+
+    # Style-of-Faulting (Fault Mechanism) Term
+    f_fltZ = ones(Ztor.shape)
+    f_fltZ = where(Ztor < 1.0, Ztor, f_fltZ)
+
+    f_flt = c7_22*Frv*f_fltZ + c8_22*Fnm
+
+#C.....
+#C.....Hanging-Wall Term
+#C.....
+#
+#      IF (Rjb .EQ. 0.0) THEN
+#        f_hngR = 1.0
+#      ELSEIF (Ztor .LT. 1.0) THEN
+#        Rmax = MAX(Rrup, SQRT(Rjb**2 + 1.0))
+#        f_hngR = (Rmax - Rjb)/Rmax
+#      ELSE
+#        f_hngR = (Rrup - Rjb)/Rrup
+#      ENDIF
+#
+#      IF (Mw .LE. 6.0) THEN
+#        f_hngM = 0.0
+#      ELSEIF (Mw .LT. 6.5) THEN
+#        f_hngM = 2.0*(Mw - 6.0)
+#      ELSE
+#        f_hngM = 1.0
+#      ENDIF
+#
+#      IF (Ztor .GE. 20.0) THEN
+#        f_hngZ = 0.0
+#      ELSE
+#        f_hngZ = (20.0 - Ztor)/20.0
+#      ENDIF
+#
+#      IF (Dip .LE. 70.0) THEN
+#        f_hngD = 1.0
+#      ELSE
+#        f_hngD = (90.0 - Dip)/20.0
+#      ENDIF
+#
+#      f_hng = c9(22)*f_hngR*f_hngM*f_hngZ*f_hngD
+
+    # Hanging-Wall Term
+    Rmax = maximum(Rrup, sqrt(Rjb**2 + 1.0))	## numpy max?
+    f_hngR = zeros(Rjb.shape)
+    f_hngR = where(Ztor < 1.0, (Rmax - Rjb)/Rmax, f_hngR)
+    f_hngR = where(Rjb == 0.0, 1.0, f_hngR)
+
+    f_hngM = ones(Mw.shape)
+    f_hngM = where(Mw < 6.5, 2.0*(Mw - 6.0), f_hngM)
+    f_hngM = where(Mw <= 6.0, 0.0, f_hngM)
+
+    f_hngZ = ones(Ztor.shape) * (20.0 - Ztor)/20.0
+    f_hngZ = where(Ztor >= 20.0, 0.0, f_hngZ)
+
+    f_hngD = ones(Dip.shape) * (90.0 - Dip)/20.0
+    f_hngD = where(Dip <= 70.0, 1.0, f_hngD)
+
+    f_hng = c9_22*f_hngR*f_hngM*f_hngZ*f_hngD
+
+#C.....
+#C.....Shallow Site Response Term (Vs30 = 1100 m/s)
+#C.....
+#
+#      f_site = (c10(22) + k2(22)*n(22))*ALOG(1100.0/k1(22))
+
+    # Shallow Site Response Term (Vs30 = 1100 m/s)
+    f_site = (c10_22 + k2_22*n_22)*log(1100.0/k1_22)
+
+#C.....
+#C.....Basin (Sediment) Response Term
+#C.....
+#
+#      IF (Z25 .LT. 1.0) THEN
+#        f_sed = c11(22)*(Z25 - 1.0)
+#      ELSEIF (Z25 .LE. 3.0) THEN
+#        f_sed = 0.0
+#      ELSE
+#        f_sed = c12(22)*k3(22)*EXP(-0.75)*(1.0 - EXP(-0.25*(Z25 - 3.0)))
+#      ENDIF
+
+    # Basin (Sediment) Response Term
+    f_sed = ones(Z25.shape) * c12_22*k3_22*exp(-0.75)*(1.0 - exp(-0.25*(Z25 - 3.0)))
+    f_sed = where(Z25 <= 3.0, 0.0, f_sed)
+    f_sed = where(Z25 < 1.0, c11_22*(Z25 - 1.0), f_sed)
+
+#C.....
+#C.....Value of PGA on Rock
+#C.....
+#
+#      A_1100 = EXP(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
+
+    # Value of PGA on Rock
+    A_1100 = exp(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
+
+#C.....
+#C.....Value of PGA on Local Site Conditions
+#C.....
+#
+#      PGA = EXP(ALOG(A_1100) - f_site)
+#
+#      IF (Vs30 .LT. k1(22)) THEN
+#        f_site = c10(22)*ALOG(Vs30/k1(22))
+#     *    + k2(22)*(ALOG(A_1100 + c(22)*(Vs30/k1(22))**n(22))
+#     *    - ALOG(A_1100 + c(22)))
+#      ELSEIF (Vs30 .LT. 1100.0) THEN
+#        f_site = (c10(22) + k2(22)*n(22))*ALOG(Vs30/k1(22))
+#      ELSE
+#        f_site = (c10(22) + k2(22)*n(22))*ALOG(1100.0/k1(22))
+#      ENDIF
+#
+#      PGA = EXP(ALOG(PGA) + f_site)
+
+    # Value of PGA on Local Site Conditions
+    PGA = exp(log(A_1100) - f_site)
+
+    f_site = ones(Vs30.shape) * (c10_22 + k2_22*n_22)*log(1100.0/k1_22)	# correct shape?
+    f_site = where(Vs30 < 1100.0, (c10_22 + k2_22*n_22)*log(Vs30/k1_22), f_site)
+    f_site = where(Vs30 < k1_22, c10_22*log(Vs30/k1_22) + k2_22*(log(A_1100 + c_22*(Vs30/k1_22)**n_22) - log(A_1100 + c_22)), f_site)
+
+    PGA = exp(log(PGA) + f_site)
+
+#C.....
+#C.....CALCULATE STRONG MOTION PARAMETER
+#C.....
+#C.....Magnitude Term
+#C.....
+#
+#      IF (Mw .LE. 5.5) THEN
+#        f_mag = c0T + c1T*Mw
+#      ELSEIF (Mw .LE. 6.5) THEN
+#        f_mag = c0T + c1T*Mw + c2T*(Mw-5.5)
+#      ELSE
+#        f_mag = c0T + c1T*Mw + c2T*(Mw-5.5) + c3T*(Mw-6.5)
+#      ENDIF
+
+    ######
+    # CALCULATE STRONG MOTION PARAMETER
+    ######
+
+    # Magnitude Term
+    f_mag = ones(Mw.shape) * c0T + c1T*Mw + c2T*(Mw-5.5) + c3T*(Mw-6.5)
+    f_mag = where(Mw <= 6.5, c0T + c1T*Mw + c2T*(Mw-5.5), f_mag)
+    f_mag = where(Mw <= 5.5, c0T + c1T*Mw, f_mag)
+
+#C.....
+#C.....Distance Term
+#C.....
+#
+#      R = SQRT(Rrup**2 + c6T**2)
+#      f_dis = (c4T + c5T*Mw)*ALOG(R)
+
+    # Distance Term
+    R = sqrt(Rrup**2 + c6T**2)
+    f_dis = (c4T + c5T*Mw)*log(R)
+
+#C.....
+#C.....Style-of-Faulting Term
+#C.....
+#
+#      IF (Ztor .LT. 1.0) THEN
+#        f_fltZ = Ztor
+#      ELSE
+#        f_fltZ = 1.0
+#      ENDIF
+#
+#      f_flt = c7T*Frv*f_fltZ + c8T*Fnm
+
+    # Style-of-Faulting Term
+    f_fltZ = ones(Ztor.shape)
+    f_fltZ = where(Ztor < 1.0, Ztor, f_fltZ)
+
+    f_flt = c7T*Frv*f_fltZ + c8T*Fnm
+
+#C.....
+#C.....Hanging-Wall Term
+#C.....
+#
+#      IF (Rjb .EQ. 0.0) THEN
+#        f_hngR = 1.0
+#      ELSEIF (Ztor .LT. 1.0) THEN
+#        Rmax = MAX(Rrup, SQRT(Rjb**2 + 1.0))
+#        f_hngR = (Rmax - Rjb)/Rmax
+#      ELSE
+#        f_hngR = (Rrup - Rjb)/Rrup
+#      ENDIF
+#
+#      IF (Mw .LE. 6.0) THEN
+#        f_hngM = 0.0
+#      ELSEIF (Mw .LT. 6.5) THEN
+#        f_hngM = 2.0*(Mw - 6.0)
+#      ELSE
+#        f_hngM = 1.0
+#      ENDIF
+#
+#      IF (Ztor .GE. 20.0) THEN
+#        f_hngZ = 0.0
+#      ELSE
+#        f_hngZ = (20.0 - Ztor)/20.0
+#      ENDIF
+#
+#      IF (Dip .LE. 70.0) THEN
+#        f_hngD = 1.0
+#      ELSE
+#        f_hngD = (90.0 - Dip)/20.0
+#      ENDIF
+#
+#      f_hng = c9T*f_hngR*f_hngM*f_hngZ*f_hngD 
+
+    # Hanging-Wall Term
+    Rmax = maximum(Rrup, sqrt(Rjb**2 + 1.0))
+
+    f_hngR = ones(Rjb.shape) * (Rrup - Rjb)/Rrup
+    f_hngR = where(Ztor < 1.0, (Rmax - Rjb)/Rmax, f_hngR)
+    f_hngR = where(Rjb == 0.0, 1.0, f_hngR)
+
+    f_hngM = ones(Mw.shape)
+    f_hngM = where(Mw < 6.5, 2.0*(Mw - 6.0), f_hngM)
+    f_hngM = where(Mw <= 6.0, 0.0, f_hngM)
+
+    f_hngZ = ones(Ztor.shape) * (20.0 - Ztor)/20.0
+    f_hngZ = where(Ztor >= 20.0, 0.0, f_hngZ)
+
+    f_hngD = ones(Dip.shape) * (90.0 - Dip)/20.0
+    f_hngD = where(Dip <= 70.0, 1.0, f_hngD)
+
+    f_hng = c9T*f_hngR*f_hngM*f_hngZ*f_hngD
+
+#C.....
+#C.....Shallow Site Response Term
+#C.....
+#
+#      IF (Vs30 .LT. k1T) THEN
+#        f_site = c10T*ALOG(Vs30/k1T)
+#     *    + k2T*(ALOG(A_1100 + cT*(Vs30/k1T)**nT)
+#     *    - ALOG(A_1100 + cT))
+#      ELSEIF (Vs30 .LT. 1100.0) THEN
+#        f_site = (c10T + k2T*nT)*ALOG(Vs30/k1T)
+#      ELSE
+#        f_site = (c10T + k2T*nT)*ALOG(1100.0/k1T)
+#      ENDIF
+
+    # Shallow Site Response Term
+    f_site = ones(Vs30.shape) * (c10T + k2T*nT)*log(1100.0/k1T)
+    f_site = where(Vs30 < 1100.0, (c10T + k2T*nT)*log(Vs30/k1T), f_site)
+    f_site = where(Vs30 < k1T, c10T*log(Vs30/k1T) + k2T*(log(A_1100 + cT*(Vs30/k1T)**nT) - log(A_1100 + cT)), f_site)
+
+#C.....
+#C.....Basin (Sediment) Response Term
+#C.....
+#
+#      IF (Z25 .LT. 1.0) THEN
+#        f_sed = c11T*(Z25 - 1.0)
+#      ELSEIF (Z25 .LE. 3.0) THEN
+#        f_sed = 0.0
+#      ELSE
+#        f_sed = c12T*k3T*EXP(-0.75)*(1.0 - EXP(-0.25*(Z25 - 3.0)))
+#      ENDIF
+
+    # Basin (Sediment) Response Term
+    f_sed = ones(Z25.shape) * c12T*k3T*exp(-0.75)*(1.0 - exp(-0.25*(Z25 - 3.0)))
+    f_sed = where(Z25 <= 3.0, 0.0, f_sed)
+    f_sed = where(Z25 < 1.0, c11T*(Z25 - 1.0), f_sed)
+
+#C.....
+#C.....Calculate Ground Motion Parameter
+#C.....
+#
+#      Y = EXP(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
+
+    # Calculate Ground Motion Parameter
+    Y = exp(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
+
+#C.....
+#C.....Check Whether Y < PGA at Short Periods
+#C.....
+#
+#      IF (Per .GE. 0.0 .AND. Per .LE. 0.25 .AND. Y .LT. PGA) Y = PGA
+
+    # Check Whether Y < PGA at Short Periods - use PGA if so
+    short_period = logical_and(periods >= 0.0, periods <= 0.25)
+    Y = where(logical_and(short_period, Y < PGA), PGA, Y)
+
+#C.....
+#C.....CALCULATE ALEATORY UNCERTAINTY
+#C.....
+#C.....Linearized Relationship Between f_site and ln PGA
+#C.....
+#
+#      IF (Vs30 .LT. k1T) THEN
+#        Alpha = k2T*A_1100*(1.0/(A_1100 + cT*(Vs30/k1T)**nT)
+#     *    - 1.0/(A_1100 + cT))
+#      ELSE
+#        Alpha = 0.0
+#      ENDIF
+
+    Alpha = zeros(Vs30.shape)
+    Alpha = where(Vs30 < k1T, k2T*A_1100*(1.0/(A_1100 + cT*(Vs30/k1T)**nT) - 1.0/(A_1100 + cT)), Alpha)
+
+#C.....
+#C     Intra-Event Standard Deviation at Base of Site Profile
+#C.....
+#
+#      slnPGA = slnY(22)
+#      tlnPGA = tlnY(22)
+#      slnYB = SQRT(slnYT**2 - slnAFT**2)
+#      slnAB = SQRT(slnPGA**2 - slnAFT**2)
+
+    # Intra-Event Standard Deviation at Base of Site Profile
+    slnPGA = slnY_22
+    tlnPGA = tlnY_22
+    slnYB = sqrt(slnYT**2 - slnAFT**2)
+    slnAB = sqrt(slnPGA**2 - slnAFT**2)
+    
+#C.....
+#C     Standard Deviation of Geometric Mean of ln Y
+#C.....
+#
+#      Sigma  = SQRT(slnYB**2 + slnAFT**2 + Alpha**2*slnAB**2
+#     *  + 2.0*Alpha*rhoT*slnYB*slnAB)
+#      Tau    = tlnYT
+#      SigT = SQRT(Sigma**2 + Tau**2)
+
+    # Standard Deviation of Geometric Mean of ln Y
+    Sigma = sqrt(slnYB**2 + slnAFT**2 + Alpha**2*slnAB**2 + 2.0*Alpha*rhoT*slnYB*slnAB)
+    Tau = tlnYT
+    SigT = sqrt(Sigma**2 + Tau**2)
+
+#C.....
+#C.....Standard Deviation of Arbitrary Horizontal Component of ln Y
+#C.....
+#
+#      SigArb = SQRT(SigT**2 + sigCT**2)
+
+    # Standard Deviation of Arbitrary Horizontal Component of ln Y
+    SigArb = sqrt(SigT**2 + sigCT**2)
 
     # check result has right dimensions
     num_sites = Rrup.shape[0]
     assert Y.shape == (num_sites, num_events, num_periods), (msg
                % ('Y', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
                   str(Y.shape)))
-    assert sigma.shape == (num_sites, num_events, num_periods), (msg
-               % ('sigma', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
-                  str(sigma.shape)))
+    assert SigT.shape == (num_sites, num_events, num_periods), (msg
+               % ('SigT', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+                  str(SigT.shape)))
+ 
+    return (log(Y), SigT)
 
-    return (log(Y), log(sigma))
 
 ######
-# Build the coefficient arrays
+# Set up a numpy array to convert a 'fault_type' flag to an array slice
+# that encodes the Frv/Fnm flags.  We want a list of three elements that
+# indexes 'fault type' to a (Frv, Fnm) tuple.
 ######
 
-# dimension = (#periods, #coefficients)
-Campbell08_Table2 = array([
-#  C0     C1      C2      C3      C4     C5     C6    C7      C8     C9      C10    C11    C12     K1    K2     K3
-[ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839],  # PGA
-[ -1.715, 0.500, -0.530, -0.262, -2.118, 0.170, 5.60, 0.280, -0.120, 0.490,  1.058, 0.040, 0.610,  865, -1.186, 1.839],  # 0.010
-[ -1.680, 0.500, -0.530, -0.262, -2.123, 0.170, 5.60, 0.280, -0.120, 0.490,  1.102, 0.040, 0.610,  865, -1.219, 1.840],  # 0.020
-[ -1.552, 0.500, -0.530, -0.262, -2.145, 0.170, 5.60, 0.280, -0.120, 0.490,  1.174, 0.040, 0.610,  908, -1.273, 1.841],  # 0.030
-[ -1.209, 0.500, -0.530, -0.267, -2.199, 0.170, 5.74, 0.280, -0.120, 0.490,  1.272, 0.040, 0.610, 1054, -1.346, 1.843],  # 0.050
-[ -0.657, 0.500, -0.530, -0.302, -2.277, 0.170, 7.09, 0.280, -0.120, 0.490,  1.438, 0.040, 0.610, 1086, -1.471, 1.845],  # 0.075
-[ -0.314, 0.500, -0.530, -0.324, -2.318, 0.170, 8.05, 0.280, -0.099, 0.490,  1.604, 0.040, 0.610, 1032, -1.624, 1.847],  # 0.10
-[ -0.133, 0.500, -0.530, -0.339, -2.309, 0.170, 8.79, 0.280, -0.048, 0.490,  1.928, 0.040, 0.610,  878, -1.931, 1.852],  # 0.15
-[ -0.486, 0.500, -0.446, -0.398, -2.220, 0.170, 7.60, 0.280, -0.012, 0.490,  2.194, 0.040, 0.610,  748, -2.188, 1.856],  # 0.20
-[ -0.890, 0.500, -0.362, -0.458, -2.146, 0.170, 6.58, 0.280,  0.000, 0.490,  2.351, 0.040, 0.700,  654, -2.381, 1.861],  # 0.25
-[ -1.171, 0.500, -0.294, -0.511, -2.095, 0.170, 6.04, 0.280,  0.000, 0.490,  2.460, 0.040, 0.750,  587, -2.518, 1.865],  # 0.30
-[ -1.466, 0.500, -0.186, -0.592, -2.066, 0.170, 5.30, 0.280,  0.000, 0.490,  2.587, 0.040, 0.850,  503, -2.657, 1.874],  # 0.40
-[ -2.569, 0.656, -0.304, -0.536, -2.041, 0.170, 4.73, 0.280,  0.000, 0.490,  2.544, 0.040, 0.883,  457, -2.669, 1.883],  # 0.50
-[ -4.844, 0.972, -0.578, -0.406, -2.000, 0.170, 4.00, 0.280,  0.000, 0.490,  2.133, 0.077, 1.000,  410, -2.401, 1.906],  # 0.75
-[ -6.406, 1.196, -0.772, -0.314, -2.000, 0.170, 4.00, 0.255,  0.000, 0.490,  1.571, 0.150, 1.000,  400, -1.955, 1.929],  # 1.0
-[ -8.692, 1.513, -1.046, -0.185, -2.000, 0.170, 4.00, 0.161,  0.000, 0.490,  0.406, 0.253, 1.000,  400, -1.025, 1.974],  # 1.5
-[ -9.701, 1.600, -0.978, -0.236, -2.000, 0.170, 4.00, 0.094,  0.000, 0.371, -0.456, 0.300, 1.000,  400, -0.299, 2.019],  # 2.0
-[-10.556, 1.600, -0.638, -0.491, -2.000, 0.170, 4.00, 0.000,  0.000, 0.154, -0.820, 0.300, 1.000,  400,  0.000, 2.110],  # 3.0
-[-11.212, 1.600, -0.316, -0.770, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.200],  # 4.0
-[-11.684, 1.600, -0.070, -0.986, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.291],  # 5.0
-[-12.505, 1.600, -0.070, -0.656, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.517],  # 7.5
-[-13.087, 1.600, -0.070, -0.422, -2.000, 0.170, 4.00, 0.000,  0.000, 0.000, -0.820, 0.300, 1.000,  400,  0.000, 2.744]]) # 10.0
+# faulting type flag encodings
+#                            'type':     (Frv, Fnm)
+Campbell08_faulting_flags = {'reverse':    (1, 0),
+                             'normal':     (0, 1),
+                             'strike_slip': (0, 0)}
 
-Campbell08_Table3 = array([
-#ElnY   TlnY   Ec     Et     Earb   rho
-[0.478, 0.219, 0.166, 0.526, 0.551, 1.000],  # PGA
-[0.478, 0.219, 0.166, 0.526, 0.551, 1.000],  # 0.010
-[0.480, 0.219, 0.166, 0.528, 0.553, 0.999],  # 0.020
-[0.489, 0.235, 0.165, 0.543, 0.567, 0.989],  # 0.030
-[0.510, 0.258, 0.162, 0.572, 0.594, 0.963],  # 0.050
-[0.520, 0.292, 0.158, 0.596, 0.617, 0.922],  # 0.075
-[0.531, 0.286, 0.170, 0.603, 0.627, 0.898],  # 0.10
-[0.532, 0.280, 0.180, 0.601, 0.628, 0.890],  # 0.15
-[0.534, 0.249, 0.186, 0.589, 0.618, 0.871],  # 0.20
-[0.534, 0.240, 0.191, 0.585, 0.616, 0.852],  # 0.25
-[0.544, 0.215, 0.198, 0.585, 0.618, 0.831],  # 0.30
-[0.541, 0.217, 0.206, 0.583, 0.618, 0.785],  # 0.40
-[0.550, 0.214, 0.208, 0.590, 0.626, 0.735],  # 0.50
-[0.568, 0.227, 0.221, 0.612, 0.650, 0.628],  # 0.75
-[0.568, 0.255, 0.225, 0.623, 0.662, 0.534],  # 1.0
-[0.564, 0.296, 0.222, 0.637, 0.675, 0.411],  # 1.5
-[0.571, 0.296, 0.226, 0.643, 0.682, 0.331],  # 2.0
-[0.558, 0.326, 0.229, 0.646, 0.686, 0.289],  # 3.0
-[0.576, 0.297, 0.237, 0.648, 0.690, 0.261],  # 4.0
-[0.601, 0.359, 0.237, 0.700, 0.739, 0.200],  # 5.0
-[0.628, 0.428, 0.271, 0.760, 0.807, 0.174],  # 7.5
-[0.667, 0.485, 0.290, 0.825, 0.874, 0.174]]) # 10.0
+# generate 'Campbell08_fault_type' from the dictionary above
+tmp = []
+for (k, v) in Campbell08_faulting_flags.iteritems():
+    index = ground_motion_misc.FaultTypeDictionary[k]
+    tmp.append((index, v))
 
-# convert to dim = (#coefficients, #periods)
-Campbell08_coefficient = Campbell08_Table2.transpose()
-Campbell08_PGA_coefficient = Campbell08_coefficient[:,0]
+# sort and make array in correct index order
+tmp2 = []
+tmp.sort()
+for (_, flags) in tmp:
+    tmp2.append(flags)
+Campbell08_fault_type = array(tmp2)
+del tmp, tmp2
 
-# dim = (period,)
-Campbell08_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
-                                 0.075, 0.10,  0.15,  0.20,  0.25,
-                                 0.30,  0.40,  0.50,  0.75,  1.0,
-                                 1.5,   2.0,   3.0,   4.0,   5.0,
-                                 7.5,  10.0]
 
-# dim = (period,)
-Campbell08_sigma_coefficient = Campbell08_Table3.transpose()
-Campbell08_PGA_sigma_coefficient = Campbell08_sigma_coefficient[:,0]
-Campbell08_sigma_coefficient_period = [0.000, 0.010, 0.020, 0.030, 0.050,
-                                       0.075, 0.10,  0.15,  0.20,  0.25,
-                                       0.30,  0.40,  0.50,  0.75,  1.0,
-                                       1.5,   2.0,   3.0,   4.0,   5.0,
-                                       7.5,  10.0]
+# coefficient table from CB08_COEFS.TXT, T=0.0 moved to top, etc
+tmp = array([
+#T(s)  c0     c1     c2     c3     c4    c5   c6   c7     c8    c9     c10   c11   c12    k1   k2    k3    c    n    s_lny t_lny s_lnAF c_lny rho
+[ 0.0, -1.715,0.500,-0.530,-0.262,-2.118,0.17,5.60,0.280,-0.120,0.490, 1.058,0.040,0.610, 865,-1.186,1.839,1.88,1.18,0.478,0.219,0.300, 0.166,1.000],
+[0.010,-1.715,0.500,-0.530,-0.262,-2.118,0.17,5.60,0.280,-0.120,0.490, 1.058,0.040,0.610, 865,-1.186,1.839,1.88,1.18,0.478,0.219,0.300, 0.166,1.000],
+[0.020,-1.680,0.500,-0.530,-0.262,-2.123,0.17,5.60,0.280,-0.120,0.490, 1.102,0.040,0.610, 865,-1.219,1.840,1.88,1.18,0.480,0.219,0.300, 0.166,0.999],
+[0.030,-1.552,0.500,-0.530,-0.262,-2.145,0.17,5.60,0.280,-0.120,0.490, 1.174,0.040,0.610, 908,-1.273,1.841,1.88,1.18,0.489,0.235,0.300, 0.165,0.989],
+[0.050,-1.209,0.500,-0.530,-0.267,-2.199,0.17,5.74,0.280,-0.120,0.490, 1.272,0.040,0.610,1054,-1.346,1.843,1.88,1.18,0.510,0.258,0.300, 0.162,0.963],
+[0.075,-0.657,0.500,-0.530,-0.302,-2.277,0.17,7.09,0.280,-0.120,0.490, 1.438,0.040,0.610,1086,-1.471,1.845,1.88,1.18,0.520,0.292,0.300, 0.158,0.922],
+[0.10, -0.314,0.500,-0.530,-0.324,-2.318,0.17,8.05,0.280,-0.099,0.490, 1.604,0.040,0.610,1032,-1.624,1.847,1.88,1.18,0.531,0.286,0.300, 0.170,0.898],
+[0.15, -0.133,0.500,-0.530,-0.339,-2.309,0.17,8.79,0.280,-0.048,0.490, 1.928,0.040,0.610, 878,-1.931,1.852,1.88,1.18,0.532,0.280,0.300, 0.180,0.890],
+[0.20, -0.486,0.500,-0.446,-0.398,-2.220,0.17,7.60,0.280,-0.012,0.490, 2.194,0.040,0.610, 748,-2.188,1.856,1.88,1.18,0.534,0.249,0.300, 0.186,0.871],
+[0.25, -0.890,0.500,-0.362,-0.458,-2.146,0.17,6.58,0.280, 0.000,0.490, 2.351,0.040,0.700, 654,-2.381,1.861,1.88,1.18,0.534,0.240,0.300, 0.191,0.852],
+[0.30, -1.171,0.500,-0.294,-0.511,-2.095,0.17,6.04,0.280, 0.000,0.490, 2.460,0.040,0.750, 587,-2.518,1.865,1.88,1.18,0.544,0.215,0.300, 0.198,0.831],
+[0.40, -1.466,0.500,-0.186,-0.592,-2.066,0.17,5.30,0.280, 0.000,0.490, 2.587,0.040,0.850, 503,-2.657,1.874,1.88,1.18,0.541,0.217,0.300, 0.206,0.785],
+[0.50, -2.569,0.656,-0.304,-0.536,-2.041,0.17,4.73,0.280, 0.000,0.490, 2.544,0.040,0.883, 457,-2.669,1.883,1.88,1.18,0.550,0.214,0.300, 0.208,0.735],
+[0.75, -4.844,0.972,-0.578,-0.406,-2.000,0.17,4.00,0.280, 0.000,0.490, 2.133,0.077,1.000, 410,-2.401,1.906,1.88,1.18,0.568,0.227,0.300, 0.221,0.628],
+[1.00, -6.406,1.196,-0.772,-0.314,-2.000,0.17,4.00,0.255, 0.000,0.490, 1.571,0.150,1.000, 400,-1.955,1.929,1.88,1.18,0.568,0.255,0.300, 0.225,0.534],
+[1.50, -8.692,1.513,-1.046,-0.185,-2.000,0.17,4.00,0.161, 0.000,0.490, 0.406,0.253,1.000, 400,-1.025,1.974,1.88,1.18,0.564,0.296,0.300, 0.222,0.411],
+[2.00, -9.701,1.600,-0.978,-0.236,-2.000,0.17,4.00,0.094, 0.000,0.371,-0.456,0.300,1.000, 400,-0.299,2.019,1.88,1.18,0.571,0.296,0.300, 0.226,0.331],
+[3.00,-10.556,1.600,-0.638,-0.491,-2.000,0.17,4.00,0.000, 0.000,0.154,-0.820,0.300,1.000, 400, 0.000,2.110,1.88,1.18,0.558,0.326,0.300, 0.229,0.289],
+[4.00,-11.212,1.600,-0.316,-0.770,-2.000,0.17,4.00,0.000, 0.000,0.000,-0.820,0.300,1.000, 400, 0.000,2.200,1.88,1.18,0.576,0.297,0.300, 0.237,0.261],
+[5.00,-11.684,1.600,-0.070,-0.986,-2.000,0.17,4.00,0.000, 0.000,0.000,-0.820,0.300,1.000, 400, 0.000,2.291,1.88,1.18,0.601,0.359,0.300, 0.237,0.200],
+[7.50,-12.505,1.600,-0.070,-0.656,-2.000,0.17,4.00,0.000, 0.000,0.000,-0.820,0.300,1.000, 400, 0.000,2.517,1.88,1.18,0.628,0.428,0.300, 0.271,0.174],
+[10.0,-13.087,1.600,-0.070,-0.422,-2.000,0.17,4.00,0.000, 0.000,0.000,-0.820,0.300,1.000, 400, 0.000,2.744,1.88,1.18,0.667,0.485,0.300, 0.290,0.174]])
 
+# construct required coefficient tables for EQRM
+# shape = (#coefficients, #periods)
+Campbell08_coefficient = array(tmp[:,1:19]).transpose()
+Campbell08_sigma_coefficient = array(tmp[:,19:]).transpose()
+
+
+# coefficient period arrays
+# dim = (period,) 
+Campbell08_coefficient_period = array(tmp[:,0]).transpose()
+Campbell08_sigma_coefficient_period = array(tmp[:,0]).transpose()
+
+# PGA coefficient & sigma coefficient tables
+Campbell08_PGA_coefficient = array(tmp[0,1:19]).transpose()
+Campbell08_PGA_sigma_coefficient = array(tmp[0,19:]).transpose()
+
+# now for the rest of the model attributes
 Campbell08_magnitude_type = 'Mw'
 Campbell08_distance_type = 'Rupture'
 Campbell08_interpolation = linear_interpolation
-
 Campbell08_uses_Vs30 = True
 
 gound_motion_init['Campbell08'] = [Campbell08_distribution,
@@ -3559,8 +3787,7 @@ gound_motion_init['Campbell08'] = [Campbell08_distribution,
                                    Campbell08_interpolation,
                                    Campbell08_uses_Vs30]
 
-del Campbell08_Table2, Campbell08_Table3
-
+del tmp
 #########################  End of Campbell08 model  ##########################
 
 
