@@ -12,11 +12,13 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import (exp, log, sum, zeros, newaxis, where, array, r_, unique)
+from scipy import (exp, log, sum, zeros, newaxis, where, array, r_, unique, 
+                   append, int64)
 
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 from eqrm_code.test_distance_functions import azimuths
 from eqrm_code.conversions import calc_fault_area
+
 #ma.core import sin
 
 
@@ -58,15 +60,17 @@ def calc_event_activity(event_set, source_model):
             event_ind= poly_ind[mag_ind]
             #event_ind=mag_ind[poly_ind]
             num_of_mag_sample_bins = source.number_of_mag_sample_bins
+            
             mag_bin_centroids=make_bins(zone_mlow,zone_mhgh,
-                                        num_of_mag_sample_bins)
+                                        num_of_mag_sample_bins,
+                                        source.recurrence_model_distribution)
 
-            # bin the event magnitudes
-            delta_mag = (zone_mhgh-zone_mlow)/num_of_mag_sample_bins
-            event_bins = array([int(i) for i in
-                                (event_set.Mw[event_ind]
-                                 -zone_mlow)/delta_mag])
-
+            event_bins =assign_event_bins(event_set.Mw[event_ind],
+                                          zone_mlow,zone_mhgh,
+                                          num_of_mag_sample_bins,
+                                          source.recurrence_model_distribution)
+           
+           
             # Check to see if all mag_bin_centroids have events
             # Assume that if there are 50 events for every bin
             # all bins will have events.
@@ -92,7 +96,8 @@ def calc_event_activity(event_set, source_model):
                 grpdf=calc_activities_from_slip_rate_Characteristic(
                     mag_bin_centroids, 
                     zone_b, zone_mlow,
-                    zone_mhgh)
+                    zone_mhgh,
+                    num_of_mag_sample_bins)
             else:
                 raise IOError(source.recurrence_model_distribution,
                               " is not a valid recurrence model distribution.")
@@ -156,13 +161,46 @@ def m2grpdfb(b,m,m0,mmax):
     return pdf
         
 
-def make_bins(min_magnitude,max_magnitude,num_bins):
-    
-    delta_mag = (max_magnitude-min_magnitude)/num_bins
-    bins = r_[min_magnitude+delta_mag/2:max_magnitude-delta_mag/2:num_bins*1j]
+def make_bins(min_mag,max_magnitude,num_bins,
+              recurrence_model_dist = 'bounded_gutenberg_richter'):
+    if (recurrence_model_dist == 'characteristic'):
+        m2=0.5
+        m_c=max_magnitude-m2
+        
+        delta_mag = (m_c-min_mag)/(num_bins)
+        bins = r_[min_mag+delta_mag/2:m_c-delta_mag/2:(num_bins)*1j]
+        
+        characteristic_bin = array([m_c+(m2/2)])
+        bins = append(bins,characteristic_bin)
+    else:
+        delta_mag = (max_magnitude-min_mag)/num_bins
+        bins = r_[min_mag+delta_mag/2:max_magnitude-delta_mag/2:num_bins*1j]
     #approximate the number of earthquakes in discrete (0.1 unit) bins
     return bins
-
+def assign_event_bins(magnitudes, min_mag, max_magnitude, num_bins,
+              recurrence_model_dist = 'bounded_gutenberg_richter'):
+    if (recurrence_model_dist=='characteristic'):
+        m2=0.5
+        m_c= max_magnitude-m2
+        k = where(magnitudes < m_c)
+        # bin the event magnitudes
+        delta_mag = (m_c-min_mag)/num_bins
+        event_bins=zeros(len(magnitudes),dtype=int64)
+        #event_bins[k] =(magnitudes[k] -min_mag)/delta_mag
+        event_bins[k] = array([int(i) for i in
+                                (magnitudes[k]
+                                 -min_mag)/delta_mag])
+        k =where(magnitudes>=m_c)
+        event_bins[k]=num_bins
+    else:
+        # bin the event magnitudes
+        delta_mag = (max_magnitude-min_mag)/num_bins
+ 
+        event_bins = array([int(i) for i in
+                                (magnitudes
+                                 -min_mag)/delta_mag])
+ 
+    return event_bins
 
 def grscale(b,max_magnitude,new_min,min_magnitude):
     """
@@ -269,9 +307,17 @@ def calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,slip_rate_mm,area_kms):
         
     return lambda_m
 
-def calc_activities_from_slip_rate_Characteristic(magnitude,b,m0,mMax):
-    
+def calc_activities_from_slip_rate_Characteristic(magnitude,b,m0,mMax,
+                                                  num_of_bins):
+    m2=0.5
+    m_c=mMax-m2
+        
+    n_bin_width= (m_c-m0)/(num_of_bins)
+    char_bin_width=m2
+
     pdfs_tmp =calc_activity_from_slip_rate_Characteristic(magnitude,b,m0,mMax)          
+    i = where(magnitude > m_c)
+    pdfs_tmp[i]= pdfs_tmp[i] *(char_bin_width/n_bin_width)
     pdfs=pdfs_tmp/sum(pdfs_tmp)
     return pdfs
 
