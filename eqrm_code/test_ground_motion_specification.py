@@ -13,7 +13,7 @@ from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
 classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Toro_1997_midcontinent', 'Sadigh_97',
                           'Youngs_97_interface', 'Youngs_97_intraslab',
-                          'Combo_Sadigh_Youngs_M8',
+                          'Combo_Sadigh_Youngs_M8', 'Boore_08',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
@@ -410,21 +410,39 @@ test_data['AllenSEA06_test_magnitude'] = [5.4]
 # ***********************************************************
 
 # Boore_08
-test_data['Boore_08_test_period'] = [
-    0.0000E+00,3.0000E-01,1.0000E-00]
+# test_data['Boore_08_test_period'] = [
+#     0.0000E+00,3.0000E-01,1.0000E-00]
 
-test_data['Boore_08_test_distance'] = [9,14,21.0]
+# test_data['Boore_08_test_distance'] = [9,14,21.0]
+
+# test_data['Boore_08_test_mean'] = array([
+#     [8.0160e-002,1.2333e-001,2.8450e-002],
+#     [5.9491e-002,9.4516e-002,2.0631e-002],
+#     [4.3928e-002,7.2391e-002,1.5113e-002]])
+# test_data['Boore_08_test_mean'] = \
+#                                   test_data['Boore_08_test_mean'] \
+#                                   [:,newaxis,:]
+# test_data['Boore_08_test_magnitude'] = [5.4]
+
+# test_data['Boore_08_test_Vs30'] = 1000.0
+
+# Boore_08
+test_data['Boore_08_test_period'] = [0.01, 0.2, 1.0]
+
+test_data['Boore_08_test_distance'] = [5, 10, 25]
 
 test_data['Boore_08_test_mean'] = array([
-    [8.0160e-002,1.2333e-001,2.8450e-002],
-    [5.9491e-002,9.4516e-002,2.0631e-002],
-    [4.3928e-002,7.2391e-002,1.5113e-002]])
+    [exp(-3.179415), exp(-2.798686), exp(-5.031195)],
+    [exp(-3.717279), exp(-3.230695), exp(-5.576974)],
+    [exp(-4.545958), exp(-3.916533), exp(-6.400938)]     ]) #, -0.169129]])
 test_data['Boore_08_test_mean'] = \
                                   test_data['Boore_08_test_mean'] \
                                   [:,newaxis,:]
-test_data['Boore_08_test_magnitude'] = [5.4]
+test_data['Boore_08_test_magnitude'] = [4]
 
-test_data['Boore_08_test_Vs30'] = 1000.0
+test_data['Boore_08_test_Vs30'] = 600.0
+
+test_data['Boore_08_test_fault_type'] = array([2])
 
 
 # ***********************************************************
