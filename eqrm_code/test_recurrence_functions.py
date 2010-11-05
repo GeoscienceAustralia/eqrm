@@ -41,7 +41,9 @@ class Test_Recurrence_functions(unittest.TestCase):
         min_magnitude = 0
         max_magnitude = 6
         num_bins = 3
-        bins = make_bins(min_magnitude,max_magnitude,num_bins)
+        bins = make_bins(min_magnitude,max_magnitude,num_bins,
+                         'bounded_gutenberg_richter')
+        
         #print "bins", bins
         self.assert_(allclose(array([1.,3.,5.]),bins))
         
@@ -70,7 +72,20 @@ class Test_Recurrence_functions(unittest.TestCase):
                                             max_magnitude,
                                             slip_rate_mm,area_kms)
         self.assert_(allclose(A_min,0.225843709057))
-
+        
+    def test_make_bins2(self):
+        max_magnitude = 7.0
+        prob_min_mag_cutoff = 4.0
+        num_of_mag_sample_bins =4
+        magnitudes= array([5,5.25,5.5,5.75,6,6.25,6.5,6.75,7])
+        mag_bin_centroids=make_bins(prob_min_mag_cutoff,max_magnitude,
+                                        num_of_mag_sample_bins,
+                                        'characteristic')
+        event_bins= assign_event_bins(magnitudes, prob_min_mag_cutoff, 
+                                      max_magnitude, num_of_mag_sample_bins,
+              recurrence_model_dist = 'characteristic')
+#        print 'event_bins ',event_bins
+        
     def test_calc_A_min_from_slip_rate_Characteristic(self):
         max_magnitude = 7.0
         prob_min_mag_cutoff = 4.0
@@ -89,7 +104,9 @@ class Test_Recurrence_functions(unittest.TestCase):
         area_kms= float(30*10)
         prob_number_of_mag_sample_bins=10
         b = 1.
-        bin_centroids = make_bins(prob_min_mag_cutoff,max_magnitude,prob_number_of_mag_sample_bins)
+        bin_centroids = make_bins(prob_min_mag_cutoff,max_magnitude,
+                                  prob_number_of_mag_sample_bins,
+                                  'characteristic')
         event_bins=r_[0:10]
         event_bins=sorted(event_bins)
     
@@ -99,23 +116,23 @@ class Test_Recurrence_functions(unittest.TestCase):
         
         pdfs= calc_activities_from_slip_rate_Characteristic(bin_centroids, b, 
                                                               prob_min_mag_cutoff, 
-                                                              max_magnitude)
+                                                              max_magnitude,
+                                                              prob_number_of_mag_sample_bins)
         
         event_activity_source = array(
                 [(A_minCharacteristic*pdfs[z]/(sum(where(
                 event_bins == z, 1,0)))) for z in event_bins])
         
-        self.assert_(allclose(event_activity_source,[1.21328345e-02,   
-                                                     6.08082174e-03,   
-                                                     3.04763023e-03,   
-                                                     1.52743336e-03,
-                                                     7.65530102e-04,   
-                                                     3.83673914e-04,   
-                                                     1.92292468e-04,   
-                                                     9.63745299e-05,
-                                                     5.41953808e-04,   
-                                                     5.41953808e-04]))
-  
+        self.assert_(allclose(event_activity_source,[1.07157089e-02,
+                                                     6.02588592e-03,
+                                                     3.38860467e-03,
+                                                     1.90555244e-03,
+                                                     1.07157089e-03,
+                                                     6.02588592e-04,
+                                                     3.38860467e-04,
+                                                     1.90555244e-04,
+                                                     1.07157089e-04,
+                                                     6.02588592e-05]))
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Recurrence_functions,'test')
