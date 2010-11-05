@@ -45,6 +45,7 @@ Created: 23 August 2010
 
 import sys,os
 import csv
+import copy
 import numpy as np
 from scipy import stats
 import matplotlib
@@ -82,11 +83,21 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
     
     """
 
+
+    # Define catalogue completeness intervals. Increase weight of small events
+    # to extend completeness
+##    mag_intervals = [3.5, 6.0]
+##    interval_multipliers = [55., 1.7]
+    mag_intervals = []
+    interval_multipliers = []
+
+    # Flag to save figure
+    savefig = True
+
     ifile = open(infile,'r')
     csvreader = csv.reader(ifile)
     header = csvreader.next()
-    magnitudes = []
-    years = []
+
 
     # If minimum magnitude is not specified, read all magnitudes
     if min_mag is not None:
@@ -97,12 +108,78 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
     ###########################################################################
     # Read data
     ###########################################################################
-    
-    for row in csvreader:
-        mag = float(row[5])
-        if (mag >= min_mag):# and (depth <= max_depth):
-            magnitudes.append(mag)
-        years.append(float(row[2]))
+
+    # Define lists
+    magnitudes = []
+    years = []
+    depths = []
+
+    # Read 'Nordic' file format    
+    if infile.endswith('.nordic'):
+        figurepath = infile.replace('.nordic', ('_' + str(min_mag) +'.png'))
+        ifile = open(infile,'r')      
+        
+        # Read data       
+        for line in ifile.readlines():
+            mag = float(line[56:59])
+            if (mag >= min_mag):
+                magnitudes.append(mag)
+            year = int(line[0:5])
+            years.append(float(line[2:5]))
+
+            depth = float(line[38:42])
+            depths.append(depth)
+            
+
+    # Read 'csv' Engdahl format
+    elif infile.endswith('.csv'):
+        figurepath = infile.replace('.csv',('_' + str(min_mag) +'.png'))
+        ifile = open(infile,'r')
+        csvreader = csv.reader(ifile)
+        header = csvreader.next()
+            
+        # Read data       
+        for row in csvreader:
+            mag = float(row[5])
+            if (mag >= min_mag):# and (depth <= max_depth):
+                magnitudes.append(mag)
+            years.append(int(row[2]))
+
+    ###########################################################################
+    # Handle catalogue completeness
+    ###########################################################################
+    counter = []
+    magnitudes_old = copy.copy(magnitudes)
+    for i in range(len(mag_intervals)):
+        if i == 0:
+            mult_mag_list = []
+            for mag in magnitudes_old:                           
+                if mag <= mag_intervals[i]:
+                    mult_mag_list.append(mag)
+            factor = len(mult_mag_list) * interval_multipliers[i]
+            j = 0
+            if factor <=0:
+                continue
+            while j <= factor:
+                for k in range(len(mult_mag_list)):
+                    magnitudes.append(mult_mag_list[k])
+                    j +=1
+                    if j > factor:
+                        break
+                    
+        elif i > 0:
+            mult_mag_list = []
+            for mag in magnitudes_old:
+                if mag_intervals[i-1] < mag and mag <= mag_intervals[i]:
+                    mult_mag_list.append(mag)
+            factor = len(mult_mag_list) * interval_multipliers[i]
+            j = 0
+            while j <= factor:
+                for k in range(len(mult_mag_list)):
+                    magnitudes.append(mult_mag_list[k])
+                    j +=1
+                    if j > factor:
+                        break
     
     # If minimum magnitude is not specified default value to minimum in catalogue
     if min_mag == -1.0:
@@ -114,6 +191,8 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
         max_mag = max(magnitudes) + 0.1
 
     num_eq = len(magnitudes)
+    max_depth = max(depths)
+    print 'Maximum depth:', max_depth
     print 'Minimum magnitude:', min_mag
     print 'Total number of earthquakes:', num_eq
     num_years = max(years)-min(years)
@@ -258,21 +337,29 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
     ###########################################################################
 
     # Plotting
-    fig = py.scatter(bins_plot, new_cum_annual_rate_plot, label = 'Catalogue')
-    ax = py.gca()
+    fig = py.figure(figsize = (12,10))
+    ax = fig.add_subplot(1,1,1)
+    ax.scatter(bins_plot, new_cum_annual_rate_plot, label = 'Catalogue')
     ax.plot(bins_plot, log_ls_fit, c = 'r', label = 'Least Squares')
     ax.plot(bins_plot, ls_bounded, c = 'r', linestyle ='--', label = 'Least Squares Bounded')
     ax.plot(bins_plot, log_mle_fit, c = 'g', label = 'Maximum Likelihood')
     ax.plot(bins_plot, mle_bounded, c = 'g', linestyle ='--', label = 'Maximum Likelihood Bounded')
     ax.plot(bins_plot, log_fit_data, c = 'b', label = 'b = 1')
     
-    #ax.plot(bins, ls_fit2, c = 'k')
     ax.set_yscale('log')
     ax.legend(loc=1)
     ax.set_ylim([min(new_cum_annual_rate_plot) * 0.1, max(new_cum_annual_rate_plot) * 10.])
     ax.set_xlim([min_mag - 0.5, max_mag + 0.5])
     ax.set_ylabel('Annual probability')
     ax.set_xlabel('Magnitude')
+
+    s = 'Minimum magnitude: %.1f \nNumber earthquakes > min mag: %i \nLS a,b: %.2f, %.2f \nMLE b: %.2f' \
+    % (min_mag, num_eq, a, -1. * b, b_mle)
+    ax.text(min_mag - 0.25, min(new_cum_annual_rate)* 0.5, s, fontsize = '14',
+            bbox=dict(facecolor = 'white', alpha=0.5, pad = 10.))
+    if savefig:
+        py.savefig(figurepath)
+        
     py.show()
 
     # Close input file
