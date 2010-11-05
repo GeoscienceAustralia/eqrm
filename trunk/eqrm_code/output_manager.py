@@ -495,19 +495,124 @@ def load_structures(save_dir, site_tag):
                                attribute_dic['SUBURB']]
     return attribute_dic
 
+def save_event_set_new(THE_PARAM_T, event_set, r_new, compress=False):
+#def save_event_set(THE_PARAM_T, event_set, r_new, compress=False):
+    """Save event_set information to a file.
+
+    event_set  ?
+    r_new      event activity (a list or None)
+    compress   True if file is to be compressed
+    """
+
+    #print('event_set[0]=%s' % type(event_set[0]))
+    #print('event_set=%s' % type(event_set))
+
+    # compress file?
+    open = file
+    if compress:
+        open = myGzipFile
+
+    # prepare output file
+    file_full_name = THE_PARAM_T.output_dir+THE_PARAM_T.site_tag+'_event_set.txt'
+    event_file = open(file_full_name, 'w')    
+
+# TODO: add new column at end here
+    # write column header line
+    event_file.write('%src_index,trace_start_lat,trace_start_lon,'
+                     'trace_end_lat,trace_end_lon,azimuth,dip,atten_model_id,'
+                     'event_activity,Mw,centroid_lat,centroid_lon,depth,'
+                     'rupture_x,rupture_y,length,width,event_index,name\n')
+
+    # This is for speed, at the expense of memory
+    # It is avoiding lots of expensive psudo-event lookups.
+    source_zone_id = event_set.source_zone_id
+    trace_start_lat = event_set.trace_start_lat
+    trace_start_lon = event_set.trace_start_lon
+    trace_end_lat = event_set.trace_end_lat
+    trace_end_lon = event_set.trace_end_lon
+    azimuth = event_set.azimuth
+    dip = event_set.dip
+    att_model_index = event_set.att_model_index
+
+    #name = event_set.name
+    #print('name=%s' % str(name))
+
+    Mw = event_set.Mw
+    rupture_centroid_lat = event_set.rupture_centroid_lat
+    rupture_centroid_lon = event_set.rupture_centroid_lon
+    depth = event_set.depth
+    rupture_x = event_set.rupture_x
+    rupture_y = event_set.rupture_y
+    length = event_set.length
+    width = event_set.width
+
+    # Pseudo_Event_Set will have a index attribute, Event_Set will not.
+    try:
+        index = event_set.index
+    except AttributeError:
+        index = None
+    
+    for i in range(len(event_set)):
+        s = []
+        
+        s.append(str(source_zone_id[i]))
+        s.append(str(trace_start_lat[i]))
+        s.append(str(trace_start_lon[i]))
+        s.append(str(trace_end_lat[i]))
+        s.append(str(trace_end_lon[i]))
+        s.append(str(azimuth[i]))
+        s.append(str(dip[i]))
+        
+        try:
+            s.append(str(att_model_index[i]))
+        except AttributeError:
+            s.append('-1')
+        try:
+            s.append(str(r_new[i]))
+        except (IndexError, TypeError):
+            s.append('-1')
+            
+        s.append(str(Mw[i]))
+        s.append(str(rupture_centroid_lat[i]))
+        s.append(str(rupture_centroid_lon[i]))
+        s.append(str(depth[i]))
+        s.append(str(rupture_x[i]))
+        s.append(str(rupture_y[i]))
+        s.append(str(length[i]))
+        s.append(str(width[i]))
+
+        # Pseudo_Event_Set will have a index attribute, Event_Set will not.
+        if index is None:
+            s.append(str(i))
+        else:
+            s.append(str(index[i]))
+
+        # finally, append the fault name
+        #s.append(name[i])
+        
+        line = ','.join(s)
+        event_file.write(line + '\n')
+
+    event_file.close()
+
+    return file_full_name        # Used in testing
+    
 def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
+#def save_event_set_OLD(THE_PARAM_T,event_set,r_new,compress=False):
     """
     Save event_set information to file.
-    This funtion is called in eqrm analysis.
+    This function is called in eqrm analysis.
 
     r_new is event activity.  It will be a vector or None.
     """
+
     if compress: open = myGzipFile
     else: open = file
 
     file_full_name = THE_PARAM_T.output_dir + THE_PARAM_T.site_tag + \
                      '_event_set.txt'
     event_file=open(file_full_name, 'w')    
+
     event_file.write('%column 1: sourcezone index\n') 
     event_file.write('%column 2: trace_start_lat\n') 
     event_file.write('%column 3: trace_start_lon\n') 
@@ -600,7 +705,44 @@ def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
     event_file.close()
     return file_full_name # Used in testing
     
+def load_event_set_subset_new(saved_dir, site_tag):
+#def load_event_set_subset(saved_dir, site_tag):
+    """Load Mw and event activity from a save file.
+
+    saved_dir  path to directory for the output file
+    site_tag   ?
+
+    Returns a dictionary with labels 'Mw' and 'event_activity'
+    and values of 1D arrays of this info.
+    """
+
+    f = open(os.path.join(saved_dir, site_tag + '_event_set.txt'), 'r')
+    text = f.read().splitlines()
+
+    # skip the first line (comment line)
+    text.pop(0)
+
+    # create dictionary with accumulated MW and activity values
+#    result = {}
+#    for line in text:
+#        split_line = line.split(',')
+#        result.setdefault('Mw', []).append(float(split_line[9]))
+#        result.setdefault('event_activity', []).append(float(split_line[8]))
+
+    result = {'Mw': [], 'event_activity': []}
+    for line in text:
+        split_line = line.split(',')
+        result['Mw'].append(float(split_line[9]))
+        result['event_activity'].append(float(split_line[8]))
+
+    # Convert entries to scipy arrays
+    for k, v in result.items():
+        v = array(v, dtype=float)
+
+    return result      
+
 def load_event_set_subset(saved_dir, site_tag):
+#def load_event_set_subset_OLD(saved_dir, site_tag):
     """
     Load the Mw, and event activity.
 

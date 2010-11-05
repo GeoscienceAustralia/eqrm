@@ -179,9 +179,9 @@ Ch_378_7_pow_8 = math.pow(378.7, 8)
 Ch_3_82_div_8 = 3.82/8.0
 
 def convert_Vs30_to_Z10(Vs30):
-    """Convert a Vs30 value to an estimated V1.0 value.
+    """Convert a Vs30 (m/s) value to an estimated Z1.0 (km) value.
 
-    This function will handle both scalar and scipy array values of Z10.
+    This function will handle both scalar and scipy array values of Vs30.
 
     Formula taken from equation (1) of:
     Chiou.B.S.-J., Youngs R.R., 2008 An NGA Model for the Average Horizontal
@@ -189,11 +189,13 @@ def convert_Vs30_to_Z10(Vs30):
     Earthquake Spectra 24, 173-215.
     """
 
-    return exp(28.5 - Ch_3_82_div_8*log(power(Vs30, 8) + Ch_378_7_pow_8))
+    Z10_m = exp(28.5 - Ch_3_82_div_8*log(power(Vs30, 8) + Ch_378_7_pow_8))
+
+    return Z10_m / 1000.0
 
 
 def convert_Z10_to_Z25(Z10):
-    """Convert a Z1.0 value to a Z2.5 value.
+    """Convert a Z1.0 value (km) to a Z2.5 value (km).
 
     This function will handle both scalar and scipy array values of Z10.
 
@@ -204,6 +206,27 @@ def convert_Z10_to_Z25(Z10):
     """
 
     return 0.519 + 3.595*Z10
+
+
+def convert_Vs30_to_Z25(Vs30):
+    """Conversion from nga_gm_tmr.for.
+    This code has no provenance apart from that fact that it is used in the Boore
+    FORTRAN for the CB08 model.  We need to find out why the Boore FORTRAN uses this
+    conversion and what is the justification.
+
+    Vs30 is in m/s.  Result Z25 in km.
+    """
+
+    if Vs30 < 180.0:
+        Z10 = math.exp(6.745)
+    elif Vs30 > 500.0:
+        Z10 = math.exp(5.394 - 4.48*math.log(Vs30/500.0))
+    else:
+        Z10 = math.exp(6.745 - 1.35*math.log(Vs30/180.0))
+
+    Z25 = 0.519 + 3.595*(Z10/1000.0)
+
+    return Z25
 
 
 def azimuth_of_trace(start_lat, start_lon, end_lat, end_lon):

@@ -162,7 +162,7 @@ def main(path=None):
                   "         You must do 'ssh -X <machine>' to run these tests.")
 
     suite, moduleNames = regressionTest(path=path)
-    runner = unittest.TextTestRunner() # verbosity=2)
+    runner = unittest.TextTestRunner() #verbosity=2)
     test_result = runner.run(suite)
     
     # moduleNames is used for do_coverage
