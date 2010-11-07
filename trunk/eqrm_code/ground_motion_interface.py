@@ -3238,6 +3238,8 @@ def Campbell08_distribution(**kwargs):
 
     periods = array(periods)
 
+#    print('periods=%s' % str(periods.flatten()))
+
     # get required distances
     Rrup = dist_object.Rupture
     Rjb = dist_object.Joyner_Boore
@@ -3397,7 +3399,7 @@ def Campbell08_distribution(**kwargs):
 
     # Hanging-Wall Term
     Rmax = maximum(Rrup, sqrt(Rjb**2 + 1.0))	## numpy max?
-    f_hngR = zeros(Rjb.shape)
+    f_hngR = ones(Rjb.shape) * (Rrup - Rjb)/Rrup
     f_hngR = where(Ztor < 1.0, (Rmax - Rjb)/Rmax, f_hngR)
     f_hngR = where(Rjb == 0.0, 1.0, f_hngR)
 
@@ -3617,6 +3619,12 @@ def Campbell08_distribution(**kwargs):
     f_sed = where(Z25 <= 3.0, 0.0, f_sed)
     f_sed = where(Z25 < 1.0, c11T*(Z25 - 1.0), f_sed)
 
+#    print('Z25=%s' % str(Z25.flatten()))
+#    print('c11T=%s' % str(c11T.flatten()))
+#    print('c12T=%s' % str(c12T.flatten()))
+#    print('k3T=%s' % str(k3T.flatten()))
+#    print('f_sed=%s' % str(f_sed.flatten()))
+
 #C.....
 #C.....Calculate Ground Motion Parameter
 #C.....
@@ -3625,6 +3633,13 @@ def Campbell08_distribution(**kwargs):
 
     # Calculate Ground Motion Parameter
     Y = exp(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
+
+#    print('f_mag=%s' % str(f_mag.flatten()))
+#    print('f_dis=%s' % str(f_dis.flatten()))
+#    print('f_flt=%s' % str(f_flt.flatten()))
+#    print('f_hng=%s' % str(f_hng.flatten()))
+#    print('f_site=%s' % str(f_site.flatten()))
+#    print('Y=%s' % str(Y.flatten()))
 
 #C.....
 #C.....Check Whether Y < PGA at Short Periods
@@ -3635,6 +3650,8 @@ def Campbell08_distribution(**kwargs):
     # Check Whether Y < PGA at Short Periods - use PGA if so
     short_period = logical_and(periods >= 0.0, periods <= 0.25)
     Y = where(logical_and(short_period, Y < PGA), PGA, Y)
+
+#    print('Final Y=%s' % str(Y.flatten()))
 
 #C.....
 #C.....CALCULATE ALEATORY UNCERTAINTY
