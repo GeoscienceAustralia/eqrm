@@ -1292,37 +1292,40 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 
         # a fake dist_object class
-        # assume Rrup=5 and Rjb=5
+        # assume Rjb=5 and Rjb=11.18...
         class DistObj(object):
             def __init__(self):
                 self.Rupture = numpy.array([[11.180340]])
                 self.Joyner_Boore = numpy.array([[5.0]])
 
-        period = 0.01
+        rtol = 1.0E-4
+        atol = 1.0E-4
+
+        period = 0.20
         periods = numpy.array([period])
         dist_object = DistObj()
-        ML = numpy.array([[[4.0]]])
+        ML = numpy.array([[[7.0]]])
         depth = numpy.array([[[10.0]]])
-        dip = numpy.array([[[90.0]]])
+        dip = numpy.array([[[45.0]]])
         fault_type = numpy.array([[[2]]], dtype=int)	# SS
         Vs30 = numpy.array([200.0])
         Z25 = numpy.array([conversions.convert_Vs30_to_Z25(200.0)])
 
         # get coeffs for this period (C0 -> K3 from table 2)
-        coeffs = numpy.array([[[[-1.715]]], [[[0.500]]],  [[[-0.530]]],
-                              [[[-0.262]]], [[[-2.118]]], [[[0.170]]],
-                              [[[5.60]]],   [[[0.280]]],  [[[-0.120]]],
-                              [[[0.490]]],  [[[1.058]]],  [[[0.040]]],
-                              [[[0.610]]],  [[[865]]],    [[[-1.186]]],
-                              [[[1.839]]],  [[[1.88]]],   [[[1.18]]]])
+        coeffs = numpy.array([[[[-0.486]]], [[[0.500]]], [[[-0.446]]],
+                              [[[-0.398]]], [[[-2.220]]], [[[0.17]]],
+                              [[[7.60]]], [[[0.280]]], [[[-0.012]]],
+                              [[[0.490]]], [[[2.194]]], [[[0.040]]],
+                              [[[0.610]]], [[[748]]], [[[-2.188]]],
+                              [[[1.856]]], [[[1.88]]], [[[1.18]]]])
 
         # sigma coefficients for this period (ElnY -> rho from table 3)
-        sigma_coeffs = numpy.array([[[[0.478]]], [[[0.219]]], [[[0.300]]], [[[0.166]]], [[[1.000]]]])
-
+        sigma_coeffs = numpy.array([[[[0.534]]], [[[0.249]]], [[[0.300]]],
+                                    [[[0.186]]], [[[0.871]]]])
 
         # expected values from Campbell08_check.py
-        log_mean_expected = numpy.array([[[math.log(5.40986434E-02)]]])
-        sigma_expected = numpy.array([[[5.035E-01]]])
+        log_mean_expected = numpy.array([[[math.log(5.22100E-01)]]])
+        sigma_expected = numpy.array([[[4.76798E-01]]])
 
         (log_mean, sigma) = model.distribution(dist_object=dist_object,
                                                mag=ML, periods=periods,
@@ -1339,13 +1342,13 @@ class Test_ground_motion_interface(unittest.TestCase):
         msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_mean=%s, expected=%s'
                % (period, ML, 5.0, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
-                                         rtol=1.0e-4, atol=1.0e-4),
+                                         rtol=rtol, atol=atol),
                                  msg)
 
         msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: sigma=%s, expected=%s'
                % (period, ML, 5.0, str(sigma), str(sigma_expected)))
         self.failUnless(allclose(asarray(sigma), sigma_expected,
-                                         rtol=1.0e-4, atol=1.0e-4),
+                                         rtol=rtol, atol=atol),
                                  msg)
 
     def test_Campbell08_SS1(self):
@@ -1363,9 +1366,10 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         ######
         # period = 0.01, ML=5.0, Rrup=200.0, Rjb=199.9
-        # expect lnY=math.log(2.7675e-3) (from Campbell08_check.py)
-        #        E=4.7793e-1
         ######
+
+        rtol = 1.0E-4
+        atol = 1.0E-4
 
         period = 0.01
         periods = numpy.array([period])
@@ -1407,13 +1411,13 @@ class Test_ground_motion_interface(unittest.TestCase):
         msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_mean=%s, expected=%s'
                % (period, ML, 10.0, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
-                                         rtol=1.0e-4, atol=1.0e-4),
+                                         rtol=rtol, atol=atol),
                                  msg)
 
         msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_sigma=%s, expected=%s'
                % (period, ML, 10.0, str(log_sigma), str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
-                                         rtol=1.0e-4, atol=1.0e-4),
+                                         rtol=rtol, atol=atol),
                                  msg)
 
     def test_Campbell08_SS1(self):
@@ -1426,27 +1430,25 @@ class Test_ground_motion_interface(unittest.TestCase):
         # assume Rrup=200 and Rjb=199.9
         class DistObj(object):
             def __init__(self):
-                self.Rupture = numpy.array([[2.0000e+2]])
-                self.Joyner_Boore = numpy.array([[1.9990e+2]])
+                self.Rupture = numpy.array([[2.0025e+2]])
+                self.Joyner_Boore = numpy.array([[2.0000e+2]])
 
         ######
-        # period = 0.01, ML=5.0, Rrup=200.0, Rjb=1.999
-        # expect lnY=math.log(2.7675e-3) (from Campbell08_check.py)
-        #        lnE=math.log(4.7793e-1)
+        # period = 0.01, ML=5.0, Rrup=200.25, Rjb=200.0
         ######
 
-        rtol = 5.0E-2
-        atol = 5.0E-2
+        rtol = 1.0E-4
+        atol = 1.0E-4
 
         period = 0.01
         periods = numpy.array([period])
         dist_object = DistObj()
         ML = numpy.array([[[5.0]]])
-        depth = numpy.array([[[5.0]]])
+        depth = numpy.array([[[10.0]]])
         dip = numpy.array([[[90.0]]])
         fault_type = numpy.array([[[2]]], dtype=int)	# SS
-        Vs30 = numpy.array([760.0])
-        Z25 = numpy.array([conversions.convert_Vs30_to_Z25(760.0)])
+        Vs30 = numpy.array([800.0])
+        Z25 = numpy.array([conversions.convert_Vs30_to_Z25(800.0)])
 
         # get coeffs for this period (C0 -> K3 from table 2)
         coeffs = numpy.array([[[[-1.715]]], [[[0.500]]],  [[[-0.530]]],
@@ -1460,8 +1462,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         sigma_coeffs = numpy.array([[[[0.478]]], [[[0.219]]], [[[0.300]]], [[[0.166]]], [[[1.000]]]])
 
         # expected values from Campbell08_check.py
-        log_mean_expected = numpy.array([[[math.log(2.7675e-3)]]])
-        log_sigma_expected = numpy.array([[[4.7793e-1]]])
+        log_mean_expected = numpy.array([[[-5.924202]]])
+        log_sigma_expected = numpy.array([[[0.525742]]])
 
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
                                                    mag=ML, periods=periods,
@@ -1506,8 +1508,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # period = 0.2, ML=7.0
         ######
 
-        rtol = 5.0e-3
-        atol = 5.0e-3
+        rtol = 1.0e-4
+        atol = 1.0e-4
 
         period = 0.2
         periods = numpy.array([period])
@@ -1517,7 +1519,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         dip = numpy.array([[[90.0]]])
         fault_type = numpy.array([[[2]]], dtype=int)	# SS
         Vs30 = numpy.array([1000.0])
-        Z25 = numpy.array([conversions.convert_Vs30_to_Z25(760.0)])
+        Z25 = numpy.array([conversions.convert_Vs30_to_Z25(1000.0)])
 
         # get coeffs for this period (C0 -> K3 from table 2)
         coeffs = numpy.array([[[[-0.486]]], [[[0.500]]], [[[-0.446]]],
@@ -1578,8 +1580,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # period = 0.01, M=7.0
         ######
 
-        rtol = 5.0e-3
-        atol = 5.0e-3
+        rtol = 1.0e-4
+        atol = 1.0e-4
 
         period = 0.01
         periods = numpy.array([period])
@@ -1649,8 +1651,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # period = 0.01, M=7.0
         ######
 
-        rtol = 5.0e-3
-        atol = 5.0e-3
+        rtol = 1.0e-4
+        atol = 1.0e-4
 
         period = 0.01
         periods = numpy.array([period])
@@ -2049,8 +2051,6 @@ class Test_ground_motion_interface(unittest.TestCase):
                                                    Vs30 = Vs30,coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
-##        print log_mean
-
         # tests for equality should be quite tight as we check against
         # Campbell03_check.py
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
