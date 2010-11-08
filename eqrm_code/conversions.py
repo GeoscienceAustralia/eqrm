@@ -210,13 +210,19 @@ def convert_Z10_to_Z25(Z10):
 
 def convert_Vs30_to_Z25(Vs30):
     """Conversion from nga_gm_tmr.for.
-    This code has no provenance apart from that fact that it is used in the Boore
-    FORTRAN for the CB08 model.  We need to find out why the Boore FORTRAN uses this
-    conversion and what is the justification.
+    This code is not referenced in the original FORTRAN, but it does appear in
+    the literature.  The formula to estimate Z1.0 from Vs30 is in [1].  The 
+    estimate of Z2.5 from Z1.0 appears in [2]
+
+    [1] Eqn (17), page 79 of Earthquake Spectra, Volume 24, number 1.
+    [2] Campbell,K.W., and Bozorgnia, Y., Campbell-Bosorgnia NGA GRound Motion
+        Relations for the Geometric Mean Horizontal Component of Peak and
+        Spectral Ground Motion Parameters, PEER 2007/02, May 2007.
 
     Vs30 is in m/s.  Result Z25 in km.
     """
 
+    # part A - convert Vs30 to Z1.0
     if Vs30 < 180.0:
         Z10 = math.exp(6.745)
     elif Vs30 > 500.0:
@@ -224,6 +230,7 @@ def convert_Vs30_to_Z25(Vs30):
     else:
         Z10 = math.exp(6.745 - 1.35*math.log(Vs30/180.0))
 
+    # part B - convert Z1.0 to Z2.5
     Z25 = 0.519 + 3.595*(Z10/1000.0)
 
     return Z25
