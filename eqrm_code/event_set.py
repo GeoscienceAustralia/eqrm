@@ -972,7 +972,10 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
             r_start_lat= r_start_lat_temp
             r_start_lon= r_start_lon_temp
             
+            
             #Now flip the rupture trace for those events with dip >90 Degrees
+            k= where(rupture_dip>=180)
+            rupture_dip[k] = rupture_dip[k]-180
             k= where(rupture_dip>90)
             fault_azimuth[k]=fault_azimuth[k]+180
             rupture_dip[k] = 180- rupture_dip[k]

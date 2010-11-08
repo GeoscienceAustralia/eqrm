@@ -26,14 +26,38 @@ class Test_Sliprate_functions(unittest.TestCase):
         prob_min_mag_cutoff = 4.0
         slip_rate_mm=2.0
         area_kms= float(30*10)
-        prob_number_of_mag_sample_bins=200
-        b = 1.
-        bin_centroids = make_bins(prob_min_mag_cutoff,max_magnitude,
-                                  prob_number_of_mag_sample_bins)
-        event_bins=r_[0:prob_number_of_mag_sample_bins]
-        event_bins=sorted(event_bins)
-        (width,length)=Wells_and_Coppersmith_94("normal", bin_centroids, 15, 30)
+        prob_number_of_mag_sample_bins=20
+        num_events =1000
+        magnitudes = r_[4.003:6.997:num_events*1j]
+        print magnitudes
         
+        b = 1.
+       
+        #hack changed to guten
+        bin_centroids = make_bins(prob_min_mag_cutoff,max_magnitude,
+                                  prob_number_of_mag_sample_bins,
+                                 'characteristic')
+        #event_bins=r_[0:num_events]
+        #event_bins=sorted(event_bins)
+       
+
+       
+        event_bins = assign_event_bins(magnitudes, prob_min_mag_cutoff,max_magnitude,
+                                  prob_number_of_mag_sample_bins,
+                                  'characteristic')
+        
+        #(width,length)=Wells_and_Coppersmith_94("normal", bin_centroids, 15, 30)
+#        event_bins = array([int(i) for i in
+#                                (event_set.Mw[event_ind]
+#                                 -zone_mlow)/delta_mag])
+#
+#        
+#        m2=0.5
+#        m_c=max_magnitude-m2
+#        k =where(event_set.Mw[event_ind]>=m_c)
+#        event_bins[k]=num_of_mag_sample_bins-1
+                
+           
         lon1=144
         lat1=(0,45,60,85)
         
@@ -55,6 +79,7 @@ class Test_Sliprate_functions(unittest.TestCase):
                                             max_magnitude,
                                             slip_rate_mm,area_kms)
         print "\nA_min from slip rate GR: ", A_min 
+        
         A_minCharacteristic= calc_A_min_from_slip_rate_Characteristic(b,
                                                                       prob_min_mag_cutoff,
                                                                       max_magnitude,
@@ -62,10 +87,18 @@ class Test_Sliprate_functions(unittest.TestCase):
                                                                       area_kms)
         print "\nA_min from -slip rate Characteristic: ", A_minCharacteristic 
         print "\n bin centroids(magnitudes): ",bin_centroids
-        pdfs= calc_activities_from_slip_rate_Characteristic(bin_centroids, b, 
+#        pdfs= calc_activities_Characteristic(bin_centroids, b, 
+#                                                              prob_min_mag_cutoff, 
+#                                                              max_magnitude)
+
+        pdfs =calc_activities_Characteristic(bin_centroids, b, 
                                                               prob_min_mag_cutoff, 
-                                                              max_magnitude)
-        #print "\npdfs  from -slip rate Characteristic: ", pdfs
+                                                              max_magnitude,
+                                            prob_number_of_mag_sample_bins)
+        
+                  
+     
+        #print "\npdfs  from -Characteristic: ", pdfs
         print "calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,recurr_dist,\
                               lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip ",\
                               (calc_A_min_from_slip_rate(b,prob_min_mag_cutoff,\
@@ -77,8 +110,19 @@ class Test_Sliprate_functions(unittest.TestCase):
         event_activity_source = array(
                 [(A_minCharacteristic*pdfs[z]/(sum(where(
                 event_bins == z, 1,0)))) for z in event_bins])
+        
+#        pdfs= calc_activities_Characteristic(magnitudes, b, 
+#                                                              prob_min_mag_cutoff, 
+#                                                              max_magnitude)
+#        event_activity_source =A_minCharacteristic*pdfs
+#        
         #print "\nevent activity: ", event_activity_source
         print "\nsum event activity: ", sum(event_activity_source)
+        
+        for i in range(len(magnitudes)):
+            print magnitudes[i],", ", event_activity_source[i]
+        
+        print
         
         t = arange(0.01, 20.0, 0.01)
         plt.figure()
@@ -86,8 +130,8 @@ class Test_Sliprate_functions(unittest.TestCase):
         plt.title('Characteristic PDF')
         plt.xlabel('magnitude')
         plt.ylabel('probability')
-        plt.plot(bin_centroids[0:-1],pdfs[0:-1])
-        plt.ylim(0.00,0.04)
+        plt.plot(bin_centroids[:],pdfs[:])
+        plt.ylim(0.00,0.6)
         plt.xlim(4,7)
         plt.savefig('pdf_characteristic.png')
 
@@ -96,21 +140,21 @@ class Test_Sliprate_functions(unittest.TestCase):
         plt.title('Characteristic Event Activity')
         plt.xlabel('magnitude')
         plt.ylabel('events/year')
-        plt.plot(bin_centroids[0:-1],event_activity_source[0:-1])
-        plt.ylim(0.00,0.001)
+        plt.plot(magnitudes[:],event_activity_source[:])
+        plt.ylim(0.00,0.01)
         plt.xlim(4,7)
         plt.savefig('characteristic_event_activity.png')
         
         plt.figure()
         plt.semilogy(t, exp(-t/5.0))
         event_activity_source=event_activity_source[::-1]
-        bin_centroids=bin_centroids[::-1]
+        bin_centroids=magnitudes[::-1]
         cumulative_event_activity= cumsum(event_activity_source)
         plt.title('Cumulative Characteristic Event Activity')
         plt.xlabel('magnitude')
         print " (max = " , max(cumulative_event_activity), ")"
         plt.ylabel('cumulative events/year')
-        plt.plot(bin_centroids[0:-1],cumulative_event_activity[:-1])
+        plt.plot(bin_centroids[:],cumulative_event_activity[:])
         plt.ylim(0.00,0.04)
         plt.xlim(4,7)
         plt.savefig('Cumulative_chrctrstc_event_activity.png')

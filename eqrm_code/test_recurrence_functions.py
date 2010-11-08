@@ -97,7 +97,7 @@ class Test_Recurrence_functions(unittest.TestCase):
                                             slip_rate_mm,area_kms)
         self.assert_(allclose(A_min,0.0253104984335))
 
-    def test_calc_activities_from_slip_rate_Characteristic(self):
+    def test_calc_activities_Characteristic(self):
         max_magnitude = 7.0
         prob_min_mag_cutoff = 4.0
         slip_rate_mm=2.0
@@ -114,7 +114,7 @@ class Test_Recurrence_functions(unittest.TestCase):
                                             max_magnitude,
                                             slip_rate_mm,area_kms)
         
-        pdfs= calc_activities_from_slip_rate_Characteristic(bin_centroids, b, 
+        pdfs= calc_activities_Characteristic(bin_centroids, b, 
                                                               prob_min_mag_cutoff, 
                                                               max_magnitude,
                                                               prob_number_of_mag_sample_bins)
