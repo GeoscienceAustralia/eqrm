@@ -93,7 +93,7 @@ def calc_event_activity(event_set, source_model):
                 
             
             elif source.recurrence_model_distribution=='characteristic':
-                grpdf=calc_activities_from_slip_rate_Characteristic(
+                grpdf=calc_activities_Characteristic(
                     mag_bin_centroids, 
                     zone_b, zone_mlow,
                     zone_mhgh,
@@ -307,21 +307,32 @@ def calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,slip_rate_mm,area_kms):
         
     return lambda_m
 
-def calc_activities_from_slip_rate_Characteristic(magnitude,b,m0,mMax,
+def calc_activities_Characteristic(magnitude,b,m0,mMax,
                                                   num_of_bins):
+    """Calculate the the A_min for a fault using slip rate using the 
+       characteristic reccurence distribution.  
+       b             b
+       mMin          recurrance_min_mag
+       mMax          recurrance_max_mag
+       slip_rate_mm  slip_rate of fault in mm
+       area_kms      area in kms of the fault
+    
+    Returns A_min for a fault.
+    """
     m2=0.5
     m_c=mMax-m2
         
     n_bin_width= (m_c-m0)/(num_of_bins)
     char_bin_width=m2
 
-    pdfs_tmp =calc_activity_from_slip_rate_Characteristic(magnitude,b,m0,mMax)          
+    pdfs_tmp =calc_activity_Characteristic(magnitude,b,m0,mMax)          
     i = where(magnitude > m_c)
     pdfs_tmp[i]= pdfs_tmp[i] *(char_bin_width/n_bin_width)
+    
     pdfs=pdfs_tmp/sum(pdfs_tmp)
     return pdfs
 
-def calc_activity_from_slip_rate_Characteristic(magnitude,b,m0,mMax):
+def calc_activity_Characteristic(magnitude,b,m0,mMax):
     m2=0.5
     m1=1.0
     beta=log(10)*b
