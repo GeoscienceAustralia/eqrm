@@ -917,9 +917,18 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                                                r_start_lon, 
                                                fault_azimuth, 
                                                rup_length)
-        
-        r_depth_min = depth_top + (0.5*rup_width) * sin(radians(fault_dip))
-        r_depth_max = depth_bottom - (0.5*rup_width) * \
+        if (slab_width > 0)and (out_of_dip_theta is not None):
+            rupture_dip = out_of_dip_theta + fault_dip
+             #for all dips greater than 180; subtract 180
+            k= where(rupture_dip>=180)
+            rupture_dip[k] = rupture_dip[k]-180
+               
+            r_depth_min = depth_top + (0.5*rup_width) * sin(radians(rupture_dip))
+            r_depth_max = depth_bottom - (0.5*rup_width) * \
+                      sin(radians(rupture_dip))
+        else:    
+            r_depth_min = depth_top + (0.5*rup_width) * sin(radians(fault_dip))
+            r_depth_max = depth_bottom - (0.5*rup_width) * \
                       sin(radians(fault_dip))
 
         
@@ -950,7 +959,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         
         
         if ((slab_width > 0)&(out_of_dip_theta is not None)):
-            rupture_dip = out_of_dip_theta + fault_dip
+            
             r_x_start = 0.0
             r_y_start = r_y_centroid -(r_depth_centroid * 
                                       ((cos(radians(rupture_dip)))/
@@ -973,10 +982,7 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
             r_start_lon= r_start_lon_temp
             
             
-            #for all dips greater than 180; subtract 180
-            k= where(rupture_dip>=180)
-            rupture_dip[k] = rupture_dip[k]-180
-            
+           
              #Now flip the rupture trace for those events with dip >90 Degrees
             k= where(rupture_dip>90)
             fault_azimuth[k]=fault_azimuth[k]+180
