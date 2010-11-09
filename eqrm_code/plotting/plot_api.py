@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 """
-All plot modules.
+This is the client facing api of all of the plotting modules.
+The data file formats are assumed to be the EQRM data file formats.
+
+These functions should link lower level functions, such as loading data,
+processing dta and graphing the data together.
 
 Copyright 2009 by Geoscience Australia
 
@@ -32,7 +36,7 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period, output_dir,
                 annotate=[]):
     """Plot an earthquake hazard map.
 
-    input_dir     directory containing input data files
+    input_dir     directory containing EQRM input data files
     site_tag      event descriptor string
     soil_amp      True for results with soil amplification,
                   False for the bedrock results.
