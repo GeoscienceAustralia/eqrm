@@ -27,6 +27,7 @@ input_dir = r".\input/"
 output_dir = r".\output\scen_gm/" 
 use_site_indexes = True
 site_indexes = [2997, 2657, 3004, 3500]
+fault_source_tag = "no_fault" 
 
 # Scenario input
 scenario_azimuth = 340

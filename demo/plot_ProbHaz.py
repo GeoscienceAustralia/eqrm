@@ -26,7 +26,7 @@ return_periods = [7500, 10000]
 input_dir = r".\input/" 
 output_dir = r".\output\plot_prob_haz/" 
 use_site_indexes = False
-site_indexes = 2255
+fault_source_tag = "no_fault" 
 
 # Scenario input
 
