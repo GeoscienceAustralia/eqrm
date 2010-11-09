@@ -302,32 +302,34 @@ class Fault_Source_Generator(object):
                                             self.out_of_dip_theta_dist,n))
         
         
-        #temp   = array( [where((out_of_dip > (175-dip) and out_of_dip < 
-        #                        (185-dip)), 1,0) for z in out_of_dip])
-        
-        numErr = sum(where(((out_of_dip > (175-dip)) & 
-                          (out_of_dip < (185-dip))),1,0))
-        
-        if numErr > 0:
-            errorIndexes=where((out_of_dip > (175-dip)) &
+        (errorIndexes,) = where((out_of_dip > (175-dip)) &
                                      (out_of_dip < (185-dip)))
-            for i in errorIndexes[0]:
-                if True: #((out_of_dip[i] > (175-dip)) & ((out_of_dip[i] < (185-dip)))):
-                    blnBadNum =True
-                    count=0
-                    while blnBadNum:
-                        newNum=self.populate_distribution(
-                                                     self.out_of_dip_theta_dist,1)
-                        if ((newNum <= (175-dip)) | (newNum >= (185-dip))):
-                            blnBadNum=False
-                        count = count +1
-                        if count>1000:
-                            msg = "Bad out of dip theta range in fault \
-                                     source file"
-                            raise IOError(msg)
-                    out_of_dip[i]=newNum[0]
         
+        if len(errorIndexes) > 0:
+            for i in errorIndexes:
+                blnBadNum =True
+                count=0
+                while blnBadNum:
+                    newNum=self.populate_distribution(
+                                                self.out_of_dip_theta_dist,1)
+                    if ((newNum[0] <= (175-dip)) | (newNum[0] >= (185-dip))):
+                        blnBadNum=False
+                    count = count +1
+                    if count>1000:
+                        msg = "Bad out of dip theta range in fault \
+                                     source file"
+                        raise IOError(msg)
+                out_of_dip[i]=newNum[0]
+        (errorIndexes,) = where((out_of_dip > (175-dip)) &
+                                     (out_of_dip < (185-dip)))
+        
+        if len(errorIndexes) > 0:
+            msg = "Bad out of dip theta range in fault \
+                                     source file"
+            raise IOError(msg)
+            
         return out_of_dip
+    
     def populate_magnitude(self,n):
         return self.populate_distribution(self.magnitude_dist,n)
     
