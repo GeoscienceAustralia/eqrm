@@ -247,10 +247,13 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnlessEqual(fault.event_type, 'crustal fault')
         expected = {'distribution': 'constant', 'mean': 30.0}
         self.failUnlessEqual(fault.dip_dist, expected)
+        
         expected = {'distribution': 'uniform', 'minimum': 0.0, 'maximum': 0.0}
         self.failUnlessEqual(fault.out_of_dip_theta_dist, expected)
+        
         expected = {'distribution': 'constant', 'mean': 0.0}
         self.failUnlessEqual(fault.depth_top_seismogenic_dist, expected)
+        
         expected = {'distribution': 'constant', 'mean': 15.0}
         self.failUnlessEqual(fault.depth_bottom_seismogenic_dist, expected)
         self.failUnlessEqual(fault.slab_width, 0.0)
@@ -284,7 +287,16 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnlessEqual(fault.dip_dist, expected)
         self.failUnlessEqual(fault.A_min, 0.58)
         self.failUnlessEqual(fault.number_of_events, 3000)
-
+        
+        #test for populate_out_of_dip_theta
+        fault.out_of_dip_theta_dist={'distribution': 'uniform', 'minimum': 83,
+                                'maximum': 98}
+        out_of_dip= fault.populate_out_of_dip_theta(100,90.0)
+        (errorIndexes,) = where((out_of_dip > (175-90)) &
+                                     (out_of_dip < (185-90)))
+        
+        self.failUnlessEqual(len(errorIndexes),0)
+        
 ################################################################################
 
 if __name__ == "__main__":
