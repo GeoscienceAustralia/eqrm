@@ -5,6 +5,8 @@ A plot module to draw contoured XYZ data onto a GMT map.
  
 Copyright 2007 by Geoscience Australia
 
+Usage: plot_gmt_xyz_contour.py <data_file>
+
 """
 
 
@@ -56,7 +58,6 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     show_graph   if True try to display final image in system-independant way
     map_extent   set the extent of the displayed map if supplied
                  (get extent from data if not supplied)
-
     """
 
     # create a scratch directory for ephemeral files
@@ -71,7 +72,7 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
 
     # if no colourmap supplied, use default
     c_map = ColourMap
-    if colourmap:
+    if colourmap is not None:
         c_map = colourmap
 
     # get maximum and minimum values
@@ -98,7 +99,7 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     if cb_steps is None:
         cb_steps = []
     if len(cb_steps) > 0:
-        util.make_discrete_cpt_from_seq(my_cpt_file, cb_steps)
+        util.make_discrete_cpt(my_cpt_file, c_map, cb_steps)
     else:
         (start, stop, step) = util.get_scale_min_max_step(max_val, min_val)
         cm = util.get_colourmap(c_map)
@@ -133,8 +134,9 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     # draw the colorbar
     if cb_label:
         x_offset = cfg.MapWidthCentimetres + 0.5 
-        util.do_cmd('psscale -K -O -E -C%s -D%.1fc/8.0c/9.0c/0.8c "-B:%s:" >> %s'
-                    % (my_cpt_file, x_offset, cb_label, my_ps_file))
+        y_offset = cfg.MapHeightCentimetres/2.0 - 1.75
+        util.do_cmd('psscale -K -O -E -C%s -D%.1fc/%.1fc/9.0c/0.8c "-B:%s:" >> %s'
+                    % (my_cpt_file, x_offset, y_offset, cb_label, my_ps_file))
 
     # draw the rest of the map
     t_opt = ''
@@ -180,10 +182,23 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
 
 
 if __name__ == '__main__':
+    import sys
+    import getopt
+    import plot_api
+
     def usage(msg=None):
         if msg:
             print(msg+'\n')
         print(__doc__)        # module docstring used
+
+
+    def do_example(datafile, outfile):
+        plot_api.fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
+                            output_dir, plot_file=plotfile, save_file=save_file,
+                            title=title, np_posn=np_posn, s_posn=s_posn,
+                            cb_steps=cb_steps, annotate=annotate,
+                            colourmap=colourmap, cb_label=cb_label)
+
     
     
     def main(argv=None):

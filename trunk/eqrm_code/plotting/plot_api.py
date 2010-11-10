@@ -76,6 +76,7 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period, output_dir,
         pgxc.plot_gmt_xyz_contour(data, plot_file, title=title,
                                   np_posn=np_posn, s_posn=s_posn,
                                   cb_label=cb_label, cb_steps=cb_steps,
+                                  colourmap=colourmap,
                                   annotate=annotate)
 
 
