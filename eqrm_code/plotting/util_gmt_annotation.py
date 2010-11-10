@@ -38,14 +38,14 @@ def generated_annotation(tmpdir, psfile, extent, mapsize, jok_opt):
     txt_file = os.path.join(tmpdir, 'data.txt')
 
     # get string we are going to use
-    ann_str = time.strftime('Generated at %H:%M:%S on %d %b %Y')
+    ann_str = time.strftime('@:4:Generated at %H:%M:%S on %d %b %Y')
 
     # figure out where we are going to put the annotation
     # -1.0c from origin, -1.0c down
     (ll_lat, ll_lon, ur_lat, ur_lon) = extent
     vert_deg = (ur_lat - ll_lat)
-    offset_lon = ll_lon - (vert_deg/mapsize)*1.0
-    offset_lat = ll_lat - (vert_deg/mapsize)*1.0
+    offset_lon = ll_lon - (vert_deg/mapsize)*2.0
+    offset_lat = ll_lat - (vert_deg/mapsize)*2.0
 
     r_opt = '-R%f/%f/%f/%f' % (ll_lon, ur_lon, ll_lat, ur_lat)
 

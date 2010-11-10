@@ -17,6 +17,7 @@ import numpy as num
 import copy
 import glob
 import atexit
+import re
 
 import eqrm_code.plotting.plot_config as cfg
 import eqrm_code.eqrm_filesystem as ef
@@ -201,7 +202,6 @@ def make_discrete_cpt(filename, colourmap, seq):
     filename   path to CPT file to create
     colourmap  colourmap to base new CPT on (path or name)
     seq        sequence describing required CPT: [val, val, ...]
-
     """
 
     # create a scratch directory for ephemeral files
@@ -285,6 +285,106 @@ def make_discrete_cpt_from_seq(filename, seq):
     fd.close()
 
 
+def make_discrete_cpt_from_cpt(filename, seq, cpt):
+    """Make a discrete CPT file from a continuous CPT.
+
+    filename   path to CPT file to create
+    seq        sequence of values from user to set output CPT steps
+               eq, [v1, v2, v3, ..., vn] (sorted, least to most)
+    cpt        CPT name input from the user.
+
+    The input continuous CPT will have contents like this:
+    ---------------
+    #	cpt file created by: hand (from AIFDR algorithm)
+    #COLOR_MODEL = RGB
+    #
+    0.0     128     64      255     0.25    128     255     0
+    0.25    128     255     0       1.0     255     64      0
+    B	64      64	255
+    F	255     128     0
+    N	255	255	255
+    ---------------
+    """
+
+    def get_rgb(cpt_seq, bucket_num, num_buckets):
+        """Get RGB tuple for Nth bucket in CPT sequence.
+
+        cpt_seq      is CPT sequence of (start, rgb, end, rgb)
+        bucket_num   is the number of the bucket we want
+        num_buckets  is number of buckets in final CPT
+
+        The idea is to convert a bucket_num to a 0.0-1.0 value,
+        find the RGB tuple for that ordinal and return it.
+        """
+
+        bucket_size = 1.0 / num_buckets
+        ordinal = bucket_size * bucket_num
+
+        for (start, rgb1, end, rgb2) in cpt_seq:
+            if ordinal >= start:
+                overall_delta = end - start
+                ordinal_fraction = (ordinal - start) / overall_delta
+                (r1, g1, b1) = rgb1
+                (r2, g2, b2) = rgb2
+                r_delta = r2 - r1
+                g_delta = g2 - g1
+                b_delta = b2 - b1
+                r = int(r1 + r_delta*ordinal_fraction)
+                g = int(g1 + g_delta*ordinal_fraction)
+                b = int(b1 + b_delta*ordinal_fraction)
+                return (start, end, (r, g, b))
+
+        raise Exception("Couldn't find interpolated bucket RGB")
+
+
+    print('make_discrete_cpt_from_cpt: %s' % str(cpt))
+    print('make_discrete_cpt_from_cpt: seq=%s' % str(seq))
+
+    # sort the users seq first, just in case
+    seq.sort()
+
+    # read the input CPT  file
+    # model is a string containing 'COLOR_MODEL=???'
+    # seq : [(start, rgb, end, rgb), ...]
+    # end is a set of final lines
+    (cpt_model, cpt_seq, cpt_end) = read_cpt_file(cpt)
+
+    print('make_discrete_cpt_from_cpt: cpt_model=%s' % str(cpt_model))
+    print('make_discrete_cpt_from_cpt: cpt_seq=%s' % str(cpt_seq))
+    print('make_discrete_cpt_from_cpt: cpt_end=%s' % str(cpt_end))
+
+    # create a set of colourmap ranges from user seq
+    num_buckets = len(seq) - 1
+    bucket_size = 1.0 /num_buckets
+    ranges = []
+    for (i, v) in enumerate(seq[:-1]):
+        next_v = seq[i+1]
+        (start, stop, rgb) = get_rgb(cpt_seq, i, num_buckets)
+        range = [start, rgb, stop, rgb]
+        ranges.append(range)
+
+    # start the CPT file
+    fd = open(filename, 'w')
+    fd.write('# cpt file created by: make_discrete_cpt_from_(%s)\n'
+             % str(seq))
+    fd.write('%s\n' % cpt_model)
+    fd.write('#\n')
+
+    # write discontinuous colourmap steps
+    print('ranges=%s' % str(ranges))
+    for (start, rgb1, end, rgb2) in ranges:
+        (r1, g1, b1) = rgb1
+        (r2, g2, b2) = rgb2
+        fd.write('%f\t%03d %03d %03d\t%f\t%03d %03d %03d\n'
+                 % (start, r1, g1, b1, end, r2, g2, b2))
+
+    # finish with background, foreground and NaN colours
+    for line in cpt_end:
+        fd.write('%s\n' % line)
+
+    fd.close()
+
+
 def make_continuous_cpt_from_seq(filename, seq):
     """Make a continuous CPT file from a user cpt_sequence.
 
@@ -300,13 +400,14 @@ def make_continuous_cpt_from_seq(filename, seq):
     Else if first and last have a colour, use that range only.
     Else just use the hazmap colour idea.
 
+
     """
 
     # sort the seq first, just in case
     seq.sort()
 
-    # create a 0-511 sample continuous colour range
-    # using the hazmap scheme
+    # create a 0-255 sample continuous colour range
+    # using the given continuous CPT
     sample = []
     for i in range(256):
         sample.append((i, 255, 0))
@@ -605,6 +706,7 @@ def get_colourmap(cmap, tmpdir=None):
         # if it's there, copy to the temp directory, return that
         cpt_file = os.path.join(tmpdir, lower_cmap + '.cpt')
         shutil.copy(cmap_path, cpt_file)
+        print('get_colourmap: returns %s' % cpt_file)
         return cpt_file
 
     msg = "Colourmap name '%s' isn't recognised" % cmap
@@ -765,4 +867,55 @@ def get_canonical_range(plot_range):
 
     return plot_range
 
+
+# re pattern to split on 'one or more spaces'
+SpacesPattern = re.compile(' +')
+
+def read_cpt_file(cpt_file):
+    """Read a CPT file and return contents.
+
+    cpt_file  the input CPT file
+
+    Return a tuple (model, seq, end) where:
+        model     is a string like '# COLOR_MODEL = RGB'
+        seq       is a list of tuples (start, rgb, end rgb)
+                  where each rgb is another tuple (r,g,b)
+        endlines  is a list of end lines of input file
+    """
+
+    # get all lines from the file
+    f = open(cpt_file, 'r')
+    lines = f.readlines()
+    f.close()
+
+    # read and skip initial comment lines, remembering model data
+    model = None
+    for (i, line) in enumerate(lines):
+        line = line.strip()
+        if line[0] != '#':
+            break
+        if 'COLOR_MODEL' in line:
+            model = line
+
+    # strip off leading comments
+    lines = lines[i:]
+
+    # now read sequence lines
+    seq = []
+    for (i, line) in enumerate(lines):
+        line = line.strip()
+        if line[0] in 'bBfFnN':
+            break
+        # line is of form '<start>  <r> <g> <b>  <end>  <r> <g> <b>'
+        (start, r1, g1, b1, stop, r2, g2, b2) = SpacesPattern.split(line)
+        seq.append((float(start), (int(r1), int(g1), int(b1)), float(stop), (int(r2), int(g2), int(b2))))
+
+    # now pick up all end lines
+    endlines = lines[i:]
+
+    # sort the sequence, just in case - this should sort on star value only
+    seq.sort()
+
+    return (model, seq, endlines)
+    
 
