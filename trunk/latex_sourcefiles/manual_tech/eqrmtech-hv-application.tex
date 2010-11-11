@@ -195,11 +195,44 @@ longitude (\texttt{lon}) of the start and end of the trace. \\
 \item \texttt{slip\_rate}: Slip rate of fault in mm per year.
 \end{itemize}
 
-
 \subsection{Event Type Control File}
 
+The event type control file is a second level control file facilitating 
+the variation of selected EQRM parameters with event types. The mechanism 
+for this is an \texttt{event\_type} parameter which links  
+the \texttt{event\_type\_control} file with the 
+\texttt{fault\_source} and/or \texttt{zone\_source} files. 
+\lstinputlisting{xml_examples/event_type_controlfile_example.xml}
 
 \subsection{Site File}
 
+The EQRM requires a site file at which either hazard or loss will be modeled. 
+The site file for hazard is a csv file 
+containing a list of points at which the hazard (PSHA simulation)
+ or ground motion (scenario simulation) will be computed. An example is 
+ given below in the grey shaded box: 
+\lstinputlisting{xml_examples/java_par_site.csv}
+
+\textbf{Parameters in the hazard site file:}
+\begin{itemize}
+\item \texttt{Latitude}: Latitude of the the points of interest. 
+\item \texttt{Longitude}: Longitude of the the points of interest. 
+\item \texttt{SITE\_CLASS}: Regolith site class. Typically, this is defined 
+by a letter. Note that the value of this parameter must match with an 
+amplification factor defined in the amplification file 
+(see \sref{sec:-appl-amplification}) \\
+\item \texttt{VS30}: Average velocity in the top 30\,m (i.e. $V_{s30}$). This is used
+to incorporate regolith for GMPEs with a $V_{s30}$ term. 
+\end{itemize}
+
+The site file for risk is a csv file
+containing a list of points at which the risk (PSHA simulation)
+ or loss (scenario simulation) will be computed. An example is
+ given below in the grey shaded box:
+\lstinputlisting{xml_examples/sitedb_newc.csv}
+
+
 
 \subsection{Amplification File}
+\label{sec:-appl-amplification}
+\lstinputlisting{xml_examples/java_par_ampfactors.xml}
