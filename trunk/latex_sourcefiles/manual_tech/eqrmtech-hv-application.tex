@@ -69,216 +69,139 @@ one of the demos described in more detail in
 \clearpage
 \subsection{The source files}
 
+The EQRM source files for probabilistic modelling (PSHA and PSRA)
+come in two forms. These are:
+\begin{itemize}
+\item source zones, and
+\item faults.
+\end{itemize}
+The EQRM can be run with either of these inputs seprately or both of
+them together
+
+
+\subsubsection{Source Zones}
+\label{sec:source-zone-file}
+
+The source zone file is used to describe one or more areal source
+zones. Earthquakes are assumed to be equally likely to occur
+anywhere within a source zone. The magnitude recurence relationship
+for each source zone is defined by a bounded Gutenberg-Richter
+relationship. The following grey shaded box provides an example of a
+source zone file. A description of each of the parameters follows.
 \lstinputlisting{xml_examples/source_model_zone_example.xml}
 
-
-
-\subsection{Parameter files}
-\label{sec:application-parfiles}
-
-This section identifies the important input files that are used by
-different components of the EQRM. Input files can be dependent or
-independent of region. For example the file
- \typeparfile{newc}{\_par}{\_ampfactors}{.mat} contains the amplification factors
-for the Newcastle region (see \sref{ch:reg}), whereas the file
- \typeparfile{attn\_toro}{\_midcontinent}{\_momag}{.txt}
-contains attenuation coefficients for the \citet*{dr_Toro97a}
-attenuation model (see \sref{ch:atten}) which are not dependent on
-region. The EQRM identifies the desired region dependent files
-using the user defined parameter \typepar{site}{\_loc}{} (see
-\sref{sec:application-setdata}).
-
-The EQRM makes use of default data to reduce the need for a large
-number of defined input files. Default data files are stored in
-the directory \typedir{*/eqrm/eqrm\_app}{/resources}{/data} (see
-\sref{sec:app-dirstruct}). The EQRM facilitates the use of
-non-default data by first looking in the user defined
- \typepar{inp}{ut}{dir} (see \sref{sec:application-setdata}) for
-required files. If the required files are found in
- \typepar{inp}{ut}{dir} they will be used by the EQRM, if the files
-are not found in  \typepar{inp}{ut}{dir} then the default files
-are used.
-
-Note that default files are available for pre-defined regions
-only. For example; Newcastle and Perth region default data can be
-accessed by defining \typepar{site}{\_}{loc} of \typenewc and
-\typeperth respectively.
-
-\begin{table}
-\caption{Default parameter files in
-\typedircaption{*/eqrm/eqrm\_app}{/resources}{/data}.}
-\label{tab:app-inputfiles} \vspace{0.8em}
-\begin{tabular}{|l|p{0.7\textwidth}|}
-\hline
-Chapter & Files \\
-\hline Earthquake & $\typeparfile{<site\_loc>}{\_par}{\_sourcepolys}{.txt}$ \\
-Source generation &  $\typeparfile{<site\_loc>}{\_par}{\_sourcezones}{.txt}$ \\
-\hline
-Grids and & $\typeparfile{au}{s}{\_mat}{.txt}$\\
-building & $\typeparfile{aust}{ralia}{\_bndy}{.txt}$\\
-databases & $\typeparfile{<site\_loc>}{\_par}{\_site}{.mat}$\\
- &  $\typeparfile{<site\_loc>}{\_par\_site}{\_uniform}{.mat}$ \\
- &  $\typeparfile{<site\_loc>}{\_par\_study}{\_region\_box}{.txt}$ \\
-  & $\typeparfile{sitedb}{\_<site}{\_loc>}{.mat}$ \\
- & $\typeparfile{suburb}{\_post}{code}{.csv}$\\
-  & $\typeparfile{text}{b}{types}{.txt}$ \\
- & $\typeparfile{text}{busage}{FCB}{.txt}$ \\
- &  $\typeparfile{text}{b}{uses}{.txt}$ \\
-\hline
-Attenuation & $\typeparfile{attn}{\_atkboore}{\_momag}{.txt}$\\
- &  $\typeparfile{attn\_sadigh}{\_coeff\_momag}{\_great65}{.txt}$ \\
- &  $\typeparfile{attn\_sadigh}{\_coeff\_momag}{\_less65}{.txt}$ \\
- &  $\typeparfile{attn\_somer}{\_nonrift}{\_hori}{.txt}$ \\
- &  $\typeparfile{attn\_somer}{\_nonrift}{\_vert}{.txt}$ \\
- &  $\typeparfile{attn\_somer}{\_rift}{\_hori}{.txt}$ \\
- &  $\typeparfile{attn\_somer}{\_rift}{\_vert}{.txt}$ \\
- & $\typeparfile{attn\_toro}{\_midcontinent}{\_momag}{.txt}$,              \\
-\hline
-Regolith &  $\typeparfile{<site\_loc>}{\_par}{\_ampfactors}{.mat}$\\
-amplification &  $\typeparfile{<site\_loc>\_par}{\_site\_class}{\_mask}{.mat}$ \\
- &  $\typeparfile{<site\_loc>\_par}{\_site\_class}{\_polys}{.mat}$ \\
-\hline
-Building & $\typeparfile{b}{factors}{db}{.mat}$\\
-damage & $\typeparfile{bfactors}{db}{\_hazus}{.mat}$ \\
- & $\typeparfile{bfactors}{db}{\_wshop}{.mat}$ \\
- & $\typeparfile{bfactorsdb}{\_wshop}{\_update2}{.mat}$ \\
- & $\typeparfile{bfactorsdb}{\_wshop}{\_update3}{.mat}$ \\
- & $\typeparfile{factors}{-nonstruct}{dam}{.csv}$ \\
- &  $\typeparfile{factors}{-struct}{dam}{.csv}$ \\
-\hline
-Losses & $\typeparfilelong{rc\_perRepl}{CostwrtBuildC}{EdwardsFCBusage}{.mat}{rc\_perRepl...EdwardsFCBusage}$ \\
-& $\typeparfilelong{rc\_perReplCost}{wrtBuildCEdwards}{Hazususage}{.mat}{rc\_perRepl...EdwardsHazususage}$\\
-% & $\typeselfnoindex{rc\_perReplCost}{wrtBuildCEdwards}{Hazususage.mat}\index{\scriptsize\texttt{rc\_perReplCostwrtBuildCEdwardsHazususage.mat}\normalsize}$\\
-& $\typeparfile{rc\_perReplCost}{wrtBuildC}{Hazusage}{.mat}$\\
-& $\typeparfile{econ}{\_p}{ar}{.mat}$\\
-\hline
-\end{tabular}
-\end{table}
-
-\tref{tab:app-inputfiles} summarises the important input files
-that can be found in the default data area. The files are listed
-against the chapter where more information can be found.
-
-
-\subsection{Running the EQRM in MATLAB}
-\label{app:runEQRM}
-
-
-The EQRM has a special startup function
-(\typefunc{eqrm}{\_start}{up}) that adds all the required
-directories to the MATLAB path. The following instructions
-describe how to use \typefunc{eqrm}{\_start}{up} to set the MATLAB
-path:
+\textbf{General inputs} (\texttt{source\_model\_zone})
 \begin{itemize}
-\item move to the directory
-\typedir{*/eqrm/eqrm\_app}{/m\_code}{/startup} \item at the
-command line type \newline \texttt{>>
-eqrm\_startup\indexfunc{eqrm\_startup}(`*$\backslash$eqrm$\backslash$eqrm\_app')}
+\item \texttt{magnitude\_type}: earthquake magnitude used derive the
+recurence parameters. NOTE - the EQRM only supports moment magnitude
+\texttt{Mw}.
 \end{itemize}
 
-The EQRM has a special GUI known as the
-\typegui{eqrm}{\_param}{\_gui} that can be used to create a
-\typeself{set}{da}{ta} file, run the EQRM application or analyse
-the EQRM outputs. To launch the GUI simply type the following at
-the command line:
-\begin{itemize} \item[\texttt{>>}] \texttt{eqrm\_param\_gui}\indexgui{eqrm\_param\_gui} \end{itemize}
-It is beyond the scope of this manual to discuss the
-\typeself{eqrm}{\_param}{\_gui} further. However it is user
-friendly and reasonably self explanatory. Alternatively the EQRM
-can be run from the command line using the function
-\typefunc{eqrm}{\_analy}{sis}. To find out how to use
-\typefunc{eqrm}{\_analy}{sis} type the following at the MATLAB
-command line: \begin{itemize} \item[\texttt{>>}] \texttt{help
-eqrm\_analysis}
+\textbf{General zone inputs} (\texttt{zone})
+\begin{itemize}
+\item \texttt{area}: area of the source zone in km$^2$ \\
+\item \texttt{name}: name for the source zone \\
+\item \texttt{event\_type}: pointer to the a collection of inputs described in the
+\texttt{event\_type\_controlfile}.
 \end{itemize}
 
-The EQRM has a special Output Manager GUI that can be used to
-view, analyse and plot EQRM outputs. The Output Manager is also
-known as the Data Interrogation Tool
-(DIT)\index{DIT}\index{GUI!DIT}\index{Data Interrogation
-Tool}\index{GUI!Data Interrogation Tool}. A report generation
-facility has been included with the Output Manager and can be used
-to create a \LaTeX \texttt{*.tex} file with EQRM output figures.
-The \LaTeX file can be compiled into a \texttt{.ps} and/or
-\texttt{.pdf} file if the appropriate MikTeX software is
-installed.
-
-
-\subsection{Compiling and using a stand--alone version of the EQRM in MATLAB R14SP1}
-
-Using the MATLAB compiler it is possible to create a stand--alone
-version of the EQRM that can be used without requiring MATLAB. The
-instructions for MATLAB R13 are given in \aref{app:MATLABR13}.
-
-\section{Creating a stand--alone executable of the EQRM GUI in MATLAB R14SP1:}
-\label{app:MATLABR13}
-
-Type the following at the MATLAB command line for the source
-machine \begin{itemize} \item[\texttt{>>}]
-\texttt{cnt\_do\_mcc\_build\_to\_system(`eqrm\_param\_gui',<*/path>)}
+\textbf{Geometry inputs} (\texttt{geometry})
+\begin{itemize}
+\item \texttt{azimuth}: center azimuth for randomly generated synthetic ruptures \\
+\item \texttt{delta\_azimuth}: range over which randomly generated azimuths will
+be sampled. That is, the azimuth of all synthetic earthquake will be randomly drawn
+from a uniform distribution between \texttt{azimuth}$\pm$\texttt{delta\_azimuth}. \\
+\item \texttt{dip}: center dip for randomly generated synthetic ruptures \\
+\item \texttt{delta\_dip}: range over which randomly generated dips will
+be sampled. That is, the dip of all synthetic earthquake will be
+randomly drawn from a uniform distribution between \texttt{dip}$\pm$\texttt{delta\_dip}.\\
+\item \texttt{depth\_top\_seismogenic}: Depth to the top of the seimogenic zone in km.
+No component of a synthetic rupture will be located above this value. \\
+\item \texttt{depth\_bottom\_seismogenic}: Depth to the bottom of the seimogenic zone in km.
+No component of a synthetic rupture will be located below this value. \\
+\item \texttt{boundary}: Boundary of the areal source zone as
+defined on the surface of the Earth in longitude (column 1) and
+latitude (column 2). \\
+\item \texttt{excludes}: Boundary of any regions in the source in
+which events are not required. Boundary defined on the surface of
+the Earth in longitude (column 1) and latitude (column 2).
 \end{itemize}
 
-This process will create the following files in \texttt{<*/path>}:
-\begin{enumerate}
-\item \typeselfnoindexnoline{eqrm}{\_param}{\_gui.exe};  \item a
-directory named \typeselfnoindexnoline{eqrm}{\_param}{\_gui\_mcr};
-and \item \typeselfnoindexnoline{eqrm}{\_param}{\_gui.ctf}.
-\end{enumerate}
-
-\vspace{2em}
-
-\textbf{Prepare the files for transportation as follows:}
-\begin{enumerate} \item Create a folder entitled
-\typeselfnoindexnoline{*/te}{st}{exe}. \item In
-\typeselfnoindexnoline{*/te}{st}{exe} create two folders
- \typeselfnoindexnoline{*/}{testexe}{/system} and
- \typeselfnoindexnoline{*/}{testexe}{/mcr}.
-\item Copy  \typeselfnoindexnoline{eqrm}{\_param}{\_gui.exe},
-\typeselfnoindexnoline{eqrm}{\_param}{\_gui\_mcr} and
-\typeselfnoindexnoline{eqrm}{\_param}{\_gui.ctf} (created above)
-into \typeselfnoindexnoline{*/}{testexe}{/system}. \item Copy the
-following files from \typeselfnoindexnoline{*/EQRM}{ROOT}{/system}
-into \typeselfnoindex{*/}{testexe}{/system}:
-\begin{enumerate}
-\item \typeselfnoindexnoline{root\_mat}{\_creator}{\_cnt.exe};
-\item the directory
-\typeselfnoindexnoline{root\_mat}{\_creator}{\_cnt\_mcr}; and
-\item \typeselfnoindexnoline{root\_mat}{\_creator}{\_cnt.ctf}.
-\end{enumerate}
-\item Copy \typeself{\_MCR}{Instal}{ler.exe} from
-\typeselfnoindexnoline{<MATLABROOT>/toolbox}{/compiler/deploy}{/win32/MCRInstaller.exe}
-into \typeselfnoindexnoline{*/}{testexe}{/mcr}. \item Copy the
-directory \typeselfnoindexnoline{*/EQRM}{ROOT}{/resources} to
-\typeselfnoindexnoline{*/}{testexe}{/resources}.
-\end{enumerate}
-
-\vspace{2em} \textbf{Installation onto the target machine is
-achieved as follows:}
-\begin{enumerate}
-\item Move the contents of \typeselfnoindex{*/te}{st}{exe} onto
-the target machine. \item Run \typeself{\_MCR}{Instal}{ler.exe} on
-\typeselfnoindex{*/}{testexe}{/mcr} by double clicking on it.
-\item Set environment path on the target machine
-\begin{enumerate}
-\item open the control panel; \item open system; \item select the
-advanced tab; \item select environment variables; \item create new
-user variable entitled \typeselfnoindex{p}{a}{th}; \item add the
-following path names (separated by semi colons) into the value
-field for \texttt{path};
-\begin{itemize} \item
-\typeselfnoindexnoline{*/}{testexe}{/system}; and \item
-\typeselfnoindexnoline{*/testexe}{/mcr/v71}{runtime/win32};
+\textbf{Recurrence inputs} (\texttt{recurrence\_model})
+\begin{itemize}
+\item \texttt{distribution}: Distribution used to define the magnitude recurence relations. Note that
+the EQRM current only supports a Bounded Gutenberg-Richter recurence
+relationship for source zones (i.e.
+\texttt{bounded\_gutenberg\_richter}) \\
+\item \texttt{recurrence\_min\_mag}: Minimum magnitude used to
+define the recurence relationship \\
+\item \texttt{recurrence\_max\_mag}: Maximum magnitude used to
+define the recurence relationship. Typically this is the magnitude
+of the largest earthquake expected in the zone. \\
+\item \texttt{A\_min}: Expected number of earthquake with magnitude \texttt{recurrence\_min\_mag}
+or higher in the source zone per year.
+\item \texttt{b}: Gutenberg-Richter b value forounded Gutenberg-Richter recurence
+relationship \\
+\item \texttt{generation\_min\_mag}: Minimum magnitude for generation of synthetic
+earthquake generation. The EQRM will only generate synthetic
+earthquakes with magnitudes equal to or greater than
+\texttt{generation\_min\_mag}. \\
+\item \texttt{number\_of\_mag\_sample\_bins}: Number of magnitude
+bins used to discretise the recurence relationship in the range
+magnitude range \texttt{generation\_min\_mag} to
+\texttt{recurrence\_max\_mag} \\
+\item \texttt{number\_of\_events}: Number of syntehtic ruptures to
+be generated in the source zone.
 \end{itemize}
-\item Log off and log back on.
-\end{enumerate}
-\item Set the software path as follows
+
+\subsubsection{Faults}
+
+The source faults file is used to describe one or more faults
+(including crsutal faults and subduction interfaces) and/or one or
+more dipping slabs for intraslab earthquakes. Earthquakes are
+assumed to be equally likely to occur anywhere within the fault (or
+slab). The magnitude recurence for faults can be defined by a
+bounded Gutenberg-Richter relationship or a combination of bounded
+Gutenberg-Richter and Characteric. The magnitude recurence for the
+intraslab earthquakes must be defined by a bounded Gutenberg-Richter
+relationship. The following is an example of a source fault file
+with the following source types:
 \begin{enumerate}
-\item Open a DOS shell; \item Type
-\typeselfnoindex{root}{\_mat\_creator}{\_cnt.exe}; \item On the
-`EQRM root file creation' GUI select the EQRM root directory (i.e.
-\typeselfnoindex{*/te}{st}{exe}).
+\item crustal fault with recurnece defined by a bounded Gutenberg-Richter
+relationship (\texttt{fault 1}), \\
+\item crustal fault with recurnece defined by a combined bounded Gutenberg-Richter
+(for small earthquakes) and a characteristic recurence for larger
+earthquakes (\texttt{fault 2}), \\
+\item a 3D dipping volume to represent intraslab earthquakes in the
+subducting slab (\texttt{intraslab 1}).
 \end{enumerate}
-\item Open the EQRM GUI by typing
-\typeselfnoindex{eqrm}{\_param}{\_gui.exe} at the DOS command
-prompt.
-\end{enumerate}
+The following grey shaded box provides an example of a source zone
+file. Many of the parameters are identical to those described in
+\sref{sec:source-zone-file} and are not described seprarately here.
+A description of the new parameters is provided below.
+\lstinputlisting{xml_examples/source_model_fault_example.xml}
+
+\textbf{Parameters unique to the source fault file}
+\begin{itemize}
+\item \texttt{dip}: Dip of fault, defined as angle in degrees from horizontal \\
+\item \texttt{out\_of\_dip\_theta}: Out of plane dip, used for intraslab events. Angle between fault plane
+and out of dip rupture plane \\
+\item \texttt{delta\_theta}: ange of dips for intraslab events. This will be $\pm$ \texttt{delta\_theta}
+taken from the angle \texttt{dip + out\_of\_dip\_theta} \\
+\item \texttt{slab\_width}: Width of slab (km) when using a fault source to represent intraslab
+in the subducting slab \\
+\item \texttt{trace}: Surface trace of the fault along the surface
+of the Earth. Note that it is the projection of fault along the
+direction of dip. It is defined by the latitude (\texttt{lat}) and
+longitude (\texttt{lon}) of the start and end of the trace. \\
+\item \texttt{slip\_rate}: Slip rate of fault in mm per year.
+\end{itemize}
+
+
+\subsection{Event Type Control File}
+
+
+\subsection{Site File}
+
+
+\subsection{Amplification File}
