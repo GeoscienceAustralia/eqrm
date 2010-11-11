@@ -1,3 +1,6 @@
+"""
+Execute all of the unit tests
+"""
 
 import os
 
