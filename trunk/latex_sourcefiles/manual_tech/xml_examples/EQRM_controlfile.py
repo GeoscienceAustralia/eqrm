@@ -1,5 +1,5 @@
 """
-  EQRM parameter file
+  EQRM Control file
   All input files are first searched for in the input_dir, then in the
   resources/data directory, which is part of EQRM.
 
@@ -33,9 +33,9 @@ input_dir = r"..\inputs\EQRM_inputs/"
 output_dir = r"." 
 use_site_indexes = False
 site_indexes = [1, 10, 100, 1000,1100]
-#zone_source_tag = "Notinuse"
-#fault_source_tag = "java_intraslab" 
-#event_control_tag = "test48"
+zone_source_tag = "zonetag"
+fault_source_tag = "faulttag"
+event_control_tag = "eventag"
 
 # Scenario input
 
