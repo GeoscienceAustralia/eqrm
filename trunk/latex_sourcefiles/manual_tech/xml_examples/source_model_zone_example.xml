@@ -1,7 +1,7 @@
 <source_model_zone magnitude_type="Mw">
   <zone 
   area = "5054.035" 
-  name = "bad zone"
+  name = "Zone 1"
   event_type = "crustal fault">
     
     <geometry 
@@ -38,7 +38,7 @@
     
   </zone>
   <zone 
-      name = "good zone">
+      name = "Zone 2">
     ...
     ...
   </zone>
