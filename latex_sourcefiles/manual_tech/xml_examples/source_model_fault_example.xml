@@ -1,6 +1,6 @@
 <source_model_fault magnitude_type="Mw">
   <fault 
-  name = "big fault"
+  name = "fault 1"
   event_type = "crustal fault">
   
     <geometry 
@@ -31,7 +31,7 @@
   </fault>
   
   <fault 
-  name = "small fault"
+  name = "fault 2"
   event_type = "crustal fault">
   
     <geometry 
@@ -63,8 +63,8 @@
   </fault>
   
   <fault 
-  name = "sumba intraplate"
-  event_type = "intraplate">
+  name = "intraslab 1"
+  event_type = "intraslab">
   
      <geometry 
         dip= "20" 
