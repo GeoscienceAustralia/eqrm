@@ -885,9 +885,8 @@ class Test_Output_manager(unittest.TestCase):
     def test_load_structures(self):
         THE_PARAM_T=Dummy()
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
-            'test_output_man_test_load_structures') + os.sep
+            prefix='test_output_man_test_load_structures') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
-
         attribute_dic={
             'BID':[1,2,3],
             'LATITUDE':[-32.9,-32.7,-32.5],

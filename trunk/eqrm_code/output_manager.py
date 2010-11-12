@@ -238,7 +238,6 @@ def load_ecloss_and_sites(save_dir, site_tag):
     
     total_building_loss, BID = load_ecloss('_total_building',
                                            save_dir, site_tag)
-    
     assert allclose(array(struct_dic['BID']), BID)
     lat = array(struct_dic['LATITUDE'])
     lon = array(struct_dic['LONGITUDE'])
@@ -434,7 +433,8 @@ def save_structures(THE_PARAM_T,structures,compress=False,
                        'HAZUS_USAGE\n')
     for i in range(len(structures.latitude)):
         maybe_nan = {'SUBURB':None, 'SURVEY_FACTOR':None,
-                     'HAZUS_STRUCTURE_CLASSIFICATION':None, 'HAZUS_USAGE':None}
+                     'HAZUS_STRUCTURE_CLASSIFICATION':None, 'HAZUS_USAGE':None,
+                     'PRE1989':None, 'POSTCODE':None, 'FCB_USAGE':None}
         nan_values = ['1.#QNAN'] #,'nan','1.#QNB']
         for title_string in maybe_nan:
             string_value = structures.attributes[title_string][i]
@@ -448,22 +448,57 @@ def save_structures(THE_PARAM_T,structures,compress=False,
                     maybe_nan[title_string] = 'nan'                    
             else:
                 maybe_nan[title_string] = structures.attributes[title_string][i]
-                
-        loc_file.write('%.6g %.6g %i %i %s %s %.5g %s %s %i %i %s\n'%
-                       (structures.latitude[i],
-                        structures.longitude[i],
-                        structures.attributes['PRE1989'][i],
-                        structures.attributes['POSTCODE'][i],
-                        structures.attributes['SITE_CLASS'][i],
-                        maybe_nan['SUBURB'].replace(' ','_'),
-                        maybe_nan['SURVEY_FACTOR'],
-                        structures.attributes['STRUCTURE_CLASSIFICATION'][i],
-                        maybe_nan['HAZUS_STRUCTURE_CLASSIFICATION'],
-                        structures.attributes['BID'][i],
-                        structures.attributes['FCB_USAGE'][i],
-                        maybe_nan['HAZUS_USAGE']))
+    #print "structures.latitude[i]",   structures.latitude[i]         
+        # loc_file.write('%.6g %.6g %i %i %s %s %.5g %s %s %i %i %s\n'%
+        #                (structures.latitude[i],
+        #                 structures.longitude[i],
+        #                 structures.attributes['PRE1989'][i],
+        #                 structures.attributes['POSTCODE'][i],
+        #                 structures.attributes['SITE_CLASS'][i],
+        #                 maybe_nan['SUBURB'].replace(' ','_'),
+        #                 maybe_nan['SURVEY_FACTOR'],
+        #                 structures.attributes['STRUCTURE_CLASSIFICATION'][i],
+        #                 maybe_nan['HAZUS_STRUCTURE_CLASSIFICATION'],
+        #                 structures.attributes['BID'][i],
+        #                 structures.attributes['FCB_USAGE'][i],
+        #                 maybe_nan['HAZUS_USAGE']))
+        if False: #True:
+            # problem.  structures.attributes['PRE1989'][i] can be Nan
+            loc_file.write('%.6g %.6g %i %i %s %s %.5g %s %s %i %i %s\n'%
+                           (structures.latitude[i],
+                            structures.longitude[i],
+                            structures.attributes['PRE1989'][i],
+                            structures.attributes['POSTCODE'][i],
+                            structures.attributes['SITE_CLASS'][i],
+                            maybe_nan['SUBURB'].replace(' ','_'),
+                            maybe_nan['SURVEY_FACTOR'],
+                            structures.attributes['STRUCTURE_CLASSIFICATION'][i],
+                            maybe_nan['HAZUS_STRUCTURE_CLASSIFICATION'],
+                            structures.attributes['BID'][i],
+                            structures.attributes['FCB_USAGE'][i],
+                            maybe_nan['HAZUS_USAGE']))
+        else:
+            loc_file.write('%.6g %.6g %s %s %s %s '%
+                           (structures.latitude[i],
+                            structures.longitude[i],
+                            maybe_nan['PRE1989'],
+                            maybe_nan['POSTCODE'],
+                            structures.attributes['SITE_CLASS'][i],
+                            maybe_nan['SUBURB'].replace(' ','_')))
+            
+            loc_file.write('%.5g %s %s '%
+                           (maybe_nan['SURVEY_FACTOR'],
+                            structures.attributes['STRUCTURE_CLASSIFICATION'][i],
+                            maybe_nan['HAZUS_STRUCTURE_CLASSIFICATION']))
+            loc_file.write('%i '%
+                           (structures.attributes['BID'][i]))
+            loc_file.write('%s '%
+                           (maybe_nan['FCB_USAGE']))
+            loc_file.write('%s\n'%
+                           (maybe_nan['HAZUS_USAGE']))
     loc_file.close()
     return base_name
+
 
 def get_structures_file_name(site_tag):
     return site_tag + '_structures.txt'
