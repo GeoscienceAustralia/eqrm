@@ -11,8 +11,9 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
 from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING
 
-from eqrm_filesystem import eqrm_path, Resources_Data_Path
-    
+from eqrm_filesystem import eqrm_path, Resources_Data_Path    
+from eqrm_code.ANUGA_utilities import log
+
 class Dummy:
     def __init__(self):
         pass
@@ -422,6 +423,12 @@ save_socloss_flag=[1]\n")
 
 
     def test_convert_THE_PARAM_T_to_py(self):
+
+        # turn logging WARNINGS off
+        # This is to stop warning messages appearing when testing
+        console_logging_level = log.console_logging_level 
+        log.console_logging_level = log.ERROR
+        
         set = self.build_instance_to_THE_PARAM_T()
         TPT = create_parameter_data(set)
 
@@ -435,6 +442,9 @@ save_socloss_flag=[1]\n")
         os.remove(file_name[:-3]+ '.pyc')
         
         self.check_THE_PARAM_T(TPT)
+
+        # turn logging back to previous levels
+        log.console_logging_level = console_logging_level
         
         
     def test_instance_to_py_file(self):
