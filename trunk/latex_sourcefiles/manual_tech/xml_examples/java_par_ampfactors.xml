@@ -1,228 +1,100 @@
-<amplification_model matlab_file = "lembang_par_ampfactors.xml">
-<moment_magnitude_bins>
-4.50000000 5.50000000
-</moment_magnitude_bins>
-<pga_bins>
-0.00000000 0.15290000 0.2548000 0.35680000 
-</pga_bins>
-<site_classes>
-CDE
-</site_classes>
-<periods>
-0.00000000 0.40000000 0.50000000 2.00000000 
-</periods>
+<amplification_model matlab_file = "example_par_ampfactors.xml">
+  <moment_magnitude_bins>
+	4.50000000 5.50000000
+  </moment_magnitude_bins>
+  <pga_bins>
+	0.00000000 0.15290000 0.2548000 0.35680000 
+  </pga_bins>
+  <site_classes>
+	CDE
+  </site_classes>
+  <periods>
+	0.00000000 0.40000000 0.50000000 2.00000000 
+  </periods>
 
-<site_class class="C">
-	  <moment_magnitude mag_bin="4.50000000">
-  	  <pga pga_bin="0.00000000">
-        <log_amplification site_class = "C" moment_magnitude = "4.50000000" pga_bin = "0.00000000">
-  			0.13976194 0.13976194 0.25464222 0.25464222
-        </log_amplification>
-        <log_std site_class = "C" moment_magnitude = "4.50000000" pga_bin = "0.00000000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-      <pga pga_bin="0.15290000">
-          <log_amplification site_class = "C" moment_magnitude = "4.50000000" pga_bin = "0.15290000">
-    			0.09531018 0.09531018 0.23111172 0.23111172
-          </log_amplification>
-          <log_std site_class = "C" moment_magnitude = "4.50000000" pga_bin = "0.15290000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.2548000">
-          <log_amplification site_class = "C" moment_magnitude = "4.50000000" pga_bin = "0.2548000">
-    			0.03922071 0.03922071 0.20701417 0.20701417
-          </log_amplification>
-          <log_std site_class = "C" moment_magnitude = "4.50000000" pga_bin = "0.2548000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.35680000">
-          <log_amplification site_class = "C" moment_magnitude = "4.50000000" pga_bin = "0.35680000">
-    			-0.02020270 -0.02020270 0.17395331 0.17395331
-          </log_amplification>
-          <log_std site_class = "C" moment_magnitude = "4.50000000" pga_bin = "0.35680000">
-          0.01000000 0.01000000 0.01000000 0.01000000	
-          </log_std>
-      </pga>
-    </moment_magnitude>
-    <moment_magnitude mag_bin="5.50000000">
-  	  <pga pga_bin="0.00000000">
-        <log_amplification site_class = "C" moment_magnitude = "5.50000000" pga_bin = "0.00000000">
-  			0.13976194 0.13976194 0.25464222 0.25464222
-        </log_amplification>
-        <log_std site_class = "C" moment_magnitude = "5.50000000" pga_bin = "0.00000000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-      <pga pga_bin="0.15290000">
-          <log_amplification site_class = "C" moment_magnitude = "5.50000000" pga_bin = "0.15290000">
-    			0.09531018 0.09531018 0.23111172 0.23111172
-          </log_amplification>
-          <log_std site_class = "C" moment_magnitude = "5.50000000" pga_bin = "0.15290000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.2548000">
-          <log_amplification site_class = "C" moment_magnitude = "5.50000000" pga_bin = "0.2548000">
-    			0.03922071 0.03922071 0.20701417 0.20701417
-          </log_amplification>
-          <log_std site_class = "C" moment_magnitude = "5.50000000" pga_bin = "0.2548000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.35680000">
-          <log_amplification site_class = "C" moment_magnitude = "5.50000000" pga_bin = "0.35680000">
-    			-0.02020270 -0.02020270 0.17395331 0.17395331
-          </log_amplification>
-          <log_std site_class = "C" moment_magnitude = "5.50000000" pga_bin = "0.35680000">
-          0.01000000 0.01000000 0.01000000 0.01000000	
-          </log_std>
-      </pga>
-    </moment_magnitude>
-</site_class>
+  <site_class class="C">
+	<moment_magnitude mag_bin="4.50000000">
+	  <pga pga_bin="0.00000000">
+		<log_amplification 
+			site_class = "C" 
+			moment_magnitude = "4.50000000" 
+			pga_bin = "0.00000000">
+  				0.13976194 0.13976194 0.25464222 0.25464222
+ 		</log_amplification>
+  		<log_std 	
+			site_class = "C" 
+			moment_magnitude = "4.50000000" 
+			pga_bin = "0.00000000">
+        			0.01000000 0.01000000 0.01000000 0.01000000
+ 		</log_std>
+	  </pga>
 
-<site_class class="D">
-	  <moment_magnitude mag_bin="4.50000000">
-  	  <pga pga_bin="0.00000000">
-        <log_amplification site_class = "D" moment_magnitude = "4.50000000" pga_bin = "0.00000000">
-  			0.28517894 0.28517894 0.53649337 0.53649337
-        </log_amplification>
-        <log_std site_class = "D" moment_magnitude = "4.50000000" pga_bin = "0.00000000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-      <pga pga_bin="0.15290000">
-        <log_amplification site_class = "D" moment_magnitude = "4.50000000" pga_bin = "0.15290000">
-  			0.20701417 0.20701417 0.49469624 0.49469624
-        </log_amplification>
-        <log_std site_class = "D" moment_magnitude = "4.50000000" pga_bin = "0.15290000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-      <pga pga_bin="0.2548000">
-        <log_amplification site_class = "D" moment_magnitude = "4.50000000" pga_bin = "0.2548000">
-  			0.08617770 0.08617770 0.43825493 0.43825493
-        </log_amplification>
-        <log_std site_class = "D" moment_magnitude = "4.50000000" pga_bin = "0.2548000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-      <pga pga_bin="0.35680000">
-        <log_amplification site_class = "D" moment_magnitude = "4.50000000" pga_bin = "0.35680000">
-  			-0.04082199 -0.04082199 0.37156356  0.37156356
-        </log_amplification>
-        <log_std site_class = "D" moment_magnitude = "4.50000000" pga_bin = "0.35680000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-    </moment_magnitude>    
-	  <moment_magnitude mag_bin="5.50000000">
-  	  <pga pga_bin="0.00000000">
-        <log_amplification site_class = "D" moment_magnitude = "5.50000000" pga_bin = "0.00000000">
-  			0.28517894 0.28517894 0.53649337 0.53649337
-        </log_amplification>
-        <log_std site_class = "D" moment_magnitude = "5.50000000" pga_bin = "0.00000000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-      <pga pga_bin="0.15290000">
-        <log_amplification site_class = "D" moment_magnitude = "5.50000000" pga_bin = "0.15290000">
-  			0.20701417 0.20701417 0.49469624 0.49469624
-        </log_amplification>
-        <log_std site_class = "D" moment_magnitude = "5.50000000" pga_bin = "0.15290000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-      <pga pga_bin="0.2548000">
-        <log_amplification site_class = "D" moment_magnitude = "5.50000000" pga_bin = "0.2548000">
-  			0.08617770 0.08617770 0.43825493 0.43825493
-        </log_amplification>
-        <log_std site_class = "D" moment_magnitude = "5.50000000" pga_bin = "0.2548000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-      <pga pga_bin="0.35680000">
-        <log_amplification site_class = "D" moment_magnitude = "5.50000000" pga_bin = "0.35680000">
-  			-0.04082199 -0.04082199 0.37156356  0.37156356
-        </log_amplification>
-        <log_std site_class = "D" moment_magnitude = "5.50000000" pga_bin = "0.35680000">
-        0.01000000 0.01000000 0.01000000 0.01000000
-        </log_std>
-      </pga>
-    </moment_magnitude>
-</site_class>
+	  <pga pga_bin="0.15290000">
+          	<log_amplification 
+			site_class = "C" 
+			moment_magnitude = "4.50000000" 
+			pga_bin = "0.15290000">
+    				0.09531018 0.09531018 0.23111172 0.23111172
+          	</log_amplification>
+          	<log_std 
+			site_class = "C" 
+			moment_magnitude = "4.50000000" 
+			pga_bin = "0.15290000">
+          			0.01000000 0.01000000 0.01000000 0.01000000
+          	</log_std>
+	  </pga>
 
-<site_class class="E">
-		<moment_magnitude mag_bin="4.50000000">
-    	 <pga pga_bin="0.00000000">
-          <log_amplification site_class = "E" moment_magnitude = "4.50000000" pga_bin = "0.00000000">
-    			0.50077529 0.50077529 0.93609336  0.93609336
-          </log_amplification>
-          <log_std site_class = "E" moment_magnitude = "4.50000000" pga_bin = "0.00000000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.15290000">
-          <log_amplification site_class = "E" moment_magnitude = "4.50000000" pga_bin = "0.15290000">
-    			0.35767444 0.35767444 0.86288996 0.86288996
-          </log_amplification>
-          <log_std site_class = "E" moment_magnitude = "4.50000000" pga_bin = "0.15290000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.2548000">
-          <log_amplification site_class = "E" moment_magnitude = "4.50000000" pga_bin = "0.2548000">
-    			0.13976194 0.13976194 0.76080583  0.76080583
-          </log_amplification>
-          <log_std site_class = "E" moment_magnitude = "4.50000000" pga_bin = "0.2548000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.35680000">
-          <log_amplification site_class = "E" moment_magnitude = "4.50000000" pga_bin = "0.35680000">
-    			-0.07257069 -0.07257069 0.64710324  0.64710324
-          </log_amplification>
-          <log_std site_class = "E" moment_magnitude = "4.50000000" pga_bin = "0.35680000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-    </moment_magnitude>
-		<moment_magnitude mag_bin="5.50000000">
-    	 <pga pga_bin="0.00000000">
-          <log_amplification site_class = "E" moment_magnitude = "5.50000000" pga_bin = "0.00000000">
-    			0.50077529 0.50077529 0.93609336  0.93609336
-          </log_amplification>
-          <log_std site_class = "E" moment_magnitude = "5.50000000" pga_bin = "0.00000000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.15290000">
-          <log_amplification site_class = "E" moment_magnitude = "5.50000000" pga_bin = "0.15290000">
-    			0.35767444 0.35767444 0.86288996 0.86288996
-          </log_amplification>
-          <log_std site_class = "E" moment_magnitude = "5.50000000" pga_bin = "0.15290000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.2548000">
-          <log_amplification site_class = "E" moment_magnitude = "5.50000000" pga_bin = "0.2548000">
-    			0.13976194 0.13976194 0.76080583  0.76080583
-          </log_amplification>
-          <log_std site_class = "E" moment_magnitude = "5.50000000" pga_bin = "0.2548000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-      <pga pga_bin="0.35680000">
-          <log_amplification site_class = "E" moment_magnitude = "5.50000000" pga_bin = "0.35680000">
-    			-0.07257069 -0.07257069 0.64710324  0.64710324
-          </log_amplification>
-          <log_std site_class = "E" moment_magnitude = "5.50000000" pga_bin = "0.35680000">
-          0.01000000 0.01000000 0.01000000 0.01000000
-          </log_std>
-      </pga>
-    </moment_magnitude>
-</site_class>
+	  <pga pga_bin="0.2548000">
+ 		<log_amplification 
+			site_class = "C" 
+			moment_magnitude = "4.50000000" 
+			pga_bin = "0.2548000">
+    				0.03922071 0.03922071 0.20701417 0.20701417
+          	</log_amplification>
+          	<log_std site_class = "C" 
+			moment_magnitude = "4.50000000" 
+			pga_bin = "0.2548000">
+          			0.01000000 0.01000000 0.01000000 0.01000000
+          	</log_std>
+	  </pga>
+	  <pga pga_bin="0.35680000">
+          	<log_amplification 
+			site_class = "C" 
+			moment_magnitude = "4.50000000" 
+			pga_bin = "0.35680000">
+    				-0.02020270 -0.02020270 0.17395331 0.17395331
+          	</log_amplification>
+          	<log_std site_class = "C" 
+			moment_magnitude = "4.50000000" 
+			pga_bin = "0.35680000">
+          			0.01000000 0.01000000 0.01000000 0.01000000
+		</log_std>
+	  </pga>
+	</moment_magnitude>
+
+    	<moment_magnitude mag_bin="5.50000000">
+  		...
+    	</moment_magnitude>
+  </site_class>
+
+  <site_class class="D">
+	<moment_magnitude mag_bin="4.50000000">
+  		...  
+    	</moment_magnitude>
+    
+	<moment_magnitude mag_bin="5.50000000">
+  	
+	</moment_magnitude>
+  </site_class>
+
+  <site_class class="E">
+	<moment_magnitude mag_bin="4.50000000">
+    		... 
+	</moment_magnitude>
+
+	<moment_magnitude mag_bin="5.50000000">
+    		... 
+	</moment_magnitude>
+  </site_class>
 
 </amplification_model>
