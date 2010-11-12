@@ -11,7 +11,7 @@ parameters are discussed and directions on how to run the EQRM
 provided. Readers who are interested in only the EQRM methodology
 and not the EQRM software package may wish to skip this chapter.
 
-\section{EQRM inputs}
+%\section{EQRM inputs}
 
 The input files required by the EQRM depend on the nature of the
 simulation conducted. For example, the inputs for a scenario loss
@@ -50,7 +50,7 @@ It contains a series of input parameters and flags that must be set
 by the user. \sref{sec:application-parfiles} describes other files
 that are required by the EQRM modules.
 
-\subsection{The EQRM control file}
+\section{The EQRM control file}
 \label{sec:application-EQRMcf}
 
 % First lets include the descriptom of the EQRM control file and its parameters
@@ -65,7 +65,7 @@ example of an EQRM controlfile to undertake a PSHA.
 
 
 \clearpage
-\subsection{The source files}
+\section{The source files}
 
 The EQRM source files for probabilistic modelling (PSHA and PSRA)
 come in two forms. These are:
@@ -77,7 +77,7 @@ The EQRM can be run with either of these inputs seprately or both
 together
 
 
-\subsubsection{Source Zones}
+\subsection{Source Zones}
 \label{sec:source-zone-file}
 
 The source zone file is used to describe one or more areal source
@@ -152,7 +152,7 @@ range \texttt{generation\_min\_mag} to
 be generated in the source zone.
 \end{itemize}
 
-\subsubsection{Faults}
+\subsection{Faults}
 
 The source faults file is used to describe one or more faults
 (including crsutal faults and subduction interfaces) and/or one or
@@ -207,7 +207,7 @@ of the largest earthquake expected on the fault (or in the
 subducting slab).
 \end{itemize}
 
-\subsection{Event Type Control File}
+\section{Event Type Control File}
 
 The event type control file is a second level control file
 facilitating the variation of selected EQRM parameters with event
@@ -295,12 +295,12 @@ Current options for the the GMPE are: \\
 
 
 
-\subsection{Site File}
+\section{Site Files}
 
 
 The EQRM requires a site file at which either hazard or loss will be modeled.
 
-\subsubsection{Hazard Site File}
+\subsection{Hazard Site File}
 
 The site file for hazard is a csv file containing a list of points at which the hazard (PSHA simulation)
  or ground motion (scenario simulation) will be computed. An example is
@@ -319,7 +319,8 @@ an amplification factor defined in the amplification file (see
 to incorporate regolith for GMPEs with a $V_{s30}$ term.
 \end{itemize}
 
-\subsubsection{Risk Site File (Building Database)}
+\subsection{Risk Site File (Building Database)}
+\label{sec:grids-bdatabase}
 
 The site file for risk is a csv file representing a building
 portfolio. It contains a list of points at which the risk (PSHA simulation)
@@ -330,22 +331,26 @@ portfolio. It contains a list of points at which the risk (PSHA simulation)
 
 \textbf{Parameters in the building database:}
 \begin{itemize}
-\item \texttt{BID}: Integer site identifier for EQRM (typically the same as column 10)\\
-\item \texttt{LATITUDE}: Latitude of building \\
-\item \texttt{LONGITUDE}: Longitude of building \\
-\item \texttt{STRUCTURE_CLASSIFICATION}: Index to building construction type... \textbf{expanded} HAZUS list (\sref{sec:grids-constructionclass}
-\item \texttt{STRUCTURE_CATEGORY}: Type of structure (e.g. building or bridge)\\
-\item \texttt{HAZUS_USAGE}: Index to HAZUS usage\index{building usgage!HAZUS} classification (\sref{sec:grids-usageclass}) \\
-\item \texttt{SUBURB}: within which building is located \\
-\item \texttt{POSTCODE}: Postcode within which building is located \\
-\item \texttt{PRE1989}: Logical index stating whether the building is pre- (0) or post- (1) the 1989 Newcastle earthquake\\
-\item \texttt{HAZUS_STRUCTURE_CLASSIFICATION}: Index to building construction type... HAZUS list (\sref{sec:grids-constructionclass})\\
-\item \texttt{CONTENTS_COST_DENSITY}: Replacement cost of contents in dollars per square meter (\sref{sec:grids-replacecosts})\\
-\item \texttt{BUILDING_COST_DENSITY}: Replacement cost of building in dollars per square meter (\sref{sec:grids-replacecosts})\\
-\item \texttt{FLOOR_AREA}: Total floor area in square meters (summed over all stories)\\
-\item \texttt{SURVEY_FACTOR}: Survey factor indicating how many `real' buildings the database entry represents\\
-\item \texttt{FCB_USAGE}: Index to FCB\index{building usgage!FCB} usage classification (\sref{sec:grids-usageclass})\\
-\item \texttt{SITE_CLASS}:
+\item \texttt{BID}: Integer site identifier for EQRM (typically the same as column 10)
+\item \texttt{LATITUDE}: Latitude of building 
+\item \texttt{LONGITUDE}: Longitude of building 
+\item \texttt{STRUCTURE\_CLASSIFICATION}: Index to building construction type... \textbf{expanded} HAZUS list (\sref{sec:grids-constructionclass})
+\item \texttt{STRUCTURE\_CATEGORY}: Type of structure (e.g. building or bridge)
+\item \texttt{HAZUS\_USAGE}: Index to HAZUS usage\index{building usgage!HAZUS} classification (\sref{sec:grids-usageclass}) 
+\item \texttt{SUBURB}: within which building is located 
+\item \texttt{POSTCODE}: Postcode within which building is located 
+\item \texttt{PRE1989}: Logical index stating whether the building is pre- (0) or post- (1) the 1989 Newcastle earthquake
+\item \texttt{HAZUS\_STRUCTURE\_CLASSIFICATION}: Index to building construction type... HAZUS list (\sref{sec:grids-constructionclass})
+\item \texttt{CONTENTS\_COST\_DENSITY}: Replacement cost of contents in dollars per square meter (\sref{sec:grids-replacecosts})
+\item \texttt{BUILDING\_COST\_DENSITY}: Replacement cost of building in dollars per square meter (\sref{sec:grids-replacecosts})
+\item \texttt{FLOOR\_AREA}: Total floor area in square meters (summed over all stories)
+\item \texttt{SURVEY\_FACTOR}: Survey factor indicating how many `real' buildings the database entry represents
+\item \texttt{FCB\_USAGE}: Index to FCB\index{building usgage!FCB} usage classification (\sref{sec:grids-usageclass})
+\item \texttt{SITE\_CLASS}:Regolith site class. Typically, this is defined
+by a letter. Note that the value of this parameter must match with
+an amplification factor defined in the amplification file (see
+\sref{sec:-appl-amplification})
+\item \texttt{VS30}: \textbf{WARNING}: Not yet operational for risk!
 \end{itemize}
 
 
@@ -354,27 +359,21 @@ the EQRM represents a subset of the true portfolio of interest.
 When creating a database that sub-samples a larger portfolio,
 individual database entries are used to represent more than one
 `real' building. Such sub-sampling is undertaken to reduce run
-times and memory requirements. Results from an EQRM simulation can
-be re-converted to the full portfolio using the \typesf defined in
-\typeparfile{sitedb}{\_<site}{\_loc>}{.mat} (see
-\sref{sec:loss-surveyfacts}).
-
-Tools to assist the creation of building database\index{building
-database}s for use with the EQRM can be found in
-\typedir{*/eqrm}{/datacvt}{/buildingdb}.
+times and memory requirements. Results from an EQRM  loss 
+simulation are scaled to the full portfolio using the \typesf. 
 
 
-\subsection{Building construction types}
+\subsubsection{Building construction types}
 \label{sec:grids-constructionclass}
 
 Buildings have been subdivided into a number of building
-types\index{building type} each with their own set of building
+types\index{building type} each with their own set of engineering
 parameters uniquely defining the median capacity
 curve\index{capacity curve} and the random variability around the
-median (see \cref{ch:damage}). The building construction types are
-based upon the HAZUS definitions \citep{dr_FEMA99b}, with some
-further subdivisions recommended by Australian engineers for
-Australian building construction types \citep{dr_Stehle01a}.
+median. The building construction types are
+based upon the HAZUS definitions (FEMA, 1999),% \citep{dr_FEMA99b}, 
+with some further subdivisions recommended by Australian engineers for
+Australian building construction types (Stehle \textit{et al.}, 2001).%\citep{dr_Stehle01a}.
 
 In essence, the seven basic HAZUS types are
 \begin{itemize}
@@ -447,9 +446,10 @@ There are further subdivisions of the HAZUS types into subtypes
 according to numbers of stories in the building. These are given
 in \tref{tab:hazus-types}.
 
-The new Australian sub-types, developed in the Australian
-engineers workshop, further subdivide some of the HAZUS types
-\citep{dr_Stehle01a}. In particular, the timber frame category
+The new Australian sub-types, developed by Australian engineers, 
+create further subdivisions of the HAZUS types
+(Stehle \textit{et al.}, 2001). %\citep{dr_Stehle01a}. 
+In particular, the timber frame category
 (W1) is subdivided into wall types (timber or brick veneer walls)
 and roof types (metal or tiled); the unreinforced masonry types
 (URML and URMM) into roof type (metal, tile or  otherwise), and
@@ -462,11 +462,15 @@ although some are rarely used. For example; the original Hazus W1
 is still there, however this is rarely used in favor of the more
 detailed classification into W1TIMBMETAL, W1BVTILE, etc. A
 complete list of all the building construction types is given in
-\tref{tab:v-dam-allbtypes}. The \typeself{set}{da}{ta} flag
-\typepar{hazus}{\_btypes}{\_flag} can be used to select between
-the use of the HAZUS building type\index{building type}
-classification and the Australian engineers extended HAZUS
-building type\index{building type} classification.
+\tref{tab:v-dam-allbtypes}. 
+%====================
+%DR - must check this block - where is the EQRM Control file parameter???
+%The EQRM control file parameter
+%\typepar{hazus}{\_btypes}{\_flag} can be used to select between
+%the use of the HAZUS building type\index{building type}
+%classification and the Australian engineers extended HAZUS
+%building type\index{building type} classification.
+% ===================================
 
 \begin{table}[htp]
 \centering \caption{Complete list of all building construction
@@ -495,16 +499,19 @@ only types).} \vspace{0.8em} \label{tab:v-dam-allbtypes}.
 \end{tabular}
 \end{table}
 
-The building capacity curve\index{capacity curve}s used in the
-Newcastle and Lake Macquarie study \citep{dr_Fulford02a} are
-provided in \aref{app:buildingpars},
-\tref{tab:vdam-building-parameters}. Other examples of the
-building capacity curve\index{capacity curve}s, as well as tools
-for manipulating them, can be found in the directory
-\typedir{*/eqrm}{/datacvt}{buildingpars}.
+% ====================================
+% DR - must choose where to put these - probably should keep 
+% them in an appendix somewhere......
+%The building capacity curve\index{capacity curve}s used in the
+%Newcastle and Lake Macquarie study \citep{dr_Fulford02a} are
+%provided in \aref{app:buildingpars},
+%\tref{tab:vdam-building-parameters}. Other examples of the
+%building capacity curve\index{capacity curve}s, as well as tools
+%for manipulating them, can be found in the directory
+%\typedir{*/eqrm}{/datacvt}{buildingpars}.
+% ====================================
 
-
-\subsection{Building usage types}
+\subsubsection{Building usage types}
 \label{sec:grids-usageclass}
 
 The cost models used by the EQRM require knowledge of the
@@ -514,12 +521,12 @@ the cost associated with building a hospital and the cost of
 building a local shop may differ even if the same materials are
 used because the buildings may be built to different standards. To
 transfer this information to the EQRM the building
-database\index{building database} must store information about
+database\index{building database}  stores information about
 each building's usage. There are two different schemes that can be
 used; the functional classification of building (FCB)
-usage\index{building usgage!FCB} \citep{dr_ABS01a} and the HAZUS
-usage\index{building usgage!HAZUS} classification
-\citep{dr_FEMA99b}.
+usage\index{building usgage!FCB} (ABS, 2001) %\citep{dr_ABS01a}
+ and the HAZUS usage\index{building usgage!HAZUS} classification
+(FEMA, 1999). %\citep{dr_FEMA99b}.
 
 
 \begin{table}
@@ -642,24 +649,24 @@ database} column 5.} \label{tab:grids-HAZUSusage} \vspace{0.8em}
 The FCB\index{building usgage!FCB} usage is summarised in
 \tref{tab:grids-FCB} and the HAZUS usage
 classification\index{building usgage!HAZUS} is summarised in
-\tref{tab:grids-HAZUSusage}. The \typeself{set}{da}{ta} flag
-\typepar{b\_usage}{\_type}{\_flag} can be used to switch between
+\tref{tab:grids-HAZUSusage}. The EQRM control file parameter 
+\typepar{buildings}{\_usage}{\_classification} can be used to switch between
 the two usage classifications.
 
 
-\subsection{Replacement costs}
+\subsubsection{Replacement costs}
 \label{sec:grids-replacecosts}
 
 
-The replacement cost in dollars per square metre for each building
+The replacement cost in dollars per square meter for each building
 and the replacement cost of the contents of each building are
 contained within the building database\index{building database}
-(columns 13 and 14 respectively: see \sref{sec:grids-bdatabase}).
+(see \sref{sec:grids-bdatabase}).
 Typically these costs are a function of the usage classification
 of the building and are hence also dependent on whether the
 HAZUS\index{building usgage!HAZUS} or FCB\index{building
 usgage!FCB} classification system is used. The EQRM does not cross
-check how the costings were created. Note that in some instances
+check how the costings were created. In some instances
 it may be appropriate to use costings created from one usage
 classification with the EQRM using the other usage mode (effects
 cost splits - see below) and in some instance it may not be
@@ -668,10 +675,42 @@ themselves with database metadata to ensure that they are using
 the EQRM appropriately for their own application.
 
 
+\clearpage
 
-
-\subsection{Amplification File}
+\section{Amplification File}
 \label{sec:-appl-amplification}
 
+Local soil conditions (or regolith) are capable of amplifying 
+bedrock (or hard rock) ground motion. Consequently, it is important 
+to incorporate regolith in many hazard and/or risk studies. 
+The choice to use regolith is controlled by the EQRM control
+file parameter \typepar{use}{\_amplification}. The manner in 
+which regolith (or amplification) is considered depends on 
+the GMPEs used. If a GMPE explicitly incorporates 
+regolith with a $V_{S30}$ term, then the EQRM will use this. 
+Otherswise the RSA is computed on bedrock and then amplified 
+to the regolith surface using a transfer function (or amplification factor). 
+An example of a an input file containing amplification factors is provided in the grey box below. 
 \lstinputlisting{xml_examples/java_par_ampfactors.xml} 
+
+
+Mention non-linearity
+
+At the beginning specify all:
+2. \texttt{moment\_magnitude\_bins} \\
+3. \texttt{pga\_bins} \\
+1. \texttt{site\_classes} \\
+4. \texttt{periods} \\
+
+Then - sorting over blocks 
+1. \texttt{site\_class} \texttt{class}\\
+2. \texttt{moment\_magnitude} \texttt{mag\_bin}
+3. \texttt{pga} \texttt{pga\_bin}
+
+The - inside the blocks we specify
+1. \texttt{log\_amplification}
+2. \texttt{log\_std}
+
+\textbf{Parameters in the Amplification Factor File}
+
 
