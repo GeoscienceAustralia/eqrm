@@ -1,4 +1,4 @@
-<amplification_model matlab_file = "example_par_ampfactors.xml">
+<amplification_model name = "example_par_ampfactors">
   <moment_magnitude_bins>
 	4.50000000 5.50000000
   </moment_magnitude_bins>
