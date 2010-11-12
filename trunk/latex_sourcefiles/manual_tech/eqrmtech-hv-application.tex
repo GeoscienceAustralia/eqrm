@@ -17,11 +17,11 @@ The input files required by the EQRM depend on the nature of the
 simulation conducted. For example, the inputs for a scenario loss
 simulation are different to those required for a probabilistic
 seismic hazard analysis. \tref{tab:input-overview} provides a
-summary of the inputs required by the EQRM. The EQRM Demos (see
-\sref{sec:application-demo}) provide examples of each input file and
+summary of the inputs required by the EQRM. The EQRM Demos in
+\texttt{*/eqrm\_core/demo} provide examples of each input file and
 demonstrate how to run the EQRM for each of the four main simulation
-types. srefmulti provides an overview of each of the main input
-files. Further details are provide in the following chapters.
+types. The following section provide an overview of each of the main
+input files.
 
 \begin{table}
 \caption{Input files required for different types of simulation with
@@ -73,8 +73,8 @@ come in two forms. These are:
 \item source zones, and
 \item faults.
 \end{itemize}
-The EQRM can be run with either of these inputs seprately or both of
-them together
+The EQRM can be run with either of these inputs seprately or both
+together
 
 
 \subsubsection{Source Zones}
@@ -90,7 +90,7 @@ source zone file. A description of each of the parameters follows.
 
 \textbf{General inputs} (\texttt{source\_model\_zone})
 \begin{itemize}
-\item \texttt{magnitude\_type}: earthquake magnitude used derive the
+\item \texttt{magnitude\_type}: earthquake magnitude used to derive the
 recurence parameters. NOTE - the EQRM only supports moment magnitude
 \texttt{Mw}.
 \end{itemize}
@@ -100,7 +100,7 @@ recurence parameters. NOTE - the EQRM only supports moment magnitude
 \item \texttt{area}: area of the source zone in km$^2$ \\
 \item \texttt{name}: name for the source zone \\
 \item \texttt{event\_type}: pointer to the a collection of inputs described in the
-\texttt{event\_type\_controlfile}.
+\texttt{event}\texttt{\_type}\texttt{\_controlfile}.
 \end{itemize}
 
 \textbf{Geometry inputs} (\texttt{geometry})
@@ -130,23 +130,23 @@ the Earth in longitude (column 1) and latitude (column 2).
 \item \texttt{distribution}: Distribution used to define the magnitude recurence relations. Note that
 the EQRM current only supports a Bounded Gutenberg-Richter recurence
 relationship for source zones (i.e.
-\texttt{bounded\_gutenberg\_richter}) \\
+\texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}) \\
 \item \texttt{recurrence\_min\_mag}: Minimum magnitude used to
 define the recurence relationship \\
 \item \texttt{recurrence\_max\_mag}: Maximum magnitude used to
 define the recurence relationship. Typically this is the magnitude
 of the largest earthquake expected in the zone. \\
-\item \texttt{A\_min}: Expected number of earthquake with magnitude \texttt{recurrence\_min\_mag}
+\item \texttt{A\_min}: Expected number of earthquakes with magnitude \texttt{recurrence\_min\_mag}
 or higher in the source zone per year.
-\item \texttt{b}: Gutenberg-Richter b value forounded Gutenberg-Richter recurence
+\item \texttt{b}: Gutenberg-Richter b value for rounded Gutenberg-Richter recurence
 relationship \\
-\item \texttt{generation\_min\_mag}: Minimum magnitude for generation of synthetic
+\item \texttt{generation\_min\_mag}: Minimum magnitude for synthetic
 earthquake generation. The EQRM will only generate synthetic
 earthquakes with magnitudes equal to or greater than
 \texttt{generation\_min\_mag}. \\
 \item \texttt{number\_of\_mag\_sample\_bins}: Number of magnitude
-bins used to discretise the recurence relationship in the range
-magnitude range \texttt{generation\_min\_mag} to
+bins used to discretise the recurence relationship in the magnitude
+range \texttt{generation\_min\_mag} to
 \texttt{recurrence\_max\_mag} \\
 \item \texttt{number\_of\_events}: Number of syntehtic ruptures to
 be generated in the source zone.
@@ -162,67 +162,158 @@ slab). The magnitude recurence for faults can be defined by a
 bounded Gutenberg-Richter relationship or a combination of bounded
 Gutenberg-Richter and Characteric. The magnitude recurence for the
 intraslab earthquakes must be defined by a bounded Gutenberg-Richter
-relationship. The following is an example of a source fault file
-with the following source types:
+relationship. The following grey box provides an example of a source
+fault file with the following source types:
 \begin{enumerate}
-\item crustal fault with recurnece defined by a bounded Gutenberg-Richter
+\item crustal fault with recurence defined by a bounded Gutenberg-Richter
 relationship (\texttt{fault 1}), \\
-\item crustal fault with recurnece defined by a combined bounded Gutenberg-Richter
+\item crustal fault with recurence defined by a combined bounded Gutenberg-Richter
 (for small earthquakes) and a characteristic recurence for larger
 earthquakes (\texttt{fault 2}), \\
 \item a 3D dipping volume to represent intraslab earthquakes in the
 subducting slab (\texttt{intraslab 1}).
 \end{enumerate}
-The following grey shaded box provides an example of a source zone
-file. Many of the parameters are identical to those described in
-\sref{sec:source-zone-file} and are not described seprarately here.
-A description of the new parameters is provided below.
-\lstinputlisting{xml_examples/source_model_fault_example.xml}
+Many of the parameters in the source fault file are identical to
+those described in \sref{sec:source-zone-file} and are not described
+seprarately here. A description of the new parameters is provided
+below. \lstinputlisting{xml_examples/source_model_fault_example.xml}
 
 \textbf{Parameters unique to the source fault file}
 \begin{itemize}
-\item \texttt{dip}: Dip of fault, defined as angle in degrees from horizontal \\
+\item \texttt{dip}: Dip of fault, defined as angle in degrees from horizontal
 \item \texttt{out\_of\_dip\_theta}: Out of plane dip, used for intraslab events. Angle between fault plane
-and out of dip rupture plane \\
-\item \texttt{delta\_theta}: ange of dips for intraslab events. This will be $\pm$ \texttt{delta\_theta}
-taken from the angle \texttt{dip + out\_of\_dip\_theta} \\
+and out of dip rupture plane
+\item \texttt{delta\_theta}: Bounds range of dips for intraslab events. That is,
+all synthetic ruptures will have uniformly random sampled dips in
+the range \texttt{dip + out\_of\_dip\_theta} $\pm$
+\texttt{delta\_theta}
 \item \texttt{slab\_width}: Width of slab (km) when using a fault source to represent intraslab
-in the subducting slab \\
+earthquakes in the subducting slab
 \item \texttt{trace}: Surface trace of the fault along the surface
 of the Earth. Note that it is the projection of fault along the
 direction of dip. It is defined by the latitude (\texttt{lat}) and
-longitude (\texttt{lon}) of the start and end of the trace. \\
+longitude (\texttt{lon}) of the start and end of the trace.
 \item \texttt{slip\_rate}: Slip rate of fault in mm per year.
+\item \texttt{distribution}: Distribution used to define the magnitude recurence relations. Note that
+for faults the EQRM supports (i) a Bounded Gutenberg-Richter
+recurence relationship
+(\texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}) or (ii) a
+combined Bounded Gutenberg-Richter and Characetristic model
+(\texttt{characteristic}). For intraslab earthquakes the EQRM
+supports only \texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}
+\item \texttt{recurrence\_max\_mag}: Maximum magnitude used to
+define the recurence relationship. Typically this is the magnitude
+of the largest earthquake expected on the fault (or in the
+subducting slab).
 \end{itemize}
 
 \subsection{Event Type Control File}
 
-The event type control file is a second level control file facilitating 
-the variation of selected EQRM parameters with event types. The mechanism 
-for this is an \texttt{event\_type} parameter which links  
-the \texttt{event\_type\_control} file with the 
-\texttt{fault\_source} and/or \texttt{zone\_source} files. 
+The event type control file is a second level control file
+facilitating the variation of selected EQRM parameters with event
+types. The mechanism for this is an \texttt{event\_type} parameter
+which links the \texttt{event\_type\_control} file with individual
+sources (i.e. specific zones, faults or dipping slabs) in the
+\texttt{fault\_source} and/or \texttt{zone\_source} files.
 \lstinputlisting{xml_examples/event_type_controlfile_example.xml}
+
+Parameters in the event type control file are separated into event
+groups. These are blocks of input parameters contained within
+\texttt{<event\_group} and \texttt{</event\_group>}. Each of these
+blocks is linked to a specific source in the source zone or source
+fault files using \texttt{event\_type}.
+
+The parameters enclosed within \texttt{<GMPE} and \texttt{</GMPE>}
+define control the use of ground motion prediction equations. These
+parameters include:
+\begin{itemize}
+\item \texttt{fault\_type}: fault mechanism used with the GMPE.
+Allowable options are \texttt{normal}, \texttt{reverse} and
+\texttt{strike\_slip}.
+\item \texttt{branch}: specifies a branch for the GMPE logic tree.
+There may be a single \texttt{branch} in which case a single GMPE is
+used or multiple \texttt{branch} in which case multiple GMPEs are
+used in a logic tree. Inside each branch the user must specify the
+chosen GMPEs (\texttt{model}: see below for a list of options) and
+the weights (\texttt{weight}) of each branch. Note that the weights
+for all brachnes in a given \texttt{GMPE} block must sum to 1.
+\end{itemize}
+
+The parameters enclosed within \texttt{<scaling} and \texttt{/>}
+ control the magnitude to size scaling during the generation of
+ synthetic ruptures. These parameters include:
+\begin{itemize}
+\item \texttt{scaling\_rule}: Defines the set of scaling rules
+which link $M_w$ to area, length and/or width. Currently the only
+set of scaling rules supported by the EQRM are those defined by
+Wells and Coppersmith (1994). Therefore, the only allowable option
+is \texttt{Wells\_\and\_Coppersmith\_94}.
+\item \texttt{scaling\_fault\_type}: Fault mechanism used with the scaling rule.
+Allowable options are \texttt{normal}, \texttt{reverse},
+\texttt{strike\_slip} and \texttt{unspecified}. \\
+\end{itemize}
+
+
+Current options for the the GMPE are: \\
+\vspace{1em}
+\begin{tabular}{|p{\textwidth}|}
+\hline
+\texttt{"Gaull\_1990\_WA"} $\Rightarrow$ Gaull \textit{et al.} (1990); \\
+\texttt{"Toro\_1997\_midcontinent"}  $\Rightarrow$ Toro \textit{et al.} (1997); \\
+\texttt{"Atkinson\_Boore\_97"}  $\Rightarrow$ Atkinson \textit{et al.} (1997); \\
+\texttt{"Sadigh\_97"}  $\Rightarrow$ Sadigh \textit{et al.} (1997); \\
+\texttt{"Youngs\_97\_interface"}  $\Rightarrow$ Youngs \textit{et al.} (1997) interface ($Z_T$=0); \\
+\texttt{"Youngs\_97\_intraslab"}  $\Rightarrow$ Youngs \textit{et al.} (1997) intraslab ($Z_T$=1); \\
+\texttt{"Combo\_Sadigh\_Youngs\_M8"}  $\Rightarrow$ combined Youngs \textit{et al.} (1997) and Sadigh \\
+\hspace{8em} \textit{et al.} (1997); \\
+\texttt{"Boore\_08"}  $\Rightarrow$ Boore \textit{et al.} (2008); \\
+\texttt{"Sommerville09\_Yilgarn"} $\Rightarrow$ Sommerville (2009) Yilgarn Craton; \\
+\texttt{"Sommerville09\_Non\_Cratonic"} $\Rightarrow$ Sommerville (2009) Average Non \\
+\hspace{8em} Cratonic model. \\
+\texttt{"AllenSEA06"} $\Rightarrow$ Allen \textit{et al.} (2006) model for South Eastern Australia \\
+\texttt{"Liang\_2008"} $\Rightarrow$ Liang \textit{et al.} (2006) \\
+\texttt{"Atkinson06\_hard\_bedrock"} $\Rightarrow$ Atkinson and Boore (2006) model for hard \\
+\hspace{8em} bedrock ($V_{s30}$=760\,ms$^{-1}$)\\
+\texttt{"Atkinson06\_bc\_boundary\_bedrock"} $\Rightarrow$ Atkinson and Boore (2006) model for \\
+\hspace{8em} $V_{s30}$ at the NEHRP BC boundary\\
+\texttt{"Campbell03"} $\Rightarrow$ Campbell (2003) hybrid empirical model\\
+\texttt{"Abrahamson08"} $\Rightarrow$ Abrahamson \textit{et al.} (2008) NGA model\\
+\texttt{"Chiou08"} $\Rightarrow$ Chiou and Youngs (2008) NGA model \\
+\texttt{"Campbell08"} $\Rightarrow$ Campbell and Borzorgnia (2008) NGA model \\
+\texttt{"Akkar\_2010\_crustal"} $\Rightarrow$ Akkar and Bommer (2010) model for Mediterranean \\
+\hspace{8em} and Middle East\\
+\texttt{"Zhao\_2006\_interface"} $\Rightarrow$ Zhao \textit{et al.} (2006) model for earthquakes \\
+\hspace{8em} on the subduction interface near Japan \\
+\texttt{"Atkinson\_2003\_intraslab"} $\Rightarrow$ Zhao \textit{et al.} (2006) model for \\
+\hspace{8em} earthquakes in the subducting slab near Japan\\
+\texttt{"Atkinson\_2003\_interface"} $\Rightarrow$ Atkinson and Boore (2003) model for \\
+\hspace{8em} earthquakes on the subduction interface\\
+\texttt{"Zhao\_2006\_intraslab"} $\Rightarrow$ Atkinson and Boore (2003) model for \\
+\hspace{8em} earthquakes in the subducting slab \\
+\hline
+\end{tabular}
+
+
 
 \subsection{Site File}
 
-The EQRM requires a site file at which either hazard or loss will be modeled. 
-The site file for hazard is a csv file 
+The EQRM requires a site file at which either hazard or loss will be modeled.
+The site file for hazard is a csv file
 containing a list of points at which the hazard (PSHA simulation)
- or ground motion (scenario simulation) will be computed. An example is 
- given below in the grey shaded box: 
+ or ground motion (scenario simulation) will be computed. An example is
+ given below in the grey shaded box:
 \lstinputlisting{xml_examples/java_par_site.csv}
 
 \textbf{Parameters in the hazard site file:}
 \begin{itemize}
-\item \texttt{Latitude}: Latitude of the the points of interest. 
-\item \texttt{Longitude}: Longitude of the the points of interest. 
-\item \texttt{SITE\_CLASS}: Regolith site class. Typically, this is defined 
-by a letter. Note that the value of this parameter must match with an 
-amplification factor defined in the amplification file 
-(see \sref{sec:-appl-amplification}) \\
+\item \texttt{Latitude}: Latitude of the the points of interest.
+\item \texttt{Longitude}: Longitude of the the points of interest.
+\item \texttt{SITE\_CLASS}: Regolith site class. Typically, this is defined
+by a letter. Note that the value of this parameter must match with
+an amplification factor defined in the amplification file (see
+\sref{sec:-appl-amplification})
 \item \texttt{VS30}: Average velocity in the top 30\,m (i.e. $V_{s30}$). This is used
-to incorporate regolith for GMPEs with a $V_{s30}$ term. 
+to incorporate regolith for GMPEs with a $V_{s30}$ term.
 \end{itemize}
 
 The site file for risk is a csv file
