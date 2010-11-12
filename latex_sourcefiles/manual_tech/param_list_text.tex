@@ -105,6 +105,35 @@ List whose elements represent the site
  indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
  index of the first row of data  (i.e. first data row in file) is 1.\\
  \hline
+\end{tabular}
+
+\vspace{2em}
+\begin{tabular}{|p{\textwidth}|}
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{zone\_source\_tag}: \\
+Extra tag for specifying a unique source zone file. That is, the
+filename for the source zone file will be
+\texttt{<site\_loc>\_}\texttt{fault\_source\_}\texttt{<zone\_source\_tag>}\texttt{.xml}
+\\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{fault\_source\_tag}: \\
+Extra tag for specifying a unique source fault file. That is, the
+filename for the fault source file will be
+\texttt{<site\_loc>\_}\texttt{fault\_source\_}\texttt{<fault\_source\_tag>}\texttt{.xml}
+\\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{event\_control\_tag}: \\
+Extra tag for specifying a unique event control file. That is, the
+filename for the event control file will be
+\texttt{<site\_loc>\_}\texttt{event\_control\_}\texttt{<event\_control\_tag>}\texttt{.xml}
+\\
+ %---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{site\_db\_tag}: \\
+Extra tag for specifying a unique site file. That is, the filename
+for the site file will be
+\texttt{<site\_loc>\_}\texttt{par\_site}\texttt{<site\_db\_tag>}\texttt{.csv}
+\\
+\hline
  \end{tabular}
 
 \vspace{2em}
@@ -166,32 +195,11 @@ Minimum magnitude below which hazard or risk is not considered.     \\
 \hline
 \vspace{0.3em} \noindent \Large \textbf{Ground Motion Input:} \normalsize \\
 %---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{atten\_models}: \\
-A list of the ground motion models (or GMPEs) to be used. Current choices are; \\
- \hspace{0.5em} \texttt{`Gaull\_1990\_WA'} $\Rightarrow$ Gaull \textit{et al.} (1990); \\
- \hspace{0.5em}  \texttt{`Toro\_1997\_midcontinent'}  $\Rightarrow$ Toro \textit{et al.} (1997); \\
- \hspace{0.5em}  \texttt{`Atkinson\_Boore\_97'}  $\Rightarrow$ Atkinson \textit{et al.} (1997); \\
- \hspace{0.5em}  \texttt{`Sadigh\_97'}  $\Rightarrow$ Sadigh \textit{et al.} (1997); \\
- \hspace{0.5em}  \texttt{`Youngs\_97\_interface'}  $\Rightarrow$ Youngs \textit{et al.} (1997) interface ($Z_T$=0); \\
- \hspace{0.5em}  \texttt{`Youngs\_97\_intraslab'}  $\Rightarrow$ Youngs \textit{et al.} (1997) intraslab ($Z_T$=1); \\
- \hspace{0.5em}  \texttt{`Combo\_Sadigh\_Youngs\_M8'}  $\Rightarrow$ combined Youngs \textit{et al.} (1997) and Sadigh \\
- \hspace{14.5em} \textit{et al.} (1997); \\
- \hspace{0.5em}  \texttt{`Boore\_08'}  $\Rightarrow$ Boore \textit{et al.} (2008); \\
- \hspace{0.5em} \texttt{`Sommerville09\_Yilgarn'} $\Rightarrow$ Sommerville (2009) Yilgarn Craton; \\
-  \hspace{0.5em} \texttt{`Sommerville09\_Non\_Cratonic'} $\Rightarrow$ Sommerville (2009) Average Non Cratonic \\
-  \hspace{14.5em}  model. \\
-%---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{atten\_model\_weights}: \\
-DEFAULT $=$ [1] \\
-A list of the weights to be applied to each of the GMPEs in
-\texttt{atten\_models}.  Note, $\sum  atten\_model\_weights=1$. \\
-%---------------------------------------------------------
 \hline \vspace{0.1em}
 \texttt{atten\_aggregate\_Sa\_of\_atten\_models}: \\
 DEFAULT $=$ \texttt{False} \\
 Set to \texttt{True} to collapse the surface acceleration's when
 multiple GMPEs are used.\\
-%---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_variability\_method}: \\
 DEFAULT  = 2 \\
  Technique used to
@@ -205,8 +213,9 @@ incorporate GMPE aleatory uncertainty: \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_periods}: \\
 Periods for $S_a$. Values must ascend. \\
+\hline
 %---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{atten\_threshold\_distance}: \\
+\vspace{0.1em} \texttt{atten\_threshold\_distance}: \\
 DEFAULT $=$ 400 \\
 Threshold distance beyond which motion is assigned to zero (km). \\
 %---------------------------------------------------------
@@ -222,8 +231,9 @@ use RSA shape from Australian earthquake loading \\
 \end{tabular}
 
 \begin{tabular}{|p{\textwidth}|}
-\hline \vspace{0.1em}
-\texttt{atten\_cutoff\_max\_spectral\_displacement}: \\
+%---------------------------------------------------------
+\hline
+ \hspace{0.5em} \texttt{atten\_cutoff\_max\_spectral\_displacement}: \\
 DEFAULT = \texttt{False} \\
 \hspace{0.5em} \texttt{True} $\Rightarrow$ cutoff maximum spectral displacement. \\
 \hspace{0.5em} \texttt{False} $\Rightarrow$ no cutoff applied to spectral displacement. \\
@@ -238,19 +248,7 @@ DEFAULT = \texttt{False} \\
 \hspace{0.5em} \texttt{True} $\Rightarrow$  Smooth RSA; \\
 \hspace{0.5em} \texttt{False} $\Rightarrow$  No smoothing applied to RSA. \\
 %---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{atten\_log\_sigma\_eq\_weight}: \\
-DEFAULT = 0 \\
-Used to separate the  total GMPE aleatory uncertainty or
-$\sigma_{total}$ into intra- $\sigma_{intra}$  and inter-
-$\sigma_{inter}$ event components.
- More specifically, \typepar{atten\_log\_sigma\_eq\_weight}{}{}
- represents the fraction of $\sigma_{total}$ associated with
- intra-event aleatory uncertainty. Similarly, \\
- 1 - \typepar{atten\_log\_sigma\_eq\_weight}{}{} is the fraction of $\sigma_{total}$
- associated with the earthquake/site pair or inter-event aleatory uncertainty.
- This variable defaults to 0 if not set.  Use a value between 0 and 1.\\
- \hline
-%---------------------------------------------------------
+\hline
  \end{tabular}
 
 \vspace{2em}
@@ -336,18 +334,20 @@ SUGGESTED = \texttt{True} \\
 Modify transition building period i.e. corner period $T_{av}$: \\
  \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: modify as in HAZUS; \\
  \hspace{0.5em}  \texttt{False} $\Rightarrow$ do NOT modify. \\
+ \hline
+\end{tabular}
+
+
+
+
+\vspace{2em}
+\begin{tabular}{|p{\textwidth}|}
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_use\_smoothing}: \\
 SUGGESTED = \texttt{True} \\
 Smoothing of damped curve: \\
  \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: apply smoothing; \\
  \hspace{0.5em} \texttt{False} $\Rightarrow$ NO smoothing.\\
-\hline
-%---------------------------------------------------------
-\end{tabular}
-
-\begin{tabular}{|p{\textwidth}|}
-%---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_hysteretic\_damping}: \\
 SUGGESTED = \texttt{`curve'} \\
 Technique for Hysteretic  damping: \\
