@@ -100,7 +100,7 @@ class Test_data_audit(unittest.TestCase):
 
 
 
-    def test_license_file_is_not_valid2(self):
+    def FIXME_test_license_file_is_not_valid2(self):
 	# Basic test using an invalid XML file. This one
         # should fail on Not Publishable
 	
@@ -249,7 +249,7 @@ class Test_data_audit(unittest.TestCase):
 
 
 
-    def test_license_file_is_valid(self):
+    def FIXME_test_license_file_is_valid(self):
 	# Basic test using an valid XML file
 		
 	# Generate valid example
@@ -309,7 +309,7 @@ class Test_data_audit(unittest.TestCase):
         os.remove(tmp_name)        
 	
 
-    def test_valid_license_file_with_multiple_files(self):
+    def FIXME_test_valid_license_file_with_multiple_files(self):
 	# Test of XML file with more than one datafile element.
 
 	
