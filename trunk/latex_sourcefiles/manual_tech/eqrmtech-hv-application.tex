@@ -1,9 +1,14 @@
 \chapter{The EQRM application}
 \label{ch:application}
 
-The Earthquake Risk Model (EQRM) is capable of earthquake scenario
-ground motion and scenario loss modeling as well as probabilistic
-seismic hazard (PSHA) and risk (PSRA) modeling. It is a product of
+The Earthquake Risk Model (EQRM) is capable of:
+\begin{enumerate}
+\item earthquake scenario ground motion modeling; 
+\item scenario loss forecasts; 
+\item probabilistic seismic hazard analysis (PSHA); and
+\item  probabilistic seismic risk analysis (PSRA).
+\end{enumerate}
+It is a product of
 Geoscience Australia, an Australian Government Agency.
 
 This chapter describes the EQRM application. Input files and
@@ -25,32 +30,27 @@ input files.
 
 \begin{table}
 \caption{Input files required for different types of simulation with
-the EQRM. The astericks indicates optional input files, the
-requirement for which depends on settings in the EQRM control file
-(see \cref{ch:reg} for more information).}
+the EQRM. The asterisks indicate optional input files, the
+requirement for which depends on settings in the EQRM control file}
 \label{tab:input-overview} \centering
 \begin{tabular}{|l|l|l|}
 \hline
  & \textbf{hazard} & \textbf{risk} \\
 \hline
-\textbf{scenario} & EQRM controlfile & EQRM controlfile \\
+\textbf{scenario} & EQRM control file & EQRM control file \\
   & amplification factors* & amplification factors* \\
   & hazard grid & building database \\
 \hline
-\textbf{probabilistic} & EQRM controlfile & EQRM controlfile\\
+\textbf{probabilistic} & EQRM control file & EQRM controlfile\\
   & source file(s) & source file(s) \\
-  & event type controlfile & event type controlfile \\
+  & event type control file & event type control file \\
   & amplification factors* & amplification factors* \\
   & hazard grid & building database \\
 \hline
 \end{tabular}
 \end{table}
 
-It contains a series of input parameters and flags that must be set
-by the user. \sref{sec:application-parfiles} describes other files
-that are required by the EQRM modules.
-
-\section{The EQRM control file}
+\section{The EQRM Control File}
 \label{sec:application-EQRMcf}
 
 % First lets include the descriptom of the EQRM control file and its parameters
@@ -58,124 +58,146 @@ that are required by the EQRM modules.
 
 % Now lets include an example EQRM controlfile
 
-\clearpage For example, the following grey shaded box provides an
+\clearpage The following grey shaded box provides an
 example of an EQRM controlfile to undertake a PSHA.
 
 \lstinputlisting{xml_examples/EQRM_controlfile.py}
 
 
 \clearpage
-\section{The source files}
+\section{The Source Files}
 
-The EQRM source files for probabilistic modelling (PSHA and PSRA)
+The EQRM source files for probabilistic modeling (PSHA and PSRA)
 come in two forms. These are:
 \begin{itemize}
 \item source zones, and
 \item faults.
 \end{itemize}
-The EQRM can be run with either of these inputs seprately or both
+The EQRM can be run with either of these inputs separately or both
 together
 
 
-\subsection{Source Zones}
+\subsection{Source Zone File}
 \label{sec:source-zone-file}
+
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+ \\
+Filename: \texttt{<site\_tag>\_}\texttt{fault\_source\_}\texttt{<zone\_source\_tag>}\texttt{.xml}  \\
+\\
+\hline
+\end{tabular} 
+\end{center}
 
 The source zone file is used to describe one or more areal source
 zones. Earthquakes are assumed to be equally likely to occur
-anywhere within a source zone. The magnitude recurence relationship
+anywhere within a source zone. The magnitude recurrence relationship
 for each source zone is defined by a bounded Gutenberg-Richter
 relationship. The following grey shaded box provides an example of a
-source zone file. A description of each of the parameters follows.
+source zone file. A description of the parameters follows.
 \lstinputlisting{xml_examples/source_model_zone_example.xml}
 
 \textbf{General inputs} (\texttt{source\_model\_zone})
 \begin{itemize}
-\item \texttt{magnitude\_type}: earthquake magnitude used to derive the
-recurence parameters. NOTE - the EQRM only supports moment magnitude
+\item \texttt{magnitude\_type}: Earthquake magnitude used to derive the
+recurrence parameters. NOTE - the EQRM only supports moment magnitude
 \texttt{Mw}.
 \end{itemize}
 
 \textbf{General zone inputs} (\texttt{zone})
 \begin{itemize}
-\item \texttt{area}: area of the source zone in km$^2$ \\
-\item \texttt{name}: name for the source zone \\
-\item \texttt{event\_type}: pointer to the a collection of inputs described in the
-\texttt{event}\texttt{\_type}\texttt{\_controlfile}.
+\item \texttt{area}: Area of the source zone in km$^2$ 
+\item \texttt{name}: Name for the source zone 
+\item \texttt{event\_type}: Pointer to the collection of inputs described in the
+event type controlfile.
 \end{itemize}
 
 \textbf{Geometry inputs} (\texttt{geometry})
 \begin{itemize}
-\item \texttt{azimuth}: center azimuth for randomly generated synthetic ruptures \\
-\item \texttt{delta\_azimuth}: range over which randomly generated azimuths will
+\item \texttt{azimuth}: Center azimuth for randomly generated synthetic ruptures 
+\item \texttt{delta\_azimuth}: Range over which randomly generated azimuths will
 be sampled. That is, the azimuth of all synthetic earthquake will be randomly drawn
-from a uniform distribution between \texttt{azimuth}$\pm$\texttt{delta\_azimuth}. \\
-\item \texttt{dip}: center dip for randomly generated synthetic ruptures \\
-\item \texttt{delta\_dip}: range over which randomly generated dips will
+from a uniform distribution between \texttt{azimuth}$\pm$\texttt{delta\_azimuth}. 
+\item \texttt{dip}: Center dip for randomly generated synthetic ruptures 
+\item \texttt{delta\_dip}: Range over which randomly generated dips will
 be sampled. That is, the dip of all synthetic earthquake will be
-randomly drawn from a uniform distribution between \texttt{dip}$\pm$\texttt{delta\_dip}.\\
-\item \texttt{depth\_top\_seismogenic}: Depth to the top of the seimogenic zone in km.
-No component of a synthetic rupture will be located above this value. \\
-\item \texttt{depth\_bottom\_seismogenic}: Depth to the bottom of the seimogenic zone in km.
-No component of a synthetic rupture will be located below this value. \\
+randomly drawn from a uniform distribution between \texttt{dip}$\pm$\texttt{delta\_dip}.
+\item \texttt{depth\_top\_seismogenic}: Depth (km) to the top of the seismogenic zone in km.
+No component of a synthetic rupture will be located above this value. 
+\item \texttt{depth\_bottom\_seismogenic}: Depth (km) to the bottom of the seismogenic zone in km.
+No component of a synthetic rupture will be located below this value. 
 \item \texttt{boundary}: Boundary of the areal source zone as
 defined on the surface of the Earth in longitude (column 1) and
-latitude (column 2). \\
+latitude (column 2). 
 \item \texttt{excludes}: Boundary of any regions in the source in
 which events are not required. Boundary defined on the surface of
-the Earth in longitude (column 1) and latitude (column 2).
+the Earth in longitude (column 1) and latitude (column 2). This parameter 
+is optional. the source zone file may have no \texttt{exclude} zones, a single 
+entry or multiple entries.
 \end{itemize}
 
 \textbf{Recurrence inputs} (\texttt{recurrence\_model})
 \begin{itemize}
-\item \texttt{distribution}: Distribution used to define the magnitude recurence relations. Note that
-the EQRM current only supports a Bounded Gutenberg-Richter recurence
+\item \texttt{distribution}: Distribution used to define the magnitude recurrence relations. Note that
+the EQRM current only supports a Bounded Gutenberg-Richter recurrence
 relationship for source zones (i.e.
-\texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}) \\
+\typepar{bounded}{\_gutenberg}{\_richter}) 
 \item \texttt{recurrence\_min\_mag}: Minimum magnitude used to
-define the recurence relationship \\
+define the recurrence relationship 
 \item \texttt{recurrence\_max\_mag}: Maximum magnitude used to
-define the recurence relationship. Typically this is the magnitude
-of the largest earthquake expected in the zone. \\
+define the recurrence relationship. Typically, this is the magnitude
+of the largest earthquake expected in the zone. 
 \item \texttt{A\_min}: Expected number of earthquakes with magnitude \texttt{recurrence\_min\_mag}
 or higher in the source zone per year.
-\item \texttt{b}: Gutenberg-Richter b value for rounded Gutenberg-Richter recurence
-relationship \\
+\item \texttt{b}: Gutenberg-Richter b value for bounded Gutenberg-Richter recurrence
+relationship 
 \item \texttt{generation\_min\_mag}: Minimum magnitude for synthetic
 earthquake generation. The EQRM will only generate synthetic
 earthquakes with magnitudes equal to or greater than
-\texttt{generation\_min\_mag}. \\
+\texttt{generation\_min\_mag}. 
 \item \texttt{number\_of\_mag\_sample\_bins}: Number of magnitude
-bins used to discretise the recurence relationship in the magnitude
+bins used to discretise the recurrence relationship in the magnitude
 range \texttt{generation\_min\_mag} to
-\texttt{recurrence\_max\_mag} \\
-\item \texttt{number\_of\_events}: Number of syntehtic ruptures to
+\texttt{recurrence\_max\_mag} 
+\item \texttt{number\_of\_events}: Number of syntectic ruptures to
 be generated in the source zone.
 \end{itemize}
 
-\subsection{Faults}
+\subsection{Source Fault File}
+
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\\
+Filename: \texttt{<site\_tag>\_}\texttt{fault\_source\_}\texttt{<fault\_source\_tag>}\texttt{.xml}\\
+\\
+\hline
+\end{tabular} 
+\end{center}
 
 The source faults file is used to describe one or more faults
-(including crsutal faults and subduction interfaces) and/or one or
+(including crustal faults and subduction interfaces) and/or one or
 more dipping slabs for intraslab earthquakes. Earthquakes are
 assumed to be equally likely to occur anywhere within the fault (or
-slab). The magnitude recurence for faults can be defined by a
+slab). The magnitude recurrence for faults can be defined by a
 bounded Gutenberg-Richter relationship or a combination of bounded
-Gutenberg-Richter and Characteric. The magnitude recurence for the
+Gutenberg-Richter and Characteristic. The magnitude recurrence for the
 intraslab earthquakes must be defined by a bounded Gutenberg-Richter
 relationship. The following grey box provides an example of a source
 fault file with the following source types:
 \begin{enumerate}
-\item crustal fault with recurence defined by a bounded Gutenberg-Richter
-relationship (\texttt{fault 1}), \\
-\item crustal fault with recurence defined by a combined bounded Gutenberg-Richter
-(for small earthquakes) and a characteristic recurence for larger
-earthquakes (\texttt{fault 2}), \\
-\item a 3D dipping volume to represent intraslab earthquakes in the
+\item \textit{crustal fault} with recurrence defined by a bounded Gutenberg-Richter
+relationship (\texttt{fault 1}), 
+\item \textit{crustal fault} with recurrence defined by a combined bounded Gutenberg-Richter
+(for small earthquakes) and a characteristic recurrence for larger
+earthquakes (\texttt{fault 2}), 
+\item a \textit{3D dipping volume} to represent intraslab earthquakes in the
 subducting slab (\texttt{intraslab 1}).
 \end{enumerate}
 Many of the parameters in the source fault file are identical to
 those described in \sref{sec:source-zone-file} and are not described
-seprarately here. A description of the new parameters is provided
+separately here. A description of the new parameters is provided
 below. \lstinputlisting{xml_examples/source_model_fault_example.xml}
 
 \textbf{Parameters unique to the source fault file}
@@ -183,31 +205,41 @@ below. \lstinputlisting{xml_examples/source_model_fault_example.xml}
 \item \texttt{dip}: Dip of fault, defined as angle in degrees from horizontal
 \item \texttt{out\_of\_dip\_theta}: Out of plane dip, used for intraslab events. Angle between fault plane
 and out of dip rupture plane
-\item \texttt{delta\_theta}: Bounds range of dips for intraslab events. That is,
+\item \texttt{delta\_theta}: Bounds the range of dips for intraslab events. That is,
 all synthetic ruptures will have uniformly random sampled dips in
 the range \texttt{dip + out\_of\_dip\_theta} $\pm$
 \texttt{delta\_theta}
 \item \texttt{slab\_width}: Width of slab (km) when using a fault source to represent intraslab
 earthquakes in the subducting slab
 \item \texttt{trace}: Surface trace of the fault along the surface
-of the Earth. Note that it is the projection of fault along the
+of the Earth. Note that it is the projection of the fault along the
 direction of dip. It is defined by the latitude (\texttt{lat}) and
 longitude (\texttt{lon}) of the start and end of the trace.
 \item \texttt{slip\_rate}: Slip rate of fault in mm per year.
-\item \texttt{distribution}: Distribution used to define the magnitude recurence relations. Note that
-for faults the EQRM supports (i) a Bounded Gutenberg-Richter
-recurence relationship
+\item \texttt{distribution}: Distribution used to define the magnitude recurrence relations. 
+For faults the EQRM supports (i) a Bounded Gutenberg-Richter
+recurrence relationship
 (\texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}) or (ii) a
-combined Bounded Gutenberg-Richter and Characetristic model
+combined Bounded Gutenberg-Richter and Characteristic model
 (\texttt{characteristic}). For intraslab earthquakes the EQRM
 supports only \texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}
 \item \texttt{recurrence\_max\_mag}: Maximum magnitude used to
-define the recurence relationship. Typically this is the magnitude
+define the recurrence relationship. Typically, this is the magnitude
 of the largest earthquake expected on the fault (or in the
 subducting slab).
 \end{itemize}
 
 \section{Event Type Control File}
+
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\\
+Filename: \texttt{<site\_tag>\_}\texttt{event\_control\_}\texttt{<event\_control\_tag>}\texttt{.xml}\\
+\\
+\hline
+\end{tabular}
+\end{center}
 
 The event type control file is a second level control file
 facilitating the variation of selected EQRM parameters with event
@@ -218,13 +250,13 @@ sources (i.e. specific zones, faults or dipping slabs) in the
 \lstinputlisting{xml_examples/event_type_controlfile_example.xml}
 
 Parameters in the event type control file are separated into event
-groups. These are blocks of input parameters contained within
-\texttt{<event\_group} and \texttt{</event\_group>}. Each of these
+groups. These are blocks of input parameters defined by
+\texttt{<event\_group} ... \texttt{</event\_group>}. Each of these
 blocks is linked to a specific source in the source zone or source
 fault files using \texttt{event\_type}.
 
-The parameters enclosed within \texttt{<GMPE} and \texttt{</GMPE>}
-define control the use of ground motion prediction equations. These
+The parameters enclosed within \texttt{<GMPE} ... \texttt{</GMPE>}
+define the use of ground motion prediction equations. These
 parameters include:
 \begin{itemize}
 \item \texttt{fault\_type}: fault mechanism used with the GMPE.
@@ -232,11 +264,11 @@ Allowable options are \texttt{normal}, \texttt{reverse} and
 \texttt{strike\_slip}.
 \item \texttt{branch}: specifies a branch for the GMPE logic tree.
 There may be a single \texttt{branch} in which case a single GMPE is
-used or multiple \texttt{branch} in which case multiple GMPEs are
+used or multiple \texttt{branch}es in which case multiple GMPEs are
 used in a logic tree. Inside each branch the user must specify the
 chosen GMPEs (\texttt{model}: see below for a list of options) and
-the weights (\texttt{weight}) of each branch. Note that the weights
-for all brachnes in a given \texttt{GMPE} block must sum to 1.
+the weights (\texttt{weight}) for each branch. The weights
+for all branches in a given \texttt{GMPE} block must sum to 1.
 \end{itemize}
 
 The parameters enclosed within \texttt{<scaling} and \texttt{/>}
@@ -250,30 +282,33 @@ Wells and Coppersmith (1994). Therefore, the only allowable option
 is \texttt{Wells\_\and\_Coppersmith\_94}.
 \item \texttt{scaling\_fault\_type}: Fault mechanism used with the scaling rule.
 Allowable options are \texttt{normal}, \texttt{reverse},
-\texttt{strike\_slip} and \texttt{unspecified}. \\
+\texttt{strike\_slip} and \texttt{unspecified}. Typically,
+\typepar{scaling}{\_fault}{\_type} will be the same as the GMPE 
+\typepar{fault}{\_type}, however the EQRM does not enforce this.  \\
 \end{itemize}
 
 
-Current options for the the GMPE are: \\
+Current options for the GMPE are: \\
 \vspace{1em}
 \begin{tabular}{|p{\textwidth}|}
 \hline
 \texttt{"Gaull\_1990\_WA"} $\Rightarrow$ Gaull \textit{et al.} (1990); \\
-\texttt{"Toro\_1997\_midcontinent"}  $\Rightarrow$ Toro \textit{et al.} (1997); \\
+\texttt{"Toro\_1997\_midcontinent"}  $\Rightarrow$ Toro \textit{et al.} (1997) model for \\
+    \hspace{8em} mid-continent USA; \\
 \texttt{"Atkinson\_Boore\_97"}  $\Rightarrow$ Atkinson \textit{et al.} (1997); \\
 \texttt{"Sadigh\_97"}  $\Rightarrow$ Sadigh \textit{et al.} (1997); \\
 \texttt{"Youngs\_97\_interface"}  $\Rightarrow$ Youngs \textit{et al.} (1997) interface ($Z_T$=0); \\
 \texttt{"Youngs\_97\_intraslab"}  $\Rightarrow$ Youngs \textit{et al.} (1997) intraslab ($Z_T$=1); \\
 \texttt{"Combo\_Sadigh\_Youngs\_M8"}  $\Rightarrow$ combined Youngs \textit{et al.} (1997) and Sadigh \\
-\hspace{8em} \textit{et al.} (1997); \\
+    \hspace{8em} \textit{et al.} (1997); \\
 \texttt{"Boore\_08"}  $\Rightarrow$ Boore \textit{et al.} (2008); \\
 \texttt{"Sommerville09\_Yilgarn"} $\Rightarrow$ Sommerville (2009) Yilgarn Craton; \\
 \texttt{"Sommerville09\_Non\_Cratonic"} $\Rightarrow$ Sommerville (2009) Average Non \\
-\hspace{8em} Cratonic model. \\
+    \hspace{8em} Cratonic model. \\
 \texttt{"AllenSEA06"} $\Rightarrow$ Allen \textit{et al.} (2006) model for South Eastern Australia \\
 \texttt{"Liang\_2008"} $\Rightarrow$ Liang \textit{et al.} (2006) \\
 \texttt{"Atkinson06\_hard\_bedrock"} $\Rightarrow$ Atkinson and Boore (2006) model for hard \\
-\hspace{8em} bedrock ($V_{s30}$=760\,ms$^{-1}$)\\
+    \hspace{8em} bedrock ($V_{s30}$=760\,ms$^{-1}$)\\
 \texttt{"Atkinson06\_bc\_boundary\_bedrock"} $\Rightarrow$ Atkinson and Boore (2006) model for \\
 \hspace{8em} $V_{s30}$ at the NEHRP BC boundary\\
 \texttt{"Campbell03"} $\Rightarrow$ Campbell (2003) hybrid empirical model\\
@@ -281,15 +316,15 @@ Current options for the the GMPE are: \\
 \texttt{"Chiou08"} $\Rightarrow$ Chiou and Youngs (2008) NGA model \\
 \texttt{"Campbell08"} $\Rightarrow$ Campbell and Borzorgnia (2008) NGA model \\
 \texttt{"Akkar\_2010\_crustal"} $\Rightarrow$ Akkar and Bommer (2010) model for Mediterranean \\
-\hspace{8em} and Middle East\\
+    \hspace{8em} and Middle East\\
 \texttt{"Zhao\_2006\_interface"} $\Rightarrow$ Zhao \textit{et al.} (2006) model for earthquakes \\
-\hspace{8em} on the subduction interface near Japan \\
+    \hspace{8em} on the subduction interface near Japan \\
 \texttt{"Atkinson\_2003\_intraslab"} $\Rightarrow$ Zhao \textit{et al.} (2006) model for \\
-\hspace{8em} earthquakes in the subducting slab near Japan\\
+    \hspace{8em} earthquakes in the subducting slab near Japan\\
 \texttt{"Atkinson\_2003\_interface"} $\Rightarrow$ Atkinson and Boore (2003) model for \\
-\hspace{8em} earthquakes on the subduction interface\\
+    \hspace{8em} earthquakes on the subduction interface\\
 \texttt{"Zhao\_2006\_intraslab"} $\Rightarrow$ Atkinson and Boore (2003) model for \\
-\hspace{8em} earthquakes in the subducting slab \\
+    \hspace{8em} earthquakes in the subducting slab \\
 \hline
 \end{tabular}
 
@@ -302,6 +337,16 @@ The EQRM requires a site file at which either hazard or loss will be modeled.
 
 \subsection{Hazard Site File}
 
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\\
+Filename: \texttt{<site\_tag>\_par\_site.csv} \\
+\\
+\hline
+\end{tabular}
+\end{center}
+
 The site file for hazard is a csv file containing a list of points at which the hazard (PSHA simulation)
  or ground motion (scenario simulation) will be computed. An example is
  given below in the grey shaded box:
@@ -309,8 +354,8 @@ The site file for hazard is a csv file containing a list of points at which the 
 
 \textbf{Parameters in the hazard site file:}
 \begin{itemize}
-\item \texttt{Latitude}: Latitude of the the points of interest.
-\item \texttt{Longitude}: Longitude of the the points of interest.
+\item \texttt{Latitude}: Latitude of the points of interest.
+\item \texttt{Longitude}: Longitude of the points of interest.
 \item \texttt{SITE\_CLASS}: Regolith site class. Typically, this is defined
 by a letter. Note that the value of this parameter must match with
 an amplification factor defined in the amplification file (see
@@ -322,6 +367,16 @@ to incorporate regolith for GMPEs with a $V_{s30}$ term.
 \subsection{Risk Site File (Building Database)}
 \label{sec:grids-bdatabase}
 
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\\
+Filename: \texttt{sitedb\_<site\_tag><site\_db\_tag>.csv} \\
+\\
+\hline
+\end{tabular} 
+\end{center}
+
 The site file for risk is a csv file representing a building
 portfolio. It contains a list of points at which the risk (PSHA simulation)
  or loss (scenario simulation) will be computed. An example is
@@ -332,13 +387,13 @@ portfolio. It contains a list of points at which the risk (PSHA simulation)
 \textbf{Parameters in the building database:}
 \begin{itemize}
 \item \texttt{BID}: Integer site identifier for EQRM (typically the same as column 10)
-\item \texttt{LATITUDE}: Latitude of building 
-\item \texttt{LONGITUDE}: Longitude of building 
+\item \texttt{LATITUDE}: Latitude of building
+\item \texttt{LONGITUDE}: Longitude of building
 \item \texttt{STRUCTURE\_CLASSIFICATION}: Index to building construction type... \textbf{expanded} HAZUS list (\sref{sec:grids-constructionclass})
 \item \texttt{STRUCTURE\_CATEGORY}: Type of structure (e.g. building or bridge)
-\item \texttt{HAZUS\_USAGE}: Index to HAZUS usage\index{building usgage!HAZUS} classification (\sref{sec:grids-usageclass}) 
-\item \texttt{SUBURB}: within which building is located 
-\item \texttt{POSTCODE}: Postcode within which building is located 
+\item \texttt{HAZUS\_USAGE}: Index to HAZUS usage\index{building usgage!HAZUS} classification (\sref{sec:grids-usageclass})
+\item \texttt{SUBURB}: within which building is located
+\item \texttt{POSTCODE}: Postcode within which building is located
 \item \texttt{PRE1989}: Logical index stating whether the building is pre- (0) or post- (1) the 1989 Newcastle earthquake
 \item \texttt{HAZUS\_STRUCTURE\_CLASSIFICATION}: Index to building construction type... HAZUS list (\sref{sec:grids-constructionclass})
 \item \texttt{CONTENTS\_COST\_DENSITY}: Replacement cost of contents in dollars per square meter (\sref{sec:grids-replacecosts})
@@ -359,8 +414,8 @@ the EQRM represents a subset of the true portfolio of interest.
 When creating a database that sub-samples a larger portfolio,
 individual database entries are used to represent more than one
 `real' building. Such sub-sampling is undertaken to reduce run
-times and memory requirements. Results from an EQRM  loss 
-simulation are scaled to the full portfolio using the \typesf. 
+times and memory requirements. Results from an EQRM  loss
+simulation are scaled to the full portfolio using the \typesf.
 
 
 \subsubsection{Building construction types}
@@ -371,7 +426,7 @@ types\index{building type} each with their own set of engineering
 parameters uniquely defining the median capacity
 curve\index{capacity curve} and the random variability around the
 median. The building construction types are
-based upon the HAZUS definitions (FEMA, 1999),% \citep{dr_FEMA99b}, 
+based upon the HAZUS definitions (FEMA, 1999),% \citep{dr_FEMA99b},
 with some further subdivisions recommended by Australian engineers for
 Australian building construction types (Stehle \textit{et al.}, 2001).%\citep{dr_Stehle01a}.
 
@@ -446,9 +501,9 @@ There are further subdivisions of the HAZUS types into subtypes
 according to numbers of stories in the building. These are given
 in \tref{tab:hazus-types}.
 
-The new Australian sub-types, developed by Australian engineers, 
+The new Australian sub-types, developed by Australian engineers,
 create further subdivisions of the HAZUS types
-(Stehle \textit{et al.}, 2001). %\citep{dr_Stehle01a}. 
+(Stehle \textit{et al.}, 2001). %\citep{dr_Stehle01a}.
 In particular, the timber frame category
 (W1) is subdivided into wall types (timber or brick veneer walls)
 and roof types (metal or tiled); the unreinforced masonry types
@@ -458,11 +513,11 @@ non-soft story types. Soft-story refers to buildings that may have
 a concrete basement or parking area but wood frame stories.
 
 In total, we currently have 56 possible construction types
-although some are rarely used. For example; the original Hazus W1
+although some are rarely used. For example; the original HAZUS W1
 is still there, however this is rarely used in favor of the more
 detailed classification into W1TIMBMETAL, W1BVTILE, etc. A
 complete list of all the building construction types is given in
-\tref{tab:v-dam-allbtypes}. 
+\tref{tab:v-dam-allbtypes}.
 %====================
 %DR - must check this block - where is the EQRM Control file parameter???
 %The EQRM control file parameter
@@ -500,7 +555,7 @@ only types).} \vspace{0.8em} \label{tab:v-dam-allbtypes}.
 \end{table}
 
 % ====================================
-% DR - must choose where to put these - probably should keep 
+% DR - must choose where to put these - probably should keep
 % them in an appendix somewhere......
 %The building capacity curve\index{capacity curve}s used in the
 %Newcastle and Lake Macquarie study \citep{dr_Fulford02a} are
@@ -649,7 +704,7 @@ database} column 5.} \label{tab:grids-HAZUSusage} \vspace{0.8em}
 The FCB\index{building usgage!FCB} usage is summarised in
 \tref{tab:grids-FCB} and the HAZUS usage
 classification\index{building usgage!HAZUS} is summarised in
-\tref{tab:grids-HAZUSusage}. The EQRM control file parameter 
+\tref{tab:grids-HAZUSusage}. The EQRM control file parameter
 \typepar{buildings}{\_usage}{\_classification} can be used to switch between
 the two usage classifications.
 
@@ -680,37 +735,66 @@ the EQRM appropriately for their own application.
 \section{Amplification File}
 \label{sec:-appl-amplification}
 
-Local soil conditions (or regolith) are capable of amplifying 
-bedrock (or hard rock) ground motion. Consequently, it is important 
-to incorporate regolith in many hazard and/or risk studies. 
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\\
+Filename: \texttt{<site\_tag>\_par\_ampfactors.xml} \\
+\\
+\hline
+\end{tabular} 
+\end{center}
+
+Local soil conditions (or regolith) are capable of amplifying
+bedrock (or hard rock) ground motion. Consequently, it can be important
+to incorporate regolith in hazard and/or risk studies.
 The choice to use regolith is controlled by the EQRM control
-file parameter \typepar{use}{\_amplification}. The manner in 
-which regolith (or amplification) is considered depends on 
-the GMPEs used. If a GMPE explicitly incorporates 
-regolith with a $V_{S30}$ term, then the EQRM will use this. 
-Otherswise the RSA is computed on bedrock and then amplified 
-to the regolith surface using a transfer function (or amplification factor). 
-An example of a an input file containing amplification factors is provided in the grey box below. 
-\lstinputlisting{xml_examples/java_par_ampfactors.xml} 
+file parameter \typepar{use}{\_amplification}. The manner in
+which regolith (or amplification) is considered depends on
+the GMPEs used. If a GMPE explicitly incorporates
+regolith with a $V_{S30}$ term, then the EQRM will use this.
+Otherwise the RSA is computed on bedrock and then amplified
+to the regolith surface using a transfer function (or amplification factor).
+An example of an input file containing amplification factors is provided in the grey box below.
+\lstinputlisting{xml_examples/java_par_ampfactors.xml}
 
+The amplification of seismic ground motion depends on the composition 
+of the regolith. The EQRM accounts for variation in regolith material by assigning 
+amplification factors to different site classes. The EQRM also recognises that 
+amplification of seismic waves is a non-linear process. That is, the degree
+of amplification is a function of the level of ground motion. To account for 
+this non-linearity, the EQRM allows users to specify a number of amplification 
+factors which are grouped according to the level of bedrock ground motion (as 
+measured by PGA) and the size of the event (as measure by $M_w$).
 
-Mention non-linearity
+The amplification factor file must specify the following parameters at the beginning: 
+\begin{itemize} 
+\item \texttt{moment\_magnitude\_bins}: centroids of the moment magnitude $M_w$ bins
+ for which amplification factors are defined. 
+\item \texttt{pga\_bins}: centroids of the PGA bins for which amplification factors are defined.
+\item \texttt{site\_classes}: List of site classes for which amplification factors are defined. 
+The EQRM assumes that each site class is defined by a single letter (e.g. \texttt{site\_class} = B). 
+\item \texttt{periods}: RSA periods at which the amplification factors are defined. Note that 
+these periods need not be the same as those in \typepar{atten}{\_}{periods} from the 
+EQRM control file. The EQRM will interpolate as required. 
+\end{itemize} 
 
-At the beginning specify all:
-2. \texttt{moment\_magnitude\_bins} \\
-3. \texttt{pga\_bins} \\
-1. \texttt{site\_classes} \\
-4. \texttt{periods} \\
+The xml amplification factor file is then composed of a sequence of blocks, each of which 
+defines:
+\begin{itemize} 
+\item the \texttt{site\_class} using the parameter \texttt{class}.
+\item the \texttt{moment\_magnitude} bin centroid using the parameter \texttt{mag\_bin}. 
+\item the \texttt{pga} bin centroid using the parameter \texttt{pga\_bin}. 
+\end{itemize}
 
-Then - sorting over blocks 
-1. \texttt{site\_class} \texttt{class}\\
-2. \texttt{moment\_magnitude} \texttt{mag\_bin}
-3. \texttt{pga} \texttt{pga\_bin}
-
-The - inside the blocks we specify
-1. \texttt{log\_amplification}
-2. \texttt{log\_std}
-
-\textbf{Parameters in the Amplification Factor File}
-
-
+Finally the inside of each block specifies:
+\begin{itemize}
+\item \texttt{log\_amplification}: the logarithm of the median amplification factor defined at each 
+of the RSA periods in \texttt{periods}.
+\item \texttt{log\_std}: the standard deviation of the amplification factor. The EQRM assumes
+ that the amplification factor is log-normally 
+distributed when using this
+standard deviation. The standard deviation can be set to an arbitrarily small 
+number such as 0.01 (as shown in grey shaded box above) when not known. Use of this standard deviation is controlled by 
+the EQRM control file parameter \texttt{amp\_variability\_method} which can also be set to \texttt{None}. 
+\end{itemize}

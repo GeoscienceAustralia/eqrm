@@ -1,14 +1,14 @@
 
 The EQRM control file is the primary input file for an EQRM
 simulation. It:
-\begin{itemize}
+\begin{enumerate}
 \item contains a series of input variables (or parameters) that define
 the manner in which the EQRM is operated; and
-\item initiallises the simulation.
-\end{itemize}
+\item initialises the simulation.
+\end{enumerate}
 For example, there is a parameter to control whether the EQRM models
-hazard or risk. Other parameters can be used to define which ground
-motion model is used and whether site amplification is considered. A
+hazard or risk. Other parameters can be used to identify return 
+periods or indicate whether site amplification is considered. A
 description of all of the parameters is given below.
 
 Note that it not essential to supply all parameters for each
@@ -16,8 +16,8 @@ simulation. For example, if amplification is not being used (i.e.
 \texttt{use\_amplification} $=$ \texttt{False}) it is not necessary
 to supply the remaining amplification parameters. Furthermore,
 default values are set by the EQRM for several parameters. These are
-indicated in the following when applicable. Omission of these input
-parameters in the \texttt{setdata} file will lead to use of the
+indicated below when applicable. Omission of these input
+parameters in the EQRM control file will lead to use of the
 default values. For example, the default value for
 \texttt{atten\_threshold\_distance} is 400\,km.
 
@@ -28,10 +28,10 @@ For example, the suggested value for \texttt{loss\_min\_pga} is
 0.05.
 
 Finally, the term preferred is used to indicate those parameters
-that the developers believe to be the most appropriate. For example,
+that the developers believe to be most appropriate. For example,
 the preferred value for \typepar{csm\_}{hysteretic\_}{damping} is
 \texttt{curve}. In this case the alternative choices of
-\texttt{None} and \texttt{curve} would typically only be used for
+\texttt{None} and \texttt{trapezoidal} would typically only be used for
 experimental purposes.
 
 
@@ -58,8 +58,8 @@ CSM is capacity spectrum method \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{run\_type}: \\
 Defines the operation mode of the EQRM: \\
-  \hspace{0.5em} 'hazard' $\Rightarrow$ Scenario RSA and PSHA (probabilistic hazard); \\
-  \hspace{0.5em} 'risk' $\Rightarrow$ Scenario Loss and PSRA (probabilistic risk); \\
+  \hspace{0.5em} `hazard' $\Rightarrow$ Scenario RSA and PSHA (probabilistic hazard); \\
+  \hspace{0.5em} `risk' $\Rightarrow$ Scenario Loss and PSRA (probabilistic risk); \\
 %---------------------------------------------------------
  \hline
 \vspace{0.1em} \texttt{is\_scenario}: \\
@@ -81,7 +81,7 @@ output file
 \hline \vspace{0.1em} \texttt{site\_db\_tag}: \\
 DEFAULT = `' \\
  String used to specify the
- exposure or building data base.  The file name is \texttt{sitedb\_[site\_tag][site\_db\_tag].csv}\\
+ exposure or building data base.  The file name is \texttt{sitedb\_<site\_tag><site\_db\_tag>.csv}\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{return\_periods}: \\
 List whose
@@ -103,7 +103,7 @@ DEFAULT = \texttt{False} \\
 \hline \vspace{0.1em} \texttt{site\_indexes}: \\
 List whose elements represent the site
  indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
- index of the first row of data  (i.e. first data row in file) is 1.\\
+ index of the first row of data  (i.e. first data row in site file) is 1.\\
  \hline
 \end{tabular}
 
@@ -111,28 +111,29 @@ List whose elements represent the site
 \begin{tabular}{|p{\textwidth}|}
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{zone\_source\_tag}: \\
-Extra tag for specifying a unique source zone file. That is, the
-filename for the source zone file will be
-\texttt{<site\_loc>\_}\texttt{fault\_source\_}\texttt{<zone\_source\_tag>}\texttt{.xml}
+Extra tag for specifying a unique source zone file. The
+filename for the source zone is
+\texttt{<site\_tag>\_}\texttt{fault\_source\_}\texttt{<zone\_source\_tag>}\texttt{.xml}
 \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{fault\_source\_tag}: \\
-Extra tag for specifying a unique source fault file. That is, the
-filename for the fault source file will be
-\texttt{<site\_loc>\_}\texttt{fault\_source\_}\texttt{<fault\_source\_tag>}\texttt{.xml}
+Extra tag for specifying a unique source fault file. The
+filename for the fault source file is
+\texttt{<site\_tag>\_}\texttt{fault\_source\_}\texttt{<fault\_source\_tag>}\texttt{.xml}
 \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{event\_control\_tag}: \\
-Extra tag for specifying a unique event control file. That is, the
-filename for the event control file will be
-\texttt{<site\_loc>\_}\texttt{event\_control\_}\texttt{<event\_control\_tag>}\texttt{.xml}
+Extra tag for specifying a unique event control file. The
+filename for the event control is
+\texttt{<site\_tag>\_}\texttt{event\_control\_}\texttt{<event\_control\_tag>}\texttt{.xml}
 \\
  %---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{site\_db\_tag}: \\
-Extra tag for specifying a unique site file. That is, the filename
-for the site file will be
-\texttt{<site\_loc>\_}\texttt{par\_site}\texttt{<site\_db\_tag>}\texttt{.csv}
-\\
+% DR - must check if this is operational for hazard site file
+%\hline \vspace{0.1em} \texttt{site\_db\_tag}: \\
+%Extra tag for specifying a unique site file. That is, the filename
+%for the site file will be
+%\texttt{<site\_loc>\_}\texttt{par\_site}\texttt{<site\_db\_tag>}\texttt{.csv}
+%\\
 \hline
  \end{tabular}
 
@@ -162,32 +163,15 @@ Dip of rupture plane (degrees from horizontal).  \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{scenario\_number\_of\_events}: \\
  The desired number of
-copies of the event to be generated. Typically copies are taken
+copies of the event to be generated. Typically, copies are taken
 if random sampling is used to incorporate aleatory uncertainty
 in GMPE (i.e. \typepar{atten\_}{variability\_}{method}$=2$),
 amplification (i.e. \typepar{amp\_}{variability\_}{method}$=2$)
-or the CSM (\typepar{csm\_}{variability\_}{method}$=3$)\\
+or the CSM (\typepar{csm\_}{variability\_}{method}$=3$).\\
 \hline
 %---------------------------------------------------------
  \end{tabular}
 
-
-\vspace{2em}
-\begin{tabular}{|p{\textwidth}|}
-%---------------------------------------------------------
-\hline
-\vspace{0.3em} \noindent \Large \textbf{Probabilistic input:} \normalsize \\
-%---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{prob\_number\_of\_events\_in\_zones}: \\
- List whose elements represent the
-desired number of simulated evenst for each generation zone.\\
-%---------------------------------------------------------
-\hline
-\vspace{0.1em} \texttt{prob\_min\_mag\_cutoff}: \\
-Minimum magnitude below which hazard or risk is not considered.     \\
-%---------------------------------------------------------
-\hline
- \end{tabular}
 
 \vspace{2em}
 \begin{tabular}{|p{\textwidth}|}
@@ -198,6 +182,7 @@ Minimum magnitude below which hazard or risk is not considered.     \\
 \hline \vspace{0.1em}
 \texttt{atten\_aggregate\_Sa\_of\_atten\_models}: \\
 DEFAULT $=$ \texttt{False} \\
+SUGGESTED $=$ 1 (PSHA), 2 (PSRA) or 3 to 6 (Scenario) 
 Set to \texttt{True} to collapse the surface acceleration's when
 multiple GMPEs are used.\\
 \hline \vspace{0.1em} \texttt{atten\_variability\_method}: \\
@@ -205,6 +190,7 @@ DEFAULT  = 2 \\
  Technique used to
 incorporate GMPE aleatory uncertainty: \\
  \hspace{0.5em} None $\Rightarrow$ No sampling; \\
+ \hspace{0.5em} 1 $\Rightarrow$ spawning; \\
  \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
  \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
  \hspace{0.5em} 4 $\Rightarrow$ $+\sigma$; \\
@@ -212,16 +198,17 @@ incorporate GMPE aleatory uncertainty: \\
  \hspace{0.5em} 6 $\Rightarrow$ $-2\sigma$.\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_periods}: \\
-Periods for $S_a$. Values must ascend. \\
+Periods for RSA. Values must ascend. \\
 \hline
 %---------------------------------------------------------
 \vspace{0.1em} \texttt{atten\_threshold\_distance}: \\
 DEFAULT $=$ 400 \\
-Threshold distance beyond which motion is assigned to zero (km). \\
+Threshold distance (km) beyond which motion is assigned to zero. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_override\_RSA\_shape}: \\
 DEFAULT = \texttt{None} \\
-Use GMPE for PGA only and change shape of RSA as follows\\
+Use GMPE for PGA only and change shape of RSA. If `None' use RSA
+as defined by GMPE, otherwise if\\
  \hspace{0.5em} \texttt{`Aust\_standard\_Sa'} $\Rightarrow$
 use RSA shape from Australian earthquake loading \\
 \hspace{11em} standard; \\
@@ -240,7 +227,7 @@ DEFAULT = \texttt{False} \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_pga\_scaling\_cutoff}: \\
 DEFAULT = 2 \\
-The maximum acceptable PGA in units g. $S_a$ at all periods re-scaled accordingly.      \\
+The maximum acceptable PGA in units g. RSA at all periods re-scaled accordingly.      \\
 %---------------------------------------------------------
 \hline \vspace{0.1em}
 \texttt{atten\_smooth\_spectral\_acceleration}: \\
@@ -256,7 +243,10 @@ DEFAULT = \texttt{False} \\
 \hline
 \vspace{0.3em} \noindent \Large \textbf{Amplification Input:} \normalsize \\
 \hline \vspace{0.1em} \texttt{use\_amplification}: \\
-If set to \texttt{True} use amplification associated with the local regolith: \\
+If set to \texttt{True} use amplification associated with the local regolith. 
+Nature of amplification varies depending on the GMPE. If GMPE has a $V_{S30}$ term
+then this will be used to compute RSA on regolith. Otherwise, RSA is computed on 
+bedrock and amplification factors used to transfer this to regolith surface. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{amp\_variability\_method}: \\
 DEFAULT = 2 \\
@@ -427,7 +417,7 @@ DEFAULT = \texttt{False} \\
 DEFAULT = \texttt{False} \\
 \texttt{True} $\Rightarrow$ Save structural non-cumulative
 probability of being in each
-damage state.  Note this is only allowed when there is one event. \\
+damage state.  Note this is only supported for a single event. \\
 \hline
 %---------------------------------------------------------
  \end{tabular}
