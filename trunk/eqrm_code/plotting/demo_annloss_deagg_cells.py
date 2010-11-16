@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Demonstration of using the plot_hazard function.
+Demonstration of using the fig_annloss_deagg_cells function.
 
 Copyright 2010 by Geoscience Australia
 

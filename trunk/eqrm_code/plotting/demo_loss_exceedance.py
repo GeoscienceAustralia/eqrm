@@ -14,9 +14,9 @@ input_dir = Demo_Output_ProbRisk_Path
 site_tag = 'newc'
 
 title = ''
-output_file = None
+output_file = 'fig_from_demo_loss_exceedance.png'
 grid = False
-show_graph = True
+show_graph = False
 annotate = None
 
 

@@ -34,7 +34,7 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period, output_dir,
                 plot_file=None, save_file=None, title=None, np_posn=None,
                 s_posn=None, cb_steps=None, colourmap=None, cb_label=None,
                 annotate=[]):
-    """Plot an earthquake hazard map.
+    """Plot an earthquake hazard map, from probabalistic data.
 
     input_dir     directory containing EQRM input data files
     site_tag      event descriptor string
@@ -84,7 +84,9 @@ def fig_loss_exceedance(input_dir, site_tag, title='',
                         output_file=None, grid=True,
                         show_graph=False, annotate=[]):
     """
-    This is also called the pml figure.
+
+    This is also called the pml figure.  This is for probabalistic
+    risk simulations.
 
     Plot the PML data.  Optionally save a file or show the graph (or both).
 
@@ -140,6 +142,7 @@ def fig_annloss_deagg_distmag(input_dir, site_tag, momag_labels,
                               colormap=None,
                               annotate=[]):
     """Plot annualised loss deaggregated distance/magnitude data.
+    This is for probabalistic risk simulations.
 
     Inputs:   
     input_dir    input directory
