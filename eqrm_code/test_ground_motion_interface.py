@@ -252,7 +252,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         distance = array([[[4]]])
         mag = array([[[5.5]]])
         Vs30 = array([[[100.0]]])
-        fault_type = array([[[0]]]) # 'reverse' -> use e4 value, of 4.
+        #fault_type = array([[[0]]]) # 'reverse' -> use e4 value, of 4.
         
         c1 = 1.0
         c2 = 2.0
@@ -285,6 +285,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         sigma_coefficient = array([[[[3.0]]]])
 
+        # Note:
+        # mag, mh and fault_type must have the same dimensions.
         # R = 5
         # Fd = [1 + 2(5.5-4.5)]ln(5/1)+3(5-1)
         fd_actual = 3*log(5) + 12
@@ -293,17 +295,17 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         # M-mh = 0
         # Fm = e4 = 4
-        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, 6.75, 6.75, fault_type)
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, 6.75, 6.75, 0)
         self.assert_(allclose(4, fm))
 
         # m-mh = -2  mh = 6.75     
         fm_actual = 4+5*-2+6*4
-        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, 4.75, 6.75, fault_type)
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, 4.75, 6.75, 0)
         self.assert_(allclose(fm_actual, fm))
         
         # m-mh = 2       
         fm_actual = 4+7*2
-        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, 8.75, 6.75, fault_type)
+        fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, 8.75, 6.75, 0)
         self.assert_(allclose(fm_actual, fm))
 
         bnl = bnl_Boore_08(b1, b2, 100)        
@@ -2069,6 +2071,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_interface,'test')
+    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Boore_08_distribution_subfunctions')
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
