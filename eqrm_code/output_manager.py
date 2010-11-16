@@ -435,7 +435,7 @@ def save_structures(THE_PARAM_T,structures,compress=False,
         maybe_nan = {'SUBURB':None, 'SURVEY_FACTOR':None,
                      'HAZUS_STRUCTURE_CLASSIFICATION':None, 'HAZUS_USAGE':None,
                      'PRE1989':None, 'POSTCODE':None, 'FCB_USAGE':None}
-        nan_values = ['1.#QNAN'] #,'nan','1.#QNB']
+        nan_values = ['1.#QNAN', '-1.#IND'] #,'nan','1.#QNB']
         for title_string in maybe_nan:
             string_value = structures.attributes[title_string][i]
             if isnan(string_value) and (string_value in nan_values or \
