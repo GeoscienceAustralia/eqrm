@@ -20,9 +20,9 @@ Zlim = [0, 8]
 R_extend_flag=True
 
 title = ''
-output_file = None
+output_file = 'fig_from_annloss_deagg_distmag'
 grid = None
-show_graph = True
+show_graph = False
 annotate = None
 
 plot_api.fig_annloss_deagg_distmag(input_dir, site_tag, momag_labels,

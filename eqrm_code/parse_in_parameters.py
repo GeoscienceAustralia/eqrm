@@ -938,7 +938,7 @@ def convert_attribute_dic_to_set_data_py(py_file_name, attribute_dic):
 
     return py_file_name
 
-# Obsolete?  
+# Used in analysis.py 
 def convert_THE_PARAM_T_to_py(py_file_name, THE_PARAM_T):
     """
     Given THE_PARAM_T convert it to a set data .py file.
