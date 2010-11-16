@@ -1850,7 +1850,12 @@ def fd_Boore_08(c1, c2, c3, distance, h, mag):
     fd = (c1 + c2*(mag - mref))* log(r/rref) + c3*(r - rref) # BA08 (4)
     return fd
 
-def fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, mh, fault_type):    
+def fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, mh, fault_type):
+    """
+    Calculates equations (5a) and (5b) from the Boore 08 paper.
+
+    Note, mag, mh and fault_type must have the same dimensions.
+    """
     mag = asarray(mag)
     # Note, no distance, so it is the same for all sites.
     # Cache to speed this.
@@ -1863,9 +1868,7 @@ def fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, mh, fault_type):
     # Note the ( + 0*e1) is to get the index shape correct.
     fm = where(mag + 0*e1<= mh,
                temp + e5*(mag - mh) + e6*(mag - mh)**2,
-               temp + e7*(mag - mh)) 
-    # *u + e2*ss + e3*ns + e4*rs for future work
-               
+               temp + e7*(mag - mh))               
     return fm
 
 # def memoize(function):
