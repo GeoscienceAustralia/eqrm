@@ -1,7 +1,8 @@
 
 import unittest
 
-from scipy import array, exp, log, allclose, newaxis, asarray, zeros
+from scipy import array, exp, log, allclose, newaxis, asarray, zeros, \
+     ones, int64
 
 from eqrm_code.ground_motion_specification import *
 from eqrm_code.ground_motion_interface import gound_motion_init
@@ -68,12 +69,15 @@ class Test_ground_motion_calculator(unittest.TestCase):
         periods = array([0.015, 0.45, 4.5 ])
         
         gm = Ground_motion_calculator(model_name, periods=periods)
-        
+        #print "magnitudes", magnitudes
+        Vs30 = 560*ones(magnitudes['Mw'].shape)
+        fault_type = zeros(magnitudes['Mw'].shape, dtype=int64)
         log_mean,log_sigma=gm.distribution_function(
             distances, magnitudes,
             depth=depths,
             event_activity=event_activity,
-            Vs30=560.0)
+            Vs30=560,
+            fault_type=fault_type)
         test_log_sigma = array([0.569, 0.609, 0.716])
         #print "log_sigma", log_sigma
         #FIXME check the shape as well
