@@ -1854,7 +1854,8 @@ def fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, mh, fault_type):
     """
     Calculates equations (5a) and (5b) from the Boore 08 paper.
 
-    Note, mag, mh and fault_type must have the same dimensions.
+    Precondition;
+    mag, mh and fault_type must have the same dimensions.
     """
     mag = asarray(mag)
     # Note, no distance, so it is the same for all sites.
