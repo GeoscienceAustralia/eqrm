@@ -650,7 +650,7 @@ def convert_cm_lonlat(x, y, extent):
 def get_colourmap(cmap, tmpdir=None):
     """Get a colourmap name given a user name string.
 
-    cmap  a colourmap name string (case insensitive)
+    cmap    a colourmap name string (case insensitive)
     tmpdir  path to a user temporary directory to use
             (if None, create our own)
 

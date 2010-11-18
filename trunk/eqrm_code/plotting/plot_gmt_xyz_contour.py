@@ -50,6 +50,7 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     cb_steps     if supplied is a sequence of discrete values at
                  the colour changes
     colourmap    string containing name of required colormap
+                 this could be a GMT name or a local name
     annotate     list of user annotations:
                      if None, no user or system annotations
                      if [],   only system annotations
@@ -74,6 +75,7 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     c_map = ColourMap
     if colourmap is not None:
         c_map = colourmap
+    c_map = util.get_colourmap(c_map)
 
     # get maximum and minimum values
     max_val = util.max_nan(data[:,2])
