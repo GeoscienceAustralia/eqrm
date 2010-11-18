@@ -2407,7 +2407,7 @@ def Atkinson06_hard_bedrock_distribution(**kwargs):
     return (log_mean, log_sigma)
 
 # constants for S calculations
-Atkinson06_Vref = 760.0
+Atkinson06_Vref = array([[[760.0]]])
 Atkinson06_V2 = 300.0
 Atkinson06_V1 = 180.0
 Atkinson06_logV1divV2 = math.log(Atkinson06_V1 / Atkinson06_V2)
@@ -2423,7 +2423,7 @@ def Atkinson06_calcS(pgaBC, **kwargs):
 
     # get args
     coefficient = kwargs['coefficient']
-    Vs30 = kwargs['Vs30']
+    Vs30 = array(kwargs['Vs30'])
 
     # check we have the right shapes
     num_periods = coefficient.shape[3]
@@ -2432,13 +2432,19 @@ def Atkinson06_calcS(pgaBC, **kwargs):
     # get the Blin, B1 and B2 coefficients.
     (Blin, B1, B2) = coefficient[-3:]
 
+    # ensure Vs30 is one-dimensional only, then ensure canonical shape
+    assert len(Vs30.shape) == 1, (msg
+               % ('Vs30', '(?,)', str(Vs30.shape)))
+    #Vs30 = Vs30[:,newaxis,newaxis] + zeros(B1.shape)
+    Vs30 = Vs30 + zeros(B1.shape)
+
     # get the Bnl array from eqns 8A, 8B, 8C, 8D, page 2200.
     # we do this by calculating 4 arrays for each of 8A, 8b, 8C and 8D
     # and then filling appropriate elements of resultant Bnl.
     BnlA = B1
     BnlB = (B1 - B2) * log(Vs30/Atkinson06_V2) / Atkinson06_logV1divV2 + B2
     BnlC = B2 * log(Vs30/Atkinson06_Vref) / Atkinson06_logV2divVref
-    Bnl = 0.0	# zeros(Vs30.shape)
+    Bnl = zeros(BnlC.shape)
 
     Bnl = where(Vs30 <= Atkinson06_Vref, BnlC, Bnl)
     Bnl = where(Vs30 <= Atkinson06_V2, BnlB, Bnl)
@@ -2485,14 +2491,16 @@ def Atkinson06_soil_distribution(**kwargs):
     assert distance.shape == (num_sites, num_events, 1), (msg
                % ('distance', '(%d,%d,%d)' % (num_sites, num_events, 1),
                   str(distance.shape)))
-    assert Vs30.shape == (num_sites,), (msg
-               % ('Vs30', '(%d,)' % num_sites, str(Vs30.shape)))
     assert coefficient.shape == (13, 1, 1, num_periods), (msg
                % ('coefficient', '(13,1,1,%d)' % num_periods,
                   str(coefficient.shape)))
     assert sigma_coefficient.shape == (2, 1, 1, num_periods), (msg
                % ('sigma_coefficient', '(2,1,1,%d)' % num_periods,
                   str(sigma_coefficient.shape)))
+
+    # ensure Vs30 is one-dimensional only
+    assert len(Vs30.shape) == 1, (msg
+               % ('Vs30', '(?,)', str(Vs30.shape)))
 
     # calculate pgaBC here, use PGA (period=0.0) coefficients
     (pgaBC, _) = Atkinson06_basic(mag=kwargs['mag'],
@@ -3083,16 +3091,24 @@ def Campbell03_distribution(**kwargs):
     tmp = 8.5 - Mw
     F1 = C2*Mw + C3*tmp*tmp
     F2 = C4*log(R) + (C5 + C6*Mw)*Rrup
-    F3 = zeros(Rrup.shape)
-    F3 = where(Rrup > Ca_R1, C9*(log(Rrup)-log(Ca_R1)), F3)
-    F3 = where(Rrup > Ca_R2,
-               C9*(log(Rrup)-log(Ca_R1))+C10*(log(Rrup)-log(Ca_R2)), F3)
+    F3 = zeros(Rrup.shape) + zeros(C1.shape)
+
+    XCa_R1 = Ca_R1 + zeros(C1.shape)
+    XCa_R2 = Ca_R2 + zeros(C1.shape)
+
+    F3 = where(Rrup > XCa_R1, C9*(log(Rrup)-log(XCa_R1)), F3)
+    F3 = where(Rrup > XCa_R2,
+               C9*(log(Rrup)-log(XCa_R1))+C10*(log(Rrup)-log(XCa_R2)), F3)
     del tmp
 
     log_mean = C1 + F1 + F2 + F3
 
     # calculate sigma values
-    log_sigma = where(Mw < Ca_M1, C11+C12*Mw, C13)
+    XCa_M1 = Ca_M1 + zeros(Mw.shape) + zeros(C1.shape)
+    XC11 = C11 + zeros(Mw.shape)
+    XC12 = C12 + zeros(Mw.shape)
+    log_sigma = C13 + zeros(Mw.shape)
+    log_sigma = where(Mw < XCa_M1, C11+C12*Mw, log_sigma)
 
     # check result has right dimensions
     assert log_mean.shape == (num_sites, num_events, num_periods), (msg
@@ -3242,8 +3258,6 @@ def Campbell08_distribution(**kwargs):
 
     periods = array(periods)
 
-#    print('periods=%s' % str(periods.flatten()))
-
     # get required distances
     Rrup = dist_object.Rupture
     Rjb = dist_object.Joyner_Boore
@@ -3286,14 +3300,6 @@ def Campbell08_distribution(**kwargs):
                % ('sigma_coefficient', '(5,1,1,%d)' % num_periods,
                   str(sigma_coefficient.shape)))
 
-    # if user passed us Z25, use it, else calculate from Vs30 (result in km)
-    # (we should only pass in Z25 during testing)
-    Z25 = kwargs.get('Z25', None)
-    if Z25 is None:
-        tmp = conversions.convert_Vs30_to_Z10(Vs30)
-        Z25 = conversions.convert_Z10_to_Z25(tmp)
-        del tmp
-
     # get flag values from 'fault_type'
     Frv = Campbell08_fault_type[:,0][fault_type]
     Fnm = Campbell08_fault_type[:,1][fault_type]
@@ -3303,12 +3309,27 @@ def Campbell08_distribution(**kwargs):
     Rjb = Rjb[:,:,newaxis]
     Vs30 = array(Vs30)[:,newaxis,newaxis]
 
+    # if user passed us Z25, use it, else calculate from Vs30 (result in km)
+    # (we should only pass in Z25 during testing)
+    Z25 = kwargs.get('Z25', None)
+    if Z25 is None:
+        tmp = conversions.convert_Vs30_to_Z10(Vs30)
+        Z25 = conversions.convert_Z10_to_Z25(tmp)
+        del tmp
+    else:
+        Z25 = array(Z25)[:,newaxis,newaxis]
+
     # unpack coefficients
-    (c0T,c1T,c2T,c3T,c4T,c5T,c6T,c7T,c8T,c9T,c10T,c11T,c12T,k1T,k2T,k3T,cT,nT) = coefficient
+    (c0T,c1T,c2T,c3T,c4T,c5T,c6T,c7T,
+     c8T,c9T,c10T,c11T,c12T,k1T,k2T,k3T,cT,nT) = coefficient
     (slnYT,tlnYT,slnAFT,sigCT,rhoT) = sigma_coefficient
 
+    # further Vs30 massaging - add num_periods dimension
+    Vs30 = Vs30 + zeros(c0T.shape)
+
     # unpack the PGA coefficients
-    (c0_22,c1_22,c2_22,c3_22,c4_22,c5_22,c6_22,c7_22,c8_22,c9_22,c10_22,c11_22,c12_22,k1_22,k2_22,k3_22,c_22,n_22) = Campbell08_PGA_coefficient
+    (c0_22,c1_22,c2_22,c3_22,c4_22,c5_22,c6_22,c7_22,c8_22,c9_22,c10_22,
+     c11_22,c12_22,k1_22,k2_22,k3_22,c_22,n_22) = Campbell08_PGA_coefficient
     (slnY_22,tlnY_22,slnAF_22,sigC_22,rho_22) = Campbell08_PGA_sigma_coefficient
 
 #C     Y      = Ground motion parameter: PGA and PSA (g), PGV (cm/sec), PGD (cm)
@@ -3477,7 +3498,11 @@ def Campbell08_distribution(**kwargs):
 
     f_site = ones(Vs30.shape) * (c10_22 + k2_22*n_22)*log(1100.0/k1_22)	# correct shape?
     f_site = where(Vs30 < 1100.0, (c10_22 + k2_22*n_22)*log(Vs30/k1_22), f_site)
-    f_site = where(Vs30 < k1_22, c10_22*log(Vs30/k1_22) + k2_22*(log(A_1100 + c_22*(Vs30/k1_22)**n_22) - log(A_1100 + c_22)), f_site)
+    XA_1100 = A_1100 + zeros(Vs30.shape)
+    XVs30 = Vs30 + zeros(XA_1100.shape)
+    Xf_site = f_site + zeros(XVs30.shape)
+    #f_site = where(Vs30 < k1_22, c10_22*log(Vs30/k1_22) + k2_22*(log(A_1100 + c_22*(Vs30/k1_22)**n_22) - log(A_1100 + c_22)), f_site)
+    f_site = where(XVs30 < k1_22, c10_22*log(XVs30/k1_22) + k2_22*(log(XA_1100 + c_22*(XVs30/k1_22)**n_22) - log(XA_1100 + c_22)), Xf_site)
 
     PGA = exp(log(PGA) + f_site)
 
@@ -3501,8 +3526,8 @@ def Campbell08_distribution(**kwargs):
 
     # Magnitude Term
     f_mag = ones(Mw.shape) * c0T + c1T*Mw + c2T*(Mw-5.5) + c3T*(Mw-6.5)
-    f_mag = where(Mw <= 6.5, c0T + c1T*Mw + c2T*(Mw-5.5), f_mag)
-    f_mag = where(Mw <= 5.5, c0T + c1T*Mw, f_mag)
+    f_mag = where((Mw <= 6.5) + zeros(c0T.shape), c0T + c1T*Mw + c2T*(Mw-5.5), f_mag)
+    f_mag = where((Mw <= 5.5) + zeros(c0T.shape), c0T + c1T*Mw, f_mag)
 
 #C.....
 #C.....Distance Term
@@ -3604,7 +3629,11 @@ def Campbell08_distribution(**kwargs):
     # Shallow Site Response Term
     f_site = ones(Vs30.shape) * (c10T + k2T*nT)*log(1100.0/k1T)
     f_site = where(Vs30 < 1100.0, (c10T + k2T*nT)*log(Vs30/k1T), f_site)
-    f_site = where(Vs30 < k1T, c10T*log(Vs30/k1T) + k2T*(log(A_1100 + cT*(Vs30/k1T)**nT) - log(A_1100 + cT)), f_site)
+    XA_1100 = A_1100 + zeros(Vs30.shape)
+    XVs30 = Vs30 + zeros(XA_1100.shape)
+    Xf_site = f_site + zeros(XVs30.shape)
+    #f_site = where(Vs30 < k1T, c10T*log(Vs30/k1T) + k2T*(log(A_1100 + cT*(Vs30/k1T)**nT) - log(A_1100 + cT)), f_site)
+    f_site = where(XVs30 < k1T, c10T*log(XVs30/k1T) + k2T*(log(XA_1100 + cT*(XVs30/k1T)**nT) - log(XA_1100 + cT)), Xf_site)
 
 #C.....
 #C.....Basin (Sediment) Response Term
@@ -3620,14 +3649,8 @@ def Campbell08_distribution(**kwargs):
 
     # Basin (Sediment) Response Term
     f_sed = ones(Z25.shape) * c12T*k3T*exp(-0.75)*(1.0 - exp(-0.25*(Z25 - 3.0)))
-    f_sed = where(Z25 <= 3.0, 0.0, f_sed)
-    f_sed = where(Z25 < 1.0, c11T*(Z25 - 1.0), f_sed)
-
-#    print('Z25=%s' % str(Z25.flatten()))
-#    print('c11T=%s' % str(c11T.flatten()))
-#    print('c12T=%s' % str(c12T.flatten()))
-#    print('k3T=%s' % str(k3T.flatten()))
-#    print('f_sed=%s' % str(f_sed.flatten()))
+    f_sed = where((Z25 <= 3.0) + zeros(f_sed.shape), 0.0, f_sed)
+    f_sed = where((Z25 < 1.0) + zeros(f_sed.shape), c11T*(Z25 - 1.0), f_sed)
 
 #C.....
 #C.....Calculate Ground Motion Parameter
@@ -3638,13 +3661,6 @@ def Campbell08_distribution(**kwargs):
     # Calculate Ground Motion Parameter
     Y = exp(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
 
-#    print('f_mag=%s' % str(f_mag.flatten()))
-#    print('f_dis=%s' % str(f_dis.flatten()))
-#    print('f_flt=%s' % str(f_flt.flatten()))
-#    print('f_hng=%s' % str(f_hng.flatten()))
-#    print('f_site=%s' % str(f_site.flatten()))
-#    print('Y=%s' % str(Y.flatten()))
-
 #C.....
 #C.....Check Whether Y < PGA at Short Periods
 #C.....
@@ -3654,8 +3670,6 @@ def Campbell08_distribution(**kwargs):
     # Check Whether Y < PGA at Short Periods - use PGA if so
     short_period = logical_and(periods >= 0.0, periods <= 0.25)
     Y = where(logical_and(short_period, Y < PGA), PGA, Y)
-
-#    print('Final Y=%s' % str(Y.flatten()))
 
 #C.....
 #C.....CALCULATE ALEATORY UNCERTAINTY
@@ -3671,7 +3685,11 @@ def Campbell08_distribution(**kwargs):
 #      ENDIF
 
     Alpha = zeros(Vs30.shape)
-    Alpha = where(Vs30 < k1T, k2T*A_1100*(1.0/(A_1100 + cT*(Vs30/k1T)**nT) - 1.0/(A_1100 + cT)), Alpha)
+    XA_1100 = A_1100 + zeros(Vs30.shape)
+    XVs30 = Vs30 + zeros(XA_1100.shape)
+    XAlpha = Alpha + zeros(XVs30.shape)
+    #Alpha = where(Vs30 < k1T, k2T*A_1100*(1.0/(A_1100 + cT*(Vs30/k1T)**nT) - 1.0/(A_1100 + cT)), Alpha)
+    Alpha = where(XVs30 < k1T, k2T*XA_1100*(1.0/(XA_1100 + cT*(XVs30/k1T)**nT) - 1.0/(XA_1100 + cT)), XAlpha)
 
 #C.....
 #C     Intra-Event Standard Deviation at Base of Site Profile
@@ -4075,7 +4093,7 @@ def Abrahamson08_distribution(**kwargs):
     Rx = Rx[:,:,newaxis]
     Per = array(Per)[newaxis,newaxis,:]
     Vs30 = array(Vs30)[:,newaxis,newaxis]
-
+# middle axis must go to 'num_events'
 
     # get Z1.0 value from Vs30
     Z10 = conversions.convert_Vs30_to_Z10(Vs30)
@@ -4329,7 +4347,7 @@ def Abrahamson08_distribution(**kwargs):
     V1 = where(Per <= 0.5, 1500.0, V1)
 
     V30 = V1
-    V30 = where(1100.0 < V1, Vs30, V30)
+    V30 = where(1100.0 < V1, Vs30+zeros(V30.shape), V30)
 
     f_5 = (a10T + bT*nT)*log(V30/VlinT)
 
@@ -4340,8 +4358,15 @@ def Abrahamson08_distribution(**kwargs):
     V1Td1 = where(T_iTd1 <= 1.0, exp(8.0 - 0.795*log(T_iTd1/0.21)), V1Td1)
     V1Td1 = where(T_iTd1 <= 0.5, 1500.0, V1Td1)
 
-    V30Td1 = ones(Vs30.shape) * V1Td1
-    V30Td1 = where(1100.0 < V1Td1, Vs30, V30Td1)
+#    V30Td1 = ones(Vs30.shape) * V1Td1
+    V30Td1 = copy(V1Td1)
+#    print('Vs30.shape=%s' % str(Vs30.shape))
+#    print('Vs30=%s' % str(Vs30))
+    Vs30X = Vs30 + 0.0*V1Td1
+#    print('Vs30X.shape=%s' % str(Vs30X.shape))
+#    print('Vs30X=%s' % str(Vs30X))
+#    print('V30Td1.shape=%s' % str(V30Td1.shape))
+    V30Td1 = where(1100.0 < V1Td1, Vs30X, V30Td1)
 
     f_5Td1 = (a10_iTd1 + b_iTd1*n_iTd1)*log(V30Td1/Vlin_iTd1)
 
@@ -4360,7 +4385,9 @@ def Abrahamson08_distribution(**kwargs):
     ######
 
     f_6 = ones(Ztor.shape) * a16T
-    f_6 = where(Ztor < 10.0, a16T*Ztor/10.0, f_6)
+    XZtor = Ztor + zeros(f_6.shape)
+    #f_6 = where(Ztor < 10.0, a16T*Ztor/10.0, f_6)
+    f_6 = where(XZtor < 10.0, a16T*XZtor/10.0, f_6)
 
     # Calcuation for Constant Dispalcement
 
@@ -4379,7 +4406,9 @@ def Abrahamson08_distribution(**kwargs):
     T6 = where(Mw < 5.5, 1.0, T6)
 
     f_8 = a18T*(Rrup - 100.0)*T6
-    f_8 = where(Rrup < 100.0, 0.0, f_8)
+    XRrup = Rrup + zeros(f_8.shape)
+    #f_8 = where(Rrup < 100.0, 0.0, f_8)
+    f_8 = where(XRrup < 100.0, 0.0, f_8)
 
     # Calculation for Constant Displacement
 
@@ -4427,7 +4456,9 @@ def Abrahamson08_distribution(**kwargs):
     V1 = where(Per <= 0.5, 1500.0, V1)
 
     V30 = V1
-    V30 = where(Vs30 < V1, Vs30, V1)
+    XVs30 = Vs30 + zeros(V30.shape)
+    #V30 = where(Vs30 < V1, Vs30, V1)
+    V30 = where(XVs30 < V1, XVs30, V1)
 
     f_5 = (a10T + bT*nT)*log(V30/VlinT)
     f_5 = where(Vs30 < VlinT,
@@ -4456,11 +4487,18 @@ def Abrahamson08_distribution(**kwargs):
                 -(a10T + bT*nT) *
                     log(V30/minimum(V1,1000.0))/log((Z10+c2T)/(Z10_med+c2T)),
                 a21)
-    a21 = where(Vs30 >= 1000.0, 0.0, a21)
+    XVs30 = Vs30 + zeros(a21.shape)
+    #a21 = where(Vs30 >= 1000.0, 0.0, a21)
+    a21 = where(XVs30 >= 1000.0, 0.0, a21)
 
     f_10 = a21*log((Z10+c2T)/(Z10_med+c2T))
-    f_10 = where(Z10 >= 200.0,
-                 a21*log((Z10+c2T)/(Z10_med+c2T)) + a22*log(Z10/200.0),
+    XZ10 = Z10 + zeros(f_10.shape)
+    XZ10_med = Z10 + zeros(f_10.shape)
+#    f_10 = where(Z10 >= 200.0,
+#                 a21*log((Z10+c2T)/(Z10_med+c2T)) + a22*log(Z10/200.0),
+#                 f_10)
+    f_10 = where(XZ10 >= 200.0,
+                 a21*log((XZ10+c2T)/(XZ10_med+c2T)) + a22*log(XZ10/200.0),
                  f_10)
     #####
     # Value of Ground Motion Parameter
@@ -4494,8 +4532,11 @@ def Abrahamson08_distribution(**kwargs):
     s0Aest = where(Mw < 5.0, AS08_PGA_s1est, s0Aest)
 
     s0Yest = ones(Mw.shape) * s2estT
-    s0Yest = where(Mw <= 7.0, s1estT + (s2estT-s1estT)*(Mw-5.0)/2.0, s0Yest)
-    s0Yest = where(Mw < 5.0, s1estT, s0Yest)
+    XMw = Mw + zeros(s0Yest.shape)
+#    s0Yest = where(Mw <= 7.0, s1estT + (s2estT-s1estT)*(Mw-5.0)/2.0, s0Yest)
+#    s0Yest = where(Mw < 5.0, s1estT, s0Yest)
+    s0Yest = where(XMw <= 7.0, s1estT + (s2estT-s1estT)*(XMw-5.0)/2.0, s0Yest)
+    s0Yest = where(XMw < 5.0, s1estT, s0Yest)
 
     sBAest = sqrt(s0Aest**2 - slnAF**2)
     sBYest = sqrt(s0Yest**2 - slnAF**2)
@@ -4509,8 +4550,11 @@ def Abrahamson08_distribution(**kwargs):
     s0Amea = where(Mw < 5.0, AS08_PGA_s1mea, s0Amea)
 
     s0Ymea = ones(Mw.shape) * s2meaT
-    s0Ymea = where(Mw <= 7.0, s1meaT + (s2meaT-s1meaT)*(Mw-5.0)/2.0, s0Ymea)
-    s0Ymea = where(Mw < 5.0, s1meaT, s0Ymea)
+    XMw = Mw + zeros(s0Ymea.shape)
+#    s0Ymea = where(Mw <= 7.0, s1meaT + (s2meaT-s1meaT)*(Mw-5.0)/2.0, s0Ymea)
+#    s0Ymea = where(Mw < 5.0, s1meaT, s0Ymea)
+    s0Ymea = where(XMw <= 7.0, s1meaT + (s2meaT-s1meaT)*(XMw-5.0)/2.0, s0Ymea)
+    s0Ymea = where(XMw < 5.0, s1meaT, s0Ymea)
 
     sBAmea = sqrt(s0Amea**2 - slnAF**2)
     sBYmea = sqrt(s0Ymea**2 - slnAF**2)
@@ -4526,8 +4570,11 @@ def Abrahamson08_distribution(**kwargs):
     tau0A = where(Mw < 5.0, AS08_PGA_s3, tau0A)
 
     tau0Y = ones(Mw.shape) * s4T
-    tau0Y = where(Mw <= 7.0, s3T + (s4T-s3T)*(Mw-5.0)/2.0, tau0Y)
-    tau0Y = where(Mw < 5.0, s3T, tau0Y)
+    XMw = Mw + zeros(tau0Y.shape)
+#    tau0Y = where(Mw <= 7.0, s3T + (s4T-s3T)*(Mw-5.0)/2.0, tau0Y)
+#    tau0Y = where(Mw < 5.0, s3T, tau0Y)
+    tau0Y = where(XMw <= 7.0, s3T + (s4T-s3T)*(XMw-5.0)/2.0, tau0Y)
+    tau0Y = where(XMw < 5.0, s3T, tau0Y)
 
     tauBA = tau0A
     tauBY = tau0Y
@@ -4923,6 +4970,8 @@ def Atkinson_2003_intraslab_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     sigma_coefficient = kwargs['sigma_coefficient']
 #    coefficient_PGA = kwargs['coefficient_PGA']
 
+    T = T[newaxis,newaxis,:]
+
     # unpack coefficients
     (c1_it,c1_it_jp,c1_it_cas,c2_it,c3_it,c4_it,c5_it,c6_it,c7_it) = coefficient
     (c10_it,c10_it_jp,c10_it_cas,c20_it,c30_it,c40_it,c50_it,c60_it,c70_it) = Atkinson_2003_intraslab_PGA_coefficient
@@ -4966,19 +5015,20 @@ def Atkinson_2003_intraslab_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     Se = where(Vs30>760,0,Se)
 
 ##    print Vs30,Sc, Sd, Se
-    Zl = 0
+    Zl = zeros(c1_it.shape)
     c10 = c10_it_jp
     c10 = where(Zl == 1, c10_it_cas, c10)
     c10 = where(Zl == 0, c10_it, c10)
     
     log_PGArx = c10 + c20_it*M + c30_it*h + c40_it*R - g*log10(R)
-    PGArx = 10**(log_PGArx)
+    PGArx = 10**(log_PGArx) + zeros(T.shape)
+
 ##    print PGArx
     T = where(T==0,.00000000000001,T)
-    sl = [0]
+    sl = zeros(PGArx.shape)
     sl = where(logical_and(1/T>=2,PGArx<500),1 - (PGArx - 100)/400,sl)
     sl = where(logical_and(1/T<2,PGArx<500),1 - ((1/T)-1)*(PGArx - 100)/400,sl)
-    sl = where(logical_and(1/T<2,PGArx>=500),1 - ((1/T)-1),sl)
+    sl = where(logical_and(1/T<2,PGArx>=500),1 - ((1/T)-1)+zeros(PGArx.shape),sl)
 
 ##    print sl
     c1 = c1_it_jp
@@ -5190,7 +5240,6 @@ def Zhao_2006_interface_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
-    Vs30 = array(Vs30)
 ##    print shape(T)
 ##    print shape(M)
 ##    print shape(x)
@@ -5201,6 +5250,9 @@ def Zhao_2006_interface_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     (a,b,c,d,e,Si,CH,C1,C2,C3,C4,Qst,Wst) = coefficient
     
     (s_t,t_s) = sigma_coefficient
+
+    # massage shapes
+    Vs30 = array(Vs30) + zeros(CH.shape)
 
     # Preliminary Computations
     h = where (h>=125,125,h)
@@ -5318,6 +5370,8 @@ def Atkinson_2003_interface_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     sigma_coefficient = kwargs['sigma_coefficient']
 #    coefficient_PGA = kwargs['coefficient_PGA']
 
+    T = T[newaxis,newaxis,:]
+
     # unpack coefficients
     (c1_it,c1_it_jp,c1_it_cas,c2_it,c3_it,c4_it,c5_it,c6_it,c7_it) = coefficient
     (c10_it,c10_it_jp,c10_it_cas,c20_it,c30_it,c40_it,c50_it,c60_it,c70_it) = Atkinson_2003_interface_PGA_coefficient
@@ -5361,19 +5415,20 @@ def Atkinson_2003_interface_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     Se = where(Vs30>760,0,Se)
 
 ##    print Vs30,Sc, Sd, Se
-    Zl = 0
+    Zl = zeros(c1_it_jp.shape)
     c10 = c10_it_jp
     c10 = where(Zl == 1, c10_it_cas, c10)
     c10 = where(Zl == 0, c10_it, c10)
     
     log_PGArx = c10 + c20_it*M + c30_it*h + c40_it*R - g*log10(R)
-    PGArx = 10**(log_PGArx)
+    PGArx = 10**(log_PGArx) + zeros(T.shape)
+
 ##    print PGArx
     T = where(T==0,.00000000000001,T)
-    sl = [0]
+    sl = zeros(PGArx.shape)
     sl = where(logical_and(1/T>=2,PGArx<500),1 - (PGArx - 100)/400,sl)
     sl = where(logical_and(1/T<2,PGArx<500),1 - ((1/T)-1)*(PGArx - 100)/400,sl)
-    sl = where(logical_and(1/T<2,PGArx>=500),1 - ((1/T)-1),sl)
+    sl = where(logical_and(1/T<2,PGArx>=500),1 - ((1/T)-1)+zeros(PGArx.shape),sl)
 
 ##    print sl
     c1 = c1_it_jp
@@ -5458,7 +5513,6 @@ def Zhao_2006_intraslab_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
-    Vs30 = array(Vs30)
 ##    print shape(T)
 ##    print shape(M)
 ##    print shape(x)
@@ -5469,6 +5523,9 @@ def Zhao_2006_intraslab_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     (a,b,c,d,e,Ss,Ssl,CH,C1,C2,C3,C4,Pst,Qst,Wst) = coefficient
     
     (s_t,t_s) = sigma_coefficient
+
+    # massage Vs30 shape
+    Vs30 = array(Vs30) + zeros(CH.shape)
 
     # Preliminary Computations
     h = where (h>=125,125,h)
