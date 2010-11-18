@@ -17,7 +17,8 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
                           'Liang_2008', 'Atkinson06_hard_bedrock',
                           'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-                          'Campbell03',  'Abrahamson08', 'Chiou08',
+                          #'Campbell03',  'Abrahamson08', 'Chiou08',
+                          'Campbell03', 'Chiou08',
                           'Akkar_2010_crustal', 'Zhao_2006_interface',
                           'Atkinson_2003_intraslab', 'Atkinson_2003_interface',
                           'Zhao_2006_intraslab')
@@ -630,7 +631,8 @@ test_data['Atkinson06_soil_test_magnitude'] = [5.5, 7.5]
 test_data['Atkinson06_soil_test_period'] = [0.2, 1.0, 2.0]
 
 # num_sites = 3
-test_data['Atkinson06_soil_test_Vs30'] = [1000.0, 1000.0, 1000.0]
+#test_data['Atkinson06_soil_test_Vs30'] = [1000.0, 1000.0, 1000.0]
+test_data['Atkinson06_soil_test_Vs30'] = [1000.0]
 
 # num_sites = 3
 tmp = zeros((3,2)) # initialise an array: (num_sites, num_events)
@@ -1203,7 +1205,7 @@ del tmp
 ################################################################################
 ## #Atkinson_2003_interface Tests - data values from Matlab Code
 ## #num_periods = 4
-test_data['Atkinson_2003_interface_test_period'] = [0.0, 0.2]
+test_data['Atkinson_2003_interface_test_period'] = array([0.0, 0.2])
 test_data['Atkinson_2003_interface_test_magnitude'] = [5.0,7.0]
 test_data['Atkinson_2003_interface_test_depth'] = [ 100,10]
 test_data['Atkinson_2003_interface_test_Vs30'] = array([760])
@@ -1231,7 +1233,7 @@ del tmp
 ################################################################################
  #Atkinson_2003_intraslab Tests - data values from Matlab Code
  #num_periods = 4
-test_data['Atkinson_2003_intraslab_test_period'] = [0.0, 0.2]
+test_data['Atkinson_2003_intraslab_test_period'] = array([0.0, 0.2])
 test_data['Atkinson_2003_intraslab_test_magnitude'] = [5.0,7.0]
 test_data['Atkinson_2003_intraslab_test_depth'] = [ 100,10]
 test_data['Atkinson_2003_intraslab_test_Vs30'] = array([300])
