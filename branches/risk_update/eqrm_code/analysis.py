@@ -497,7 +497,7 @@ def main(parameter_handle,
         #  2.  this has not been tested recently
         #  3.  it absolutely will not work
         
-        soil_SA, bedrock_SA = calc_and_save_SA(
+        soil_SA, bedrock_SA, soil_SA_5D, bedrock_SA_5D = calc_and_save_SA(
             THE_PARAM_T,
             sites,
             event_set,
@@ -531,11 +531,22 @@ def main(parameter_handle,
                                 0.50*SA[:,:,1:-2] +
                                 0.25*SA[:,:,2:-1])
 
-
+            
             (total_loss, damage,
                days_to_complete) = calc_total_loss(sites, SA, THE_PARAM_T,
                                                    pseudo_event_set.Mw,
                                                    bridge_SA_indices)
+            if False: # True: #False:
+                if soil_SA_5D is not None:
+                    SA_5D = soil_SA_5D
+                else:
+                    SA_5D = bedrock_SA_5D
+                (total_loss_new, damage_new,
+                 days_to_complete_new) = calc_total_loss(
+                    sites, SA_5D, THE_PARAM_T,
+                    event_set.Mw,
+                    bridge_SA_indices)
+                
             assert isfinite(total_loss[0]).all()
 
             # I think it's called total loss since it is summed over
@@ -973,7 +984,7 @@ def calc_and_save_SA(THE_PARAM_T,
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
                                       1.0/array(THE_PARAM_T.return_periods))
-    return soil_SA_overloaded, rock_SA_overloaded
+    return soil_SA_overloaded, rock_SA_overloaded, soil_SA, bedrock_SA
 
 
 def apply_threshold_distance(sites,

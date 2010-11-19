@@ -144,7 +144,10 @@ def bridge_states_ModelLinear(model, CLASS, sa_0_3, sa_1_0, skew, num_spans):
 
     result = num.array((P_slight-P_moderate, P_moderate-P_extensive,
                         P_extensive-P_complete, P_complete))
-    result = num.transpose(result, (1, 2, 0))
+    if result.ndim == 3:
+        result = num.transpose(result, (1, 2, 0))
+    else:
+        result = num.transpose(result, (1, 2, 3, 4, 0))
 
     return result
 
@@ -180,7 +183,7 @@ def choose_random_state(states, rand_value=None):
     Choose a random state from each tuple, return an array of shape (S, E, 1),
     ie, return an array collapsed from 4 to 1 in the last dimension.
     """
-
+    print "bridge damage 186 states.shape", states.shape
     axis0 = states.shape[0]		# S
     axis1 = states.shape[1]		# E
     newshape = (axis0, axis1, 1)	# (S, E, 1)
