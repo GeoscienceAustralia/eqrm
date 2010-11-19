@@ -231,12 +231,12 @@ should NOT be set after initialization - read __init__ for reasons.
         SAcap=calculate_capacity(SD,self.capacity_parameters)
         return SA,SD,SAcap
         
-    def _calculate_parameters(self,building_parameters,magnitude,
+    def _calculate_parameters(self, building_parameters, magnitude,
                               building_type_index=None):
         """
         Calculate the derived parameters
         """
-        number_events=len(magnitude)
+        number_events = len(magnitude)
 
         if building_type_index is None:
             building_type_index=slice(None)
@@ -257,12 +257,13 @@ should NOT be set after initialization - read __init__ for reasons.
         csm_variability_method=self.csm_variability_method
 
         # calculate capacity curve parameters from building parameters:
-        params=calculate_capacity_parameters(C,
-                                             T,a1,a2,y,Lambda,u,
-                                             sdtcap=sdtcap,
-                                             number_events=number_events,
-                                             csm_use_variability=csm_use_variability,
-                                             csm_variability_method=csm_variability_method)
+        params = calculate_capacity_parameters(
+            C,
+            T,a1,a2,y,Lambda,u,
+            sdtcap=sdtcap,
+            number_events=number_events,
+            csm_use_variability=csm_use_variability,
+            csm_variability_method=csm_variability_method)
         # note: params=Dy,Ay,Du,Au,aa,bb,cc
         #print "_calculate_parameters params", params
         return params

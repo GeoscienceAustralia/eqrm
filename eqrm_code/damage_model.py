@@ -230,8 +230,12 @@ class Bridge_damage_model(object):
 
         # get SA slices for periods 0.3s and 1.0s
         (i03, i10) = self.sa_indices
-        sa_0_3 = self.SA[:,:,i03]
-        sa_1_0 = self.SA[:,:,i10]
+        if self.SA.ndim == 3:
+            sa_0_3 = self.SA[:,:,i03]
+            sa_1_0 = self.SA[:,:,i10]
+        else:
+            sa_0_3 = self.SA[:,:,:,:,i03]
+            sa_1_0 = self.SA[:,:,:,:,i10]
 
         # go calculate bridge states for events
         ssa = self.structures.attributes
