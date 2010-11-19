@@ -1,0 +1,154 @@
+\chapter{Introduction}
+\label{ch:intro}
+
+\section{Overview}
+
+The EQRM application is a computer model for estimating earthquake
+hazard and earthquake risk. Modelling earthquake hazard involves
+assessing the probability that certain levels of ground motion
+will be exceeded. Modelling of earthquake risk involves estimating
+the probability of a building portfolio experiencing a range of
+earthquake induced losses. For any number of synthetic
+earthquakes, the EQRM application can be used to estimate:
+\begin{enumerate}
+\item the ground motion and its likelihood of occurrence
+(earthquake hazard), \item the direct financial loss and its
+likelihood of occurrence (earthquake risk), and \item less
+reliably the number of casualties and injuries and their
+likelihood of occurrence (earthquake risk).
+\end{enumerate}
+
+The EQRM application is Geoscience Australia's centerpiece for
+modelling earthquake hazard and risk. Its use formed the basis for
+Geoscience Australia's recent reports on Earthquake risk in the
+Newcastle and Lake Macquarie \citep*{dr_Dhu02a} and Perth
+\citep*{dr_Sinadinovski05a} regions.
+
+The process for computing earthquake hazard can be described by
+the following steps:
+\begin{enumerate}
+\item the generation of a catalogue of synthetic earthquakes (or
+events) (see \cref{ch:source}), \item the propagation or
+attenuation (see \cref{ch:atten}) of the `seismic wave' from each
+of the events in 1 to locations of interest (see \cref{ch:grids}),
+\item accounting for the interactions between the propagating
+`seismic wave' and the local geology or regolith (see
+\cref{ch:reg}), and \item accounting for the probability of each
+event and the estimation of hazard (see \cref{ch:risk}).
+\end{enumerate}
+
+The process for computing earthquake risk shares the same first
+three steps as the earthquake hazard. The fourth step and onwards
+can be described as follows:
+\begin{enumerate}
+\item[4.] estimating the probability that the portfolio buildings
+(see \cref{ch:grids}) will experience different levels of damage
+(see \cref{ch:damage}), \item[5.] the computation of direct
+financial loss as a result of the probabilities computed in 4 (see
+\cref{ch:losses}), and \item[6.] assembling the results to compute
+the risk (see \cref{ch:risk}).
+\end{enumerate}
+
+\section{Using this manual}
+
+This manual describes the EQRM application; it has been designed
+to serve the following three purposes:
+\begin{enumerate}
+\item describe the theory and methodology behind the EQRM
+application; \item explain how to use the EQRM application to
+model earthquake hazard and risk; and \item provide enough
+information to assist those who may wish to access individual
+modules and modify them.
+\end{enumerate}
+
+A number of features have been included to assist readers of the
+manual. These features include:
+\begin{itemize}
+\item \textbf{Text highlighting -} Important parameters, file
+names and code are identified by a typeset font. \item
+\textbf{Index -} An index has been introduced to allow speedy of
+navigation of the manual. \item \textbf{Chapter summary - } Each
+chapter is concluded with a `Key functions, flags and parameters'
+section that summarises the key code related items that were
+discussed in the chapter.
+\end{itemize}
+
+
+\section{About this manual}
+
+\textit{\cref{ch:application}: The EQRM application} introduces
+the EQRM software. The chapter describes the directory structure
+and introduces important input parameter files. Setup and
+operational processes are discussed and the conversion of the EQRM
+to a stand-alone executable described. Readers who do not wish to
+familiarise themselves with details of the EQRM application may
+wish to skip this chapter.
+
+\textit{\cref{ch:source}: Earthquake source generation} discusses
+the creation of an earthquake catalogue. At the core of any hazard
+or risk assessment is the simulation of synthetic earthquakes and
+the creation of a catalogue of synthetic events. The chapter
+describes how the simulation of earthquakes can focus around a
+specific earthquake of interest (a scenario based simulation) or
+how it can model the effect of `all foreseeable' events (a
+probabilistic simulation).
+
+\textit{\cref{ch:grids}: Grids and building databases} describes
+how calculations of risk and hazard are conducted on a point by
+point basis. In the case of earthquake hazard,  a grid of points
+is created and hazard computed at each of the grid nodes.
+Typically a regular grid is used to improve the production of
+hazard maps, however this is not a requirement. Earthquake risk
+calculations are also performed on a grid. Each node of the grid
+represents the centroid of a building within a portfolio of
+interest. The chapter demonstrates how the grid points are
+associated with other attributes such as site--class or building
+construction type.
+
+\textit{\cref{ch:atten}: Attenuation} discusses the propagation
+(or attenuation) of the motion from each of the synthetic
+earthquakes in the event catalogue to locations of interest.
+Different measures of distance between an event and a site of
+interest are introduced. The chapter also describes the
+attenuation models that can be used with the EQRM application.
+
+\textit{\cref{ch:reg}: Regolith amplification} discusses how local
+geology, or regolith, can be incorporated in an earthquake hazard
+or risk assessment. The chapter illustrates how the presence of
+regolith can lead to amplification (or de-amplification) of both
+ground and building motion, and consequently result in higher (or
+lower) levels of hazard and risk.
+
+\textit{\cref{ch:damage}: Building damage} describes how the EQRM
+application estimates the probability that each building will
+experience different levels of damage. The chapter gives a brief
+discussion of the theory behind making such estimates as well as
+outlining how to extrapolate the estimates to an entire portfolio
+of buildings in a region of interest.
+
+\textit{\cref{ch:losses}: Losses} illustrates how to model the
+direct financial loss as a result of the damage estimates
+described in \textit{\cref{ch:damage}}. The chapter also provides
+a brief description of how the EQRM application can estimate
+injuries and casualties.
+
+\textit{\cref{ch:risk}: Displaying hazard and risk results}
+describes how the results from the EQRM application can be
+summarised and displayed. There are many ways to display estimates
+of earthquake hazard and risk. Earthquake hazard is commonly
+modelled in terms of a probability (often 10\%) of a particular
+ground motion (usually acceleration) being exceeded in some time
+frame (often 50 years). In the case of a scenario based
+simulation, earthquake risk can be modelled in terms of dollar
+estimates of building loss. Such losses can be categorised by
+building type\index{building type}, geography or any other
+category of interest. In the case of a probabilistic simulation,
+earthquake risk is often modelled in terms of one or both of the
+following:
+\begin{enumerate}
+\item the loss per year averaged over a long period of time,
+typically 10000 years. This is known as the annualised loss. \item
+the probability that different levels of loss will be exceeded.
+The plot of loss against such exceedance probabilities is referred
+to as a probable maximum loss curve.
+\end{enumerate}

@@ -1,0 +1,2 @@
+building_id, slight, moderate, extensive, complete
+11,0.242765857374,0.101517455633,0.105366051382,0.0777150124312
