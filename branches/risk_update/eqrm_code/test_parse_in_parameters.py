@@ -426,7 +426,7 @@ save_socloss_flag=[1]\n")
 
         # turn logging WARNINGS off
         # This is to stop warning messages appearing when testing
-        console_logging_level = log.console_logging_level 
+        console_logging_level = log.console_logging_level
         log.console_logging_level = log.ERROR
         
         set = self.build_instance_to_THE_PARAM_T()
