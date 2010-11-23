@@ -56,9 +56,6 @@ import eqrm_code.util as util
 import eqrm_filesystem as eq_fs
 
 
-class Dummy:
-    def __init__(self):
-        pass
     
 # data columns expected in a BRIDGE data file
 BridgeDataColumns = {'BID': int,
