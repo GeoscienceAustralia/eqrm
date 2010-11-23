@@ -28,6 +28,7 @@ from eqrm_code.ANUGA_utilities import log
 log.console_logging_level = log.ERROR
 log.file_logging_level = log.ERROR
 log.default_to_console = False
+log.debug('Starting up the log file, so warnings are suppressed.')
 
 #List files that should be excluded from the testing process.
 #E.g. if they are known to fail and under development
