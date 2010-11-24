@@ -512,15 +512,19 @@ def calculate_updated_demand(periods,SA0,SD0,Ra,Rv,Rd,TAV,TVD,
     #print 'SDnew',SDnew[:,0:5]
     return SAnew,SDnew
 
-def calculate_corner_periods(periods,ground_motion,magnitude):
+def calculate_corner_periods(periods, ground_motion, magnitude):
     """
+    periods - 1D array, dimension # of periods
+    ground_motion - XD array, with last dimension periods.
+    magnitude - 1D array, dimension # of events
     from Newmark and Hall 1982
     
     returns TAV,TVD - the acceleration and velocity dependent
-    corner periods    
+    corner periods
+    TAV and TVD have the same dimensions as ground_motion, except
+       the last axis (periods) is dropped.
     """
     #reference_periods = 0.3,1.0
-    
     S03=interp(array(0.3),ground_motion,periods,axis=-1)
     S10=interp(array(1.0),ground_motion,periods,axis=-1)
     #print 'S03',S03[:,0:5]
@@ -529,11 +533,14 @@ def calculate_corner_periods(periods,ground_motion,magnitude):
     # interpolate the ground motion at reference periods
     acceleration_dependent=(S10/S03)
     acceleration_dependent[where(S03<0.00000000000001)]=0.0
-    acceleration_dependent=acceleration_dependent[:,:,0] # and collapse
+    acceleration_dependent=acceleration_dependent[...,0] # and collapse
+
+    # This assumes ground_motion.shape = (1, events) 
     velocity_dependent=(10**((magnitude-5.0)/2))[newaxis,:]
     assert len(acceleration_dependent.shape)==2
     assert len(velocity_dependent.shape)==2
-    return acceleration_dependent,velocity_dependent
+    assert velocity_dependent.shape == acceleration_dependent.shape
+    return acceleration_dependent, velocity_dependent
         
 def undamped_response(SA,periods,atten_override_RSA_shape=None,
                       atten_cutoff_max_spectral_displacement=False,

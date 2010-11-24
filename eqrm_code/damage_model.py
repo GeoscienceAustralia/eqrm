@@ -230,12 +230,8 @@ class Bridge_damage_model(object):
 
         # get SA slices for periods 0.3s and 1.0s
         (i03, i10) = self.sa_indices
-        if self.SA.ndim == 3:
-            sa_0_3 = self.SA[:,:,i03]
-            sa_1_0 = self.SA[:,:,i10]
-        else:
-            sa_0_3 = self.SA[:,:,:,:,i03]
-            sa_1_0 = self.SA[:,:,:,:,i10]
+        sa_0_3 = self.SA[...,i03]
+        sa_1_0 = self.SA[...,i10]
 
         # go calculate bridge states for events
         ssa = self.structures.attributes
@@ -344,9 +340,9 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
     sites              a Structures/Bridge instance
     THE_PARAM_T        high level controlling object
     SA                 array of Spectral Acceleration, in g, with axis;
-                           site, period, return_period
+                           sites, events, periods
                        the site axis usually has a size of 1
-    event_set_Mw       array of Mw, 1 axis
+    event_set_Mw       array of Mw, 1D, dimension (events)
                        (used only by buildings)
     bridge_sa_indices  a tuple (0.3, 1.0) of indices into
                        THE_PARAM_T.atten_periods for bridge SA values
@@ -355,13 +351,14 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
     Returns a tuple (total_loss, damage_model) where:
       total_loss    a 4 long list of dollar loss.  The loss categories are;
                     (structure_loss, nsd_loss, accel_loss, contents_loss)
+                    These dollar losses have the dimensions of;
+                    (site, event)
       damage_model  an instance of the damage model.
                     used in risk.py to get damage states.
 
     Note: we can't determine type of data from the 'sites' type.  We must look
           at the .attributes['STRUCTURE_CATEGORY'] string.
     """
-
     # decide what sort of data we have in 'sites'
     if sites.attributes['STRUCTURE_CATEGORY'][0].upper() == 'BUILDING':
         # note: damage_model has an object called capacity_spectrum_model
