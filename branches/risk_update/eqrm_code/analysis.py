@@ -24,7 +24,7 @@ import datetime
 import scipy
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
-     arange, reshape, exp
+     arange, reshape, exp, tile
 
 from eqrm_code.parse_in_parameters import  \
     ParameterSyntaxError, create_parameter_data, convert_THE_PARAM_T_to_py
@@ -318,9 +318,10 @@ def main(parameter_handle,
         event_set,
         source_model[0].atten_models,
         source_model[0].atten_model_weights)
-
+    
+    num_gmm_max = source_model.get_max_num_atten_models()
     num_events = len(event_set)
-    num_psudo_events = len(source_model[0].atten_models) * num_events * \
+    num_psudo_events = num_gmm_max * num_events * \
                        num_spawning
     
     msg = ('Pseudo event set created. Number of pseudo_events=' +
@@ -487,14 +488,13 @@ def main(parameter_handle,
         # To remove loop over sites, just disable the loop
         # and remove the 'sites=all_sites[i:i+1]'.
         # and change NUM_SITES_PER_SITE_LOOP
-        num_spawning = 1
         
         # CAUTIONS:
         #  1.  this will run out of memory if sites*events is large.
         #  2.  this has not been tested recently
         #  3.  it absolutely will not work
         
-        soil_SA, bedrock_SA, soil_SA_5D, bedrock_SA_5D = calc_and_save_SA(
+        soil_SA, bedrock_SA = calc_and_save_SA(
             THE_PARAM_T,
             sites,
             event_set,
@@ -524,16 +524,19 @@ def main(parameter_handle,
             # smooth SA (function of periods) using a weighted
             # running 3-point smoother
             if THE_PARAM_T.atten_smooth_spectral_acceleration is True:
-                SA[:,:,1:-2] = (0.25*SA[:,:,0:-3] +
-                                0.50*SA[:,:,1:-2] +
-                                0.25*SA[:,:,2:-1])
-
+                SA[...,1:-2] = (0.25*SA[...,0:-3] +
+                                0.50*SA[...,1:-2] +
+                                0.25*SA[...,2:-1])
+            
+            
+            overloaded_MW = tile(event_set.Mw, num_gmm_max * num_spawning)
+            #overloaded_MW = pseudo_event_set.Mw
             
             (total_loss, damage,
                days_to_complete) = calc_total_loss(sites, SA, THE_PARAM_T,
-                                                   pseudo_event_set.Mw,
+                                                   overloaded_MW,
                                                    bridge_SA_indices)
-            if False: # True: #False:
+            if False: # True: # False:
                 if soil_SA_5D is not None:
                     SA_5D = soil_SA_5D
                 else:
@@ -831,7 +834,7 @@ def calc_and_save_SA(THE_PARAM_T,
          num_sites, num_events, num_periods),
         dtype=float)
     rock_SA_overloaded = zeros((num_sites,
-                                num_gmm_max * num_events,
+                                num_events * num_gmm_max * num_spawn,
                                 num_periods),
                                dtype=float)
     if THE_PARAM_T.use_amplification is True:
@@ -840,7 +843,7 @@ def calc_and_save_SA(THE_PARAM_T,
              len(THE_PARAM_T.atten_periods)),
             dtype=float)
         soil_SA_overloaded = zeros((num_sites,
-                                    num_gmm_max * num_events,
+                                    num_events * num_gmm_max * num_spawn,
                                     num_periods),
                                    dtype=float)
     else:
@@ -861,6 +864,7 @@ def calc_and_save_SA(THE_PARAM_T,
             Vs30=BEDROCKVs30)
         _ , log_mean_extend_GM, log_sigma_extend_GM = results
         # *_extend_GM has shape of (GM_model, sites, events, periods)
+        # the value of GM_model can change for each source.
         
         # evaluate the RSA
         # that is desired (i.e. chosen in parameter_handle)
@@ -868,7 +872,6 @@ def calc_and_save_SA(THE_PARAM_T,
                         ground_motion_distribution.sample_for_eqrm(
             log_mean_extend_GM, log_sigma_extend_GM)
         # bedrock_SA shape (spawn, GM_model, sites, events, periods)
-        #print "bedrock_SA", bedrock_SA
         
         #print 'ENDING Calculating attenuation'
 
@@ -951,12 +954,16 @@ def calc_and_save_SA(THE_PARAM_T,
         # Set up the arrays to pass to risk
         # Assume no spawning
         # assume one site
-        for i in arange(bedrock_SA.shape[1]): # loop over gmm
-            i_overloaded = i * num_events + event_inds
-            # rock_SA_overloaded dim (sites, events * gmm, period)
-            rock_SA_overloaded[0, i_overloaded, :] = bedrock_SA[0,i,0,:,:]
-            if soil_SA is not None:
-                soil_SA_overloaded[0, i_overloaded, :] = soil_SA[0,i,0,:,:]
+        for i_spawn in arange(bedrock_SA.shape[0]): # loop over spawn
+            for i_gmm in arange(bedrock_SA.shape[1]): # loop over gmm
+                i_overloaded = i_spawn * num_gmm_max * num_events + \
+                                i_gmm * num_events + event_inds
+                # rock_SA_overloaded dim (sites, events * gmm, period)
+                rock_SA_overloaded[0, i_overloaded, :] = \
+                                      bedrock_SA[i_spawn,i_gmm,0,:,:]
+                if soil_SA is not None:
+                    soil_SA_overloaded[0, i_overloaded, :] = \
+                                          soil_SA[i_spawn,i_gmm,0,:,:]
             
     #End source loop
     
@@ -981,7 +988,8 @@ def calc_and_save_SA(THE_PARAM_T,
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
                                       1.0/array(THE_PARAM_T.return_periods))
-    return soil_SA_overloaded, rock_SA_overloaded, soil_SA, bedrock_SA
+                
+    return soil_SA_overloaded, rock_SA_overloaded
 
 
 def apply_threshold_distance(sites,

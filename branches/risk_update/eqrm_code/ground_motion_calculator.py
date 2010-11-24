@@ -258,7 +258,9 @@ class Multiple_ground_motion_calculator(object):
           instance will be equal to the shape of the returned arrays.
         Vs30 - the Vs30 value used if the gmm needs it.  If none is given the
           site Vs30 value is used.
-        
+
+        returns:
+          *_extend_GM has shape of (GM_model, sites, events, periods)
         """
 
         # get distances, etc

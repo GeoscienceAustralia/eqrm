@@ -107,22 +107,22 @@ should NOT be set after initialization - read __init__ for reasons.
     def building_response(self,SA):
         """Use the equivilant linear solver to solve 
         """
-        rtol,maxits=self.rtol,self.csm_damping_max_iterations
-        periods=self.periods
-        magnitudes=self.magnitudes
+        rtol,maxits = self.rtol,self.csm_damping_max_iterations
+        periods = self.periods
+        magnitudes = self.magnitudes
         # building_parameters should already be compressed, or expanded.
         if True:
             # TODO: Allow hazus and aus standard response curves.
             # TODO: Allow cutoff after max.
-            SA,surface_displacement=undamped_response(
+            SA,surface_displacement = undamped_response(
                 SA,periods,
                 self.atten_override_RSA_shape,
                 self.atten_cutoff_max_spectral_displacement,
                 self.loss_min_pga,
                 magnitude=magnitudes)
-            self.undamped_response=SA,surface_displacement
+            self.undamped_response = SA,surface_displacement
         else: raise ValueError
-        self.corner_periods=calculate_corner_periods(periods,SA,magnitudes)
+        self.corner_periods = calculate_corner_periods(periods,SA,magnitudes)
         
         # set up initial conditions:
         update_function=self.updated_response
@@ -206,27 +206,28 @@ should NOT be set after initialization - read __init__ for reasons.
         else:
             raise ValueError
 
-        TAV,TVD=self.corner_periods # get corner periods
-        assert len(TAV.shape)==2
-        assert len(TVD.shape)==2     
+        TAV,TVD = self.corner_periods # get corner periods
+        assert len(TAV.shape) == 2
+        assert len(TVD.shape) == 2     
         # damp the corner periods is flag is set:
         # (note this does not affect the original corner periods)
-        assert Ra.shape[-1]==1
-        assert Rv.shape[-1]==1
-        assert len(Ra.shape)==3
-        assert len(Rv.shape)==3
-        if self.csm_damping_modify_Tav==CSM_DAMPING_MODIFY_TAV:
+        assert Ra.shape[-1] == 1
+        assert Rv.shape[-1] == 1
+        assert len(Ra.shape) == 3
+        assert len(Rv.shape) == 3
+        if self.csm_damping_modify_Tav == CSM_DAMPING_MODIFY_TAV:
             #print 'damping',damping_factor
             #print 'TAV',TAV[:,0:5]
             #print 'Ra,Rv',Ra[:,0:5],Rv[:,0:5]
-            TAV=TAV*(Ra[:,:,0]/Rv[:,:,0])
+            TAV=TAV*(Ra[...,0]/Rv[...,0])
             #print 'TAV',TAV[:,0:5]
 
         periods=self.periods
         
         # update SA:  
-        SA,SD=calculate_updated_demand(periods,SA0,SD0,Ra,Rv,Rd,TAV,TVD,
-                                       csm_damping_use_smoothing=self.csm_damping_use_smoothing)
+        SA,SD = calculate_updated_demand(
+            periods,SA0,SD0,Ra,Rv,Rd,TAV,TVD,
+            csm_damping_use_smoothing=self.csm_damping_use_smoothing)
         # update capacity:
         SAcap=calculate_capacity(SD,self.capacity_parameters)
         return SA,SD,SAcap
