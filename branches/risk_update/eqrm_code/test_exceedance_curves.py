@@ -482,6 +482,47 @@ class Test_Exceedance(unittest.TestCase):
         self.assert_ (allclose(sum, sum_act))
         self.assert_ (sum[0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
         
+    def test_collapse_att_model_dimension2(self):
+        gmm = 3
+        site = 1
+        events = 2
+        periods = 4
+        size = gmm * site * events * periods
+        data = arange(0, size, 1)
+        data = reshape(data, (gmm, site, events, periods))
+        weights = [0.2, 0.3]
+        sum = _collapse_att_model_dimension(data, weights)
+
+        actual = zeros((gmm, site, events, periods))
+        for i in [0,1]:
+            actual[i,:] = data[i,...] * weights[i]
+        sum_act = scipy.sum(actual, 0)
+
+        self.assert_ (allclose(sum, sum_act))
+        self.assert_ (sum[0, 1, 3] == 7*0.2 + 15*0.3)
+  
+    def test_collapse_att_model_dimension3(self):
+        gmm = 2
+        site = 1
+        events = 2
+        periods = 1
+        size = gmm * site * events * periods
+        data = array([[1., 0], [0, 1.]])
+        data = reshape(data, (gmm, site, events, periods))
+        weights = [2., 0]
+        sum = _collapse_att_model_dimension(data, weights)
+
+        actual = array([[2., 0]])
+        actual = reshape(actual, (1, site, events, periods))
+        self.assert_ (allclose(sum, actual))
+        
+        weights = [2.]
+        sum = _collapse_att_model_dimension(data, weights)
+
+        actual = array([[2., 0]])
+        actual = reshape(actual, (1, site, events, periods))
+        self.assert_ (allclose(sum, actual))
+        
   
     def test_collapse_att_model(self):
         spawn = 1
@@ -518,13 +559,36 @@ class Test_Exceedance(unittest.TestCase):
         actual = array([[123.],[246.]])
         actual = reshape(actual, (spawn, 1, site, events, periods))
         self.assert_ (allclose(sum, actual))
-                  
-        
-        
-        
+             
+            
+    def test_collapse_source_gmms(self):
+        spawn = 1
+        gmm = 3
+        site = 1
+        events = 5
+        periods = 1
+        data = array([[1., 1, 0, 1, 0], [2., 2, 2, 1, 0], [0, 3, 0, 0, 1]])
+        data = reshape(data, (spawn, gmm, site, events, periods))
+
+        dummy_list = []
+        indexes = [[0, 2, 3],[1, 4]]
+        weights = [[1,2],[1,1,1]]
+        for index, weight in map(None, indexes, weights):
+            d = Dummy()
+            d.atten_model_weights = weight
+            d.event_set_indexes = index
+            dummy_list.append(d)
+            
+        sum = collapse_source_gmms(data, dummy_list, True)
+        actual = array([5., 6, 4, 3, 1])
+        actual = reshape(actual, (spawn, 1, site, events, periods))
+        self.assert_ (sum.shape == actual.shape)
+        self.assert_ (allclose(sum, actual))
+                    
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Exceedance,'test')
-    #suite = unittest.makeSuite(Test_Exceedance,'test_collapse_att_model')
+    #suite = unittest.makeSuite(Test_Exceedance,'test_collapse_source_gmms')
+    #suite = unittest.makeSuite(Test_Exceedance,'test_collapse_att_model_dimension3')
     runner = unittest.TextTestRunner()
     runner.run(suite)

@@ -45,7 +45,7 @@ from eqrm_code.util import reset_seed, determine_eqrm_path, \
 from ground_motion_distribution import Distribution_Log_Normal
 from eqrm_code.structures import Structures, build_par_file
 from eqrm_code.exceedance_curves import do_collapse_logic_tree, hzd_do_value, \
-     collapse_att_model
+     collapse_att_model, collapse_source_gmms
 from eqrm_code.sites import Sites, truncate_sites_for_test
 from eqrm_code.damage_model import calc_total_loss
 from eqrm_code.parallel import Parallel
@@ -431,6 +431,9 @@ def main(parameter_handle,
     if THE_PARAM_T.save_total_financial_loss is True:
         total_building_loss = zeros((array_size, num_psudo_events),
                                     dtype=float)
+        total_building_loss_qw = zeros((array_size, num_spawning,
+                                        num_gmm_max, num_events),
+                                    dtype=float)
     if THE_PARAM_T.save_building_loss is True:
         building_loss = zeros((array_size, num_psudo_events),
                               dtype=float)
@@ -536,17 +539,7 @@ def main(parameter_handle,
                days_to_complete) = calc_total_loss(sites, SA, THE_PARAM_T,
                                                    overloaded_MW,
                                                    bridge_SA_indices)
-            if False: # True: # False:
-                if soil_SA_5D is not None:
-                    SA_5D = soil_SA_5D
-                else:
-                    SA_5D = bedrock_SA_5D
-                (total_loss_new, damage_new,
-                 days_to_complete_new) = calc_total_loss(
-                    sites, SA_5D, THE_PARAM_T,
-                    event_set.Mw,
-                    bridge_SA_indices)
-                
+           
             assert isfinite(total_loss[0]).all()
 
             # I think it's called total loss since it is summed over
@@ -557,14 +550,27 @@ def main(parameter_handle,
             # accel_loss = non-structural acceleration  sensitive loss
             # con_loss = contents loss
             (structure_loss, nsd_loss, accel_loss, con_loss) = total_loss
+            # The losses have the dimensions of (site, event)
+            # the event dimension is overloaded with event * max_gmm * spawning
+            # Can unload the event dimension.
+            #  dimensions of (site, spawn, max ground motion model, events)
+            newshape = (1,num_spawning, num_gmm_max, num_events)
+            structure_loss_qw = structure_loss.reshape(newshape)
+            nsd_loss_qw = nsd_loss.reshape(newshape)
+            accel_loss_qw = accel_loss.reshape(newshape)
+            con_loss_qw = con_loss.reshape(newshape)
 
-            # putting economic loss values into a big array
+            
+            # Putting economic loss values into a big array
             # (number of buildings versus number of events)
             # Note that this matrix is transposed before saving
             # (i.e. to number of events versus number of buildings)
             if THE_PARAM_T.save_total_financial_loss is True:
                 total_building_loss[rel_i,:] = (structure_loss + nsd_loss +
                                                 accel_loss + con_loss)[0,:]
+                total_building_loss_qw[rel_i,...] = (
+                    structure_loss_qw + nsd_loss_qw + accel_loss_qw \
+                    + con_loss_qw)[0,...]
             if THE_PARAM_T.save_building_loss is True:
                 building_loss[rel_i,:] = (structure_loss + nsd_loss +
                                           accel_loss)[0,:]
@@ -686,18 +692,37 @@ def main(parameter_handle,
         # have to be changed to take into account
         # the different atten weigths for each source.
         # No sites were investigated.
-        #print "analysis total_building_loss",total_building_loss
+        # print "analysis total_building_loss",total_building_loss
+        # newaxis is added to give fake periods dimension.
         (new_total_building_loss, _, _) = \
                 do_collapse_logic_tree(total_building_loss[:,:,newaxis],
                                        pseudo_event_set.index,
                                        pseudo_event_set.attenuation_weights,
                                        THE_PARAM_T)
+        if True:
+            #  dimensions of total_building_loss_qw;
+            # (site, spawn, max ground motion model, events)
+            # want (spawn, max ground motion model, site, events, periods)
+            # or (site, spawn, max ground motion model, dummy, events, periods)
+            new_total_building_loss_qw = collapse_source_gmms(
+                total_building_loss_qw[...,newaxis,:,newaxis],
+                source_model, THE_PARAM_T.atten_collapse_Sa_of_atten_models)
+            # collapse out fake site axis and fake periods axis.
+            new_total_building_loss_qw = new_total_building_loss_qw[...,0,:,0]
+            # overload the event
+            new_total_building_loss_qw = new_total_building_loss_qw.reshape(
+            (num_sites, -1))
 
+        # This us true when the same gmm is used in risk, and no spawning
         #print "analysis new_total_building_loss", new_total_building_loss
         # collapse out fake periods axis
         new_total_building_loss = new_total_building_loss[:,:,0]
+        assert allclose(new_total_building_loss,
+                        new_total_building_loss_qw)
+
+        
         file = save_ecloss('_total_building',THE_PARAM_T,
-                           new_total_building_loss, all_sites,
+                           new_total_building_loss_qw, all_sites,
                            compress=THE_PARAM_T.compress_output,
                            parallel_tag=parallel.file_tag)
         column_files_that_parallel_splits.append(file)
@@ -816,7 +841,13 @@ def calc_and_save_SA(THE_PARAM_T,
                      amp_distribution,
                      event_activity,
                      source_model):
-     
+    """
+    Calculate the spectral acceleration, in g, for both bedrock and soil.
+
+    Return:
+      
+    
+    """
     num_spawn = event_activity.get_num_spawn()
 
     # WARNING - this only works if the event activity is not collapsed.
@@ -825,6 +856,7 @@ def calc_and_save_SA(THE_PARAM_T,
     num_gmm_max = source_model.get_max_num_atten_models()
     
     num_sites = len(sites)
+    assert num_sites == 1
     num_events = len(event_set)
     num_periods = len(THE_PARAM_T.atten_periods)
     
@@ -952,19 +984,23 @@ def calc_and_save_SA(THE_PARAM_T,
                 coll_soil_SA_all_events[:,:,:,event_inds,:] = \
                                                           collapsed_soil_SA
         # Set up the arrays to pass to risk
-        # Assume no spawning
+        # This is built up as sources are iterated over.
         # assume one site
         for i_spawn in arange(bedrock_SA.shape[0]): # loop over spawn
             for i_gmm in arange(bedrock_SA.shape[1]): # loop over gmm
                 i_overloaded = i_spawn * num_gmm_max * num_events + \
                                 i_gmm * num_events + event_inds
-                # rock_SA_overloaded dim (sites, events * gmm, period)
+                # rock_SA_overloaded dim (sites, events * gmm * spawn, period)
                 rock_SA_overloaded[0, i_overloaded, :] = \
                                       bedrock_SA[i_spawn,i_gmm,0,:,:]
                 if soil_SA is not None:
                     soil_SA_overloaded[0, i_overloaded, :] = \
                                           soil_SA[i_spawn,i_gmm,0,:,:]
-            
+        # can not do this, the current SA only has a subset of all events.
+        # 0 to drop site out
+        #rock_SA_overloaded_auto = (bedrock_SA[:,:,0,:,:]).reshape(
+        #    (num_sites, num_spawn*num_gmm_max*num_events, num_periods))
+
     #End source loop
     
     # Compute hazard if desired
