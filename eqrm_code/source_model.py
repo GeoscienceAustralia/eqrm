@@ -209,7 +209,7 @@ class Source_Model(object):
         
     @classmethod
     def create_scenario_source_model(cls, num_events):
-        # FIXME this is highlighting that source is beting used for two
+        # FIXME this is highlighting that source is being used for two
         # activities
         # calculating an event activity and associating an event with
         # a ground motion model.  So split this class into two classes sometime
