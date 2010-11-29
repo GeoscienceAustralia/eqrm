@@ -80,6 +80,53 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period, output_dir,
                                   annotate=annotate)
 
 
+def fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period, period,
+                          output_dir, plot_file=None, save_file=None,
+                          title=None, np_posn=None, s_posn=None, cb_steps=None,
+                          colourmap=None, cb_label=None, annotate=[]):
+    """Plot an earthquake hazard map, from probabalistic data.
+    Continuous colourbar and map.
+
+    input_dir     directory containing EQRM input data files
+    site_tag      event descriptor string
+    soil_amp      True for results with soil amplification,
+                  False for the bedrock results.
+    return_period event return period
+    period        period of the event
+    output_dir    directory for output file(s)
+    plot_file     full filename for generated plot file (*.png, *.eps, etc)
+    save_file     full filename for saved plot data
+
+    All other parameters are plot parameters as described elsewhere.
+
+    Outputs are:
+        plot_file  if specified, a plot file (*.png, *.eps, etc)
+        save_file  if specified, a file containing data as plotted,
+                   after any 'calc' manipulations.
+    """
+
+    # get raw data, all periods
+    data = om.load_xyz_from_hazard(input_dir, site_tag, soil_amp,
+                                   period, return_period)
+
+    # would do extra calc functions here, if required
+
+    # if user wants to save actual plotted data
+    if save_file:
+        save(data, save_file)      ####################### needs change
+
+    # plot the data
+    if plot_file:
+        if title is None:
+            title = 'RP=%s, period=%s' % (return_period, period)
+
+        pgx.plot_gmt_xyz_continuous(data, plot_file, title=title,
+                                  np_posn=np_posn, s_posn=s_posn,
+                                  cb_label=cb_label, cb_steps=cb_steps,
+                                  colourmap=colourmap,
+                                  annotate=annotate)
+
+
 def fig_loss_exceedance(input_dir, site_tag, title='',
                         output_file=None, grid=True,
                         show_graph=False, annotate=[]):
