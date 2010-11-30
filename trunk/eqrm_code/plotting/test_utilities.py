@@ -63,7 +63,7 @@ class TestUtilities(unittest.TestCase):
        
 
     def test_make_discrete_cpt(self):
-        # test the make_discrete_cpt() function that makes discrete CPT files
+        """Test the make_discrete_cpt() function that makes discrete CPT files."""
 
         # need a temporary working directory
         tmp_dir = tempfile.mkdtemp(prefix='test_utilities_')
@@ -81,13 +81,14 @@ class TestUtilities(unittest.TestCase):
                       ['F', '255', '0', '0'],
                       ['N', '255', '255', '255']]
         else:
-            expected=[['0', '32', '255', '0', '1', '32', '255', '0'],
-                      ['1', '96', '255', '0', '2', '96', '255', '0'],
-                      ['2', '191', '255', '0', '4', '191', '255', '0'],
-                      ['4', '255', '127', '0', '8', '255', '127', '0'],
+            expected=[['0.00', '32', '255', '0', '1.00', '32', '255', '0'],
+                      ['1.00', '96', '255', '0', '2.00', '96', '255', '0'],
+                      ['2.00', '191', '255', '0', '4.00', '191', '255', '0'],
+                      ['4.00', '255', '127', '0', '8.00', '255', '127', '0'],
                       ['B', '0', '255', '0'],
                       ['F', '255', '0', '0'],
                       ['N', '255', '255', '255']]
+
 
         util.make_discrete_cpt(filename, colourmap, seq)
 
