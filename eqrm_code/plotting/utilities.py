@@ -706,7 +706,7 @@ def get_colourmap(cmap, tmpdir=None):
         # if it's there, copy to the temp directory, return that
         cpt_file = os.path.join(tmpdir, lower_cmap + '.cpt')
         shutil.copy(cmap_path, cpt_file)
-        print('get_colourmap: returns %s' % cpt_file)
+#        print('get_colourmap: returns %s' % cpt_file)
         return cpt_file
 
     msg = "Colourmap name '%s' isn't recognised" % cmap
