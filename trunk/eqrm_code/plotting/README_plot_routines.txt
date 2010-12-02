@@ -51,7 +51,7 @@ text is added.
 
 Otherwise the annotation parameter is a list of one or more tuples like
 (<type>, <point>, ...)
-where <type> defines the type of annotation (one of 'text', 'image' or 'polygon)
+where <type> defines the type of annotation (one of 'text', 'image' or 'polygon')
 and <point> is a position tuple (longitude, latitude).  Further parameters
 depend on the annotation type.  There may be an *optional* final parameter that
 is a dictionary of extra parameters to fine-tune the annotation.  This dictionary
