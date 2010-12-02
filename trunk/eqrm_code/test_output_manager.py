@@ -1212,6 +1212,49 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(THE_PARAM_T.output_dir)
 
 
+    def test_load_motion_sites(self):      
+        THE_PARAM_T=Dummy()
+        motion_name = 'soil_SA'
+        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+            'output_managertest_load_motion_file') + os.sep
+        THE_PARAM_T.site_tag = "site_tag"
+        THE_PARAM_T.atten_periods = [0.1, 0.2]
+        
+        def digital(sp, gmm, site, ev, pd):
+            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
+        # (spawn, gmm, sites, events, periods)
+        motion = fromfunction(digital, (1,2,4,3,2))
+
+        lat_actual = array([-32., -31., -32., -31.])
+        lon_actual = array([120., 121., 3., 4.])
+        sites = Sites(lat_actual,lon_actual)
+        base_name = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+                   sites)
+        
+        base_names = save_motion(motion_name, THE_PARAM_T, motion)
+        tmp = load_motion_sites(THE_PARAM_T.output_dir,  THE_PARAM_T.site_tag,
+                          soil_amp=True, period=0.2)
+        SA, lat, lon = tmp
+        self.assert_(allclose(lat, lat_actual))
+        self.assert_(allclose(lon, lon_actual))
+        #self.assert_(allclose(SA, motion[0,0,...]))
+        # (sites, events*gmm*spawn, periods)
+        
+        for spawn_i in range(motion.shape[0]):
+            for gmm_i in range(motion.shape[1]):
+                for event_i in range(motion.shape[3]):
+                    overload_i = event_i + motion.shape[3]*gmm_i + \
+                                  motion.shape[3]* motion.shape[1]*spawn_i
+                    self.assert_(allclose(motion[spawn_i, gmm_i, :, event_i, 1],
+                                          SA[:, overload_i]))
+
+        
+        os.remove(base_name)
+        for name in base_names:
+            os.remove(name)
+        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
+        os.rmdir(THE_PARAM_T.output_dir)
+        
     def test_load_motion_file(self):
         THE_PARAM_T=Dummy()
         motion_name = 'motion_name'
@@ -1249,7 +1292,7 @@ class Test_Output_manager(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Output_manager, 'test')
-    #suite=unittest.makeSuite(Test_Output_manager,'test_load_collapsed_motion_sites')
+    #suite=unittest.makeSuite(Test_Output_manager,'test_load_motion_sites')
     #suite=unittest.makeSuite(Test_Output_manager,'test_save_eclossII')
     runner = unittest.TextTestRunner()  #verbosity=2) #verbosity=2
     runner.run(suite)
