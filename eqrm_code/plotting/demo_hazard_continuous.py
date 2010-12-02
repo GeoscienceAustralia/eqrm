@@ -25,9 +25,9 @@ save_file = None
 np_posn = 'nw'
 s_posn = 'se'
 cb_steps = None
-colourmap = 'hazmap'
+colourmap = 't9'
 cb_label = 'Acceleration (g)'
-annotate = []
+annotate = [('text', (151.35, -32.80), "Colourmap is '%s'" % colourmap)]
 
 plot_api.fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period,
                                period, output_dir, plot_file=plot_file,
