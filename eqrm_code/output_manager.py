@@ -486,7 +486,40 @@ def load_collapsed_motion_sites(saved_dir, site_tag, motion_name):
     assert site_n_from_lat == site_n_from_SA
     
     return SA, periods, lat, lon
+
         
+def load_motion_sites(output_dir, site_tag, soil_amp, period):
+    """
+    Given a hazard output from EQRM, return the long, lat and SA for a
+    specified period and return_period.
+    
+    Returns:
+      SA: Array of spectral acceleration
+        dimensions (sites, events*gmm*spawn)
+      lat: a vector of latitude values, site long
+      lon: a vector of longitude values, site long
+    """
+    if soil_amp is True:
+        geo = 'soil_SA' # Bad.  These magic strings are used in analysis
+        #FIXME Make these a constant.
+    else:
+        geo = 'bedrock_SA'
+    
+    SA, periods_f, lat, lon = load_collapsed_motion_sites(output_dir, site_tag, geo)
+    #if period not in periods_f:
+     #   print "Bad period" # Throw acception here
+
+    tol = 0.0001
+    SA_slice = None
+    for i, array_period in enumerate(periods_f):
+        if period - tol < array_period and period + tol > array_period:
+            SA_slice = SA[:,:,i]
+    if SA_slice is None:
+        print "Bad period" # Throw acception here
+    
+    return SA_slice, lat, lon
+
+
 def load_motion_file(file_full_name):
     """
     Given a file in the standard motion SA format, load it.
