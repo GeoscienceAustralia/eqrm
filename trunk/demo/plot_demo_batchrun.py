@@ -11,7 +11,7 @@ def demo_run():
 
 
     # list of input parameter files to use in the batch run
-    run_names = ['plot_ProbRisk.py', 'plot_ProbHaz.py']
+    run_names = ['plot_ProbRisk.py', 'plot_ProbHaz.py', 'plot_ScenGM.py']
 
     print 'Parameter file names = ',run_names
 
