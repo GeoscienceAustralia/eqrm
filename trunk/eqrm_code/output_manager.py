@@ -362,7 +362,7 @@ def load_distance(save_dir, site_tag, is_rjb):
         dist = reshape(dist, (-1,1))
     return dist
 
-def save_motion(motion_name,THE_PARAM_T,motion,compress=False,
+def save_motion(motion_name, THE_PARAM_T, motion, compress=False,
                 parallel_tag=None, write_title=True):
     """
     Who creates this motion data structure?
@@ -456,7 +456,7 @@ def load_motion(saved_dir, site_tag, motion_name):
                 SA.shape[1]))
     for spawn_i in range(max_spawn_ind+1):
         for gmm_i in range(max_gmm_ind+1):
-            for event_i in range(event_index+1):
+            for event_i in range(max_event_ind+1):
                 SA[spawn_i, gmm_i, :, event_i, :] = \
                             SA_dic[(spawn_i, gmm_i, event_i)]
     return SA, periods
@@ -534,7 +534,6 @@ def load_motion_file(file_full_name):
     """
     f=open(file_full_name,'r')            
     text = f.read().splitlines()
-    
     event_index = int(text[0].split('=')[1])
     ev = text.pop(0)
     spawn_index = int(text[0].split('=')[1])
