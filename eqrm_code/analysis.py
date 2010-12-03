@@ -761,7 +761,7 @@ def main(parameter_handle,
     # parallel code.  Needed if # of processes is > # of structures
     calc_num_blocks = parallel.calc_num_blocks()
 
-    # Now process 0 can stich some files together.
+    # Now process 0 can stich some files together
     if parallel.is_parallel and parallel.rank == 0:
         join_parallel_files(row_files_that_parallel_splits,
                             calc_num_blocks,
