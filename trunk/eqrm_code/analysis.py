@@ -90,7 +90,8 @@ def main(parameter_handle,
 
     eqrm_dir: The directory which 'eqrm_code' and 'resources' reside.
     """
-    t0 = time.clock()
+    t0 = t0_clock = time.clock()
+    t0_time = time.time()
 
 
     # Let's work-out the eqrm dir
@@ -128,8 +129,9 @@ def main(parameter_handle,
     # Setting up parallelisation
     parallel = Parallel(THE_PARAM_T.is_parallel)
 
-    # Make the output dir, if it is not present
-    add_last_directory(THE_PARAM_T.output_dir)
+    # process 0 can make the output dir, if it is not present
+    if parallel.rank == 0:
+        add_last_directory(THE_PARAM_T.output_dir)
 
     # copy input parameter file to output directory.
     if isinstance(parameter_handle, str) and parameter_handle[-3:] == '.py':
@@ -470,7 +472,8 @@ def main(parameter_handle,
         raise RuntimeError(msg)
 
     for i in range(array_size):
-        msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + str(array_size)
+        msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' \
+              + str(array_size)
         log.info(msg)
         rel_i = i #- parallel.lo
 
@@ -586,6 +589,9 @@ def main(parameter_handle,
     log.info(msg)
     msg = "loop_time (excluding file saving) " + \
            str(datetime.timedelta(seconds=loop_time)) + " hr:min:sec"
+    log.info(msg)
+    msg = "loop_time_seconds = " + \
+           str(loop_time) + " seconds."
     log.info(msg)
 
     #print "time_taken_pre_site_loop", time_taken_pre_site_loop
@@ -768,11 +774,24 @@ def main(parameter_handle,
     # Let's stop all the programs at the same time
     # Needed when scenarios are in series.
     # This was hanging nodes, when using mpirun
-    real_time_taken_overall = (time.clock() - t0)
-    msg = "On node %i, %s time_taken_overall %s hr:min:sec" % \
+    clock_time_taken_overall = (time.clock() - t0_clock)
+    wall_time_taken_overall = (time.time() - t0_time)
+    msg = "On node %i, %s clock (processor) time taken overall %s hr:min:sec." % \
           (parallel.rank,
            parallel.node,
-           str(datetime.timedelta(seconds=real_time_taken_overall)) )
+           str(datetime.timedelta(seconds=clock_time_taken_overall)))
+    log.info(msg)
+    msg = "clock_time_taken_overall_seconds = %s" % \
+          (str(clock_time_taken_overall))
+    
+    wall_time_taken_overall = (time.time() - t0_time)
+    msg = "On node %i, %s wall time taken overall %s hr:min:sec." % \
+          (parallel.rank,
+           parallel.node,
+           str(datetime.timedelta(seconds=wall_time_taken_overall)))
+    log.info(msg)
+    msg = "wall_time_taken_overall_seconds = %s" % \
+          (str(wall_time_taken_overall))
     log.info(msg)
     parallel.finalize()
     del parallel

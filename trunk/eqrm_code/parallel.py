@@ -97,7 +97,7 @@ class Parallel(object):
         self.size = 1
         self.node = socket.gethostname() # The host name
         self.is_parallel = False
-        self.file_tag = ''
+        self.file_tag = '-0' # this is so there is always a log-0.txt file.
             
     def barrier(self):
         """
