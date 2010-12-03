@@ -1129,7 +1129,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(THE_PARAM_T.output_dir)
 
 
-    def test_load_collapsed_motion_sites(self):      
+    def test_load_collapsed_motion_sitess(self):      
         THE_PARAM_T=Dummy()
         motion_name = 'motion_name'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
@@ -1149,11 +1149,14 @@ class Test_Output_manager(unittest.TestCase):
                    sites)
         
         base_names = save_motion(motion_name, THE_PARAM_T, motion)
-        tmp = load_collapsed_motion_sites(THE_PARAM_T.output_dir,  THE_PARAM_T.site_tag,
-                          motion_name)
+        tmp = load_collapsed_motion_sites(THE_PARAM_T.output_dir,
+                                          THE_PARAM_T.site_tag,
+                                          motion_name)
         SA, periods, lat, lon = tmp
         self.assert_(allclose(lat, lat_actual))
         self.assert_(allclose(lon, lon_actual))
+        #print "SA", SA
+        #print "motion[0,0,...]", motion[0,0,...]
         self.assert_(allclose(SA, motion[0,0,...]))
         self.assert_(allclose(array(THE_PARAM_T.atten_periods),
                               periods))
@@ -1161,6 +1164,7 @@ class Test_Output_manager(unittest.TestCase):
         
         os.remove(base_name)
         for name in base_names:
+            #pass
             os.remove(name)
         #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
         os.rmdir(THE_PARAM_T.output_dir)
@@ -1292,7 +1296,7 @@ class Test_Output_manager(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Output_manager, 'test')
-    #suite=unittest.makeSuite(Test_Output_manager,'test_load_motion_sites')
+    #suite=unittest.makeSuite(Test_Output_manager,'test_load_collapsed_motion_sitess')
     #suite=unittest.makeSuite(Test_Output_manager,'test_save_eclossII')
     runner = unittest.TextTestRunner()  #verbosity=2) #verbosity=2
     runner.run(suite)
