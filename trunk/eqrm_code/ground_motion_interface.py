@@ -3335,17 +3335,17 @@ def Campbell08_distribution(**kwargs):
      c11_22,c12_22,k1_22,k2_22,k3_22,c_22,n_22) = Campbell08_PGA_coefficient
     (slnY_22,tlnY_22,slnAF_22,sigC_22,rho_22) = Campbell08_PGA_sigma_coefficient
 
-    print('periods=%s' % str(periods))
-    print('Mw=%s' % str(Mw))
-    print('Ztor=%s' % str(Ztor))
-    print('Dip=%s' % str(Dip))
-    print('Frv=%s' % str(Frv))
-    print('Fnm=%s' % str(Fnm))
-    print('Rjb=%s' % str(Rjb))
-    print('Rrup=%s' % str(Rrup))
-    print('Vs30=%s' % str(Vs30))
-    print('Z25=%s' % str(Z25))
-    print('c0T=%s' % str(c0T))
+#    print('periods=%s' % str(periods))
+#    print('Mw=%s' % str(Mw))
+#    print('Ztor=%s' % str(Ztor))
+#    print('Dip=%s' % str(Dip))
+#    print('Frv=%s' % str(Frv))
+#    print('Fnm=%s' % str(Fnm))
+#    print('Rjb=%s' % str(Rjb))
+#    print('Rrup=%s' % str(Rrup))
+#    print('Vs30=%s' % str(Vs30))
+#    print('Z25=%s' % str(Z25))
+#    print('c0T=%s' % str(c0T))
 
     ######
     # CALCULATE ROCK PGA (Per = 0; Vs30 = 1100 m/sec)
