@@ -14,6 +14,8 @@ Copyright 2009 by Geoscience Australia
 
 import os
 import scipy
+import numpy
+import matplotlib.pyplot as plt
 
 import eqrm_code.output_manager as om
 import eqrm_code.plotting.calc_sum_xyz as csx
@@ -167,7 +169,7 @@ def fig_loss_exceedance(input_dir, site_tag, title='',
     # Load in the event activity
     out_dict = om.load_event_set_subset(input_dir, site_tag)
     event_activity = out_dict['event_activity']
-    
+
     # Check array dimensions
 
     # Do calculations
@@ -179,7 +181,7 @@ def fig_loss_exceedance(input_dir, site_tag, title='',
     plot_pml.plot_pml(pml_curve, title=title,
                       output_file=output_file, grid=grid,
                       show_graph=show_graph, annotate=annotate)
-    
+
 
 def fig_annloss_deagg_distmag(input_dir, site_tag, momag_labels,
                               momag_bin, range_bins, Zlim,
@@ -259,11 +261,11 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
     total_building_value = results[1]
     lon = results[2]
     lat = results[3]
-    
+
     # Load in the event activity
     out_dict = om.load_event_set_subset(input_dir, site_tag)
     event_activity = out_dict['event_activity']
-    
+
     # Run annualised loss calc and bin data
     percent_ann_loss, lat_lon, binx, _ = calc_annloss.calc_annloss_deagg_grid(
         lat,
@@ -348,9 +350,9 @@ def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
         # now standardise xrange
         xrange = util.get_canonical_range(xrange)
         yrange = util.get_canonical_range(yrange)
-        
+
         range_ann = []
-        
+
         if xrange:
             range_ann.append((0.02, 0.05,
                               'X range forced to (%.2f,%.2f)' % xrange))
@@ -368,5 +370,223 @@ def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
                          show_graph=show_graph, bardict=bardict,
                          annotate=range_ann)
 
+
+# function string to object mapping
+# later, we will only do this mapping if 'collapse_function' is type string
+fig_motion_function_map = {'mean': numpy.mean,
+                           'median': numpy.median}
+
+def fig_motion(input_dir, site_tag, soil_amp, period, plotfile,
+               collapse_function=None, savefile=None, title=None, xlabel=None,
+               ylabel=None, xrange=None, yrange=None, bins=100, bardict=None,
+               show_graph=False):
+    """Plot a 1D histogram from XYZ data.
+
+    input_dir      general input/output directory
+    site_tag       overall site identifier
+    soil_amp       soil/bedrock switch - True means soil, False means bedrock
+    period         the RSA period to be plotted
+    plotfile       name of plot output file to create in 'output_dir' directory
+    collapse_function       string defining function used to collapse site values
+                   ('mean' or 'medium', default is 'mean')
+    savefile       name of data output file to create in 'output_dir' directory
+    title          title to put on the graph
+    xlabel         text of X axis label
+    ylabel         text of Y axis label
+    xrange         Either <max> or (<min>, <max>) of X range to plot
+    yrange         Either <max> or (<min>, <max>) of Y range to plot
+    bins           number of bins to use
+    bardict        dictionary of extra keywords to pass to plot_barchart()
+                   see plot_barchart.py for the details on this
+    show_graph     True if the plot is to be shown on the screen
+    """
+
+    # read in raw data
+    data = om.load_motion_sites(input_dir, site_tag, soil_amp, period)
+
+    # get function to use
+    if collapse_function is None:
+        collapse_function = 'mean'
+
+    if isinstance(collapse_function, basestring):
+        try:
+            func = fig_motion_function_map[collapse_function]
+        except KeyError:
+            msg = ("Bad function param, got '%s', expected 'mean' or 'median'"
+                   % function)
+            raise Exception(msg)
+    else:
+        func = collapse_function
+
+    # split returned data into components
+    (SA, lat, lon) = data
+
+    # collapse axis=1 with func object
+    # simplest approach - just try to call function and catch exception
+    try:
+        SA = func(SA, axis=1)
+    except:
+        msg = 'Exception?'
+        raise Exception(msg)
+
+    # now combine collapsed SA, lat and lon into list of (x, y, z) tuples
+    data = []
+    for i in xrange(len(SA)):
+        data.append((SA[i], lon[i], lat[i]))
+
+    # plot the data
+    if plot_file:
+        if title is None:
+            title = 'site_tag=%s, period=%s' % (site_tag, period)
+
+
+
+def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
+                     xlabel=None, ylabel=None, xrange=None, yrange=None,
+                     show_grid=False, plot_file=None, save_file=None,
+                     show_graph=False, legend_placement=None):
+    """Plot an earthquake hazard map, by sites.
+
+    input_dir         directory containing EQRM input data files
+    site_tag          event descriptor string
+    soil_amp          True for results with soil amplification,
+                      False for the bedrock results.
+    sites             a list of required site tuples (lat, lon, RP, [colour])
+    title             graph title
+    xlabel            text of X axis label
+    ylabel            text of Y axis label
+    xrange            Either <max> or (<min>, <max>) of X range to plot
+    yrange            Either <max> or (<min>, <max>) of Y range to plot
+    show_grid         True if a grid is to be drawn
+    plot_file         full filename for generated plot file (*.png, *.eps, etc)
+    save_file         full filename for saved plot data (CURRENTLY UNUSED)
+    show_graph        True if the graph is to be shown on the screen
+    legend_placement  a string determining where to place the legend
+                      ('lower left' is the default)
+
+    All other parameters are plot parameters as described elsewhere.
+
+    Outputs are:
+        plot_file  if specified, a plot file (*.png, *.eps, etc)
+        save_file  if specified, a file containing data as plotted,
+                   after any 'calc' manipulations.
+
+    The optional 'colour' part of the 'sites' tuple is a string as described
+    in [http://matplotlib.sourceforge.net/api/colors_api.html].  Note that if
+    you specify colour on only a few sites, matplotlib will choose any colour
+    it likes for the sites without a 'colour' element.
+
+    Valid legend placement strings may be found at
+    [http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.legend]
+    """
+
+    # get raw data, all periods
+    # SA      is numpy array of shape (site, periods, RP)
+    # RP      is a list of return periods of the SA values
+    # periods is a list of return periods of the SA values
+    (SA, periods, RP) = om.load_hazards(input_dir, site_tag, 'soil_SA')
+
+    # now get sites lat&lon data
+    (site_lats, site_lons) = om.load_sites(input_dir, site_tag)
+
+    # default the title, axis labels, etc, if necessary
+    if title is None:
+        title = 'Hazard at location and Return Period'
+    if xlabel is None:
+        xlabel = 'RSA period (s)'
+    if ylabel is None:
+        ylabel = 'Hazard (g)'
+    if legend_placement is None:
+        legend_placement = 'lower left'
+
+    # now find user sites and RPs in the loaded data, create plot dataset
+    plot_data = []
+    legend_titles = []
+    for (i, s) in enumerate(sites):
+        (slat, slon, sRP) = s
+
+        # find site index matching user site
+        site_index = None
+        for (lat, lon) in zip(site_lats, site_lons):
+            #if abs(lat - slat) <= delta and abs(lon - slon) <= delta:
+            if lat == slat and lon == slon:
+                site_index = i
+                break
+        if site_index is None:
+            msg = "Site (%.3f,%.3f) not found in site data" % (slat, slon)
+            raise Exception(msg)
+
+        # find RP_index matching user RP
+        RP_index = None
+        for (i, rp) in enumerate(RP):
+            if sRP == rp:
+                RP_index = i
+                break
+        if RP_index is None:
+            msg = "RP %.1f not found in site data" % sRP
+            raise Exception(msg)
+
+        # at this point we take slices at site and RP indices to get plot data
+        data = SA[site_index,:,RP_index]
+        plot_data.append(periods)
+        plot_data.append(data)
+
+        # generate legend string for this dataset
+        legend = ('Location: %.1f,%.1f    Return Period: %d years'
+                  %  (slon, slat, int(sRP)))
+        legend_titles.append(legend)
+
+    # if user wants to save actual plotted data
+#    if save_file:
+#        save(data, save_file)      ####################### needs change
+
+    # plot the data
+    if plot_file or show_graph:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        ax.plot(*plot_data)
+
+        leg = ax.legend(legend_titles, legend_placement, shadow=True)
+
+        if xrange:
+            try:
+                (x_min, x_max) = xrange
+            except TypeError:
+                # single value
+                x_min = 0.0
+                x_max = xrange
+            ax.set_xlim((x_min, x_max))
+
+        if yrange:
+            try:
+                (y_min, y_max) = yrange
+            except TypeError:
+                # single value
+                y_min = 0.0
+                y_max = xrange
+            ax.set_ylim((y_min, y_max))
+
+        ax.grid(show_grid)
+
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        
+        # tweak various legend params
+        frame  = leg.get_frame()
+        frame.set_facecolor('0.95')   # set the frame face color to light gray
+        
+        for t in leg.get_texts():
+            t.set_fontsize('small')    # the legend text fontsize
+        
+        for l in leg.get_lines():
+            l.set_linewidth(2.0)       # the legend line width
+
+        if plot_file:
+            plt.savefig(plot_file)
+
+        if show_graph:
+            plt.show()
 
 
