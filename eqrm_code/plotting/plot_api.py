@@ -445,7 +445,7 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
                      xlabel=None, ylabel=None, xrange=None, yrange=None,
                      show_grid=False, plot_file=None, save_file=None,
                      show_graph=False, legend_placement=None):
-    """Plot an earthquake hazard map, by sites.
+    """Plot an earthquake hazard/period graph, for multiple sites.
 
     input_dir         directory containing EQRM input data files
     site_tag          event descriptor string
@@ -478,6 +478,9 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
 
     Valid legend placement strings may be found at
     [http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.legend]
+
+    Linestyle suffixes to line colours are documented here:
+    [http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot]
     """
 
     # get raw data, all periods
@@ -503,7 +506,11 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
     plot_data = []
     legend_titles = []
     for (i, s) in enumerate(sites):
-        (slat, slon, sRP) = s
+        try:
+            (slat, slon, sRP) = s
+            colour = None
+        except ValueError:
+            (slat, slon, sRP, colour) = s
 
         # find site index matching user site
         site_index = None
@@ -513,7 +520,8 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
                 site_index = i
                 break
         if site_index is None:
-            msg = "Site (%.3f,%.3f) not found in site data" % (slat, slon)
+            msg = ("Site (%.3f,%.3f) not found in site data"
+                   % (float(slat), float(slon)))
             raise Exception(msg)
 
         # find RP_index matching user RP
@@ -530,6 +538,8 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
         data = SA[site_index,:,RP_index]
         plot_data.append(periods)
         plot_data.append(data)
+        if colour:
+            plot_data.append(colour)
 
         # generate legend string for this dataset
         legend = ('Location: %.1f,%.1f    Return Period: %d years'

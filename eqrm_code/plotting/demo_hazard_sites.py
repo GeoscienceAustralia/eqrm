@@ -28,8 +28,11 @@ show_graph = True
 show_grid = True
 legend_placement = 'upper right'
 
-sites = [(-32.7928, 151.64931, 7500),(-33.20083, 151.44729, 7500),
-         (-32.7928, 151.64931, 10000),(-33.20083, 151.44729, 10000)]
+# example of optional colour and linestyle specification
+sites = [(-32.7928, 151.64931, 7500, 'r--'),
+         (-33.20083, 151.44729, 7500, 'g-'),
+         (-32.7928, 151.64931, 10000, 'b:'),
+         (-33.20083, 151.44729, 10000, 'c-.')]
 
 plot_api.fig_hazard_sites(input_dir, site_tag, soil_amp, sites,
                           plot_file=plot_file, save_file=save_file,
