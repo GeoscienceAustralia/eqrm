@@ -445,7 +445,7 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
                      xlabel=None, ylabel=None, xrange=None, yrange=None,
                      show_grid=False, plot_file=None, save_file=None,
                      show_graph=False, legend_placement=None):
-    """Plot an earthquake hazard/period graph, for multiple sites.
+    """Plot an earthquake hazard/period graph for multiple sites.
 
     input_dir         directory containing EQRM input data files
     site_tag          event descriptor string
@@ -482,7 +482,7 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
     Linestyle suffixes to line colours are documented here:
     [http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot]
     Note this only seem to work on 'single char' colour strings, ie, 'g--' but not
-    'green--'?
+    'green--'.
     """
 
     # get raw data, all periods
@@ -606,13 +606,13 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
                           xlabel=None, ylabel=None, xrange=None, yrange=None,
                           show_grid=False, plot_file=None, save_file=None,
                           show_graph=False, legend_placement=None):
-    """Plot an earthquake hazardexceedance graph, for multiple sites.
+    """Plot an earthquake hazard exceedance graph for multiple sites.
 
     input_dir         directory containing EQRM input data files
     site_tag          event descriptor string
     soil_amp          True for results with soil amplification,
                       False for the bedrock results.
-    sites             a list of required site tuples (lat, lon, RSAperiod, [colour])
+    sites             a list of required site tuples (lat, lon, period, [colour])
     title             graph title
     xlabel            text of X axis label
     ylabel            text of Y axis label
@@ -643,21 +643,16 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
     Linestyle suffixes to line colours are documented here:
     [http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot]
     Note this only seem to work on 'single char' colour strings, ie, 'g--' but not
-    'green--'?
+    'green--'.
     """
 
     # get raw data, all periods
-    # SA      is numpy array of shape (site, periods, RP)
-    # RP      is a list of return periods of the SA values
-    # periods is a list of return periods of the SA values
+    # SA           is numpy array of shape (site, periods, RP)
+    # RP           is a list of return periods of the SA values
+    # periods      is a list of return periods of the SA values
+    # prob_exceed  is inverse of RP (Y data)
     (SA, periods, RP) = om.load_hazards(input_dir, site_tag, soil_amp)
-
-    print('SA.shape=%s' % str(SA.shape))
-    print('SA=%s' % str(SA))
-    print('len(RP)=%d' % len(RP))
-    print('RP=%s' % str(RP))
-    print('periods.shape=%s' % str(periods.shape))
-    print('periods=%s' % str(periods))
+    prob_exceed = [1/rp for rp in RP]
 
     # now get sites lat&lon data
     (site_lats, site_lons) = om.load_sites(input_dir, site_tag)
@@ -672,15 +667,15 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
     if legend_placement is None:
         legend_placement = 'upper right'
 
-    # now find user sites and RSAperiods in the loaded data, create plot dataset
+    # now find user sites and period in the loaded data, create plot dataset
     plot_data = []
     legend_titles = []
     for (i, s) in enumerate(sites):
         try:
-            (slat, slon, sRSAp) = s
+            (slat, slon, period) = s
             colour = None
         except ValueError:
-            (slat, slon, sRSAp, colour) = s
+            (slat, slon, period, colour) = s
 
         # find site index matching user site
         site_index = None
@@ -694,26 +689,26 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
                    % (float(slat), float(slon)))
             raise Exception(msg)
 
-        # find RSA_index matching user RP
-        RSA_index = None
-        for (i, rp) in enumerate(RP):
-            if sRSAp == rp:
-                RSA_index = i
+        # find index matching user period
+        period_index = None
+        for (i, rp) in enumerate(periods):
+            if period == rp:
+                period_index = i
                 break
-        if RSA_index is None:
-            msg = "RSAperiod %.1f not found in site data" % sRSAp
+        if period_index is None:
+            msg = "period %.1f not found in site data" % period
             raise Exception(msg)
 
-        # at this point we take slices at site and RP indices to get plot data
-        data = SA[site_index,:,RSA_index]
-        plot_data.append(periods)
-        plot_data.append(data)
+        # at this point we take slices at site and period indices -> plot data
+        data = SA[site_index,period_index,:]
+        plot_data.append(data)		# X data
+        plot_data.append(prob_exceed)		# Y data
         if colour:
-            plot_data.append(colour)
+            plot_data.append(colour)	# line attributes
 
         # generate legend string for this dataset
         legend = ('Location: %.1f,%.1f    RSA Period: %.1f'
-                  %  (slon, slat, int(sRSAp)))
+                  %  (slon, slat, int(period)))
         legend_titles.append(legend)
 
     # if user wants to save actual plotted data
@@ -729,6 +724,12 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
 
         leg = ax.legend(legend_titles, legend_placement)
 
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.set_yscale('log')
+        ax.grid(show_grid)
+        
         if xrange:
             try:
                 (x_min, x_max) = xrange
@@ -747,12 +748,6 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
                 y_max = xrange
             ax.set_ylim((y_min, y_max))
 
-        ax.grid(show_grid)
-
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
-        ax.set_title(title)
-        
         # tweak various legend params
         frame  = leg.get_frame()
         frame.set_facecolor('0.95')   # set the frame face color to light gray
