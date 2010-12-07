@@ -150,7 +150,7 @@ def main(parameter_handle,
     #log.console_logging_level = log.INFO
     #log.file_logging_level = log.DEBUG
     log_filename = os.path.join(THE_PARAM_T.output_dir,
-                                'log' + parallel.file_tag + '.txt')
+                                'log' + parallel.log_file_tag + '.txt')
     log.log_filename = log_filename
     log.remove_log_file()
     log.set_log_file(log_filename)
