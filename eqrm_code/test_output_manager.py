@@ -161,7 +161,7 @@ class Test_Output_manager(unittest.TestCase):
     def test_load_SA(self):
         THE_PARAM_T=Dummy()
         soil_amp = False
-        hazard_name = 'rock_SA'
+        hazard_name = 'bedrock_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazard_1') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
@@ -244,7 +244,7 @@ class Test_Output_manager(unittest.TestCase):
     def test_load_hazardsII(self):
         THE_PARAM_T=Dummy()
         soil_amp = False
-        hazard_name = 'rock_SA'
+        hazard_name = 'bedrock_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazardsII') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
@@ -330,7 +330,7 @@ class Test_Output_manager(unittest.TestCase):
     def test_load_hazards_no_files(self):
         THE_PARAM_T=Dummy()
         soil_amp = False
-        hazard_name = 'rock_SA'
+        hazard_name = 'bedrock_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazards_no_files') + os.sep
         THE_PARAM_T.site_tag = "site_tag"

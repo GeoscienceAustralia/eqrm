@@ -52,7 +52,7 @@ def save_hazard(soil_amp,THE_PARAM_T,
     assert isfinite(hazard).all()
 
     # interpret 'soil_amp' into filename fragment
-    hazard_name = 'soil_SA' if soil_amp else 'rock_SA'
+    hazard_name = 'soil_SA' if soil_amp else 'bedrock_SA'
        
     base_names = []
     if sites is not None:
@@ -108,7 +108,7 @@ def load_hazards(saved_dir, site_tag, soil_amp):
     """
 
     # interpret 'soil_amp' to correct filename fragment
-    hazard_name = 'soil_SA' if soil_amp else 'rock_SA'
+    hazard_name = 'soil_SA' if soil_amp else 'bedrock_SA'
 
     beginning = site_tag+ '_'+ hazard_name+'_rp'
     rp_start_index = len(beginning) + 1 # +1 due to the [ bracket.
@@ -394,7 +394,7 @@ def save_motion(soil_amp, THE_PARAM_T, motion, compress=False,
     """
 
     # convert 'soil_amp' to a filename fragment
-    motion_name = 'soil_SA' if soil_amp else 'rock_SA'
+    motion_name = 'soil_SA' if soil_amp else 'bedrock_SA'
 
     if compress: open = myGzipFile
     else: open = file
@@ -436,7 +436,7 @@ def load_motion(saved_dir, site_tag, soil_amp):
     Load motion is used to load scenario SA data.
     
     The file name structure is;
-      [site_tag]_[soil_SA|rock_SA]_motion_[event #]_spawn_[spawn #]_gmm_[gmm #].txt
+      [site_tag]_[soil_SA|bedrock_SA]_motion_[event #]_spawn_[spawn #]_gmm_[gmm #].txt
 
     Returns:
       SA: Array of spectral acceleration
@@ -445,7 +445,7 @@ def load_motion(saved_dir, site_tag, soil_amp):
     """
 
     # convert 'soil_amp' to a filename fragment
-    motion_name = 'soil_SA' if soil_amp else 'rock_SA'
+    motion_name = 'soil_SA' if soil_amp else 'bedrock_SA'
 
     beginning = site_tag+ '_'+ motion_name +'_motion'
     #rp_start_index = len(beginning) + 1 # +1 due to the [ bracket.
