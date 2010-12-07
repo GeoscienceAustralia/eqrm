@@ -34,7 +34,7 @@ class myGzipFile(GzipFile):
     def __init__(self,name,mode='r'):
         GzipFile.__init__(self,name+'.gz',mode)
     
-def save_hazard(hazard_name,THE_PARAM_T,
+def save_hazard(soil_amp,THE_PARAM_T,
                 hazard,sites=None,compress=False,
                 parallel_tag=None, write_title=True):
     """
@@ -50,6 +50,9 @@ def save_hazard(hazard_name,THE_PARAM_T,
     
     """
     assert isfinite(hazard).all()
+
+    # interpret 'soil_amp' into filename fragment
+    hazard_name = 'soil_SA' if soil_amp else 'rock_SA'
        
     base_names = []
     if sites is not None:
@@ -86,9 +89,14 @@ def save_hazard(hazard_name,THE_PARAM_T,
         f.close()
     return base_names
 
-def load_hazards(saved_dir, site_tag, hazard_name):
+def load_hazards(saved_dir, site_tag, soil_amp):
     """
     Load in all of the data written by save hazards.
+
+    saved_dir  
+    site_tag   
+    soli_amp   True if soil amplification, else bedrock
+
     The file name structure is;
       [site_tag]_[hazard_name]_rp[return period].txt
 
@@ -98,6 +106,10 @@ def load_hazards(saved_dir, site_tag, hazard_name):
       periods: A list of periods of the SA values
       return_p: A list of return periods of the SA values
     """
+
+    # interpret 'soil_amp' to correct filename fragment
+    hazard_name = 'soil_SA' if soil_amp else 'rock_SA'
+
     beginning = site_tag+ '_'+ hazard_name+'_rp'
     rp_start_index = len(beginning) + 1 # +1 due to the [ bracket.
     rp_end_index = -(len(EXTENSION) + 1)
@@ -362,7 +374,7 @@ def load_distance(save_dir, site_tag, is_rjb):
         dist = reshape(dist, (-1,1))
     return dist
 
-def save_motion(motion_name, THE_PARAM_T, motion, compress=False,
+def save_motion(soil_amp, THE_PARAM_T, motion, compress=False,
                 parallel_tag=None, write_title=True):
     """
     Who creates this motion data structure?
@@ -375,11 +387,15 @@ def save_motion(motion_name, THE_PARAM_T, motion, compress=False,
     motion file is created.
 
     parameters:
-    motion_name, such as 'bedrock_SA' or 'soil_SA'
+    soil_amp: False -> 'bedrock_SA', True -> 'soil_SA'
     motion: Array of spectral acceleration, units g
         dimensions (spawn, gmm, sites, events, periods)
 
     """
+
+    # convert 'soil_amp' to a filename fragment
+    motion_name = 'soil_SA' if soil_amp else 'rock_SA'
+
     if compress: open = myGzipFile
     else: open = file
     if parallel_tag is None:
@@ -413,20 +429,24 @@ def save_motion(motion_name, THE_PARAM_T, motion, compress=False,
                 f.close()
     return base_names
 
-def load_motion(saved_dir, site_tag, motion_name):
+def load_motion(saved_dir, site_tag, soil_amp):
     """
     Load in all of the data written by save motion.
     This is SA w.r.t. location,rsa periods, spawn and ground motion model.
     Load motion is used to load scenario SA data.
     
     The file name structure is;
-      [site_tag]_[motion_name]_motion_[event #]_spawn_[spawn #]_gmm_[gmm #].txt
+      [site_tag]_[soil_SA|rock_SA]_motion_[event #]_spawn_[spawn #]_gmm_[gmm #].txt
 
     Returns:
       SA: Array of spectral acceleration
         dimensions (spawn, gmm, sites, events, periods)
       periods: A list of periods of the SA values
     """
+
+    # convert 'soil_amp' to a filename fragment
+    motion_name = 'soil_SA' if soil_amp else 'rock_SA'
+
     beginning = site_tag+ '_'+ motion_name +'_motion'
     #rp_start_index = len(beginning) + 1 # +1 due to the [ bracket.
     #rp_end_index = -(len(EXTENSION) + 1)
@@ -462,7 +482,7 @@ def load_motion(saved_dir, site_tag, motion_name):
     return SA, periods
                 
 
-def load_collapsed_motion_sites(saved_dir, site_tag, motion_name):
+def load_collapsed_motion_sites(saved_dir, site_tag, soil_amp):
     """
     Load in all of the data written by save motion.
 
@@ -475,7 +495,7 @@ def load_collapsed_motion_sites(saved_dir, site_tag, motion_name):
       lon: a vector of longitude values, site long
     """
     lat, lon = load_sites(saved_dir, site_tag)
-    SA, periods = load_motion(saved_dir, site_tag, motion_name)
+    SA, periods = load_motion(saved_dir, site_tag, soil_amp)
     #  SA dimensions (spawn, gmm, sites, events, periods)
     newshape = (SA.shape[2], SA.shape[0]*SA.shape[1]*SA.shape[3], SA.shape[4])
     SA = rollaxis(SA, 2)
@@ -499,13 +519,8 @@ def load_motion_sites(output_dir, site_tag, soil_amp, period):
       lat: a vector of latitude values, site long
       lon: a vector of longitude values, site long
     """
-    if soil_amp is True:
-        geo = 'soil_SA' # Bad.  These magic strings are used in analysis
-        #FIXME Make these a constant.
-    else:
-        geo = 'bedrock_SA'
     
-    SA, periods_f, lat, lon = load_collapsed_motion_sites(output_dir, site_tag, geo)
+    SA, periods_f, lat, lon = load_collapsed_motion_sites(output_dir, site_tag, soil_amp)
     #if period not in periods_f:
      #   print "Bad period" # Throw acception here
 
