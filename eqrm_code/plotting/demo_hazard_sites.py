@@ -15,22 +15,22 @@ input_dir = Demo_Output_PlotProbHaz_Path
 site_tag = 'newc'
 
 soil_amp = True
-return_period = 7500
-period = 1.0
-
 title = 'demo_hazard_sites.py'
-output_dir = '.'
 plot_file = 'fig_from_demo_hazard_sites.png'
 save_file = None
+# override X range to show how it is done
 xrange = 1.1
+# leave space at top for legend (data makes Y range be (0.1,0.9))
 yrange = (0.1, 1.3)
 show_graph = True
 show_grid = True
-legend_placement = 'upper right'
+# default placement overridden
+legend_placement = 'upper left'
 
 # example of optional colour and linestyle specification
 sites = [(-32.7928, 151.64931, 7500, 'r--'),
-         (-33.20083, 151.44729, 7500, 'g-'),
+#         (-33.20083, 151.44729, 7500, 'g-'),	# same as below
+         (-33.20083, 151.44729, 7500, 'green'),
          (-32.7928, 151.64931, 10000, 'b:'),
          (-33.20083, 151.44729, 10000, 'c-.')]
 

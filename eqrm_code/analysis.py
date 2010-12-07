@@ -599,7 +599,7 @@ def main(parameter_handle,
 
     # SAVE HAZARD
     if THE_PARAM_T.save_hazard_map is True and parallel.lo != parallel.hi:
-        files = save_hazard('bedrock_SA', THE_PARAM_T, hazard=bedrock_hazard,
+        files = save_hazard(False, THE_PARAM_T, hazard=bedrock_hazard,
                             sites=all_sites,
                             compress=THE_PARAM_T.compress_output,
                             parallel_tag=parallel.file_tag,
@@ -607,7 +607,7 @@ def main(parameter_handle,
         row_files_that_parallel_splits.extend(files)
 
         if soil_hazard is not None:
-            files = save_hazard('soil_SA', THE_PARAM_T, hazard=soil_hazard,
+            files = save_hazard(True, THE_PARAM_T, hazard=soil_hazard,
                                 compress=THE_PARAM_T.compress_output,
                                 parallel_tag=parallel.file_tag,
                                 write_title=(parallel.rank == False))
@@ -622,14 +622,14 @@ def main(parameter_handle,
                           write_title=(parallel.rank == False))
         row_files_that_parallel_splits.append(file)
 
-        files = save_motion('bedrock_SA', THE_PARAM_T,motion=bedrock_SA_all,
+        files = save_motion(False, THE_PARAM_T,motion=bedrock_SA_all,
                             compress=THE_PARAM_T.compress_output,
                             parallel_tag=parallel.file_tag,
                             write_title=(parallel.rank == False))
         row_files_that_parallel_splits.extend(files)
 
         if soil_SA_all is not None:
-            files = save_motion('soil_SA',THE_PARAM_T,motion=soil_SA_all,
+            files = save_motion(True,THE_PARAM_T,motion=soil_SA_all,
                                compress=THE_PARAM_T.compress_output,
                                parallel_tag=parallel.file_tag,
                                write_title=(parallel.rank == False))

@@ -467,7 +467,7 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
     All other parameters are plot parameters as described elsewhere.
 
     Outputs are:
-        plot_file  if specified, a plot file (*.png, *.eps, etc)
+        plot_file  if specified, a plot file (*.png, *.eps, *.ps, etc)
         save_file  if specified, a file containing data as plotted,
                    after any 'calc' manipulations.
 
@@ -481,13 +481,15 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
 
     Linestyle suffixes to line colours are documented here:
     [http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot]
+    Note this only seem to work on 'single char' colour strings, ie, 'g--' but not
+    'green--'?
     """
 
     # get raw data, all periods
     # SA      is numpy array of shape (site, periods, RP)
     # RP      is a list of return periods of the SA values
     # periods is a list of return periods of the SA values
-    (SA, periods, RP) = om.load_hazards(input_dir, site_tag, 'soil_SA')
+    (SA, periods, RP) = om.load_hazards(input_dir, site_tag, soil_amp)
 
     # now get sites lat&lon data
     (site_lats, site_lons) = om.load_sites(input_dir, site_tag)
@@ -500,7 +502,7 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
     if ylabel is None:
         ylabel = 'Hazard (g)'
     if legend_placement is None:
-        legend_placement = 'lower left'
+        legend_placement = 'upper right'
 
     # now find user sites and RPs in the loaded data, create plot dataset
     plot_data = []
@@ -557,7 +559,175 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
 
         ax.plot(*plot_data)
 
-        leg = ax.legend(legend_titles, legend_placement, shadow=True)
+        leg = ax.legend(legend_titles, legend_placement)
+
+        if xrange:
+            try:
+                (x_min, x_max) = xrange
+            except TypeError:
+                # single value
+                x_min = 0.0
+                x_max = xrange
+            ax.set_xlim((x_min, x_max))
+
+        if yrange:
+            try:
+                (y_min, y_max) = yrange
+            except TypeError:
+                # single value
+                y_min = 0.0
+                y_max = xrange
+            ax.set_ylim((y_min, y_max))
+
+        ax.grid(show_grid)
+
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        
+        # tweak various legend params
+        frame  = leg.get_frame()
+        frame.set_facecolor('0.95')   # set the frame face color to light gray
+        
+        for t in leg.get_texts():
+            t.set_fontsize('small')    # the legend text fontsize
+        
+        for l in leg.get_lines():
+            l.set_linewidth(2.0)       # the legend line width
+
+        if plot_file:
+            plt.savefig(plot_file)
+
+        if show_graph:
+            plt.show()
+
+
+def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
+                          xlabel=None, ylabel=None, xrange=None, yrange=None,
+                          show_grid=False, plot_file=None, save_file=None,
+                          show_graph=False, legend_placement=None):
+    """Plot an earthquake hazardexceedance graph, for multiple sites.
+
+    input_dir         directory containing EQRM input data files
+    site_tag          event descriptor string
+    soil_amp          True for results with soil amplification,
+                      False for the bedrock results.
+    sites             a list of required site tuples (lat, lon, RSAperiod, [colour])
+    title             graph title
+    xlabel            text of X axis label
+    ylabel            text of Y axis label
+    xrange            Either <max> or (<min>, <max>) of X range to plot
+    yrange            Either <max> or (<min>, <max>) of Y range to plot
+    show_grid         True if a grid is to be drawn
+    plot_file         full filename for generated plot file (*.png, *.eps, etc)
+    save_file         full filename for saved plot data (CURRENTLY UNUSED)
+    show_graph        True if the graph is to be shown on the screen
+    legend_placement  a string determining where to place the legend
+                      ('lower left' is the default)
+
+    All other parameters are plot parameters as described elsewhere.
+
+    Outputs are:
+        plot_file  if specified, a plot file (*.png, *.eps, *.ps, etc)
+        save_file  if specified, a file containing data as plotted,
+                   after any 'calc' manipulations.
+
+    The optional 'colour' part of the 'sites' tuple is a string as described
+    in [http://matplotlib.sourceforge.net/api/colors_api.html].  Note that if
+    you specify colour on only a few sites, matplotlib will choose any colour
+    it likes for the sites without a 'colour' element.
+
+    Valid legend placement strings may be found at
+    [http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.legend]
+
+    Linestyle suffixes to line colours are documented here:
+    [http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot]
+    Note this only seem to work on 'single char' colour strings, ie, 'g--' but not
+    'green--'?
+    """
+
+    # get raw data, all periods
+    # SA      is numpy array of shape (site, periods, RP)
+    # RP      is a list of return periods of the SA values
+    # periods is a list of return periods of the SA values
+    (SA, periods, RP) = om.load_hazards(input_dir, site_tag, soil_amp)
+
+    print('SA.shape=%s' % str(SA.shape))
+    print('SA=%s' % str(SA))
+    print('len(RP)=%d' % len(RP))
+    print('RP=%s' % str(RP))
+    print('periods.shape=%s' % str(periods.shape))
+    print('periods=%s' % str(periods))
+
+    # now get sites lat&lon data
+    (site_lats, site_lons) = om.load_sites(input_dir, site_tag)
+
+    # default the title, axis labels, etc, if necessary
+    if title is None:
+        title = 'Hazard Exceedance'
+    if xlabel is None:
+        xlabel = 'Hazard (g)'
+    if ylabel is None:
+        ylabel = 'Probability of Exceedance in One Year'
+    if legend_placement is None:
+        legend_placement = 'upper right'
+
+    # now find user sites and RSAperiods in the loaded data, create plot dataset
+    plot_data = []
+    legend_titles = []
+    for (i, s) in enumerate(sites):
+        try:
+            (slat, slon, sRSAp) = s
+            colour = None
+        except ValueError:
+            (slat, slon, sRSAp, colour) = s
+
+        # find site index matching user site
+        site_index = None
+        for (lat, lon) in zip(site_lats, site_lons):
+            #if abs(lat - slat) <= delta and abs(lon - slon) <= delta:
+            if lat == slat and lon == slon:
+                site_index = i
+                break
+        if site_index is None:
+            msg = ("Site (%.3f,%.3f) not found in site data"
+                   % (float(slat), float(slon)))
+            raise Exception(msg)
+
+        # find RSA_index matching user RP
+        RSA_index = None
+        for (i, rp) in enumerate(RP):
+            if sRSAp == rp:
+                RSA_index = i
+                break
+        if RSA_index is None:
+            msg = "RSAperiod %.1f not found in site data" % sRSAp
+            raise Exception(msg)
+
+        # at this point we take slices at site and RP indices to get plot data
+        data = SA[site_index,:,RSA_index]
+        plot_data.append(periods)
+        plot_data.append(data)
+        if colour:
+            plot_data.append(colour)
+
+        # generate legend string for this dataset
+        legend = ('Location: %.1f,%.1f    RSA Period: %.1f'
+                  %  (slon, slat, int(sRSAp)))
+        legend_titles.append(legend)
+
+    # if user wants to save actual plotted data
+#    if save_file:
+#        save(data, save_file)      ####################### needs change
+
+    # plot the data
+    if plot_file or show_graph:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        ax.plot(*plot_data)
+
+        leg = ax.legend(legend_titles, legend_placement)
 
         if xrange:
             try:
