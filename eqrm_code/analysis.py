@@ -133,15 +133,17 @@ def main(parameter_handle,
     if parallel.rank == 0:
         add_last_directory(THE_PARAM_T.output_dir)
 
-    # copy input parameter file to output directory.
-    if isinstance(parameter_handle, str) and parameter_handle[-3:] == '.py':
-        shutil.copyfile(parameter_handle,
-                        THE_PARAM_T.output_dir+'THE_PARAM_T.py')
-    else:
-        para_instance = copy.deepcopy(THE_PARAM_T)
-        convert_THE_PARAM_T_to_py(
-            os.path.join(THE_PARAM_T.output_dir, 'THE_PARAM_T.txt'),
-            para_instance)
+        # copy input parameter file to output directory.
+        if isinstance(parameter_handle, str) and parameter_handle[-3:] == '.py':
+            shutil.copyfile(parameter_handle,
+                            THE_PARAM_T.output_dir+'THE_PARAM_T.py')
+        else:
+            para_instance = copy.deepcopy(THE_PARAM_T)
+            convert_THE_PARAM_T_to_py(
+                os.path.join(THE_PARAM_T.output_dir, 'THE_PARAM_T.txt'),
+                para_instance)
+    parallel.barrier()
+        
 
     # Set up the logging
     # Use defaults.
