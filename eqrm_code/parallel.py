@@ -50,6 +50,7 @@ class Parallel(object):
                     self.node = pypar.get_processor_name()
                     self.is_parallel = True
                     self.file_tag = FILE_TAG_DELIMITER + str(self.rank)
+                    self.log_file_tag = FILE_TAG_DELIMITER + str(self.rank)
                 else:
                     self._not_parallel()
         else:
@@ -97,7 +98,8 @@ class Parallel(object):
         self.size = 1
         self.node = socket.gethostname() # The host name
         self.is_parallel = False
-        self.file_tag = '-0' # this is so there is always a log-0.txt file.
+        self.file_tag = ''
+        self.log_file_tag = '-0' # this is so there is always a log-0.txt file.
             
     def barrier(self):
         """
