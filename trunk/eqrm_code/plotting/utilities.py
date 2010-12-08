@@ -24,7 +24,7 @@ import eqrm_code.eqrm_filesystem as ef
 import eqrm_code.plotting.util_get_extent as uge
 
 
-def do_cmd(cmd, fail=False, verbose=True):
+def do_cmd(cmd, fail=False, verbose=False):
     """Execute a command in another process.
     
     cmd     the command string to execute
