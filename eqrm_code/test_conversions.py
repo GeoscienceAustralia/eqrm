@@ -194,7 +194,7 @@ class Test_Conversions(unittest.TestCase):
     def test_calc_max_width_in_slab(self):
         
         calc_max_width_in_slab= conversion_functions['calc_max_width_in_slab']
-        out_of_dip = array([0.0, 10, 20, 30, 110.0, 0.0, 111.0, 90.0])
+        out_of_dip = array([190, 10, 20, 90, 110.0, 0.0, 111.0, 179.5])
         result = calc_max_width_in_slab(out_of_dip,1,30)    
         expected = array([3.00000000e+01,   5.75877048e+00,   2.92380440e+00,   
                           2.00000000e+00, 8.16588936e+15,   3.00000000e+01,   
