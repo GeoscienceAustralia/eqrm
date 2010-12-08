@@ -471,6 +471,9 @@ def set_gmt_defaults(tmp_dir):
     do_cmd('gmtset PLOT_DEGREE_FORMAT = +D.x')
     do_cmd('gmtset OUTPUT_DEGREE_FORMAT = +D.x')
     do_cmd('gmtset D_FORMAT = "%.02f"')
+    # gets around crash 'GMT Fatal Error: Z-slice with dz = 0' in grd* calls
+    # *but* increases colourbar tick precision
+    #do_cmd('gmtset D_FORMAT = "%.03f"')
 
     # header text sizes, offset
     do_cmd('gmtset HEADER_FONT_SIZE = 20p')
