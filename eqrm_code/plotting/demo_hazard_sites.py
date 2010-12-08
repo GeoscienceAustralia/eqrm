@@ -21,11 +21,12 @@ save_file = None
 # override X range to show how it is done
 xrange = 1.1
 # leave space at top for legend (data makes Y range be (0.1,0.9))
-yrange = (0.1, 1.3)
+#yrange = (0.1, 1.5)
+yrange = None
 show_graph = True
 show_grid = True
 # default placement overridden
-legend_placement = 'upper left'
+legend_placement = 'upper right'
 
 # example of optional colour and linestyle specification
 sites = [(-32.7928, 151.64931, 7500, 'r--'),

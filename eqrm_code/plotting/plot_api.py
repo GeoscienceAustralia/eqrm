@@ -376,29 +376,29 @@ def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
 fig_motion_function_map = {'mean': numpy.mean,
                            'median': numpy.median}
 
-def fig_motion(input_dir, site_tag, soil_amp, period, plotfile,
-               collapse_function=None, savefile=None, title=None, xlabel=None,
-               ylabel=None, xrange=None, yrange=None, bins=100, bardict=None,
-               show_graph=False):
-    """Plot a 1D histogram from XYZ data.
+def fig_motion(input_dir, site_tag, soil_amp, period, output_dir,
+               collapse_function=None, plot_file=None, save_file=None,
+               title=None, np_posn=None, s_posn=None, cb_steps=None,
+               colourmap=None, cb_label=None, annotate=[], show_graph=False):
+    """Plot a contoured acceleration map with meaned/medianed data.
 
-    input_dir      general input/output directory
-    site_tag       overall site identifier
-    soil_amp       soil/bedrock switch - True means soil, False means bedrock
-    period         the RSA period to be plotted
-    plotfile       name of plot output file to create in 'output_dir' directory
-    collapse_function       string defining function used to collapse site values
-                   ('mean' or 'medium', default is 'mean')
-    savefile       name of data output file to create in 'output_dir' directory
-    title          title to put on the graph
-    xlabel         text of X axis label
-    ylabel         text of Y axis label
-    xrange         Either <max> or (<min>, <max>) of X range to plot
-    yrange         Either <max> or (<min>, <max>) of Y range to plot
-    bins           number of bins to use
-    bardict        dictionary of extra keywords to pass to plot_barchart()
-                   see plot_barchart.py for the details on this
-    show_graph     True if the plot is to be shown on the screen
+    input_dir          general input/output directory
+    site_tag           overall site identifier
+    soil_amp           soil/bedrock switch - True means soil, False means bedrock
+    period             the RSA period to be plotted
+    output_dir         path to directory to save files in (UNUSED?)
+    collapse_function  string defining function used to collapse site values
+                       ('mean' or 'medium', default is 'mean')
+    plot_file          name of plot output file to create
+    save_file          path to file to save plot data in (UNUSED?)
+    title              title to put on the graph
+    np_posn            north pointer placement data
+    s_posn             scale placement data
+    cb_steps           iterable of colourbar step values
+    colourmap          name of colourmap to use
+    cb_label           colourbar label string
+    annotate           iterable of annotate values
+    show_graph         True if the plot is to be shown on the screen
     """
 
     # read in raw data
@@ -407,6 +407,7 @@ def fig_motion(input_dir, site_tag, soil_amp, period, plotfile,
     # get function to use
     if collapse_function is None:
         collapse_function = 'mean'
+    collapse_function = collapse_function.lower()
 
     if isinstance(collapse_function, basestring):
         try:
@@ -431,14 +432,103 @@ def fig_motion(input_dir, site_tag, soil_amp, period, plotfile,
 
     # now combine collapsed SA, lat and lon into list of (x, y, z) tuples
     data = []
-    for i in xrange(len(SA)):
-        data.append((SA[i], lon[i], lat[i]))
+    for (i, val) in enumerate(SA):
+        data.append([lon[i], lat[i], val])
+    data = numpy.array(data)
 
     # plot the data
     if plot_file:
         if title is None:
             title = 'site_tag=%s, period=%s' % (site_tag, period)
 
+        # use default contour values if user didn't supply any
+        if cb_steps is None:
+            cb_steps = [0.1,0.15,0.20,0.30,0.40,0.50]
+
+        if title is None:
+            title = 'RP=%s, period=%s' % (return_period, period)
+
+        pgxc.plot_gmt_xyz_contour(data, plot_file, title=title,
+                                  np_posn=np_posn, s_posn=s_posn,
+                                  cb_label=cb_label, cb_steps=cb_steps,
+                                  colourmap=colourmap,
+                                  annotate=annotate)
+
+
+def fig_motion_continuous(input_dir, site_tag, soil_amp, period, output_dir,
+                          collapse_function=None, plot_file=None,
+                          save_file=None, title=None, np_posn=None, s_posn=None,
+                          cb_steps=None, colourmap=None, cb_label=None,
+                          annotate=[], show_graph=False):
+    """Plot a continuous contoured acceleration map with meaned/medianed data.
+
+    input_dir          general input/output directory
+    site_tag           overall site identifier
+    soil_amp           soil/bedrock switch - True means soil, False means bedrock
+    period             the RSA period to be plotted
+    output_dir         path to directory to save files in (UNUSED?)
+    collapse_function  string defining function used to collapse site values
+                       ('mean' or 'medium', default is 'mean')
+    plot_file          name of plot output file to create
+    save_file          path to file to save plot data in (UNUSED?)
+    title              title to put on the graph
+    np_posn            north pointer placement data
+    s_posn             scale placement data
+    cb_steps           iterable of colourbar step values
+    colourmap          name of colourmap to use
+    cb_label           colourbar label string
+    annotate           iterable of annotate values
+    show_graph         True if the plot is to be shown on the screen
+    """
+
+    # read in raw data
+    data = om.load_motion_sites(input_dir, site_tag, soil_amp, period)
+
+    # get function to use
+    if collapse_function is None:
+        collapse_function = 'mean'
+    collapse_function = collapse_function.lower()
+
+    if isinstance(collapse_function, basestring):
+        try:
+            func = fig_motion_function_map[collapse_function]
+        except KeyError:
+            msg = ("Bad function param, got '%s', expected 'mean' or 'median'"
+                   % function)
+            raise Exception(msg)
+    else:
+        func = collapse_function
+
+    # split returned data into components
+    (SA, lat, lon) = data
+
+    # collapse axis=1 with func object
+    # simplest approach - just try to call function and catch exception
+    try:
+        SA = func(SA, axis=1)
+    except:
+        msg = 'Exception?'
+        raise Exception(msg)
+
+    # now combine collapsed SA, lat and lon into list of (x, y, z) tuples
+    data = []
+    for (i, val) in enumerate(SA):
+        data.append([lon[i], lat[i], val])
+    data = numpy.array(data)
+
+    # plot the data
+    if plot_file:
+        if title is None:
+            title = 'site_tag=%s, period=%s' % (site_tag, period)
+
+        if title is None:
+            title = 'RP=%s, period=%s' % (return_period, period)
+
+        pgx.plot_gmt_xyz_continuous(data, plot_file, title=title,
+                                    np_posn=np_posn, s_posn=s_posn,
+                                    cb_label=cb_label, cb_steps=cb_steps,
+                                    colourmap=colourmap,
+                                    annotate=annotate)
 
 
 def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
