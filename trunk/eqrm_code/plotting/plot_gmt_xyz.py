@@ -224,8 +224,7 @@ def plot_gmt_xyz_continuous(data, output_file, bins=100, title=None,
                  (if not supplied, no colourbar)
     colourmap    string containing name of required colormap
                  (a local file 'hazmap.cpt' or GMT name 'cool')
-    cb_steps     an iterable of desired colourbar limits (low, high)
-                 or None if the data determines the limits
+    cb_steps     either None, [] or iterable of 2 values (low, high)
     annotate     list of user annotations:
                      if None, no user or system annotations
                      if [],   only system annotations
@@ -270,13 +269,17 @@ def plot_gmt_xyz_continuous(data, output_file, bins=100, title=None,
         # get max NON-NAN value from XYZ data
         max_val = util.max_nan(data[:,2])
         min_val = util.min_nan(data[:,2])
-    elif hasattr(cb_steps, '__iter__') and len(cb_steps) == 2:
+    elif hasattr(cb_steps, '__iter__') and len(cb_steps) <= 2:
         # use user range
-        max_val = float(cb_steps[1])
-        min_val = float(cb_steps[0])
+        if len(cb_steps) == 2:
+            max_val = float(cb_steps[1])
+            min_val = float(cb_steps[0])
+        else:
+            max_val = float(cb_steps[0])
+            min_val = 0.0
     else:
-        msg = ("cb_steps param must be None, [] or 2-sequence: got %s"
-               % type(cb_steps))
+        msg = ("cb_steps param must be None, [] or 1- or 2-sequence: got %s (%s)"
+               % (str(cb_steps), type(cb_steps)))
         raise RuntimeError(msg)
 
     # write a GMT XYZ file
@@ -291,7 +294,7 @@ def plot_gmt_xyz_continuous(data, output_file, bins=100, title=None,
     # generate CPT file
     my_cpt_file = os.path.join(tmp_dir, 'data.cpt')
     util.do_cmd('makecpt -C%s -T%f/%f/%f -Z > %s'
-                % (c_map, min_val, max_val, min_val/10.0, my_cpt_file))
+                % (c_map, min_val, max_val, (max_val-min_val)/10.0, my_cpt_file))
 
     # think of a postscript filename
     my_ps_file = os.path.join(tmp_dir, 'data.ps')
