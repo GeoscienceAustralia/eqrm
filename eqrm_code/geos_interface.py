@@ -42,8 +42,8 @@ def polygon_to_geos_polygon(polygon,exclude=None):
 
 def _list_to_geos_poly(polygon):
     geos_polygon = Polygon(polygon)
-    if geos_polygon.boundary.is_ring == False:
-        raise ValueError, 'Polygon is not a ring'
+#    if geos_polygon.boundary.is_ring == False:
+#        raise ValueError, 'Polygon is not a ring'
     return geos_polygon
 
 ##############################################################################
