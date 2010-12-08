@@ -313,7 +313,7 @@ class Fault_Source_Generator(object):
                     newNum=self.populate_distribution(
                                                 self.out_of_dip_theta_dist,1)
                     if ((newNum[0] <= (175-dip)) | (newNum[0] >= (185-dip))):
-                        blnBadNum=False
+                        blnBadNum=False                        
                     count = count +1
                     if count>1000:
                         msg = "Bad out of dip theta range in fault \
