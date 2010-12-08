@@ -345,9 +345,62 @@ def switch_coords(start_lat,start_lon,end_lat,end_lon):
     end_lat            latitude of end point
     end_lon            longitude of end point
     
-    Returns the lat, lon of the coords in the reverse order.
+    Returns the lat, lon of the 2 coords in the reverse order.
     """
     return(end_lat,end_lon,start_lat,start_lon)
+
+def calc_new_rupture_trace_lower_slab(top_dip, depth_bottom, top_trace_lat_s,
+                                      top_trace_lon_s, top_trace_lat_e,
+                                      top_trace_lon_e, lower_dip,):
+    """Calculates the trace for a lower slab so that it matches the bottom
+    of the upper slab.
+    
+    top_dip                  dip of top slab
+    depth_bottom             depth of the bottom of top slab
+    top_trace_lat_s          latitude of start point - top slab
+    top_trace_lon_s          longitude of start point - top slab
+    top_trace_lat_e          latitude of end point - top slab
+    top_trace_lon_e          longitude of end point - top slab
+    lower_dip
+    
+    Returns low_trace_lat_s, low_trace_lon_s, low_trace_lat_e,low_trace_lon_e.
+    """
+    azimuth =azimuth_of_trace(top_trace_lat_s, top_trace_lon_s, top_trace_lat_e,
+                               top_trace_lon_e)
+    
+    y1= depth_bottom * ((cos(radians(top_dip)))/
+                       (sin(radians(top_dip))))
+    (temp_trace_lat_s, temp_trace_lon_s) = \
+                        azimuthal_orthographic_xy_to_ll(0,y1,top_trace_lat_s,
+                                                         top_trace_lon_s,
+                                                          azimuth)
+    (temp2_trace_lat_s, temp2_trace_lon_s) = \
+                                            get_new_ll(top_trace_lat_s,
+                                                         top_trace_lon_s,
+                                                          azimuth+90,y1)                   
+    (temp_trace_lat_e, temp_trace_lon_e) = \
+                        azimuthal_orthographic_xy_to_ll(0,y1,top_trace_lat_e,
+                                                         top_trace_lon_e,
+                                                          azimuth)
+    (temp2_trace_lat_e, temp2_trace_lon_e) = \
+                                             get_new_ll(top_trace_lat_e,
+                                                         top_trace_lon_e,
+                                                          azimuth+90,y1)
+    y2= depth_bottom * ((cos(radians(lower_dip)))/
+                       (sin(radians(lower_dip))))
+    y = y1-y2
+    
+    (low_trace_lat_s, low_trace_lon_s) = \
+                        azimuthal_orthographic_xy_to_ll(0,y,top_trace_lat_s,
+                                                         top_trace_lon_s,
+                                                          azimuth)  
+    
+    (low_trace_lat_e, low_trace_lon_e) = \
+                        azimuthal_orthographic_xy_to_ll(0,y,top_trace_lat_e,
+                                                         top_trace_lon_e,
+                                                          azimuth)  
+    return low_trace_lat_s, low_trace_lon_s, low_trace_lat_e,low_trace_lon_e
+    
 
 def obsolete_calc_azimuth(lat1,lon1,lat2,lon2):
     """NOT USED
