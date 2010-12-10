@@ -1,9 +1,6 @@
-
 #!/usr/bin/env python
 
-"""Test the utilities module.
-
-"""
+"""Test the utilities module."""
 
 import os
 import sys

@@ -32,7 +32,6 @@ def do_cmd(cmd, fail=False, verbose=False):
     verbose if True will echo commands to stdout
 
     Prints combined stdout+stderr output, if any.
-
     """
 
     # TODO: log this rather than print
@@ -68,7 +67,6 @@ def lat_width(width_deg, lat):
     Assumes circumference of a spherical earth to be 40,075km.
 
     Returns the absolute width in kilometres.
-
     """
    
     # convert latitude degrees to radians
@@ -89,7 +87,6 @@ def get_scale_skip(max_val, min_val=0.0):
     Returns a number that is to be used as skip on the option:
         -Tmin/max/skip
     Skip is such that there will be 5 to 10 steps in scale.
-
     """
 
     # check we don't have a Nan as max/min
@@ -129,7 +126,6 @@ def get_scale_min_max_step(max_val, min_val=0.0):
     Returns a tuple (start, stop, step) where 'start' and 'stop' are the
     suggested minimum and maximum scale values, and 'step' is the delta
     to step up with.
-
     """
 
     delta = 0.001
@@ -160,6 +156,9 @@ def get_unique_key(d, key):
     Return the full key of dictionary 'd' matching 'key'.
     Return None if no match or > 1 match.
 
+    This allows us to find a dictionary key given only a partial string.
+    We return the full key only if the partial matches one (and only one)
+    key.
     """
 
     # create string: |key1|key2|key3|...
@@ -241,7 +240,6 @@ def make_discrete_cpt_from_seq(filename, seq):
     If *every* element of seq has a colour value, use it.
     Else if first and last have a colour, use that range only.
     Else just use the hazmap colour idea.
-
     """
 
     # sort the seq first, just in case
@@ -399,8 +397,6 @@ def make_continuous_cpt_from_seq(filename, seq):
     If *every* element of seq has a colour value, use it.
     Else if first and last have a colour, use that range only.
     Else just use the hazmap colour idea.
-
-
     """
 
     # sort the seq first, just in case
@@ -449,7 +445,6 @@ def set_gmt_defaults(tmp_dir):
     
     tmp_dir  path to the temporary directory GMT should use
              for storing .gmtdefaults
-
     """
 
     # delete local copies of files '.gmt*'
@@ -495,7 +490,6 @@ def get_xyz_bin_inc(xyz, epsilon=1.0e-6):
 
     Returns (x_num, y_num) if binning exists, or None if no binning.
     (x_num and y_num are the number of bins in X and Y directions)
-
     """
 
     # initialise empty sets of X and Y coords
@@ -546,7 +540,6 @@ def get_coords_cm(lon, lat, extent, j_opt):
 
     Returns a tuple (x, y) of the point position in cm from the map
     bottom left origin.
-
     """
 
     # create a scratch directory for ephemeral files
@@ -601,7 +594,6 @@ def convert_lonlat_cm(lon, lat, extent):
     extent  extent of map (ll_lat, ll_lon, ur_lat, ur_lon)
 
     Returns a tuple (x, y) of position (centimetres).
-
     """
 
     # unpack extent
@@ -626,7 +618,6 @@ def convert_cm_lonlat(x, y, extent):
     extent  extent of map (ll_lat, ll_lon, ur_lat, ur_lon)
 
     Returns a tuple (lon, lat) of position.
-
     """
 
     # unpack extent
@@ -667,7 +658,6 @@ def get_colourmap(cmap, tmpdir=None):
           this routine copies the local CPT file to the temporary directory
           and returns that path.  This shortens the path, which is the problem
           with grd2cpt.
-
     """
 
     # make sure the requested name is lowercase
@@ -709,7 +699,6 @@ def get_colourmap(cmap, tmpdir=None):
         # if it's there, copy to the temp directory, return that
         cpt_file = os.path.join(tmpdir, lower_cmap + '.cpt')
         shutil.copy(cmap_path, cpt_file)
-#        print('get_colourmap: returns %s' % cpt_file)
         return cpt_file
 
     msg = "Colourmap name '%s' isn't recognised" % cmap
@@ -921,4 +910,85 @@ def read_cpt_file(cpt_file):
 
     return (model, seq, endlines)
     
+
+if __name__ == '__main__':
+    """Run this code to see if the max_nan() and min_nan() 
+    functions are still required.  These functions were written
+    because numpy, at one time, wasn't returning the correct
+    value, which should be NaN.
+
+    See [http://projects.scipy.org/numpy/wiki/ProperNanHandling]
+    and [http://projects.scipy.org/numpy/ticket/241].
+
+    Anyhow, the code below tests if we can remove the max_nan()
+    and min_nan() functions.
+
+    Replace this way once we can:
+        util.max_nan(a) -> numpy.max(a)
+        util.min_nan(a) -> numpy.min(a)
+    """
+
+    new_is_ok = True
+
+    a = num.array([[num.nan],[6],[9]])
+    if new_is_ok and not num.isnan(num.max(a)):
+        new_is_ok = False
+        
+    a = num.array([[3],[num.nan],[9]])
+    if new_is_ok and not num.isnan(num.max(a)):
+        new_is_ok = False
+
+    a = num.array([[3],[6],[num.nan]])
+    if new_is_ok and not num.isnan(num.max(a)):
+        new_is_ok = False
+
+    a = num.array([num.nan,6,9])
+    if new_is_ok and not num.isnan(num.max(a)):
+        new_is_ok = False
+        
+    a = num.array([3,num.nan,9])
+    if new_is_ok and not num.isnan(num.max(a)):
+        new_is_ok = False
+
+    a = num.array([3,6,num.nan])
+    if new_is_ok and not num.isnan(num.max(a)):
+        new_is_ok = False
+
+    if new_is_ok:
+        print('We no longer need the num.max() function in utilities.py')
+    else:
+        print('We still need the num.max() function in utilities.py')
+
+
+    new_is_ok = True
+
+    b = num.array([[num.nan,6,9]])
+    if new_is_ok and not num.isnan(num.min(b)):
+        new_is_ok = False
+        
+    b = num.array([[3,num.nan,9]])
+    if new_is_ok and not num.isnan(num.min(b)):
+        new_is_ok = False
+        
+    b = num.array([[3,6,num.nan]])
+    if new_is_ok and not num.isnan(num.min(b)):
+        new_is_ok = False
+        
+    b = num.array([num.nan,6,9])
+    if new_is_ok and not num.isnan(num.min(b)):
+        new_is_ok = False
+        
+    b = num.array([3,num.nan,9])
+    if new_is_ok and not num.isnan(num.min(b)):
+        new_is_ok = False
+        
+    b = num.array([3,6,num.nan])
+    if new_is_ok and not num.isnan(num.min(b)):
+        new_is_ok = False
+        
+    if new_is_ok:
+        print('We no longer need the num.min() function in utilities.py')
+    else:
+        print('We still need the num.min() function in utilities.py')
+
 
