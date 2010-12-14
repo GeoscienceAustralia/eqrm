@@ -839,8 +839,12 @@ Atkinson_Boore_97_sigma_coefficient_period=[0, 0.10, 0.20, 0.50, 1.00, 100]
 
 Atkinson_Boore_97_sigma_coefficient_interpolation=linear_interpolation
 
-def Atkinson_Boore_97_distribution_python(mag,distance,coefficient,
-                                   sigma_coefficient,depth):
+def Atkinson_Boore_97_distribution_python(**kwargs):
+    mag = kwargs['mag']
+    distance = kwargs['distance']
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
+
     c1,c2,c3,c4=coefficient
     log_mean = c1+c2*(mag-6)+c3*(mag-6)**2-log(distance)-c4*distance    
     num_events=distance.shape[2]
