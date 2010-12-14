@@ -155,6 +155,29 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.failUnless(sigma_1==log_sigma, 'Model incorrect.')
         self.assert_(allclose(log_mean_calc, log_mean))
 
+    def speed_test(self):
+        import time
+
+        LOOP = 10000
+
+        start = time.time()
+        for i in xrange(LOOP):
+            self.speed_test_Toro_1997_midcontinent_distribution()
+        delta = time.time() - start
+        print('speed_test_Toro_1997_midcontinent_distribution - %d iterations took %.3fs' % (LOOP, delta))
+
+        start = time.time()
+        for i in xrange(LOOP):
+            self.speed_test_Atkinson_Boore_97_distribution()
+        delta = time.time() - start
+        print('speed_test_Atkinson_Boore_97_distribution - %d iterations took %.3fs' % (LOOP, delta))
+
+        start = time.time()
+        for i in xrange(LOOP):
+            self.test_Sadigh_97_distribution()
+        delta = time.time() - start
+        print('test_Sadigh_97_distribution() - %d iterations took %.3fs' % (LOOP, delta))
+
  
     def test_Toro_1997_midcontinent_distribution(self):
         
@@ -205,6 +228,36 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.assert_(allclose(actual, log_mean[0][0][0]))
         self.assert_(allclose(actual, log_mean_p[0][0][0]))
         
+    def speed_test_Toro_1997_midcontinent_distribution(self):
+        """This is here purely for the speed_test() function."""
+        
+        model_name = 'Toro_1997_midcontinent'
+        model = Ground_motion_specification(model_name)
+        
+        distance = array([[[8.6602540]]])
+        mag = array([[[8.0]]])
+
+        c1 = 1.0
+        c2 = 2.0
+        c3 = 3.0
+        c4 = 4.0
+        c5 = 5.0
+        c6 = 6.0
+        c7 = 5.0
+        
+        coefficient = array([[[[c1]]], [[[c2]]], [[[c3]]], [[[c4]]], [[[c5]]],
+                       [[[c6]]], [[[c7]]]])
+        
+        sigma_coefficient = coefficient
+        
+        log_mean,log_sigma=model.distribution(
+            mag=mag,
+            distance=distance,
+            coefficient=coefficient,
+            sigma_coefficient=sigma_coefficient)
+        actual = -52.21034037197618
+        self.assert_(allclose(actual, log_mean[0][0][0]))
+        
     def test_Atkinson_Boore_97_distribution(self):
         
         model_name='Atkinson_Boore_97'
@@ -236,12 +289,39 @@ class Test_ground_motion_interface(unittest.TestCase):
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient)
         log_mean_p, log_sigma_p=Atkinson_Boore_97_distribution_python(
-            mag,distance,
-            coefficient,sigma_coefficient,
-            None)
+            mag=mag, distance=distance,
+            coefficient=coefficient,sigma_coefficient=sigma_coefficient)
         #print "log_mean", log_mean
         #print "log_mean_p", log_mean_p
         self.assert_(allclose(actual, log_mean_p[0][0][0]))
+        self.assert_(allclose(actual, log_mean[0][0][0]))
+
+    def speed_test_Atkinson_Boore_97_distribution(self):
+        """This is here as it is called by the speed_test() function."""
+        
+        model_name='Atkinson_Boore_97'
+        model=Ground_motion_specification(model_name)
+        
+        distance = array([[[10]]])
+        mag = array([[[8.0]]])
+
+        c1 = 1.0
+        c2 = 2.0
+        c3 = 3.0
+        c4 = 4.0
+        
+        coefficient = array([[[[c1]]], [[[c2]]], [[[c3]]], [[[c4]]]])
+
+        actual = -25.302585092994047
+        
+        sigma_coefficient = array([[[[3.0]]]])
+        
+        log_mean,log_sigma=model.distribution(
+            mag=mag,
+            distance=distance,
+            coefficient=coefficient,
+            sigma_coefficient=sigma_coefficient)
+
         self.assert_(allclose(actual, log_mean[0][0][0]))
 
     def test_Boore_08_distribution_subfunctions(self):
@@ -2072,6 +2152,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_interface,'test')
+    #suite = unittest.makeSuite(Test_ground_motion_interface,'speed_test')
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
