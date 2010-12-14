@@ -62,4 +62,6 @@ Postprocessing_Path = os.path.join(eqrm_path, 'postprocessing')
 Eqrmcode_Plotting_Colourmaps_Path = os.path.join(eqrm_path, 'eqrm_code',
                                                  'plotting', 'colourmaps')
 
+Demo_Output_ScenRisk_Path = os.path.join(eqrm_path,
+                                         'demo', 'output', 'scen_risk')
 
