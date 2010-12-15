@@ -13,7 +13,8 @@ Copyright 2010 by Geoscience Australia
 
 
 from eqrm_code.plotting import plot_api
-from eqrm_code.eqrm_filesystem import Demo_Output_ProbRisk_Path
+from eqrm_code.eqrm_filesystem import Demo_Output_ProbRisk_Path, \
+     Demo_Output_PlotProbRisk_Path # this is slower
 
 
 input_dir = Demo_Output_ProbRisk_Path
@@ -35,4 +36,4 @@ plot_api.fig_scenario_building_loss_percent(input_dir, site_tag, plotfile,
                                             xlabel=xlabel, ylabel=ylabel,
                                             xrange=xrange, yrange=yrange,
                                             bins=bins, bardict=None,
-                                            show_graph=True)
+                                            show_graph=False)
