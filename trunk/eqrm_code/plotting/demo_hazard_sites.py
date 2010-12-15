@@ -23,7 +23,7 @@ xrange = 1.1
 # leave space at top for legend (data makes Y range be (0.1,0.9))
 #yrange = (0.1, 1.5)
 yrange = None
-show_graph = True
+show_graph = False
 show_grid = True
 # default placement overridden
 legend_placement = 'upper right'
