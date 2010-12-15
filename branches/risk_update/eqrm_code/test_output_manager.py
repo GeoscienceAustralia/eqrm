@@ -3,7 +3,7 @@ import sys
 import unittest
 import tempfile
 import shutil
-from scipy import array, zeros, allclose, asarray, transpose
+from scipy import array, zeros, allclose, asarray, transpose, fromfunction, who
 
 from eqrm_code.output_manager import *
 from eqrm_code.sites import Sites
@@ -18,6 +18,78 @@ class Dummy:
     def __init__(self):
         pass
 
+
+def get_bridges_from_dic(attributes=None):
+    """Get a Bridges object from a dictionary.
+
+    attributes  a dictionary of bridge data
+
+    Returns (bridge_obj, attributes)
+    """
+
+    attributes = {'BID': int,
+                  'LATITUDE': float,
+                  'LONGITUDE': float,
+                  'STRUCTURE_CLASSIFICATION': str,
+                  'STRUCTURE_CATEGORY': str,
+                  'SKEW': float,
+                  'SPAN': int,
+                  'SITE_CLASS': str}
+
+    # get a temporary file
+    (handle, filename) = tempfile.mkstemp('.csv','get_bridges_from_dic_')
+    os.close(handle)
+
+    (filename, _) = write_test_bridges_file(filename)
+
+    # create links to required building parameters
+    eqrm_dir = determine_eqrm_path()
+    data_dir = os.path.join(eqrm_dir, efs.Resources_Data_Path)
+    default_input_dir=os.path.join(eqrm_dir, efs.Resources_Data_Path)
+
+    #bridges = Bridges.from_csv(filename, default_input_dir,
+    #                           eqrm_dir=eqrm_dir, **attributes)
+    bridges = Bridges.from_csv(filename, **attributes)
+
+    # clean up
+    os.remove(filename)
+
+    return (bridges, attributes)
+
+def write_test_bridges_file(filename, attributes=None):
+    """Write a test bridges data file.
+
+    filename    path to the file to write
+    attributes  attributes dictionary
+
+    Returns (filename, attributes)
+    """
+
+    # FIXME: This should be in a global module
+    title_index_dic = {'BID': 0,
+                       'LATITUDE': 1,
+                       'LONGITUDE': 2,
+                       'STRUCTURE_CLASSIFICATION': 3,
+                       'STRUCTURE_CATEGORY': 4,
+                       'SKEW': 5,
+                       'SPAN': 6,
+                       'SITE_CLASS': 7}
+
+    if attributes is None:
+        attributes = {'BID': [1, 2],
+                      'LATITUDE': [-32.9, 32.7],
+                      'LONGITUDE': [151.7, 151.3],
+                      'STRUCTURE_CLASSIFICATION': ['HWB17', 'HWB22'],
+                      'STRUCTURE_CATEGORY': ['BRIDGE', 'BRIDGE'],
+                      'SKEW': ['0', '32'],
+                      'SPAN': ['1', '4'],
+                      'SITE_CLASS': ['C', 'F']}
+
+    dict2csv(filename, title_index_dic, attributes)
+
+    return (filename, attributes)
+
+
 class Test_Output_manager(unittest.TestCase):
 
     def setUp(self):
@@ -28,7 +100,8 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_save_hazard(self):
         THE_PARAM_T=Dummy()
-        hazard_name = 'hazard_name'
+        soil_amp = True
+        hazard_name = 'soil_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_save_hazard') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
@@ -48,7 +121,7 @@ class Test_Output_manager(unittest.TestCase):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
 
-        save_hazard(hazard_name,THE_PARAM_T,
+        save_hazard(soil_amp,THE_PARAM_T,
                 hazard,sites,compress=False)
 
 
@@ -87,7 +160,8 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_load_SA(self):
         THE_PARAM_T=Dummy()
-        hazard_name = 'hazard_name'
+        soil_amp = False
+        hazard_name = 'bedrock_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazard_1') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
@@ -106,7 +180,7 @@ class Test_Output_manager(unittest.TestCase):
                 for k,rtrn in enumerate(THE_PARAM_T.return_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
-        save_hazard(hazard_name,THE_PARAM_T,
+        save_hazard(soil_amp,THE_PARAM_T,
                 hazard,sites,compress=False)
 
         # delete site files
@@ -127,7 +201,8 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_load_hazards_1(self):
         THE_PARAM_T=Dummy()
-        hazard_name = 'hazard_name'
+        soil_amp = True
+        hazard_name = 'soil_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazard_1') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
@@ -147,10 +222,10 @@ class Test_Output_manager(unittest.TestCase):
                 for k,rtrn in enumerate(THE_PARAM_T.return_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
-        save_hazard(hazard_name,THE_PARAM_T,
+        save_hazard(soil_amp,THE_PARAM_T,
                 hazard,sites,compress=False)
         SA, periods, return_p = load_hazards(THE_PARAM_T.output_dir,
-                         THE_PARAM_T.site_tag, hazard_name)
+                         THE_PARAM_T.site_tag, soil_amp)
         self.assert_ (allclose(SA, hazard))
         self.assert_ (allclose(array(periods), array(THE_PARAM_T.atten_periods)))
         self.assert_ (allclose(return_p, THE_PARAM_T.return_periods))
@@ -168,7 +243,8 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_load_hazardsII(self):
         THE_PARAM_T=Dummy()
-        hazard_name = 'hazard_name'
+        soil_amp = False
+        hazard_name = 'bedrock_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazardsII') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
@@ -188,10 +264,10 @@ class Test_Output_manager(unittest.TestCase):
                 for k,rtrn in enumerate(THE_PARAM_T.return_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
-        save_hazard(hazard_name,THE_PARAM_T,
+        save_hazard(soil_amp,THE_PARAM_T,
                 hazard,sites,compress=False)
         SA, periods, return_p = load_hazards(THE_PARAM_T.output_dir,
-                         THE_PARAM_T.site_tag, hazard_name)
+                         THE_PARAM_T.site_tag, soil_amp)
         self.assert_ (allclose(SA, hazard))
         self.assert_ (allclose(array(periods), array(THE_PARAM_T.atten_periods)))
         self.assert_ (allclose(return_p, THE_PARAM_T.return_periods))
@@ -211,7 +287,8 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_load_hazardsIII(self):
         THE_PARAM_T=Dummy()
-        hazard_name = 'hazard_name'
+        soil_amp = True
+        hazard_name = 'soil_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazardsIII') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
@@ -230,10 +307,10 @@ class Test_Output_manager(unittest.TestCase):
                 for k,rtrn in enumerate(THE_PARAM_T.return_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
-        save_hazard(hazard_name,THE_PARAM_T,
+        save_hazard(soil_amp,THE_PARAM_T,
                 hazard,sites,compress=False)
         SA, periods, return_p = load_hazards(THE_PARAM_T.output_dir,
-                         THE_PARAM_T.site_tag, hazard_name)
+                         THE_PARAM_T.site_tag, soil_amp)
         self.assert_ (allclose(SA, hazard))
         self.assert_ (allclose(array(periods), array(THE_PARAM_T.atten_periods)))
         self.assert_ (allclose(return_p, THE_PARAM_T.return_periods))
@@ -252,14 +329,15 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_load_hazards_no_files(self):
         THE_PARAM_T=Dummy()
-        hazard_name = 'hazard_name'
+        soil_amp = False
+        hazard_name = 'bedrock_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazards_no_files') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
         try:
             SA, periods, return_p = load_hazards(THE_PARAM_T.output_dir,
                                                 THE_PARAM_T.site_tag,
-                                                hazard_name)
+                                                soil_amp)
         except IOError:
             pass
         else:
@@ -528,9 +606,10 @@ class Test_Output_manager(unittest.TestCase):
             'output_managertest_save_motion') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
         THE_PARAM_T.atten_periods = [0.3, 0.5, 0.9]
-        motion_name = "motion_name"
+        soil_amp = True
+        motion_name = "soil_SA"
         motion = array([[[[[4,5]],[[2,7,]]]]])# spawn,gmm,sites,event.periods
-        save_motion(motion_name, THE_PARAM_T, motion)
+        save_motion(soil_amp, THE_PARAM_T, motion)
         # Check the file output
         for i in range(motion.shape[3]):
             file_name = THE_PARAM_T.output_dir+THE_PARAM_T.site_tag+ '_' \
@@ -828,6 +907,7 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_load_xyz_from_hazard(self):
         THE_PARAM_T=Dummy()
+        soil_amp = True
         hazard_name = 'soil_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_manager_test_load_xyz_from_hazard') + os.sep
@@ -845,10 +925,10 @@ class Test_Output_manager(unittest.TestCase):
             for j,period in enumerate(THE_PARAM_T.atten_periods):
                 for k,rtrn in enumerate(THE_PARAM_T.return_periods):
                     hazard[i,j,k] = site_lon*period #*rtrn[0]
-        save_hazard(hazard_name,THE_PARAM_T,
+        save_hazard(soil_amp,THE_PARAM_T,
                 hazard,sites,compress=False)
         lon_lat_SA = load_xyz_from_hazard(THE_PARAM_T.output_dir,
-                         THE_PARAM_T.site_tag, True, 0.5, 0.025)
+                         THE_PARAM_T.site_tag, soil_amp, 0.5, 0.025)
         self.assert_ (allclose(array(lon), array(lon_lat_SA[:,0])))
         self.assert_ (allclose(array(lat), array(lon_lat_SA[:,1])))
         self.assert_ (allclose(array(hazard[:,1,0]),
@@ -1032,82 +1112,199 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(name)
         os.rmdir(THE_PARAM_T.output_dir)
 
-def get_bridges_from_dic(attributes=None):
-    """Get a Bridges object from a dictionary.
-
-    attributes  a dictionary of bridge data
-
-    Returns (bridge_obj, attributes)
-    """
-
-    attributes = {'BID': int,
-                  'LATITUDE': float,
-                  'LONGITUDE': float,
-                  'STRUCTURE_CLASSIFICATION': str,
-                  'STRUCTURE_CATEGORY': str,
-                  'SKEW': float,
-                  'SPAN': int,
-                  'SITE_CLASS': str}
-
-    # get a temporary file
-    (handle, filename) = tempfile.mkstemp('.csv','get_bridges_from_dic_')
-    os.close(handle)
-
-    (filename, _) = write_test_bridges_file(filename)
-
-    # create links to required building parameters
-    eqrm_dir = determine_eqrm_path()
-    data_dir = os.path.join(eqrm_dir, efs.Resources_Data_Path)
-    default_input_dir=os.path.join(eqrm_dir, efs.Resources_Data_Path)
-
-    #bridges = Bridges.from_csv(filename, default_input_dir,
-    #                           eqrm_dir=eqrm_dir, **attributes)
-    bridges = Bridges.from_csv(filename, **attributes)
-
-    # clean up
-    os.remove(filename)
-
-    return (bridges, attributes)
-
-def write_test_bridges_file(filename, attributes=None):
-    """Write a test bridges data file.
-
-    filename    path to the file to write
-    attributes  attributes dictionary
-
-    Returns (filename, attributes)
-    """
-
-    # FIXME: This should be in a global module
-    title_index_dic = {'BID': 0,
-                       'LATITUDE': 1,
-                       'LONGITUDE': 2,
-                       'STRUCTURE_CLASSIFICATION': 3,
-                       'STRUCTURE_CATEGORY': 4,
-                       'SKEW': 5,
-                       'SPAN': 6,
-                       'SITE_CLASS': 7}
-
-    if attributes is None:
-        attributes = {'BID': [1, 2],
-                      'LATITUDE': [-32.9, 32.7],
-                      'LONGITUDE': [151.7, 151.3],
-                      'STRUCTURE_CLASSIFICATION': ['HWB17', 'HWB22'],
-                      'STRUCTURE_CATEGORY': ['BRIDGE', 'BRIDGE'],
-                      'SKEW': ['0', '32'],
-                      'SPAN': ['1', '4'],
-                      'SITE_CLASS': ['C', 'F']}
-
-    dict2csv(filename, title_index_dic, attributes)
-
-    return (filename, attributes)
+    def test_load_motion(self):       
+        THE_PARAM_T=Dummy()
+        soil_amp = False
+        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+            'output_managertest_load_motion_file') + os.sep
+        THE_PARAM_T.site_tag = "site_tag"
+        THE_PARAM_T.atten_periods = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+        
+        def digital(sp, gmm, site, ev, pd):
+            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
+        # (spawn, gmm, sites, events, periods)
+        motion = fromfunction(digital, (2,3,4,5,6))
+        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
+        SA, periods = load_motion(THE_PARAM_T.output_dir,  THE_PARAM_T.site_tag,
+                                  soil_amp)
+        
+        self.assert_(allclose(array(THE_PARAM_T.atten_periods),
+                              periods))
+        self.assert_(allclose(SA, motion))
+        for name in base_names:
+            os.remove(name)
+        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
+        os.rmdir(THE_PARAM_T.output_dir)
 
 
+    def test_load_collapsed_motion_sitess(self):      
+        THE_PARAM_T=Dummy()
+        soil_amp = True
+        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+            'output_managertest_load_motion_file') + os.sep
+        THE_PARAM_T.site_tag = "site_tag"
+        THE_PARAM_T.atten_periods = [0.1, 0.2, 0.3, 0.4]
+        
+        def digital(sp, gmm, site, ev, pd):
+            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
+        # (spawn, gmm, sites, events, periods)
+        motion = fromfunction(digital, (1,1,2,3,4))
+
+        lat_actual = array([-32., -31.])
+        lon_actual = array([120., 121.])
+        sites = Sites(lat_actual,lon_actual)
+        base_name = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+                   sites)
+        
+        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
+        tmp = load_collapsed_motion_sites(THE_PARAM_T.output_dir,
+                                          THE_PARAM_T.site_tag,
+                                          soil_amp)
+        SA, periods, lat, lon = tmp
+        self.assert_(allclose(lat, lat_actual))
+        self.assert_(allclose(lon, lon_actual))
+        #print "SA", SA
+        #print "motion[0,0,...]", motion[0,0,...]
+        self.assert_(allclose(SA, motion[0,0,...]))
+        self.assert_(allclose(array(THE_PARAM_T.atten_periods),
+                              periods))
+
+        
+        os.remove(base_name)
+        for name in base_names:
+            #pass
+            os.remove(name)
+        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
+        os.rmdir(THE_PARAM_T.output_dir)
+
+
+    def test_load_collapsed_motion_sitesII(self):      
+        THE_PARAM_T=Dummy()
+        soil_amp = True
+        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+            'output_managertest_load_motion_file') + os.sep
+        THE_PARAM_T.site_tag = "site_tag"
+        THE_PARAM_T.atten_periods = [0.1]
+        
+        def digital(sp, gmm, site, ev, pd):
+            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
+        # (spawn, gmm, sites, events, periods)
+        motion = fromfunction(digital, (1,2,4,3,1))
+
+        lat_actual = array([-32., -31., -32., -31.])
+        lon_actual = array([120., 121., 3., 4.])
+        sites = Sites(lat_actual,lon_actual)
+        base_name = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+                   sites)
+        
+        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
+        tmp = load_collapsed_motion_sites(THE_PARAM_T.output_dir,  THE_PARAM_T.site_tag,
+                          soil_amp)
+        SA, periods, lat, lon = tmp
+        self.assert_(allclose(lat, lat_actual))
+        self.assert_(allclose(lon, lon_actual))
+        #self.assert_(allclose(SA, motion[0,0,...]))
+        # (sites, events*gmm*spawn, periods)
+        
+        for spawn_i in range(motion.shape[0]):
+            for gmm_i in range(motion.shape[1]):
+                for event_i in range(motion.shape[3]):
+                    overload_i = event_i + motion.shape[3]*gmm_i + \
+                                  motion.shape[3]* motion.shape[1]*spawn_i
+                    self.assert_(allclose(motion[spawn_i, gmm_i, :, event_i, :],
+                                          SA[:, overload_i, :]))
+        self.assert_(allclose(array(THE_PARAM_T.atten_periods),
+                              periods))
+
+        
+        os.remove(base_name)
+        for name in base_names:
+            os.remove(name)
+        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
+        os.rmdir(THE_PARAM_T.output_dir)
+
+
+    def test_load_motion_sites(self):      
+        THE_PARAM_T=Dummy()
+        soil_amp = True
+        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+            'output_managertest_load_motion_file') + os.sep
+        THE_PARAM_T.site_tag = "site_tag"
+        THE_PARAM_T.atten_periods = [0.1, 0.2]
+        
+        def digital(sp, gmm, site, ev, pd):
+            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
+        # (spawn, gmm, sites, events, periods)
+        motion = fromfunction(digital, (1,2,4,3,2))
+
+        lat_actual = array([-32., -31., -32., -31.])
+        lon_actual = array([120., 121., 3., 4.])
+        sites = Sites(lat_actual,lon_actual)
+        base_name = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+                   sites)
+        
+        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
+        tmp = load_motion_sites(THE_PARAM_T.output_dir,  THE_PARAM_T.site_tag,
+                          soil_amp=True, period=0.2)
+        SA, lat, lon = tmp
+        self.assert_(allclose(lat, lat_actual))
+        self.assert_(allclose(lon, lon_actual))
+        #self.assert_(allclose(SA, motion[0,0,...]))
+        # (sites, events*gmm*spawn, periods)
+        
+        for spawn_i in range(motion.shape[0]):
+            for gmm_i in range(motion.shape[1]):
+                for event_i in range(motion.shape[3]):
+                    overload_i = event_i + motion.shape[3]*gmm_i + \
+                                  motion.shape[3]* motion.shape[1]*spawn_i
+                    self.assert_(allclose(motion[spawn_i, gmm_i, :, event_i, 1],
+                                          SA[:, overload_i]))
+
+        
+        os.remove(base_name)
+        for name in base_names:
+            os.remove(name)
+        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
+        os.rmdir(THE_PARAM_T.output_dir)
+        
+    def test_load_motion_file(self):
+        THE_PARAM_T=Dummy()
+        soil_amp = False
+        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+            'output_managertest_load_motion_file') + os.sep
+        THE_PARAM_T.site_tag = "site_tag"
+        THE_PARAM_T.atten_periods = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+        
+        def digital(sp, gmm, site, ev, pd):
+            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
+        # (spawn, gmm, sites, events, periods)
+        motion = fromfunction(digital, (1,1,5,2,6))
+        SA_answer = motion[0, 0, :,1,:]
+        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
+
+        ans = load_motion_file(base_names[1]) # 1, so event_index == 1
+        SA, periods, event_index, spawn_index, gmm_index = ans
+        
+        self.assert_(allclose(array(THE_PARAM_T.atten_periods),
+                              periods))
+        self.assert_(allclose(SA, SA_answer))
+        self.assert_(event_index == 1)
+        self.assert_(spawn_index == 0)
+        self.assert_(gmm_index == 0)
+        
+        for name in base_names:
+            os.remove(name)
+        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
+        os.rmdir(THE_PARAM_T.output_dir)
+        
+
+        
+    
 ################################################################################
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Output_manager, 'test')
-    #suite=unittest.makeSuite(Test_Output_manager,'test_save_bridges')
+    #suite=unittest.makeSuite(Test_Output_manager,'test_load_collapsed_motion_sitess')
     #suite=unittest.makeSuite(Test_Output_manager,'test_save_eclossII')
     runner = unittest.TextTestRunner()  #verbosity=2) #verbosity=2
     runner.run(suite)

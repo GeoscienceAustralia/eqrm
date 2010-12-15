@@ -155,6 +155,29 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.failUnless(sigma_1==log_sigma, 'Model incorrect.')
         self.assert_(allclose(log_mean_calc, log_mean))
 
+    def speed_test(self):
+        import time
+
+        LOOP = 10000
+
+        start = time.time()
+        for i in xrange(LOOP):
+            self.speed_test_Toro_1997_midcontinent_distribution()
+        delta = time.time() - start
+        print('speed_test_Toro_1997_midcontinent_distribution - %d iterations took %.3fs' % (LOOP, delta))
+
+        start = time.time()
+        for i in xrange(LOOP):
+            self.speed_test_Atkinson_Boore_97_distribution()
+        delta = time.time() - start
+        print('speed_test_Atkinson_Boore_97_distribution - %d iterations took %.3fs' % (LOOP, delta))
+
+        start = time.time()
+        for i in xrange(LOOP):
+            self.test_Sadigh_97_distribution()
+        delta = time.time() - start
+        print('test_Sadigh_97_distribution() - %d iterations took %.3fs' % (LOOP, delta))
+
  
     def test_Toro_1997_midcontinent_distribution(self):
         
@@ -205,6 +228,36 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.assert_(allclose(actual, log_mean[0][0][0]))
         self.assert_(allclose(actual, log_mean_p[0][0][0]))
         
+    def speed_test_Toro_1997_midcontinent_distribution(self):
+        """This is here purely for the speed_test() function."""
+        
+        model_name = 'Toro_1997_midcontinent'
+        model = Ground_motion_specification(model_name)
+        
+        distance = array([[[8.6602540]]])
+        mag = array([[[8.0]]])
+
+        c1 = 1.0
+        c2 = 2.0
+        c3 = 3.0
+        c4 = 4.0
+        c5 = 5.0
+        c6 = 6.0
+        c7 = 5.0
+        
+        coefficient = array([[[[c1]]], [[[c2]]], [[[c3]]], [[[c4]]], [[[c5]]],
+                       [[[c6]]], [[[c7]]]])
+        
+        sigma_coefficient = coefficient
+        
+        log_mean,log_sigma=model.distribution(
+            mag=mag,
+            distance=distance,
+            coefficient=coefficient,
+            sigma_coefficient=sigma_coefficient)
+        actual = -52.21034037197618
+        self.assert_(allclose(actual, log_mean[0][0][0]))
+        
     def test_Atkinson_Boore_97_distribution(self):
         
         model_name='Atkinson_Boore_97'
@@ -236,12 +289,39 @@ class Test_ground_motion_interface(unittest.TestCase):
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient)
         log_mean_p, log_sigma_p=Atkinson_Boore_97_distribution_python(
-            mag,distance,
-            coefficient,sigma_coefficient,
-            None)
+            mag=mag, distance=distance,
+            coefficient=coefficient,sigma_coefficient=sigma_coefficient)
         #print "log_mean", log_mean
         #print "log_mean_p", log_mean_p
         self.assert_(allclose(actual, log_mean_p[0][0][0]))
+        self.assert_(allclose(actual, log_mean[0][0][0]))
+
+    def speed_test_Atkinson_Boore_97_distribution(self):
+        """This is here as it is called by the speed_test() function."""
+        
+        model_name='Atkinson_Boore_97'
+        model=Ground_motion_specification(model_name)
+        
+        distance = array([[[10]]])
+        mag = array([[[8.0]]])
+
+        c1 = 1.0
+        c2 = 2.0
+        c3 = 3.0
+        c4 = 4.0
+        
+        coefficient = array([[[[c1]]], [[[c2]]], [[[c3]]], [[[c4]]]])
+
+        actual = -25.302585092994047
+        
+        sigma_coefficient = array([[[[3.0]]]])
+        
+        log_mean,log_sigma=model.distribution(
+            mag=mag,
+            distance=distance,
+            coefficient=coefficient,
+            sigma_coefficient=sigma_coefficient)
+
         self.assert_(allclose(actual, log_mean[0][0][0]))
 
     def test_Boore_08_distribution_subfunctions(self):
@@ -1294,10 +1374,10 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 
         # a fake dist_object class
-        # assume Rjb=5 and Rjb=11.18...
+        # assume Rjb=5.0 and Rjb=5.0
         class DistObj(object):
             def __init__(self):
-                self.Rupture = numpy.array([[11.180340]])
+                self.Rupture = numpy.array([[5.0]])
                 self.Joyner_Boore = numpy.array([[5.0]])
 
         rtol = 1.0E-4
@@ -1306,12 +1386,12 @@ class Test_ground_motion_interface(unittest.TestCase):
         period = 0.20
         periods = numpy.array([period])
         dist_object = DistObj()
-        ML = numpy.array([[[7.0]]])
-        depth = numpy.array([[[10.0]]])
-        dip = numpy.array([[[45.0]]])
+        ML = numpy.array([[[5.0]]])
+        depth = numpy.array([[[0.0]]])
+        dip = numpy.array([[[90.0]]])
         fault_type = numpy.array([[[2]]], dtype=int)	# SS
-        Vs30 = numpy.array([200.0])
-        Z25 = numpy.array([conversions.convert_Vs30_to_Z25(200.0)])
+        Vs30 = numpy.array([760.0])
+        Z25 = numpy.array([0.640])
 
         # get coeffs for this period (C0 -> K3 from table 2)
         coeffs = numpy.array([[[[-0.486]]], [[[0.500]]], [[[-0.446]]],
@@ -1326,8 +1406,8 @@ class Test_ground_motion_interface(unittest.TestCase):
                                     [[[0.186]]], [[[0.871]]]])
 
         # expected values from Campbell08_check.py
-        log_mean_expected = numpy.array([[[math.log(5.22100E-01)]]])
-        sigma_expected = numpy.array([[[4.76798E-01]]])
+        log_mean_expected = numpy.array([[[math.log(3.56477E-01)]]])
+        sigma_expected = numpy.array([[[5.89200E-01]]])
 
         (log_mean, sigma) = model.distribution(dist_object=dist_object,
                                                mag=ML, periods=periods,
@@ -1439,8 +1519,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # period = 0.01, ML=5.0, Rrup=200.25, Rjb=200.0
         ######
 
-        rtol = 1.0E-4
-        atol = 1.0E-4
+        rtol = 1.0E-3
+        atol = 1.0E-3
 
         period = 0.01
         periods = numpy.array([period])
@@ -1582,8 +1662,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # period = 0.01, M=7.0
         ######
 
-        rtol = 1.0e-4
-        atol = 1.0e-4
+        rtol = 1.0e-3
+        atol = 1.0e-3
 
         period = 0.01
         periods = numpy.array([period])
@@ -1653,8 +1733,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # period = 0.01, M=7.0
         ######
 
-        rtol = 1.0e-4
-        atol = 1.0e-4
+        rtol = 1.0e-3
+        atol = 1.0e-3
 
         period = 0.01
         periods = numpy.array([period])
@@ -1705,7 +1785,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=rtol, atol=atol),
                                  msg)
 
-    def Xtest_Abrahamson08(self):
+    def test_Abrahamson08(self):
         """Test the Abrahamson08 model.
 
         Compare with data from Abrahamson08_check.py.
@@ -1748,7 +1828,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                     [[[0.874]]]])
 
         # expected values from Abrahamson08_check.py
-        log_mean_expected = numpy.array([[[6.909E-02], [6.699E-03]]])
+        log_mean_expected = numpy.array([[[math.log(6.909E-02)], [math.log(6.699E-03)]]])
         log_sigma_expected = numpy.array([[[6.103E-01], [8.169E-01]]])
 
         (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
@@ -1763,24 +1843,25 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         # tests for equality should be quite tight as we check against
         # Abrahamson08_check.py
-#        msg = ('Shape error:\nlog_mean.shape=%s\nexpected.shape=%s' %
-#               (str(log_mean.shape), str(log_mean_expected.shape)))
-#        self.failUnlessEqual(log_mean.shape, log_mean_expected.shape, msg)
+        msg = ('Shape error:\nlog_mean.shape=%s\nexpected.shape=%s' %
+               (str(log_mean.shape), str(log_mean_expected.shape)))
+        self.failUnlessEqual(log_mean.shape, log_mean_expected.shape, msg)
         msg = ('\nT=%.2f, Rrup=%.1f, ML=\n%s\nlog_mean=\n%s\nexpected=\n%s' %
                (period, Rrup, str(ML), str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(log_mean, log_mean_expected,
                                  rtol=1.0e-4, atol=1.0e-4),
                         msg)
 
-#        msg = ('Shape error:\nlog_sigma.shape=%s\nexpected.shape=%s' %
-#               (str(log_sigma.shape), str(log_sigma_expected.shape)))
-#        self.failUnlessEqual(log_sigma.shape, log_sigma_expected.shape, msg)
+        msg = ('Shape error:\nlog_sigma.shape=%s\nexpected.shape=%s' %
+               (str(log_sigma.shape), str(log_sigma_expected.shape)))
+        self.failUnlessEqual(log_sigma.shape, log_sigma_expected.shape, msg)
         msg = ('\nT=%.2f, Rrup=%.1f, ML=\n%s\nlog_sigma=\n%s\nexpected=\n%s'
                % (period, Rrup, str(ML), str(log_sigma),
                   str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
                                  rtol=1.0e-4, atol=1.0e-4),
                         msg)
+
 
     def test_mean_10_sigma_1(self):
         model_name = 'mean_10_sigma_1'
@@ -2071,7 +2152,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_interface,'test')
-    #suite = unittest.makeSuite(Test_ground_motion_interface,'test_Boore_08_distribution_subfunctions')
+    #suite = unittest.makeSuite(Test_ground_motion_interface,'speed_test')
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

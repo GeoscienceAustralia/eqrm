@@ -288,7 +288,7 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnlessEqual(fault.A_min, 0.58)
         self.failUnlessEqual(fault.number_of_events, 3000)
         
-        #test for populate_out_of_dip_theta
+        #test for Fault_Source_Generator.populate_out_of_dip_theta
         fault.out_of_dip_theta_dist={'distribution': 'uniform', 'minimum': 83,
                                 'maximum': 98}
         out_of_dip= fault.populate_out_of_dip_theta(100,90.0)

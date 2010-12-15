@@ -10,10 +10,10 @@ eqrm_path = util.determine_eqrm_path()
 # create paths to various sub-directories
 datadir = os.path.join(eqrm_path, 'demo', 'output', 'prob_haz')
 site_tag = 'newc'
-hazard_name = 'bedrock_SA'
+soil_amp = False		# bedrock
 
 # load the hazard info from demo\prob_haz 
-SA, periods, return_p  = load_hazards(datadir, site_tag, hazard_name)
+SA, periods, return_p  = load_hazards(datadir, site_tag, soil_amp)
 
 print "periods len", len(periods) 
 print "return_p", len(return_p)

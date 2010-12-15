@@ -839,8 +839,12 @@ Atkinson_Boore_97_sigma_coefficient_period=[0, 0.10, 0.20, 0.50, 1.00, 100]
 
 Atkinson_Boore_97_sigma_coefficient_interpolation=linear_interpolation
 
-def Atkinson_Boore_97_distribution_python(mag,distance,coefficient,
-                                   sigma_coefficient,depth):
+def Atkinson_Boore_97_distribution_python(**kwargs):
+    mag = kwargs['mag']
+    distance = kwargs['distance']
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
+
     c1,c2,c3,c4=coefficient
     log_mean = c1+c2*(mag-6)+c3*(mag-6)**2-log(distance)-c4*distance    
     num_events=distance.shape[2]
@@ -2767,9 +2771,9 @@ gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
 ######
 
 # faulting type flag encodings
-#                    'type':     (Frv, Fnm)
-Ch_faulting_flags = {'reverse':    (1, 0),
-                     'normal':     (0, 1),
+#                    'type':      (Frv, Fnm)
+Ch_faulting_flags = {'reverse':     (1, 0),
+                     'normal':      (0, 1),
                      'strike_slip': (0, 0)}
 
 # generate 'Ch_fault_type' from the dictionary above 
@@ -2811,9 +2815,11 @@ def Chiou08_distribution(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
+    # for testing, can pass in 'Fhw' param
+    Fhw = kwargs.get('Fhw', 0)
+
     # assumed (for now) parameters
     AS = 0
-    Fhw = 0
 
     # Rrup, Rjb and Rx from distance object
     Rrup = dist_object.Rupture
@@ -3213,9 +3219,9 @@ Campbell08_exp_min_075 = math.exp(-0.75)
 ######
 
 # faulting type flag encodings
-#                            'type':     (Frv, Fnm)
-Campbell08_faulting_flags = {'reverse':    (1, 0),
-                             'normal':     (0, 1),
+#                            'type':      (Frv, Fnm)
+Campbell08_faulting_flags = {'reverse':     (1, 0),
+                             'normal':      (0, 1),
                              'strike_slip': (0, 0)}
 
 # generate 'Campbell08_fault_type' from the dictionary above
@@ -3241,8 +3247,9 @@ def Campbell08_distribution(**kwargs):
 
     kwargs  dictionary of parameters
 
-    The algorithm here is taken from [1], pp 144-146  and returns results
-    that are natural log g.  Code derived from the original FORTRAN.
+    The algorithm here is described in [1], pp 144-146 but the code
+    is copied from the FORTRAN in
+    [www.daveboore.com/nga_gm_tmr/nga_gm_tmr_zips.zip].
     """
 
     # get args
@@ -3332,23 +3339,6 @@ def Campbell08_distribution(**kwargs):
      c11_22,c12_22,k1_22,k2_22,k3_22,c_22,n_22) = Campbell08_PGA_coefficient
     (slnY_22,tlnY_22,slnAF_22,sigC_22,rho_22) = Campbell08_PGA_sigma_coefficient
 
-#C     Y      = Ground motion parameter: PGA and PSA (g), PGV (cm/sec), PGD (cm)
-#C     SigT   = Total standard deviation of geometric mean of ln Y
-#
-#C.....
-#C.....CALCULATE ROCK PGA (Per = 0; Vs30 = 1100 m/sec)
-#C.....
-#C.....Magnitude Term
-#C.....
-#
-#      IF (Mw .LE. 5.5) THEN
-#        f_mag = c0(22) + c1(22)*Mw
-#      ELSEIF (Mw .LE. 6.5) THEN
-#        f_mag = c0(22) + c1(22)*Mw + c2(22)*(Mw-5.5)
-#      ELSE
-#        f_mag = c0(22) + c1(22)*Mw + c2(22)*(Mw-5.5) + c3(22)*(Mw-6.5)
-#      ENDIF
-
     ######
     # CALCULATE ROCK PGA (Per = 0; Vs30 = 1100 m/sec)
     ######
@@ -3358,28 +3348,9 @@ def Campbell08_distribution(**kwargs):
     f_mag = where(Mw <= 6.5, c0_22 + c1_22*Mw + c2_22*(Mw-5.5), f_mag)
     f_mag = where(Mw <= 5.5, c0_22 + c1_22*Mw, f_mag)
 
-#C.....
-#C.....Distance Term
-#C.....
-#
-#      R = SQRT(Rrup**2 + c6(22)**2)
-#      f_dis = (c4(22) + c5(22)*Mw)*ALOG(R)
-
     # Distance Term
     R = sqrt(Rrup**2 + c6_22**2)
     f_dis = (c4_22 + c5_22*Mw)*log(R)
-
-#C.....
-#C.....Style-of-Faulting (Fault Mechanism) Term
-#C.....
-#
-#      IF (Ztor .LT. 1.0) THEN
-#        f_fltZ = Ztor
-#      ELSE
-#        f_fltZ = 1.0
-#      ENDIF
-#
-#      f_flt = c7(22)*Frv*f_fltZ + c8(22)*Fnm
 
     # Style-of-Faulting (Fault Mechanism) Term
     f_fltZ = ones(Ztor.shape)
@@ -3387,43 +3358,8 @@ def Campbell08_distribution(**kwargs):
 
     f_flt = c7_22*Frv*f_fltZ + c8_22*Fnm
 
-#C.....
-#C.....Hanging-Wall Term
-#C.....
-#
-#      IF (Rjb .EQ. 0.0) THEN
-#        f_hngR = 1.0
-#      ELSEIF (Ztor .LT. 1.0) THEN
-#        Rmax = MAX(Rrup, SQRT(Rjb**2 + 1.0))
-#        f_hngR = (Rmax - Rjb)/Rmax
-#      ELSE
-#        f_hngR = (Rrup - Rjb)/Rrup
-#      ENDIF
-#
-#      IF (Mw .LE. 6.0) THEN
-#        f_hngM = 0.0
-#      ELSEIF (Mw .LT. 6.5) THEN
-#        f_hngM = 2.0*(Mw - 6.0)
-#      ELSE
-#        f_hngM = 1.0
-#      ENDIF
-#
-#      IF (Ztor .GE. 20.0) THEN
-#        f_hngZ = 0.0
-#      ELSE
-#        f_hngZ = (20.0 - Ztor)/20.0
-#      ENDIF
-#
-#      IF (Dip .LE. 70.0) THEN
-#        f_hngD = 1.0
-#      ELSE
-#        f_hngD = (90.0 - Dip)/20.0
-#      ENDIF
-#
-#      f_hng = c9(22)*f_hngR*f_hngM*f_hngZ*f_hngD
-
     # Hanging-Wall Term
-    Rmax = maximum(Rrup, sqrt(Rjb**2 + 1.0))	## numpy max?
+    Rmax = maximum(Rrup, sqrt(Rjb**2 + 1.0))
     f_hngR = ones(Rjb.shape) * (Rrup - Rjb)/Rrup
     f_hngR = where(Ztor < 1.0, (Rmax - Rjb)/Rmax, f_hngR)
     f_hngR = where(Rjb == 0.0, 1.0, f_hngR)
@@ -3440,58 +3376,16 @@ def Campbell08_distribution(**kwargs):
 
     f_hng = c9_22*f_hngR*f_hngM*f_hngZ*f_hngD
 
-#C.....
-#C.....Shallow Site Response Term (Vs30 = 1100 m/s)
-#C.....
-#
-#      f_site = (c10(22) + k2(22)*n(22))*ALOG(1100.0/k1(22))
-
     # Shallow Site Response Term (Vs30 = 1100 m/s)
     f_site = (c10_22 + k2_22*n_22)*log(1100.0/k1_22)
-
-#C.....
-#C.....Basin (Sediment) Response Term
-#C.....
-#
-#      IF (Z25 .LT. 1.0) THEN
-#        f_sed = c11(22)*(Z25 - 1.0)
-#      ELSEIF (Z25 .LE. 3.0) THEN
-#        f_sed = 0.0
-#      ELSE
-#        f_sed = c12(22)*k3(22)*EXP(-0.75)*(1.0 - EXP(-0.25*(Z25 - 3.0)))
-#      ENDIF
 
     # Basin (Sediment) Response Term
     f_sed = ones(Z25.shape) * c12_22*k3_22*exp(-0.75)*(1.0 - exp(-0.25*(Z25 - 3.0)))
     f_sed = where(Z25 <= 3.0, 0.0, f_sed)
     f_sed = where(Z25 < 1.0, c11_22*(Z25 - 1.0), f_sed)
 
-#C.....
-#C.....Value of PGA on Rock
-#C.....
-#
-#      A_1100 = EXP(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
-
     # Value of PGA on Rock
     A_1100 = exp(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
-
-#C.....
-#C.....Value of PGA on Local Site Conditions
-#C.....
-#
-#      PGA = EXP(ALOG(A_1100) - f_site)
-#
-#      IF (Vs30 .LT. k1(22)) THEN
-#        f_site = c10(22)*ALOG(Vs30/k1(22))
-#     *    + k2(22)*(ALOG(A_1100 + c(22)*(Vs30/k1(22))**n(22))
-#     *    - ALOG(A_1100 + c(22)))
-#      ELSEIF (Vs30 .LT. 1100.0) THEN
-#        f_site = (c10(22) + k2(22)*n(22))*ALOG(Vs30/k1(22))
-#      ELSE
-#        f_site = (c10(22) + k2(22)*n(22))*ALOG(1100.0/k1(22))
-#      ENDIF
-#
-#      PGA = EXP(ALOG(PGA) + f_site)
 
     # Value of PGA on Local Site Conditions
     PGA = exp(log(A_1100) - f_site)
@@ -3506,20 +3400,6 @@ def Campbell08_distribution(**kwargs):
 
     PGA = exp(log(PGA) + f_site)
 
-#C.....
-#C.....CALCULATE STRONG MOTION PARAMETER
-#C.....
-#C.....Magnitude Term
-#C.....
-#
-#      IF (Mw .LE. 5.5) THEN
-#        f_mag = c0T + c1T*Mw
-#      ELSEIF (Mw .LE. 6.5) THEN
-#        f_mag = c0T + c1T*Mw + c2T*(Mw-5.5)
-#      ELSE
-#        f_mag = c0T + c1T*Mw + c2T*(Mw-5.5) + c3T*(Mw-6.5)
-#      ENDIF
-
     ######
     # CALCULATE STRONG MOTION PARAMETER
     ######
@@ -3529,69 +3409,15 @@ def Campbell08_distribution(**kwargs):
     f_mag = where((Mw <= 6.5) + zeros(c0T.shape), c0T + c1T*Mw + c2T*(Mw-5.5), f_mag)
     f_mag = where((Mw <= 5.5) + zeros(c0T.shape), c0T + c1T*Mw, f_mag)
 
-#C.....
-#C.....Distance Term
-#C.....
-#
-#      R = SQRT(Rrup**2 + c6T**2)
-#      f_dis = (c4T + c5T*Mw)*ALOG(R)
-
     # Distance Term
     R = sqrt(Rrup**2 + c6T**2)
     f_dis = (c4T + c5T*Mw)*log(R)
-
-#C.....
-#C.....Style-of-Faulting Term
-#C.....
-#
-#      IF (Ztor .LT. 1.0) THEN
-#        f_fltZ = Ztor
-#      ELSE
-#        f_fltZ = 1.0
-#      ENDIF
-#
-#      f_flt = c7T*Frv*f_fltZ + c8T*Fnm
 
     # Style-of-Faulting Term
     f_fltZ = ones(Ztor.shape)
     f_fltZ = where(Ztor < 1.0, Ztor, f_fltZ)
 
     f_flt = c7T*Frv*f_fltZ + c8T*Fnm
-
-#C.....
-#C.....Hanging-Wall Term
-#C.....
-#
-#      IF (Rjb .EQ. 0.0) THEN
-#        f_hngR = 1.0
-#      ELSEIF (Ztor .LT. 1.0) THEN
-#        Rmax = MAX(Rrup, SQRT(Rjb**2 + 1.0))
-#        f_hngR = (Rmax - Rjb)/Rmax
-#      ELSE
-#        f_hngR = (Rrup - Rjb)/Rrup
-#      ENDIF
-#
-#      IF (Mw .LE. 6.0) THEN
-#        f_hngM = 0.0
-#      ELSEIF (Mw .LT. 6.5) THEN
-#        f_hngM = 2.0*(Mw - 6.0)
-#      ELSE
-#        f_hngM = 1.0
-#      ENDIF
-#
-#      IF (Ztor .GE. 20.0) THEN
-#        f_hngZ = 0.0
-#      ELSE
-#        f_hngZ = (20.0 - Ztor)/20.0
-#      ENDIF
-#
-#      IF (Dip .LE. 70.0) THEN
-#        f_hngD = 1.0
-#      ELSE
-#        f_hngD = (90.0 - Dip)/20.0
-#      ENDIF
-#
-#      f_hng = c9T*f_hngR*f_hngM*f_hngZ*f_hngD 
 
     # Hanging-Wall Term
     Rmax = maximum(Rrup, sqrt(Rjb**2 + 1.0))
@@ -3612,20 +3438,6 @@ def Campbell08_distribution(**kwargs):
 
     f_hng = c9T*f_hngR*f_hngM*f_hngZ*f_hngD
 
-#C.....
-#C.....Shallow Site Response Term
-#C.....
-#
-#      IF (Vs30 .LT. k1T) THEN
-#        f_site = c10T*ALOG(Vs30/k1T)
-#     *    + k2T*(ALOG(A_1100 + cT*(Vs30/k1T)**nT)
-#     *    - ALOG(A_1100 + cT))
-#      ELSEIF (Vs30 .LT. 1100.0) THEN
-#        f_site = (c10T + k2T*nT)*ALOG(Vs30/k1T)
-#      ELSE
-#        f_site = (c10T + k2T*nT)*ALOG(1100.0/k1T)
-#      ENDIF
-
     # Shallow Site Response Term
     f_site = ones(Vs30.shape) * (c10T + k2T*nT)*log(1100.0/k1T)
     f_site = where(Vs30 < 1100.0, (c10T + k2T*nT)*log(Vs30/k1T), f_site)
@@ -3635,55 +3447,23 @@ def Campbell08_distribution(**kwargs):
     #f_site = where(Vs30 < k1T, c10T*log(Vs30/k1T) + k2T*(log(A_1100 + cT*(Vs30/k1T)**nT) - log(A_1100 + cT)), f_site)
     f_site = where(XVs30 < k1T, c10T*log(XVs30/k1T) + k2T*(log(XA_1100 + cT*(XVs30/k1T)**nT) - log(XA_1100 + cT)), Xf_site)
 
-#C.....
-#C.....Basin (Sediment) Response Term
-#C.....
-#
-#      IF (Z25 .LT. 1.0) THEN
-#        f_sed = c11T*(Z25 - 1.0)
-#      ELSEIF (Z25 .LE. 3.0) THEN
-#        f_sed = 0.0
-#      ELSE
-#        f_sed = c12T*k3T*EXP(-0.75)*(1.0 - EXP(-0.25*(Z25 - 3.0)))
-#      ENDIF
-
     # Basin (Sediment) Response Term
     f_sed = ones(Z25.shape) * c12T*k3T*exp(-0.75)*(1.0 - exp(-0.25*(Z25 - 3.0)))
     f_sed = where((Z25 <= 3.0) + zeros(f_sed.shape), 0.0, f_sed)
     f_sed = where((Z25 < 1.0) + zeros(f_sed.shape), c11T*(Z25 - 1.0), f_sed)
 
-#C.....
-#C.....Calculate Ground Motion Parameter
-#C.....
-#
-#      Y = EXP(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
-
     # Calculate Ground Motion Parameter
     Y = exp(f_mag + f_dis + f_flt + f_hng + f_site + f_sed)
-
-#C.....
-#C.....Check Whether Y < PGA at Short Periods
-#C.....
-#
-#      IF (Per .GE. 0.0 .AND. Per .LE. 0.25 .AND. Y .LT. PGA) Y = PGA
 
     # Check Whether Y < PGA at Short Periods - use PGA if so
     short_period = logical_and(periods >= 0.0, periods <= 0.25)
     Y = where(logical_and(short_period, Y < PGA), PGA, Y)
 
-#C.....
-#C.....CALCULATE ALEATORY UNCERTAINTY
-#C.....
-#C.....Linearized Relationship Between f_site and ln PGA
-#C.....
-#
-#      IF (Vs30 .LT. k1T) THEN
-#        Alpha = k2T*A_1100*(1.0/(A_1100 + cT*(Vs30/k1T)**nT)
-#     *    - 1.0/(A_1100 + cT))
-#      ELSE
-#        Alpha = 0.0
-#      ENDIF
+    ######
+    # CALCULATE ALEATORY UNCERTAINTY
+    ######
 
+    # Linearized Relationship Between f_site and ln PGA
     Alpha = zeros(Vs30.shape)
     XA_1100 = A_1100 + zeros(Vs30.shape)
     XVs30 = Vs30 + zeros(XA_1100.shape)
@@ -3691,40 +3471,16 @@ def Campbell08_distribution(**kwargs):
     #Alpha = where(Vs30 < k1T, k2T*A_1100*(1.0/(A_1100 + cT*(Vs30/k1T)**nT) - 1.0/(A_1100 + cT)), Alpha)
     Alpha = where(XVs30 < k1T, k2T*XA_1100*(1.0/(XA_1100 + cT*(XVs30/k1T)**nT) - 1.0/(XA_1100 + cT)), XAlpha)
 
-#C.....
-#C     Intra-Event Standard Deviation at Base of Site Profile
-#C.....
-#
-#      slnPGA = slnY(22)
-#      tlnPGA = tlnY(22)
-#      slnYB = SQRT(slnYT**2 - slnAFT**2)
-#      slnAB = SQRT(slnPGA**2 - slnAFT**2)
-
     # Intra-Event Standard Deviation at Base of Site Profile
     slnPGA = slnY_22
     tlnPGA = tlnY_22
     slnYB = sqrt(slnYT**2 - slnAFT**2)
     slnAB = sqrt(slnPGA**2 - slnAFT**2)
     
-#C.....
-#C     Standard Deviation of Geometric Mean of ln Y
-#C.....
-#
-#      Sigma  = SQRT(slnYB**2 + slnAFT**2 + Alpha**2*slnAB**2
-#     *  + 2.0*Alpha*rhoT*slnYB*slnAB)
-#      Tau    = tlnYT
-#      SigT = SQRT(Sigma**2 + Tau**2)
-
     # Standard Deviation of Geometric Mean of ln Y
     Sigma = sqrt(slnYB**2 + slnAFT**2 + Alpha**2*slnAB**2 + 2.0*Alpha*rhoT*slnYB*slnAB)
     Tau = tlnYT
     SigT = sqrt(Sigma**2 + Tau**2)
-
-#C.....
-#C.....Standard Deviation of Arbitrary Horizontal Component of ln Y
-#C.....
-#
-#      SigArb = SQRT(SigT**2 + sigCT**2)
 
     # Standard Deviation of Arbitrary Horizontal Component of ln Y
     SigArb = sqrt(SigT**2 + sigCT**2)
@@ -3748,9 +3504,9 @@ def Campbell08_distribution(**kwargs):
 ######
 
 # faulting type flag encodings
-#                            'type':     (Frv, Fnm)
-Campbell08_faulting_flags = {'reverse':    (1, 0),
-                             'normal':     (0, 1),
+#                            'type':      (Frv, Fnm)
+Campbell08_faulting_flags = {'reverse':     (1, 0),
+                             'normal':      (0, 1),
                              'strike_slip': (0, 0)}
 
 # generate 'Campbell08_fault_type' from the dictionary above
@@ -4031,6 +3787,10 @@ def Abrahamson08_distribution(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
+    # for testing, pass in 'Z10' and 'Fhw' params
+    Z10 = kwargs.get('Z10', None)
+    Fhw = kwargs.get('Fhw', 0)
+
     # get required distance arrays
     Rrup = dist_object.Rupture
     Rjb = dist_object.Joyner_Boore
@@ -4085,7 +3845,6 @@ def Abrahamson08_distribution(**kwargs):
 
     # these parameters are assumed 0 (for now)
     Fas = 0
-    Fhw = 0
 
     # set correct shape for params
     Rrup = Rrup[:,:,newaxis]
@@ -4095,8 +3854,9 @@ def Abrahamson08_distribution(**kwargs):
     Vs30 = array(Vs30)[:,newaxis,newaxis]
 # middle axis must go to 'num_events'
 
-    # get Z1.0 value from Vs30
-    Z10 = conversions.convert_Vs30_to_Z10(Vs30)
+    # get Z1.0 value from Vs30 (Z10 will be supplied if testing)
+    if Z10 is None:
+        (Z10, _) = conversions.AS08_convert_Vs30_to_Z10_Z25(Vs30)
 
     # unpack coefficients
     (c1T, c4T, a3T, a4T, a5T, nT, cT, c2T, VlinT, bT,
@@ -4182,18 +3942,17 @@ def Abrahamson08_distribution(**kwargs):
 
     Td = 10.0**(-1.25 + 0.3*Mw)
 
-    # get indices of periods either side of the Td value
+    # get indices of periods either side of the Td value.
+    # this is different from the Boore FORTRAN because we must be vector
+    # and because the Boore periods includes oddballs like '-1'.
 
-    num_T = Abrahamson08_coefficient_period.shape[0]
-    num_Td = Td.shape[1]
+    # we want indices iTd1 and iTd2 into list of periods
+    # that bracket the period Td, limited at top so iTd2 is legal.
 
-    T = copy(Abrahamson08_coefficient_period)
-    Tbig = resize(T, (num_Td, num_T))
-    Tdbig = copy(Td)[0,:,0]
-    Tdbig = resize(Tdbig, (num_T, num_Td)).transpose()
-    iTd2 = sum(where(Tdbig > Tbig, 1, 0), axis=1)
-    iTd1 = iTd2 - 1
-
+    tmp = sum(where(Abrahamson08_coefficient_period < Td, 1, 0), axis=2).flatten()
+    iTd1 = where(tmp >= AS08_nper, AS08_nper - 1, tmp) - 1	# make an index
+    iTd2 = iTd1 + 1
+    
     # unpack coefficients for the bracket periods
 
     (c1_iTd1, c4_iTd1, a3_iTd1, a4_iTd1, a5_iTd1, n_iTd1, c_iTd1, c2_iTd1,
@@ -4358,14 +4117,8 @@ def Abrahamson08_distribution(**kwargs):
     V1Td1 = where(T_iTd1 <= 1.0, exp(8.0 - 0.795*log(T_iTd1/0.21)), V1Td1)
     V1Td1 = where(T_iTd1 <= 0.5, 1500.0, V1Td1)
 
-#    V30Td1 = ones(Vs30.shape) * V1Td1
     V30Td1 = copy(V1Td1)
-#    print('Vs30.shape=%s' % str(Vs30.shape))
-#    print('Vs30=%s' % str(Vs30))
     Vs30X = Vs30 + 0.0*V1Td1
-#    print('Vs30X.shape=%s' % str(Vs30X.shape))
-#    print('Vs30X=%s' % str(Vs30X))
-#    print('V30Td1.shape=%s' % str(V30Td1.shape))
     V30Td1 = where(1100.0 < V1Td1, Vs30X, V30Td1)
 
     f_5Td1 = (a10_iTd1 + b_iTd1*n_iTd1)*log(V30Td1/Vlin_iTd1)
@@ -4493,13 +4246,14 @@ def Abrahamson08_distribution(**kwargs):
 
     f_10 = a21*log((Z10+c2T)/(Z10_med+c2T))
     XZ10 = Z10 + zeros(f_10.shape)
-    XZ10_med = Z10 + zeros(f_10.shape)
+    XZ10_med = Z10_med + zeros(f_10.shape)
 #    f_10 = where(Z10 >= 200.0,
 #                 a21*log((Z10+c2T)/(Z10_med+c2T)) + a22*log(Z10/200.0),
 #                 f_10)
     f_10 = where(XZ10 >= 200.0,
                  a21*log((XZ10+c2T)/(XZ10_med+c2T)) + a22*log(XZ10/200.0),
                  f_10)
+
     #####
     # Value of Ground Motion Parameter
     #####
@@ -4608,7 +4362,7 @@ def Abrahamson08_distribution(**kwargs):
                % ('SigTest', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
                   str(SigTest.shape)))
 
-    return (Y, SigTest)
+    return (log(Y), SigTest)
 
 
 ######
@@ -4617,9 +4371,9 @@ def Abrahamson08_distribution(**kwargs):
 ######
 
 # faulting type flag encodings
-#                      'type':     (Frv, Fnm)
-AS08_faulting_flags = {'reverse':    (1, 0),
-                       'normal':     (0, 1),
+#                      'type':      (Frv, Fnm)
+AS08_faulting_flags = {'reverse':     (1, 0),
+                       'normal':      (0, 1),
                        'strike_slip': (0, 0)}
 
 # generate 'AS08_fault_type' from the dictionary above
@@ -4710,6 +4464,7 @@ gound_motion_init['Abrahamson08'] = Abrahamson08_args
 del AS08_coeff
 
 #########################  End of Abrahamson08 model  ##########################
+
 ########################  Start of Akkar-Bommer 2010 model  #####################
 
 """Code here is based on Akkar and Bommer [1].
