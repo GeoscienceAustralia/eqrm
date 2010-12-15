@@ -18,7 +18,7 @@ from gzip import GzipFile
 from os import listdir
 
 from scipy import isfinite, array, allclose, asarray, swapaxes, transpose, \
-     newaxis, reshape, nan, isnan
+     newaxis, reshape, nan, isnan, zeros, rollaxis
 import numpy as np
 
 from csv_interface import csv2dict
@@ -34,7 +34,7 @@ class myGzipFile(GzipFile):
     def __init__(self,name,mode='r'):
         GzipFile.__init__(self,name+'.gz',mode)
     
-def save_hazard(hazard_name,THE_PARAM_T,
+def save_hazard(soil_amp,THE_PARAM_T,
                 hazard,sites=None,compress=False,
                 parallel_tag=None, write_title=True):
     """
@@ -50,6 +50,9 @@ def save_hazard(hazard_name,THE_PARAM_T,
     
     """
     assert isfinite(hazard).all()
+
+    # interpret 'soil_amp' into filename fragment
+    hazard_name = 'soil_SA' if soil_amp else 'bedrock_SA'
        
     base_names = []
     if sites is not None:
@@ -86,9 +89,14 @@ def save_hazard(hazard_name,THE_PARAM_T,
         f.close()
     return base_names
 
-def load_hazards(saved_dir, site_tag, hazard_name):
+def load_hazards(saved_dir, site_tag, soil_amp):
     """
     Load in all of the data written by save hazards.
+
+    saved_dir  
+    site_tag   
+    soli_amp   True if soil amplification, else bedrock
+
     The file name structure is;
       [site_tag]_[hazard_name]_rp[return period].txt
 
@@ -98,6 +106,10 @@ def load_hazards(saved_dir, site_tag, hazard_name):
       periods: A list of periods of the SA values
       return_p: A list of return periods of the SA values
     """
+
+    # interpret 'soil_amp' to correct filename fragment
+    hazard_name = 'soil_SA' if soil_amp else 'bedrock_SA'
+
     beginning = site_tag+ '_'+ hazard_name+'_rp'
     rp_start_index = len(beginning) + 1 # +1 due to the [ bracket.
     rp_end_index = -(len(EXTENSION) + 1)
@@ -105,7 +117,7 @@ def load_hazards(saved_dir, site_tag, hazard_name):
     files = [s for s in files if s.startswith(beginning)and \
                s[-4:] == EXTENSION]
     if files == []:
-        raise IOError("No SA files found to load in.")
+        raise IOError("No hazard SA files found to load in.")
     SA_dic = {}
     periods = None
     for file in files:
@@ -154,7 +166,7 @@ def get_hazard_file_name(site_tag, geo, return_period,
 
 def load_SA(file_full_name):
     """
-    Given a file in the standard SA format, load it.
+    Given a file in the standard hazard SA format, load it.
     Note return periods are ignored.
     The SA returned has the axis site, period, return_p
     with the return_p axis only having one element.
@@ -362,7 +374,7 @@ def load_distance(save_dir, site_tag, is_rjb):
         dist = reshape(dist, (-1,1))
     return dist
 
-def save_motion(motion_name,THE_PARAM_T,motion,compress=False,
+def save_motion(soil_amp, THE_PARAM_T, motion, compress=False,
                 parallel_tag=None, write_title=True):
     """
     Who creates this motion data structure?
@@ -374,9 +386,16 @@ def save_motion(motion_name,THE_PARAM_T,motion,compress=False,
     There is a THE_PARAM_T.save_motion.  If it is equal to 1 a
     motion file is created.
 
-    motion_name, such as bedrock or soil
+    parameters:
+    soil_amp: False -> 'bedrock_SA', True -> 'soil_SA'
+    motion: Array of spectral acceleration, units g
+        dimensions (spawn, gmm, sites, events, periods)
 
     """
+
+    # convert 'soil_amp' to a filename fragment
+    motion_name = 'soil_SA' if soil_amp else 'bedrock_SA'
+
     if compress: open = myGzipFile
     else: open = file
     if parallel_tag is None:
@@ -401,7 +420,6 @@ def save_motion(motion_name,THE_PARAM_T,motion,compress=False,
                     f.write('% ground motion model = '+str(i_gmm)+'\n')
                     f.write('% First row are rsa periods, then rows are sites'
                             '\n')
-                    #f.write('% First row are rsa periods - subsequent rows are sites\n')
                     f.write(
                         ' '.join([str(p) for p in THE_PARAM_T.atten_periods]) \
                             + '\n')
@@ -410,6 +428,146 @@ def save_motion(motion_name,THE_PARAM_T,motion,compress=False,
                     f.write(' '.join(['%.10g'%(m) for m in mi])+ '\n')
                 f.close()
     return base_names
+
+def load_motion(saved_dir, site_tag, soil_amp):
+    """
+    Load in all of the data written by save motion.
+    This is SA w.r.t. location,rsa periods, spawn and ground motion model.
+    Load motion is used to load scenario SA data.
+    
+    The file name structure is;
+      [site_tag]_[soil_SA|bedrock_SA]_motion_[event #]_spawn_[spawn #]_gmm_[gmm #].txt
+
+    Returns:
+      SA: Array of spectral acceleration
+        dimensions (spawn, gmm, sites, events, periods)
+      periods: A list of periods of the SA values
+    """
+
+    # convert 'soil_amp' to a filename fragment
+    motion_name = 'soil_SA' if soil_amp else 'bedrock_SA'
+
+    beginning = site_tag+ '_'+ motion_name +'_motion'
+    #rp_start_index = len(beginning) + 1 # +1 due to the [ bracket.
+    #rp_end_index = -(len(EXTENSION) + 1)
+    files = listdir(saved_dir)
+    files = [s for s in files if s.startswith(beginning)and \
+               s[-4:] == EXTENSION]
+    if files == []:
+        raise IOError("No motion SA files found to load in.")
+    SA_dic = {}
+    max_event_ind = 0
+    max_spawn_ind = 0
+    max_gmm_ind = 0
+    for file in files:
+        tmp = load_motion_file(os.path.join(saved_dir, file))
+        SA, periods, event_index, spawn_index, gmm_index = tmp
+        # SA dimensions (sites, periods)
+        # assume that the periods do not change
+        assert len(periods) == SA.shape[1]
+        SA_dic[(spawn_index, gmm_index, event_index)] = SA
+        if spawn_index > max_spawn_ind:
+            max_spawn_ind = spawn_index
+        if gmm_index > max_gmm_ind:
+            max_gmm_ind = gmm_index
+        if event_index > max_event_ind:
+            max_event_ind = event_index
+    SA = zeros((max_spawn_ind+1, max_gmm_ind+1, SA.shape[0], max_event_ind+1,
+                SA.shape[1]))
+    for spawn_i in range(max_spawn_ind+1):
+        for gmm_i in range(max_gmm_ind+1):
+            for event_i in range(max_event_ind+1):
+                SA[spawn_i, gmm_i, :, event_i, :] = \
+                            SA_dic[(spawn_i, gmm_i, event_i)]
+    return SA, periods
+                
+
+def load_collapsed_motion_sites(saved_dir, site_tag, soil_amp):
+    """
+    Load in all of the data written by save motion.
+
+    
+    Returns:
+      SA: Array of spectral acceleration
+        dimensions (sites, events*gmm*spawn, periods)
+      periods: A list of periods of the SA values
+      lat: a vector of latitude values, site long
+      lon: a vector of longitude values, site long
+    """
+    lat, lon = load_sites(saved_dir, site_tag)
+    SA, periods = load_motion(saved_dir, site_tag, soil_amp)
+    #  SA dimensions (spawn, gmm, sites, events, periods)
+    newshape = (SA.shape[2], SA.shape[0]*SA.shape[1]*SA.shape[3], SA.shape[4])
+    SA = rollaxis(SA, 2)
+    SA = SA.reshape(newshape)
+    
+    site_n_from_lat = lat.shape[0]
+    site_n_from_SA = SA.shape[0]
+    assert site_n_from_lat == site_n_from_SA
+    
+    return SA, periods, lat, lon
+
+        
+def load_motion_sites(output_dir, site_tag, soil_amp, period):
+    """
+    Given a hazard output from EQRM, return the long, lat and SA for a
+    specified period and return_period.
+    
+    Returns:
+      SA: Array of spectral acceleration
+        dimensions (sites, events*gmm*spawn)
+      lat: a vector of latitude values, site long
+      lon: a vector of longitude values, site long
+    """
+    
+    SA, periods_f, lat, lon = load_collapsed_motion_sites(output_dir, site_tag, soil_amp)
+    #if period not in periods_f:
+     #   print "Bad period" # Throw acception here
+
+    tol = 0.0001
+    SA_slice = None
+    for i, array_period in enumerate(periods_f):
+        if period - tol < array_period and period + tol > array_period:
+            SA_slice = SA[:,:,i]
+    if SA_slice is None:
+        print "Bad period" # Throw acception here
+    
+    return SA_slice, lat, lon
+
+
+def load_motion_file(file_full_name):
+    """
+    Given a file in the standard motion SA format, load it.
+    The SA returned has the axis site, period.
+
+    returned:
+      SA: Array of SA values, with unit of g.  dimensions (site, period)
+      periods: The periods of the SA array. dimension(period)
+      event_index: event index of this slice, to add an extra dimension to SA
+      spawn_index: spawn index of this slice, to add an extra dimension to SA
+      gmm_index: gmm index of this slice, to add an extra dimension to SA
+    """
+    f=open(file_full_name,'r')            
+    text = f.read().splitlines()
+    event_index = int(text[0].split('=')[1])
+    ev = text.pop(0)
+    spawn_index = int(text[0].split('=')[1])
+    sp = text.pop(0)
+    gmm_index = int(text[0].split('=')[1]) 
+    gmm = text.pop(0)
+    com = text.pop(0)
+    periods = array([float(ix) for ix in text[0].split(' ')])
+    
+    period_line = text.pop(0)
+    SA_list = []
+    for line in text:
+        # Each line is a site
+        split = line.split(' ')
+        SA_list.append([float(ix) for ix in line.split(' ')])
+    SA = array(SA_list)
+    return SA, periods, event_index, spawn_index, gmm_index
+
+    
 
 
 def save_structures(THE_PARAM_T,structures,compress=False,

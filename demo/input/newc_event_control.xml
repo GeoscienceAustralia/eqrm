@@ -1,0 +1,22 @@
+ <event_type_controlfile>
+  <event_group
+     event_type = "crustal fault">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "NOT USED" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" />
+  </event_group>
+  
+  <event_group
+     event_type = "subduction interface">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "NOT USED" weight = "1.0"/> 
+    </GMPE>
+    <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" />
+  </event_group>
+	
+</event_type_controlfile>
+			
+	

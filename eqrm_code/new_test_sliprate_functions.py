@@ -19,8 +19,53 @@ class Test_Sliprate_functions(unittest.TestCase):
         
     def tearDown(self):
         pass
-
-    
+    def obtest_calc_new_rupture_trace_lower_slab(self):
+        (low_trace_lat_s, low_trace_lon_s, low_trace_lat_e,low_trace_lon_e) = \
+        calc_new_rupture_trace_lower_slab(35, 140, -10.338979, 112.433555, 
+                                          -8.60524, 105.822974, 
+                                          58)
+        print ("low_trace_lat_s, low_trace_lon_s, low_trace_lat_e,low_trace_lon_e")
+        print "Calculated loweer trace ",low_trace_lat_s, low_trace_lon_s, \
+        low_trace_lat_e,low_trace_lon_e
+        print("Jono's lower trace -9.35599, 112.691361, -7.622251,106.080779")
+        
+        azimuth_top =azimuth_of_trace(-10.338979, 112.433555, 
+                                          -8.60524, 105.822974)
+        
+        print ("azimuth of new top trace", azimuth_top)
+        
+        azimuth =azimuth_of_trace(low_trace_lat_s, low_trace_lon_s, 
+                                  low_trace_lat_e,low_trace_lon_e)
+        
+        print ("azimuth of new calc trace", azimuth)
+        
+        azimuth =azimuth_of_trace(-9.35599, 112.691361, 
+                                  -7.622251,106.080779)
+        
+        print ("azimuth of new jono trace", azimuth)
+        
+        dist_start_traces = calc_ll_dist(-10.338979, 112.433555, low_trace_lat_s,
+                                          low_trace_lon_s)
+        dist_end_traces = calc_ll_dist(-8.60524, 105.822974, low_trace_lat_e,
+                                          low_trace_lon_e)
+        
+        print ("Dist between the trace start of the top and lower slab ", 
+                dist_start_traces)
+        print ("Dist between the trace end of the top and lower slab ", 
+                dist_end_traces)
+        
+        j_dist_start_traces = calc_ll_dist(-9.35599, 112.691361, low_trace_lat_s,
+                                          low_trace_lon_s)
+        j_dist_end_traces = calc_ll_dist(-7.622251, 106.080779, low_trace_lat_e,
+                                          low_trace_lon_e)
+        
+        print ("Dist between the trace start of the lower slab (jono and calc)  ", 
+                j_dist_start_traces)
+        print ("Dist between the trace end of the lower slab (jono and calc)  ", 
+                j_dist_end_traces)
+        
+        
+        
     def test_sliprate_functions(self):
         max_magnitude = 7.0
         prob_min_mag_cutoff = 4.0
@@ -28,7 +73,7 @@ class Test_Sliprate_functions(unittest.TestCase):
         area_kms= float(30*10)
         prob_number_of_mag_sample_bins=20
         num_events =1000
-        magnitudes = r_[4.003:6.997:num_events*1j]
+        magnitudes = r_[4.803:6.997:num_events*1j]
         print magnitudes
         
         b = 1.

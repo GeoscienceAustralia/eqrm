@@ -273,7 +273,7 @@ class Test_Csv_Interface(unittest.TestCase):
                               convert={'Q':int})
 
         # now see if we get expected errors - file not found
-        self.failUnlessRaises(IOError, csvi.csv2rowdict, 'xyzzy')
+        self.failUnlessRaises(IOError, csvi.csv2rowdict, 'xyzzy_42_xyzzy')
 
         os.remove(filename)
 

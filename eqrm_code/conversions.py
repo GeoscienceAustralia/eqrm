@@ -209,31 +209,32 @@ def convert_Z10_to_Z25(Z10):
 
 
 def convert_Vs30_to_Z25(Vs30):
-    """Conversion from nga_gm_tmr.for.
-    This code is not referenced in the original FORTRAN, but it does appear in
-    the literature.  The formula to estimate Z1.0 from Vs30 is in [1].  The 
-    estimate of Z2.5 from Z1.0 appears in [2]
+    """A combined function to get Z2.5 from Z1.0."""
 
-    [1] Eqn (17), page 79 of Earthquake Spectra, Volume 24, number 1.
-    [2] Campbell,K.W., and Bozorgnia, Y., Campbell-Bosorgnia NGA GRound Motion
-        Relations for the Geometric Mean Horizontal Component of Peak and
-        Spectral Ground Motion Parameters, PEER 2007/02, May 2007.
+    return convert_Z10_to_Z25(convert_Vs30_to_Z10(Vs30))
 
-    Vs30 is in m/s.  Result Z25 in km.
+
+def AS08_convert_Vs30_to_Z10_Z25(Vs30):
+    """Convert a Vs30 (m/s) value to estimated Z1.0 & Z2.5 (km) values
+    according to the AS08 model code from site below.
+
+    Vs30  shear wave speed at depth of 30m (m/s)
+
+    Returns a tuple (Z1.0, Z2.5), both values in km.
+
+    This function will handle both scalar and scipy array values of Vs30.
+
+    This code is taken from the nga_gm_tmr.for program found at
+    [http://www.daveboore.com/software_online.html].
     """
 
-    # part A - convert Vs30 to Z1.0
-    if Vs30 < 180.0:
-        Z10 = math.exp(6.745)
-    elif Vs30 > 500.0:
-        Z10 = math.exp(5.394 - 4.48*math.log(Vs30/500.0))
-    else:
-        Z10 = math.exp(6.745 - 1.35*math.log(Vs30/180.0))
+    AS08_Z10 = exp(6.745 - 1.35*log(Vs30/180.0))
+    AS08_Z10 = where(Vs30 > 500.0, exp(5.394 - 4.48*log(Vs30/500.0)), AS08_Z10)
+    AS08_Z10 = where(Vs30 < 180.0, exp(6.745), AS08_Z10)
 
-    # part B - convert Z1.0 to Z2.5
-    Z25 = 0.519 + 3.595*(Z10/1000.0)
+    AS08_Z25 = 0.519 + 3.595*(AS08_Z10/1000.0)
 
-    return Z25
+    return (AS08_Z10, AS08_Z25)
 
 
 def azimuth_of_trace(start_lat, start_lon, end_lat, end_lon):
@@ -344,9 +345,62 @@ def switch_coords(start_lat,start_lon,end_lat,end_lon):
     end_lat            latitude of end point
     end_lon            longitude of end point
     
-    Returns the lat, lon of the coords in the reverse order.
+    Returns the lat, lon of the 2 coords in the reverse order.
     """
     return(end_lat,end_lon,start_lat,start_lon)
+
+def calc_new_rupture_trace_lower_slab(top_dip, depth_bottom, top_trace_lat_s,
+                                      top_trace_lon_s, top_trace_lat_e,
+                                      top_trace_lon_e, lower_dip,):
+    """Calculates the trace for a lower slab so that it matches the bottom
+    of the upper slab.
+    
+    top_dip                  dip of top slab
+    depth_bottom             depth of the bottom of top slab
+    top_trace_lat_s          latitude of start point - top slab
+    top_trace_lon_s          longitude of start point - top slab
+    top_trace_lat_e          latitude of end point - top slab
+    top_trace_lon_e          longitude of end point - top slab
+    lower_dip
+    
+    Returns low_trace_lat_s, low_trace_lon_s, low_trace_lat_e,low_trace_lon_e.
+    """
+    azimuth =azimuth_of_trace(top_trace_lat_s, top_trace_lon_s, top_trace_lat_e,
+                               top_trace_lon_e)
+    
+    y1= depth_bottom * ((cos(radians(top_dip)))/
+                       (sin(radians(top_dip))))
+    (temp_trace_lat_s, temp_trace_lon_s) = \
+                        azimuthal_orthographic_xy_to_ll(0,y1,top_trace_lat_s,
+                                                         top_trace_lon_s,
+                                                          azimuth)
+    (temp2_trace_lat_s, temp2_trace_lon_s) = \
+                                            get_new_ll(top_trace_lat_s,
+                                                         top_trace_lon_s,
+                                                          azimuth+90,y1)                   
+    (temp_trace_lat_e, temp_trace_lon_e) = \
+                        azimuthal_orthographic_xy_to_ll(0,y1,top_trace_lat_e,
+                                                         top_trace_lon_e,
+                                                          azimuth)
+    (temp2_trace_lat_e, temp2_trace_lon_e) = \
+                                             get_new_ll(top_trace_lat_e,
+                                                         top_trace_lon_e,
+                                                          azimuth+90,y1)
+    y2= depth_bottom * ((cos(radians(lower_dip)))/
+                       (sin(radians(lower_dip))))
+    y = y1-y2
+    
+    (low_trace_lat_s, low_trace_lon_s) = \
+                        azimuthal_orthographic_xy_to_ll(0,y,top_trace_lat_s,
+                                                         top_trace_lon_s,
+                                                          azimuth)  
+    
+    (low_trace_lat_e, low_trace_lon_e) = \
+                        azimuthal_orthographic_xy_to_ll(0,y,top_trace_lat_e,
+                                                         top_trace_lon_e,
+                                                          azimuth)  
+    return low_trace_lat_s, low_trace_lon_s, low_trace_lat_e,low_trace_lon_e
+    
 
 def obsolete_calc_azimuth(lat1,lon1,lat2,lon2):
     """NOT USED

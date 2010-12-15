@@ -90,7 +90,8 @@ def main(parameter_handle,
 
     eqrm_dir: The directory which 'eqrm_code' and 'resources' reside.
     """
-    t0 = time.clock()
+    t0 = t0_clock = time.clock()
+    t0_time = time.time()
 
 
     # Let's work-out the eqrm dir
@@ -128,25 +129,28 @@ def main(parameter_handle,
     # Setting up parallelisation
     parallel = Parallel(THE_PARAM_T.is_parallel)
 
-    # Make the output dir, if it is not present
-    add_last_directory(THE_PARAM_T.output_dir)
+    # process 0 can make the output dir, if it is not present
+    if parallel.rank == 0:
+        add_last_directory(THE_PARAM_T.output_dir)
 
-    # copy input parameter file to output directory.
-    if isinstance(parameter_handle, str) and parameter_handle[-3:] == '.py':
-        shutil.copyfile(parameter_handle,
-                        THE_PARAM_T.output_dir+'THE_PARAM_T.py')
-    else:
-        para_instance = copy.deepcopy(THE_PARAM_T)
-        convert_THE_PARAM_T_to_py(
-            os.path.join(THE_PARAM_T.output_dir, 'THE_PARAM_T.txt'),
-            para_instance)
+        # copy input parameter file to output directory.
+        if isinstance(parameter_handle, str) and parameter_handle[-3:] == '.py':
+            shutil.copyfile(parameter_handle,
+                            THE_PARAM_T.output_dir+'THE_PARAM_T.py')
+        else:
+            para_instance = copy.deepcopy(THE_PARAM_T)
+            convert_THE_PARAM_T_to_py(
+                os.path.join(THE_PARAM_T.output_dir, 'THE_PARAM_T.txt'),
+                para_instance)
+    parallel.barrier()
+        
 
     # Set up the logging
     # Use defaults.
     #log.console_logging_level = log.INFO
     #log.file_logging_level = log.DEBUG
     log_filename = os.path.join(THE_PARAM_T.output_dir,
-                                'log' + parallel.file_tag + '.txt')
+                                'log' + parallel.log_file_tag + '.txt')
     log.log_filename = log_filename
     log.remove_log_file()
     log.set_log_file(log_filename)
@@ -474,7 +478,8 @@ def main(parameter_handle,
         raise RuntimeError(msg)
 
     for i in range(array_size):
-        msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + str(array_size)
+        msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' \
+              + str(array_size)
         log.info(msg)
         rel_i = i #- parallel.lo
 
@@ -607,13 +612,16 @@ def main(parameter_handle,
     msg = "loop_time (excluding file saving) " + \
            str(datetime.timedelta(seconds=loop_time)) + " hr:min:sec"
     log.info(msg)
+    msg = "loop_time_seconds = " + \
+           str(loop_time) + " seconds."
+    log.info(msg)
 
     #print "time_taken_pre_site_loop", time_taken_pre_site_loop
     #print "time_taken_site_loop", time_taken_site_loop
 
     # SAVE HAZARD
     if THE_PARAM_T.save_hazard_map is True and parallel.lo != parallel.hi:
-        files = save_hazard('bedrock_SA', THE_PARAM_T, hazard=bedrock_hazard,
+        files = save_hazard(False, THE_PARAM_T, hazard=bedrock_hazard,
                             sites=all_sites,
                             compress=THE_PARAM_T.compress_output,
                             parallel_tag=parallel.file_tag,
@@ -621,7 +629,7 @@ def main(parameter_handle,
         row_files_that_parallel_splits.extend(files)
 
         if soil_hazard is not None:
-            files = save_hazard('soil_SA', THE_PARAM_T, hazard=soil_hazard,
+            files = save_hazard(True, THE_PARAM_T, hazard=soil_hazard,
                                 compress=THE_PARAM_T.compress_output,
                                 parallel_tag=parallel.file_tag,
                                 write_title=(parallel.rank == False))
@@ -636,14 +644,14 @@ def main(parameter_handle,
                           write_title=(parallel.rank == False))
         row_files_that_parallel_splits.append(file)
 
-        files = save_motion('bedrock_SA', THE_PARAM_T,motion=bedrock_SA_all,
+        files = save_motion(False, THE_PARAM_T,motion=bedrock_SA_all,
                             compress=THE_PARAM_T.compress_output,
                             parallel_tag=parallel.file_tag,
                             write_title=(parallel.rank == False))
         row_files_that_parallel_splits.extend(files)
 
         if soil_SA_all is not None:
-            files = save_motion('soil_SA',THE_PARAM_T,motion=soil_SA_all,
+            files = save_motion(True,THE_PARAM_T,motion=soil_SA_all,
                                compress=THE_PARAM_T.compress_output,
                                parallel_tag=parallel.file_tag,
                                write_title=(parallel.rank == False))
@@ -794,7 +802,7 @@ def main(parameter_handle,
     # parallel code.  Needed if # of processes is > # of structures
     calc_num_blocks = parallel.calc_num_blocks()
 
-    # Now process 0 can stich some files together.
+    # Now process 0 can stich some files together
     if parallel.is_parallel and parallel.rank == 0:
         join_parallel_files(row_files_that_parallel_splits,
                             calc_num_blocks,
@@ -807,11 +815,24 @@ def main(parameter_handle,
     # Let's stop all the programs at the same time
     # Needed when scenarios are in series.
     # This was hanging nodes, when using mpirun
-    real_time_taken_overall = (time.clock() - t0)
-    msg = "On node %i, %s time_taken_overall %s hr:min:sec" % \
+    clock_time_taken_overall = (time.clock() - t0_clock)
+    wall_time_taken_overall = (time.time() - t0_time)
+    msg = "On node %i, %s clock (processor) time taken overall %s hr:min:sec." % \
           (parallel.rank,
            parallel.node,
-           str(datetime.timedelta(seconds=real_time_taken_overall)) )
+           str(datetime.timedelta(seconds=clock_time_taken_overall)))
+    log.info(msg)
+    msg = "clock_time_taken_overall_seconds = %s" % \
+          (str(clock_time_taken_overall))
+    
+    wall_time_taken_overall = (time.time() - t0_time)
+    msg = "On node %i, %s wall time taken overall %s hr:min:sec." % \
+          (parallel.rank,
+           parallel.node,
+           str(datetime.timedelta(seconds=wall_time_taken_overall)))
+    log.info(msg)
+    msg = "wall_time_taken_overall_seconds = %s" % \
+          (str(wall_time_taken_overall))
     log.info(msg)
     parallel.finalize()
     del parallel

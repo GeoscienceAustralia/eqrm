@@ -48,6 +48,9 @@ Demo_Output_ProbRisk_Path = os.path.join(eqrm_path,
 Demo_Output_PlotProbRisk_Path = os.path.join(eqrm_path,
                                          'demo', 'output', 'plot_prob_risk')
 
+Demo_Output_PlotScenGM_Path = os.path.join(eqrm_path,
+                                         'demo', 'output', 'plot_scen_gm')
+
 Demo_Output_ProbHaz_Path = os.path.join(eqrm_path,
                                          'demo', 'output', 'prob_haz')
 
@@ -59,4 +62,6 @@ Postprocessing_Path = os.path.join(eqrm_path, 'postprocessing')
 Eqrmcode_Plotting_Colourmaps_Path = os.path.join(eqrm_path, 'eqrm_code',
                                                  'plotting', 'colourmaps')
 
+Demo_Output_ScenRisk_Path = os.path.join(eqrm_path,
+                                         'demo', 'output', 'scen_risk')
 
