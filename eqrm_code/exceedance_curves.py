@@ -80,23 +80,32 @@ def _collapse_att_model_dimension(data, weights):
     Collapse the data so it does not have an attenuation model dimension.
     To collapse it, multiply the data by the weights and sum.
 
+    This assumes the same ground motion model weights are applied to
+    all of the data.  
+
     Parameters:
-      data:  4 or more dimensions; with ground motion model being the
-        third last dimension e.g.
-      (ground motion model, site, events, periods)
-      (spawn, ground motion model, site, events, periods)
+      data: With dimensions 4 or more;
+      The 4th last dimension is ground motion model.
+      e.g. (spawn, max ground motion model, site, events, periods) OR
+      (max ground motion model, site, events, periods)
         Site is 1. What the data is changes. Sometimes its SA, sometimes
         it's cost.
       weights: The weight to apply to each ground motion model 'layer'
-    
+       1D, dimension (gmm)
+
+       max gmm >= gmm
+
+    Returns
+    sum : same dimensions as weight without the gmm dimension.
     """
+    gmm_index_from_end=-4
     new_weight_shape = ones((data.ndim))
-    gmm_index_from_end = -4
-    gmm_index_from_start = data.ndim - 4
+    gmm_index_from_start = data.ndim + gmm_index_from_end
     new_weight_shape[gmm_index_from_end] = -1
-    weighted_data = data * reshape(weights, new_weight_shape) 
+    # The lenght of weight can be less than the max gmm dimension in data.
+    weight_length = len(weights)
+    weighted_data = data[...,0:weight_length,:,:,:] * reshape(weights, new_weight_shape) 
     sum = scipy.sum(weighted_data, gmm_index_from_start)
-    
     return sum    
 
     
@@ -107,35 +116,68 @@ def collapse_att_model(data, weights, do_collapse):
     dimension length is one.  To collapse it, multiply the data by the
     weights and sum, across the ground motion model dimension.
 
+    This assumes the same ground motion model weights are applied to
+    all of the data.
+
+
     Parameters:
       data:  5 dimensions; 
       (spawn, ground motion model, site, events, periods)
         Site is 1. What the data is changes. Sometimes its SA, sometimes
         it's cost.
       weights: The weight to apply to each ground motion model 'layer'
-    
+               1D, dimension (gmm)
+      
     """
     if do_collapse:
+        gmm_index_from_end=-4
         new_data_shape = data.shape
-        new_weight_shape = ones((data.ndim))
-        gmm_index_from_end = -4
-        gmm_index_from_start = data.ndim - 4
-        new_weight_shape[gmm_index_from_end] = -1
-
+        
         # the new data shape will be just like data,
         # but the length of the gmm dimension will be 1.
         new_data_shape = list(data.shape)
         new_data_shape[gmm_index_from_end] = 1
-        
-        weighted_data = data * reshape(weights, new_weight_shape) 
-        data = scipy.sum(weighted_data, gmm_index_from_start)
 
+        data = _collapse_att_model_dimension(data, weights)
         # Put the gmm dimension back
-        data = data.reshape(new_data_shape)
-
-    
+        data = data.reshape(new_data_shape)    
     return data
 
+def collapse_source_gmms(data, source_model, do_collapse):
+    """
+    Given data with a ground motion model dimension (gmm),
+    collapse this dimension, applying the weights in source_model.
+
+    THE SECOND LAST AXIS IS ASSUMED TO BE EVENT
+    THE FOUTH LAST AXIS IS ASSUMED TO BE GMM
+    
+    parameters:
+      data - an array of values (e.g. cost).  One of the dimensions is gmm. An example of
+             the dimensions are (spawn, ground motion model, site, events, periods)
+      source_model - An interable object that iterates over Source instances.
+      do_collapse - If True, collapse the ground motion model dimension.
+
+    returns:
+      data - the dimensions will still be the same as the input data.  If do_collapse is
+             True the gmm dimension will be 1, and the data has been collapsed.
+    """
+    if not do_collapse:
+        return data
+    
+    for source in source_model:
+        event_ind = source.event_set_indexes
+        col_data = collapse_att_model(data[...,event_ind, :],
+                                      source.atten_model_weights, do_collapse)
+        data[...,0:1,:,event_ind, :] = col_data
+
+        # Erase the data that has been weighted.
+        weight_length = len(source.atten_model_weights)
+        data[...,1:weight_length,:,event_ind, :] = 0.0
+
+    # Check here that all values have been collapsed.
+    assert scipy.sum(data[...,1:,:,:,:]) == 0.0
+    
+    return data[...,0:1,:,:,:]
 
 def hzd_do_value(sa, r_nu, rtrn_rte): #,hack=[0]):
     """
@@ -157,36 +199,7 @@ def hzd_do_value(sa, r_nu, rtrn_rte): #,hack=[0]):
     assert isfinite(trghzd_rock_pga).all()
     hzd = trghzd_rock_pga	
     return hzd
-'''
-	print 'hack'
-	if hack[0]==3*3:
-            print 'HACK',hack[0]
-            r_nu_f = open('r_nu.txt','w')
-            r_nu_f.write('\n'.join([' '.join([str(float(f)) for f in line])
-                                   for line in [r_nu]]))
-            r_nu_f.close()
 
-            sa_f = open('sa.txt','w')
-            sa_f.write('\n'.join([' '.join([str(float(f)) for f in line])
-                                   for line in sa]))
-            sa_f.close()
-
-            hzd_file = open('hzd.txt','w')
-            hzd_file.write('\n'.join([' '.join([str(float(f)) for f in line])
-                                   for line in [hzd]]))
-            hzd_file.close()
-            
-            cumnu_file = open('cumnu.txt','w')
-            cumnu_file.write('\n'.join([' '.join([str(float(f)) for f in line])
-                                   for line in [cumnu]]))
-            cumnu_file.close()
-            
-            trghzd_rock_pga_file = open('trghzd_rock_pga.txt','w')
-            trghzd_rock_pga_file.write('\n'.join([' '.join([str(float(f)) for f in line])
-                                   for line in [trghzd_rock_pga]]))
-            trghzd_rock_pga_file.close()
-            raise
-        else: hack[0]+=1     '''   
 
 def _rte2cumrte(each_risk,each_rte):
     if not each_risk.shape[-1]==each_rte.shape[-1]:
@@ -198,6 +211,7 @@ def _rte2cumrte(each_risk,each_rte):
     rsk=each_risk[risk_order]
     cumrte=each_rte[risk_order].cumsum()
     return rsk,cumrte
+
 
 def _get_rskgvnrte(rsk,cumrte,trgrte):
     #from numpy import NaN,zeros,isfinite,allclose

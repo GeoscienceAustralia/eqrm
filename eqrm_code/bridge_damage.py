@@ -144,7 +144,10 @@ def bridge_states_ModelLinear(model, CLASS, sa_0_3, sa_1_0, skew, num_spans):
 
     result = num.array((P_slight-P_moderate, P_moderate-P_extensive,
                         P_extensive-P_complete, P_complete))
-    result = num.transpose(result, (1, 2, 0))
+    if result.ndim == 3:
+        result = num.transpose(result, (1, 2, 0))
+    else:
+        result = num.transpose(result, (1, 2, 3, 4, 0))
 
     return result
 
@@ -170,31 +173,31 @@ def interpret_damage_state(state):
 def choose_random_state(states, rand_value=None):
     """Choose a random state from a state array.
 
-    states      is an array of shape (S, E, ST)
-                    S  is the number of sites (N)
-                    E  is the number of events (probably 1)
-                    ST is the number of states for the bridge (4 in this case)
+    states      is an array with dimensions;
+           (spawn, GM_model, sites, events, states)
+           sites will be equal to 1.
+           states is equal to 4.
+                    
     rand_value  if not None, this is random value for all tuples ([0.0, 1.0])
                 (TESTING *ONLY*)
 
     Choose a random state from each tuple, return an array of shape (S, E, 1),
     ie, return an array collapsed from 4 to 1 in the last dimension.
     """
-
-    axis0 = states.shape[0]		# S
-    axis1 = states.shape[1]		# E
-    newshape = (axis0, axis1, 1)	# (S, E, 1)
-
+    newshape = list(states.shape)
+    # set the States dimension to 1
+    newshape[-1] = 1
+    
     if rand_value is not None:
         rand_array = num.ones(newshape) * rand_value
     else:
-        rand_array = num.random.rand(axis0,axis1,1)	# (S, E, 1)
+        rand_array = num.random.rand(*newshape)	# (S, E, 1)
 
     # create result vector, fill with -1 (get error indexing if not changed)
     result = num.ones(newshape, dtype=int) * -1		# (S, E, 1)
 
     # fill accum with 'none' probability
-    accum = 1.0 - num.sum(states, axis=2)
+    accum = 1.0 - num.sum(states, axis=-1) # the last axis, STATE
     accum = num.reshape(accum, newshape)		# (S, E, 1)
 
     # handle 'none' damage state
@@ -203,7 +206,7 @@ def choose_random_state(states, rand_value=None):
     accum[cols] = -10.0		# shove accum way back, never see it again
 
     for i in xrange(4):
-        delta = num.reshape(states[:,:,i], newshape)
+        delta = num.reshape(states[...,i], newshape) 
         accum = accum + delta
         cols = num.where(accum >= rand_array)
         result[cols] = i + 1

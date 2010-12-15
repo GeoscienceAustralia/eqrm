@@ -1580,7 +1580,7 @@ class TestBridgeDamage(unittest.TestCase):
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
 
-    def test_choose_random_state(self):
+    def test_choose_random_state_3d(self):
         """Test the choose_random_state() function.
 
         The array input to choose_random_state() has the shape (S, E, ST)
@@ -1648,6 +1648,76 @@ class TestBridgeDamage(unittest.TestCase):
                % (str(expected_states), str(result_states)))
         self.failUnless(np.alltrue(result_states == expected_states), msg)
 
+
+    def test_choose_random_state_5d(self):
+        """Test the choose_random_state() function.
+        Choose a random state from a state array.
+
+        states      is an array with dimensions;
+        (spawn, GM_model, sites, events, states)
+        sites will be equal to 1.
+        states is equal to 4.
+       
+        """
+
+        # check that the state change values are as expected
+        # that is, around the 0.2, 0.4, etc places
+        states = np.array([[[[[0.2, 0.2, 0.2, 0.2]]]]])
+
+        rand_value = 0.0
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 0)
+        
+        rand_value = 0.1999
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 0)
+        
+        rand_value = 0.2001
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 1)
+        
+        rand_value = 0.3999
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 1)
+        
+        rand_value = 0.4001
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 2)
+        
+        rand_value = 0.5999
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 2)
+        
+        rand_value = 0.6001
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 3)
+        
+        rand_value = 0.7999
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 3)
+        
+        rand_value = 0.8001
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 4)
+        
+        rand_value = 0.9999
+        state = bd.choose_random_state(states, rand_value)
+        self.failUnless(state[0,0,0] == 4)
+
+        # now try tuples that are one state only, any random gets that state
+        # this is a one site example
+        states = np.array([[[[[0.0, 0.0, 0.0, 0.0],	# none
+                            [1.0, 0.0, 0.0, 0.0],	# slight
+                            [0.0, 1.0, 0.0, 0.0],	# moderate
+                            [0.0, 0.0, 1.0, 0.0],	# extensive
+                            [0.0, 0.0, 0.0, 1.0],	# complete
+                          ]]]])
+        expected_states = np.array([[[[[0], [1], [2], [3], [4]]]]])
+ 
+        result_states = bd.choose_random_state(states)
+        msg = ('expected_states=%s\nresult_states=%s'
+               % (str(expected_states), str(result_states)))
+        self.failUnless(np.alltrue(result_states == expected_states), msg)
 
     def test_interpret_damage_state(self):
         """Test the interpret_damage_state() function."""
