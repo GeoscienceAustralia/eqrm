@@ -1,3 +1,4 @@
+from scipy import array
 
 class A(object):
     def dis(self, depth, Vs30):
@@ -77,7 +78,7 @@ if __name__ == '__main__':
         else:
             print "Fail"
         
-    if True:
+    if False: #True:
         sunny(1,2,3)
 
         q = {'a':1,'b':2,'c':3}
@@ -101,4 +102,14 @@ if __name__ == '__main__':
         # Below is invalid
         #q = {'b':2}
         #sunny(1,**q, c=3)
+
+    if True:
+        a = array([[[0],[1]],
+                   [[2],[3]],
+                   [[4],[5]]])
+        print "a.shape", a.shape
+        b = a.reshape((-1,))
+        print "b", b
+        c = b.reshape(3,2,1)
+        print "c", c
         
