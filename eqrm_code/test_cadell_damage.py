@@ -47,6 +47,7 @@ class Test_cadell(unittest.TestCase):
         cadell_gm_loc = join(cadel_dir, 'Cadell_ground_motions_precision.csv')
         SA=self.ground_motions_from_csv(cadell_gm_loc,
             num_periods,num_sites)
+        #SA = SA[0:1,...]
 
         # set up damage model
         csm_use_variability = None
