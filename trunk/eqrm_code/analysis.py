@@ -90,8 +90,7 @@ def main(parameter_handle,
 
     eqrm_dir: The directory which 'eqrm_code' and 'resources' reside.
     """
-    t0 = t0_clock = time.clock()
-    t0_time = time.time()
+    t0 = time.clock()
 
 
     # Let's work-out the eqrm dir
@@ -129,28 +128,25 @@ def main(parameter_handle,
     # Setting up parallelisation
     parallel = Parallel(THE_PARAM_T.is_parallel)
 
-    # process 0 can make the output dir, if it is not present
-    if parallel.rank == 0:
-        add_last_directory(THE_PARAM_T.output_dir)
+    # Make the output dir, if it is not present
+    add_last_directory(THE_PARAM_T.output_dir)
 
-        # copy input parameter file to output directory.
-        if isinstance(parameter_handle, str) and parameter_handle[-3:] == '.py':
-            shutil.copyfile(parameter_handle,
-                            THE_PARAM_T.output_dir+'THE_PARAM_T.py')
-        else:
-            para_instance = copy.deepcopy(THE_PARAM_T)
-            convert_THE_PARAM_T_to_py(
-                os.path.join(THE_PARAM_T.output_dir, 'THE_PARAM_T.txt'),
-                para_instance)
-    parallel.barrier()
-        
+    # copy input parameter file to output directory.
+    if isinstance(parameter_handle, str) and parameter_handle[-3:] == '.py':
+        shutil.copyfile(parameter_handle,
+                        THE_PARAM_T.output_dir+'THE_PARAM_T.py')
+    else:
+        para_instance = copy.deepcopy(THE_PARAM_T)
+        convert_THE_PARAM_T_to_py(
+            os.path.join(THE_PARAM_T.output_dir, 'THE_PARAM_T.txt'),
+            para_instance)
 
     # Set up the logging
     # Use defaults.
     #log.console_logging_level = log.INFO
     #log.file_logging_level = log.DEBUG
     log_filename = os.path.join(THE_PARAM_T.output_dir,
-                                'log' + parallel.log_file_tag + '.txt')
+                                'log' + parallel.file_tag + '.txt')
     log.log_filename = log_filename
     log.remove_log_file()
     log.set_log_file(log_filename)
@@ -433,16 +429,18 @@ def main(parameter_handle,
 
 
     if THE_PARAM_T.save_total_financial_loss is True:
-        total_building_loss = zeros((array_size, num_psudo_events),
-                                    dtype=float)
         total_building_loss_qw = zeros((array_size, num_spawning,
                                         num_gmm_max, num_events),
                                     dtype=float)
     if THE_PARAM_T.save_building_loss is True:
-        building_loss = zeros((array_size, num_psudo_events),
+        building_loss_qw = zeros((array_size, num_spawning,
+                                        num_gmm_max, num_events),
                               dtype=float)
     if THE_PARAM_T.save_contents_loss is True:
         contents_loss = zeros((array_size, num_psudo_events),
+                              dtype=float)
+        contents_loss_qw = zeros((array_size, num_spawning,
+                                        num_gmm_max, num_events),
                               dtype=float)
     if (THE_PARAM_T.save_prob_structural_damage is True and
         num_psudo_events == 1 and THE_PARAM_T.run_type == "risk"):
@@ -478,8 +476,7 @@ def main(parameter_handle,
         raise RuntimeError(msg)
 
     for i in range(array_size):
-        msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' \
-              + str(array_size)
+        msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + str(array_size)
         log.info(msg)
         rel_i = i #- parallel.lo
 
@@ -547,8 +544,7 @@ def main(parameter_handle,
            
             assert isfinite(total_loss[0]).all()
 
-            # I think it's called total loss since it is summed over
-            # all of the events.
+            # It is called total building loss since it includes contents
             # break loss tuple into components
             # structure_loss = structural loss
             # nsd_loss = non-structural drift sensitive loss
@@ -571,16 +567,14 @@ def main(parameter_handle,
             # Note that this matrix is transposed before saving
             # (i.e. to number of events versus number of buildings)
             if THE_PARAM_T.save_total_financial_loss is True:
-                total_building_loss[rel_i,:] = (structure_loss + nsd_loss +
-                                                accel_loss + con_loss)[0,:]
                 total_building_loss_qw[rel_i,...] = (
                     structure_loss_qw + nsd_loss_qw + accel_loss_qw \
                     + con_loss_qw)[0,...]
             if THE_PARAM_T.save_building_loss is True:
-                building_loss[rel_i,:] = (structure_loss + nsd_loss +
-                                          accel_loss)[0,:]
+                building_loss_qw[rel_i,...] = (
+                    structure_loss_qw + nsd_loss_qw + accel_loss_qw )[0,...]
             if THE_PARAM_T.save_contents_loss is True:
-                contents_loss[rel_i,:] = con_loss[0,:]
+                contents_loss_qw[rel_i,...] = con_loss_qw[0,...]
 
             if (THE_PARAM_T.save_prob_structural_damage is True and
                     num_psudo_events == 1):
@@ -612,16 +606,13 @@ def main(parameter_handle,
     msg = "loop_time (excluding file saving) " + \
            str(datetime.timedelta(seconds=loop_time)) + " hr:min:sec"
     log.info(msg)
-    msg = "loop_time_seconds = " + \
-           str(loop_time) + " seconds."
-    log.info(msg)
 
     #print "time_taken_pre_site_loop", time_taken_pre_site_loop
     #print "time_taken_site_loop", time_taken_site_loop
 
     # SAVE HAZARD
     if THE_PARAM_T.save_hazard_map is True and parallel.lo != parallel.hi:
-        files = save_hazard(False, THE_PARAM_T, hazard=bedrock_hazard,
+        files = save_hazard('bedrock_SA', THE_PARAM_T, hazard=bedrock_hazard,
                             sites=all_sites,
                             compress=THE_PARAM_T.compress_output,
                             parallel_tag=parallel.file_tag,
@@ -629,7 +620,7 @@ def main(parameter_handle,
         row_files_that_parallel_splits.extend(files)
 
         if soil_hazard is not None:
-            files = save_hazard(True, THE_PARAM_T, hazard=soil_hazard,
+            files = save_hazard('soil_SA', THE_PARAM_T, hazard=soil_hazard,
                                 compress=THE_PARAM_T.compress_output,
                                 parallel_tag=parallel.file_tag,
                                 write_title=(parallel.rank == False))
@@ -644,14 +635,14 @@ def main(parameter_handle,
                           write_title=(parallel.rank == False))
         row_files_that_parallel_splits.append(file)
 
-        files = save_motion(False, THE_PARAM_T,motion=bedrock_SA_all,
+        files = save_motion('bedrock_SA', THE_PARAM_T,motion=bedrock_SA_all,
                             compress=THE_PARAM_T.compress_output,
                             parallel_tag=parallel.file_tag,
                             write_title=(parallel.rank == False))
         row_files_that_parallel_splits.extend(files)
 
         if soil_SA_all is not None:
-            files = save_motion(True,THE_PARAM_T,motion=soil_SA_all,
+            files = save_motion('soil_SA',THE_PARAM_T,motion=soil_SA_all,
                                compress=THE_PARAM_T.compress_output,
                                parallel_tag=parallel.file_tag,
                                write_title=(parallel.rank == False))
@@ -696,38 +687,19 @@ def main(parameter_handle,
 
     if (THE_PARAM_T.save_total_financial_loss is True and
             parallel.lo != parallel.hi):
-        # The do_collapse_logic_tree here will
-        # have to be changed to take into account
-        # the different atten weigths for each source.
-        # No sites were investigated.
-        # print "analysis total_building_loss",total_building_loss
-        # newaxis is added to give fake periods dimension.
-        (new_total_building_loss, _, _) = \
-                do_collapse_logic_tree(total_building_loss[:,:,newaxis],
-                                       pseudo_event_set.index,
-                                       pseudo_event_set.attenuation_weights,
-                                       THE_PARAM_T)
-        if True:
-            #  dimensions of total_building_loss_qw;
-            # (site, spawn, max ground motion model, events)
-            # want (spawn, max ground motion model, site, events, periods)
-            # or (site, spawn, max ground motion model, dummy, events, periods)
-            new_total_building_loss_qw = collapse_source_gmms(
-                total_building_loss_qw[...,newaxis,:,newaxis],
-                source_model, THE_PARAM_T.atten_collapse_Sa_of_atten_models)
-            # collapse out fake site axis and fake periods axis.
-            new_total_building_loss_qw = new_total_building_loss_qw[...,0,:,0]
-            # overload the event
-            new_total_building_loss_qw = new_total_building_loss_qw.reshape(
+        
+        #  dimensions of total_building_loss_qw;
+        # (site, spawn, max ground motion model, events)
+        # want (spawn, max ground motion model, site, events, periods)
+        # or (site, spawn, max ground motion model, dummy, events, periods)
+        new_total_building_loss_qw = collapse_source_gmms(
+            total_building_loss_qw[...,newaxis,:,newaxis],
+            source_model, THE_PARAM_T.atten_collapse_Sa_of_atten_models)
+        # collapse out fake site axis and fake periods axis.
+        new_total_building_loss_qw = new_total_building_loss_qw[...,0,:,0]
+        # overload the event
+        new_total_building_loss_qw = new_total_building_loss_qw.reshape(
             (num_sites, -1))
-
-        # This us true when the same gmm is used in risk, and no spawning
-        #print "analysis new_total_building_loss", new_total_building_loss
-        # collapse out fake periods axis
-        new_total_building_loss = new_total_building_loss[:,:,0]
-        assert allclose(new_total_building_loss,
-                        new_total_building_loss_qw)
-
         
         file = save_ecloss('_total_building',THE_PARAM_T,
                            new_total_building_loss_qw, all_sites,
@@ -745,15 +717,16 @@ def main(parameter_handle,
         row_files_that_parallel_splits.append(file)
 
     if THE_PARAM_T.save_building_loss is True and parallel.lo != parallel.hi:
-        (new_building_loss, _, _) = \
-            do_collapse_logic_tree(building_loss[:,:,newaxis],
-                                   pseudo_event_set.index,
-                                   pseudo_event_set.attenuation_weights,
-                                   THE_PARAM_T)
-
-         # collapse out fake periods axis
-        new_building_loss = new_building_loss[:,:,0]
-        file = save_ecloss('_building', THE_PARAM_T, new_building_loss,
+        
+        new_building_loss_qw = collapse_source_gmms(
+            building_loss_qw[...,newaxis,:,newaxis],
+            source_model, THE_PARAM_T.atten_collapse_Sa_of_atten_models)
+        # collapse out fake site axis and fake periods axis.
+        new_building_loss_qw = new_building_loss_qw[...,0,:,0]
+        # overload the event
+        new_building_loss_qw = new_building_loss_qw.reshape(
+            (num_sites, -1))
+        file = save_ecloss('_building', THE_PARAM_T, new_building_loss_qw,
                            all_sites, compress=THE_PARAM_T.compress_output,
                            parallel_tag=parallel.file_tag)
         column_files_that_parallel_splits.append(file)
@@ -767,15 +740,16 @@ def main(parameter_handle,
 #         row_files_that_parallel_splits.append(file)
 
     if THE_PARAM_T.save_contents_loss is True and parallel.lo != parallel.hi:
-        (new_contents_loss, _, _) = \
-            do_collapse_logic_tree(contents_loss[:,:,newaxis],
-                                   pseudo_event_set.index,
-                                   pseudo_event_set.attenuation_weights,
-                                   THE_PARAM_T)
-
-        # collapse out fake  axis
-        new_contents_loss = new_contents_loss[:,:,0]
-        file = save_ecloss('_contents', THE_PARAM_T,new_contents_loss,
+        new_contents_loss_qw = collapse_source_gmms(
+            contents_loss_qw[...,newaxis,:,newaxis],
+            source_model, THE_PARAM_T.atten_collapse_Sa_of_atten_models)
+        # collapse out fake site axis and fake periods axis.
+        new_contents_loss_qw = new_contents_loss_qw[...,0,:,0]
+        # overload the event
+        new_contents_loss_qw = new_contents_loss_qw.reshape(
+            (num_sites, -1))
+        
+        file = save_ecloss('_contents', THE_PARAM_T,new_contents_loss_qw,
                            all_sites, compress=THE_PARAM_T.compress_output,
                            parallel_tag=parallel.file_tag)
         column_files_that_parallel_splits.append(file)
@@ -796,13 +770,13 @@ def main(parameter_handle,
         save_event_set(THE_PARAM_T, pseudo_event_set,
                        pseudo_event_set.event_activity,
                        compress=THE_PARAM_T.compress_output)
-
+        
     # delete big data structures here
 
     # parallel code.  Needed if # of processes is > # of structures
     calc_num_blocks = parallel.calc_num_blocks()
 
-    # Now process 0 can stich some files together
+    # Now process 0 can stich some files together.
     if parallel.is_parallel and parallel.rank == 0:
         join_parallel_files(row_files_that_parallel_splits,
                             calc_num_blocks,
@@ -815,24 +789,11 @@ def main(parameter_handle,
     # Let's stop all the programs at the same time
     # Needed when scenarios are in series.
     # This was hanging nodes, when using mpirun
-    clock_time_taken_overall = (time.clock() - t0_clock)
-    wall_time_taken_overall = (time.time() - t0_time)
-    msg = "On node %i, %s clock (processor) time taken overall %s hr:min:sec." % \
+    real_time_taken_overall = (time.clock() - t0)
+    msg = "On node %i, %s time_taken_overall %s hr:min:sec" % \
           (parallel.rank,
            parallel.node,
-           str(datetime.timedelta(seconds=clock_time_taken_overall)))
-    log.info(msg)
-    msg = "clock_time_taken_overall_seconds = %s" % \
-          (str(clock_time_taken_overall))
-    
-    wall_time_taken_overall = (time.time() - t0_time)
-    msg = "On node %i, %s wall time taken overall %s hr:min:sec." % \
-          (parallel.rank,
-           parallel.node,
-           str(datetime.timedelta(seconds=wall_time_taken_overall)))
-    log.info(msg)
-    msg = "wall_time_taken_overall_seconds = %s" % \
-          (str(wall_time_taken_overall))
+           str(datetime.timedelta(seconds=real_time_taken_overall)) )
     log.info(msg)
     parallel.finalize()
     del parallel
