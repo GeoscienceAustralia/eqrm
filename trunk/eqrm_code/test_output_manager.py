@@ -8,7 +8,7 @@ from scipy import array, zeros, allclose, asarray, transpose, fromfunction, who
 from eqrm_code.output_manager import *
 from eqrm_code.sites import Sites
 from eqrm_code.bridges import Bridges
-from eqrm_code.event_set import Event_Set
+from eqrm_code.event_set import Event_Set, Event_Activity
 from test_structures import get_sites_from_dic
 from eqrm_code.util import dict2csv, determine_eqrm_path
 import eqrm_code.eqrm_filesystem as efs
@@ -659,6 +659,68 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(save_dir)
 
 
+    def test_save_event_set_new(self):
+        rupture_centroid_lat = [-33.351170370959323, -32.763381339789468]
+        rupture_centroid_lon = [151.45946928787703, 151.77787395867014]
+        azimuth = [162.8566392635347, 201.51805898897854]
+        dip = [35.0, 35.0]
+        ML = None
+        Mw = [5.0286463459649076, 4.6661943094693887]
+        fault_width = [15.0, 15.0]
+        depth_top_seismogenic = [7.0, 7.0]
+
+        set = Event_Set.create(
+            rupture_centroid_lat,
+            rupture_centroid_lon,
+            azimuth,
+            dip,
+            ML,
+            Mw,
+            None, #depth,
+            fault_width,
+            depth_top_seismogenic=depth_top_seismogenic)
+        set.source_zone_id = asarray([0,1]) # FIXME
+        set.att_model_index = asarray([0,1]) # FIXME
+        event_activity = [0.2, 0.4]
+
+        ea = Event_Activity(len(Mw))
+        ea.set_event_activity(event_activity)
+        
+        THE_PARAM_T=Dummy()
+        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+            'output_managertest_load_event_set_subset') + os.sep
+        THE_PARAM_T.site_tag = "site_tag"
+        file_full_name = save_event_set_new(
+            THE_PARAM_T,set, ea)
+        out = load_event_set_new(
+            THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
+        #print "out", out
+        msg = 'loaded Mw=%s, expected Mw=%s' % (str(out['Mw']), \
+                                                str(set.Mw))
+        #self.failUnless(allclose(out['Mw'], set.Mw), msg)
+        self.assert_ (allclose(out['Mw'], set.Mw)), msg
+        msg = 'loaded event_activity=%s, expected event_activity=%s' % \
+              (str(out['event_activity']), str(asarray(event_activity)))
+        self.failUnless(allclose(out['event_activity'],
+                                 asarray(event_activity)), msg)
+        self.assert_ (allclose(out['event_activity'],
+                               asarray(event_activity)))
+        set_dic = set.introspect_attribute_values()
+        for key in out:
+            if set_dic.has_key(key):
+                #print "key", key
+                if key == 'event_activity':
+                    self.assert_(allclose(out[key],
+                                 asarray(event_activity)))   
+                else:
+                    self.assert_(allclose(out[key],
+                                           set_dic[key]))
+            else:
+                pass
+                #print "bad key", key
+        os.remove(file_full_name)
+        os.rmdir(THE_PARAM_T.output_dir)
+
     def test_load_event_set_subset(self):
         rupture_centroid_lat = [-33.351170370959323, -32.763381339789468]
         rupture_centroid_lon = [151.45946928787703, 151.77787395867014]
@@ -689,8 +751,8 @@ class Test_Output_manager(unittest.TestCase):
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
             'output_managertest_load_event_set_subset') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
-        file_full_name = save_event_set_new(THE_PARAM_T,set, event_activity)
-        out = load_event_set_subset_new(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
+        file_full_name = save_event_set(THE_PARAM_T,set, event_activity)
+        out = load_event_set_subset(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
         msg = 'loaded Mw=%s, expected Mw=%s' % (str(out['Mw']), str(set.Mw))
         #self.failUnless(allclose(out['Mw'], set.Mw), msg)
         #self.assert_ (allclose(out['Mw'], set.Mw)), msg
@@ -1305,7 +1367,7 @@ class Test_Output_manager(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Output_manager, 'test')
     #suite=unittest.makeSuite(Test_Output_manager,'test_load_collapsed_motion_sitess')
-    #suite=unittest.makeSuite(Test_Output_manager,'test_save_eclossII')
+    #suite=unittest.makeSuite(Test_Output_manager,'test_save_event_set_new')
     runner = unittest.TextTestRunner()  #verbosity=2) #verbosity=2
     runner.run(suite)
 

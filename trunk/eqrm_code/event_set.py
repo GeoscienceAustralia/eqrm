@@ -1344,6 +1344,16 @@ class Event_Activity(object):
         """
         return self.event_activity.shape[GMMODEL]
 
+    def get_ea_event_dimsion_only(self):
+        """
+        Get the event activity collapsing the ground motion model
+        and spawning dimensions.
+        """
+        return scipy.sum(scipy.sum(self.event_activity, axis=SPAWN_D),
+                         axis=(GMMODEL-1))  
+        
+        
+
     
 class Obsolete_Event_Activity(object):
     """

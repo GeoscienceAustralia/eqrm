@@ -688,11 +688,15 @@ def load_structures(save_dir, site_tag):
                                attribute_dic['SUBURB']]
     return attribute_dic
 
-def save_event_set_new(THE_PARAM_T, event_set, r_new, compress=False):
+def get_event_set_file_name(site_tag):
+    return site_tag + '_event_set.txt'
+
+def save_event_set_new(THE_PARAM_T, event_set, event_activity,
+                       compress=False):
 #def save_event_set(THE_PARAM_T, event_set, r_new, compress=False):
     """Save event_set information to a file.
 
-    event_set  ?
+    event_set  Event_set instance
     r_new      event activity (a list or None)
     compress   True if file is to be compressed
     """
@@ -706,26 +710,27 @@ def save_event_set_new(THE_PARAM_T, event_set, r_new, compress=False):
         open = myGzipFile
 
     # prepare output file
-    file_full_name = THE_PARAM_T.output_dir+THE_PARAM_T.site_tag+'_event_set.txt'
+    file_full_name = THE_PARAM_T.output_dir + \
+                     get_event_set_file_name(THE_PARAM_T.site_tag)
     event_file = open(file_full_name, 'w')    
 
 # TODO: add new column at end here
     # write column header line
-    event_file.write('%src_index,trace_start_lat,trace_start_lon,'
-                     'trace_end_lat,trace_end_lon,azimuth,dip,atten_model_id,'
-                     'event_activity,Mw,centroid_lat,centroid_lon,depth,'
+    event_file.write('trace_start_lat,trace_start_lon,'
+                     'trace_end_lat,trace_end_lon,azimuth,dip,'
+                     'event_activity,Mw,rupture_centroid_lat,'
+                     'rupture_centroid_lon,depth,'
                      'rupture_x,rupture_y,length,width,event_index,name\n')
 
     # This is for speed, at the expense of memory
     # It is avoiding lots of expensive psudo-event lookups.
-    source_zone_id = event_set.source_zone_id
     trace_start_lat = event_set.trace_start_lat
     trace_start_lon = event_set.trace_start_lon
     trace_end_lat = event_set.trace_end_lat
     trace_end_lon = event_set.trace_end_lon
     azimuth = event_set.azimuth
     dip = event_set.dip
-    att_model_index = event_set.att_model_index
+    event_activity = event_activity.get_ea_event_dimsion_only()
 
     #name = event_set.name
     #print('name=%s' % str(name))
@@ -748,23 +753,13 @@ def save_event_set_new(THE_PARAM_T, event_set, r_new, compress=False):
     for i in range(len(event_set)):
         s = []
         
-        s.append(str(source_zone_id[i]))
         s.append(str(trace_start_lat[i]))
         s.append(str(trace_start_lon[i]))
         s.append(str(trace_end_lat[i]))
         s.append(str(trace_end_lon[i]))
         s.append(str(azimuth[i]))
         s.append(str(dip[i]))
-        
-        try:
-            s.append(str(att_model_index[i]))
-        except AttributeError:
-            s.append('-1')
-        try:
-            s.append(str(r_new[i]))
-        except (IndexError, TypeError):
-            s.append('-1')
-            
+        s.append(str(event_activity[i]))
         s.append(str(Mw[i]))
         s.append(str(rupture_centroid_lat[i]))
         s.append(str(rupture_centroid_lon[i]))
@@ -779,6 +774,7 @@ def save_event_set_new(THE_PARAM_T, event_set, r_new, compress=False):
             s.append(str(i))
         else:
             s.append(str(index[i]))
+        s.append("yellow") #FIXME
 
         # finally, append the fault name
         #s.append(name[i])
@@ -789,7 +785,7 @@ def save_event_set_new(THE_PARAM_T, event_set, r_new, compress=False):
     event_file.close()
 
     return file_full_name        # Used in testing
-    
+
 def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
 #def save_event_set_OLD(THE_PARAM_T,event_set,r_new,compress=False):
     """
@@ -897,42 +893,42 @@ def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
     #    mag_file.write('%.5g %.10g\n'%(Mw[i],r_nu[i]))
     event_file.close()
     return file_full_name # Used in testing
-    
-def load_event_set_subset_new(saved_dir, site_tag):
-#def load_event_set_subset(saved_dir, site_tag):
-    """Load Mw and event activity from a save file.
+
+def load_event_set_new(saved_dir, site_tag):
+    """Load the event set from a saved file.
 
     saved_dir  path to directory for the output file
-    site_tag   ?
+    site_tag   
 
-    Returns a dictionary with labels 'Mw' and 'event_activity'
+    Returns a dictionary with labels such as
+    'Mw' and 'event_activity'
     and values of 1D arrays of this info.
     """
-
-    f = open(os.path.join(saved_dir, site_tag + '_event_set.txt'), 'r')
-    text = f.read().splitlines()
-
-    # skip the first line (comment line)
-    text.pop(0)
-
-    # create dictionary with accumulated MW and activity values
-#    result = {}
-#    for line in text:
-#        split_line = line.split(',')
-#        result.setdefault('Mw', []).append(float(split_line[9]))
-#        result.setdefault('event_activity', []).append(float(split_line[8]))
-
-    result = {'Mw': [], 'event_activity': []}
-    for line in text:
-        split_line = line.split(',')
-        result['Mw'].append(float(split_line[9]))
-        result['event_activity'].append(float(split_line[8]))
-
-    # Convert entries to scipy arrays
-    for k, v in result.items():
-        v = array(v, dtype=float)
-
-    return result      
+    
+    file =os.path.join(saved_dir, get_event_set_file_name(site_tag))
+    convert = {
+        'trace_start_lat':float,
+        'trace_start_lon':float,
+        'trace_end_lat':float,
+        'trace_end_lon':float,
+        'azimuth':float,
+        'dip':float,
+        'event_activity':float,
+        'Mw':float,
+        'rupture_centroid_lat':float,
+        'rupture_centroid_lon':float,
+        'depth':float,
+        'rupture_x':float,
+        'rupture_y':float,
+        'length':float,
+        'width':float,
+        'event_index':int,
+        'name':str
+        }
+    attribute_dic, title_index_dic = csv2dict(file, convert=convert,
+                                              delimiter=',')
+    return attribute_dic
+     
 
 def load_event_set_subset(saved_dir, site_tag):
 #def load_event_set_subset_OLD(saved_dir, site_tag):

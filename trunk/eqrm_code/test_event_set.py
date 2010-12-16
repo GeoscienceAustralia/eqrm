@@ -882,6 +882,8 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(event[7], 6./4.))
 
         self.assert_(ea.get_num_spawn() == 2)
+        self.assert_(allclose(ea.get_ea_event_dimsion_only(),
+                              activity))
         
     def test_generate_synthetic_events_fault(self):
         def dump_src(etc):
