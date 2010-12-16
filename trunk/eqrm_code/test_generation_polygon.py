@@ -226,7 +226,7 @@ class Test_Generation_polygon(unittest.TestCase):
         handle.close()
 
         (faults, magtype) = xml_fault_generators(file_name)
-
+        os.remove(file_name)
 #        # dump the FSG objects
 #        for fault in faults:
 #            print('-'*50)
