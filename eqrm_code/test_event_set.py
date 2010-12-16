@@ -119,7 +119,7 @@ class Test_Event_Set(unittest.TestCase):
         assert allclose(event_set1.dip,event_set2.dip)
 
     def not_finished_test_event_from_file(self):
-        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        (handle, file_name) = tempfile.mkstemp('_1.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
         
@@ -424,7 +424,7 @@ class Test_Event_Set(unittest.TestCase):
         prob_min_mag_cutoff = 1.0
         override_xml = True
         prob_number_of_events_in_zones = array([1])
-        handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
+        handle, file_name = tempfile.mkstemp('_2.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
 
@@ -461,7 +461,7 @@ class Test_Event_Set(unittest.TestCase):
         source_model = [source]
 
 
-        (handle, et_file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        (handle, et_file_name) = tempfile.mkstemp('_3.xml', __name__+'_')
         os.close(handle)
         et_handle = open(et_file_name,'w')
 
@@ -514,7 +514,7 @@ class Test_Event_Set(unittest.TestCase):
 
     def test_generate_synthetic_events_horspool(self):
 
-        handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
+        handle, file_name = tempfile.mkstemp('_4.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
         
@@ -1011,7 +1011,9 @@ class Test_Event_Set(unittest.TestCase):
             source_mod_zone, 
             source_mod_fault
             )
-        
+
+        os.remove(fault_xml_file)
+        os.remove(event_control_file)
         #event_activity = Event_Activity(len(event_set))
         #source_mod.calculate_recurrence(
          #   event_set,
