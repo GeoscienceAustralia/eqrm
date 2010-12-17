@@ -767,8 +767,9 @@ def main(parameter_handle,
 
     if parallel.rank == 0:		# No site component
         # So just get one process to write these files.
-        save_event_set(THE_PARAM_T, pseudo_event_set,
-                       pseudo_event_set.event_activity,
+        save_event_set(THE_PARAM_T, event_set,
+                       event_activity,
+                       source_model,
                        compress=THE_PARAM_T.compress_output)
         
     # delete big data structures here
