@@ -139,6 +139,8 @@ class Test_Generation_polygon(unittest.TestCase):
             'Failed!')
         self.failUnless(calc_gp.number_of_events==number_of_events,
             'Failed!')
+        self.failUnless(calc_gp.polygon_name=="bad zone",
+            'Failed!')
 
     def test_xml_fault_generators(self):
         def dump_fault(fault):

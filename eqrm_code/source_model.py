@@ -206,6 +206,20 @@ class Source_Model(object):
         """
         pass
 
+    def sources_of_event_set(self, event_length):
+        """
+        Return a list the length of the event_set with values being the Source
+        the event came from.  Return None if the event has no Source (currently this
+        should not be possible).
+        """
+        sources = [None] * event_length
+        for source in self._sources:
+            for event_ind in source.event_set_indexes:
+                sources[event_ind] = source
+        return sources
+        
+        
+
         
     @classmethod
     def create_scenario_source_model(cls, num_events):
@@ -217,6 +231,7 @@ class Source_Model(object):
                         max_magnitude=None,
                         prob_min_mag_cutoff=None,
                         A_min=None, b=None, number_of_mag_sample_bins=None,
+                        name='scenario',
                         event_type=None)
         source.set_event_set_indexes(arange(0, num_events))
         source_model = cls([source])
@@ -231,7 +246,7 @@ class Source(object):
     """
 
     def __init__(self, min_magnitude, max_magnitude, prob_min_mag_cutoff,
-                 A_min, b, number_of_mag_sample_bins, event_type,
+                 A_min, b, number_of_mag_sample_bins, event_type, name,
                  recurrence_model_distribution='bounded_gutenberg_richter'):
         """
         min_magnitude,max_magnitude,
@@ -250,6 +265,7 @@ class Source(object):
         self.b = b
         self.number_of_mag_sample_bins = number_of_mag_sample_bins
         self.event_type = event_type
+        self.name = name
         self.recurrence_model_distribution = recurrence_model_distribution
 
         # indexes to the event sets in this source zone
@@ -304,6 +320,7 @@ class Source_Zone(Source, polygon_object):
                  A_min,b,
                  number_of_mag_sample_bins,
                  event_type,
+                 name,
                  recurrence_model_distribution='bounded_gutenberg_richter'):
         """
         boundary is a list of points that forms a polygon
@@ -325,6 +342,7 @@ class Source_Zone(Source, polygon_object):
                         b=b,
                         number_of_mag_sample_bins=number_of_mag_sample_bins,
                         event_type=event_type,
+                        name = name,
                         recurrence_model_distribution=
                         recurrence_model_distribution)
                  
@@ -482,6 +500,7 @@ def create_fault_sources(event_control_file, fsg_list, magnitude_type):
         source = Source(min_magnitude, max_magnitude,
                         prob_min_mag_cutoff, fsg.A_min, fsg.b,
                         fsg.number_of_mag_sample_bins, fsg.event_type,
+                        fsg.name,
                         recurrence_model_distribution=fsg.distribution)
 
         # add new source to result list
@@ -501,7 +520,11 @@ def source_model_from_xml(filename, prob_min_mag_cutoff):
     
     source_zone_polygons=[]
     xml_polygons = doc['zone']
-    for xml_polygon in xml_polygons:
+    for i, xml_polygon in enumerate(xml_polygons):
+        try:
+            polygon_name = xml_polygon.attributes['name']
+        except KeyError:
+            polygon_name = 'zone_' + str(i)
         geometry = xml_polygon['geometry'][0]
         boundary = geometry['boundary'][0].array
         recurrence = xml_polygon['recurrence_model'][0].attributes
@@ -533,6 +556,7 @@ def source_model_from_xml(filename, prob_min_mag_cutoff):
             A_min,b,
             number_of_mag_sample_bins,
             event_type,
+            polygon_name,
             recurrence_model_distribution=recurrence_model_distribution)
         source_zone_polygons.append(source_zone_polygon)
         

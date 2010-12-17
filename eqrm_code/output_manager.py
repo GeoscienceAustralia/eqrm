@@ -691,9 +691,8 @@ def load_structures(save_dir, site_tag):
 def get_event_set_file_name(site_tag):
     return site_tag + '_event_set.txt'
 
-def save_event_set_new(THE_PARAM_T, event_set, event_activity,
+def save_event_set_new(THE_PARAM_T, event_set, event_activity, source_model,
                        compress=False):
-#def save_event_set(THE_PARAM_T, event_set, r_new, compress=False):
     """Save event_set information to a file.
 
     event_set  Event_set instance
@@ -714,13 +713,12 @@ def save_event_set_new(THE_PARAM_T, event_set, event_activity,
                      get_event_set_file_name(THE_PARAM_T.site_tag)
     event_file = open(file_full_name, 'w')    
 
-# TODO: add new column at end here
     # write column header line
     event_file.write('trace_start_lat,trace_start_lon,'
                      'trace_end_lat,trace_end_lon,azimuth,dip,'
                      'event_activity,Mw,rupture_centroid_lat,'
                      'rupture_centroid_lon,depth,'
-                     'rupture_x,rupture_y,length,width,event_index,name\n')
+                     'rupture_x,rupture_y,length,width,event_num,name\n')
 
     # This is for speed, at the expense of memory
     # It is avoiding lots of expensive psudo-event lookups.
@@ -731,6 +729,7 @@ def save_event_set_new(THE_PARAM_T, event_set, event_activity,
     azimuth = event_set.azimuth
     dip = event_set.dip
     event_activity = event_activity.get_ea_event_dimsion_only()
+    sources_of_event_set = source_model.sources_of_event_set(len(event_set))
 
     #name = event_set.name
     #print('name=%s' % str(name))
@@ -743,6 +742,7 @@ def save_event_set_new(THE_PARAM_T, event_set, event_activity,
     rupture_y = event_set.rupture_y
     length = event_set.length
     width = event_set.width
+    event_num = event_set.event_num
 
     # Pseudo_Event_Set will have a index attribute, Event_Set will not.
     try:
@@ -769,12 +769,8 @@ def save_event_set_new(THE_PARAM_T, event_set, event_activity,
         s.append(str(length[i]))
         s.append(str(width[i]))
 
-        # Pseudo_Event_Set will have a index attribute, Event_Set will not.
-        if index is None:
-            s.append(str(i))
-        else:
-            s.append(str(index[i]))
-        s.append("yellow") #FIXME
+        s.append(str(event_num[i]))
+        s.append(str(sources_of_event_set[i].name))
 
         # finally, append the fault name
         #s.append(name[i])
@@ -922,7 +918,7 @@ def load_event_set_new(saved_dir, site_tag):
         'rupture_y':float,
         'length':float,
         'width':float,
-        'event_index':int,
+        'event_num':int,
         'name':str
         }
     attribute_dic, title_index_dic = csv2dict(file, convert=convert,

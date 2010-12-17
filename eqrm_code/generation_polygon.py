@@ -445,9 +445,12 @@ def xml_fault_generators(filename, prob_min_mag_cutoff=None):
     
     # now cycle through 'fault' tags
     fsg_list = []
-    for fault in faults:
+    for i, fault in enumerate(faults):
         # get <fault> attributes
-        fault_name = fault.attributes['name']
+        try:
+            fault_name = fault.attributes['name']
+        except KeyError:
+            fault_name = 'fault_' + str(i)
         fault_event_type = fault.attributes['event_type']
 
         # now get <geometry> attributes/children
@@ -527,8 +530,7 @@ def polygons_from_xml_horspool(doc,
     
     generation_polygons=[]
     xml_polygons = doc['zone']
-    for i in range(len(xml_polygons)):
-        xml_polygon = xml_polygons[i]
+    for i, xml_polygon in enumerate(xml_polygons):
         try:
             polygon_name = xml_polygon.attributes['name']
         except KeyError:
