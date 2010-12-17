@@ -36,7 +36,7 @@ class Test_Source_model(unittest.TestCase):
         
         sample = """<source_model_zone magnitude_type="Mw">
   <zone 
-  area = "5054.035"  event_type = "TS_haz03">
+  area = "5054.035"  event_type = "TS_haz03" name="bake">
     
     <geometry 
        azimuth= "6" 
@@ -97,29 +97,32 @@ class Test_Source_model(unittest.TestCase):
         A_min = 0.568
         number_of_mag_sample_bins = 15
         event_type = 'fish'
+        name = 'bake'
         szp = Source_Zone(boundary,exclude,
-                                  min_magnitude,max_magnitude,
-                                  prob_min_mag_cutoff,
-                                  A_min,b,
-                                  number_of_mag_sample_bins,
-                                  event_type)
+                          min_magnitude,max_magnitude,
+                          prob_min_mag_cutoff,
+                          A_min,b,
+                          number_of_mag_sample_bins,
+                          event_type,
+                          name)
         #print "source_zone_polygon.polygon_object", szp._linestring
         result = source_model._sources[0]
-        self.failUnless( result._linestring==szp._linestring,
+        self.failUnless(result._linestring==szp._linestring,
             'Failed!')
-        self.failUnless( result.min_magnitude==szp.min_magnitude,
+        self.failUnless(result.min_magnitude==szp.min_magnitude,
             'Failed!')
-        self.failUnless( result.max_magnitude==szp.max_magnitude,
+        self.failUnless(result.max_magnitude==szp.max_magnitude,
             'Failed!')
-        self.failUnless( result.b==szp.b,
+        self.failUnless(result.b==szp.b,
             'Failed!')
-        self.failUnless( result.A_min==szp.A_min,
+        self.failUnless(result.A_min==szp.A_min,
             'Failed!')
-        self.failUnless( result.prob_min_mag_cutoff==
+        self.failUnless(result.prob_min_mag_cutoff ==
                          szp.prob_min_mag_cutoff,
             'Failed!')
-        self.failUnless(source_model._magnitude_type==
-                        'Mw','Failed!')
+        self.failUnless(result.name == name,'Failed!')
+        self.failUnless(szp.name == name,'Failed!')
+        self.failUnless(source_model._magnitude_type == 'Mw','Failed!')
         self.failUnless(result.number_of_mag_sample_bins== 15,'Failed!')
 
     
@@ -133,24 +136,26 @@ class Test_Source_model(unittest.TestCase):
         A_min = 0.5
         number_of_mag_sample_bins = 15
         event_type = 'fish'
+        name = 'Source_Zone'
         szp = Source_Zone(boundary,exclude,
-                                  min_magnitude,max_magnitude,
-                                  prob_min_mag_cutoff,
-                                  A_min,b,
-                                  number_of_mag_sample_bins, event_type)
-        self.failUnless( boundary==szp._linestring,
+                          min_magnitude,max_magnitude,
+                          prob_min_mag_cutoff,
+                          A_min,b,
+                          number_of_mag_sample_bins, event_type,
+                          name)
+        self.failUnless(boundary==szp._linestring,
             'Failed!')
-        self.failUnless( exclude==szp._exclude,
+        self.failUnless(exclude==szp._exclude,
             'Failed!')
-        self.failUnless( min_magnitude==szp.min_magnitude,
+        self.failUnless(min_magnitude==szp.min_magnitude,
             'Failed!')
-        self.failUnless( max_magnitude==szp.max_magnitude,
+        self.failUnless(max_magnitude==szp.max_magnitude,
             'Failed!')
-        self.failUnless( b==szp.b,
+        self.failUnless(b==szp.b,
             'Failed!')
-        self.failUnless( A_min==szp.A_min,
+        self.failUnless(A_min==szp.A_min,
             'Failed!')
-        self.failUnless( prob_min_mag_cutoff==szp.prob_min_mag_cutoff,
+        self.failUnless(prob_min_mag_cutoff==szp.prob_min_mag_cutoff,
             'Failed!')
         self.failUnless(szp.number_of_mag_sample_bins== \
                         number_of_mag_sample_bins,'Failed!')
@@ -221,29 +226,6 @@ class Test_Source_model(unittest.TestCase):
                % (str(array(actual)), str(event_activity.event_activity)))
         self.assert_(allclose(array(actual),
                               event_activity.event_activity[:,0,0]), msg)
-
-    def test_Source_Model(self):
-        
-        eqrm_dir = determine_eqrm_path()
-        file_name = join(eqrm_dir, 'implementation_tests', 'input',
-                         'newc_zone_source.xml')
-        fid_sourcepolys = open(file_name)
-        
-        prob_min_mag_cutoff = 4.5
-        weight = [1.0]
-        number_of_mag_sample_bins = 100000000
-        source_model = Obsolete_Source_Models(prob_min_mag_cutoff,
-                                     weight,
-                                     number_of_mag_sample_bins,
-                                     fid_sourcepolys)
-        atten_models = ["Neal", "Jack"]
-        atten_model_weights = array([.4, .6])
-        source_model[0].set_attenuation(atten_models, atten_model_weights)
-        msg = 'Fail'
-        for sm in source_model[0]:
-            self.assert_(allclose(array(sm.atten_model_weights),
-                                  atten_model_weights), msg)
-            self.assert_(sm.atten_models == atten_models, msg)
 
     def test_Source(self):
         def dump_etc(etc):
@@ -515,11 +497,29 @@ class Test_Source_model(unittest.TestCase):
         
         
     def test_create_scenario_source_model(self):
-
         source_model = Source_Model.create_scenario_source_model(3)
         self.failUnless(allclose(source_model[0].event_set_indexes,
                                      array([0,1,2])))
 
+    def test_sources_of_event_set(self):
+        setups = [('5,3,2', [5,3,2]), ('6,4',[6, 4]), ('0,1',[0,1])]
+        setups_dic = dict(setups)
+        sources = []
+        for setup in setups:
+            d = Dummy()
+            d.name = setup[0]
+            d.event_set_indexes = setup[1]
+            sources.append(d)
+        sm = Source_Model(sources)
+        sources_wrt_events = sm.sources_of_event_set(7)
+        for i, source in enumerate(sources_wrt_events):
+            key = source.name
+            self.failUnless(setups_dic.has_key(key))
+            self.failUnless(i in setups_dic[key])
+            setups_dic[key].remove(i)
+            
+        
+            
 ################################################################################
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ from scipy import array, zeros, allclose, asarray, transpose, fromfunction, who
 
 from eqrm_code.output_manager import *
 from eqrm_code.sites import Sites
+from eqrm_code.source_model import Source_Model
 from eqrm_code.bridges import Bridges
 from eqrm_code.event_set import Event_Set, Event_Activity
 from test_structures import get_sites_from_dic
@@ -682,16 +683,26 @@ class Test_Output_manager(unittest.TestCase):
         set.source_zone_id = asarray([0,1]) # FIXME
         set.att_model_index = asarray([0,1]) # FIXME
         event_activity = [0.2, 0.4]
-
+        
+        setups = [('1', [1]), ('0',[0])]
+        setups_dic = dict(setups)
+        sources = []
+        for setup in setups:
+            d = Dummy()
+            d.name = setup[0]
+            d.event_set_indexes = setup[1]
+            sources.append(d)
+        sm = Source_Model(sources)
+        
         ea = Event_Activity(len(Mw))
         ea.set_event_activity(event_activity)
         
         THE_PARAM_T=Dummy()
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
-            'output_managertest_load_event_set_subset') + os.sep
+            'output_managertest_load_event_set') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
         file_full_name = save_event_set_new(
-            THE_PARAM_T,set, ea)
+            THE_PARAM_T,set, ea, sm)
         out = load_event_set_new(
             THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
         #print "out", out
@@ -711,13 +722,18 @@ class Test_Output_manager(unittest.TestCase):
                 #print "key", key
                 if key == 'event_activity':
                     self.assert_(allclose(out[key],
-                                 asarray(event_activity)))   
+                                 asarray(event_activity)))
                 else:
                     self.assert_(allclose(out[key],
                                            set_dic[key]))
+            elif key == 'name':
+                for i,name in enumerate(out[key]):
+                    self.assert_(i == int(name))
+            elif key == 'event_activity':
+                self.assert_(allclose(out[key],
+                                      asarray(event_activity)))
             else:
-                pass
-                #print "bad key", key
+                self.fail()
         os.remove(file_full_name)
         os.rmdir(THE_PARAM_T.output_dir)
 
