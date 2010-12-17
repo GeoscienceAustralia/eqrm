@@ -1,20 +1,2 @@
-%column 1: sourcezone index
-%column 2: trace_start_lat
-%column 3: trace_start_lon
-%column 4: trace_end_lat
-%column 5: trace_end_lon
-%column 6: azimuth
-%column 7: dip
-%column 8: id of attenuation model position. 0 is the first model. 1 is the second.
-%column 9: event activity
-%column 10: Mw
-%column 11: rupture_centroid_lat
-%column 12: rupture_centroid_lon
-%column 13: depth
-%column 14: rupture_x
-%column 15: rupture_y
-%column 16: length
-%column 17: width
-%column 18: Event index
-0,-8.25461120208,110.129238608,-9.13697490248,110.129238608,180.0,62.6091045568,0,7.5,7.45237955351,-8.69579305228,110.08516415,9.34379382727,49.026383166,4.84147913087,98.0527663319,20.9832189179,0
-0,-8.25461120208,110.129238608,-9.13697490248,110.129238608,180.0,62.6091045568,1,2.5,7.45237955351,-8.69579305228,110.08516415,9.34379382727,49.026383166,4.84147913087,98.0527663319,20.9832189179,0
+trace_start_lat,trace_start_lon,trace_end_lat,trace_end_lon,azimuth,dip,event_activity,Mw,rupture_centroid_lat,rupture_centroid_lon,depth,rupture_x,rupture_y,length,width,event_num,name
+-8.25461120208,110.129238608,-9.13697490248,110.129238608,180.0,62.6091045568,10.0,7.45237955351,-8.69579305228,110.08516415,9.34379382727,49.026383166,4.84147913087,98.0527663319,20.9832189179,0,java_megathrust

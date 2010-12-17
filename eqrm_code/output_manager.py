@@ -691,7 +691,10 @@ def load_structures(save_dir, site_tag):
 def get_event_set_file_name(site_tag):
     return site_tag + '_event_set.txt'
 
-def save_event_set_new(THE_PARAM_T, event_set, event_activity, source_model,
+#def save_event_set_new(THE_PARAM_T, event_set, event_activity, source_model,
+ #                      compress=False):
+
+def save_event_set(THE_PARAM_T, event_set, event_activity, source_model,
                        compress=False):
     """Save event_set information to a file.
 
@@ -782,8 +785,8 @@ def save_event_set_new(THE_PARAM_T, event_set, event_activity, source_model,
 
     return file_full_name        # Used in testing
 
-def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
-#def save_event_set_OLD(THE_PARAM_T,event_set,r_new,compress=False):
+#def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
+def obsolete_save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
     """
     Save event_set information to file.
     This function is called in eqrm analysis.
@@ -890,7 +893,7 @@ def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
     event_file.close()
     return file_full_name # Used in testing
 
-def load_event_set_new(saved_dir, site_tag):
+def load_event_set(saved_dir, site_tag):
     """Load the event set from a saved file.
 
     saved_dir  path to directory for the output file
@@ -926,7 +929,7 @@ def load_event_set_new(saved_dir, site_tag):
     return attribute_dic
      
 
-def load_event_set_subset(saved_dir, site_tag):
+def obsolete_load_event_set_subset(saved_dir, site_tag):
 #def load_event_set_subset_OLD(saved_dir, site_tag):
     """
     Load the Mw, and event activity.
