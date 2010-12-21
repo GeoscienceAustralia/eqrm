@@ -123,10 +123,10 @@ def fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period, period,
             title = 'RP=%s, period=%s' % (return_period, period)
 
         pgx.plot_gmt_xyz_continuous(data, plot_file, title=title,
-                                  np_posn=np_posn, s_posn=s_posn,
-                                  cb_label=cb_label, cb_steps=cb_steps,
-                                  colourmap=colourmap,
-                                  annotate=annotate)
+                                    np_posn=np_posn, s_posn=s_posn,
+                                    cb_label=cb_label, cb_steps=cb_steps,
+                                    colourmap=colourmap,
+                                    annotate=annotate)
 
 
 def fig_loss_exceedance(input_dir, site_tag, title='',
@@ -169,8 +169,6 @@ def fig_loss_exceedance(input_dir, site_tag, title='',
     # Load in the event activity
     out_dict = om.load_event_set_subset(input_dir, site_tag)
     event_activity = out_dict['event_activity']
-
-    # Check array dimensions
 
     # Do calculations
     pml_curve = calc_pml.calc_pml(total_building_loss,
@@ -1022,5 +1020,44 @@ def fig_scenario_building_loss_percent(input_dir, site_tag, plotfile=None,
                          xrange=xrange, yrange=yrange,
                          show_graph=show_graph, bardict=bardict,
                          annotate=range_ann)
+
+
+# function string to object mapping
+# later, we will only do this mapping if 'collapse_function' is of type string
+fig_scenario_loss_percent_map = {'mean': numpy.mean,
+                                 'median': numpy.median}
+
+def fig_scenario_loss_percent(input_dir, site_tag, output_dir, plotfile,
+                              collapse_function='mean',
+                              savefile=None, title='',
+                              np_posn=None, s_posn=None,
+                              cb_steps=None, colourmap=None,
+                              cb_label=None, annotate=None,
+                              show_graph=False):
+    """Plot a set of gridded % loss data over a map of an area.
+
+    input_dir          general input/output directory
+    site_tag           overall site identifier
+    output_dir         path to directory to save files in (UNUSED?)
+    collapse_function  string defining function used to collapse site values
+                       ('mean' or 'medium', default is 'mean')
+    plot_file          name of plot output file to create
+    save_file          path to file to save plot data in (UNUSED?)
+    title              title to put on the graph
+    np_posn            north pointer placement data
+    s_posn             scale placement data
+    cb_steps           iterable of colourbar step values
+    colourmap          name of colourmap to use
+    cb_label           colourbar label string
+    annotate           iterable of annotate values
+    show_graph         True if the plot is to be shown on the screen
+    """
+
+    # Load in the structure loss data, shape = (location, event)
+    # and building value -> (location, event)
+    # and lon & lat -> (location,)
+    (total_building_loss, building_value,
+      lon, lat) = om.load_ecloss_and_sites(input_dir, site_tag)
+
 
 
