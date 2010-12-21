@@ -155,30 +155,6 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.failUnless(sigma_1==log_sigma, 'Model incorrect.')
         self.assert_(allclose(log_mean_calc, log_mean))
 
-    def speed_test(self):
-        import time
-
-        LOOP = 10000
-
-        start = time.time()
-        for i in xrange(LOOP):
-            self.speed_test_Toro_1997_midcontinent_distribution()
-        delta = time.time() - start
-        print('speed_test_Toro_1997_midcontinent_distribution - %d iterations took %.3fs' % (LOOP, delta))
-
-        start = time.time()
-        for i in xrange(LOOP):
-            self.speed_test_Atkinson_Boore_97_distribution()
-        delta = time.time() - start
-        print('speed_test_Atkinson_Boore_97_distribution - %d iterations took %.3fs' % (LOOP, delta))
-
-        start = time.time()
-        for i in xrange(LOOP):
-            self.test_Sadigh_97_distribution()
-        delta = time.time() - start
-        print('test_Sadigh_97_distribution() - %d iterations took %.3fs' % (LOOP, delta))
-
- 
     def test_Toro_1997_midcontinent_distribution(self):
         
         model_name = 'Toro_1997_midcontinent'
@@ -228,36 +204,6 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.assert_(allclose(actual, log_mean[0][0][0]))
         self.assert_(allclose(actual, log_mean_p[0][0][0]))
         
-    def speed_test_Toro_1997_midcontinent_distribution(self):
-        """This is here purely for the speed_test() function."""
-        
-        model_name = 'Toro_1997_midcontinent'
-        model = Ground_motion_specification(model_name)
-        
-        distance = array([[[8.6602540]]])
-        mag = array([[[8.0]]])
-
-        c1 = 1.0
-        c2 = 2.0
-        c3 = 3.0
-        c4 = 4.0
-        c5 = 5.0
-        c6 = 6.0
-        c7 = 5.0
-        
-        coefficient = array([[[[c1]]], [[[c2]]], [[[c3]]], [[[c4]]], [[[c5]]],
-                       [[[c6]]], [[[c7]]]])
-        
-        sigma_coefficient = coefficient
-        
-        log_mean,log_sigma=model.distribution(
-            mag=mag,
-            distance=distance,
-            coefficient=coefficient,
-            sigma_coefficient=sigma_coefficient)
-        actual = -52.21034037197618
-        self.assert_(allclose(actual, log_mean[0][0][0]))
-        
     def test_Atkinson_Boore_97_distribution(self):
         
         model_name='Atkinson_Boore_97'
@@ -294,34 +240,6 @@ class Test_ground_motion_interface(unittest.TestCase):
         #print "log_mean", log_mean
         #print "log_mean_p", log_mean_p
         self.assert_(allclose(actual, log_mean_p[0][0][0]))
-        self.assert_(allclose(actual, log_mean[0][0][0]))
-
-    def speed_test_Atkinson_Boore_97_distribution(self):
-        """This is here as it is called by the speed_test() function."""
-        
-        model_name='Atkinson_Boore_97'
-        model=Ground_motion_specification(model_name)
-        
-        distance = array([[[10]]])
-        mag = array([[[8.0]]])
-
-        c1 = 1.0
-        c2 = 2.0
-        c3 = 3.0
-        c4 = 4.0
-        
-        coefficient = array([[[[c1]]], [[[c2]]], [[[c3]]], [[[c4]]]])
-
-        actual = -25.302585092994047
-        
-        sigma_coefficient = array([[[[3.0]]]])
-        
-        log_mean,log_sigma=model.distribution(
-            mag=mag,
-            distance=distance,
-            coefficient=coefficient,
-            sigma_coefficient=sigma_coefficient)
-
         self.assert_(allclose(actual, log_mean[0][0][0]))
 
     def test_Boore_08_distribution_subfunctions(self):
@@ -2148,11 +2066,328 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)      
         
+    def speed_test(self):
+        """Tests relative speeds of the weave and pure-python versions of:
+            Toro_1997_midcontinent_distribution
+            Atkinson_Boore_97_distribution
+            Sadigh_97_distribution
+
+        Also test speed of pure-python models.
+
+        Not normally executed: do 'python test_ground_motion_interface.py speed'
+        to run this.
+        """
+
+        def speedup(p_time, w_time):
+            """Utility function to calculate a 'times faster' figure given:
+            p_time  python time
+            w_time  weave time
+
+            Returns a times faster float value.
+            """
+
+            return float(p_time)/w_time
+
+
+        import time
+
+        LOOP = 10
+
+        NUMEVENTS = 50000
+        NUMPERIODS = 10
+        NUMSITES = 1
+
+        print('Number of Sites = %d' % NUMSITES)
+        print('Number of Events = %d' % NUMEVENTS)
+        print('Number of Periods = %d' % NUMPERIODS)
+        print('')
+
+        # Toro_1997 model - generate test data
+        distance = array([[[8.6602540]]*NUMEVENTS])
+        mag = array([[[8.0]]*NUMEVENTS])
+        c1 = 1.0
+        c2 = 2.0
+        c3 = 3.0
+        c4 = 4.0
+        c5 = 5.0
+        c6 = 6.0
+        c7 = 5.0
+        coefficient = array([[[[c1]*NUMPERIODS]], [[[c2]*NUMPERIODS]],
+                             [[[c3]*NUMPERIODS]], [[[c4]*NUMPERIODS]],
+                             [[[c5]*NUMPERIODS]], [[[c6]*NUMPERIODS]],
+                             [[[c7]*NUMPERIODS]]])
+        sigma_coefficient = coefficient
+        
+        start = time.time()
+        for i in xrange(LOOP):
+            Toro_1997_midcontinent_distribution_python(mag=mag,
+                distance=distance, coefficient=coefficient,
+                sigma_coefficient=sigma_coefficient)
+        py_delta = time.time() - start
+        print('Toro_1997 (python) - %d iterations took %.3fs'
+              % (LOOP, py_delta))
+
+        start = time.time()
+        for i in xrange(LOOP):
+            Toro_1997_midcontinent_distribution(mag=mag, distance=distance,
+                coefficient=coefficient, sigma_coefficient=sigma_coefficient)
+        delta = time.time() - start
+        print 'Toro_1997 (weave)  - %d iterations took %.3fs' % (LOOP, delta),
+        s = speedup(py_delta, delta)
+        print('- Weave is %.2f times faster\n' % s)
+
+        # Atkinson_Boore_97 model - generate test data
+        distance = array([[[10]]*NUMEVENTS])
+        mag = array([[[8.0]]*NUMEVENTS])
+
+        c1 = 1.0
+        c2 = 2.0
+        c3 = 3.0
+        c4 = 4.0
+
+        coefficient = array([[[[c1]*NUMPERIODS]], [[[c2]*NUMPERIODS]],
+                             [[[c3]*NUMPERIODS]], [[[c4]*NUMPERIODS]]])
+        sigma_coefficient = array([[[[3.0]*NUMPERIODS]]])
+
+        start = time.time()
+        for i in xrange(LOOP):
+            Atkinson_Boore_97_distribution_python(mag=mag, distance=distance,
+                coefficient=coefficient, sigma_coefficient=sigma_coefficient)
+        py_delta = time.time() - start
+        print('Atkinson_Boore_97 (python) - %d iterations took %.3fs'
+              % (LOOP, py_delta))
+
+        start = time.time()
+        for i in xrange(LOOP):
+            Atkinson_Boore_97_distribution(mag=mag, distance=distance,
+                coefficient=coefficient, sigma_coefficient=sigma_coefficient)
+        delta = time.time() - start
+        print 'Atkinson_Boore_97 (weave)  - %d iterations took %.3fs' % (LOOP, delta),
+        s = speedup(py_delta, delta)
+        print('- Weave is %.2f times faster\n' % s)
+
+        # Sadigh_97 model - generate test data
+        distance=array([[[10.0]]*NUMEVENTS])
+        mag=array([[[7.0]]*NUMEVENTS])
+
+        F=1.0
+        r_z=10.0
+        Z_t=0.0
+        a=1.0
+        b=1.0
+        c=1.0
+        d=1.0
+        e=1.0
+        f=1.0
+        g=1.0
+        h=1.0
+        coefficient=array([[[[a]*NUMPERIODS]], [[[b]*NUMPERIODS]],
+                           [[[c]*NUMPERIODS]], [[[d]*NUMPERIODS]],
+                           [[[e]*NUMPERIODS]], [[[f]*NUMPERIODS]],
+                           [[[g]*NUMPERIODS]], [[[h]*NUMPERIODS]],
+                           [[[a]*NUMPERIODS]], [[[b]*NUMPERIODS]],
+                           [[[c]*NUMPERIODS]], [[[d]*NUMPERIODS]],
+                           [[[e]*NUMPERIODS]], [[[f]*NUMPERIODS]],
+                           [[[g]*NUMPERIODS]], [[[h]*NUMPERIODS]]])
+
+        s1=1.0
+        s2=1.0
+        s3=1.0
+        sigma_coefficient = array([[[[s1]*NUMPERIODS]],
+                                   [[[s2]*NUMPERIODS]],
+                                   [[[s3]*NUMPERIODS]]])
+
+        start = time.time()
+        for i in xrange(LOOP):
+            Sadigh_97_distribution_python(mag=mag, distance=distance,
+                coefficient=coefficient, sigma_coefficient=sigma_coefficient) 
+        py_delta = time.time() - start
+        print('Sadigh_97 (python) - %d iterations took %.3fs'
+              % (LOOP, py_delta))
+ 
+        start = time.time()
+        for i in xrange(LOOP):
+            Sadigh_97_distribution(mag=mag, distance=distance,
+                coefficient=coefficient, sigma_coefficient=sigma_coefficient)
+        delta = time.time() - start
+        print 'Sadigh_97 (weave)  - %d iterations took %.3fs' % (LOOP, delta),
+        s = speedup(py_delta, delta)
+        print('- Weave is %.2f times faster\n' % s)
+
+        # Campbell03 model - generate test data
+        period = 0.2
+        ML = numpy.array([[[7.0]]*NUMEVENTS])
+        R = numpy.array([[[10.0]]*NUMEVENTS])
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[-0.432800]*NUMPERIODS]], [[[ 0.617000]*NUMPERIODS]], [[[-0.058600]*NUMPERIODS]],
+                              [[[-1.320000]*NUMPERIODS]], [[[-0.004600]*NUMPERIODS]], [[[ 0.000337]*NUMPERIODS]],
+                              [[[ 0.399000]*NUMPERIODS]], [[[ 0.493000]*NUMPERIODS]], [[[ 1.250000]*NUMPERIODS]],
+                              [[[-0.928000]*NUMPERIODS]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[1.077]*NUMPERIODS]], [[[-0.0838]*NUMPERIODS]], [[[0.478]*NUMPERIODS]]])
+
+        start = time.time()
+        for i in xrange(LOOP):
+            Campbell03_distribution(mag=ML, distance=R,
+                                    coefficient=coeffs,
+                                    sigma_coefficient=sigma_coeffs)
+        py_delta = time.time() - start
+        print('Campbell03 (python) - %d iterations took %.3fs'
+              % (LOOP, py_delta))
+        print('')
+
+        # Campbell08 model - generate test data
+        # a fake dist_object class
+        class DistObj(object):
+            def __init__(self, Rrup, Rjb):
+                self.Rupture = numpy.array([[Rrup]*NUMEVENTS])
+                self.Joyner_Boore = numpy.array([[Rjb]*NUMEVENTS])
+
+        period = 0.01
+        periods = numpy.array([period]*NUMPERIODS)
+        Rrup = 100.0
+        Rjb = 100.0
+        dist_object = DistObj(Rrup, Rjb)
+        M = numpy.array([[[7.0]]*NUMEVENTS])
+        depth = numpy.array([[[0.0]]*NUMEVENTS])
+        dip = numpy.array([[[45.0]]*NUMEVENTS])
+        fault_type = numpy.array([[[0]]*NUMEVENTS], dtype=int)	# RV
+        Vs30 = numpy.array([760.0]*NUMSITES)
+        Z25 = numpy.array([conversions.convert_Vs30_to_Z25(760.0)]*NUMSITES)
+
+        # get coeffs for this period (C0 -> K3 from table 2)
+        coeffs = numpy.array([[[[-1.715]*NUMPERIODS]], [[[0.500]*NUMPERIODS]],  [[[-0.530]*NUMPERIODS]],
+                              [[[-0.262]*NUMPERIODS]], [[[-2.118]*NUMPERIODS]], [[[0.170]*NUMPERIODS]],
+                              [[[5.60]*NUMPERIODS]],   [[[0.280]*NUMPERIODS]],  [[[-0.120]*NUMPERIODS]],
+                              [[[0.490]*NUMPERIODS]],  [[[1.058]*NUMPERIODS]],  [[[0.040]*NUMPERIODS]],
+                              [[[0.610]*NUMPERIODS]],  [[[865]*NUMPERIODS]],    [[[-1.186]*NUMPERIODS]],
+                              [[[1.839]*NUMPERIODS]],  [[[1.88]*NUMPERIODS]],   [[[1.18]*NUMPERIODS]]])
+
+        # sigma coefficients for this period (ElnY -> rho from table 3)
+        sigma_coeffs = numpy.array([[[[0.478]*NUMPERIODS]], [[[0.219]*NUMPERIODS]], [[[0.300]*NUMPERIODS]],
+                                    [[[0.166]*NUMPERIODS]], [[[1.000]*NUMPERIODS]]])
+
+        start = time.time()
+        for i in xrange(LOOP):
+            Campbell08_distribution(dist_object=dist_object, mag=M, periods=periods,
+                                    depth_to_top=depth, fault_type=fault_type, dip=dip, Vs30=Vs30,
+                                    Z25=Z25, coefficient=coeffs, sigma_coefficient=sigma_coeffs)
+        py_delta = time.time() - start
+        print('Campbell08 (python) - %d iterations took %.3fs'
+              % (LOOP, py_delta))
+        print('')
+
+        # Chiou08 model - generate test data
+        period = 0.01
+        ML = numpy.array([[[4.0]]*NUMEVENTS])
+        R = numpy.array([[5.0]*NUMEVENTS])
+        Vs30 = numpy.array([300.0]*NUMSITES)
+        fault_type = numpy.array([[[2]]*NUMEVENTS], dtype=int)
+        dip = numpy.array([[[90.0]]*NUMEVENTS])
+        Ztor = numpy.array([[[0.0]]*NUMEVENTS])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[1.06]*NUMPERIODS]],[[[3.45]*NUMPERIODS]],[[[-2.1]*NUMPERIODS]],
+                              [[[-0.5]*NUMPERIODS]],[[[50.0]*NUMPERIODS]],[[[3.0]*NUMPERIODS]],
+                              [[[4.0]*NUMPERIODS]],[[[-1.2687]*NUMPERIODS]],[[[0.1000]*NUMPERIODS]],
+                              [[[-0.2550]*NUMPERIODS]],[[[2.996]*NUMPERIODS]],[[[4.1840]*NUMPERIODS]],
+                              [[[6.1600]*NUMPERIODS]],[[[0.4893]*NUMPERIODS]],[[[0.0512]*NUMPERIODS]],
+                              [[[0.0860]*NUMPERIODS]],[[[0.7900]*NUMPERIODS]],[[[1.5005]*NUMPERIODS]],
+                              [[[-0.3218]*NUMPERIODS]],[[[-0.00804]*NUMPERIODS]],[[[-0.00785]*NUMPERIODS]],
+                              [[[-0.4417]*NUMPERIODS]],[[[-0.1417]*NUMPERIODS]],[[[-0.007010]*NUMPERIODS]],
+                              [[[0.102151]*NUMPERIODS]],[[[0.2289]*NUMPERIODS]],[[[0.014996]*NUMPERIODS]],
+                              [[[580.0]*NUMPERIODS]],[[[0.0700]*NUMPERIODS]]])
+
+        # sigma coefficients - these are static
+        sigma_coeffs = numpy.array([[[[0.3437]*NUMPERIODS]],[[[0.2637]*NUMPERIODS]],[[[0.4458]*NUMPERIODS]],
+                                    [[[0.3459]*NUMPERIODS]],[[[0.8000]*NUMPERIODS]],[[[0.0663]*NUMPERIODS]]])
+
+        # a fake dist_object class
+        # assume Rrup & Rx = the R value
+        class DistObj(object):
+            def __init__(self, R):
+                self.Rupture = numpy.array(R)
+                self.Joyner_Boore = numpy.array(R)
+                self.Horizontal = numpy.array(R)
+        distances = DistObj(R)
+
+        start = time.time()
+        for i in xrange(LOOP):
+             Chiou08_distribution(mag=ML, dist_object=distances,
+                                  fault_type=fault_type, dip=dip,
+                                  depth_to_top=Ztor, Vs30=Vs30,
+                                  coefficient=coeffs,
+                                  sigma_coefficient=sigma_coeffs)
+        py_delta = time.time() - start
+        print('Chiou08 (python) - %d iterations took %.3fs'
+              % (LOOP, py_delta))
+        print('')
+
+        # Abrahamson08 model - generate test data
+        # a fake dist_object class
+        # it can be this simple since delta=90 and Ztor=0.0
+        class DistObj(object):
+            def __init__(self, distance):
+                self.Rupture = distance
+                self.Joyner_Boore = distance
+                self.Horizontal = distance
+
+        # Test various scenarios for period=0.2
+        period = 0.2
+        periods = numpy.array([period]*NUMPERIODS)
+        Rrup = 100.0
+        dist_object = DistObj(array([[Rrup]*NUMEVENTS]))
+        ML = numpy.array([[[7.0]]*NUMEVENTS])
+        depth = numpy.array([[[0.0]]*NUMEVENTS])
+        dip = numpy.array([[[90.0]]*NUMEVENTS])
+        fault_type = numpy.array([[[2]]*NUMEVENTS], dtype=int)	# strike_slip
+        Vs30 = numpy.array([760.0]*NUMSITES)
+        width = numpy.array([[[10.0]]*NUMEVENTS])
+
+        # get coeffs for this period
+        coeffs = numpy.array([[[[6.75]*NUMPERIODS]],[[[4.5]*NUMPERIODS]],[[[0.265]*NUMPERIODS]],[[[-0.231]*NUMPERIODS]],
+                              [[[-0.398]*NUMPERIODS]],[[[1.18]*NUMPERIODS]],[[[1.88]*NUMPERIODS]],[[[50.0]*NUMPERIODS]],
+                              [[[748.2]*NUMPERIODS]],[[[-2.188]*NUMPERIODS]], [[[1.6870]*NUMPERIODS]],
+                              [[[-0.9700]*NUMPERIODS]],[[[-0.0396]*NUMPERIODS]], [[[2.0773]*NUMPERIODS]],
+                              [[[0.0309]*NUMPERIODS]],[[[-0.0600]*NUMPERIODS]],[[[1.1274]*NUMPERIODS]],
+                              [[[-0.3500]*NUMPERIODS]], [[[0.9000]*NUMPERIODS]],[[[-0.0083]*NUMPERIODS]]])
+
+        # sigma coefficients for this period (S1 -> rho from table 6)
+        sigma_coeffs = numpy.array([[[[0.630]*NUMPERIODS]],[[[0.514]*NUMPERIODS]],[[[0.614]*NUMPERIODS]],
+                                    [[[0.495]*NUMPERIODS]],[[[0.520]*NUMPERIODS]],[[[0.329]*NUMPERIODS]],
+                                    [[[0.874]*NUMPERIODS]]])
+
+        start = time.time()
+        for i in xrange(LOOP):
+            Abrahamson08_distribution(dist_object=dist_object, mag=ML, periods=periods,
+                                      depth_to_top=depth, width=width, fault_type=fault_type,
+                                      dip=dip, Vs30=Vs30, coefficient=coeffs,
+                                      sigma_coefficient=sigma_coeffs)
+        py_delta = time.time() - start
+        print('Abrahamson08 (python) - %d iterations took %.3fs'
+              % (LOOP, py_delta))
+        print('')
+ 
+
 ################################################################################
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(Test_ground_motion_interface,'test')
-    #suite = unittest.makeSuite(Test_ground_motion_interface,'speed_test')
+    import sys
+
+    def usage():
+        print('Usage: python test_ground_motion_interface.py [<test_prefix>]')
+
+    # get the method prefix for tests to run
+    prefix = 'test'		# the default
+    if len(sys.argv) > 1:
+        if len(sys.argv) > 2:
+            usage()
+            sys.exit(10)
+        prefix = sys.argv[1]
+        
+    suite = unittest.makeSuite(Test_ground_motion_interface, prefix)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

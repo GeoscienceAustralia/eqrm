@@ -385,130 +385,138 @@ Toro_1997_midcontinent_sigma_coefficient_period = [
     #epistemic2 = [0.7,0.7,0.7,0.7,0.7,0.7,0.65,0.6,0.6]
 
 def Toro_1997_midcontinent_distribution_python(**kwargs):
+    """The usual parameters passed are:
+        mag, distance, coefficient, sigma_coefficient, depth,  Vs30
+    """
 
-    # This function is called in Ground_motion_calculator.distribution_function
-    # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    c1,c2,c3,c4,c5,c6,c7=coefficient
-    d1,d2,d3,f1,f2,e1,e2=sigma_coefficient
-    
-    Rm=sqrt(distance**2+c7**2)
-    log_Rm=log(Rm)
-    log_100 = 4.60517018599 
-    log_mean=c1+c2*(mag-6.0)+c3*((mag-6.0)**2)-c4*log_Rm\
-              -(c5-c4)*where((log_Rm-log_100)>0,(log_Rm-log_100),0)-c6*Rm
-    del log_Rm
 
-    log_sigma_aleatory1=(mag<=5)*(d1)
-    log_sigma_aleatory1+=(5<mag)*(mag<=5.5)*(d1+(d2-d1)*(mag-5)/0.5)
-    log_sigma_aleatory1+=(5.5<mag)*(mag<=8)*(d2+(d3-d2)*(mag-5.5)/2.5)
-    log_sigma_aleatory1+=(8<mag)*(d3)
+    (num_sites, num_events) = distance.shape[0:2]
+    num_periods = coefficient.shape[3]
+
+    assert coefficient.shape == (7,1,1,num_periods)
+    assert mag.shape == (1,num_events,1)
+    assert distance.shape == (num_sites,num_events,1)
+
+    (c1, c2, c3, c4, c5, c6, c7) = coefficient
+    (d1, d2, d3, f1, f2, e1, e2) = sigma_coefficient
+    
+    Rm = sqrt(distance**2 + c7**2)
+    log_Rm = log(Rm)
+    log_100 = 4.60517018599 
+    log_mean = (c1 + c2*(mag-6.0) + c3*((mag-6.0)**2) - c4*log_Rm -
+                (c5-c4)*where((log_Rm-log_100)>0, (log_Rm-log_100), 0) - c6*Rm)
+    del log_Rm, log_100, Rm
+
+    log_sigma_aleatory1 = ((mag <= 5)*d1 +(5 < mag)*(mag <= 5.5)*(d1 +
+                           (d2-d1)*(mag-5)/0.5) +
+                           (5.5 < mag)*(mag <= 8)*(d2 + (d3-d2)*(mag-5.5)/2.5) +
+                           (8 < mag)*d3)
+
     # getting the aleatory (mag part) sigma
-    log_sigma_aleatory2=(distance<=5)*(f1)
-    log_sigma_aleatory2+=(5<distance)*(distance<=20)*(f1+(f2-f1)* \
-                                                      (distance-5)/15)
-    log_sigma_aleatory2+=(20<distance)*f2
-    # getting the aleatory (distance part) sigma
-    ##log_epistemic=e1+e2*(mag-6)
-    # getting model uncertainty
-    ###log_sigma=sqrt(log_epistemic**2+log_sigma_aleatory1**2\
-    ###               +log_sigma_aleatory2**2)
-    log_sigma=sqrt(log_sigma_aleatory1**2+
-                   log_sigma_aleatory2**2)                  
-    return log_mean,log_sigma
+    log_sigma_aleatory2 = ((distance <= 5)*f1 +
+                           (5 < distance)*(distance <= 20)*(f1+(f2-f1)*(distance-5)/15) +
+                           (20 < distance)*f2)
+
+    log_sigma = sqrt(log_sigma_aleatory1**2 + log_sigma_aleatory2**2)
+
+    return (log_mean, log_sigma)
 
 def Toro_1997_midcontinent_distribution(**kwargs):
+    """The usual parameters passed are:
+        mag, distance, coefficient, sigma_coefficient, depth,  Vs30
+    """
 
-    # This function is called in Ground_motion_calculator.distribution_function
-    # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    num_sites,num_events=distance.shape[0:2]
-    num_periods=coefficient.shape[3]
-    assert coefficient.shape==(7,1,1,num_periods)
-    #assert sigma_coefficient.shape==(7,1,1,num_periods)
-    assert mag.shape==(1,num_events,1)
-    assert distance.shape==(num_sites,num_events,1)
-    log_mean=zeros((num_sites,num_events,num_periods),dtype=float)
-    #log_sigma=zeros((num_sites,num_events,num_periods),dtype=float)
-    log_sigma=0.0 # who cares - I think the python bit is fast enough.
 
-    coefficient=coefficient[:,0,0,:]
-    mag=mag[0,:,0]
-    distance=distance[:,:,0]
+    (num_sites, num_events) = distance.shape[0:2]
+    num_periods = coefficient.shape[3]
+
+    assert coefficient.shape == (7,1,1,num_periods)
+    #assert sigma_coefficient.shape==(7,1,1,num_periods)
+    assert mag.shape == (1,num_events,1)
+    assert distance.shape == (num_sites,num_events,1)
+
+    log_mean = zeros((num_sites,num_events,num_periods), dtype=float)
+    log_sigma = zeros((num_sites,num_events,num_periods), dtype=float)
+
+    coefficient = coefficient[:,0,0,:]
+    sigma_coefficient = sigma_coefficient[:,0,0,:]
+    mag = mag[0,:,0]
+    distance = distance[:,:,0]
     
-    code="""
-    double c1,c2,c3,c4,c5,c6,c7;
-    double m,d;
-    double Rm,log_Rm,log_Rm_100;
-    for (int i=0; i<num_sites; ++i){
-        for (int j=0; j<num_events; ++j){
-            m=mag(j);
-            d=distance(i,j);
+    code = """
+    double c1, c2, c3, c4, c5, c6, c7;
+    double d1, d2, d3, f1, f2, e1, e2;
+    double m, d;
+    double Rm,log_Rm, log_Rm_100, log_100;
+    double sig_1, sig_2;
+
+    for (int i=0; i < num_sites; ++i) {
+        for (int j=0; j < num_events; ++j) {
+            m = mag(j);
+            d = distance(i, j);
             
-            for (int k=0;k<num_periods;++k){
-                c1=coefficient(0,k);
-                c2=coefficient(1,k);
-                c3=coefficient(2,k);
-                c4=coefficient(3,k);
-                c5=coefficient(4,k);
-                c6=coefficient(5,k);
-                c7=coefficient(6,k);
+            for (int k=0; k < num_periods; ++k) {
+                c1 = coefficient(0, k);
+                c2 = coefficient(1, k);
+                c3 = coefficient(2, k);
+                c4 = coefficient(3, k);
+                c5 = coefficient(4, k);
+                c6 = coefficient(5, k);
+                c7 = coefficient(6, k);
                 
-                Rm=sqrt(d*d+c7*c7);
-                log_Rm=log(Rm);
-                log_Rm_100=log_Rm-log(100);
-                
-                if (log_Rm_100<0.0){
-                    log_Rm_100=0.0;
-                }                   
-                log_mean(i,j,k)=c1+c2*(m-6.0)+c3*((m-6.0)*(m-6.0))
-                               -c4*log_Rm-(c5-c4)*log_Rm_100-c6*Rm;
+                Rm = sqrt(d*d + c7*c7);
+                log_Rm = log(Rm);
+                log_100 = 4.6051701859880918; /* log(100) */
+                log_Rm_100 = log_Rm - log_100;
+
+                if (log_Rm_100 < 0.0)
+                    log_Rm_100 = 0.0;
+
+                log_mean(i, j, k) = c1 + c2*(m-6.0) + c3*((m-6.0)*(m-6.0))
+                                       - c4*log_Rm - (c5-c4)*log_Rm_100-c6*Rm;
+
+                d1 = sigma_coefficient(0, k);
+                d2 = sigma_coefficient(1, k);
+                d3 = sigma_coefficient(2, k);
+                f1 = sigma_coefficient(3, k);
+                f2 = sigma_coefficient(4, k);
+                e1 = sigma_coefficient(5, k);
+                e2 = sigma_coefficient(6, k);
+
+                sig_1 = (m <= 5)*d1 +
+                            (5 < m)*(m <= 5.5)*(d1 + (d2-d1)*(m-5)/0.5) +
+                            (5.5 < m)*(m <= 8)*(d2 + (d3-d2)*(m-5.5)/2.5) +
+                            (8 < m)*d3;
+                sig_2 = (d <= 5)*f1 +
+                            (5 < d)*(d <= 20)*(f1 + (f2-f1)*(d-5)/15) +
+                            (20 < d)*f2;
+                log_sigma(i, j, k) = sqrt(sig_1*sig_1 + sig_2*sig_2);
             }       
         }
     }
+
     return_val = 0;
     """
+
     try:
         weave.inline(code,
-                     ['num_sites','num_events','num_periods',
-                      'coefficient','sigma_coefficient',
-                      'mag','log_mean','distance','log_sigma'],
+                     ['num_sites', 'num_events', 'num_periods',
+                      'coefficient', 'sigma_coefficient',
+                      'mag', 'log_mean', 'distance', 'log_sigma'],
                      type_converters=weave.converters.blitz,
                      compiler='gcc')   
     except IOError:
         raise util.WeaveIOError 
     
-    coefficient=coefficient[:,newaxis,newaxis,:]
-    mag=mag[newaxis,:,newaxis]
-    distance=distance[:,:,newaxis]
-    
-    d1,d2,d3,f1,f2,e1,e2=sigma_coefficient
-    log_sigma_aleatory1=(mag<=5)*(d1)
-    log_sigma_aleatory1+=(5<mag)*(mag<=5.5)*(d1+(d2-d1)*(mag-5)/0.5)
-    log_sigma_aleatory1+=(5.5<mag)*(mag<=8)*(d2+(d3-d2)*(mag-5.5)/2.5)
-    log_sigma_aleatory1+=(8<mag)*(d3)
-    # getting the aleatory (mag part) sigma
-    log_sigma_aleatory2=(distance<=5)*(f1)
-    log_sigma_aleatory2+=(5<distance)*(distance<=20)*(f1+(f2-f1)* \
-                                                      (distance-5)/15)
-    log_sigma_aleatory2+=(20<distance)*f2
-    # getting the aleatory (distance part) sigma
-    ##log_epistemic=e1+e2*(mag-6)
-    # getting model uncertainty
-    ###log_sigma=sqrt(log_epistemic**2+log_sigma_aleatory1**2\
-    ###               +log_sigma_aleatory2**2)
-    log_sigma=sqrt(log_sigma_aleatory1**2+
-                   log_sigma_aleatory2**2)
-    
-    return log_mean,log_sigma
+    return (log_mean, log_sigma)
 
 Toro_1997_midcontinent_magnitude_type='Mw'
 Toro_1997_midcontinent_distance_type='Joyner_Boore'
@@ -845,69 +853,78 @@ def Atkinson_Boore_97_distribution_python(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
-    c1,c2,c3,c4=coefficient
-    log_mean = c1+c2*(mag-6)+c3*(mag-6)**2-log(distance)-c4*distance    
-    num_events=distance.shape[2]
-    log_sigma = tile(sigma_coefficient[0],(1,num_events,1))   
-    return log_mean,log_sigma
+    (num_sites, num_events) = distance.shape[0:2]
+    num_periods = coefficient.shape[3]
+
+    assert coefficient.shape == (4,1,1,num_periods)
+    assert sigma_coefficient.shape == (1,1,1,num_periods)
+    assert mag.shape == (1,num_events,1)
+    assert distance.shape == (num_sites,num_events,1)
+
+    (c1, c2, c3, c4) = coefficient
+    log_mean = c1 + c2*(mag-6) + c3*(mag-6)**2 - log(distance) - c4*distance
+    log_sigma = tile(sigma_coefficient[0], (1, num_events, 1))   
+
+    return (log_mean, log_sigma)
 
 def Atkinson_Boore_97_distribution(**kwargs):
+    """The usual parameters passed are:
+           mag, distance, coefficient, sigma_coefficient, depth,  Vs30
+    """
 
-    # This function is called in Ground_motion_calculator.distribution_function
-    # The usual parameters passed are
-    # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
    
-    num_sites,num_events=distance.shape[0:2]
+    (num_sites, num_events) = distance.shape[0:2]
     num_periods=coefficient.shape[3]
-    assert coefficient.shape==(4,1,1,num_periods)
-    assert sigma_coefficient.shape==(1,1,1,num_periods)
-    assert mag.shape==(1,num_events,1)
-    assert distance.shape==(num_sites,num_events,1)
-    log_mean=zeros((num_sites,num_events,num_periods),dtype=float)
-    log_sigma=zeros((num_sites,num_events,num_periods),dtype=float)
 
-    coefficient=coefficient[:,0,0,:]
-    sigma_coefficient=sigma_coefficient[0,0,0,:]
-    mag=mag[0,:,0]
-    distance=distance[:,:,0]
+    assert coefficient.shape == (4,1,1,num_periods)
+    assert sigma_coefficient.shape == (1,1,1,num_periods)
+    assert mag.shape == (1,num_events,1)
+    assert distance.shape == (num_sites,num_events,1)
+
+    log_mean = zeros((num_sites, num_events, num_periods), dtype=float)
+    log_sigma = zeros((num_sites, num_events, num_periods), dtype=float)
+
+    coefficient = coefficient[:,0,0,:]
+    sigma_coefficient = sigma_coefficient[0,0,0,:]
+    mag = mag[0,:,0]
+    distance = distance[:,:,0]
     code="""
-    double c1,c2,c3,c4;
-    double s;
-    double m,d;
-    for (int i=0; i<num_sites; ++i){
-        for (int j=0; j<num_events; ++j){
-            m=mag(j);
-            d=distance(i,j);
-            for (int k=0;k<num_periods;++k){
-                c1=coefficient(0,k);
-                c2=coefficient(1,k);
-                c3=coefficient(2,k);
-                c4=coefficient(3,k);
+    double c1, c2, c3, c4;
+    double m, d;
+    for (int i=0; i < num_sites; ++i) {
+        for (int j=0; j < num_events; ++j) {
+            m = mag(j);
+            d = distance(i,j);
+            for (int k=0; k < num_periods; ++k) {
+                c1 = coefficient(0, k);
+                c2 = coefficient(1, k);
+                c3 = coefficient(2, k);
+                c4 = coefficient(3, k);
                 
-                log_mean(i,j,k) = c1+c2*(m-6)+(c3*(m-6)*(m-6))-log(d)-c4*d;
-                
-                s=sigma_coefficient(k);
-                log_sigma(i,j,k)=s;                
+                log_mean(i, j, k) = c1 + c2*(m-6) + (c3*(m-6)*(m-6)) - log(d) - c4*d;
+                log_sigma(i, j, k) = sigma_coefficient(k);
             }       
         }
     }
+
     return_val = 0;
     """
+
     try:
         weave.inline(code,
-                     ['num_sites','num_events','num_periods',
-                      'coefficient','sigma_coefficient',
-                      'mag','log_mean','distance','log_sigma'],
+                     ['num_sites', 'num_events', 'num_periods',
+                      'coefficient', 'sigma_coefficient',
+                      'mag', 'log_mean', 'distance', 'log_sigma'],
                      type_converters=weave.converters.blitz,
                      compiler='gcc')     
     except IOError:
         raise util.WeaveIOError 
   
-    return log_mean,log_sigma
+    return (log_mean, log_sigma)
 
 Atkinson_Boore_97_distance_type='Rupture'
 Atkinson_Boore_97_magnitude_type='Mw'
@@ -1138,33 +1155,39 @@ def Sadigh_97_distribution_python(**kwargs):
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     
-    F=1.0
-    
-    # R = RrupMatrix + c7.*exp(c8.*MagMatrix);
-    # lnSA(ind,:) = c1*F + c2 + c3.*MagMatrix + c4.*(8.5-MagMatrix).^(2.5) ...
-    #   +c5.*log(R)+ c6.*log(RrupMatrix+2);
-    #if not (mag<8.5).all():
+    (num_sites, num_events) = distance.shape[0:2]
+    num_periods = coefficient.shape[3]
+
+    assert coefficient.shape == (16,1,1,num_periods)
+    assert sigma_coefficient.shape == (3,1,1,num_periods)
+    assert mag.shape == (1,num_events,1)
+    assert distance.shape == (num_sites,num_events,1)
+
+    #if not (mag < 8.5).all():
     #    raise ValueError('Sadigh 97 is not valid for magnitude > 8.5')
         
-    c_less65=coefficient[:8]
-    c_less65=c_less65+mag*0 # expand it to size of mag
-    
-    c_more65=coefficient[8:]
-    c_more65=c_more65+mag*0 # expand it to size of mag
+    F=1.0
 
-    coefficient=where((mag+c_less65*0)>6.5,c_more65,c_less65)
+    c_less65 = coefficient[:8] + mag*0
+    #c_less65 = c_less65+mag*0 # expand it to size of mag
     
-    c1,c2,c3,c4,c5,c6,c7,c8=coefficient
+    c_more65 = coefficient[8:] + mag*0
+    #c_more65 = c_more65+mag*0 # expand it to size of mag
+
+    coefficient = where((mag + c_less65*0) >6.5, c_more65, c_less65)
+    
+    (c1, c2, c3, c4, c5, c6, c7, c8) = coefficient
     R = distance + c7*exp(c8*mag)
     
-    log_mean = (c1*F + c2 + c3*mag + c4*(8.5-mag)**(2.5)
-                +c5*log(R)+ c6*log(distance+2))
+    log_mean = c1*F + c2 + c3*mag + c4*(8.5-mag)**2.5 + c5*log(R)+ c6*log(distance+2)
 
-    s1,s2,s3=sigma_coefficient
+    (s1, s2, s3) = sigma_coefficient
     
-    log_sigma=where((mag+0*s1)>7.21,s3+0*mag,s1-s2*mag)
+    log_sigma = where((mag + 0*s1) > 7.21, s3+0*mag, s1-s2*mag)
+
     assert isfinite(log_mean).all()
-    return log_mean,log_sigma
+
+    return (log_mean, log_sigma)
 
 def Sadigh_97_distribution(**kwargs):
 
@@ -1175,84 +1198,93 @@ def Sadigh_97_distribution(**kwargs):
     # This function is called in Ground_motion_calculator.distribution_function
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
+
     mag = kwargs['mag']
     distance = kwargs['distance']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
     
-    num_sites,num_events=distance.shape[0:2]
-    num_periods=coefficient.shape[3]
-    assert coefficient.shape==(16,1,1,num_periods)
-    assert sigma_coefficient.shape==(3,1,1,num_periods)
-    assert mag.shape==(1,num_events,1)
-    assert distance.shape==(num_sites,num_events,1)
-    log_mean=zeros((num_sites,num_events,num_periods),dtype=float)
-    log_sigma=zeros((num_sites,num_events,num_periods),dtype=float)
+    (num_sites, num_events) = distance.shape[0:2]
+    num_periods = coefficient.shape[3]
 
-    coefficient=coefficient[:,0,0,:]
-    sigma_coefficient=sigma_coefficient[:,0,0,:]
-    mag=mag[0,:,0]
-    distance=distance[:,:,0]
-    code="""
-    double F;
+    assert coefficient.shape == (16,1,1,num_periods)
+    assert sigma_coefficient.shape == (3,1,1,num_periods)
+    assert mag.shape == (1,num_events,1)
+    assert distance.shape == (num_sites,num_events,1)
+
+    log_mean =zeros((num_sites, num_events, num_periods), dtype=float)
+    log_sigma =zeros((num_sites, num_events, num_periods), dtype=float)
+
+    coefficient = coefficient[:,0,0,:]
+    sigma_coefficient = sigma_coefficient[:,0,0,:]
+    mag = mag[0,:,0]
+    distance = distance[:,:,0]
+    code = """
+    double F = 1.0;
     double c1,c2,c3,c4,c5,c6,c7,c8;
     double s1,s2,s3;
     double m,d;
     double R;
-    F=1.0;
     int c_offset;
-    for (int i=0; i<num_sites; ++i){
-        for (int j=0; j<num_events; ++j){
-            m=mag(j);
-            d=distance(i,j);
-            
-            if (m>6.5){
+
+    for (int i=0; i < num_sites; ++i) {
+        for (int j=0; j < num_events; ++j) {
+            m = mag(j);
+            d = distance(i,j);
+
+            c_offset = (m > 6.5) ? 8 : 0;            
+#ifdef JUNK
+            if (m > 6.5)
                 c_offset=8;
-            }
-            else{
+            else
                 c_offset=0;
-            }
-            for (int k=0;k<num_periods;++k){
-                c1=coefficient((0+c_offset),k);
-                c2=coefficient((1+c_offset),k);
-                c3=coefficient((2+c_offset),k);
-                c4=coefficient((3+c_offset),k);
-                c5=coefficient((4+c_offset),k);
-                c6=coefficient((5+c_offset),k);
-                c7=coefficient((6+c_offset),k);
-                c8=coefficient((7+c_offset),k);
+#endif
+
+            for (int k=0; k < num_periods; ++k) {
+                c1 = coefficient((0 + c_offset), k);
+                c2 = coefficient((1 + c_offset), k);
+                c3 = coefficient((2 + c_offset), k);
+                c4 = coefficient((3 + c_offset), k);
+                c5 = coefficient((4 + c_offset), k);
+                c6 = coefficient((5 + c_offset), k);
+                c7 = coefficient((6 + c_offset), k);
+                c8 = coefficient((7 + c_offset), k);
                 
                 R = d + c7*exp(c8*m);
-                log_mean(i,j,k) = c1*F + c2 + c3*m+ c4*pow((8.5-m),2.5)
-                                  +c5*log(R)+ c6*log(d+2.0);
-                s1=sigma_coefficient(0,k);
-                s2=sigma_coefficient(1,k);
-                s3=sigma_coefficient(2,k);
-                
-                if (m>7.21){
-                    log_sigma(i,j,k)=s3;
-                }
-                else{
-                    log_sigma(i,j,k)=s1-s2*m;
-                }
+                log_mean(i, j, k) = c1*F + c2 + c3*m + c4*pow((8.5-m), 2.5) +
+                                        c5*log(R)+ c6*log(d+2.0);
+
+                s1 = sigma_coefficient(0, k);
+                s2 = sigma_coefficient(1, k);
+                s3 = sigma_coefficient(2, k);
+
+                log_sigma(i, j, k) = (m > 7.21) ? s3 : s1 - s2*m;
+#ifdef JUNK
+                if (m > 7.21)
+                    log_sigma(i, j, k) = s3;
+                else
+                    log_sigma(i, j, k) = s1 - s2*m;
+#endif
             }       
         }
     }
+
     return_val = 0;
     """
     try:
         weave.inline(code,
-                     ['num_sites','num_events','num_periods',
-                      'coefficient','sigma_coefficient',
-                      'mag','log_mean','distance','log_sigma'],
+                     ['num_sites', 'num_events', 'num_periods',
+                      'coefficient', 'sigma_coefficient',
+                      'mag', 'log_mean', 'distance', 'log_sigma'],
                      type_converters=weave.converters.blitz,
                      compiler='gcc')   
     except IOError:
         raise util.WeaveIOError 
 
     assert isfinite(log_mean).all()
-    return log_mean,log_sigma
+
+    return (log_mean, log_sigma)
 
 Sadigh_97_distance_type='Rupture'
 Sadigh_97_magnitude_type='Mw'
@@ -3890,6 +3922,8 @@ def Abrahamson08_distribution(**kwargs):
                     (AS08_PGA_a2 + AS08_PGA_a3*(Mw-AS08_PGA_c1))*log(R),
                 f_1)
 
+    del R
+
     #####
     # Hanging-Wall Term
     #####
@@ -3914,6 +3948,8 @@ def Abrahamson08_distribution(**kwargs):
 
     f_4 = AS08_PGA_a14*T1*T2*T3*T4*T5
 
+    del RxTest, T1, T2, T3, T4, T5
+
     #####
     # Shallow Site Response Term (Vs30 = 1100 m/sec)
     #####
@@ -3934,9 +3970,13 @@ def Abrahamson08_distribution(**kwargs):
     f_8 = AS08_PGA_a18*(Rrup - 100.0)*T6
     f_8 = where(Rrup < 100.0, 0.0, f_8)
 
+    del T6
+
     # PGA value for rock
 
     PGA_1100 = exp(f_1 + AS08_PGA_a12*Frv + AS08_PGA_a13*Fnm + AS08_PGA_a15*Fas + f_5  + Fhw*f_4 + f_6 + f_8)
+
+    del f_1, f_4, f_5, f_6, f_8
 
     # determine index of period for constant displacement calculation
 
@@ -3954,7 +3994,6 @@ def Abrahamson08_distribution(**kwargs):
     iTd2 = iTd1 + 1
     
     # unpack coefficients for the bracket periods
-
     (c1_iTd1, c4_iTd1, a3_iTd1, a4_iTd1, a5_iTd1, n_iTd1, c_iTd1, c2_iTd1,
      Vlin_iTd1, b_iTd1, a1_iTd1, a2_iTd1, a8_iTd1, a10_iTd1, a12_iTd1,
      a13_iTd1, a14_iTd1, a15_iTd1,
@@ -4047,6 +4086,8 @@ def Abrahamson08_distribution(**kwargs):
                     (a2T + a3T*(Mw-c1T))*log(R),
                 f_1)
 
+    del R
+
     # Calculation for Constant Displacement
 
     RTd1 = sqrt(Rrup**2 + c4_iTd1**2)
@@ -4058,6 +4099,8 @@ def Abrahamson08_distribution(**kwargs):
                        (a2_iTd1 + a3_iTd1*(Mw-c1_iTd1)) * log(RTd1),
                    f_1Td1)
 
+    del RTd1
+
     RTd2 = sqrt(Rrup**2 + c4_iTd2**2)
 
     f_1Td2 = (a1_iTd2 + a5_iTd2*(Mw-c1_iTd2) + a8_iTd2*(8.5-Mw)**2 +
@@ -4066,6 +4109,8 @@ def Abrahamson08_distribution(**kwargs):
                    a1_iTd2 + a4_iTd2*(Mw-c1_iTd2) + a8_iTd2*(8.5-Mw)**2 +
                        (a2_iTd2 + a3_iTd2*(Mw-c1_iTd2)) * log(RTd2),
                    f_1Td2)
+
+    del RTd2
 
     ######
     # Hanging-Wall Term
@@ -4096,6 +4141,8 @@ def Abrahamson08_distribution(**kwargs):
     f_4Td1 = a14_iTd1*T1*T2*T3*T4*T5
     f_4Td2 = a14_iTd2*T1*T2*T3*T4*T5
 
+    del RxTest, T1, T2, T3, T4, T5
+
     ######
     # Shallow Site Response Term for Rock (Vs30 = 1100 m/sec)
     ######
@@ -4105,10 +4152,14 @@ def Abrahamson08_distribution(**kwargs):
     V1 = where(Per <= 1.0, exp(8.0 - 0.795*log(Per/0.21)), V1)
     V1 = where(Per <= 0.5, 1500.0, V1)
 
+
     V30 = V1
     V30 = where(1100.0 < V1, Vs30+zeros(V30.shape), V30)
 
+
     f_5 = (a10T + bT*nT)*log(V30/VlinT)
+
+    del V1, V30
 
     # Calculation for Constant Displacement
 
@@ -4118,10 +4169,13 @@ def Abrahamson08_distribution(**kwargs):
     V1Td1 = where(T_iTd1 <= 0.5, 1500.0, V1Td1)
 
     V30Td1 = copy(V1Td1)
-    Vs30X = Vs30 + 0.0*V1Td1
+    #Vs30X = Vs30 + 0*V1Td1
+    Vs30X = Vs30 + ones(V1Td1.shape)
     V30Td1 = where(1100.0 < V1Td1, Vs30X, V30Td1)
 
     f_5Td1 = (a10_iTd1 + b_iTd1*n_iTd1)*log(V30Td1/Vlin_iTd1)
+
+    del V1Td1, V30Td1, Vs30X
 
     V1Td2 = ones(T_iTd2.shape) * 700.0
     V1Td2 = where(T_iTd2 < 2.0, exp(6.76 - 0.297*log(T_iTd2)), V1Td2)
@@ -4133,6 +4187,8 @@ def Abrahamson08_distribution(**kwargs):
 
     f_5Td2 = (a10_iTd2 + b_iTd2*n_iTd2)*log(V30Td2/Vlin_iTd2)
 
+    del V1Td2, V30Td2
+
     ######
     # Depth to top of Rupture Term
     ######
@@ -4141,6 +4197,7 @@ def Abrahamson08_distribution(**kwargs):
     XZtor = Ztor + zeros(f_6.shape)
     #f_6 = where(Ztor < 10.0, a16T*Ztor/10.0, f_6)
     f_6 = where(XZtor < 10.0, a16T*XZtor/10.0, f_6)
+    del XZtor
 
     # Calcuation for Constant Dispalcement
 
@@ -4162,6 +4219,7 @@ def Abrahamson08_distribution(**kwargs):
     XRrup = Rrup + zeros(f_8.shape)
     #f_8 = where(Rrup < 100.0, 0.0, f_8)
     f_8 = where(XRrup < 100.0, 0.0, f_8)
+    del XRrup
 
     # Calculation for Constant Displacement
 
@@ -4170,6 +4228,8 @@ def Abrahamson08_distribution(**kwargs):
 
     f_8Td2 = a18_iTd2*(Rrup - 100.0)*T6
     f_8Td2 = where(Rrup < 100.0, 0.0, f_8Td2)
+
+    del T6
 
     #####
     # Ground Motion on Rock Before Constant Displacement Adjustment
@@ -4184,6 +4244,10 @@ def Abrahamson08_distribution(**kwargs):
     Y_1100Td2 = exp(f_1Td2 + a12_iTd2*Frv + a13_iTd2*Fnm +
                     a15_iTd2*Fas + f_5Td2 + Fhw*f_4Td2 + f_6Td2 + f_8Td2)
 
+    del f_1Td1, f_1Td2
+    del f_6Td1, f_6Td2
+    del f_8Td1, f_8Td2
+
     #####
     # Ground Motion on Rock After Constant Displacement Adjustment
     #####
@@ -4195,11 +4259,15 @@ def Abrahamson08_distribution(**kwargs):
     Y_1100Td = Y_1100Td0*(Td/Per)**2
     Y_1100Td = where(Per <= Td, Y_1100, Y_1100Td)
 
+    del Y_1100, Y_1100Td0, Y_1100Td1, Y_1100Td2
+
     #####
     # Ground Motion on Local Site Conditions
     #####
 
     Y = exp(log(Y_1100Td) - f_5)
+
+    del Y_1100Td, f_5
 
     # Shallow Site Response Term
 
@@ -4218,6 +4286,8 @@ def Abrahamson08_distribution(**kwargs):
                 a10T*log(V30/VlinT) - bT*log(PGA_1100 + cT) +
                     bT*log(PGA_1100 + cT*(V30/VlinT)**nT),
                 f_5)
+
+    del XVs30
 
     # Soil Depth Term
 
@@ -4254,11 +4324,15 @@ def Abrahamson08_distribution(**kwargs):
                  a21*log((XZ10+c2T)/(XZ10_med+c2T)) + a22*log(XZ10/200.0),
                  f_10)
 
+    del Z10_med, e2, a22, a21Test, a21, XVs30, XZ10, XZ10_med, V1
+
     #####
     # Value of Ground Motion Parameter
     #####
 
     Y = exp(log(Y) + f_5 + f_10)
+
+    del f_5, f_10
 
     #####
     # CALCULATE ALEATORY UNCERTAINTY
@@ -4271,6 +4345,8 @@ def Abrahamson08_distribution(**kwargs):
                                  1.0/(PGA_1100 + cT)),
                   Alpha)
     
+    del V30
+
     #####
     # Intra-Event Standard Deviation
     #####
@@ -4295,6 +4371,8 @@ def Abrahamson08_distribution(**kwargs):
     sBAest = sqrt(s0Aest**2 - slnAF**2)
     sBYest = sqrt(s0Yest**2 - slnAF**2)
 
+    del s0Aest, s0Yest, XMw 
+
     # Measured Vs30
 
     s0Amea = ones(Mw.shape) * AS08_PGA_s2mea
@@ -4312,6 +4390,8 @@ def Abrahamson08_distribution(**kwargs):
 
     sBAmea = sqrt(s0Amea**2 - slnAF**2)
     sBYmea = sqrt(s0Ymea**2 - slnAF**2)
+
+    del s0Amea, s0Ymea, XMw
 
     #####
     # Inter-Event Standard Deviation
@@ -4333,25 +4413,33 @@ def Abrahamson08_distribution(**kwargs):
     tauBA = tau0A
     tauBY = tau0Y
 
+    del tau0A
+
     #####
     # Standard Deviation of Geometric Mean of ln Y
     #####
 
     Tau = sqrt(tau0Y**2 + (Alpha**2)*(tauBA**2) + 2.0*Alpha*rhoT*tauBY*tauBA)
 
+    del tau0Y, tauBA, tauBY
+
     # Estimated Vs30
 
     Sigest = sqrt(sBYest**2 + slnAF**2 + (Alpha**2)*(sBAest**2) +
                   2.0*Alpha*rhoT*sBYest*sBAest)
+    del sBAest, sBYest
 
     SigTest = sqrt(Sigest**2 + Tau**2)
 
-    # Measured Vs30
+    del Sigest, Tau
 
-    Sigmea = sqrt(sBYmea**2 + slnAF**2 + (Alpha**2)*(sBAmea**2) +
-                  2.0*Alpha*rhoT*sBYmea*sBAmea)
-
-    SigTmea = sqrt(Sigmea**2 + Tau**2)
+# unused
+#    # Measured Vs30
+#
+#    Sigmea = sqrt(sBYmea**2 + slnAF**2 + (Alpha**2)*(sBAmea**2) +
+#                  2.0*Alpha*rhoT*sBYmea*sBAmea)
+#
+#    SigTmea = sqrt(Sigmea**2 + Tau**2)
 
     # check result has right dimensions
     num_sites = Vs30.shape[0]
