@@ -2097,6 +2097,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         NUMPERIODS = 10
         NUMSITES = 1
 
+        NAMEWIDTH = 40
+
         print('Number of Sites = %d' % NUMSITES)
         print('Number of Events = %d' % NUMEVENTS)
         print('Number of Periods = %d' % NUMPERIODS)
@@ -2105,137 +2107,411 @@ class Test_ground_motion_interface(unittest.TestCase):
         # Toro_1997 model - generate test data
         distance = array([[[8.6602540]]*NUMEVENTS])
         mag = array([[[8.0]]*NUMEVENTS])
-        c1 = 1.0
-        c2 = 2.0
-        c3 = 3.0
-        c4 = 4.0
-        c5 = 5.0
-        c6 = 6.0
-        c7 = 5.0
-        coefficient = array([[[[c1]*NUMPERIODS]], [[[c2]*NUMPERIODS]],
-                             [[[c3]*NUMPERIODS]], [[[c4]*NUMPERIODS]],
-                             [[[c5]*NUMPERIODS]], [[[c6]*NUMPERIODS]],
-                             [[[c7]*NUMPERIODS]]])
+        coefficient = array([[[[1.0]*NUMPERIODS]], [[[2.0]*NUMPERIODS]],
+                             [[[3.0]*NUMPERIODS]], [[[4.0]*NUMPERIODS]],
+                             [[[5.0]*NUMPERIODS]], [[[6.0]*NUMPERIODS]],
+                             [[[7.0]*NUMPERIODS]]])
         sigma_coefficient = coefficient
-        
+       
+        name = 'Toro_1997 (python)' 
         start = time.time()
         for i in xrange(LOOP):
             Toro_1997_midcontinent_distribution_python(mag=mag,
                 distance=distance, coefficient=coefficient,
                 sigma_coefficient=sigma_coefficient)
         py_delta = time.time() - start
-        print('Toro_1997 (python) - %d iterations took %.3fs'
-              % (LOOP, py_delta))
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
 
+        name = 'Toro_1997 (weave)'
         start = time.time()
         for i in xrange(LOOP):
             Toro_1997_midcontinent_distribution(mag=mag, distance=distance,
                 coefficient=coefficient, sigma_coefficient=sigma_coefficient)
         delta = time.time() - start
-        print 'Toro_1997 (weave)  - %d iterations took %.3fs' % (LOOP, delta),
+        print '%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, delta),
         s = speedup(py_delta, delta)
         print('- Weave is %.2f times faster\n' % s)
 
         # Atkinson_Boore_97 model - generate test data
         distance = array([[[10]]*NUMEVENTS])
         mag = array([[[8.0]]*NUMEVENTS])
-
-        c1 = 1.0
-        c2 = 2.0
-        c3 = 3.0
-        c4 = 4.0
-
-        coefficient = array([[[[c1]*NUMPERIODS]], [[[c2]*NUMPERIODS]],
-                             [[[c3]*NUMPERIODS]], [[[c4]*NUMPERIODS]]])
+        coefficient = array([[[[1.0]*NUMPERIODS]], [[[2.0]*NUMPERIODS]],
+                             [[[3.0]*NUMPERIODS]], [[[4.0]*NUMPERIODS]]])
         sigma_coefficient = array([[[[3.0]*NUMPERIODS]]])
 
+        name = 'Atkinson_Boore_97 (python)'
         start = time.time()
         for i in xrange(LOOP):
             Atkinson_Boore_97_distribution_python(mag=mag, distance=distance,
                 coefficient=coefficient, sigma_coefficient=sigma_coefficient)
         py_delta = time.time() - start
-        print('Atkinson_Boore_97 (python) - %d iterations took %.3fs'
-              % (LOOP, py_delta))
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
 
+        name = 'Atkinson_Boore_97 (weave)'
         start = time.time()
         for i in xrange(LOOP):
             Atkinson_Boore_97_distribution(mag=mag, distance=distance,
                 coefficient=coefficient, sigma_coefficient=sigma_coefficient)
         delta = time.time() - start
-        print 'Atkinson_Boore_97 (weave)  - %d iterations took %.3fs' % (LOOP, delta),
+        print '%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, delta),
         s = speedup(py_delta, delta)
         print('- Weave is %.2f times faster\n' % s)
 
         # Sadigh_97 model - generate test data
         distance=array([[[10.0]]*NUMEVENTS])
         mag=array([[[7.0]]*NUMEVENTS])
+        coefficient=array([[[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]],
+                           [[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]],
+                           [[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]],
+                           [[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]],
+                           [[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]],
+                           [[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]],
+                           [[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]],
+                           [[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]]])
+        sigma_coefficient = array([[[[1.0]*NUMPERIODS]],
+                                   [[[1.0]*NUMPERIODS]],
+                                   [[[1.0]*NUMPERIODS]]])
 
-        F=1.0
-        r_z=10.0
-        Z_t=0.0
-        a=1.0
-        b=1.0
-        c=1.0
-        d=1.0
-        e=1.0
-        f=1.0
-        g=1.0
-        h=1.0
-        coefficient=array([[[[a]*NUMPERIODS]], [[[b]*NUMPERIODS]],
-                           [[[c]*NUMPERIODS]], [[[d]*NUMPERIODS]],
-                           [[[e]*NUMPERIODS]], [[[f]*NUMPERIODS]],
-                           [[[g]*NUMPERIODS]], [[[h]*NUMPERIODS]],
-                           [[[a]*NUMPERIODS]], [[[b]*NUMPERIODS]],
-                           [[[c]*NUMPERIODS]], [[[d]*NUMPERIODS]],
-                           [[[e]*NUMPERIODS]], [[[f]*NUMPERIODS]],
-                           [[[g]*NUMPERIODS]], [[[h]*NUMPERIODS]]])
-
-        s1=1.0
-        s2=1.0
-        s3=1.0
-        sigma_coefficient = array([[[[s1]*NUMPERIODS]],
-                                   [[[s2]*NUMPERIODS]],
-                                   [[[s3]*NUMPERIODS]]])
-
+        name = 'Sadigh_97 (python)'
         start = time.time()
         for i in xrange(LOOP):
             Sadigh_97_distribution_python(mag=mag, distance=distance,
                 coefficient=coefficient, sigma_coefficient=sigma_coefficient) 
         py_delta = time.time() - start
-        print('Sadigh_97 (python) - %d iterations took %.3fs'
-              % (LOOP, py_delta))
- 
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+
+        name = 'Sadigh_97 (weave)' 
         start = time.time()
         for i in xrange(LOOP):
             Sadigh_97_distribution(mag=mag, distance=distance,
                 coefficient=coefficient, sigma_coefficient=sigma_coefficient)
         delta = time.time() - start
-        print 'Sadigh_97 (weave)  - %d iterations took %.3fs' % (LOOP, delta),
+        print '%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, delta),
         s = speedup(py_delta, delta)
         print('- Weave is %.2f times faster\n' % s)
+
+        # mean_10_sigma_1 model - generate data
+        distance = zeros((NUMSITES, NUMEVENTS, NUMPERIODS))
+        coefficient = zeros((1, 1, 1, NUMPERIODS))
+
+        name = 'mean_10_sigma_1 (python)' 
+        start = time.time()
+        for i in xrange(LOOP):
+            mean_10_sigma_1_distribution(distance=distance, coefficient=coefficient)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Zhao_2006_intraslab model - generate data
+        period = 0.0
+        ML = numpy.array([[[5.0]]*NUMEVENTS])
+        R = numpy.array([[[1.0]]*NUMEVENTS])
+        h = numpy.array([[[100]]*NUMEVENTS])
+        Vs30 = numpy.array([[[760]*NUMSITES]])
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[1.1010]*NUMPERIODS]], [[[ -0.00564]*NUMPERIODS]], [[[0.0055]*NUMPERIODS]],
+                              [[[1.08]*NUMPERIODS]], [[[0.01412]*NUMPERIODS]], [[[ 2.6070]*NUMPERIODS]],
+                              [[[ -0.528]*NUMPERIODS]], [[[ 0.293]*NUMPERIODS]], [[[ 1.111]*NUMPERIODS]],
+                              [[[1.344]*NUMPERIODS]], [[[ 1.355]*NUMPERIODS]], [[[ 1.420]*NUMPERIODS]],
+                             [[[0.1392]*NUMPERIODS]], [[[ 0.1584]*NUMPERIODS]], [[[ -0.0529]*NUMPERIODS]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[0.604]*NUMPERIODS]], [[[0.321]*NUMPERIODS]]])
+
+        name = 'Zhao_2006_intraslab (python)' 
+        start = time.time()
+        for i in xrange(LOOP):
+            Zhao_2006_intraslab_distribution(periods=period, mag=ML,
+                                             distance=R, depth=h,
+                                             Vs30=Vs30, coefficient=coeffs,
+                                             sigma_coefficient=sigma_coeffs)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Zhao_2006_interface model - generate data
+        period = numpy.array([0.0]*NUMPERIODS)
+        ML = numpy.array([[[5.0]]*NUMEVENTS])
+        R = numpy.array([[[1.0]]*NUMEVENTS])
+        h = numpy.array([[[100]]*NUMEVENTS])
+        Vs30 = numpy.array([[[760]*NUMSITES]])
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[1.1010]*NUMPERIODS]], [[[ -0.00564]*NUMPERIODS]], [[[0.0055]*NUMPERIODS]],
+                              [[[1.08]*NUMPERIODS]], [[[0.01412]*NUMPERIODS]], [[[ 0]*NUMPERIODS]],
+                              [[[ 0.293]*NUMPERIODS]], [[[ 1.111]*NUMPERIODS]],
+                              [[[1.344]*NUMPERIODS]], [[[ 1.355]*NUMPERIODS]], [[[ 1.420]*NUMPERIODS]],
+                              [[[ 0.0]*NUMPERIODS]], [[[ 0.0]*NUMPERIODS]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[0.604]*NUMPERIODS]], [[[0.308]*NUMPERIODS]]])
+
+        name = 'Zhao_2006_interface (python)' 
+        start = time.time()
+        for i in xrange(LOOP):
+            Zhao_2006_interface_distribution(periods=period, mag=ML,
+                                             distance=R, depth = h,
+                                             Vs30=Vs30, coefficient=coeffs,
+                                             sigma_coefficient=sigma_coeffs)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Atkinson_2003_intraslab model - generate data
+        period = numpy.array([0.0]*NUMPERIODS)
+        ML = numpy.array([[[5.0]]*NUMEVENTS])
+        R = numpy.array([[[10.0]]*NUMEVENTS])
+        h = numpy.array([[[100]]*NUMEVENTS])
+        Vs30 = numpy.array([[[500]*NUMSITES]])
+        
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[-0.04713]*NUMPERIODS]], [[[0.1]*NUMPERIODS]], [[[-0.25]*NUMPERIODS]],
+                              [[[0.6909]*NUMPERIODS]], [[[0.0113]*NUMPERIODS]], [[[-0.00202]*NUMPERIODS]],
+                              [[[0.19]*NUMPERIODS]], [[[0.2400]*NUMPERIODS]], [[[0.2900]*NUMPERIODS]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[0.23]*NUMPERIODS]], [[[0.14]*NUMPERIODS]]])
+
+        name = 'Atkinson_2003_intraslab (python)'
+        start = time.time()
+        for i in xrange(LOOP):
+            Atkinson_2003_intraslab_distribution(periods=period, mag=ML,
+                                                 distance=R, depth=h,
+                                                 Vs30=Vs30, coefficient=coeffs,
+                                                 sigma_coefficient=sigma_coeffs)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Akkar_2010_crustal model - generate data
+        period = 0.0
+        ML = numpy.array([[[5.0]]*NUMEVENTS])
+        R = numpy.array([[[10.0]]*NUMEVENTS])
+        Vs30 = numpy.array([[[760]*NUMSITES]])
+        FT = numpy.array([[[0]]*NUMEVENTS])
+        
+
+        # get coeffs for this period (C1 -> C10 from table 6)
+        coeffs = numpy.array([[[[1.04159]*NUMPERIODS]], [[[0.91333]*NUMPERIODS]], [[[-0.08140]*NUMPERIODS]],
+                              [[[-2.92728]*NUMPERIODS]], [[[0.2812]*NUMPERIODS]], [[[ 7.86638]*NUMPERIODS]],
+                              [[[ 0.08753]*NUMPERIODS]], [[[ 0.01527]*NUMPERIODS]], [[[ -0.04189]*NUMPERIODS]],
+                              [[[0.08015]*NUMPERIODS]]])
+
+        # sigma coefficients for this period (C11 -> C13 from table 6)
+        sigma_coeffs = numpy.array([[[[0.261]*NUMPERIODS]], [[[0.0994]*NUMPERIODS]]])
+
+        name = 'Akkar_2010_crustal (python)'
+        start = time.time()
+        for i in xrange(LOOP):
+            Akkar_2010_crustal_distribution(periods=period, mag=ML, distance=R,
+                                            fault_type=FT, Vs30=Vs30,
+                                            coefficient=coeffs,
+                                            sigma_coefficient=sigma_coeffs)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Youngs_97 model - generate data
+        mag = array([[[7.0]]*NUMEVENTS])
+        distance = array([[[10.0]]*NUMEVENTS])
+        r_z = array([[[10.0]]*NUMEVENTS])
+        coefficient = array([[[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]], [[[0.0]*NUMPERIODS]]])
+        sigma_coefficient = array([[[[1.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]]])
+       
+        name = 'Youngs_97 (python)' 
+        start = time.time()
+        for i in xrange(LOOP):
+            Youngs_97_distribution_python(mag=mag, distance=distance,
+                                          coefficient=coefficient,
+                                          sigma_coefficient=sigma_coefficient,
+                                          depth=r_z)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+        
+        # Boore_08 model - generate data
+        mag=7.0
+        distance = array([[[4]]*NUMEVENTS])
+        mag = array([[[5.5]]*NUMEVENTS])
+        Vs30 = array([[[100.0]*NUMSITES]])
+        fault_type = array([[[0]]*NUMEVENTS]) # 'reverse' -> use e4 value, of 4.
+        coefficient = array([[[[1.0]*NUMPERIODS]], [[[2.0]*NUMPERIODS]], [[[3.0]*NUMPERIODS]], [[[3.0]*NUMPERIODS]],
+                             [[[1.0]*NUMPERIODS]], [[[2.0]*NUMPERIODS]], [[[3.0]*NUMPERIODS]], [[[4.0]*NUMPERIODS]],
+                             [[[5.0]*NUMPERIODS]], [[[6.0]*NUMPERIODS]], [[[7.0]*NUMPERIODS]], [[[6.75]*NUMPERIODS]],
+                             [[[2.0]*NUMPERIODS]], [[[2.0]*NUMPERIODS]], [[[2.0]*NUMPERIODS]], [[[2.0]*NUMPERIODS]],
+                             [[[2.0]*NUMPERIODS]], [[[2.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]], [[[2.0]*NUMPERIODS]]])
+        sigma_coefficient = array([[[[3.0]*NUMPERIODS]]])
+       
+        name = 'Boore_08 (python)' 
+        start = time.time()
+        for i in xrange(LOOP):
+            Boore_08_distribution(mag=mag, distance=distance,
+                                  coefficient=coefficient,
+                                  sigma_coefficient=sigma_coefficient,
+                                  Vs30=Vs30, fault_type=fault_type)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+        
+        # Somerville09 model - generate data
+        mag = numpy.array([[[5.4]]*NUMEVENTS])
+        distance = numpy.array([[[4.3125572498396156]]*NUMEVENTS])
+        coefficient = numpy.array([[[[0.0]*NUMPERIODS]], [[[1.0]*NUMPERIODS]],
+                                   [[[2.0]*NUMPERIODS]], [[[3.0]*NUMPERIODS]],
+                                   [[[4.0]*NUMPERIODS]], [[[5.0]*NUMPERIODS]],
+                                   [[[6.0]*NUMPERIODS]], [[[7.0]*NUMPERIODS]]])
+
+        name = 'Somerville09_log_mean (python)'
+        start = time.time()
+        for i in xrange(LOOP):
+            Somerville09_log_mean(coefficient, mag, distance)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Liang_2008_distribution model - generate data
+        period = 10.0
+        ML = numpy.array([[[4.0]]*NUMEVENTS])
+        R = numpy.array([[[50.0]]*NUMEVENTS])
+        coeffs = numpy.array([[[[-10.565]*NUMPERIODS]],[[[2.380]*NUMPERIODS]],[[[-0.019]*NUMPERIODS]],
+                              [[[-0.395]*NUMPERIODS]],[[[0.044]*NUMPERIODS]]])
+        sigma_coeffs = numpy.array([[[[1.166]*NUMPERIODS]],[[[1.166]*NUMPERIODS]]])
+
+        name = 'Liang_2008 (python)'
+        start = time.time()
+        for i in xrange(LOOP):
+            Liang_2008_distribution(coefficient=coeffs,
+                                    sigma_coefficient=sigma_coeffs,
+                                    mag=ML, distance=R)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Atkinson06_hard_bedrock_distribution model - generate data
+        period = 1.0
+        ML = numpy.array([[[5.5]]*NUMEVENTS])
+        R = numpy.array([[[100.0]]*NUMEVENTS])
+        coeffs = numpy.array([[[[-5.27e+0]*NUMPERIODS]],[[[2.26e+0]*NUMPERIODS]],[[[-1.48e-1]*NUMPERIODS]],
+                              [[[-2.07e+0]*NUMPERIODS]],[[[1.50e-1]*NUMPERIODS]],[[[-8.13e-1]*NUMPERIODS]],
+                              [[[ 4.67e-2]*NUMPERIODS]],[[[8.26e-1]*NUMPERIODS]],[[[-1.62e-1]*NUMPERIODS]],
+                              [[[-4.86e-4]*NUMPERIODS]],[[[0]*NUMPERIODS]],[[[0]*NUMPERIODS]],[[[0]*NUMPERIODS]]])
+        sigma = 0.30
+        sigma_coeffs = numpy.array([[[[sigma]*NUMPERIODS]],[[[sigma]*NUMPERIODS]]])
+
+        name = 'Atkinson06_hard_bedrock (python)'
+        start = time.time()
+        for i in xrange(LOOP):
+            Atkinson06_hard_bedrock_distribution(coefficient=coeffs,
+                                                 sigma_coefficient=sigma_coeffs,
+                                                 mag=ML, distance=R)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Atkinson06_soil model - generate data
+        period = 1.0
+        ML = numpy.array([[[7.5]]*NUMEVENTS])
+        R = numpy.array([[[100.0]]*NUMEVENTS])
+        Vs30 = numpy.array([400.0]*NUMSITES)
+        coeffs = numpy.array([[[[-5.27e+0]*NUMPERIODS]],[[[2.26e+0]*NUMPERIODS]],[[[-1.48e-1]*NUMPERIODS]],
+                              [[[-2.07e+0]*NUMPERIODS]],[[[1.50e-1]*NUMPERIODS]],[[[-8.13e-1]*NUMPERIODS]],
+                              [[[ 4.67e-2]*NUMPERIODS]],[[[8.26e-1]*NUMPERIODS]],[[[-1.62e-1]*NUMPERIODS]],
+                              [[[-4.86e-4]*NUMPERIODS]],
+                              [[[-0.7]*NUMPERIODS]],[[[-0.44]*NUMPERIODS]],[[[0]*NUMPERIODS]]])
+        sigma_coeffs = numpy.array([[[[0.30]*NUMPERIODS]],[[[0.30]*NUMPERIODS]]])
+
+        name = 'Atkinson06_soil (python)'
+        start = time.time()
+        for i in xrange(LOOP):
+            Atkinson06_soil_distribution(coefficient=coeffs,
+                                         sigma_coefficient=sigma_coeffs,
+                                         mag=ML, distance=R, Vs30=Vs30)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Atkinson06_bc_boundary_bedrock model - generate data
+        period = 1.0
+        ML = numpy.array([[[5.5]]*NUMEVENTS])
+        R = numpy.array([[[100.0]]*NUMEVENTS])
+        coeffs = numpy.array([[[[-5.06E+00]*NUMPERIODS]],[[[2.23E+00]*NUMPERIODS]],[[[-1.45E-01]*NUMPERIODS]],
+                              [[[-2.03E+00]*NUMPERIODS]],[[[1.41E-01]*NUMPERIODS]],[[[-8.74E-01]*NUMPERIODS]],
+                              [[[5.41E-02]*NUMPERIODS]],[[[7.92E-01]*NUMPERIODS]],[[[-1.70E-01]*NUMPERIODS]],
+                              [[[-4.89E-04]*NUMPERIODS]],[[[0]*NUMPERIODS]],[[[0]*NUMPERIODS]],[[[0]*NUMPERIODS]]])
+        sigma = 0.30
+        sigma_coeffs = numpy.array([[[[0.30]*NUMPERIODS]],[[[0.30]*NUMPERIODS]]])
+
+        name = 'Atkinson06_bc_boundary_bedrock (python)'
+        start = time.time()
+        for i in xrange(LOOP):
+            Atkinson06_bc_boundary_bedrock(coefficient=coeffs,
+                                           sigma_coefficient=sigma_coeffs,
+                                           mag=ML, distance=R)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
+
+        # Chiou08 model - generate test data
+        period = 0.01
+        ML = numpy.array([[[4.0]]*NUMEVENTS])
+        R = numpy.array([[5.0]*NUMEVENTS])
+        Vs30 = numpy.array([300.0]*NUMSITES)
+        fault_type = numpy.array([[[2]]*NUMEVENTS], dtype=int)
+        dip = numpy.array([[[90.0]]*NUMEVENTS])
+        Ztor = numpy.array([[[0.0]]*NUMEVENTS])
+        coeffs = numpy.array([[[[1.06]*NUMPERIODS]],[[[3.45]*NUMPERIODS]],[[[-2.1]*NUMPERIODS]],
+                              [[[-0.5]*NUMPERIODS]],[[[50.0]*NUMPERIODS]],[[[3.0]*NUMPERIODS]],
+                              [[[4.0]*NUMPERIODS]],[[[-1.2687]*NUMPERIODS]],[[[0.1000]*NUMPERIODS]],
+                              [[[-0.2550]*NUMPERIODS]],[[[2.996]*NUMPERIODS]],[[[4.1840]*NUMPERIODS]],
+                              [[[6.1600]*NUMPERIODS]],[[[0.4893]*NUMPERIODS]],[[[0.0512]*NUMPERIODS]],
+                              [[[0.0860]*NUMPERIODS]],[[[0.7900]*NUMPERIODS]],[[[1.5005]*NUMPERIODS]],
+                              [[[-0.3218]*NUMPERIODS]],[[[-0.00804]*NUMPERIODS]],[[[-0.00785]*NUMPERIODS]],
+                              [[[-0.4417]*NUMPERIODS]],[[[-0.1417]*NUMPERIODS]],[[[-0.007010]*NUMPERIODS]],
+                              [[[0.102151]*NUMPERIODS]],[[[0.2289]*NUMPERIODS]],[[[0.014996]*NUMPERIODS]],
+                              [[[580.0]*NUMPERIODS]],[[[0.0700]*NUMPERIODS]]])
+        sigma_coeffs = numpy.array([[[[0.3437]*NUMPERIODS]],[[[0.2637]*NUMPERIODS]],[[[0.4458]*NUMPERIODS]],
+                                    [[[0.3459]*NUMPERIODS]],[[[0.8000]*NUMPERIODS]],[[[0.0663]*NUMPERIODS]]])
+
+        # a fake dist_object class
+        # assume Rrup & Rx = the R value
+        class DistObj(object):
+            def __init__(self, R):
+                self.Rupture = numpy.array(R)
+                self.Joyner_Boore = numpy.array(R)
+                self.Horizontal = numpy.array(R)
+        distances = DistObj(R)
+
+        name = 'Chiou08 (python)'
+        start = time.time()
+        for i in xrange(LOOP):
+             Chiou08_distribution(mag=ML, dist_object=distances,
+                                  fault_type=fault_type, dip=dip,
+                                  depth_to_top=Ztor, Vs30=Vs30,
+                                  coefficient=coeffs,
+                                  sigma_coefficient=sigma_coeffs)
+        py_delta = time.time() - start
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
+        print('')
 
         # Campbell03 model - generate test data
         period = 0.2
         ML = numpy.array([[[7.0]]*NUMEVENTS])
         R = numpy.array([[[10.0]]*NUMEVENTS])
-
-        # get coeffs for this period (C1 -> C10 from table 6)
         coeffs = numpy.array([[[[-0.432800]*NUMPERIODS]], [[[ 0.617000]*NUMPERIODS]], [[[-0.058600]*NUMPERIODS]],
                               [[[-1.320000]*NUMPERIODS]], [[[-0.004600]*NUMPERIODS]], [[[ 0.000337]*NUMPERIODS]],
                               [[[ 0.399000]*NUMPERIODS]], [[[ 0.493000]*NUMPERIODS]], [[[ 1.250000]*NUMPERIODS]],
                               [[[-0.928000]*NUMPERIODS]]])
-
-        # sigma coefficients for this period (C11 -> C13 from table 6)
         sigma_coeffs = numpy.array([[[[1.077]*NUMPERIODS]], [[[-0.0838]*NUMPERIODS]], [[[0.478]*NUMPERIODS]]])
 
+        name = 'Campbell03 (python)'
         start = time.time()
         for i in xrange(LOOP):
             Campbell03_distribution(mag=ML, distance=R,
                                     coefficient=coeffs,
                                     sigma_coefficient=sigma_coeffs)
         py_delta = time.time() - start
-        print('Campbell03 (python) - %d iterations took %.3fs'
-              % (LOOP, py_delta))
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
         print('')
 
         # Campbell08 model - generate test data
@@ -2256,73 +2532,23 @@ class Test_ground_motion_interface(unittest.TestCase):
         fault_type = numpy.array([[[0]]*NUMEVENTS], dtype=int)	# RV
         Vs30 = numpy.array([760.0]*NUMSITES)
         Z25 = numpy.array([conversions.convert_Vs30_to_Z25(760.0)]*NUMSITES)
-
-        # get coeffs for this period (C0 -> K3 from table 2)
         coeffs = numpy.array([[[[-1.715]*NUMPERIODS]], [[[0.500]*NUMPERIODS]],  [[[-0.530]*NUMPERIODS]],
                               [[[-0.262]*NUMPERIODS]], [[[-2.118]*NUMPERIODS]], [[[0.170]*NUMPERIODS]],
                               [[[5.60]*NUMPERIODS]],   [[[0.280]*NUMPERIODS]],  [[[-0.120]*NUMPERIODS]],
                               [[[0.490]*NUMPERIODS]],  [[[1.058]*NUMPERIODS]],  [[[0.040]*NUMPERIODS]],
                               [[[0.610]*NUMPERIODS]],  [[[865]*NUMPERIODS]],    [[[-1.186]*NUMPERIODS]],
                               [[[1.839]*NUMPERIODS]],  [[[1.88]*NUMPERIODS]],   [[[1.18]*NUMPERIODS]]])
-
-        # sigma coefficients for this period (ElnY -> rho from table 3)
         sigma_coeffs = numpy.array([[[[0.478]*NUMPERIODS]], [[[0.219]*NUMPERIODS]], [[[0.300]*NUMPERIODS]],
                                     [[[0.166]*NUMPERIODS]], [[[1.000]*NUMPERIODS]]])
 
+        name = 'Campbell08 (python)'
         start = time.time()
         for i in xrange(LOOP):
             Campbell08_distribution(dist_object=dist_object, mag=M, periods=periods,
                                     depth_to_top=depth, fault_type=fault_type, dip=dip, Vs30=Vs30,
                                     Z25=Z25, coefficient=coeffs, sigma_coefficient=sigma_coeffs)
         py_delta = time.time() - start
-        print('Campbell08 (python) - %d iterations took %.3fs'
-              % (LOOP, py_delta))
-        print('')
-
-        # Chiou08 model - generate test data
-        period = 0.01
-        ML = numpy.array([[[4.0]]*NUMEVENTS])
-        R = numpy.array([[5.0]*NUMEVENTS])
-        Vs30 = numpy.array([300.0]*NUMSITES)
-        fault_type = numpy.array([[[2]]*NUMEVENTS], dtype=int)
-        dip = numpy.array([[[90.0]]*NUMEVENTS])
-        Ztor = numpy.array([[[0.0]]*NUMEVENTS])
-
-        # get coeffs for this period
-        coeffs = numpy.array([[[[1.06]*NUMPERIODS]],[[[3.45]*NUMPERIODS]],[[[-2.1]*NUMPERIODS]],
-                              [[[-0.5]*NUMPERIODS]],[[[50.0]*NUMPERIODS]],[[[3.0]*NUMPERIODS]],
-                              [[[4.0]*NUMPERIODS]],[[[-1.2687]*NUMPERIODS]],[[[0.1000]*NUMPERIODS]],
-                              [[[-0.2550]*NUMPERIODS]],[[[2.996]*NUMPERIODS]],[[[4.1840]*NUMPERIODS]],
-                              [[[6.1600]*NUMPERIODS]],[[[0.4893]*NUMPERIODS]],[[[0.0512]*NUMPERIODS]],
-                              [[[0.0860]*NUMPERIODS]],[[[0.7900]*NUMPERIODS]],[[[1.5005]*NUMPERIODS]],
-                              [[[-0.3218]*NUMPERIODS]],[[[-0.00804]*NUMPERIODS]],[[[-0.00785]*NUMPERIODS]],
-                              [[[-0.4417]*NUMPERIODS]],[[[-0.1417]*NUMPERIODS]],[[[-0.007010]*NUMPERIODS]],
-                              [[[0.102151]*NUMPERIODS]],[[[0.2289]*NUMPERIODS]],[[[0.014996]*NUMPERIODS]],
-                              [[[580.0]*NUMPERIODS]],[[[0.0700]*NUMPERIODS]]])
-
-        # sigma coefficients - these are static
-        sigma_coeffs = numpy.array([[[[0.3437]*NUMPERIODS]],[[[0.2637]*NUMPERIODS]],[[[0.4458]*NUMPERIODS]],
-                                    [[[0.3459]*NUMPERIODS]],[[[0.8000]*NUMPERIODS]],[[[0.0663]*NUMPERIODS]]])
-
-        # a fake dist_object class
-        # assume Rrup & Rx = the R value
-        class DistObj(object):
-            def __init__(self, R):
-                self.Rupture = numpy.array(R)
-                self.Joyner_Boore = numpy.array(R)
-                self.Horizontal = numpy.array(R)
-        distances = DistObj(R)
-
-        start = time.time()
-        for i in xrange(LOOP):
-             Chiou08_distribution(mag=ML, dist_object=distances,
-                                  fault_type=fault_type, dip=dip,
-                                  depth_to_top=Ztor, Vs30=Vs30,
-                                  coefficient=coeffs,
-                                  sigma_coefficient=sigma_coeffs)
-        py_delta = time.time() - start
-        print('Chiou08 (python) - %d iterations took %.3fs'
-              % (LOOP, py_delta))
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
         print('')
 
         # Abrahamson08 model - generate test data
@@ -2345,20 +2571,17 @@ class Test_ground_motion_interface(unittest.TestCase):
         fault_type = numpy.array([[[2]]*NUMEVENTS], dtype=int)	# strike_slip
         Vs30 = numpy.array([760.0]*NUMSITES)
         width = numpy.array([[[10.0]]*NUMEVENTS])
-
-        # get coeffs for this period
         coeffs = numpy.array([[[[6.75]*NUMPERIODS]],[[[4.5]*NUMPERIODS]],[[[0.265]*NUMPERIODS]],[[[-0.231]*NUMPERIODS]],
                               [[[-0.398]*NUMPERIODS]],[[[1.18]*NUMPERIODS]],[[[1.88]*NUMPERIODS]],[[[50.0]*NUMPERIODS]],
                               [[[748.2]*NUMPERIODS]],[[[-2.188]*NUMPERIODS]], [[[1.6870]*NUMPERIODS]],
                               [[[-0.9700]*NUMPERIODS]],[[[-0.0396]*NUMPERIODS]], [[[2.0773]*NUMPERIODS]],
                               [[[0.0309]*NUMPERIODS]],[[[-0.0600]*NUMPERIODS]],[[[1.1274]*NUMPERIODS]],
                               [[[-0.3500]*NUMPERIODS]], [[[0.9000]*NUMPERIODS]],[[[-0.0083]*NUMPERIODS]]])
-
-        # sigma coefficients for this period (S1 -> rho from table 6)
         sigma_coeffs = numpy.array([[[[0.630]*NUMPERIODS]],[[[0.514]*NUMPERIODS]],[[[0.614]*NUMPERIODS]],
                                     [[[0.495]*NUMPERIODS]],[[[0.520]*NUMPERIODS]],[[[0.329]*NUMPERIODS]],
                                     [[[0.874]*NUMPERIODS]]])
 
+        name = 'Abrahamson08 (python)'
         start = time.time()
         for i in xrange(LOOP):
             Abrahamson08_distribution(dist_object=dist_object, mag=ML, periods=periods,
@@ -2366,14 +2589,18 @@ class Test_ground_motion_interface(unittest.TestCase):
                                       dip=dip, Vs30=Vs30, coefficient=coeffs,
                                       sigma_coefficient=sigma_coeffs)
         py_delta = time.time() - start
-        print('Abrahamson08 (python) - %d iterations took %.3fs'
-              % (LOOP, py_delta))
+        print('%-*s %d iterations took %.3fs' % (NAMEWIDTH, name, LOOP, py_delta))
         print('')
- 
 
 ################################################################################
 
 if __name__ == "__main__":
+    """The idea here is that if you want to run just the test_xyz() test, do:
+        python test_ground_motion_interface.py test_xyz
+
+    There is no need to edit the code below to run just one test.
+    """
+
     import sys
 
     def usage():
