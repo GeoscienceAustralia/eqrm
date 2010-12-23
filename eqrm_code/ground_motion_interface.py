@@ -3884,7 +3884,6 @@ def Abrahamson08_distribution(**kwargs):
     Rx = Rx[:,:,newaxis]
     Per = array(Per)[newaxis,newaxis,:]
     Vs30 = array(Vs30)[:,newaxis,newaxis]
-# middle axis must go to 'num_events'
 
     # get Z1.0 value from Vs30 (Z10 will be supplied if testing)
     if Z10 is None:
