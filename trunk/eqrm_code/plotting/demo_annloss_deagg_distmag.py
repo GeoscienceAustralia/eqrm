@@ -6,6 +6,8 @@ Copyright 2010 by Geoscience Australia
 
 """
 
+import sys
+
 from eqrm_code.plotting import plot_api
 from eqrm_code.eqrm_filesystem import Demo_Output_ProbRisk_Path
 
@@ -19,10 +21,10 @@ range_bins = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45,
 Zlim = [0, 8]
 R_extend_flag=True
 
-title = ''
-output_file = 'fig_from_annloss_deagg_distmag'
+title = 'demo_annloss_deagg_distmag.py'
+output_file = 'demo_annloss_deagg_distmag.png'
 grid = None
-show_graph = False
+show_graph = len(sys.argv) > 1
 annotate = None
 
 plot_api.fig_annloss_deagg_distmag(input_dir, site_tag, momag_labels,

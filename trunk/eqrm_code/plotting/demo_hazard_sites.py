@@ -7,6 +7,8 @@ Copyright 2010 by Geoscience Australia
 
 """
 
+import sys
+
 from eqrm_code.plotting import plot_api
 from eqrm_code.eqrm_filesystem import Demo_Output_PlotProbHaz_Path
 
@@ -16,14 +18,14 @@ site_tag = 'newc'
 
 soil_amp = True
 title = 'demo_hazard_sites.py'
-plot_file = 'fig_from_demo_hazard_sites.png'
+plot_file = 'demo_hazard_sites.png'
 save_file = None
 # override X range to show how it is done
 xrange = 1.1
 # leave space at top for legend (data makes Y range be (0.1,0.9))
 #yrange = (0.1, 1.5)
 yrange = None
-show_graph = False
+show_graph = len(sys.argv) > 1
 show_grid = True
 # default placement overridden
 legend_placement = 'upper right'

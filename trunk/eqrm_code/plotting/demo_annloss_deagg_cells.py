@@ -15,13 +15,13 @@ site_tag = 'newc'
 
 title = 'demo_annloss_deagg_cells.py'
 output_dir = '.'
-output_file = 'fig_from_demo_annloss_deagg_cells.png'
+output_file = 'demo_annloss_deagg_cells.png'
 save_file = None
 np_posn = 'nw'
 s_posn = 'se'
 cb_steps = []		# discrete colourbar, code chooses breaks
 colourmap = 'hazmap'
-cb_label = 'Annualised loss as a percentage of total value, %'
+cb_label = 'Annualised loss as a percentage of total value (%)'
 annotate = []
 
 plot_api.fig_annloss_deagg_cells(input_dir, site_tag,

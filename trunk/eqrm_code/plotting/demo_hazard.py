@@ -19,8 +19,7 @@ return_period = 7500
 period = 1.0
 
 title = 'demo_hazard.py'
-output_dir = '.'
-plot_file = 'fig_from_demo_hazard.png'
+plot_file = 'demo_hazard.png'
 save_file = None
 np_posn = 'nw'
 #np_posn = (151.35, -32.82)
@@ -32,7 +31,7 @@ cb_label = 'Acceleration (g)'
 annotate = []
 
 plot_api.fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
-                     output_dir, plot_file=plot_file, save_file=save_file,
+                     plot_file=plot_file, save_file=save_file,
                      title=title, np_posn=np_posn, s_posn=s_posn,
                      cb_steps=cb_steps, annotate=annotate,
                      colourmap=colourmap, cb_label=cb_label)
