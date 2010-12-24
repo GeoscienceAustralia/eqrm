@@ -32,7 +32,7 @@ from eqrm_code.plotting import calc_pml
 from eqrm_code.plotting import calc_annloss
 
 
-def fig_hazard(input_dir, site_tag, soil_amp, return_period, period, output_dir,
+def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
                 plot_file=None, save_file=None, title=None, np_posn=None,
                 s_posn=None, cb_steps=None, colourmap=None, cb_label=None,
                 annotate=[]):
@@ -44,7 +44,6 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period, output_dir,
                   False for the bedrock results.
     return_period event return period
     period        period of the event
-    output_dir    directory for output file(s)
     plot_file     full filename for generated plot file (*.png, *.eps, etc)
     save_file     full filename for saved plot data
 
@@ -83,7 +82,7 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period, output_dir,
 
 
 def fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period, period,
-                          output_dir, plot_file=None, save_file=None,
+                          plot_file=None, save_file=None,
                           title=None, np_posn=None, s_posn=None, cb_steps=None,
                           colourmap=None, cb_label=None, annotate=[]):
     """Plot an earthquake hazard map, from probabalistic data.
@@ -95,7 +94,6 @@ def fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period, period,
                   False for the bedrock results.
     return_period event return period
     period        period of the event
-    output_dir    directory for output file(s)
     plot_file     full filename for generated plot file (*.png, *.eps, etc)
     save_file     full filename for saved plot data
 
@@ -167,7 +165,11 @@ def fig_loss_exceedance(input_dir, site_tag, title='',
     total_building_value = results[1]
 
     # Load in the event activity
-    out_dict = om.load_event_set_subset(input_dir, site_tag)
+######
+# NOTE: load_event_set_subset() changed to obsolete_load_event_set_subset()
+######
+    #out_dict = om.load_event_set_subset(input_dir, site_tag)
+    out_dict = om.obsolete_load_event_set_subset(input_dir, site_tag)
     event_activity = out_dict['event_activity']
 
     # Do calculations
@@ -221,7 +223,11 @@ def fig_annloss_deagg_distmag(input_dir, site_tag, momag_labels,
     total_building_value = results[1]
 
     # Load in the event activity, mag and distance
-    out_dict = om.load_event_set_subset(input_dir, site_tag)
+######
+# NOTE: load_event_set_subset() changed to obsolete_load_event_set_subset()
+######
+    #out_dict = om.load_event_set_subset(input_dir, site_tag)
+    out_dict = om.obsolete_load_event_set_subset(input_dir, site_tag)
     event_activity = out_dict['event_activity']
     Mw = out_dict['Mw']
     distance = om.load_distance(input_dir, site_tag, True)
@@ -261,7 +267,11 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
     lat = results[3]
 
     # Load in the event activity
-    out_dict = om.load_event_set_subset(input_dir, site_tag)
+######
+# NOTE: load_event_set_subset() changed to obsolete_load_event_set_subset()
+######
+    #out_dict = om.load_event_set_subset(input_dir, site_tag)
+    out_dict = om.obsolete_load_event_set_subset(input_dir, site_tag)
     event_activity = out_dict['event_activity']
 
     # Run annualised loss calc and bin data
@@ -286,7 +296,7 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
 
 
 def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
-                      plotfile, savefile=None,
+                      plot_file=None, savefile=None,
                       title=None, xlabel=None, ylabel=None,
                       xrange=None, yrange=None,
                       bins=100, bardict=None, show_graph=False):
@@ -297,8 +307,8 @@ def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
     soil_amp       soil/bedrock switch - True means soil, False means bedrock
     period         the RSA period to be plotted
     return_period  the data return period
-    plotfile       name of plot output file to create in 'output_dir' directory
-    savefile       name of data output file to create in 'output_dir' directory
+    plot_file      path to plot output file to create (*.png, etc)
+    savefile       name of data output file to create
     title          title to put on the graph
     xlabel         text of X axis label
     ylabel         text of Y axis label
@@ -326,9 +336,15 @@ def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
         f.close()
 
     # plot the data
-    if plotfile:
+    if plot_file:
+        # default some of the labels
         if title is None:
             title = ''          #######  needs work!
+
+        if xlabel is None:
+            xlabel = ''
+        if ylabel is None:
+            ylabel = 'Count'
 
         # now generate histogrammed data
         (hist_data, xedges) = scipy.histogram(data, bins=bins, normed=False)
@@ -360,8 +376,7 @@ def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
                               'Y range forced to (%.2f,%.2f)' % yrange))
 
         # actually plot the thing
-        plot_outfile = os.path.join(input_dir, plotfile)
-        pb.plot_barchart(data, plot_outfile, title=title,
+        pb.plot_barchart(data, plot_file, title=title,
                          xlabel=xlabel, ylabel=ylabel,
                          bin_width=bin_width,
                          xrange=xrange, yrange=yrange,
@@ -374,7 +389,7 @@ def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
 fig_motion_function_map = {'mean': numpy.mean,
                            'median': numpy.median}
 
-def fig_motion(input_dir, site_tag, soil_amp, period, output_dir,
+def fig_motion(input_dir, site_tag, soil_amp, period,
                collapse_function=None, plot_file=None, save_file=None,
                title=None, np_posn=None, s_posn=None, cb_steps=None,
                colourmap=None, cb_label=None, annotate=[], show_graph=False):
@@ -384,10 +399,9 @@ def fig_motion(input_dir, site_tag, soil_amp, period, output_dir,
     site_tag           overall site identifier
     soil_amp           soil/bedrock switch - True means soil, False means bedrock
     period             the RSA period to be plotted
-    output_dir         path to directory to save files in (UNUSED?)
     collapse_function  string defining function used to collapse site values
                        ('mean' or 'medium', default is 'mean')
-    plot_file          name of plot output file to create
+    plot_file          path to plot output file to create (*.png, etc)
     save_file          path to file to save plot data in (UNUSED?)
     title              title to put on the graph
     np_posn            north pointer placement data
@@ -425,7 +439,7 @@ def fig_motion(input_dir, site_tag, soil_amp, period, output_dir,
     try:
         SA = func(SA, axis=1)
     except:
-        msg = 'Exception?'
+        msg = 'Exception calling function: %s' % str(func)
         raise Exception(msg)
 
     # now combine collapsed SA, lat and lon into list of (x, y, z) tuples
@@ -453,7 +467,7 @@ def fig_motion(input_dir, site_tag, soil_amp, period, output_dir,
                                   annotate=annotate)
 
 
-def fig_motion_continuous(input_dir, site_tag, soil_amp, period, output_dir,
+def fig_motion_continuous(input_dir, site_tag, soil_amp, period,
                           collapse_function=None, plot_file=None,
                           save_file=None, title=None, np_posn=None, s_posn=None,
                           cb_steps=None, colourmap=None, cb_label=None,
@@ -464,10 +478,9 @@ def fig_motion_continuous(input_dir, site_tag, soil_amp, period, output_dir,
     site_tag           overall site identifier
     soil_amp           soil/bedrock switch - True means soil, False means bedrock
     period             the RSA period to be plotted
-    output_dir         path to directory to save files in (UNUSED?)
     collapse_function  string defining function used to collapse site values
                        ('mean' or 'medium', default is 'mean')
-    plot_file          name of plot output file to create
+    plot_file          path to plot output file to create (*.png, etc)
     save_file          path to file to save plot data in (UNUSED?)
     title              title to put on the graph
     np_posn            north pointer placement data
@@ -505,7 +518,7 @@ def fig_motion_continuous(input_dir, site_tag, soil_amp, period, output_dir,
     try:
         SA = func(SA, axis=1)
     except:
-        msg = 'Exception?'
+        msg = 'Exception calling function: %s' % str(func)
         raise Exception(msg)
 
     # now combine collapsed SA, lat and lon into list of (x, y, z) tuples
@@ -853,7 +866,7 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
             plt.show()
 
 
-def fig_scenario_building_loss(input_dir, site_tag, plotfile=None, scale=None,
+def fig_scenario_building_loss(input_dir, site_tag, plot_file=None, scale=None,
                                savefile=None, title=None, xlabel=None,
                                ylabel=None, xrange=None, yrange=None, bins=100,
                                bardict=None, show_graph=False):
@@ -861,7 +874,7 @@ def fig_scenario_building_loss(input_dir, site_tag, plotfile=None, scale=None,
 
     input_dir      general input/output directory
     site_tag       overall site identifier
-    plotfile       path to plot output file to create
+    plot_file      path to plot output file to create
     scale          None or scaling factor to *divide* data with
                    (eg, if *billions* of dollars, uses scale=1.0e+9)
     savefile       path to data output file to create (UNUSED)
@@ -888,7 +901,7 @@ def fig_scenario_building_loss(input_dir, site_tag, plotfile=None, scale=None,
         
 
     # plot the data
-    if plotfile or show_graph:
+    if plot_file or show_graph:
         if title is None:
             title = ''          #######  needs work!
 
@@ -928,10 +941,7 @@ def fig_scenario_building_loss(input_dir, site_tag, plotfile=None, scale=None,
                               'Y range forced to (%.2f,%.2f)' % yrange))
 
         # actually plot the thing
-        plot_outfile = os.path.join(input_dir, plotfile)
-
-
-        pb.plot_barchart(plot_data, plot_outfile, title=title,
+        pb.plot_barchart(plot_data, plot_file, title=title,
                          xlabel=xlabel, ylabel=ylabel,
                          bin_width=bin_width,
                          xrange=xrange, yrange=yrange,
@@ -939,7 +949,7 @@ def fig_scenario_building_loss(input_dir, site_tag, plotfile=None, scale=None,
                          annotate=range_ann)
 
 
-def fig_scenario_building_loss_percent(input_dir, site_tag, plotfile=None,
+def fig_scenario_building_loss_percent(input_dir, site_tag, plot_file=None,
                                        savefile=None, title=None,
                                        xlabel=None, ylabel=None, xrange=None,
                                        yrange=None, bins=100, bardict=None,
@@ -948,7 +958,7 @@ def fig_scenario_building_loss_percent(input_dir, site_tag, plotfile=None,
 
     input_dir      general input/output directory
     site_tag       overall site identifier
-    plotfile       path to plot output file to create
+    plot_file      path to plot output file to create
     savefile       path to data output file to create (UNUSED)
     title          title to put on the graph
     xlabel         text of X axis label
@@ -971,9 +981,15 @@ def fig_scenario_building_loss_percent(input_dir, site_tag, plotfile=None,
     data = (data/building_value)*100.0
 
     # plot the data
-    if plotfile or show_graph:
+    if plot_file or show_graph:
+        # default the labels
         if title is None:
             title = ''          #######  needs work!
+
+        if xlabel is None:
+            xlabel = ''
+        if ylabel is None:
+            ylabel = 'Count'
 
         # now generate histogrammed data
         (hist_data, xedges) = scipy.histogram(data, bins=bins, normed=False)
@@ -1011,10 +1027,7 @@ def fig_scenario_building_loss_percent(input_dir, site_tag, plotfile=None,
                               'Y range forced to (%.2f,%.2f)' % yrange))
 
         # actually plot the thing
-        plot_outfile = os.path.join(input_dir, plotfile)
-
-
-        pb.plot_barchart(plot_data, plot_outfile, title=title,
+        pb.plot_barchart(plot_data, plot_file, title=title,
                          xlabel=xlabel, ylabel=ylabel,
                          bin_width=bin_width,
                          xrange=xrange, yrange=yrange,
@@ -1027,7 +1040,7 @@ def fig_scenario_building_loss_percent(input_dir, site_tag, plotfile=None,
 fig_scenario_loss_percent_map = {'mean': numpy.mean,
                                  'median': numpy.median}
 
-def fig_scenario_loss_percent(input_dir, site_tag, output_dir, plotfile,
+def fig_scenario_loss_percent(input_dir, site_tag, plot_file=None,
                               collapse_function='mean',
                               savefile=None, title='',
                               np_posn=None, s_posn=None,
@@ -1038,10 +1051,9 @@ def fig_scenario_loss_percent(input_dir, site_tag, output_dir, plotfile,
 
     input_dir          general input/output directory
     site_tag           overall site identifier
-    output_dir         path to directory to save files in (UNUSED?)
+    plot_file          full path to plot output file to create (*.png, etc)
     collapse_function  string defining function used to collapse site values
                        ('mean' or 'medium', default is 'mean')
-    plot_file          name of plot output file to create
     save_file          path to file to save plot data in (UNUSED?)
     title              title to put on the graph
     np_posn            north pointer placement data
