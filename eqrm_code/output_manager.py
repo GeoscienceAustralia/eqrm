@@ -52,8 +52,12 @@ def save_hazard(soil_amp,THE_PARAM_T,
     assert isfinite(hazard).all()
 
     # interpret 'soil_amp' into filename fragment
-    hazard_name = 'soil_SA' if soil_amp else 'bedrock_SA'
-       
+    if soil_amp is True:
+        hazard_name = 'soil_SA'
+    elif soil_amp is False:
+        hazard_name = 'bedrock_SA'
+    else:
+        raise IOError("soil_amp must be True or False")  
     base_names = []
     if sites is not None:
         file_name = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
@@ -76,7 +80,6 @@ def save_hazard(soil_amp,THE_PARAM_T,
           #     rp.replace('.','pt').replace(' ','') + EXTENSION
         base_names.append(base_name)
         name = base_name + parallel_tag
-        
         f=open(name,'w')
         if write_title:
             f.write('% Return period = '+str(rp).replace(' ','')+'\n')
@@ -394,8 +397,15 @@ def save_motion(soil_amp, THE_PARAM_T, motion, compress=False,
     """
 
     # convert 'soil_amp' to a filename fragment
-    motion_name = 'soil_SA' if soil_amp else 'bedrock_SA'
+    #motion_name = 'soil_SA' if soil_amp else 'bedrock_SA'
 
+    if soil_amp is True:
+        motion_name = 'soil_SA'
+    elif soil_amp is False:
+        motion_name = 'bedrock_SA'
+    else:
+        raise IOError("soil_amp must be True or False")
+    
     if compress: open = myGzipFile
     else: open = file
     if parallel_tag is None:
