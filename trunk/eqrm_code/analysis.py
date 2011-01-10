@@ -28,7 +28,7 @@ from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
 
 from eqrm_code.parse_in_parameters import  \
     ParameterSyntaxError, create_parameter_data, convert_THE_PARAM_T_to_py
-from eqrm_code.event_set import Event_Set, Pseudo_Event_Set, Event_Activity, \
+from eqrm_code.event_set import Event_Set, Event_Activity, \
      generate_synthetic_events_fault, merge_events_and_sources
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
@@ -312,12 +312,6 @@ def main(parameter_handle,
     log.info('Sites set created. Number of sites=' + str(num_sites))
     log.debug('Memory: Sites created')
     log.resource_usage()
-
-    # FIXME this 'removes' gmm splitting for risk
-    pseudo_event_set = Pseudo_Event_Set.split_logic_tree(
-        event_set,
-        source_model[0].atten_models,
-        source_model[0].atten_model_weights)
     
     num_gmm_max = source_model.get_max_num_atten_models()
     num_events = len(event_set)
@@ -535,7 +529,6 @@ def main(parameter_handle,
             
             
             overloaded_MW = tile(event_set.Mw, num_gmm_max * num_spawning)
-            #overloaded_MW = pseudo_event_set.Mw
             
             (total_loss, damage,
                days_to_complete) = calc_total_loss(sites, SA, THE_PARAM_T,
