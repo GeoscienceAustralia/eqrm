@@ -37,13 +37,6 @@ def calc_event_activity(event_set, source_model):
     eqrmlog.debug('Memory: event_activity_matrix weight_matrix created')
     eqrmlog.resource_usage()
 
-    # A hacky way of finding the source_zone_id
-    # There should really be a source zone object that is
-    # used by event set as well
-    # And this should know about source_zone_id's.
-    # Maybe.  But event set uses generation polygons,
-    # which in future versions of EQRM may not be the same
-    # as source zone polygons.
     for source in source_model: # loop over source zones 
         zone_mlow = max(source.prob_min_mag_cutoff, source.min_magnitude)
         zone_mhgh = source.max_magnitude
