@@ -108,17 +108,7 @@ def calc_event_activity(event_set, source_model):
                                                event_bins == z, 1,0)))) 
                                               for z in event_bins])
             event_activity_matrix[event_ind] = event_activity_source
-        event_set.set_event_activity(event_activity_matrix)
-
-    # This should be used to remove events from the scenario's
-    # that are not in the mag range.
-    # But currently events not in range are removed.
-    no_event_activity_index = where(event_set.event_activity==0)
-
-    # If any events are outside of all of the source zones
-    # EQRM halts.
-    assert len(no_event_activity_index[0]) == 0
-
+            
     eqrmlog.debug('Memory: Out of the event_activity loop')
     eqrmlog.resource_usage()
 
