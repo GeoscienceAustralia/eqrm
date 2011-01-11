@@ -8,20 +8,18 @@ Copyright 2010 by Geoscience Australia
 """
 
 ######
-# This demo assumes that the java_*_rp[???].txt files and the
-# java_locations.txt filesa are in the demo/output/prob_risk directory.
-#
+
 # You *can't* run this from IDLE.  Use a command line.
 ######
 
 import sys
 
 from eqrm_code.plotting import plot_api
-from eqrm_code.eqrm_filesystem import Demo_Output_ProbRisk_Path
+from eqrm_code.eqrm_filesystem import Demo_Output_ProbHaz_Path
 
 
-input_dir = Demo_Output_ProbRisk_Path
-site_tag = 'java'
+input_dir = Demo_Output_ProbHaz_Path
+site_tag = 'newc'
 soil_amp = True
 return_period = 100
 period = 1.0
