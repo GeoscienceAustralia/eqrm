@@ -12,14 +12,12 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import (exp, log, sum, zeros, newaxis, where, array, r_, unique, 
-                   append, int64)
+from scipy import exp, log, sum, zeros, newaxis, where, array, r_, unique, \
+                   append, int64
 
 from eqrm_code.ANUGA_utilities import log as eqrmlog
 from eqrm_code.test_distance_functions import azimuths
 from eqrm_code.conversions import calc_fault_area
-
-#ma.core import sin
 
 
 def calc_event_activity(event_set, source_model):
