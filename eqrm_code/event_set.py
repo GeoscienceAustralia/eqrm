@@ -90,10 +90,6 @@ class Event_Set(object):
     rupture_centroid_lon  longitude of the rupture_centroid - scalor or
                           n-vector range unbounded.
                          
-      event_activity: probability that this event will occur is this
-        year.  Takes into account; - The actual probability that a
-        real event of the given magnitude will occur in a given year.
-        - The number of synthetic events used.  
 
       
         can have:
@@ -1102,8 +1098,6 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     eqrmlog.debug('Memory: finished generating events')
     eqrmlog.resource_usage()
 
-    #return create_fault_sources(event_control_file, fsg_list)
-
     return event, source_mods
 
 
@@ -1116,10 +1110,18 @@ class Event_Activity(object):
     Class to manipulate the event activity value.
     Handles the logic of splitting based on spawning.
     
-    The event activity is NOT split based on the attenuation models.
-    Use the weights in the list of sources to handle this.
+    The event activity is also split based on the attenuation models.
+    The weights in the list of sources are used to handle this.
 
 
+      event_activity: probability that this event will occur is this
+        year.  Takes into account;
+        - The actual probability that a
+        real event of the given magnitude will occur in a given year.
+        - The number of synthetic events used.
+        - spawning  (as a seperate dimension)
+        - multiple ground motion models (as a seperate dimension)
+        
     The dimensions of the event_activity are;
       (num_spawns, num_gm_models, num_events)
     """
