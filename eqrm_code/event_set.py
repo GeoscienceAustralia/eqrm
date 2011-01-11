@@ -60,8 +60,7 @@ class Event_Set(object):
                  trace_end_lat, trace_end_lon,
                  trace_start_x, trace_start_y,
                  rupture_x, rupture_y,
-                 rupture_centroid_lat, rupture_centroid_lon,
-                 event_activity=None):
+                 rupture_centroid_lat, rupture_centroid_lon):
         """
     A set of seismic events. Can be created  either directly or from an
     XML file which generates the events from eqrm_code.generation polygons.
@@ -130,7 +129,6 @@ class Event_Set(object):
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
         self.event_num = r_[0:len(self.depth)] # gives every event an id
-        self.event_activity = event_activity
         self.check_arguments() 
 
 
@@ -540,30 +538,9 @@ class Event_Set(object):
         Attributes that are tacked onto an event_set instance.
         """
         # Moved from analysis        
-        self.event_activity = array(0*self.depth+1) # create a vector of 1's
         self.source_zone_id = array(0*self.depth+1) # create a vector of 1's
 
 
-    def set_event_activity(self, event_activity):
-        """        
-        Set event activity boiler plate code.  I'm doing this so I
-        know when this is being set.        
-        """
-        self.event_activity = asarray(event_activity)
-
-            
-    def remove_events_with_no_activity(self):
-        """        
-        Set event activity boiler plate code.  I'm doing this so I
-        know when this is being set.
-
-        returns an event instance which is a subset of this event index.
-          where all events with 0 event activity have been removed.
-        """
-        event_activity_index = where(event_set.event_activity!=0)
-        return self[event_activity_index]
-
-        
     def check_arguments(self):
         """
         Checks that all arguments are the same size (or scalar).
@@ -632,10 +609,6 @@ class Event_Set(object):
         else:
             fault_width = self.fault_width
 
-        if self.event_activity == None:
-            event_activity = None
-        else:
-            event_activity = self.event_activity[key] 
 
         # create and return a slice of the Event_Set data values
         return Event_Set(self.azimuth[key],
@@ -659,8 +632,7 @@ class Event_Set(object):
                          self.rupture_x[key],
                          self.rupture_y[key],
                          self.rupture_centroid_lat[key],
-                         self.rupture_centroid_lon[key],
-                         event_activity)
+                         self.rupture_centroid_lon[key])
    
     def __len__(self):
         return len(self.rupture_centroid_lat)
