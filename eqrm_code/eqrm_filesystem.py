@@ -26,7 +26,7 @@ eqrm_path = util.determine_eqrm_path()
 # define various paths
 Resources_Data_Path = os.path.join(eqrm_path, 'resources', 'data')
 
-Demo_Path = os.path.join(eqrm_path, 'demo')
+demo_path = os.path.join(eqrm_path, 'demo')
 
 Implementation_Path = os.path.join(eqrm_path, 'implementation_tests')
 
@@ -45,17 +45,18 @@ scenario_input_bridges_path = os.path.join(eqrm_path, 'implementation_tests',
 Demo_Output_ProbRisk_Path = os.path.join(eqrm_path,
                                          'demo', 'output', 'prob_risk')
 
-Demo_Output_PlotProbRisk_Path = os.path.join(eqrm_path,
-                                         'demo', 'output', 'plot_prob_risk')
+demo_plot_path = os.path.join(eqrm_path, 'resources', 'plot_data')
+Demo_Output_PlotProbRisk_Path = os.path.join(demo_plot_path,
+                                             'output', 'plot_prob_risk')
 
-Demo_Output_PlotScenGM_Path = os.path.join(eqrm_path,
-                                         'demo', 'output', 'plot_scen_gm')
+Demo_Output_PlotScenGM_Path = os.path.join(demo_plot_path,
+                                             'output', 'plot_scen_gm')
 
 Demo_Output_ProbHaz_Path = os.path.join(eqrm_path,
                                          'demo', 'output', 'prob_haz')
 
-Demo_Output_PlotProbHaz_Path = os.path.join(eqrm_path,
-                                         'demo', 'output', 'plot_prob_haz')
+Demo_Output_PlotProbHaz_Path = os.path.join(demo_plot_path,
+                                            'output', 'plot_prob_haz')
 
 Postprocessing_Path = os.path.join(eqrm_path, 'postprocessing')
 

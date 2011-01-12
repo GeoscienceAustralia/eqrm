@@ -440,11 +440,14 @@ def make_continuous_cpt_from_seq(filename, seq):
     fd.close()
 
 
-def set_gmt_defaults(tmp_dir):
+def set_gmt_defaults(tmp_dir, increase_D_FORMAT_precision=False):
     """Set the 'standard' GMT default values for plotting.
     
     tmp_dir  path to the temporary directory GMT should use
              for storing .gmtdefaults
+    increase_D_FORMAT_precision  This is used to avoid a precision error
+                                 crashing a plot function.  The error is
+                                 GMT Fatal Error: Z-slice with dz = 0.
     """
 
     # delete local copies of files '.gmt*'
@@ -468,7 +471,8 @@ def set_gmt_defaults(tmp_dir):
     do_cmd('gmtset D_FORMAT = "%.02f"')
     # gets around crash 'GMT Fatal Error: Z-slice with dz = 0' in grd* calls
     # *but* increases colourbar tick precision
-    #do_cmd('gmtset D_FORMAT = "%.03f"')
+    if increase_D_FORMAT_precision is True:
+        do_cmd('gmtset D_FORMAT = "%.03f"')
 
     # header text sizes, offset
     do_cmd('gmtset HEADER_FONT_SIZE = 20p')
