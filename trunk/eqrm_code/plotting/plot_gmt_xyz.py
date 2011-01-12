@@ -200,7 +200,8 @@ def plot_gmt_xyz(data, output_file, bins=100, title=None, np_posn=None,
 def plot_gmt_xyz_continuous(data, output_file, bins=100, title=None,
                             np_posn=None, s_posn=None, cb_label=None,
                             colourmap=None, cb_steps=None, annotate=[],
-                            show_graph=False, map_extent=None):
+                            show_graph=False, map_extent=None,
+                            increase_D_FORMAT_precision=True):
     """A function to take gridded XYZ data and plot onto a GMT map.
     Use a continuous colourbar.
     
@@ -232,14 +233,17 @@ def plot_gmt_xyz_continuous(data, output_file, bins=100, title=None,
     show_graph   if True try to display final image in system-independant way
     map_extent   sets the extent of the displayed map if supplied
                  (get extent from data if not supplied)
-
+    increase_D_FORMAT_precision  If True the precission is increased to avoid
+                                 the error GMT Fatal Error: Z-slice with dz = 0
+                                 It does result in more .000's though.
+                                 
     """
 
     # create a scratch directory for ephemeral files
     tmp_dir = tempfile.mkdtemp(prefix='plot_map_')
 
     # set up the GMT default values
-    util.set_gmt_defaults(tmp_dir)
+    util.set_gmt_defaults(tmp_dir, increase_D_FORMAT_precision=True)
 
     # handle bins parameter
     try:

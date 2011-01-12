@@ -17,6 +17,7 @@ import scipy
 import numpy
 import matplotlib.pyplot as plt
 
+import eqrm_code.plotting.utilities as util
 import eqrm_code.output_manager as om
 import eqrm_code.plotting.calc_sum_xyz as csx
 import eqrm_code.plotting.plot_gmt_xyz as pgx
