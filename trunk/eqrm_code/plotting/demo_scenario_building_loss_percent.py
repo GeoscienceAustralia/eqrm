@@ -18,7 +18,7 @@ from eqrm_code.eqrm_filesystem import Demo_Output_ProbRisk_Path, \
      Demo_Output_PlotProbRisk_Path # this is slower
 
 
-input_dir = Demo_Output_ProbRisk_Path
+input_dir = Demo_Output_PlotProbRisk_Path
 site_tag = 'newc'
 bins = 10
 

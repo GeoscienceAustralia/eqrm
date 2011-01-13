@@ -9,7 +9,8 @@ def demo_run(verbose=True):
         print 'STARTING'  
 
     # list of input parameter files to use in the batch run
-    run_names = ['plot_ProbRisk.py', 'plot_ProbHaz.py', 'plot_ScenGM.py']
+    run_names = ['plot_ProbRisk.py', 'plot_ProbHaz.py', 'plot_ScenGM.py',
+                 'plot_ScenRisk.py']
     #run_names = ['plot_ScenGM.py']
     plot_dir = os.path.join(eqrm_filesystem.demo_plot_path)
     current_dir = os.getcwd()

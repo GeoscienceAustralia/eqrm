@@ -15,10 +15,10 @@ Copyright 2010 by Geoscience Australia
 import sys
 
 from eqrm_code.plotting import plot_api
-from eqrm_code.eqrm_filesystem import Demo_Output_ProbHaz_Path
+from eqrm_code.eqrm_filesystem import Demo_Output_PlotProbHaz_Path
 
 
-input_dir = Demo_Output_ProbHaz_Path
+input_dir = Demo_Output_PlotProbHaz_Path
 site_tag = 'newc'
 soil_amp = True
 return_period = 100
