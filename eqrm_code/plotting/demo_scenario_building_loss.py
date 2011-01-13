@@ -17,10 +17,10 @@ Copyright 2010 by Geoscience Australia
 import sys
 
 from eqrm_code.plotting import plot_api
-from eqrm_code.eqrm_filesystem import Demo_Output_ProbRisk_Path
+from eqrm_code.eqrm_filesystem import Demo_Output_PlotProbRisk_Path
 
 
-input_dir = Demo_Output_ProbRisk_Path
+input_dir = Demo_Output_PlotProbRisk_Path
 site_tag = 'newc'
 bins = 10
 

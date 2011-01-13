@@ -65,4 +65,6 @@ Eqrmcode_Plotting_Colourmaps_Path = os.path.join(eqrm_path, 'eqrm_code',
 
 Demo_Output_ScenRisk_Path = os.path.join(eqrm_path,
                                          'demo', 'output', 'scen_risk')
+plot_output_scen_risk_path = os.path.join(demo_plot_path,
+                                             'output', 'plot_scen_risk')
 
