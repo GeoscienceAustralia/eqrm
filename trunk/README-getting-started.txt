@@ -50,7 +50,7 @@ Questions and comments are welcomed. Please please join the list
 
 
 INPUT:
-1) The first input *\demo\setdata_ProbRisk.par is a parameter file
+1) The first input *\demo\setdata_ProbRisk.py is a parameter file
    containing flags and other input parameters to control the type/nature
    of the simulation. Further information of individual parameters is
    given in *\eqrm_core\Documentation\new_param_list.pdf
@@ -73,13 +73,13 @@ seed.
 
 Run at DOS command line:
     cd *\eqrm_core\demo
-    python ..\eqrm_analysis.py setdata_ScenGM.par y
+    python setdata_ScenGM.py y
         ** to deterministicaly seed the random number generator
            (the run is repeatable)
 
         or
 
-    python ..\eqrm_analysis.py setdata_ScenGM.par n
+    python setdata_ScenGM.py n
         ** to seed the random number generated based on time (the run
            is not repeatable)
 
@@ -104,7 +104,7 @@ simulation.
 To implement the zip save mode run the following at the DOS command line
 (note use of second y):
     	cd *\eqrm_core\demo
-	python ..\eqrm_analysis.py setdata_ProbHaz.par y y
+	python setdata_ProbHaz.py y y
 
 
 ---------------------------------------------------------------------
@@ -134,7 +134,7 @@ There are three variables that warrant special mention here.
     simulation types and it points to examples that ship with the eqrm
     in the *\eqrm_core\resources\data directory:
 
-1) Ground Motion Scenario (example parameter file: setdata_ScenGM.par)
+1) Ground Motion Scenario (example parameter file: setdata_ScenGM.py)
 		
 	a) A grid of sites at which to compute motion (longitude,
 	latitude and site class)
@@ -146,7 +146,7 @@ There are three variables that warrant special mention here.
 	b) OPTIONAL: Amplification Factors are needed if using amplification
 		e.g. *\eqrm_core\demo\input\newc_par_ampfactors.xml   
 
-2) Damage Scenario (example parameter file: setdata_ScenRisk.par)
+2) Damage Scenario (example parameter file: setdata_ScenRisk.py)
 
 	a) Building database (contains building locations, properties etc.)
 	e.g. *\eqrm_core\demo\input\sitedb_newc.csv
