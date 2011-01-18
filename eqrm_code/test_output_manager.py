@@ -983,12 +983,12 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(THE_PARAM_T.output_dir)
 
 
-    def test_load_xyz_from_hazard(self):
+    def test_load_lat_long_haz_SA(self):
         THE_PARAM_T=Dummy()
         soil_amp = True
         hazard_name = 'soil_SA'
         THE_PARAM_T.output_dir = tempfile.mkdtemp(
-            'output_manager_test_load_xyz_from_hazard') + os.sep
+            'output_manager_test_load_lat_long_haz_SA') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
         lat = array([-32, -31, -30])
         lon = array([120, 121, 122])
@@ -1005,7 +1005,7 @@ class Test_Output_manager(unittest.TestCase):
                     hazard[i,j,k] = site_lon*period #*rtrn[0]
         save_hazard(soil_amp,THE_PARAM_T,
                 hazard,sites,compress=False)
-        lon_lat_SA = load_xyz_from_hazard(THE_PARAM_T.output_dir,
+        lon_lat_SA = load_lat_long_haz_SA(THE_PARAM_T.output_dir,
                          THE_PARAM_T.site_tag, soil_amp, 0.5, 0.025)
         self.assert_ (allclose(array(lon), array(lon_lat_SA[:,0])))
         self.assert_ (allclose(array(lat), array(lon_lat_SA[:,1])))

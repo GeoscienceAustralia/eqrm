@@ -57,7 +57,7 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
     """
 
     # get raw data, all periods
-    data = om.load_xyz_from_hazard(input_dir, site_tag, soil_amp,
+    data = om.load_lat_long_haz_SA(input_dir, site_tag, soil_amp,
                                    period, return_period)
 
     # would do extra calc functions here, if required
@@ -107,7 +107,7 @@ def fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period, period,
     """
 
     # get raw data, all periods
-    data = om.load_xyz_from_hazard(input_dir, site_tag, soil_amp,
+    data = om.load_lat_long_haz_SA(input_dir, site_tag, soil_amp,
                                    period, return_period)
 
     # would do extra calc functions here, if required
@@ -313,8 +313,8 @@ def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
     show_graph     True if the plot is to be shown on the screen
     """
 
-    # read in raw data - load_xyz_from_hazard() returns [[[lon, lat, SA], ...]]
-    data = om.load_xyz_from_hazard(input_dir, site_tag, soil_amp, period,
+    # read in raw data - load_lat_long_haz_SA() returns [[[lon, lat, SA], ...]]
+    data = om.load_lat_long_haz_SA(input_dir, site_tag, soil_amp, period,
                                    return_period)
 
     # throw away all but SA values (the Z value)
