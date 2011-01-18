@@ -22,6 +22,8 @@ numpy
 scipy
 Shapely
 gcc
+GMT
+matplotlib
 
 The above requirements are for the 'core' of EQRM. The plotting functions
 require one or more of the following:
@@ -64,13 +66,17 @@ now forces weave to re-compile the required components)
    http://pypi.python.org/pypi/Shapely/.   
    (If you are using Python 2.4, you will have to install ctypes as well)
 
+8. Install GMT from http://gmt.soest.hawaii.edu/gmt/gmt_windows.html.
+   Install the basic and highfull executables.
+
+9. Install matplotlib (http://matplotlib.sourceforge.net/).
     
-8. Install the full package of MinGW. (TICK THE G++ COMPILER)
+10. Install the full package of MinGW. (TICK THE G++ COMPILER)
    When installing using mingw-5.X.X.exe, you are asked to choose
    components.  Tick the g++ compiler and do not untick any components.
    http://www.mingw.org/
 
-9. Add C:\MinGW\bin (so you can compile c extensions to python) and
+11. Add C:\MinGW\bin (so you can compile c extensions to python) and
    C:\Python25 (so you can call Python from a DOS prompt) to your path
    and *\eqrm_core\ to your pythonpath:
 
@@ -88,10 +94,10 @@ now forces weave to re-compile the required components)
    d) Variable Name = PYTHONPATH, add "*\python_core\;" to
    Variable Value (use ";" to separate values).
 
-10. Optional: install gzip working with compressed
+12. Optional: install gzip working with compressed
    output. http://gnuwin32.sourceforge.net/downlinks/gzip.php
   
-11. At the dos prompt:
+13. At the dos prompt:
     cd *\eqrm_core\eqrm_code
     python test_all.py	
     cd ..
