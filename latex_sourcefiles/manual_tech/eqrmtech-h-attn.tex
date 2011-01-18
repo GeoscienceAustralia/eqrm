@@ -339,6 +339,64 @@ implemented GMPEs are given in the next section.
 \end{tabular}
 \end{table}
 %\end{landscape}
+
+\subsection{Further Comments on Specific GMPEs}
+
+\subsubsection{Gaull...}
+Hadi to add
+
+\subsubsection{Somerville09} \textbf{Complete this section}
+\begin{itemize}
+\item decsribe the two options available (NonCratonic and Yilgarn)
+\item cite the report
+\item create table with the NonCratonic coeeficients (i.e.
+\tref{tab:Somerville09_Non_Cratonic})
+\end{itemize}
+
+\begin{table}
+\caption{Coeeficients for \texttt{Somerville09\_Non\_Cratonic}. The
+Non-Cratonic model represents an everage model for all non cratonic
+regions of Australia (\textbf{update citation}. For all practical
+purposes it can be used in all regions except the Yilgran Craton.
+The complete table of coefficients is include here because it was
+omitted from the original publication where it should have been
+table 7-3g.} \label{tab:Coeff-Somerville09_Non_Cratonic}
+\footnotesize
+\begin{tabular}{ccccccccc}
+ \hline
+Period  & $C_1$    & $C_2$     & $C_3$     & $C_4$     & $C_5$    & $C_6$    & $C_7$    & $C_8$ \\
+\hline
+PGA     & 1.03780  & -0.03970  & -0.79430  & 0.14450   & -0.00618 & -0.72540 & -0.03590 & -0.09730 \\
+0.010   & 1.05360  & -0.04190  & -0.79390  & 0.14450   & -0.00619 & -0.72660 & -0.03940 & -0.09740 \\
+0.020   & 1.05680  & -0.03920  & -0.79680  & 0.14550   & -0.00617 & -0.73230 & -0.03930 & -0.09600 \\
+0.030   & 1.13530  & -0.04790  & -0.80920  & 0.15000   & -0.00610 & -0.76410 & -0.05710 & -0.09210 \\
+0.040   & 1.30000  & -0.07020  & -0.83150  & 0.15920   & -0.00599 & -0.82850 & -0.09810 & -0.08530 \\
+0.050   & 1.47680  & -0.09310  & -0.83330  & 0.15600   & -0.00606 & -0.86740 & -0.12740 & -0.09130 \\
+0.075   & 1.70220  & -0.05160  & -0.80720  & 0.14560   & -0.00655 & -0.87690 & -0.10970 & -0.08690 \\
+0.100   & 1.65720  & 0.15080   & -0.77590  & 0.13100   & -0.00708 & -0.77830 & 0.01690  & -0.05980 \\
+0.150   & 1.94440  & -0.09620  & -0.75000  & 0.11670   & -0.00698 & -0.69490 & -0.13320 & -0.12530 \\
+0.200   & 1.82720  & -0.06230  & -0.73430  & 0.11940   & -0.00677 & -0.64380 & -0.09570 & -0.11920 \\
+0.250   & 1.74380  & -0.02530  & -0.72480  & 0.11950   & -0.00646 & -0.63740 & -0.06250 & -0.11650 \\
+0.3003  & 1.80560  & -0.27020  & -0.73190  & 0.13490   & -0.00606 & -0.66440 & -0.17470 & -0.14340 \\
+0.400   & 1.88750  & -0.37820  & -0.70580  & 0.09960   & -0.00589 & -0.58770 & -0.24420 & -0.21890 \\
+0.500   & 2.03760  & -0.79590  & -0.69730  & 0.11470   & -0.00565 & -0.59990 & -0.48670 & -0.29690 \\
+0.750   & 1.93060  & -0.80280  & -0.74510  & 0.11220   & -0.00503 & -0.59460 & -0.50120 & -0.34990 \\
+1.000   & 1.60380  & -0.47800  & -0.86950  & 0.07320   & -0.00569 & -0.41590 & 0.06360  & -0.33730 \\
+1.4993  & 0.47740  & 0.90960   & -1.02440  & 0.11060   & -0.00652 & -0.19000 & 1.09610  & -0.10660 \\
+2.000   & -0.25810 & 1.37770   & -1.01000  & 0.10310   & -0.00539 & -0.27340 & 1.50330  & -0.04530 \\
+3.0003  & -0.96360 & 1.14690   & -0.88530  & 0.10380   & -0.00478 & -0.40420 & 1.54130  & -0.11020 \\
+4.000   & -1.46140 & 1.07950   & -0.80490  & 0.10960   & -0.00395 & -0.46040 & 1.41960  & -0.14700 \\
+5.000   & -1.61160 & 0.74860   & -0.78100  & 0.09650   & -0.00307 & -0.46490 & 1.24090  & -0.22170 \\
+7.5019  & -2.35310 & 0.35190   & -0.64340  & 0.09590   & -0.00138 & -0.68260 & 0.92880  & -0.31230 \\
+10.000  & -3.26140 & 0.69730   & -0.62760  & 0.12920   & -0.00155 & -0.61980 & 1.01050  & -0.24550 \\
+PGV     & 5.07090  & 0.52780   & -0.85740  & 0.17700   & -0.00501 & -0.61190 & 0.80660  & -0.03800 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\normalsize
+
 \section{Implementation}\label{sec:implementation} In the EQRM
 application the attenuation calculations are conducted within the
 main driving function \typefunc{do}{\_ana}{lysis} which computes the
@@ -576,6 +634,10 @@ basin depths at target region and California are similar. However if
 it would not be the case this may introduce bias in predictions at
 longer periods, where the basin effects are most pronounced.
 
+
+
+
+
 \section{accounting for uncertainties}\label{sec:uncertain}
 Regarding GMPEs, seismic hazard studies incorporate two types of
 uncertainty: aleatory variability and epistemic uncertainty. By
@@ -599,27 +661,35 @@ weights to each model. The incorporation of aleatory variability and
 epistemic uncertainty in EQRM are discussed in sections
 ~\ref{attn:uncertainty} and ~\ref{sec:attn-multi-attnmodels}
 respectively.
-\subsection{Incorporating aleatory variability}
+
+
+
+
+\section{Incorporating aleatory uncertainty}
 \label{attn:uncertainty}
 
-The inclusion of aleatory variability of GMPEs in the EQRM
- is facilitated by the flag
-\typepar{var}{\_attn}{\_flag}. The aleatory variability is based on
-estimations of $\sigma_{log(S_a)}$  and is incorporated within
-\typefunc{do}{\_atten}{uation}. The following sections describe two
-of the most commonly used techniques for incorporating GMPE aleatory
-variability when using the EQRM. The flag to control the variability
-method is \typepar{var}{\_attn}{\_method} and
+Incorporating uncertainty is a critical component of any PSHA. The
+inclusion of aleatory uncertainty in the EQRM for attenuation
+ is facilitated by the EQRM controlfile parameter
+ \typepar{atten}{\_variability}{\_method}.
+ The aleatory uncertainty is based on estimations of
+$\sigma_{log(S_a)}$ (see
+\sreftwo{attn:atten-formula}{attn:implementation}).
+\sreftwo{attn:uncert-randomchoice}{attn:uncert-pdfchoice} describe
+two of the most commonly used techniques for incorporating
+attenuation aleatory uncertainty when using the EQRM.
 \tref{tab:attn-varmethods} illustrates all of the aleatory
-variability options that are available with the EQRM.
+uncertainty options that are available with the EQRM.
 \begin{table}
 \caption{Different techniques for incorporating attenuation
 variability in the EQRM.} \vspace{0.8em} \label{tab:attn-varmethods}
 \begin{centering}
 \begin{tabular}{c|p{0.7\textwidth}}
 \typeparcaption{var}{\_attn}{\_method} & Description \\
-\hline 1 & PDF sampling or spawning  when \typeparcaption{src}{\_eps}{\_switch} is 1 0 $-1$ \\
-2 & random sampling  \\
+\hline
+None & No sampling \\
+1 & PDF sampling or spawning (see \sref{attn:uncert-pdfchoice}) \\
+2 & random sampling (see \sref{attn:uncert-randomchoice}) \\
 3 & $+2\sigma$ from median\\
 4 & $+\sigma$ from median\\
 5 & $-\sigma$ from median\\
@@ -632,7 +702,7 @@ variability in the EQRM.} \vspace{0.8em} \label{tab:attn-varmethods}
 
 
 
-\subsubsection{Random sampling \index{response spectral acceleration}}
+\subsection{Random sampling of a response spectral acceleration\index{response spectral acceleration}}
 \label{attn:uncert-randomchoice}
 
 This technique involves selecting a single `random' response
@@ -661,24 +731,35 @@ about random selection:
 \item Two sites that are close to one another may give
 dramatically different estimates of ground motion for the same
 event. Earthquake hazard and risk values that are computed using
-random sampling exhibit a low level of spatial correlation. \item
+random sampling exhibit a low level of spatial correlation.
+\item
 The number $n_{rand}$ can theoretically take on any value between
 $\pm \infty$. Therefore it is possible that estimates of $S_a$ using
-\eref{attn:attn-var} can be unrealistically large. \cite{dr_Dhu02b}
-overcame this problem by re-scaling the excessively large $S_a$ to
-some acceptable level. The re-scaling was performed by the function
-\typefunc{pga}{\_cut}{off} which computes a re-scaling parameter
-$R_{scale}$ as follows
+\eref{attn:attn-var} can be unrealistically large. The EQRM
+overcomes this problem by introducing a scaling factor
+$PGA_{cut}=$\typepar{atten}{\_pga}{\_scaling\_cutoff} which is
+applied to the RSA as follows:
 \begin{equation}
-R_{scale} =
-\frac{\textrm{\typepar{pga}{\_cut}{off}}}{log(A_{S_a}(0,r_m,R))}.
+ log(A_{S_a,new}(T_o,r_m,R)) = R_{scale} \times
+log(A_{S_a,old}(T_o,r_m,R))
 \end{equation}
-The re-scaling parameter is then applied to the entire $S_a$ as
-follows
-\begin{equation}
-log(A_{S_a,new}(T_o,r_m,R)) = R_{scale} \times
-log(A_{S_a,old}(T_o,r_m,R)).
+where
+\begin{equation}\label{rw}
+R_{scale}  =
+\begin{cases}
+1,  PGA \leq PGA_{cut}\\
+\frac{PGA_{cut}}{log(A_{S_a}(0,r_m,R))},
+PGA > PGA_{cut}\\
+\end{cases}
 \end{equation}
+
+%if PGA > \typepar{atten}{\_pga}{\_scaling\_cutoff}\\
+%R_{scale} =
+%\frac{\textrm{\typepar{atten}{\_pga}{\_scaling\_cutoff}}}{log(A_{S_a}(0,r_m,R))}
+%\\
+% log(A_{S_a,new}(T_o,r_m,R)) = R_{scale} \times
+%log(A_{S_a,old}(T_o,r_m,R)).
+%\end{equation}
 \item There is no effort to account for the likelihood (or
 probability) of selecting a particular $n_{rand}$ i.e. a particular
 value of the $S_a$ is not weighted against its likelihood. It can be
@@ -688,11 +769,12 @@ and/or risk values will converge to the true ones.
 \end{enumerate}
 
 
-\subsubsection{Spawning\index{response spectral acceleration}
-} \label{attn:uncert-pdfchoice}
+\subsection{Sampling the probability density function of
+the response spectral acceleration\index{response spectral
+acceleration} (spawning)} \label{attn:uncert-pdfchoice}
 
 
-An alternative technique for incorporating variability relies on
+An alternative technique for incorporating uncertainty relies on
 sampling the PDF of the $S_a$. This technique is used by Aon Re
 (Mendez, \textit{pers. comm.}, 2003) and is often referred to as
 spawning. An integral component of sampling the PDF is the spawning
@@ -700,7 +782,7 @@ of events with the event catalogue (see \sref{source:spawning}).
 Essentially the approach involves taking a user defined number of
 copies of each event. Every event copy is then available for
 calculation of hazard (or risk) using a different sample from the
-attenuation model PDF.
+attenuation PDF.
 \begin{enumerate}
 \item Firstly the user must define a lower magnitude bound
 $m_{bnd}$, a number of samples $n_{smples}$ and a PDF range
@@ -721,13 +803,13 @@ where
 \begin{equation}
 \label{attn:uncertainty-def-epsilon}
 \begin{array}{ll}
-\epsilon_i = -n_\sigma + \frac{\Delta}{2} + (i-1)\Delta &
+\epsilon_i = -n_\sigma + + (i-1)\Delta &
 \textrm{for $i=1 \ldots n_{smples}$} \\
 \end{array}
 \end{equation}
 and
 \begin{equation}
-\Delta = \frac{2n_\sigma}{n_{smples}}.
+\Delta = \frac{2n_\sigma}{n_{smples}-1}.
 \end{equation}
 Note that
 \ereftwo{attn:uncertainty-pdfsample}{attn:uncertainty-def-epsilon}
@@ -749,22 +831,25 @@ the estimates of $\mu_{log(S_a)}$ have the following standard
 deviations \mbox{$\sigma_{log(S_a)}=\sigma_a = [0.03,0.04,0.01]$}.
 Defining $m_{bnd}=0$, $n_{smples}=5$ and $n_\sigma=2.5$ gives
 \begin{equation}
-\Delta = \frac{2 \times 2.5}{5} = 1,
+\Delta = \frac{2 \times 2.5}{5-1} = 1.25,
 \end{equation}
 
 and
 
+%%%========================
+% Automatically generated by *\diags\make_spawn_table.m
 \begin{center} $ \begin{array}{ccccc}
 i & w_{e,i} & \epsilon_i & r_\nu & log(A_{S_a,i}) \\
 \hline
-1 & 0.0545 & -2 & 0.0027 & [0.24g, 0.42g, 0.18g] \\
-2 & 0.2442 & -1 & 0.0122 & [0.27g, 0.46g, 0.19g] \\
-3 & 0.4026 & 0  & 0.0201 & [0.30g, 0.50g, 0.20g] \\
-4 & 0.2442 & 1  & 0.0122 & [0.33g, 0.54g, 0.21g] \\
-5 & 0.0545 & 2  & 0.0027 & [0.36g, 0.58g, 0.22g] \\
+1 & 0.0219 & -2.5 & 0.0011 & [0.225g, 0.4g, 0.175g] \\
+2 & 0.2285 & -1.25 & 0.0114 & [0.2625g, 0.45g, 0.1875g] \\
+3 & 0.4991 & 0 & 0.025 & [0.3g, 0.5g, 0.2g] \\
+4 & 0.2285 & 1.25 & 0.0114 & [0.3375g, 0.55g, 0.2125g] \\
+5 & 0.0219 & 2.5 & 0.0011 & [0.375g, 0.6g, 0.225g] \\
 \hline
 \end{array}$
 \end{center}
+%%%========================
 
 \begin{figure}
 \includegraphics[width=1\textwidth]{diags/fig-hattn-spawning}
@@ -779,22 +864,83 @@ It is important to note the following about spawning:
 \begin{enumerate}
 \item Sub-sampling the PDF provides a smoother (and repeatable)
 estimate of the $S_a$ than random selection
-(\sref{attn:uncert-randomchoice}). This equates to a high level of
-spatial correlation. \item The range of possible $S_a$ values is
-bounded by the $n_\sigma$. \item Estimates of all $S_a$ are weighted
-against an event activity $r_\nu$ that accounts for the likelihood
-of a particular attenuation being observed. \item The nature of
-spawning means that the synthetic event catalogue is copied a number
-of times and hence requires more computation time and memory.
+(\sref{attn:uncert-randomchoice}). \item The range of possible $S_a$
+values is bounded by the $n_\sigma$. \item Estimates of all $S_a$
+are weighted against an event activity $r_\nu$ that accounts for the
+likelihood of a particular ground motion being observed. \item The
+nature of spawning means that there are more evaluations of the
+GMPE. This means that it is typically slower and more memory
+intesive since the $S_a$ array is larger.
 \end{enumerate}
 
-\sref{source:spawning} stated that event spawning is conducted when
-\typepar{src}{\_eps}{\_switch} is 1 or $2$. When
-\typepar{src}{\_eps}{\_switch}$=2$ the spawned values are treated
-separately throughout the hazard or risk assessment. When
-\typepar{src}{\_eps}{\_switch}$=1$ however, the spawned values are
-aggregated again before the hazard or risk assessment is made. This
-idea is illustrated in \fref{fig:attn-treecollapse}.
+
+
+
+\subsection{Recomendation for sampling GMPE aleatory Uncertainty}
+
+\textbf{David to complete this section}
+\begin{itemize}
+\item use spawning for hazard - exaplin why
+\item use random sampling for risk - exaplain why
+\end{itemize}
+
+\section{Using multiple GMPEs - Incorporating epistemic uncertainty}
+\label{sec:attn-multi-attnmodels}
+
+The use of attenuation models in the EQRM is controlled by the
+\typeself{set}{da}{ta} parameter \typepar{atten}{uation}{\_flag}.
+Recall from \sref{sec:application-setdata} that
+\typepar{atten}{uation}{\_flag} is a two row matrix with one column
+for each attenuation model to be used. The format of
+\typepar{atten}{uation}{\_flag} is
+\begin{center}
+\begin{math}
+%\label{fig:attn-sa-matrix}
+ \left[ \begin{array}{ccccc}
+P_1 & P_2 &  \hdots & P_n \\
+w_{a,1} & w_{a,2} &  \hdots & w_{a,n} \\
+\end{array} \right],
+\end{math}
+\end{center}
+where the integers $\{P_i\}_{i=1}^n$ are pointers to the attenuation
+model (see \tref{tab:attn-flags}) and the real numbers
+$\{w_{a,i}\}_{i=1}^n$ are weights for the respective attenuation
+models. Note that the weights $w_i$ must either be all positive or
+all negative and
+\begin{equation}
+\left|\sum_{i=1}^{n}w_{a,i}\right| = 1.
+\end{equation}
+
+
+
+The mechanism for using more than one attenuation model is similar
+to the mechanism used for spawning (see
+\sref{attn:uncert-pdfchoice}). That is, the event catalogue is
+copied $n$ times (once for each attenuation model) and the
+appropriate attenuation model applied to its respective copy. The
+values of ground motion (loss for risk) can then be treated
+independently for the hazard/risk calculation (if
+$\sum_{i=1}^{n}w_{a,i} = -1$) or aggregated before the hazard/risk
+assessment is undertaken (if $\sum_{i=1}^{n}w_{a,i} = 1$). This
+notion of logic tree collapse is described by
+\fref{fig:attn-treecollapse}.
+
+
+\section{Collapse versus no-collapse}
+
+The techniques adopted for incorporating spawning (see \sref
+{attn:uncert-pdfchoice}) and using multiple ground motion models are
+similar in the sense that they require multiple evaluations of
+ground motion for each event. These are carried through the various
+stages of an EQRM simulation such as amplification, building damage
+and loss calculation (see following chapters). At the end of the
+simulation these values can then be collapsed back to a single `best
+estimate' or kept in a un-collapsed form and used to determine the
+hazard and/or risk curve (see \cref{ch:risk}). These two options are
+illustrated in \fref{fig:attn-treecollapse} for both a hazrd and
+risk simulation. Note that when collapsing the samples the extreme
+values are removed from the hazard or risk curves. For this reason
+we recomend the no-collapse option.
 
 \begin{figure}
  \setlength{\unitlength}{1mm}
@@ -906,138 +1052,6 @@ illustrated procedure is repeated for $N_s$ events in the event
 catalogue and the techniques of \cref{ch:risk} used to assess the
 hazard or risk.} \label{fig:attn-treecollapse}
 \end{figure}
-
-\subsection{Incorporating
-epistemic uncertainty} \label{sec:attn-multi-attnmodels}
-
-The use of attenuation models in the EQRM is controlled by the
-\typeself{set}{da}{ta} parameter \typepar{atten}{uation}{\_flag}.
-Recall from \sref{sec:application-setdata} that
-\typepar{atten}{uation}{\_flag} is a two row matrix with one column
-for each attenuation model to be used. The format of
-\typepar{atten}{uation}{\_flag} is
-\begin{center}
-\begin{math}
-%\label{fig:attn-sa-matrix}
- \left[ \begin{array}{ccccc}
-P_1 & P_2 &  \hdots & P_n \\
-w_{a,1} & w_{a,2} &  \hdots & w_{a,n} \\
-\end{array} \right],
-\end{math}
-\end{center}
-where the integers $\{P_i\}_{i=1}^n$ are pointers to the attenuation
-model (see \tref{tab:attn-flags}) and the real numbers
-$\{w_{a,i}\}_{i=1}^n$ are weights for the respective attenuation
-models. Note that the weights $w_i$ must either be all positive or
-all negative and
-\begin{equation}
-\left|\sum_{i=1}^{n}w_{a,i}\right| = 1.
-\end{equation}
-\begin{table}
-\caption{Pointers to attenuation models for use in the first row of
-\typeparcaption{atten}{uation}{\_flag}.} \vspace{0.8em}
-\label{tab:attn-flags}
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline \textbf{Motion} & \textbf{pointer} & \textbf{model} \\
-\hline
- & 0 & \cite{dr_Gaull90a} PGA with $S_a$ extension\\
- & 1 & \cite{dr_Toro97a} \\
-$S_a$ & 2 & \cite{dr_Atkinson97a} \\
- & 3 & \cite{dr_Sadigh97a} \\
- & 4 & \cite{dr_Somerville01a} \\
-\hline
- $\Imm$ & 100 & \cite{dr_Gaull90a} \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-\begin{table}
-\caption{Attenuation region (\typeparcaption{attn}{\_reg}{ion})
-options for each of the attenuation models.} \vspace{0.8em}
-\label{tab:attn-regions}
-\begin{center}
-\begin{tabular}{|c|c|l|}
-\hline \textbf{attenuation} & \textbf{attenuation} & \textbf{\texttt{attn\_region}} \\
-\textbf{pointer} & \textbf{model} & \textbf{} \\
-\hline
-0   &  & 1 $\Rightarrow$ Western Australia  \\
-or & \cite{dr_Gaull90a} & 2 $\Rightarrow$ Northeastern Australia\\
-100 & & 3 $\Rightarrow$ Indonesia\\
- & & 4 $\Rightarrow$ Southeastern Australia\\
-\hline
-1 & \cite{dr_Toro97a} & 1 $\Rightarrow$ Mid-Continent $M_o$ \\
-\hline
-2 & \cite{dr_Atkinson97a} & 1 $\Rightarrow$ No published options \\
-\hline
-3 & \cite{dr_Sadigh97a} & 1 $\Rightarrow$ No published options \\
-\hline
- &  & 1 $\Rightarrow$ Nonrift - Horizontal\\
-4 & \cite{dr_Somerville01a} & 2 $\Rightarrow$ Rift -- Horizontal\\
- & & 3 $\Rightarrow$ Nonrift -- Vertical\\
- & & 4 $\Rightarrow$ Rift --Vertical\\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-The mechanism for using more than one attenuation model is similar
-to the mechanism used for spawning (see
-\sref{attn:uncert-pdfchoice}). That is, the event catalogue is
-copied $n$ times (once for each attenuation model) and the
-appropriate attenuation model applied to its respective copy. The
-values of ground motion (loss for risk) can then be treated
-independently for the hazard/risk calculation (if
-$\sum_{i=1}^{n}w_{a,i} = -1$) or aggregated before the hazard/risk
-assessment is undertaken (if $\sum_{i=1}^{n}w_{a,i} = 1$). This
-notion of logic tree collapse is described by
-\fref{fig:attn-treecollapse}.
-
-\clearpage
-\newpage
-\section{Key functions, flags and parameters}
-
-\begin{tabular}{llp{0.55\textwidth}}
-\hline
-\textbf{Name} & \textbf{Type} & \textbf{Description} \\
-\hline
-\keyrowsep \typefunc{do}{\_ana}{lysis} & Function & The main driving function for modelling earthquake hazard or risk. \\
-\keyrowsep \typefunc{do}{\_all}{dist} & Function & Computes the Joyner-Boore and Rupture Distance from a site to every event. \\
-\keyrowsep \typefunc{prep}{\_at}{tn} & Function & Prepares the attenuation coefficients by interpolating them to periods of interest $T_o$. \\
-\keyrowsep \typefunc{m}{w2}{ml} & Function & Converts moment magnitude $r_m$ to local magnitude $r_{m_l}$. \\
-\keyrowsep \typefunc{do}{\_atten}{uation} & Function & Controls the selection of attenuation models for evaluation and assembles outputs. \\
-\keyrowsep \splitrowfunc{attn\_prepcoeff}{\_toro} & Function & Preparation of attenuation coefficients for \cite{dr_Toro97a}. \\
-\keyrowsep \splitrowfunc{attn\_allpervec}{\_toro} & Function & Computes \cite{dr_Toro97a} attenuation. \\
-\keyrowsep \splitrowfunc{attn\_preptoro}{\_aleatory1} & Function & Computes $\sigma_{a,r_m}$ for use with \cite{dr_Toro97a} attenuation. \\
-\keyrowsep \splitrowfunc{attn\_preptoro}{\_aleatory2} & Function & Computes $\sigma_{a,\Rjb}$ for use with \cite{dr_Toro97a} attenuation. \\
-\keyrowsep \splitrowfunc{attn\_preptoro}{\_epistemic} & Function & Computes $\sigma_{e,r_m}$ for use with \cite{dr_Toro97a} attenuation. \\
-\keyrowsep \splitrowfunc{attn\_allpervec}{\_gaull} & Function & Computes \cite{dr_Gaull90a} attenuation. \\
-\keyrowsep \typefunc{aus}{\_pesh}{new} & Function & Extends $PGA$ to standard $\mu_{log(S_a)}$. \\
-\keyrowsep \splitrowfunc{attn\_prepcoeff}{\_atkboore} & Function & Preparation of attenuation coefficients for \cite{dr_Atkinson97a}.\\
-\keyrowsep \splitrowfunc{attn\_allpervec}{\_atkboore} & Function & Computes \cite{dr_Atkinson97a} attenuation. \\
-\keyrowsep \splitrowfunc{attn\_prep\_atkboore}{\_aleatory} & Function & Computes $\sigma_a$ for use with \cite{dr_Atkinson97a} attenuation. \\
-\keyrowsep \splitrowfunc{attn\_prepcoeff}{\_sadigh} & Function & Preparation of attenuation coefficients for \cite{dr_Sadigh97a}. \\
-\keyrowsep \splitrowfunc{attn\_allpervec}{\_sadigh} & Function & Computes \cite{dr_Sadigh97a} attenuation. \\
-\end{tabular}
-
-\begin{tabular}{llp{0.55\textwidth}}
-\keyrowsep \splitrowfunc{attn\_prep\_sadigh}{\_uncertainty} & Function & Prepares uncertainty coefficients for \cite{dr_Sadigh97a} attenuation. \\
-\keyrowsep \typefunc{pga}{\_cut}{off} & Function & Re-scales the $S_a$ such that PGA $\leq$ \typepar{pga}{cut}{off}. \\
-\keyrowsep \splitrowfunc{attn\_toro\_mid}{continent\_momag} & Par File & Stores attenuation coefficients for \cite{dr_Toro97a} attenuation. \\
-\keyrowsep \splitrowfunc{attn\_atkboore}{\_momag} & Par File & Stores attenuation coefficients for \cite{dr_Atkinson97a} attenuation. \\
-\keyrowsep \splitrowfunc{attn\_sadigh\_coeff}{\_momag\_less65} & Par File & Stores attenuation coefficients for \cite{dr_Sadigh97a} attenuation. \\
-\keyrowsep \splitrowfunc{attn\_sadigh\_coeff}{\_momag\_great65} & Par File & Stores attenuation coefficients for \cite{dr_Sadigh97a} attenuation. \\
-\keyrowsep \typepar{per}{io}{ds} & Par & Periods at which to compute $S_a$. \\
-\keyrowsep \typepar{atten}{uation}{\_flag} & Par & Defines the attenuation models to be used as well as their respective weights. \\
-\keyrowsep \typepar{attn}{\_reg}{ion} & Par & Flag to assign different attenuation regions for \cite{dr_Gaull90a} attenuation.\\
-\keyrowsep \typepar{var}{\_attn}{\_flag} & Par & Variability in evaluation of the attenuation model. \\
-\keyrowsep \typepar{var}{\_attn}{\_method} & Par & Selects the technique for incorporating variability. \\
-  \hline
-\end{tabular}
-
-
-
 
 
 
