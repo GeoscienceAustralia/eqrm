@@ -166,11 +166,7 @@ def fig_loss_exceedance(input_dir, site_tag, title='',
     total_building_value = results[1]
 
     # Load in the event activity
-######
-# NOTE: load_event_set_subset() changed to obsolete_load_event_set_subset()
-######
-    #out_dict = om.load_event_set_subset(input_dir, site_tag)
-    out_dict = om.obsolete_load_event_set_subset(input_dir, site_tag)
+    out_dict = om.load_event_set(input_dir, site_tag)
     event_activity = out_dict['event_activity']
 
     # Do calculations
@@ -224,11 +220,7 @@ def fig_annloss_deagg_distmag(input_dir, site_tag, momag_labels,
     total_building_value = results[1]
 
     # Load in the event activity, mag and distance
-######
-# NOTE: load_event_set_subset() changed to obsolete_load_event_set_subset()
-######
-    #out_dict = om.load_event_set_subset(input_dir, site_tag)
-    out_dict = om.obsolete_load_event_set_subset(input_dir, site_tag)
+    out_dict = om.load_event_set(input_dir, site_tag)
     event_activity = out_dict['event_activity']
     Mw = out_dict['Mw']
     distance = om.load_distance(input_dir, site_tag, True)
@@ -272,7 +264,7 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
 # NOTE: load_event_set_subset() changed to obsolete_load_event_set_subset()
 ######
     #out_dict = om.load_event_set_subset(input_dir, site_tag)
-    out_dict = om.obsolete_load_event_set_subset(input_dir, site_tag)
+    out_dict = om.load_event_set(input_dir, site_tag)
     event_activity = out_dict['event_activity']
 
     # Run annualised loss calc and bin data
