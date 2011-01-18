@@ -76,8 +76,8 @@ def save_hazard(soil_amp,THE_PARAM_T,
         base_name = THE_PARAM_T.output_dir + get_hazard_file_name(
             THE_PARAM_T.site_tag, hazard_name, rp, EXTENSION)
         #base_name = THE_PARAM_T.output_dir+THE_PARAM_T.site_tag+ '_'+ \
-         #      hazard_name+'_rp' + \
-          #     rp.replace('.','pt').replace(' ','') + EXTENSION
+        #      hazard_name+'_rp' + \
+        #     rp.replace('.','pt').replace(' ','') + EXTENSION
         base_names.append(base_name)
         name = base_name + parallel_tag
         f=open(name,'w')
@@ -125,7 +125,6 @@ def load_hazards(saved_dir, site_tag, soil_amp):
     periods = None
     for file in files:
         number = file[rp_start_index:rp_end_index]
-        split_num = number.split('pt')
             
         rp = file[rp_start_index:rp_end_index].replace('pt','.')
         return_period = float(rp) # use as a dic index
@@ -189,21 +188,21 @@ def load_hazard(file_full_name):
     f=open(file_full_name,'r')            
     text = f.read().splitlines()
     # ditch the comment lines
-    com = text.pop(0)
-    com = text.pop(0)
+    text.pop(0)
+    text.pop(0)
     
     periods_f = [float(ix) for ix in text[0].split(' ')]
     
-    period_line = text.pop(0)
+    text.pop(0) # period_line
     SA_list = []
     for line in text:
         # Each line is a site
-        split = line.split(' ')
+        line.split(' ')
         SA_list.append([float(ix) for ix in line.split(' ')])
     return SA_list, periods_f
 
 
-def load_xyz_from_hazard(output_dir, site_tag, soil_amp, period, return_period):
+def load_lat_long_haz_SA(output_dir, site_tag, soil_amp, period, return_period):
     """
     Given a hazard output from EQRM, return the long, lat and SA for a
     specified period and return_period.
@@ -218,7 +217,7 @@ def load_xyz_from_hazard(output_dir, site_tag, soil_amp, period, return_period):
     SA_list, periods_f = load_hazard(os.path.join(output_dir, file_name))
     SA_array = array(SA_list)
     #if period not in periods_f:
-     #   print "Bad period" # Throw acception here
+    #   print "Bad period" # Throw acception here
 
     tol = 0.0001
     SA_vector = None
@@ -532,7 +531,7 @@ def load_motion_sites(output_dir, site_tag, soil_amp, period):
     
     SA, periods_f, lat, lon = load_collapsed_motion_sites(output_dir, site_tag, soil_amp)
     #if period not in periods_f:
-     #   print "Bad period" # Throw acception here
+    #   print "Bad period" # Throw acception here
 
     tol = 0.0001
     SA_slice = None
@@ -560,19 +559,18 @@ def load_motion_file(file_full_name):
     f=open(file_full_name,'r')            
     text = f.read().splitlines()
     event_index = int(text[0].split('=')[1])
-    ev = text.pop(0)
+    text.pop(0) # event
     spawn_index = int(text[0].split('=')[1])
-    sp = text.pop(0)
+    text.pop(0) # spawn
     gmm_index = int(text[0].split('=')[1]) 
-    gmm = text.pop(0)
-    com = text.pop(0)
+    text.pop(0)
+    text.pop(0)
     periods = array([float(ix) for ix in text[0].split(' ')])
     
-    period_line = text.pop(0)
+    text.pop(0) # period_line 
     SA_list = []
     for line in text:
         # Each line is a site
-        split = line.split(' ')
         SA_list.append([float(ix) for ix in line.split(' ')])
     SA = array(SA_list)
     return SA, periods, event_index, spawn_index, gmm_index
@@ -702,7 +700,7 @@ def get_event_set_file_name(site_tag):
     return site_tag + '_event_set.txt'
 
 #def save_event_set_new(THE_PARAM_T, event_set, event_activity, source_model,
- #                      compress=False):
+#                      compress=False):
 
 def save_event_set(THE_PARAM_T, event_set, event_activity, source_model,
                        compress=False):
@@ -756,16 +754,9 @@ def save_event_set(THE_PARAM_T, event_set, event_activity, source_model,
     length = event_set.length
     width = event_set.width
     event_num = event_set.event_num
-
-    # Pseudo_Event_Set will have a index attribute, Event_Set will not.
-    try:
-        index = event_set.index
-    except AttributeError:
-        index = None
     
     for i in range(len(event_set)):
-        s = []
-        
+        s = []     
         s.append(str(trace_start_lat[i]))
         s.append(str(trace_start_lon[i]))
         s.append(str(trace_end_lat[i]))
@@ -781,7 +772,6 @@ def save_event_set(THE_PARAM_T, event_set, event_activity, source_model,
         s.append(str(rupture_y[i]))
         s.append(str(length[i]))
         s.append(str(width[i]))
-
         s.append(str(event_num[i]))
         s.append(str(sources_of_event_set[i].name))
 
@@ -952,7 +942,7 @@ def obsolete_load_event_set_subset(saved_dir, site_tag):
     text = f.read().splitlines()
     # ditch the comment lines
     for i in range(18):
-        com = text.pop(0)
+        text.pop(0)
     out = {}
     for line in text:
         split_line = line.split(',')
@@ -1268,7 +1258,7 @@ def get_source_file_handle(THE_PARAM_T, source_file_type='zone'):
         source_tag = THE_PARAM_T.event_control_tag
         file_constant = EVENT_CONTROL_FILE
     else:
-         raise IOError(source_file_type, " is not a valid source file type.")
+        raise IOError(source_file_type, " is not a valid source file type.")
     if source_tag is None:
         source_file = THE_PARAM_T.site_tag + file_constant + '.xml'
     else:

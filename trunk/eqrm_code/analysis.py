@@ -15,13 +15,11 @@
   Copyright 2007 by Geoscience Australia
 """
 
-import sys
 import os
 import time
 import shutil
 import copy
 import datetime
-import scipy
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
      arange, reshape, exp, tile
@@ -44,7 +42,7 @@ from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
 from ground_motion_distribution import Distribution_Log_Normal
 from eqrm_code.structures import Structures, build_par_file
-from eqrm_code.exceedance_curves import do_collapse_logic_tree, hzd_do_value, \
+from eqrm_code.exceedance_curves import hzd_do_value, \
      collapse_att_model, collapse_source_gmms
 from eqrm_code.sites import Sites, truncate_sites_for_test
 from eqrm_code.damage_model import calc_total_loss
@@ -120,7 +118,7 @@ def main(parameter_handle,
     del eqrm_dir
     del is_parallel
     
-     # Reset random seeds if required
+    # Reset random seeds if required
     # If use_determ_seed is True, then use a hardwired seed.
     # If use_determ_seed is False, set random seeds based on time.
     reset_seed(THE_PARAM_T.use_determ_seed)
@@ -188,7 +186,7 @@ def main(parameter_handle,
     else:
         # (i.e. is_scenario is False) generate a probablistic event set
         # (using THE_PARAM_T.source_filename)
- # Once the event control file is 'fully operational'
+        # Once the event control file is 'fully operational'
         # remove the try.
         try:
             fid_event_types = get_source_file_handle(THE_PARAM_T,
@@ -282,13 +280,7 @@ def main(parameter_handle,
         log.debug('Memory: event activity has been calculated')
         log.resource_usage()
         
-    
-    if parallel.rank == 0 and False:		
-        # So just get one process to write these files.
-        save_event_set_new(THE_PARAM_T, event_set, None,
-                       compress=THE_PARAM_T.compress_output)
-        
-         #  event_activity.event_activity[drop down to one dimension],
+    #  event_activity.event_activity[drop down to one dimension],
     event_activity.ground_motion_model_logic_split(
         source_model,
         not THE_PARAM_T.atten_collapse_Sa_of_atten_models)
@@ -431,8 +423,6 @@ def main(parameter_handle,
                                         num_gmm_max, num_events),
                               dtype=float)
     if THE_PARAM_T.save_contents_loss is True:
-        contents_loss = zeros((array_size, num_psudo_events),
-                              dtype=float)
         contents_loss_qw = zeros((array_size, num_spawning,
                                         num_gmm_max, num_events),
                               dtype=float)
@@ -591,7 +581,7 @@ def main(parameter_handle,
     column_files_that_parallel_splits = []
 
     loop_time = (time.clock() - t0)
-    time_taken_site_loop = loop_time - time_taken_pre_site_loop
+    #time_taken_site_loop = loop_time - time_taken_pre_site_loop
     time_pre_site_loop_fraction = time_taken_pre_site_loop/loop_time
 
     msg = "time_pre_site_loop_fraction " + str(time_pre_site_loop_fraction)
@@ -866,7 +856,6 @@ def calc_and_save_SA(THE_PARAM_T,
         if len(event_inds) == 0:
             continue
         sub_event_set = event_set[event_inds]
-        atten_models = source.atten_models
         atten_model_weights = source.atten_model_weights
         ground_motion_calc = source.ground_motion_calculator
         

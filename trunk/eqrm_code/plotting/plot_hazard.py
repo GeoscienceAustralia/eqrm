@@ -43,7 +43,7 @@ def obsolete_plot_hazard(input_dir, site_tag, soil_amp, return_period, period, o
     """
 
     # get raw data, all periods
-    data = om.load_xyz_from_hazard(input_dir, site_tag, soil_amp,
+    data = om.load_lat_long_haz_SA(input_dir, site_tag, soil_amp,
                                    return_period, period)
 
     # would do extra calc functions here, if required
