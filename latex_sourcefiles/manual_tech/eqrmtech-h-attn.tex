@@ -198,7 +198,7 @@ Condition}
 & {\footnotesize Type} & {\footnotesize Range} &\\
 \hline \multicolumn{9}{|c|}{Shallow crustal events in active
 tectonic regions}\\
-\hline {\footnotesize Sadigh et al. (1997)} & $M_W$ & 4-7.4 &
+\hline {\footnotesize \citet{eqrm_Sadigh97a}} & $M_W$ & 4-7.4 &
 $R_{rup}$ &
 0-100& $GMX$ & Geometric mean & 0-4 & 9\\
 \hline {\footnotesize Zhao et al. (2006)} & $M_W$ & 4.9-8.3 &
@@ -219,14 +219,13 @@ $R_{jb}$
 & 0-100& $V_{S30}$ Class & Geometric mean & 0-3 & 14\\
 \hline \multicolumn{9}{|c|}{Shallow crustal events in stable
 continental regions}\\
-\hline {\footnotesize Gaull et al. (1990)} & $M_L$ & ?  &
+\hline {\footnotesize \citet{dr_Gaull90a}} & $M_L$ & ?  &
 $R_{hypo}$& 10-500& $V_{S30}$ Class & Random & 0-2 & ?\\
-\hline {\footnotesize Atkinson and Boore (1997)} & $M_W$ & 4.0-7.25
-&
+\hline {\footnotesize \citet{dr_Atkinson97a}} & $M_W$ & 4.0-7.25 &
 $R_{hypo}$& 10-500& $V_{S30}$ Class & Random & 0-2 & 5\\
-\hline {\footnotesize Toro et al. (1997)} & $M_W$ & 5.0-8.0 &
+\hline {\footnotesize \citet{eqrm_Toro97a}} & $M_W$ & 5.0-8.0 &
 $R_{jb}$& 1-500& Hard Rock & Geometric mean & 0-2 & 9\\
-\hline {\footnotesize Campbell (2003)} & $M_W$ & 5.0-8.2 &
+\hline {\footnotesize \citet{eqrm_Campbell03a}} & $M_W$ & 5.0-8.2 &
 $R_{rup}$& 1-1000& Hard Rock & Geometric mean & 0-4 & 13\\
 \hline {\footnotesize Atkinson and Boore (2006)} & $M_W$ & 4.0-8.0 &
 $R_{rup}$& 1-1000& $V_{S30}$ & Random & 0-5 & 14 \\
@@ -461,20 +460,20 @@ catalogue are based on moment magnitude scale. However, among the
 implemented GMPES Gaul et al. (1990), and Liang et al. (2008) models
 use $M_L$ scale. In this case, adjustment is done using the
 correlation relationship between and as suggested by Johnston
-(2001):
+(\textit{pers. comm.}, 2001):
 \begin{equation}
 M_L =
 \frac{0.473+\sqrt{0.473^2-4\times0.145(3.45-M_W)}}{2\times0.145};
 \end{equation}
 Equation 2 is developed for stable continental regions and is based
-on earlier work published by the same author (Johnston, 1996). It is
-important to note that uncertainties in the explanatory variables
-are map to the response variable. In other words, in equation
-~\ref{eq:general} if an explanatory parameter, $x$, has been
-assigned using a correlation conversion with associated measure of
-aleatory variability, $\sigma_x$, then this should be map into the
-aleatory variability of the GMPEs, $\sigma_y$, by using the
-expression:
+on earlier work published by the same author
+\citep{eqrm_Johnstone96a}. It is important to note that
+uncertainties in the explanatory variables are map to the response
+variable. In other words, in equation ~\ref{eq:general} if an
+explanatory parameter, $x$, has been assigned using a correlation
+conversion with associated measure of aleatory variability,
+$\sigma_x$, then this should be map into the aleatory variability of
+the GMPEs, $\sigma_y$, by using the expression:
 \begin{equation}
 \sigma_{Total} = \sqrt{\sigma_y^2+(\dfrac{\partial log(Y)}{\partial
 x})^2 \sigma_x^2}
