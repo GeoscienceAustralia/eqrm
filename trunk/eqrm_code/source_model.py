@@ -524,7 +524,7 @@ def source_model_from_xml(filename, prob_min_mag_cutoff):
         try:
             polygon_name = xml_polygon.attributes['name']
         except KeyError:
-            polygon_name = 'zone_' + str(i)
+            polygon_name = str(i)
         geometry = xml_polygon['geometry'][0]
         boundary = geometry['boundary'][0].array
         recurrence = xml_polygon['recurrence_model'][0].attributes
