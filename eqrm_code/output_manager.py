@@ -706,6 +706,11 @@ def save_event_set(THE_PARAM_T, event_set, event_activity, source_model,
                        compress=False):
     """Save event_set information to a file.
 
+    WARNING: ADDING STRINGS INTO THE VALUES OF THIS FILE WILL CAUSE
+    CHECK SCENARIOS TO FAIL IN WINDOWS. Due to differences in converting
+    floats.  eg 4e-05 or 4e-005.  This could be fixed by improving the
+    testing code.
+
     event_set  Event_set instance
     r_new      event activity (a list or None)
     compress   True if file is to be compressed
