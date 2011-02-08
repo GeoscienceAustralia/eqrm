@@ -91,7 +91,7 @@ Description:
             depth_to_top         (sites, events, 1)
             width                (sites, events, 1)
             fault_type           (sites, events, 1)
-            distance             (sites, events, 1)   (deprecated)
+            distance             (sites, events, 1)   
             dist_object.Rupture  (sites, events)      (etc)
             Vs30                 (sites,)
             coefficient          (coefficients, 1, 1, periods)
@@ -3393,7 +3393,7 @@ def Campbell08_distribution(**kwargs):
     # Hanging-Wall Term
     Rmax = maximum(Rrup, sqrt(Rjb**2 + 1.0))
     f_hngR = ones(Rjb.shape) * (Rrup - Rjb)/Rrup
-    f_hngR = where(Ztor < 1.0, (Rmax - Rjb)/Rmax, f_hngR)
+    f_hngR = where(Ztor + zeros(Rmax.shape)< 1.0, (Rmax - Rjb)/Rmax, f_hngR)
     f_hngR = where(Rjb == 0.0, 1.0, f_hngR)
 
     f_hngM = ones(Mw.shape)
@@ -3455,7 +3455,7 @@ def Campbell08_distribution(**kwargs):
     Rmax = maximum(Rrup, sqrt(Rjb**2 + 1.0))
 
     f_hngR = ones(Rjb.shape) * (Rrup - Rjb)/Rrup
-    f_hngR = where(Ztor < 1.0, (Rmax - Rjb)/Rmax, f_hngR)
+    f_hngR = where(Ztor + zeros(Rmax.shape)< 1.0, (Rmax - Rjb)/Rmax, f_hngR)
     f_hngR = where(Rjb == 0.0, 1.0, f_hngR)
 
     f_hngM = ones(Mw.shape)
@@ -3910,17 +3910,18 @@ def Abrahamson08_distribution(**kwargs):
     #####
 
     R = sqrt(Rrup**2 + AS08_PGA_c4**2)
-
     f_1 = (AS08_PGA_a1 + AS08_PGA_a5*(Mw-AS08_PGA_c1) + 
            AS08_PGA_a8*(8.5-Mw)**2 + 
            (AS08_PGA_a2 + AS08_PGA_a3*(Mw-AS08_PGA_c1))*log(R))
-
-    f_1 = where(Mw <= AS08_PGA_c1,
+    # This is to get the Mw the same shape as f_1.  f_1's shape is
+    # based on Rrup.  In tests the site component of this is not
+    # always zero.
+    Mw_tiled = tile(Mw,(f_1.shape[0],1,1))
+    f_1 = where(Mw_tiled <= AS08_PGA_c1,
                 AS08_PGA_a1 + AS08_PGA_a4*(Mw-AS08_PGA_c1) +
-                    AS08_PGA_a8*(8.5-Mw)**2 +
-                    (AS08_PGA_a2 + AS08_PGA_a3*(Mw-AS08_PGA_c1))*log(R),
+                AS08_PGA_a8*(8.5-Mw)**2 +
+                (AS08_PGA_a2 + AS08_PGA_a3*(Mw-AS08_PGA_c1))*log(R),
                 f_1)
-
     del R
 
     #####
@@ -4080,7 +4081,7 @@ def Abrahamson08_distribution(**kwargs):
     R = sqrt(Rrup**2 + c4T**2)
 
     f_1 = a1T + a5T*(Mw-c1T) + a8T*(8.5-Mw)**2 + (a2T + a3T*(Mw-c1T))*log(R)
-    f_1 = where(Mw <= c1T,
+    f_1 = where(Mw_tiled <= c1T,
                 a1T + a4T*(Mw-c1T) + a8T*(8.5-Mw)**2 +
                     (a2T + a3T*(Mw-c1T))*log(R),
                 f_1)
@@ -4093,7 +4094,7 @@ def Abrahamson08_distribution(**kwargs):
 
     f_1Td1 = (a1_iTd1 + a5_iTd1*(Mw-c1_iTd1) + a8_iTd1*(8.5-Mw)**2 +
               (a2_iTd1 + a3_iTd1*(Mw-c1_iTd1)) * log(RTd1))
-    f_1Td1 = where(Mw <= c1_iTd1,
+    f_1Td1 = where(Mw_tiled <= c1_iTd1,
                    a1_iTd1 + a4_iTd1*(Mw-c1_iTd1) + a8_iTd1*(8.5-Mw)**2 +
                        (a2_iTd1 + a3_iTd1*(Mw-c1_iTd1)) * log(RTd1),
                    f_1Td1)
@@ -4104,7 +4105,8 @@ def Abrahamson08_distribution(**kwargs):
 
     f_1Td2 = (a1_iTd2 + a5_iTd2*(Mw-c1_iTd2) + a8_iTd2*(8.5-Mw)**2 +
               (a2_iTd2 + a3_iTd2*(Mw-c1_iTd2)) * log(RTd2))
-    f_1Td2 = where(Mw <= c1_iTd2,
+    
+    f_1Td2 = where(Mw_tiled <= c1_iTd2,
                    a1_iTd2 + a4_iTd2*(Mw-c1_iTd2) + a8_iTd2*(8.5-Mw)**2 +
                        (a2_iTd2 + a3_iTd2*(Mw-c1_iTd2)) * log(RTd2),
                    f_1Td2)
@@ -4153,8 +4155,9 @@ def Abrahamson08_distribution(**kwargs):
 
 
     V30 = V1
-    V30 = where(1100.0 < V1, Vs30+zeros(V30.shape), V30)
-
+    
+    V30 = where(1100.0 < V1+zeros(Vs30.shape), Vs30+zeros(V30.shape),
+                V30+zeros(Vs30.shape))
 
     f_5 = (a10T + bT*nT)*log(V30/VlinT)
 
@@ -4170,8 +4173,8 @@ def Abrahamson08_distribution(**kwargs):
     V30Td1 = copy(V1Td1)
     #Vs30X = Vs30 + 0*V1Td1
     Vs30X = Vs30 + ones(V1Td1.shape)
-    V30Td1 = where(1100.0 < V1Td1, Vs30X, V30Td1)
-
+    V30Td1 = where(1100.0 < V1Td1+ones(Vs30.shape), Vs30X,
+                   V30Td1+ones(Vs30.shape))
     f_5Td1 = (a10_iTd1 + b_iTd1*n_iTd1)*log(V30Td1/Vlin_iTd1)
 
     del V1Td1, V30Td1, Vs30X
@@ -4182,8 +4185,8 @@ def Abrahamson08_distribution(**kwargs):
     V1Td2 = where(T_iTd2 <= 0.5, 1500.0, V1Td2)
 
     V30Td2 = V1Td2
-    V30Td2 = where(1100.0 < V1Td2, Vs30, V30Td2)
-
+    V30Td2 = where(1100.0 < V1Td2+zeros(Vs30.shape), Vs30+zeros( V1Td2.shape),
+                   V30Td2+zeros(Vs30.shape))
     f_5Td2 = (a10_iTd2 + b_iTd2*n_iTd2)*log(V30Td2/Vlin_iTd2)
 
     del V1Td2, V30Td2
@@ -4256,7 +4259,7 @@ def Abrahamson08_distribution(**kwargs):
                     log(Td/T_iTd1) + log(Y_1100Td1))
 
     Y_1100Td = Y_1100Td0*(Td/Per)**2
-    Y_1100Td = where(Per <= Td, Y_1100, Y_1100Td)
+    Y_1100Td = where(Per <= Td+zeros(Y_1100.shape), Y_1100, Y_1100Td)
 
     del Y_1100, Y_1100Td0, Y_1100Td1, Y_1100Td2
 
@@ -4278,14 +4281,13 @@ def Abrahamson08_distribution(**kwargs):
     V30 = V1
     XVs30 = Vs30 + zeros(V30.shape)
     #V30 = where(Vs30 < V1, Vs30, V1)
-    V30 = where(XVs30 < V1, XVs30, V1)
+    V30 = where(XVs30 < V1+zeros(Vs30.shape), XVs30, V1+zeros(Vs30.shape))
 
     f_5 = (a10T + bT*nT)*log(V30/VlinT)
-    f_5 = where(Vs30 < VlinT,
+    f_5 = where(Vs30 < VlinT+zeros(PGA_1100.shape),
                 a10T*log(V30/VlinT) - bT*log(PGA_1100 + cT) +
                     bT*log(PGA_1100 + cT*(V30/VlinT)**nT),
-                f_5)
-
+                f_5+zeros(PGA_1100.shape))
     del XVs30
 
     # Soil Depth Term
@@ -4295,7 +4297,8 @@ def Abrahamson08_distribution(**kwargs):
     Z10_med = where(Vs30 < 180.0, exp(6.745), Z10_med)
 
     e2 = ones(Per.shape) * -0.25*log(Vs30/1000.0)*log(2.0/0.35)
-    e2 = where(Per <= 2.0, -0.25*log(Vs30/1000.0)*log(Per/0.35), e2)
+    e2 = where(Per*ones(Vs30.shape) <= 2.0,
+               -0.25*log(Vs30/1000.0)*log(Per/0.35), e2)
     e2 = where(logical_or(Per < 0.35, Vs30 > 1000.0), 0.0, e2)
 
     a22 = ones(Per.shape) * 0.0625*(Per - 2.0)
@@ -4337,13 +4340,11 @@ def Abrahamson08_distribution(**kwargs):
     # CALCULATE ALEATORY UNCERTAINTY
     # Partial Derivative of ln f_5 With Respect to ln PGA
     #####
-
-    Alpha = zeros(V30.shape)
-    Alpha = where(Vs30 < VlinT,
+    Alpha = zeros(V30.shape) + zeros(PGA_1100.shape)
+    Alpha = where(Vs30 < VlinT+zeros(PGA_1100.shape),
                   bT*PGA_1100 * (1.0/(PGA_1100 + cT*(V30/VlinT)**nT) -
                                  1.0/(PGA_1100 + cT)),
                   Alpha)
-    
     del V30
 
     #####
@@ -4365,8 +4366,7 @@ def Abrahamson08_distribution(**kwargs):
 #    s0Yest = where(Mw <= 7.0, s1estT + (s2estT-s1estT)*(Mw-5.0)/2.0, s0Yest)
 #    s0Yest = where(Mw < 5.0, s1estT, s0Yest)
     s0Yest = where(XMw <= 7.0, s1estT + (s2estT-s1estT)*(XMw-5.0)/2.0, s0Yest)
-    s0Yest = where(XMw < 5.0, s1estT, s0Yest)
-
+    s0Yest = where(XMw < 5.0, s1estT*ones(Mw.shape), s0Yest)
     sBAest = sqrt(s0Aest**2 - slnAF**2)
     sBYest = sqrt(s0Yest**2 - slnAF**2)
 
@@ -4385,7 +4385,7 @@ def Abrahamson08_distribution(**kwargs):
 #    s0Ymea = where(Mw <= 7.0, s1meaT + (s2meaT-s1meaT)*(Mw-5.0)/2.0, s0Ymea)
 #    s0Ymea = where(Mw < 5.0, s1meaT, s0Ymea)
     s0Ymea = where(XMw <= 7.0, s1meaT + (s2meaT-s1meaT)*(XMw-5.0)/2.0, s0Ymea)
-    s0Ymea = where(XMw < 5.0, s1meaT, s0Ymea)
+    s0Ymea = where(XMw < 5.0, s1meaT*ones(Mw.shape), s0Ymea)
 
     sBAmea = sqrt(s0Amea**2 - slnAF**2)
     sBYmea = sqrt(s0Ymea**2 - slnAF**2)
@@ -4407,7 +4407,7 @@ def Abrahamson08_distribution(**kwargs):
 #    tau0Y = where(Mw <= 7.0, s3T + (s4T-s3T)*(Mw-5.0)/2.0, tau0Y)
 #    tau0Y = where(Mw < 5.0, s3T, tau0Y)
     tau0Y = where(XMw <= 7.0, s3T + (s4T-s3T)*(XMw-5.0)/2.0, tau0Y)
-    tau0Y = where(XMw < 5.0, s3T, tau0Y)
+    tau0Y = where(XMw < 5.0, s3T*ones(Mw.shape), tau0Y)
 
     tauBA = tau0A
     tauBY = tau0Y
