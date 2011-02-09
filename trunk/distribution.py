@@ -14,7 +14,7 @@ import os
 from shutil import copyfile, copytree, rmtree
 from os import system, remove, sep, getcwd, chdir, rmdir, mkdir, popen, \
      listdir
-from os.path import join
+from os.path import join, isfile
 
 from for_all_verification import do_tests_checks_demos_audits
 
@@ -39,7 +39,6 @@ distro_files = [
     'copyright.tex',
     'eqrm_analysis.py',
     'README.txt',
-    'README-demo-risk.txt',
     'README-getting-started.txt',
     'README-getting-started.txt',
     'README-install.txt',
@@ -72,7 +71,8 @@ def create_distribution_zip(vername, distro_dirs=None,
     print "expo_dir", expo_dir
 
     # When using this, make sure the expo_dir is not deleted in 2 places.
-    if True: 
+    
+    if False: 
         s = 'svn --force export http://65.61.168.30/svn/eqrm_core/trunk '\
             + expo_dir
     
@@ -100,7 +100,10 @@ def create_distribution_zip(vername, distro_dirs=None,
     else:
         expo_dir = join("C:","WINNT","Profiles","gray duncan",
                         "Local Settings","Temp",
-                        "EQRM_distribution_expo_dirgeozc-")
+                        "EQRM_distribution_expo_dir-uphuz")
+        expo_dir = join("c:\\","winnt","Profiles","graydu~1",
+                        "locals~1","temp",
+                        "EQRM_distribution_expo_dir-uphuz")
         version = '999'
         
         
@@ -121,10 +124,9 @@ def create_distribution_zip(vername, distro_dirs=None,
     
     # Copy the file's we want to distribute
     for file in distro_files:
-        # Fail silently if I can't copy a dir.
+        # Fail silently if I can't copy a file.
         src = join(expo_dir, file)
         dst = join(zip_dir, file)
-        copyfile(src, dst)
         try:
             copyfile(src, dst)
         except:
@@ -153,27 +155,43 @@ def create_distribution_zip(vername, distro_dirs=None,
     except:
         pass
 
-    # compile the new parameter list
-    chdir('Documentation')
-    print '       '
-    print 'compiling the new parameter list'
-    s = 'latex new_param_list.tex'
-    print s
-    system(s)
-    s = 'dvipdfm new_param_list.dvi'
-    print s
-    system(s)
-    remove('new_param_list.tex')
-    remove('new_param_list.log')
-    remove('new_param_list.aux')
-    remove('new_param_list.dvi')
-    try:    
-        remove('new_param_list.tex.bak')
+    # Move the EQRM inputs pdf to the Documentation directory. 
+    src = join(expo_dir, 'latex_sourcefiles', 'manual_tech', 'EQRM_inputs.pdf')
+    dst = join(zip_dir, 'Documentation', 'EQRM_inputs.pdf')
+    try:
+        copyfile(src, dst)
     except:
-        pass
-    remove('IMPORTANT_NOTE.doc')
+        print "***************************************"
+        print "***  Could not move EQRM_inputs.pdf ***"
+        print "***************************************"
 
-    # Remove, this is not our IP, we shouldn't distribute.
+    if False:
+        chdir('latex_sourcefiles')
+        chdir('manual_tech')
+        file_base = 'EQRM_inputs'
+        print '       '
+        print 'compiling the new parameter list'
+        s = 'latex ' + file_base + '.tex'
+        print s
+        system(s)
+        s = 'dvipdfm ' + file_base + '.dvi'
+        print s
+        system(s)
+        if False:
+            for ext in ['.tex', '.log', '.aux', '.dvi']:  
+                try:    
+                    remove(file_base + ext)
+                except:
+                    pass
+            try:    
+                remove(file_base + '.bak')
+            except:
+                pass
+            chdir('..')
+            chdir('..')
+
+    chdir('Documentation')
+    # Remove, this dir is not our IP, we shouldn't distribute.
     rmtree('coding_standards')
     
     # Add the stored_version_info.py file to eqrm_code
@@ -239,7 +257,7 @@ def create_distribution_zip(vername, distro_dirs=None,
 def clean_up(current_dir, temp_dir, expo_dir):
     chdir(current_dir)
     rmtree(temp_dir)
-    rmtree(expo_dir)
+    #rmtree(expo_dir)
 
 if __name__ == '__main__':
     if sys.platform == 'win32':  #Windows

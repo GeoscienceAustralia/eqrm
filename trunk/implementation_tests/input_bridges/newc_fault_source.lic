@@ -5,8 +5,8 @@
       <author>David Robinson</author>
     </metadata>
     <datafile>
-      <filename>newc_source_polygon.xml</filename>
-      <checksum>-904432932</checksum>
+      <filename>newc_fault_source.xml</filename>
+      <checksum>2056007991</checksum>
       <publishable>Yes</publishable>
       <accountable>David Robinson</accountable>
       <source>Created by EQRM team.</source>
