@@ -24,7 +24,7 @@ from eqrm_code.ANUGA_utilities.data_audit import IP_verified
 
 # Ignore source code files
 standard_extensions_to_ignore = ['.py','.c', '.h', '.cpp', '.f', '.bat', '.m',
-                        '.sh','.awk','.dll', '.pyd']
+                        '.sh','.awk','.dll', '.pyd', '.for']
 
 # Ignore LaTeX documents
 standard_extensions_to_ignore += ['.tex', '.sty', '.cls', '.bib', '.def',
@@ -57,6 +57,7 @@ standard_extensions_to_ignore += ['.lic']
 # Ignore certain other files,
 standard_files_to_ignore = ['README-documentation.txt',
                             '.project',
+                            'README',
                             'README.txt',
                             'README-getting-started.txt',
                             'README-getting-started.txt',

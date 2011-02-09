@@ -1,6 +1,7 @@
 This directory contains the FORTRAN code and associated files from
-[www.daveboore.com] website.  The FORTRAN has been modified slightly
-to get it to compile.  The Makefile will compile the FORTRAN.
+[http://www.daveboore.com/software_online.htm] website .  The FORTRAN
+has been modified slightly to get it to compile.  The Makefile will
+compile the FORTRAN.
 
 The file nga_gm_tmr.for contains the harness that reads a CTL file
 and calls the model code in nga_gm_tmr_subs.for.  The harness code
