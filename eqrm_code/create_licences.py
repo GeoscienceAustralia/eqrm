@@ -34,9 +34,9 @@ def write_licence(path_file, author,accountable):
       <checksum>%s</checksum>
       <publishable>Yes</publishable>
       <accountable>%s</accountable>
-      <source>HAZUS</source>
+      <source>?</source>
       <IP_owner>?</IP_owner>
-      <IP_info>GNU General Public License</IP_info>
+      <IP_info>?</IP_info>
     </datafile>
 
   </ga_license_file>
@@ -103,9 +103,13 @@ def identify_datafiles(root,
 #-------------------------------------------------------------
 if __name__ == "__main__":
     #write_licence('b_types.csv','Duncan Gray','Duncan Gray')
-#     add_licences_recursively('.',
-# 			     '.csv','u','Peter Row',
-# 			     'Duncan Gray')
+    if False:
+	    add_licences_recursively('.',
+				     '.csv','u','Peter Row',
+				     'Duncan Gray')
+	    add_licences_recursively('.',
+				     '','iot','?',
+				     'Duncan Gray')
     add_licences_recursively('.',
-			     '','iot','?',
+			     '.xml','','?',
 			     'Duncan Gray')

@@ -2,16 +2,16 @@
 
   <ga_license_file>
     <metadata>
-      <author>David Robinson</author>
+      <author>?</author>
     </metadata>
     <datafile>
       <filename>building_parameters_demo_risk_params.csv</filename>
       <checksum>1527447889</checksum>
       <publishable>Yes</publishable>
       <accountable>Duncan Gray</accountable>
-      <source>Created by EQRM team.</source>
-      <IP_owner>Geoscience Australia</IP_owner>
-      <IP_info>For use with EQRM.</IP_info>
+      <source>?</source>
+      <IP_owner>?</IP_owner>
+      <IP_info>?</IP_info>
     </datafile>
 
   </ga_license_file>

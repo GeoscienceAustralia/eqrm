@@ -26,6 +26,9 @@ from eqrm_code.ANUGA_utilities.data_audit import IP_verified
 standard_extensions_to_ignore = ['.py','.c', '.h', '.cpp', '.f', '.bat', '.m',
                         '.sh','.awk','.dll', '.pyd', '.for']
 
+# Ignore fortran contol files
+#standard_extensions_to_ignore = ['.ctl']
+
 # Ignore LaTeX documents
 standard_extensions_to_ignore += ['.tex', '.sty', '.cls', '.bib', '.def',
                                   '.dvi']
@@ -33,8 +36,8 @@ standard_extensions_to_ignore += ['.tex', '.sty', '.cls', '.bib', '.def',
 # Ignore pdf and doc documents
 standard_extensions_to_ignore += ['.pdf', '.doc']
 
-# Ignore images
-standard_extensions_to_ignore += ['.png', '.gif', '.sun', '.eps']
+# Ignore images and colour maps
+standard_extensions_to_ignore += ['.png', '.gif', '.sun', '.eps', '.cpt']
 
 # Ignore EQRM par setup files 
 standard_extensions_to_ignore += ['.par']
@@ -54,10 +57,17 @@ standard_extensions_to_ignore += ['.aux', '.log', '.idx', 'ilg', '.ind',
 standard_extensions_to_ignore += ['.lic']    
 
 
+standard_extensions_to_ignore += ['.machines_tornado']    
+
+
+# Ignore config files
+standard_extensions_to_ignore += ['.gmtcommands4', '.gmtdefaults4']
+
 # Ignore certain other files,
 standard_files_to_ignore = ['README-documentation.txt',
                             '.project',
                             'README',
+                            'Makefile',
                             'README.txt',
                             'README-getting-started.txt',
                             'README-getting-started.txt',
@@ -70,6 +80,7 @@ standard_files_to_ignore = ['README-documentation.txt',
                             'README_imp_unit_test_coverage.txt',
                             'README_notes.txt',
                             'README_system_coverage.txt',
+                            '.machines_tornado'
                             'RcPerWrtBuildCFCBusageEdwards.xls'  # CRC changes
                             ]
 
