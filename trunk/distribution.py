@@ -72,7 +72,7 @@ def create_distribution_zip(vername, distro_dirs=None,
 
     # When using this, make sure the expo_dir is not deleted in 2 places.
     
-    if False: 
+    if True: 
         s = 'svn --force export http://65.61.168.30/svn/eqrm_core/trunk '\
             + expo_dir
     
@@ -257,7 +257,7 @@ def create_distribution_zip(vername, distro_dirs=None,
 def clean_up(current_dir, temp_dir, expo_dir):
     chdir(current_dir)
     rmtree(temp_dir)
-    #rmtree(expo_dir)
+    rmtree(expo_dir)
 
 if __name__ == '__main__':
     if sys.platform == 'win32':  #Windows
