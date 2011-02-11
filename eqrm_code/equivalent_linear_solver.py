@@ -12,7 +12,6 @@
   ModifiedDate: $Date: 2009-09-18 17:10:15 +1000 (Fri, 18 Sep 2009) $
 """
 
-from eqrm_code.util import dict2csv  
 from scipy import nan_to_num, where, array, zeros, indices, ndarray
 
 def solve(SA,SD,SAcap,update_function,rtol=0.05,maxits=100):
@@ -46,18 +45,6 @@ def solve(SA,SD,SAcap,update_function,rtol=0.05,maxits=100):
         #    print iters
         iters+=1 # update number of iterations
         old_intersection_x=intersection_x.copy() # copy old intersection
-        #print "SAcap", SAcap[0][0][0:6]
-        #print "SA",SA[0][0][0:6]
-        #print "SD", SD[0][0][0:6]
-        #print "intersection_x", intersection_x
-        if False: # Note, this is a hack.  For one event, one site examples
-            attribute_dic = {'SA(g)':SA.tolist()[0][0],
-                             'SD(mm)':SD.tolist()[0][0],
-                             'SAcap(g)':SAcap.tolist()[0][0]}
-            title_index_dic = {'SA(g)':0,
-                             'SD(mm)':1,
-                             'SAcap(g)':2} 
-            dict2csv('csm_internal'+str(iters)+'.csv', title_index_dic, attribute_dic)
         SA,SD,SAcap,exit_flag=update_function(intersection_x) # update curves
        
         intersection_x=find_intersection(SD,SA,SAcap) # get new intersection
@@ -78,100 +65,8 @@ def solve(SA,SD,SAcap,update_function,rtol=0.05,maxits=100):
     else: non_convergent=array([])
     return intersection_x,non_convergent
 
-############################################################################
-# The rest of the code just finds the (interpolated) intersection point
-# of Y1,Y2,X. It looks like a good candidate for porting to c - it may
-# actually be simpler in c than in its current vectorized form.
-############################################################################
-# def new_find_intersection(SD,SA,SAcap):
-#     # Note, this doesn't yet work.
-#     num_sites,num_events,num_periods=SA.shape
-#     assert SA.shape==SD.shape
-#     assert SA.shape==SAcap.shape
-#     SDcr=zeros((num_sites,num_events),dtype=float)
-
-    
-#     try:
-#         from scipy import weave
-#         from scipy.weave import converters
-#         code="""
-#         double SDout,y1,y0,x1,x0,dx,dy;
-#         int i,j,k,k0,k1;
-#         for (i=0;i<num_sites;++i){
-#             for (j=0;i<num_events;++j){
-#                 for (k=0;k<num_periods;++k){                
-#                     if (SAcap(i,j,k) > SA(i,j,k)){
-#                         break;
-#                     }
-#                 }
-#                 if (k==0){
-#                     SDout=SD(i,j,0);
-#                 }
-#                 else if (k==num_periods){
-#                     SDout=SD(i,j,0);
-#                     for (k=1;k<num_periods;++k){
-#                         if (SD(i,j,k) > SDout){
-#                             SDout=SD(i,j,k);
-#                         }
-#                     }
-#                 }
-#                 else{
-#                     k1=k;
-#                     k0=k1-1;
-#                     x0=SD(i,j,k0);
-#                     x1=SD(i,j,k1);
-#                     if (x1==x0){
-#                         SDout=x0;
-#                     }
-#                     else{
-#                         y0=SA(i,j,k0)-SAcap(i,j,k0);
-#                         y1=SA(i,j,k1)-SAcap(i,j,k1);
-#                         dx=x1-x0;
-#                         dy=y1-y0;
-#                         SDout=x1-(y1*(dx/dy));
-#                     }
-#                 }
-#                 SDcr(i,j)=SDout;
-#             }
-#         }   
-#         """
-#         weave.inline(code,
-#                      ['SD','SA','SAcap','SDcr',
-#                       'num_sites','num_events','num_periods'],
-#                      type_converters=converters.blitz,
-#                      compiler='gcc')
-#     except:
-#         print 'Slow, running equevalent linear solver in python'
-#         for i in range(num_sites):
-#             for j in range(num_events):
-#                 for k in range(num_periods):
-#                     if SAcap[i,j,k]>SA[i,j,k]:
-#                         break
-#                     k=k+1
-#                 if k==0:
-#                     SDout=SD[i,j,0]
-#                 elif k==num_periods:
-#                     SDout=SD[i,j,0]
-#                     for k in range(1,num_periods):
-#                         if SD[i,j,k]>SDout:
-#                             SDout=SD[i,j,k]
-#                 else:
-#                     k1=k
-#                     k0=k1-1
-#                     x0=SD[i,j,k0]
-#                     x1=SD[i,j,k1]
-#                     if x1==x0:
-#                         SDout=x0
-#                     else:
-#                         y0=SA[i,j,k0]-SAcap[i,j,k0]
-#                         y1=SA[i,j,k1]-SAcap[i,j,k1]
-#                         dx=x1-x0
-#                         dy=y1-y0
-#                         # interpolate SD
-#                         SDout=x1-y1*(dx/dy)
-#                 SDcr[i,j]=SDout
-#     return SDcr
-
+# In EQRM versions before 617 there is a commented out attempt to
+# write this function in C at this point.
 
 def findfirst(condition,axis=-1,no_intersection=-1):
     """

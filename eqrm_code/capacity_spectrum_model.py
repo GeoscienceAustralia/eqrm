@@ -11,8 +11,7 @@
 """
 
 from scipy import newaxis, where
-
-from eqrm_code.util import dict2csv      
+    
 from eqrm_code.equivalent_linear_solver import solve
 from eqrm_code.capacity_spectrum_functions import \
      calculate_capacity_parameters, \
@@ -129,15 +128,6 @@ should NOT be set after initialization - read __init__ for reasons.
         SA,SD,SAcap=self._damped_response(non_linear_damping=0)
         assert len(SA.shape)==3
 
-        # Let's write SA, SD and SAcap out in a file.
-        if False: # Note, this is a hack.  For one event, one site examples
-            attribute_dic = {'SA(g)':SA.tolist()[0][0],
-                             'SD(mm)':SD.tolist()[0][0],
-                             'SAcap(g)':SAcap.tolist()[0][0]}
-            title_index_dic = {'SA(g)':0,
-                             'SD(mm)':1,
-                             'SAcap(g)':2} 
-            dict2csv('csm_internal.csv', title_index_dic, attribute_dic)
         #print "self.capacity_parameters", self.capacity_parameters
         #print "SAcap.tolist()[0][0]", SAcap.tolist()[0][0]
         #print "SA.tolist()[0][0]", SA.tolist()[0][0]

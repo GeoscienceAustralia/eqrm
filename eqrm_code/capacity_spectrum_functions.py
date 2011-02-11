@@ -10,12 +10,19 @@
   Copyright 2007 by Geoscience Australia
 """
 
+import exceptions
+
 from scipy import where, exp, pi, newaxis, stats, weave, zeros, log, \
      asarray, array
 from interp import interp
 
 from eqrm_code import util 
 
+class WeaveIOError(exceptions.Exception):
+    def __init__(self, errno=None, msg=None):
+        msg = ("%s directory is full. Space is needed to compile files."
+               % get_weave_dir())
+        raise IOError(msg)
 
 CSM_DAMPING_USE_SMOOTHING = True # TRUE 0
 CSM_DAMPING_DO_NOT_USE_SMOOTHING = False # FALSE 1
@@ -331,7 +338,7 @@ def calculate_capacity(surface_displacement,capacity_parameters):
                          type_converters=weave.converters.blitz,
                          compiler='gcc')
         except IOError:
-            raise util.WeaveIOError
+            raise WeaveIOError
     else:
         assert Dy.shape==(num_sites,1,1)
         Ay=Ay[:,0,0]
@@ -353,7 +360,7 @@ def calculate_capacity(surface_displacement,capacity_parameters):
                          type_converters=weave.converters.blitz,
                          compiler='gcc')
         except IOError:
-            raise util.WeaveIOError
+            raise WeaveIOError
     return capacity
 
 def calculate_reduction_factors(damping_factor):
@@ -481,7 +488,7 @@ def calculate_updated_demand(periods,SA0,SD0,Ra,Rv,Rd,TAV,TVD,
                          type_converters=weave.converters.blitz,
                          compiler='gcc')
         except IOError:
-            raise util.WeaveIOError
+            raise WeaveIOError
     else:
         assert Ra.shape==(num_sites,num_events,1)
         assert Rv.shape==(num_sites,num_events,1)
@@ -501,15 +508,13 @@ def calculate_updated_demand(periods,SA0,SD0,Ra,Rv,Rd,TAV,TVD,
                          type_converters=weave.converters.blitz,
                          compiler='gcc')
         except IOError:
-            raise util.WeaveIOError
+            raise WeaveIOError
 
     
     if csm_damping_use_smoothing == CSM_DAMPING_USE_SMOOTHING:
         R[...,1:-1]=0.25*R[...,0:-2]+0.5*R[...,1:-1]+0.25*R[...,2:]
     SAnew=SA0/R
     SDnew=SD0/R
-    #print 'SAnew',SAnew[:,0:5]
-    #print 'SDnew',SDnew[:,0:5]
     return SAnew,SDnew
 
 def calculate_corner_periods(periods, ground_motion, magnitude):
