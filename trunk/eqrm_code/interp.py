@@ -56,12 +56,11 @@ def interp(new_period, old_c, old_period, axis=0,
     if not old_c.shape[axis]==len(old_period):
         raise TypeError, "Bad vaules"
 
-    # this will sort the 
+    # this will sort the old periods
     old_period_order=old_period.argsort()
     old_period=old_period.take(old_period_order)
     old_c=old_c.take(old_period_order,axis=axis)     
 
-    # scipy interp is annoying
     new_period_index=old_period.searchsorted(new_period)
     # returns i such that old_period[i-1] < new_period <= old_period[i]
     # returns len(old_period) if old < new
