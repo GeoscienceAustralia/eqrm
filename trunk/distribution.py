@@ -47,7 +47,7 @@ distro_files = [
     ]
     
 def main():
-    create_distribution_zip('eqrm_version2.0.',distro_dirs=distro_dirs,
+    create_distribution_zip('eqrm_version2.1.',distro_dirs=distro_dirs,
                                    distro_files=distro_files)
     
 def create_distribution_zip(vername, distro_dirs=None,
@@ -201,7 +201,7 @@ def create_distribution_zip(vername, distro_dirs=None,
     fid.write('version = '+version+'\n')
     fid.close()
     remove('test_cadell_damage.py')
-    rmtree('plotting')
+    #rmtree('plotting')
     
     
     #eqrm_code_dir = join(zip_dir,'eqrm_code')
