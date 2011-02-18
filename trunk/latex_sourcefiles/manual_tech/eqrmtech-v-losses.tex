@@ -1,0 +1,317 @@
+\chapter{Losses}
+\label{ch:losses}
+
+\section{Overview}
+The EQRM considers two types of loss:
+\begin{enumerate}
+\item \textbf{direct financial loss} defined as the cost involved
+in replacing damaged building components and/or contents; and
+\item \textbf{social loss} defined as the number (or probability)
+of casualties and injuries as a result of a simulated scenario.
+\end{enumerate}
+This chapter describes the direct financial and social loss
+modules.
+
+\section{Direct financial loss}
+
+\subsection{General financial loss equations: loss for a single building}
+
+Recall that the capacity spectrum method\index{capacity spectrum
+method} assumes that each building comprises three main
+components, namely a structural, non-structural drift sensitive
+and non-structural acceleration sensitive component.
+\sref{ch:damage} described how the damage experienced by each
+building is computed separately for each of the components. It is
+therefore necessary to partition the replacement cost of the
+building into the replacement cost for each of the three
+components. The proportion chosen for each building component is a
+function of the buildings construction and usage type as well as
+the usage classification system. For example
+\tref{tab:grids-costproportions} illustrates the proportion of the
+replacement value corresponding to a couple of different buildings
+for both the HAZUS\index{building usgage!HAZUS} and
+FCB\index{building usgage!FCB} classification system. The
+\typeself{set}{da}{ta} flag \typepar{b\_usage}{\_type}{\_flag} can
+be used to select the usage classification system and consequently
+the desired cost proportions.
+
+\begin{table}
+\centering \caption{Examples of costing splits for the
+FCB\index{building usgage!FCB} and HAZUS usage
+classification\index{building usgage!HAZUS}.}
+\label{tab:grids-costproportions}  \vspace{0.8em}
+\begin{tabular}{|l|l|}
+
+ \hline
+\textbf{FCB Usage Classification} &  \\
+ & \\
+\textit{111 -- W1BVTILE:} & \\
+structural & 23.44\%\\
+non-structural drift sensitive & 50.00\%\\
+non-structural acceleration sensitive & 26.56\%\\
+ & \\
+\textit{491 -- C1MSOFT:} & \\
+structural & 15.32\%\\
+non-structural drift sensitive & 34.23\%\\
+non-structural acceleration sensitive & 50.45\%\\
+\hline
+\textbf{HAZUS Usage Classification} &  \\
+ & \\
+\textit{RES1  -- W1BVTILE:} & \\
+structural & 23.44\%\\
+non-structural drift sensitive & 50.00\% \\
+non-structural acceleration sensitive & 26.56\%\\
+ & \\
+\textit{COM5 -- URMLMETAL:} & \\
+structural & 13.79\%\\
+non-structural drift sensitive & 34.48\%\\
+non-structural acceleration sensitive & 51.72\%\\
+\hline
+\end{tabular}
+\end{table}
+
+Let $P_{i \alpha}$ denote the probability of being in a damage
+state $\alpha=(1,2,3,4)=(S,M,E,C)$ corresponding to Slight,
+Moderate, Extensive and Complete damage, where the index
+$i=(1,2,3)=(s, n_d, n_a)$ corresponds to the type of damage: drift
+sensitive structural damage (s), drift sensitive non-structural
+damage ($n_d$) and acceleration sensitive non-structural damage
+($n_a$). Contents damage is factored in later.
+
+We also define $L_i$ as the financial loss corresponding to the 3
+building components (structural damage, $i=s=1$; drift-sensitive
+non-structural damage, $i=n_d=2$; acceleration-sensitive
+non-structural damage $i=n_a=3$; and $L_4$ as the financial loss
+due to damage of contents.
+
+
+Let $R_i$ denote the replacement cost component of the building
+per unit floor area, for $i=(1,2,3)=(s,n_d,n_a)$. Thus
+$R=R_1+R_2+R_3$ is the total replacement cost (per unit floor
+area) of the building (excluding contents). The financial loss,
+for a single building, excluding contents, is then given as the
+weighted sums of the probabilities
+\begin{align*}
+\label{eq:this-loss}
+ L_1 &= C_0\sum_{\alpha=1}^4
+   f_{\alpha, 1} R_1 A P_{\alpha, 1} =
+   \sum_{\alpha=1}^4 f_{\alpha, 1} g_1R A P_{\alpha, 1},\\
+L_2 &= C_0 \sum_{\alpha=1}^4
+   f_{\alpha, 2} R_2 A P_{\alpha, 2} =
+   \sum_{\alpha=1}^4 f_{\alpha, 2} g_2R A P_{\alpha, 2}, and\\
+L_3 &= C_0 \sum_{\alpha=1}^4
+   f_{\alpha, 3} R_3 A P_{\alpha, 3} =
+    \sum_{\alpha=1}^4 f_{\alpha, 3} g_3R A P_{\alpha, 3},
+\end{align*}
+where $A$ is the floor area of the building (in $\mathrm{m}^2$).
+Note that $R$ is the replacement cost of the building, $f_{\alpha,
+i}$ is a repair cost fraction of replacement cost for the given
+damage state, $g_i$ is the damage component replacement value as a
+fraction of the replacement value, and $C_0$ is a regional cost
+factor\index{regional cost factor}. The total loss of the
+building, excluding contents, is $L=L_1+L_2+L_3$.
+
+Note that for percentage loss (loss divided by the value of the
+building) the quantity $c_0R$ cancels.
+
+
+For example, the total repair cost for a building (excluding contents)
+in damage
+state $\alpha=3=E$ is $f_{3,1}R_1+f_{3,2}R_2+f_{3,3}R_3$.
+The probabilities $P_{\alpha, i}$ correspond to the probability
+of the building component $i=(s, n_d, n_a)$ being in damage state
+$\alpha=(S,M,E,C)$.
+
+The regional cost factor\index{regional cost factor}, $C_0$, is a
+normalising factor to calibrate the replacement costs if
+necessary. For example in the Newcastle risk assessment
+\citep{dr_Fulford02a} the HAZUS cost values were used (see
+\tref{tab:replace_costs}) and converted to the Newcastle region
+using $C_0= 1.4516$. In this particular case the $C_0$ was
+computed by assuming that a $100\,\mathrm{m^2}$ brick veneer
+residential house (RES1, W1BVTILE) had a replacement cost of
+AUS\$1,000 per $\mathrm{m}^2$ (this value of \$1000 having been
+obtained from NRMA web site for the NSW region). In other studies,
+such as the Perth Cities case study, the replacement costs (see
+\tref{tab:grids-bdatabasecolumns}) were defined for the region and
+no further correction was required. Note that the parameter $C_0$
+is \typepar{c}{}{i} in the \typeself{set}{da}{ta} file.
+
+\begin{table}[p]
+\centering \caption{Calculated replacement costs (AUD
+$\mathrm{m^2}$) of building
+  usage types.}
+  \vspace{0.8em}
+\label{tab:replace_costs} \small
+\input tab-v-losses-repcosts
+\end{table}
+
+
+The repair cost factors $f_{\alpha, i}$
+are the proportions of the replacement costs (for each building
+component $i=(1,2,3)=(s, n_d, n_a)$  per floor area.
+For structural damage,
+\begin{equation}
+ f_{\alpha, 1} = (2\%, 10\%, 50\%, 100\%),
+\end{equation}
+for non-structural damage (drift-sensitive),
+\begin{equation}
+ f_{\alpha, 2} = (2\%, 10\%, 50\%, 100\%),
+\end{equation}
+and for non-structural damage (acceleration-sensitive)
+\begin{equation}
+ f_{\alpha, 3} = (2\%, 10\%, 30\%, 100\%),
+\end{equation}
+These values are taken from \cite{dr_FEMA99b}. For example, the
+repair cost for the acceleration-sensitive components in the
+extensive damage state are given by the product $f_{33}R_3$, so
+that if the replacement cost for complete damage is \$500 per
+square metre, the repair cost would be $30/100\times\$500$.
+
+
+The directory \typedir{*/eqrm}{/datacvt}{/econsoclosspars}
+contains tools to assist the preparation of direct financial loss
+parameters. The files
+\typeparfile{RcPerWrt}{BuildCFCB}{usageEdwards}{.xls} and
+\typeparfile{RcPerWrt}{BuildCHazus}{usageEdwards}{.xls} contain
+the replacement cost component of the building per unit floor area
+$R_i$ for the FCB\index{building usgage!FCB} and
+HAZUS\index{building usgage!HAZUS} usage types respectively. The
+MATLAB function \typefunc{per\_replace}{\_cost\_wrt}{\_bc\_usage}
+converts these excel files to \texttt{*.MAT} that can be used by
+the EQRM. The EQRM assumes the replacement cost components to be
+independent of the construction type. There are a few exceptions,
+which have not been implemented. These are based on the tables
+given in \cite{dr_FEMA99b}, in particular, Table 25.2a (page
+15-12), Table 13.3 (page 15-14) and Table 15.4 (page 15-15). In
+principle the tools in
+\typedir{*/eqrm}{/datacvt}{/econsoclosspars} allow the replacement
+cost components to be a function of both usage and construction
+type. Note that \typefunc{per\_replace}{\_cost\_wrt}{\_bc\_usage}
+attributes proportions of the building's total value to its
+different components. Recall form
+\tref{tab:grids-bdatabasecolumns} that the replacement costs for
+each building is stored with the building database.
+
+The contents damage, $L_4$, is based only on the probabilities for
+acceleration sensitive non-structural damage being in Slight,
+Moderate, Extensive or Complete states, and on the total contents
+repair costs $R_4$ defined by the building database\index{building
+database} (see \tref{tab:grids-bdatabasecolumns}). The cost $L_4$
+is then added to the building damage cost $L$ to get the overall
+loss $L^*$ which includes contents.
+
+As with the building components, the loss for contents damage, is
+expressed as a weighted sum of probabilities of the acceleration
+sensitive components for each damage state,
+\begin{equation}
+\label{eq:vlosses-contents}
+ L_{4} = C_0 \sum_{\alpha=1}^{4} f_{\alpha,4}R_4P_{\alpha 3},
+\end{equation}
+where $P_{\alpha 3}$ is the probability of the acceleration
+sensitive component of the building being in damage state
+$\alpha=(1,2,3,4)=(S,M,E,C)$ and $f_{\alpha,4}$ is the repair cost
+fraction of the replacement value for the contents in damage state
+$\alpha=(S,M,E,C)$. This factor is expressed as a percentage in
+\tref{tab:replace_costs} and has been taken from \citet[Table
+15.6, page 15-21]{dr_FEMA99b}. Furthermore, for contents damage,
+\begin{equation}
+ f_{\alpha 4} = (1\%, 5\%, 25\%, 50\%).
+\end{equation}
+These values assume that 50\%\ of the contents in complete damage
+can be salvaged with similar proportions for lesser damage
+\citep{dr_FEMA99b}. If the \typeself{set}{da}{ta} parameter
+$\typepar{aus}{\_contents}{\_flag}$ is set to 1 the following
+modifications are made as to suggested by George Walker (Aon Re):
+\begin{enumerate}
+\item HAZUS usage\index{building usgage!HAZUS} only: The contents
+value of usage types 1 to 10, 24 and 29 (see
+\tref{tab:grids-HAZUSusage}) are re-assigned to 60\% of $R_4$.
+\item $f_{\alpha 4}$ is re-assigned to $(2\%, 10\%, 50\%, 100\%)$
+which assumes that no contents will be salvaged from complete
+damage of Australian buildings.
+\end{enumerate}
+
+\subsection{Aggregated loss and survey factors}
+\label{sec:loss-surveyfacts}
+
+Each building in the database represents a sample from its
+surrounding area. There is a building survey factor associated
+with each building, which represents the additional number of
+buildings that are represented by the modelled building (see
+\tref{tab:grids-bdatabasecolumns}). Typically the extra buildings
+are of the same type and are located in close proximity to the
+modelled building.
+
+The aggregated loss is therefore the weighted sum of the losses of
+each building in the database with its corresponding survey factor.
+
+The aggregated financial loss values are saved to a file of form
+\typeoutput{<site\_loc>}{\_db\_save}{decloss}{.mat}. If the
+\typeself{set}{da}{ta} parameter
+$\typepar{save}{\_ecloss}{\_flag}=1$ a combined loss for the
+building and contents is saved; whereas if
+$\typepar{save}{\_ecloss}{\_flag}=2$ the losses for the building
+and contents are saved separately.
+
+
+\subsection{Cutoff values}
+
+The damage and financial loss models estimate small (but finite)
+damage for very small ground accelerations. This arises due to the
+asymptotic nature of the fragility curves. A cutoff value has been
+implemented in the code to prevent such small values being
+calculated. The cutoff is in terms of PGA and is controlled by the
+\typeself{set}{da}{ta} parameter \typepar{pga}{\_min}{damage}. For
+all those events having peak ground acceleration (pga) values
+smaller than \typepar{pga}{\_min}{damage} at the building
+location, the financial loss is set to zero. Typically it is
+assumed that no damage worth reporting occurs for ground
+accelerations smaller than $\typepar{pga}{\_min}{damage}=0.05g$.
+
+
+\section{Social losses}
+
+The EQRM includes a module for computing the injuries and
+casualties associated with a scenario simulation (see
+\sref{sec:source-scenario}). The code for considering social
+losses associated with probabilistic simulations has not yet been
+written. The social loss module is activated by setting the
+\typeself{set}{da}{ta} parameter \typepar{save}{\_socloss}{\_flag}
+to 1. When activated, the social loss module produces a file
+\typeoutput{<site\_loc>}{\_db\_save}{dsocloss}{.mat} that can be
+processed by the MATLAB script \typescript{newc}{89plot}{histsoc}.
+
+For the Newcastle 1989 simulation the results are slightly greater
+than those observed in the actual earthquake (e.g. median of 45
+casualties vs 13 casualties actually recorded). Further
+investigation of the model is recommended before it is widely
+used. Firstly, a check on the accuracy of the distribution of the
+population would be useful. Secondly, some thought should be given
+to a model which distributes the population randomly. It is
+expected that this will result in a greater spread of the
+distribution of injuries.
+
+Chapter 13 of \cite{dr_FEMA99b} provides a detailed description of
+the methodology behind social loss calculations.
+
+\section{Key functions, flags and parameters}
+
+\begin{tabular}{llp{0.5\textwidth}}
+\hline
+\textbf{Name} & \textbf{Type} & \textbf{Description} \\
+\hline
+\splitrowdir{*/eqrm/datacvt}{/econsoclosspars} & Dir & Tools to assist the preparation of direct financial loss parameters.\\
+\keyrowsep \splitrowfunc{per\_replace\_cost}{\_wrt\_bc\_usage} & Function & Converts the \typeparfile{RcPerWrt}{BuildCFCB}{usageEdwards}{.xls} and \typeparfile{RcPerWrt}{BuildCHazus}{usageEdwards}{.xls} to the required format for the EQRM.\\
+\keyrowsep \typefunc{so}{c}{loss} & Function & Function for calculating injury probabilities.\\
+\keyrowsep \typescript{newc}{89plot}{histsoc} & Script & MATLAB script to plot injury probabilities (for Newcastle scenario only).\\
+\keyrowsep \splitrowparfile{RcPerWrtBuildCFCB}{usageEdwards}{.xls} & Par File & Replacement cost component of the building per unit floor area for the HAZUS usage classification.\\
+\keyrowsep \splitrowparfile{RcPerWrtBuildCHazus}{usageEdwards}{.xls}  & Par File & Replacement cost component of the building per unit floor area for the FCB usage classification.\\
+\keyrowsep \typepar{c}{}{i} & Par & Regional cost index multiplier.\\
+\keyrowsep \typepar{aus}{\_contents}{\_flag} & Par & Contents value for residential buildings and salvageability after complete building damage.\\
+\keyrowsep \typepar{pga}{\_min}{damage} & Par & minimum PGA(g) below which financial loss is assigned to zero.\\
+\keyrowsep \typepar{save}{\_ecloss}{\_flag} & Par & Options for saving direct financial loss data.\\
+\keyrowsep \typepar{save}{\_socloss}{\_flag} & Par & Options for saving casualty and injury data.\\
+\keyrowsep \splitrowoutput{<site\_loc>\_db}{\_savedecloss}{.mat} & Output & Output file containing the loss estimates for an EQRM risk simulation.\\
+\hline
+\end{tabular}
