@@ -5,11 +5,30 @@ import unittest
 
 from numpy import array, allclose, asarray
 
-from eqrm_code.util import reset_seed
 from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
 from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING
 
+
+def reset_seed(use_determ_seed=False):
+    """Set random seeds.
+
+    use_determ_seed  True if we use a fixed seed (for testing)
+    """
+    
+    from random import seed as pyseed
+    from random import random
+    from numpy.random import seed
+
+    if use_determ_seed:
+        # reset both seeds to a deterministic inital state
+	pyseed(11)
+	seed(10)
+    else:
+        from time import time 
+
+	pyseed(int(time()))
+	seed(int(999*random()+time()))
 
 class Test_Capaciy_Spectrum_model(unittest.TestCase):
     

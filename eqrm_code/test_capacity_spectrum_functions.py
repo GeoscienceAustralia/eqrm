@@ -3,11 +3,8 @@ import unittest
 
 from scipy import array, allclose, newaxis, arange
 from eqrm_code.capacity_spectrum_functions import *
-from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model
 from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
-
-from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING
 
 
      
