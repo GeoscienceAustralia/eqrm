@@ -66,6 +66,9 @@ requirement for which depends on settings in the EQRM control file}
 \clearpage The following grey shaded box provides an
 example of an EQRM controlfile to undertake a PSHA.
 
+% Use a real file that is exected during distribution.
+% This will automatically keep this small section 
+% of the manual up-to-date.
 %\lstinputlisting{xml_examples/EQRM_controlfile.py}
 \lstinputlisting{../../demo/setdata_ProbHaz.py}
 
@@ -86,11 +89,17 @@ together
 \subsection{Source Zone File}
 \label{sec:source-zone-file}
 
+
 \begin{center}
 \begin{tabular}{|c|}
 \hline
  \\
-Filename: \texttt{<site\_tag>\_}\texttt{fault\_source\_}\texttt{<zone\_source\_tag>}\texttt{.xml}  \\
+ If \texttt{<zone\_source\_tag>} is defined then the file name is:\\
+\texttt{<site\_tag>\_}\texttt{zone\_source\_}\texttt{<zone\_source\_tag>}\texttt{.xml}
+\\
+\\
+Otherwise the file name is:\\
+\texttt{<site\_tag>\_}\texttt{zone\_source}\texttt{.xml}\\
 \\
 \hline
 \end{tabular} 
@@ -102,7 +111,8 @@ anywhere within a source zone. The magnitude recurrence relationship
 for each source zone is defined by a bounded Gutenberg-Richter
 relationship. The following grey shaded box provides an example of a
 source zone file. A description of the parameters follows.
-\lstinputlisting{xml_examples/source_model_zone_example.xml}
+%\lstinputlisting{xml_examples/source_model_zone_example.xml}
+\lstinputlisting{../../demo/input/newc_zone_source.xml}
 
 \textbf{General inputs} (\texttt{source\_model\_zone})
 \begin{itemize}
@@ -121,26 +131,43 @@ event type controlfile.
 
 \textbf{Geometry inputs} (\texttt{geometry})
 \begin{itemize}
-\item \texttt{azimuth}: Center azimuth for randomly generated synthetic ruptures 
-\item \texttt{delta\_azimuth}: Range over which randomly generated azimuths will
-be sampled. That is, the azimuth of all synthetic earthquake will be randomly drawn
-from a uniform distribution between \texttt{azimuth}$\pm$\texttt{delta\_azimuth}. 
-\item \texttt{dip}: Center dip for randomly generated synthetic ruptures 
+
+\item \texttt{azimuth}: Center azimuth for randomly generated
+  synthetic ruptures (degrees).
+  
+\item \texttt{delta\_azimuth}: Range over which randomly generated
+  azimuths will be sampled. That is, the azimuth of all synthetic
+  earthquake will be randomly drawn from a uniform distribution
+  between \texttt{azimuth}$\pm$\texttt{delta\_azimuth} (degrees).
+
+\item \texttt{dip}: Center dip for randomly generated synthetic
+  ruptures (degrees).
+  
 \item \texttt{delta\_dip}: Range over which randomly generated dips will
 be sampled. That is, the dip of all synthetic earthquake will be
-randomly drawn from a uniform distribution between \texttt{dip}$\pm$\texttt{delta\_dip}.
-\item \texttt{depth\_top\_seismogenic}: Depth (km) to the top of the seismogenic zone in km.
-No component of a synthetic rupture will be located above this value. 
-\item \texttt{depth\_bottom\_seismogenic}: Depth (km) to the bottom of the seismogenic zone in km.
-No component of a synthetic rupture will be located below this value. 
+randomly drawn from a uniform distribution between
+\texttt{dip}$\pm$\texttt{delta\_dip} (degrees).
+
+\item \texttt{depth\_top\_seismogenic}: Depth (km) to the top of the
+  seismogenic zone in km.  No component of a synthetic rupture will be
+  located above this value.
+
+\item \texttt{depth\_bottom\_seismogenic}: Depth (km) to the bottom of
+  the seismogenic zone in km.  No component of a synthetic rupture
+  will be located below this value.
+ 
 \item \texttt{boundary}: Boundary of the areal source zone as
 defined on the surface of the Earth in longitude (column 1) and
-latitude (column 2). 
+latitude (column 2). The first and last points must be the same to
+close the polygon.
+
 \item \texttt{excludes}: Boundary of any regions in the source in
-which events are not required. Boundary defined on the surface of
-the Earth in longitude (column 1) and latitude (column 2). This parameter 
-is optional. the source zone file may have no \texttt{exclude} zones, a single 
-entry or multiple entries.
+  which events are not required. Boundary defined on the surface of
+  the Earth in longitude (column 1) and latitude (column 2). The first
+  and last points must be the same to close the polygon.This parameter
+  is optional. the source zone file may have no \texttt{exclude}
+  zones, a single entry or multiple entries.
+
 \end{itemize}
 
 \textbf{Recurrence inputs} (\texttt{recurrence\_model})
@@ -175,12 +202,18 @@ be generated in the source zone.
 \begin{center}
 \begin{tabular}{|c|}
 \hline
+ \\
+ If \texttt{<fault\_source\_tag>} is defined then the file name is:\\
+\texttt{<site\_tag>\_}\texttt{fault\_source\_}\texttt{<fault\_source\_tag>}\texttt{.xml}
 \\
-Filename: \texttt{<site\_tag>\_}\texttt{fault\_source\_}\texttt{<fault\_source\_tag>}\texttt{.xml}\\
+\\
+Otherwise the file name is:\\
+\texttt{<site\_tag>\_}\texttt{fault\_source}\texttt{.xml}\\
 \\
 \hline
 \end{tabular} 
 \end{center}
+
 
 The source faults file is used to describe one or more faults
 (including crustal faults and subduction interfaces) and/or one or
@@ -204,31 +237,43 @@ subducting slab (\texttt{intraslab 1}).
 Many of the parameters in the source fault file are identical to
 those described in \sref{sec:source-zone-file} and are not described
 separately here. A description of the new parameters is provided
-below. \lstinputlisting{xml_examples/source_model_fault_example.xml}
+below. 
+
+%\lstinputlisting{xml_examples/source_model_fault_example.xml}
+\lstinputlisting{../../demo/input/newc_fault_source.xml}
 
 \textbf{Parameters unique to the source fault file}
 \begin{itemize}
-\item \texttt{dip}: Dip of fault, defined as angle in degrees from horizontal
-\item \texttt{out\_of\_dip\_theta}: Out of plane dip, used for intraslab events. Angle between fault plane
-and out of dip rupture plane
-\item \texttt{delta\_theta}: Bounds the range of dips for intraslab events. That is,
-all synthetic ruptures will have uniformly random sampled dips in
-the range \texttt{dip + out\_of\_dip\_theta} $\pm$
-\texttt{delta\_theta}
-\item \texttt{slab\_width}: Width of slab (km) when using a fault source to represent intraslab
-earthquakes in the subducting slab
+\item \texttt{dip}: Dip of fault, defined as angle in degrees from
+  horizontal.
+  
+\item \texttt{out\_of\_dip\_theta}: Out of plane dip, used for
+  intraslab events. Angle between fault plane and out of dip rupture
+  plane (degrees).
+
+\item \texttt{delta\_theta}: Bounds the range of dips for intraslab
+  events. That is, all synthetic ruptures will have uniformly random
+  sampled dips in the range \texttt{dip + out\_of\_dip\_theta} $\pm$
+  \texttt{delta\_theta} (degrees).
+
+\item \texttt{slab\_width}: Width of slab (km) when using a fault
+  source to represent intraslab earthquakes in the subducting slab.
+
 \item \texttt{trace}: Surface trace of the fault along the surface
 of the Earth. Note that it is the projection of the fault along the
 direction of dip. It is defined by the latitude (\texttt{lat}) and
 longitude (\texttt{lon}) of the start and end of the trace.
 \item \texttt{slip\_rate}: Slip rate of fault in mm per year.
-\item \texttt{distribution}: Distribution used to define the magnitude recurrence relations. 
-For faults the EQRM supports (i) a Bounded Gutenberg-Richter
-recurrence relationship
-(\texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}) or (ii) a
-combined Bounded Gutenberg-Richter and Characteristic model
-(\texttt{characteristic}). For intraslab earthquakes the EQRM
-supports only \texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}
+
+\item \texttt{distribution}: Distribution used to define the magnitude
+  recurrence relations.  For faults the EQRM supports (i) a Bounded
+  Gutenberg-Richter recurrence relationship
+  (\texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}) or (ii) a
+  combined Bounded Gutenberg-Richter and Characteristic model
+  (\texttt{characteristic}). For intraslab earthquakes the EQRM
+  supports only
+  \texttt{bounded}\texttt{\_gutenberg}\texttt{\_richter}.
+
 \item \texttt{recurrence\_max\_mag}: Maximum magnitude used to
 define the recurrence relationship. Typically, this is the magnitude
 of the largest earthquake expected on the fault (or in the
@@ -281,11 +326,14 @@ The parameters enclosed within \texttt{<scaling} and \texttt{/>}
  control the magnitude to size scaling during the generation of
  synthetic ruptures. These parameters include:
 \begin{itemize}
-\item \texttt{scaling\_rule}: Defines the set of scaling rules
-which link $M_w$ to area, length and/or width. Currently the only
-set of scaling rules supported by the EQRM are those defined by
-Wells and Coppersmith (1994). Therefore, the only allowable option
-is \texttt{Wells\_\and\_Coppersmith\_94}.
+
+\item \texttt{scaling\_rule}: Defines the set of scaling rules which
+  link $M_w$ to area, length and/or width. Currently the only set of
+  scaling rules supported by the EQRM are those defined by Wells and
+  Coppersmith (1994). Therefore, the only allowable options are
+  \texttt{Wells\_and\_Coppersmith\_94} and
+  \texttt{modified\_Wells\_and\_Coppersmith\_94}.
+
 \item \texttt{scaling\_fault\_type}: Fault mechanism used with the scaling rule.
 Allowable options are \texttt{normal}, \texttt{reverse},
 \texttt{strike\_slip} and \texttt{unspecified}. Typically,
