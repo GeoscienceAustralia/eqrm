@@ -27,13 +27,19 @@ merely suggesting the value they would use in most circumstances.
 For example, the suggested value for \texttt{loss\_min\_pga} is
 0.05.
 
-Finally, the term preferred is used to indicate those parameters
+The term preferred is used to indicate those parameters
 that the developers believe to be most appropriate. For example,
 the preferred value for \typepar{csm\_}{hysteretic\_}{damping} is
 \texttt{curve}. In this case the alternative choices of
 \texttt{None} and \texttt{trapezoidal} would typically only be used for
 experimental purposes.
 
+A simulation can be started by executing an EQRM control file or by
+executing \texttt{analysis.py} and passing a control file in.  The
+control file is a Python script, so Python code can be used to
+manipulate parameter values.  Note though that all variables other
+than the parameter values must be deleted to avoid passing unknown
+variables into EQRM.
 
 \vspace{2em}
 
@@ -92,7 +98,8 @@ return periods to be considered for PSHA. \\
 Directory containing any local input files.\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{output\_dir}: \\
-Directory for output files.    \\
+Directory for output files. This directory will be created
+if not present   \\
 %---------------------------------------------------------
     \hline \vspace{0.1em} \texttt{use\_site\_indexes}: \\
 DEFAULT = \texttt{False} \\
@@ -111,21 +118,27 @@ List whose elements represent the site
 \begin{tabular}{|p{\textwidth}|}
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{zone\_source\_tag}: \\
-Extra tag for specifying a unique source zone file. The
-filename for the source zone is
-\texttt{<site\_tag>\_}\texttt{fault\_source\_}\texttt{<zone\_source\_tag>}\texttt{.xml}
+Extra tag for specifying a unique source zone file. 
+If  \texttt{zone\_source\_tag} is defined the
+filename for the zone source file is
+\texttt{<site\_tag>\_zone\_source\_<fault\_source\_tag>.xml}.
+Otherwise it is \texttt{<site\_tag>\_zone\_source.xml}.
 \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{fault\_source\_tag}: \\
-Extra tag for specifying a unique source fault file. The
+Extra tag for specifying a unique source fault file. 
+If  \texttt{fault\_source\_tag} is defined the
 filename for the fault source file is
-\texttt{<site\_tag>\_}\texttt{fault\_source\_}\texttt{<fault\_source\_tag>}\texttt{.xml}
+\texttt{<site\_tag>\_fault\_source\_<fault\_source\_tag>.xml}.
+Otherwise it is \texttt{<site\_tag>\_fault\_source.xml}.
 \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{event\_control\_tag}: \\
-Extra tag for specifying a unique event control file. The
+Extra tag for specifying a unique event control file.
+If  \texttt{fault\_source\_tag} is defined the
 filename for the event control is
 \texttt{<site\_tag>\_}\texttt{event\_control\_}\texttt{<event\_control\_tag>}\texttt{.xml}
+Otherwise it is \texttt{<site\_tag>\_event\_control.xml}.
 \\
  %---------------------------------------------------------
 % DR - must check if this is operational for hazard site file
@@ -180,11 +193,11 @@ or the CSM (\typepar{csm\_}{variability\_}{method}$=3$).\\
 \vspace{0.3em} \noindent \Large \textbf{Ground Motion Input:} \normalsize \\
 %---------------------------------------------------------
 \hline \vspace{0.1em}
-\texttt{atten\_aggregate\_Sa\_of\_atten\_models}: \\
+\texttt{atten\_collapse\_Sa\_of\_atten\_models}: \\
 DEFAULT $=$ \texttt{False} \\
-SUGGESTED $=$ 1 (PSHA), 2 (PSRA) or 3 to 6 (Scenario) 
 Set to \texttt{True} to collapse the surface acceleration's when
 multiple GMPEs are used.\\
+%---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_variability\_method}: \\
 DEFAULT  = 2 \\
  Technique used to
@@ -199,12 +212,16 @@ incorporate GMPE aleatory uncertainty: \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_periods}: \\
 Periods for RSA. Values must ascend. \\
-\hline
 %---------------------------------------------------------
 \vspace{0.1em} \texttt{atten\_threshold\_distance}: \\
 DEFAULT $=$ 400 \\
 Threshold distance (km) beyond which motion is assigned to zero. \\
 %---------------------------------------------------------
+\vspace{0.1em} \texttt{atten\_spawn\_bins}: \\
+DEFAULT $=$ None \\
+Number of bins created when spawning. \\
+%---------------------------------------------------------
+\hline
 \hline \vspace{0.1em} \texttt{atten\_override\_RSA\_shape}: \\
 DEFAULT = \texttt{None} \\
 Use GMPE for PGA only and change shape of RSA. If `None' use RSA
@@ -261,11 +278,13 @@ Technique used to incorporate amplification aleatory uncertainty: \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{amp\_min\_factor}: \\
 SUGGESTED = 0.6 \\
-Minimum accepted value for amplification factor.    \\
+Minimum accepted value for amplification factor. 
+This minimum will not be used for Vs30 models.   \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{amp\_max\_factor}: \\
 SUGGESTED = 10000 \\
-Maximum accepted value for amplification factor.   \\
+Maximum accepted value for amplification factor. 
+This maximum will not be used for Vs30 models.    \\
 \hline
 %---------------------------------------------------------
 \end{tabular}
@@ -393,7 +412,9 @@ building database and salvageability \\
 \vspace{0.3em} \noindent \Large \textbf{Save Input:} \normalsize \\
 \hline \vspace{0.1em} \texttt{save\_hazard\_map}: \\
 DEFAULT = \texttt{False} \\
-\texttt{True} $\Rightarrow$ Save data for hazard maps (Use for saving PSHA results). \\
+\texttt{True} $\Rightarrow$ Save data for hazard maps (Use for saving
+PSHA results). Specifically spectral acceleration with respect to
+location, return period and period.\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{save\_total\_financial\_loss}: \\
 DEFAULT = \texttt{False} \\
