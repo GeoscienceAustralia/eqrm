@@ -413,7 +413,7 @@ The site file for hazard is a csv file containing a list of points at which the 
 \item \texttt{SITE\_CLASS}: Regolith site class. Typically, this is defined
 by a letter. Note that the value of this parameter must match with
 an amplification factor defined in the amplification file (see
-\sref{sec:-appl-amplification})
+\sref{sec:-appl-amplification}) 
 \item \texttt{VS30}: Average velocity in the top 30\,m (i.e. $V_{s30}$). This is used
 to incorporate regolith for GMPEs with a $V_{s30}$ term.
 \end{itemize}
@@ -440,21 +440,33 @@ portfolio. It contains a list of points at which the risk (PSHA simulation)
 
 \textbf{Parameters in the building database:}
 \begin{itemize}
-\item \texttt{BID}: Integer site identifier for EQRM (typically the same as column 10)
+\item \texttt{BID}: Integer site identifier for EQRM
 \item \texttt{LATITUDE}: Latitude of building
 \item \texttt{LONGITUDE}: Longitude of building
-\item \texttt{STRUCTURE\_CLASSIFICATION}: Index to building construction type... \textbf{expanded} HAZUS list (\sref{sec:grids-constructionclass})
-\item \texttt{STRUCTURE\_CATEGORY}: Type of structure (e.g. building or bridge)
+
+\item \texttt{STRUCTURE\_CLASSIFICATION}: \textbf{Expanded} HAZUS
+  building type. See \sref{sec:grids-constructionclass}
+    \tref{tab:v-dam-allbtypes}, \tref{tab:hazus-types}) for a full
+    description of the types.
+  
+\item \texttt{STRUCTURE\_CATEGORY}: Type of structure. Currently ``texttt{BUILDING} `` only
 \item \texttt{HAZUS\_USAGE}: Index to HAZUS usage\index{building usgage!HAZUS} classification (\sref{sec:grids-usageclass})
 \item \texttt{SUBURB}: within which building is located
 \item \texttt{POSTCODE}: Postcode within which building is located
 \item \texttt{PRE1989}: Logical index stating whether the building is pre- (0) or post- (1) the 1989 Newcastle earthquake
-\item \texttt{HAZUS\_STRUCTURE\_CLASSIFICATION}: Index to building construction type... HAZUS list (\sref{sec:grids-constructionclass})
+\item \texttt{HAZUS\_STRUCTURE\_CLASSIFICATION}: HAZUS building
+  type, not expanded. See \sref{sec:grids-constructionclass} for a full
+  description of the types.
 \item \texttt{CONTENTS\_COST\_DENSITY}: Replacement cost of contents in dollars per square meter (\sref{sec:grids-replacecosts})
 \item \texttt{BUILDING\_COST\_DENSITY}: Replacement cost of building in dollars per square meter (\sref{sec:grids-replacecosts})
 \item \texttt{FLOOR\_AREA}: Total floor area in square meters (summed over all stories)
-\item \texttt{SURVEY\_FACTOR}: Survey factor indicating how many `real' buildings the database entry represents
-\item \texttt{FCB\_USAGE}: Index to FCB\index{building usgage!FCB} usage classification (\sref{sec:grids-usageclass})
+\item \texttt{SURVEY\_FACTOR}: Survey factor indicating how many
+  `real' buildings the database entry represents.  Multiple buildings
+  are represented by single buildings to reduce computational time.
+\item \texttt{FCB\_USAGE}: FCB usage type. See
+  (\sref{sec:grids-usageclass})  for a list of the usage
+  classification
+  % FCB\index{building usgage!FCB} this could be a link? 
 \item \texttt{SITE\_CLASS}:Regolith site class. Typically, this is defined
 by a letter. Note that the value of this parameter must match with
 an amplification factor defined in the amplification file (see
@@ -551,9 +563,10 @@ MH & Mobile homes & (All)\\
   \hline
 \end{tabular}
 \end{table}
+
 There are further subdivisions of the HAZUS types into subtypes
-according to numbers of stories in the building. These are given
-in \tref{tab:hazus-types}.
+according to numbers of stories in the building. The complete list of
+HAZUS types is in \tref{tab:hazus-types}.
 
 The new Australian sub-types, developed by Australian engineers,
 create further subdivisions of the HAZUS types
@@ -569,8 +582,8 @@ a concrete basement or parking area but wood frame stories.
 In total, we currently have 56 possible construction types
 although some are rarely used. For example; the original HAZUS W1
 is still there, however this is rarely used in favor of the more
-detailed classification into W1TIMBMETAL, W1BVTILE, etc. A
-complete list of all the building construction types is given in
+detailed classification into W1TIMBMETAL, W1BVTILE, etc. The
+expanded HAZUS types is given in
 \tref{tab:v-dam-allbtypes}.
 %====================
 %DR - must check this block - where is the EQRM Control file parameter???
