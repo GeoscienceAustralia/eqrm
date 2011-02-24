@@ -16,136 +16,42 @@ is introduced by \citet{dr_Cornell68a} and summarised by
 \citet{dr_McGuire90a}. A core component of any event based
 analysis with the EQRM is the generation of a simulated
 event\index{simulated event} (or earthquake) catalogue. The
-generation of the earthquake catalogue is performed by
-\typefunc{mk}{e}{\_evnts} which relies upon an existing model for
-the seismicity
- in the region. Typically the  model of seismicity comes
+generation of the earthquake catalogue relies upon an existing model for
+the seismicity in the region. Typically the  model of seismicity comes
  from an interpretation of historical earthquakes,
- geology and neotectonics. The current version of the EQRM application requires a source zone model
-that consists of a set of areal source zones with associated
-Gutenberg-Richter recurrence relationships. \citet{dr_Dhu02b} show
-how the seismic source zones were created for a risk assessment of
-the Newcastle and Lake Macquarie region.
+ geology and neotectonics. The current version of the EQRM application requires a source model
+that consists of a set of areal source zones (defined by a polygon) with associated
+Gutenberg-Richter recurrence relationships and the option of including fault sources (defined by a plane) with associated 
+Gutenberg-Richter or characteristic earthquake recurrence relationships \citet{dr_Schwartz84}. 
 
-The EQRM can be used with a single source model containing one or
-more source zones or multiple source models each containing one or
-more source zones. For example; \citet{dr_Gaull90a} (G90) and
-\citet{dr_Brown04a} (BG04) both present different source zone
-models for Australia containing 34 and 108 source zones
-respectively. An Australian hazard or risk assessment can be
-conducted using the EQRM with either G90 or BG04 independently or
-by using some weighted combination of the two of them.
-\sref{sec:source-EQcat} largely focusses on the generation of a
-synthetic earthquake catalogue from one source zone model, whereas
-\sref{sec:source-multizones} describes the use of multiple source
-zone models.
+\emph{Areal source zones} typically capture the background seismicity in an area and are decribed by the acitivty rate within
+each source zone through its Gutenberg-Richter \emph{a} and \emph{b} values. In event-based PSHA calculations, such as \typeself{E}{QR}{M},
+synthetic ruptures will be generated stochastically throughout the areal source zone. However, a user may have sufficient information 
+on the geometry and earthquake recurrence rates of a known fault and may want to place synthetic ruptures on the fault by defining a 
+\emph{fault source}. In this instance, instead of placing the synthetic ruptures within the areal source zone, they will be placed 
+on the known fault plane. \\
+
+In addition, a novel technique has been developed to generate synthetic ruptures within a 3D volume that may represent seismotectonic 
+features such as the intraplate environment of a subducting slab. Such events are often referred to as intraslab earthquakes and have been known
+to generate larger and devastating earthquakes (e.g. 30 September 2009 Padang earthquake in Indonesia). \\
+
+This chapter describes the process of creating an earthquake catalogue for probabilistic seismic hazard 
+analysis and for defining an individual scenario event. The chapter is organised as follows. First the 
+method of generating realistic ruptures in source zones and fault zones is discussed in Section \label{sec:source-EQgeom}. Second, the approach for 
+determining recurrence rates is presented in Section \label{sec:source-EQrec}. Lastly, Section \label{sec:source-scen} 
+describes scenario event generation.
 
 \section{Creating an earthquake catalogue for probabilistic seismic hazard analysis}% a probabilistic seismic hazard analysis}
 \label{sec:source-EQcat}
 
-
-The generation of a synthetic catalogue of earthquakes is handled
-by the function \typefunc{mke}{\_evn}{ts}. This function function
-requires one of the following groups of input files to be located
-within the \typepar{in}{put}{dir} or
-\typedir{*/eqrm/eqrm\_app}{/resources}{/data}:
-\begin{enumerate}
-\item \typeparfilecaption{<site\_loc>}{\_par}{\_sourcezones}{.txt}
-and \typeparfile{<site\_loc>}{\_par}{\_sourcepolys}{.txt}. When
-the EQRM uses these files directly only a single source zone model
-can be used. Moreover, the location and magnitude of the
-earthquakes are controlled by the source zones themselves. \item
-\typeparfilecaption{<site\_loc>}{\_par}{\_source}{.mat} containing
-two variables whose names are \typevar{gen}{erat}{ion} and
-\typevar{so}{ur}{ce}. This format must be used with the EQRM when
-considering multiple source zones. Moreover, this format
-facilitates the generation of synthetic earthquakes (location
-etc.) using one set of polygons and the assignment of key
-attributes (such as probabilities) using the actual source zone
-models. The latter feature is very useful for concentrating
-earthquake generation in regions of interest (e.g. the central
-business district). Note that the function
-\typefunc{src\_zones}{\_to\_struc}{ture} can be used to create a
-\typeparfile{<site\_loc>}{\_par}{\_source}{.mat} file by using one
-or more combinations of the
-\typeparfile{<site\_loc>}{\_par}{\_sourcezones}{.txt} and
-\typeparfile{<site\_loc>}{\_par}{\_sourcepolys}{.txt} pair.
-\end{enumerate}
-
- The ASCII files
-\typeparfile{<site\_loc>}{\_par}{\_sourcezones}{.txt} and
-\typeparfile{<site\_loc>}{\_par\_source}{polys}{.txt} are critical
-to both of the input combinations (1 and 2) introduced above. The
- file \typeselfnoindex{<site\_loc>}{\_par}{\_sourcezones} contains
-the parameters that define the seismic activity in each zone and
-has nine columns separated by tabs or spaces. There is one row for
-each areal source zone in the source model. The format of
-\typeparfile{<site\_loc>}{\_par}{\_sourcezones}{.txt} is described
-in \tref{tab:site-loc-par-sourcezones}. The ASCII file
-\typeparfile{<site\_loc>}{\_par}{\_sourcepolys}{.txt} contains the
-vertices of each of the source zones and it has four columns
-separated by tabs or spaces. The format of
-\typeparfile{<site}{\_loc>\_par}{\_sourcepolys}{.txt} is described
-in \tref{tab:site-loc-par-sourcepolys}. Note that each polygon
-represents a block of rows containing the information for all
-vertices in the polygon. Moreover, each polygon must be closed
-(i.e. the first and last row of each polygon block should be the
-same). Examples of \typeselfnoindex{newc}{\_par}{\_sourcezones}
-and \typeselfnoindex{newc}{\_par}{\_sourcepolys} are shown in
-\aref{app:sourcezones} and \aref{app:sourcepolys} respectively.
-Note that both of these files may also contain metadata in the
-form of comments (indicated by a \%).
-
-
-\begin{table}
-\centering \caption{Columns in
-\typeparfilecaption{<site\_loc>}{\_par}{\_sourcezones}{.txt}.}
- \label{tab:site-loc-par-sourcezones}
-\vspace{0.8em}
-\begin{tabular}{r|p{0.85\textwidth}}
-\hline
-column & description \\
-\hline
-1 & zone identification number ($integer$) \\
-2 & area of zone ($km^2$) \\
-3 & $f_z$ - depth to seismogenic region ($km$) \\
-4 & $m_{min}$ - minimum moment magnitude for zone \\
-5 & $m_{max}$ - maximum moment magnitude for zone \\
-6 & $b$ - slope of Gutenberg-Richter recurrence rate \\
-7 & place holder (currently reserved for $\sigma_b$) \\
-8 & $A_{min}$ - number of earthquakes of magnitude $m_{min}$ or greater per year\\
-9 & place holder (currently reserved for $\sigma_{A_{min}}$) \\
- \hline
-\end{tabular}
-\end{table}
-
-\begin{table}
-\centering \caption{Columns in
-\typeparfilecaption{<site\_loc>}{\_par}{\_sourcepolys}{.txt}.}\label{tab:site-loc-par-sourcepolys}
-\vspace{0.8em}
-\begin{tabular}{r|l}
- \hline
-column & description \\
-\hline 1 & polygon vertex identifier ($integer$)\\
-2 & longitude of polygon vertex \\
-3 & latitude of polygon vertex \\
-4 & zone identification number ($integer$) \\
- \hline
-\end{tabular}
-\end{table}
-
-\subsection{Simulated events and the earthquake catalogue}
-\label{sec:event-catalogue}
+This section describes the method to generate a synthetic earthquake catalog of plausible events. The event catalog can be
+created for events that are defined within an areal source or located on a known fault source. The recurrence relationship for the events
+can be defined as a Gutenberg-Richter or Characteristic earthquake relationships.
 
 A simulated event\index{simulated event} is represented by a plane
 (or rupture) in 3D space that signifies the region where slip has
 occurred. The geometry of a rupture plane is shown in
-\Fref{fig:hrupture-3d}. The earthquake catalogue is a *.MAT file
-that contains a single variable \typevar{ev}{nt}{db}. The variable
-\typevar{ev}{nt}{db} is an array containing 31 columns and $N_s$
-rows, where $N_s$ refers to the number of events in the simulated
-catalogue. The columns of \typevar{ev}{nt}{db} are defined in
-\tref{tab:evntdb-columns}. The important parameters of a simulated
+\Fref{fig:hrupture-3d}. The important parameters of a simulated
 event\index{simulated event} are its location, geometry, magnitude
 and activity (or likelihood of occurrence). The rupture trace is
 the surface projection of the simulated event\index{simulated
@@ -179,8 +85,8 @@ on magnitude and position) occurs in one year (see
 (a) & (b) \\
 % \psfrag{Fault Trace}{Rupture Trace} \psfrag{Dip}{$r_\theta$}
 % \psfrag{Azimuth}{$r_\phi$}
-\includegraphics[width=0.49\textwidth]{fig-hrupture-3d} &
-\includegraphics[width=0.41\textwidth]{fig-hrupture-2d}
+\includegraphics[width=0.49\textwidth]{diags/fig-hrupture-3d} &
+\includegraphics[width=0.41\textwidth]{diags/fig-hrupture-2d}
 \end{tabular}
 \end{center}
 \caption{Orientation and dimension of the rupture plane in (a) 3D
@@ -244,10 +150,11 @@ will be used in place of `simulated' to refer to a historic
 earthquake (i.e. one that has actually occurred rather than one
 that is simulated).
 
- A virtual fault\index{virtual fault} refers to a plane in 3D space upon which an event can
-occur.  The program \typefunc{mke}{\_evn}{ts}
- works by first creating a virtual fault\index{virtual fault} and then
-placing the rupture on the virtual fault\index{virtual fault} (the
+A virtual fault\index{virtual fault} refers to a plane in 3D space upon which an event can
+occur.  The virtual fault can be located in within an areal source or defined by a known fault. 
+The \typeself{E}{QR}{M} works by first creating a virtual fault\index{virtual fault}, either within an
+areal source zone, or by a user defined know fault. The rupture is then placed 
+on the virtual fault\index{virtual fault} (the
 rupture is not allowed to exceed the bounds of the virtual
 fault\index{virtual fault}). The introduction of a virtual
 fault\index{virtual fault} is the mechanism by which the
@@ -257,145 +164,141 @@ fault\index{virtual fault} is defined as the depth to the
 seismogenic region $f_z$ (see
 \tref{tab:site-loc-par-sourcezones}). Other geometrical parameters
 of virtual fault\index{virtual fault}s include the width $f_w$ and
-length $f_l$, both of which are hardwired within the program
-\typefunc{mke}{\_aseq}{4mat} as $f_w=15km$ and $f_l=1000km$
-respectively. Note that the facility used to constrain synthetic
-ruptures to virtual faults can also be used to constrain a
-synthetic rupture to a mapped `known' fault.
+length $f_l$. 
 
 
-\subsection{Location of synthetic earthquakes}
+\subsection{Location of synthetic earthquakes in areal sources}
 \label{sec:rup-location}
 
-The location of each event is assigned randomly within the
-`generation polygon'\index{generation polygon} where the
-`generation polygon'\index{generation polygon} is
-\begin{enumerate}
-\item a source zone from the source zone model when the
-\typeparfile{<site\_loc>}{\_par\_source}{zones}{.txt} and
-\typeparfile{<site\_loc>}{\_par}{\_sourcepolys}{.txt} files are
-used directly with the EQRM, or \item a polygon from the
-\typevar{gen}{erat}{ion} variable when the
-\typeparfile{<site\_loc>}{\_par\_sour}{ce}{.mat}  option is used.
-\end{enumerate}
- This assignment is done in such a way that the event has
+The location of each event is assigned randomly within an areal source zone 
+and on a fault source. 
+This assignment is done in such a way that the event has
 an equal probability of being located anywhere in the `generation
-polygon' and is achieved by following a two phase process. The
-process makes use of a uniform random probability density function
-and is conducted by the function \typefunc{mke}{\_aseq}{4mat}. The
-user is required to define a vector \typepar{ntrg}{vec}{tor} in
-\typeself{set}{da}{ta} whose $i^{th}$ element represents the
-desired number of events to be simulated in the $i^{th}$
-`generation polygon'.
+polygon' or on the fault. 
 
+The first phase of locating the events involves positioning the
+centre point of each rupture trace ($r_c^{lat}$,$r_c^{lon}$). A
+rectangular box is generated over the top of the source zone polygon. The
+box is bounded by the minimum and maximum latitude and the
+minimum and maximum longitude of the source zone itself. 
+
+% Need to change this to have no underlying grid. 
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.9\textwidth]{fig-hsource-trace-starts}
 \end{center}
-\caption{Random selection of rupture trace start points for a
+\caption{Random selection of rupture centroids for a
 rectangular `generation polygon'. (a) to (c) illustrate the first
 iteration and (d) to (f) the second iteration after contraction of
 the grid spacing.} \label{fig:source-trace-starts}
 \end{figure}
 
+The rupture centroid of each event is then randomly placed within the box 
+using a discrete uniform probability density function
+(\fref{fig:source-trace-starts}b). The event is the checked to identify whether 
+it falls within the source polygon or not. Events that fall within the source polygon 
+are kept and those that lie outside it are discarded. 
 
-The first phase of locating the events involves positioning the
-start point of each rupture trace $(r_s^{lat},r_s^{lon})$. A
-regular grid is generated over the top of the source zone. The
-grid is bounded by the minimum and maximum latitude and the
-minimum and maximum longitude of the source zone itself. The
-initial number of points in both the northerly and easterly
-direction is $n_{trg}$ where
-\begin{equation}
-n_{trg} = max\{1.05\times ntrgvector(i), 25\} \end{equation} i.e.
-there are a total of $n_{trg}^2$ points in the grid
-(\fref{fig:source-trace-starts}a). The start point of each event
-is then randomly placed on nodes of the grid using a discrete
-uniform probability density function
-(\fref{fig:source-trace-starts}b). The events that fall within the
-polygon are distinguished from those that fall outside using the
-in-built MATLAB function \typefunc{in}{poly}{gon}
-(\fref{fig:source-trace-starts}c). The grid is then expanded and
-contracted in an iterative process until the number of events
-simulated within the source zone is greater than 90\% of the
-desired number (\fref{fig:source-trace-starts}d to f). The details
-of the contraction and
- expansion of the grid are not important for the purpose of this
- document. The interested reader is referred to the function
- \typefunc{mke}{\_aseq}{4mat} for further information.
-
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=1\textwidth]{fig-hsource-trace-ends}
-\end{center}
-\caption{Rotation of the rupture trace to move the end of the
-rupture trace inside the source zone. (a) to (c) illustrate a
-successful rotation whereas (d) to (f) illustrate a rotation that
-failed to place the rupture entirely within the source zone. The
-text alongside each circle represents the rotation iteration i.e.
-1 represents the first, randomly chosen, azimuth whereas 30
-represents 29 iterative rotations from the 1st azimuth.}
-\label{fig:source-trace-ends}
-\end{figure}
-
-The second phase of locating events involves positioning the end
+The second phase of locating events involves positioning the start and end
 point of the rupture trace. Assume for the moment that both the
 length and azimuth of the rupture trace are already known (see
 \sref{sec:dim-rupture} and \sref{sec:az-dip-rupture} respectively
 for a description of how these are computed). It is then a trivial
-process to compute the end of the rupture trace
-$(r_e^{lat},r_e^{lon})$ (see function \typefunc{ll}{2}{xy}). If
-the end of the rupture trace lies within the `generation
-polygon'\index{generation polygon} the rupture trace is accepted.
-The azimuth of each rupture trace whose end lies outside the
-`generation polygon'\index{generation polygon} is adjusted by an
-increment of $+1.5^o$ and \typefunc{in}{poly}{gon} used to
-identify whether the adjustment has moved the end of the trace
-inside the source zone. The azimuth of all those events whose end
-continues to fall outside the `generation
-polygon'\index{generation polygon} is then iteratively adjusted by
-increments of $3^o$ until:
-\begin{enumerate}
-\item the end of the rupture trace falls within the `generation
-polygon'\index{generation polygon}, in which case the event is
-accepted with the adjusted azimuth (\fref{fig:source-trace-ends}a
-to c), or \item the adjustment is $358.5^o$, in which case the
-event is accepted with the final azimuth taken as the true azimuth
-(\fref{fig:source-trace-ends}d to f).
-\end{enumerate}
-Note that it is possible to omit the second phase of the location
-process (see \sref{sec:az-dip-rupture} for an explanation).
-Alternatively, azi can be determined from the orientation of the
-Australian stress field and an assumption of the style of
-faulting.  If all faults are assumed to be thrust events, then azi
-will be set in the direction of the minimum horizontal stress.
-However, if some faults are strike-slip faults, then a proportion
-of the faults will be randomly selected and azi will be in the
-orientation of maximum horizontal stress.  The decision to use the
-Australian stress field is controlled by setting azi to
-\texttt{aust} if all of the events are considered thrust events
-and \texttt{aust\_ss} to have 10\% of the events randomly assigned
-as strike-slip events.
+process to compute the start and end of the rupture trace
+$(r_s^{lat},r_s^{lon} and r_e^{lat},r_e^{lon})$. It is important to note that the \typeself{E}{QR}{M} will allow the 
+start or end points of the rupture trace to lie outside of the source polygon 
+providing the rupture centroid is located within the polygon. The source zone polygon 
+is only used to constrain the rupture centroid ($r_c^{lat},r_c^{lon}$).
 
+\subsection{Location of events on fault sources}
 
-The above process is repeated for each of the `generation
-polygons'\index{generation polygon} in (1)
-\typeparfile{<site}{\_loc>\_par}{\_sourcezones}{.txt} when the
-\typeparfile{<site}{\_loc>\_par}{\_sourcezones}{.txt} and
-\typeparfile{<site}{\_loc>\_par}{\_sourcepolys}{.txt} input is
-used or (2) the variable \typevar{gen}{erat}{ion} when
-\typeparfile{<site\_loc>}{\_par}{\_source}{.mat} is used. Recall
-that each event is described by a row in \typevar{ev}{nt}{db}. The
-originating source zone is identified in the first column of the
-row for each event (see \tref{tab:evntdb-columns}).
+As discussed earlier in this chapter, fault sources in the \typeself{E}{QR}{M} can represent three different styles of faulting:
 
-It is important to realise that the \typeself{E}{QR}{M} software
-does not force the rupture plane, or even the rupture centroid to
-fall within the source zone. The source zone is only used to
-constrain the start and end (if $d_{azi}>0$) of the rupture trace.
+\begin{itemize}
+\item Crustal faults
+\item Subduction interface faults
+\item Intraslab faults in the subducting slab
+\end{itemize}
 
+The method for placing synthetic ruptures on crustal faults and subduction interface faults is the same, but intraslab faults required a 
+different approach. \\
 
+\subsubsection{Crustal Faults and Subduction Interface Faults}
+Assuming again that we have already defined the length and width of the rupture plane, we then solve to find the location of the rupture
+trace along the predefined fault trace by:
+
+\begin{equation} \label{eq:ds}
+D_s = (f_l - r_l) \times \mathtt{X}
+\end{equation}
+
+where $\mathtt{X}$ is a random variable between 0$\rightarrow$1. Following this step the new start and end of the rupture trace can be 
+obtained using the rupture length, azimuth of the fault. \\
+
+We now use $D_s$ from equation \ref{eq:ds}, and the precalculated rupture length and fault azimuth to calculate the 
+new longitude and latitude of the start and end of the rupture trace (\ref{fig:traces}). 
+
+% \begin{figure}[htp]
+% \centerline{\includegraphics[width=6cm]
+% {faulttrace.png}}
+% \caption{A plan view of the fault trace and rupture trace defined by its start and end coordinates.}
+% \label{fig:traces}
+% \end{figure}
+
+We now follow a similar process (to equation \ref{ds}) to determine the depth of the rupture centroid. Since we 
+already have the fault width we can randomly assign the depth of the rupture centre while making sure the rupture 
+plane does not extend beyond the top and bottom of the fault plane defined in the source file (\ref{fig:rzrange}). 
+
+% \begin{figure}[htp]
+% \centerline{\includegraphics[width=12cm]
+% {depthrange.png}}
+% \caption{A schematic diagram of how we define the depth range of the rupture centroid.}
+% \label{fig:rzrange}
+% \end{figure}
+
+We first find the depth range which the rupture centroid can lie within [$r_z^{min}, r_z^{max}$] such that 
+the rupture plane does not extend above or below the bounds of the seismogenic zone [$f_z^{top}, f_z^{bot}$]:
+
+\begin{subequations} \label{drange}
+\begin{align}
+r_z^{min} & = \mbox{minimum depth of rupture centroid}  \\
+r_z^{max} & = \mbox{maximum depth of rupture centroid}   \\
+r_z^{min} & = r_z^{top} + 0.5r_w  \times sin(r_\theta  \times \mbox{rad})    \\
+r_z^{max} & = r_z^{bot} - 0.5r_w  \times sin(r_\theta \times \mbox{rad})  
+\end{align}
+\end{subequations}
+
+where $f_\theta = r_\theta$. Note that for intrapate ruptures which will be discussed later $f_\theta \ne r_\theta$. 
+We can now randomly assign the rupture centroid depth using a uniform distribution between $r_z^{min}$ and $r_z^{max}$ 
+using the \texttt{numpy} package in \texttt{python}:
+
+\begin{equation} \label{eq:rand}
+	r_z = ( r_z^{max}-r_z^{min} ) \times  \mathtt{X} +   r_z^{min}
+\end{equation}
+
+where $\mathtt{X}$ is a random varaible from 0$\rightarrow$1. The local x and y coordinates ($r_x$ and $r_y$) of the rupture 
+centroid can be calculated by the employing the same equations as for the source zones:
+
+\begin{equation}
+r_y = r_z  \frac{cos(f_\theta  \times rad)}{sin(f_\theta  \times rad)}
+\end{equation}
+
+\begin{equation}
+r_x = \frac{r_l}{2}
+\end{equation}
+
+Where the rupture centroid location in local coordinates ($r_x$, $r_y$) can be converted to longitude and latitude ($r_c^{lon}$, $r_c^{lat}$).
+
+\subsubsection{Intraslab Faults}
+
+The concept of creating realistic ruptures that represent events in a subducting slab is achieved by considering these events as 
+out of plane ruptures. The subducting slab is defined as a 3D plane from which rupture planes extend out from at angles defined by
+the user (FIGURE PLOT). For this functionality and out of dip value must be defined ($\delta_\theta$). 
+This parameter defines the angle between the dipping fault and the rupture plane (figure \ref{fig:intraslabGeom}). If the rupture 
+plane is parallel to the fault plane this value will be zero. If the rupture plane is it an angle to the dipping plane then it 
+will be non-zero. When handling a non-zero $\delta_\theta$ we also need to consider another parameter, $\Delta_\theta$, which 
+defines the range of dips we will sample across to obtain the rupture dip ($r_\theta$, figure \ref{fig:intraslabGeom}).
+We first take a uniform sample from the range [$\delta_\theta - \Delta_\theta, \delta_\theta + \Delta_\theta$]  to determine 
+the out of plane angle ($\omega$) and the dip of the rupture plane ($r_\theta$) :
 
 
 \subsection{Overlapping source zones}
@@ -456,7 +359,7 @@ These modifications are described in \sref{sec:source-multizones}.
 
 
 \begin{figure}[htp]
-\includegraphics[width=1\textwidth]{fig-hattn-montecarlo.eps}
+\includegraphics[width=1\textwidth]{fig-hattn-montecarlo}
 \caption{Stratified Monte Carlo technique for sampling a PDF. In
 this case a normal distribution is shown but any PDF can be used.}
 \label{fig-hattn-montecarlo}
