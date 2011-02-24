@@ -15,7 +15,7 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces Orientation and dimension of the rupture plane in (a) 3D and (b) 2D vertical projection to ground surface.}}{44}}
 \newlabel{fig:hrupture-3d}{{3.1}{44}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}Simulated events and virtual faults}{44}}
-\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Columns in \texttt  {ev}\discretionary {-}{}{}\texttt  {nt}\discretionary {-}{}{}\texttt  {db}. Note that some of the columns are not defined until after \texttt  {fuse}\discretionary {-}{}{}\texttt  {4}\discretionary {-}{}{}\texttt  {\_hzd} is run (see Section\nobreakspace  {}\G@refundefinedtrue \text  {\normalfont  \bfseries  ??}\GenericWarning  {               }{LaTeX Warning: Reference `source:spawning' on page 45 undefined}).}}{45}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Columns in \texttt  {ev}\discretionary {-}{}{}\texttt  {nt}\discretionary {-}{}{}\texttt  {db}. Note that some of the columns are not defined until after \texttt  {fuse}\discretionary {-}{}{}\texttt  {4}\discretionary {-}{}{}\texttt  {\_hzd} is run (see Section\nobreakspace  {}3.4\hbox {}).}}{45}}
 \newlabel{tab:evntdb-columns}{{3.1}{45}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Location of synthetic earthquakes in areal sources}{46}}
 \newlabel{sec:rup-location}{{3.2.2}{46}}
@@ -27,15 +27,43 @@
 \newlabel{drange}{{3.2}{48}}
 \newlabel{eq:rand}{{3.3}{49}}
 \@writefile{toc}{\contentsline {subsubsection}{Intraslab Faults}{49}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.4}Overlapping source zones}{50}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces Overlapping source zones shown in (a) can be incorporated into the EQRM by cutting out a doughnut (b) or splitting the outer polygon (c). The numbers in different fonts illustrate how the polygon vertices could be listed in the \texttt  {<site\_loc>}\discretionary {-}{}{}\texttt  {\_par\_source}\discretionary {-}{}{}\texttt  {zones}\discretionary {-}{}{}\texttt  {.txt} file. }}{50}}
-\newlabel{fig:h-source-overlapping}{{3.3}{50}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.4}Case if $0 \leq r_\theta \leq 90$}{50}}
+\newlabel{sec:0to90}{{3.2.4}{50}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces A schematic diagram of the geometry of out of plane ruptures. Panel A shows the rupture plane dipping out of the fault plane that defines the dipping slab. Panel B is a zoom in of the angles that define the rupture plane geometry. The user defines the fault dip ($f_\theta $), which in this case represents the direction of the downgoing slab, and the out of plane dip ($\delta _\theta $) and a sampling range ($\Delta _\theta $) over which the EQRM will uniformly distribute the rupture plane. }}{51}}
+\newlabel{fig:intraslabGeom}{{3.3}{51}}
+\newlabel{rwmax}{{3.8}{52}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces The geometry of determining the maximum rupture width ($r_w^{max}$) shown in the lower trigonometric geometry and the $r_z^{min}$ and $r_z^{max}$ shown in the upper part and equation 3.13\hbox {}.}}{52}}
+\newlabel{fig:deltaeq}{{3.4}{52}}
+\newlabel{rw090}{{3.9}{52}}
+\newlabel{eq:newrs2}{{3.11}{53}}
+\newlabel{eq:newre2}{{3.12}{53}}
+\newlabel{drange2}{{3.13}{53}}
+\newlabel{eq:ry}{{3.15}{53}}
+\newlabel{eq:rsx}{{3.17}{53}}
+\newlabel{eq:rex}{{3.19}{54}}
+\newlabel{eq:rey}{{3.20}{54}}
+\newlabel{eq:rx}{{3.21}{54}}
+\newlabel{eq:rcll}{{3.23}{54}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.5}Case if $90 < r_\theta \leq 180$}{54}}
+\newlabel{sec:90t180}{{3.2.5}{54}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Fault and rupture plane geometry for. Lower panel shows cross section view and upper panel shows a plan view of the surface projection. Note that in this case we need to re-project the rupture plane to the surface and redefine the start and end of the rupture trace such that the plane dips to the right hand side of the fault trace when looking from the start to end of the trace.}}{55}}
+\newlabel{fig:gt90}{{3.5}{55}}
+\newlabel{eq:rsll2}{{3.26}{56}}
+\newlabel{eq:rell2}{{3.27}{56}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.6}Case if $180 < r_\theta \leq f_\theta + \omega $}{56}}
+\newlabel{sec:180to270}{{3.2.6}{56}}
+\newlabel{eq:ry4}{{3.29}{56}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces Fault and rupture plane geometry for. Lower panel shows cross section view and upper panel shows a plan view of the surface projection. Note that in this case we need to re-project the rupture plane to the surface and redefine the start and end of the rupture trace.}}{57}}
+\newlabel{fig:gt180}{{3.6}{57}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.7}Overlapping source zones}{58}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces Overlapping source zones shown in (a) can be incorporated into the EQRM by cutting out a doughnut (b) or splitting the outer polygon (c). The numbers in different fonts illustrate how the polygon vertices could be listed in the \texttt  {<site\_loc>}\discretionary {-}{}{}\texttt  {\_par\_source}\discretionary {-}{}{}\texttt  {zones}\discretionary {-}{}{}\texttt  {.txt} file. }}{58}}
+\newlabel{fig:h-source-overlapping}{{3.7}{58}}
 \citation{dr_Kramer96a}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.5}Magnitude selection and event activity}{51}}
-\newlabel{sec:magnitude_selection}{{3.2.5}{51}}
-\newlabel{eq:event-activity}{{3.6}{51}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Stratified Monte Carlo technique for sampling a PDF. In this case a normal distribution is shown but any PDF can be used.}}{52}}
-\newlabel{fig-hattn-montecarlo}{{3.4}{52}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.8}Magnitude selection and event activity}{59}}
+\newlabel{sec:magnitude_selection}{{3.2.8}{59}}
+\newlabel{eq:event-activity}{{3.32}{59}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.8}{\ignorespaces Stratified Monte Carlo technique for sampling a PDF. In this case a normal distribution is shown but any PDF can be used.}}{60}}
+\newlabel{fig-hattn-montecarlo}{{3.8}{60}}
 \citation{dr_Kramer96a}
 \citation{dr_Kramer96a}
 \citation{dr_Dhu02b}
@@ -46,30 +74,30 @@
 \citation{dr_Dhu02b}
 \citation{dr_Dhu02b}
 \citation{dr_Dhu02b}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.6}Dimensions and position of the rupture plane}{53}}
-\newlabel{sec:dim-rupture}{{3.2.6}{53}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Simulated events for the Newcastle Triangle Zone (see \citealt  {dr_Dhu02b}). Plots (a) and (b) show histograms of the rupture magnitude $r_m$ and rupture azimuth $r_{azi}$ respectively. Plots (c), (d), (e) and (f) illustrate the relationship between the event magnitude $r_m$ and the event activity $r_\nu $, the depth to the rupture centroid $r_z$, the length of the rupture $r_l$ and the width of the rupture $r_w$ respectively. The desired number of events $ntrgvector(1)$ was $5000$.}}{54}}
-\newlabel{fig:source-catalogue-results1}{{3.5}{54}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces Simulated events for the Newcastle Rectangle Zone (see \citealt  {dr_Dhu02b}). Parts (a) to (f) are the same as those described in Figure\nobreakspace  {}\G@refundefinedtrue \text  {\normalfont  \bfseries  ??}\GenericWarning  {               }{LaTeX Warning: Reference `fig:source-catalogue-results1' on page 55 undefined}. The desired number of events $ntrgvector(4)$ was $3000$.}}{55}}
-\newlabel{fig:source-catalogue-results2}{{3.6}{55}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces Simulated events when the Newcastle Triangle Zone and Newcastle Fault Zone are considered together (see \citealt  {dr_Dhu02b}). Parts (a) to (f) are the same as those described in Figure\nobreakspace  {}\G@refundefinedtrue \text  {\normalfont  \bfseries  ??}\GenericWarning  {               }{LaTeX Warning: Reference `fig:source-catalogue-results1' on page 56 undefined}. The desired number of events was defined by $ntrgvector = [5000,3000]$ where the source zones $1$ and $2$ refer to the the Newcastle Triangle Zone (NTZ) and the Newcastle Fault Zone respectively.}}{56}}
-\newlabel{fig:source-catalogue-results3}{{3.7}{56}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.8}{\ignorespaces Simulated events for all six of the source zones used in the Newcastle and Lake Macquarie study (see \citealt  {dr_Dhu02b}). Parts (a) to (f) are the same as those described in Figure\nobreakspace  {}\G@refundefinedtrue \text  {\normalfont  \bfseries  ??}\GenericWarning  {               }{LaTeX Warning: Reference `fig:source-catalogue-results1' on page 57 undefined}. The desired number of events was defined by $ntrgvector = [5000,1000,1000,3000,1000,1000]$ where the source zones $1$ to $6$ refer to the the Newcastle Triangle Zone (NTZ) the Tasman Sea Margin Zone Subset 1 (TSMZ1), the TSMZ2, the Newcastle Fault Zone, the TSMZ3 and the TSMZ4 respectively.}}{57}}
-\newlabel{fig:source-catalogue-results4}{{3.8}{57}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.9}Dimensions and position of the rupture plane}{61}}
+\newlabel{sec:dim-rupture}{{3.2.9}{61}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.9}{\ignorespaces Simulated events for the Newcastle Triangle Zone (see \citealt  {dr_Dhu02b}). Plots (a) and (b) show histograms of the rupture magnitude $r_m$ and rupture azimuth $r_{azi}$ respectively. Plots (c), (d), (e) and (f) illustrate the relationship between the event magnitude $r_m$ and the event activity $r_\nu $, the depth to the rupture centroid $r_z$, the length of the rupture $r_l$ and the width of the rupture $r_w$ respectively. The desired number of events $ntrgvector(1)$ was $5000$.}}{62}}
+\newlabel{fig:source-catalogue-results1}{{3.9}{62}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.10}{\ignorespaces Simulated events for the Newcastle Rectangle Zone (see \citealt  {dr_Dhu02b}). Parts (a) to (f) are the same as those described in Figure\nobreakspace  {}3.9\hbox {}. The desired number of events $ntrgvector(4)$ was $3000$.}}{63}}
+\newlabel{fig:source-catalogue-results2}{{3.10}{63}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.11}{\ignorespaces Simulated events when the Newcastle Triangle Zone and Newcastle Fault Zone are considered together (see \citealt  {dr_Dhu02b}). Parts (a) to (f) are the same as those described in Figure\nobreakspace  {}3.9\hbox {}. The desired number of events was defined by $ntrgvector = [5000,3000]$ where the source zones $1$ and $2$ refer to the the Newcastle Triangle Zone (NTZ) and the Newcastle Fault Zone respectively.}}{64}}
+\newlabel{fig:source-catalogue-results3}{{3.11}{64}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.12}{\ignorespaces Simulated events for all six of the source zones used in the Newcastle and Lake Macquarie study (see \citealt  {dr_Dhu02b}). Parts (a) to (f) are the same as those described in Figure\nobreakspace  {}3.9\hbox {}. The desired number of events was defined by $ntrgvector = [5000,1000,1000,3000,1000,1000]$ where the source zones $1$ to $6$ refer to the the Newcastle Triangle Zone (NTZ) the Tasman Sea Margin Zone Subset 1 (TSMZ1), the TSMZ2, the Newcastle Fault Zone, the TSMZ3 and the TSMZ4 respectively.}}{65}}
+\newlabel{fig:source-catalogue-results4}{{3.12}{65}}
 \citation{dr_Wells94a}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.7}Azimuth and dip of rupture}{59}}
-\newlabel{sec:az-dip-rupture}{{3.2.7}{59}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.3}Using multiple source zones - Incorporating epistemic uncertainty}{59}}
-\newlabel{sec:source-multizones}{{3.3}{59}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.4}Spawning events}{61}}
-\newlabel{source:spawning}{{3.4}{61}}
-\newlabel{source:spawning-activity}{{3.24}{62}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.5}Analysing a scenario event}{62}}
-\newlabel{sec:source-scenario}{{3.5}{62}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.6}Key functions, flags and parameters}{63}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.10}Azimuth and dip of rupture}{67}}
+\newlabel{sec:az-dip-rupture}{{3.2.10}{67}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Using multiple source zones - Incorporating epistemic uncertainty}{67}}
+\newlabel{sec:source-multizones}{{3.3}{67}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Spawning events}{69}}
+\newlabel{source:spawning}{{3.4}{69}}
+\newlabel{source:spawning-activity}{{3.50}{70}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}Analysing a scenario event}{70}}
+\newlabel{sec:source-scenario}{{3.5}{70}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.6}Key functions, flags and parameters}{71}}
 \@setckpt{eqrmtech-h-source}{
-\setcounter{page}{65}
-\setcounter{equation}{24}
+\setcounter{page}{73}
+\setcounter{equation}{50}
 \setcounter{enumi}{2}
 \setcounter{enumii}{0}
 \setcounter{enumiii}{0}
@@ -83,9 +111,9 @@
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{8}
+\setcounter{figure}{12}
 \setcounter{table}{1}
-\setcounter{parentequation}{2}
+\setcounter{parentequation}{13}
 \setcounter{NAT@ctr}{0}
 \setcounter{lstlisting}{0}
 \setcounter{lstnumber}{101}

@@ -1,4 +1,4 @@
-This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=pdflatex 2007.8.1)  24 FEB 2011 16:53
+This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=pdflatex 2007.8.1)  24 FEB 2011 17:05
 entering extended mode
 **eqrmtech.tex
 (./eqrmtech.tex
@@ -207,7 +207,34 @@ Package: lscape 2000/10/22 v3.01 Landscape Pages (DPC)
 
 
 Writing index file eqrmtech.idx
-(./eqrmtech.aux)
+(./eqrmtech.aux (./eqrmtech-intro.aux) (./eqrmtech-hv-application.aux)
+(./eqrmtech-h-source.aux) (./eqrmtech-hv-grids.aux
+
+LaTeX Warning: Label `sec:grids-bdatabase' multiply defined.
+
+
+LaTeX Warning: Label `sec:grids-constructionclass' multiply defined.
+
+
+LaTeX Warning: Label `tab:hazus-types' multiply defined.
+
+
+LaTeX Warning: Label `tab:v-dam-allbtypes' multiply defined.
+
+
+LaTeX Warning: Label `sec:grids-usageclass' multiply defined.
+
+
+LaTeX Warning: Label `tab:grids-FCB' multiply defined.
+
+
+LaTeX Warning: Label `tab:grids-HAZUSusage' multiply defined.
+
+
+LaTeX Warning: Label `sec:grids-replacecosts' multiply defined.
+
+) (./eqrmtech-h-attn.aux) (./eqrmtech-h-regolith.aux) (./eqrmtech-v-damage.aux)
+(./eqrmtech-v-losses.aux) (./eqrmtech-v-risk.aux))
 \openout1 = `eqrmtech.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 62.
@@ -222,7 +249,8 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 62.
 LaTeX Font Info:    ... okay on input line 62.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 62.
 LaTeX Font Info:    ... okay on input line 62.
- (/usr/share/texmf/tex/context/base/supp-pdf.tex
+
+(/usr/share/texmf/tex/context/base/supp-pdf.tex
 (/usr/share/texmf/tex/context/base/supp-mis.tex
 loading : Context Support Macros / Miscellaneous (2004.10.26)
 \protectiondepth=\count114
@@ -259,13 +287,13 @@ loading : Context Support Macros / PDF (2004.03.26)
 Non-PDF special ignored!
 
 {/usr/share/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [1] [2] [3] (./eqrmt
-ech.toc)
+ech.toc [4
+
+] [5] [6] [7])
 \tf@toc=\write7
 \openout7 = `eqrmtech.toc'.
 
- [4
-
-]
+ [8]
 \openout2 = `eqrmtech-intro.aux'.
 
  (./eqrmtech-intro.tex
@@ -278,82 +306,22 @@ Package natbib Warning: Citation `dr_Dhu02a' on page 1 undefined on input line
 Package natbib Warning: Citation `dr_Sinadinovski05a' on page 1 undefined on in
 put line 25.
 
-
-LaTeX Warning: Reference `ch:source' on page 1 undefined on input line 31.
-
-
-LaTeX Warning: Reference `ch:atten' on page 1 undefined on input line 32.
-
-
-LaTeX Warning: Reference `ch:grids' on page 1 undefined on input line 33.
-
 [1
 
 
 ]
-
-LaTeX Warning: Reference `ch:reg' on page 2 undefined on input line 36.
-
-
-LaTeX Warning: Reference `ch:risk' on page 2 undefined on input line 37.
-
-
-LaTeX Warning: Reference `ch:grids' on page 2 undefined on input line 45.
-
-
-LaTeX Warning: Reference `ch:damage' on page 2 undefined on input line 46.
-
-
-LaTeX Warning: Reference `ch:losses' on page 2 undefined on input line 48.
-
-
-LaTeX Warning: Reference `ch:risk' on page 2 undefined on input line 49.
-
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 67.
-(/usr/share/texmf/tex/latex/base/omscmr.fd
+ (/usr/share/texmf/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 67.
- [2]
-
-LaTeX Warning: Reference `ch:application' on page 3 undefined on input line 79.
-
-
-
-LaTeX Warning: Reference `ch:source' on page 3 undefined on input line 87.
-
-
-LaTeX Warning: Reference `ch:grids' on page 3 undefined on input line 96.
-
-
-LaTeX Warning: Reference `ch:atten' on page 3 undefined on input line 108.
-
-
-LaTeX Warning: Reference `ch:reg' on page 3 undefined on input line 115.
-
-
-LaTeX Warning: Reference `ch:damage' on page 3 undefined on input line 122.
-
-[3]
-
-LaTeX Warning: Reference `ch:losses' on page 4 undefined on input line 129.
-
-
-LaTeX Warning: Reference `ch:damage' on page 4 undefined on input line 131.
-
-
-LaTeX Warning: Reference `ch:risk' on page 4 undefined on input line 135.
-
-) [4]
+ [2] [3]) [4]
 \openout2 = `eqrmtech-hv-application.aux'.
 
- (./eqrmtech-hv-application.tex
+
+(./eqrmtech-hv-application.tex
 Chapter 2.
-
-LaTeX Warning: Reference `tab:input-overview' on page 5 undefined on input line
- 24.
-
 (./param_list_text.tex [5
 
 
@@ -486,12 +454,7 @@ Overfull \hbox (11.39235pt too wide) in paragraph at lines 184--186
 th mag-ni-tude \OT1/cmtt/m/n/12 recurrence[]min[]mag
  []
 
-[23]
-
-LaTeX Warning: Reference `sec:source-zone-file' on page 24 undefined on input l
-ine 238.
-
-(../../demo/input/newc_fault_source.xml [24]) [25]
+[23] (../../demo/input/newc_fault_source.xml [24]) [25]
 Overfull \hbox (31.36932pt too wide) in paragraph at lines 268--276
 \OT1/cmr/m/n/12 For in-traslab earth-quakes the EQRM sup-ports only \OT1/cmtt/m
 /n/12 bounded[]gutenberg[]richter\OT1/cmr/m/n/12 . 
@@ -514,50 +477,8 @@ Overfull \hbox (16.5694pt too wide) in paragraph at lines 345--384
  [] 
  []
 
-[28] [29] (./xml_examples/java_par_site.csv)
-
-LaTeX Warning: Reference `sec:-appl-amplification' on page 30 undefined on inpu
-t line 416.
-
-(./xml_examples/sitedb_newc.csv [30])
-
-LaTeX Warning: Reference `sec:grids-constructionclass' on page 31 undefined on 
-input line 446.
-
-
-LaTeX Warning: Reference `sec:grids-usageclass' on page 31 undefined on input l
-ine 448.
-
-
-LaTeX Warning: Reference `sec:grids-constructionclass' on page 31 undefined on 
-input line 452.
-
-
-LaTeX Warning: Reference `sec:grids-replacecosts' on page 31 undefined on input
- line 453.
-
-
-LaTeX Warning: Reference `sec:grids-replacecosts' on page 31 undefined on input
- line 454.
-
-[31]
-
-LaTeX Warning: Reference `sec:grids-usageclass' on page 32 undefined on input l
-ine 457.
-
-
-LaTeX Warning: Reference `sec:-appl-amplification' on page 32 undefined on inpu
-t line 461.
-
-[32]
-
-LaTeX Warning: Reference `tab:hazus-types' on page 33 undefined on input line 5
-56.
-
-
-LaTeX Warning: Reference `tab:v-dam-allbtypes' on page 33 undefined on input li
-ne 574.
-
+[28] [29] (./xml_examples/java_par_site.csv) (./xml_examples/sitedb_newc.csv
+[30]) [31] [32]
 
 Package natbib Warning: Citation `dr_ABS01a' on page 33 undefined on input line
  645.
@@ -576,18 +497,6 @@ e 710.
 
 Package natbib Warning: Citation `dr_FEMA99b' on page 33 undefined on input lin
 e 710.
-
-
-LaTeX Warning: Reference `tab:grids-FCB' on page 33 undefined on input line 759
-.
-
-
-LaTeX Warning: Reference `tab:grids-HAZUSusage' on page 33 undefined on input l
-ine 761.
-
-
-LaTeX Warning: Reference `sec:grids-bdatabase' on page 33 undefined on input li
-ne 773.
 
 [33] [34] [35] [36] [37] (./xml_examples/java_par_ampfactors.xml [38
 
@@ -623,39 +532,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 34--37
 
  []
 
-
-LaTeX Warning: Reference `fig:hrupture-3d' on page 43 undefined on input line 5
-4.
-
-
-LaTeX Warning: Reference `fig:hrupture-3d' on page 43 undefined on input line 6
-6.
-
-
-LaTeX Warning: Reference `sec:magnitude_selection' on page 43 undefined on inpu
-t line 75.
-
-
-LaTeX Warning: Reference `sec:magnitude_selection' on page 43 undefined on inpu
-t line 80.
-
-[43] <diags/fig-hrupture-3d.pdf, id=192, 326.21875pt x 403.5075pt>
+[43] <diags/fig-hrupture-3d.pdf, id=205, 326.21875pt x 403.5075pt>
 File: diags/fig-hrupture-3d.pdf Graphic file (type pdf)
 
 <use diags/fig-hrupture-3d.pdf>
-<diags/fig-hrupture-2d.pdf, id=193, 269.005pt x 385.44pt>
+<diags/fig-hrupture-2d.pdf, id=206, 269.005pt x 385.44pt>
 File: diags/fig-hrupture-2d.pdf Graphic file (type pdf)
 
 <use diags/fig-hrupture-2d.pdf>
-
-LaTeX Warning: Reference `source:spawning' on page 44 undefined on input line 1
-04.
-
-
-LaTeX Warning: Reference `source:spawning' on page 44 undefined on input line 1
-04.
-
-
 Overfull \hbox (3.89513pt too wide) in paragraph at lines 107--139
  [][] 
  []
@@ -665,23 +549,11 @@ LaTeX Warning: Reference `tab:site-loc-par-sourcezones' on page 44 undefined on
  input line 165.
 
 [44 <./diags/fig-hrupture-3d.pdf> <./diags/fig-hrupture-2d.pdf>] [45]
-<diags/fig-hsource-trace-starts.pdf, id=219, 598.235pt x 845.1575pt>
+<diags/fig-hsource-trace-starts.pdf, id=231, 598.235pt x 845.1575pt>
 File: diags/fig-hsource-trace-starts.pdf Graphic file (type pdf)
 
-<use diags/fig-hsource-trace-starts.pdf>
-
-LaTeX Warning: Reference `fig:source-trace-starts' on page 46 undefined on inpu
-t line 198.
-
-
-LaTeX Warning: Reference `sec:dim-rupture' on page 46 undefined on input line 2
-05.
-
-
-LaTeX Warning: Reference `sec:az-dip-rupture' on page 46 undefined on input lin
-e 205.
-
-[46] [47 <./diags/fig-hsource-trace-starts.pdf>]
+<use diags/fig-hsource-trace-starts.pdf> [46] [47 <./diags/fig-hsource-trace-st
+arts.pdf>]
 Underfull \hbox (badness 10000) in paragraph at lines 223--225
 
  []
@@ -692,9 +564,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 234--236
  []
 
 
-LaTeX Warning: Reference `eq:ds' on page 48 undefined on input line 237.
-
-
 LaTeX Warning: Reference `fig:traces' on page 48 undefined on input line 238.
 
 
@@ -703,417 +572,225 @@ LaTeX Warning: Reference `ds' on page 48 undefined on input line 247.
 
 LaTeX Warning: Reference `fig:rzrange' on page 48 undefined on input line 249.
 
-[48]
+[48] [49] <diags/geomoutplane.pdf, id=249, 1483.5425pt x 1464.47125pt>
+File: diags/geomoutplane.pdf Graphic file (type pdf)
 
-LaTeX Warning: Reference `fig:intraslabGeom' on page 49 undefined on input line
- 296.
+<use diags/geomoutplane.pdf>
+
+LaTeX Warning: Reference `sec:faultplane' on page 50 undefined on input line 33
+1.
+
+[50] [51 <./diags/geomoutplane.pdf>]
+<diags/geomwidth.png, id=262, 1529.715pt x 646.415pt>
+File: diags/geomwidth.png Graphic file (type png)
+
+<use diags/geomwidth.png>
+
+LaTeX Warning: Reference `ra' on page 52 undefined on input line 354.
 
 
-LaTeX Warning: Reference `fig:intraslabGeom' on page 49 undefined on input line
- 299.
+LaTeX Warning: Reference `eq:rw' on page 52 undefined on input line 354.
 
 
-LaTeX Warning: Reference `fig:h-source-overlapping' on page 49 undefined on inp
-ut line 313.
+LaTeX Warning: Reference `ds' on page 52 undefined on input line 366.
 
 
-LaTeX Warning: Reference `fig:h-source-overlapping' on page 49 undefined on inp
-ut line 321.
+LaTeX Warning: Reference `eq:newrs' on page 52 undefined on input line 366.
 
-[49]
-<diags/fig-hsource-overlapping-zones.pdf, id=236, 471.46138pt x 277.20566pt>
+
+LaTeX Warning: Reference `eq:newre' on page 52 undefined on input line 366.
+
+[52 <./diags/geomwidth.png>]
+
+LaTeX Warning: Reference `eq:newrs' on page 53 undefined on input line 405.
+
+
+LaTeX Warning: Reference `eq:newre' on page 53 undefined on input line 405.
+
+[53] <diags/gt90.pdf, id=276, 1470.49374pt x 1229.59375pt>
+File: diags/gt90.pdf Graphic file (type pdf)
+
+<use diags/gt90.pdf> [54]
+
+LaTeX Warning: Reference `eq:rsll' on page 55 undefined on input line 486.
+
+
+LaTeX Warning: Reference `eq:rell' on page 55 undefined on input line 486.
+
+[55 <./diags/gt90.pdf>] <diags/gt180.png, id=289, 1479.5275pt x 1463.4675pt>
+File: diags/gt180.png Graphic file (type png)
+
+<use diags/gt180.png>
+
+LaTeX Warning: Reference `eq:rsll' on page 56 undefined on input line 540.
+
+[56] [57 <./diags/gt180.png>]
+<diags/fig-hsource-overlapping-zones.pdf, id=296, 471.46138pt x 277.20566pt>
 File: diags/fig-hsource-overlapping-zones.pdf Graphic file (type pdf)
 
-<use diags/fig-hsource-overlapping-zones.pdf>
-
-LaTeX Warning: Reference `fig-hattn-montecarlo' on page 50 undefined on input l
-ine 345.
-
-[50 <./diags/fig-hsource-overlapping-zones.pdf>]
-
-LaTeX Warning: Reference `sec:source-multizones' on page 51 undefined on input 
-line 358.
-
-<diags/fig-hattn-montecarlo.pdf, id=255, 1414.53468pt x 1624.24823pt>
+<use diags/fig-hsource-overlapping-zones.pdf> [58 <./diags/fig-hsource-overlapp
+ing-zones.pdf>]
+<diags/fig-hattn-montecarlo.pdf, id=315, 1414.53468pt x 1624.24823pt>
 File: diags/fig-hattn-montecarlo.pdf Graphic file (type pdf)
 
 <use diags/fig-hattn-montecarlo.pdf>
 
-Package natbib Warning: Citation `dr_Kramer96a' on page 51 undefined on input l
-ine 369.
+Package natbib Warning: Citation `dr_Kramer96a' on page 59 undefined on input l
+ine 608.
+
+[59] [60 <./diags/fig-hattn-montecarlo.pdf>]
+
+Package natbib Warning: Citation `dr_Kramer96a' on page 61 undefined on input l
+ine 656.
 
 
-LaTeX Warning: Reference `fig-hattn-montecarlo' on page 51 undefined on input l
-ine 376.
+LaTeX Warning: Reference `app:discret-pdf' on page 61 undefined on input line 6
+63.
 
 
-LaTeX Warning: Reference `fig-hattn-montecarlo' on page 51 undefined on input l
-ine 379.
+Package natbib Warning: Citation `dr_Kramer96a' on page 61 undefined on input l
+ine 672.
 
-
-LaTeX Warning: Reference `fig-hattn-montecarlo' on page 51 undefined on input l
-ine 386.
-
-
-LaTeX Warning: Reference `fig-hattn-montecarlo' on page 51 undefined on input l
-ine 393.
-
-
-LaTeX Warning: Reference `eq:event-activity' on page 51 undefined on input line
- 403.
-
-
-LaTeX Warning: Reference `eq:event-activity' on page 51 undefined on input line
- 408.
-
-[51] [52 <./diags/fig-hattn-montecarlo.pdf>]
-
-Package natbib Warning: Citation `dr_Kramer96a' on page 53 undefined on input l
-ine 417.
-
-
-LaTeX Warning: Reference `eq:event-activity' on page 53 undefined on input line
- 417.
-
-
-LaTeX Warning: Reference `app:discret-pdf' on page 53 undefined on input line 4
-24.
-
-
-Package natbib Warning: Citation `dr_Kramer96a' on page 53 undefined on input l
-ine 433.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 53 undefined o
-n input line 439.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results3' on page 53 undefined o
-n input line 439.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 53 undefined o
-n input line 442.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results2' on page 53 undefined o
-n input line 442.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 53 undefined o
-n input line 445.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results3' on page 53 undefined o
-n input line 445.
-
-<diags/fig-hsource-eventstatstri.pdf, id=269, 492.84125pt x 494.84875pt>
+<diags/fig-hsource-eventstatstri.pdf, id=329, 492.84125pt x 494.84875pt>
 File: diags/fig-hsource-eventstatstri.pdf Graphic file (type pdf)
 
 <use diags/fig-hsource-eventstatstri.pdf>
 
-Package natbib Warning: Citation `dr_Dhu02b' on page 53 undefined on input line
- 460.
+Package natbib Warning: Citation `dr_Dhu02b' on page 61 undefined on input line
+ 699.
 
 
-Package natbib Warning: Citation `dr_Dhu02b' on page 53 undefined on input line
- 460.
+Package natbib Warning: Citation `dr_Dhu02b' on page 61 undefined on input line
+ 699.
 
-<diags/fig-hsource-eventstatsrec.pdf, id=270, 492.84125pt x 494.84875pt>
+<diags/fig-hsource-eventstatsrec.pdf, id=330, 492.84125pt x 494.84875pt>
 File: diags/fig-hsource-eventstatsrec.pdf Graphic file (type pdf)
 
 <use diags/fig-hsource-eventstatsrec.pdf>
 
-Package natbib Warning: Citation `dr_Dhu02b' on page 53 undefined on input line
- 470.
+Package natbib Warning: Citation `dr_Dhu02b' on page 61 undefined on input line
+ 709.
 
 
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 53 undefined o
-n input line 470.
+Package natbib Warning: Citation `dr_Dhu02b' on page 61 undefined on input line
+ 709.
 
-
-Package natbib Warning: Citation `dr_Dhu02b' on page 53 undefined on input line
- 470.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 53 undefined o
-n input line 470.
-
-<diags/fig-hsource-eventstats_tri_rec.pdf, id=271, 492.84125pt x 494.84875pt>
+<diags/fig-hsource-eventstats_tri_rec.pdf, id=331, 492.84125pt x 494.84875pt>
 File: diags/fig-hsource-eventstats_tri_rec.pdf Graphic file (type pdf)
 
 <use diags/fig-hsource-eventstats_tri_rec.pdf>
 
-Package natbib Warning: Citation `dr_Dhu02b' on page 53 undefined on input line
- 485.
+Package natbib Warning: Citation `dr_Dhu02b' on page 61 undefined on input line
+ 724.
 
 
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 53 undefined o
-n input line 485.
+Package natbib Warning: Citation `dr_Dhu02b' on page 61 undefined on input line
+ 724.
 
-
-Package natbib Warning: Citation `dr_Dhu02b' on page 53 undefined on input line
- 485.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 53 undefined o
-n input line 485.
-
-<diags/fig-hsource-eventstatsall.pdf, id=272, 492.84125pt x 494.84875pt>
+<diags/fig-hsource-eventstatsall.pdf, id=332, 492.84125pt x 494.84875pt>
 File: diags/fig-hsource-eventstatsall.pdf Graphic file (type pdf)
 
 <use diags/fig-hsource-eventstatsall.pdf>
 
-Package natbib Warning: Citation `dr_Dhu02b' on page 53 undefined on input line
- 503.
+Package natbib Warning: Citation `dr_Dhu02b' on page 61 undefined on input line
+ 742.
 
 
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 53 undefined o
-n input line 503.
+Package natbib Warning: Citation `dr_Dhu02b' on page 61 undefined on input line
+ 742.
 
 
-Package natbib Warning: Citation `dr_Dhu02b' on page 53 undefined on input line
- 503.
+LaTeX Warning: Reference `tab:site-loc-par-sourcezones' on page 61 undefined on
+ input line 757.
 
-
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 53 undefined o
-n input line 503.
-
-
-LaTeX Warning: Reference `tab:site-loc-par-sourcezones' on page 53 undefined on
- input line 518.
-
-[53] [54 <./diags/fig-hsource-eventstatstri.pdf>] [55 <./diags/fig-hsource-even
-tstatsrec.pdf>] [56 <./diags/fig-hsource-eventstats_tri_rec.pdf>] [57 <./diags/
+[61] [62 <./diags/fig-hsource-eventstatstri.pdf>] [63 <./diags/fig-hsource-even
+tstatsrec.pdf>] [64 <./diags/fig-hsource-eventstats_tri_rec.pdf>] [65 <./diags/
 fig-hsource-eventstatsall.pdf>]
 
-Package natbib Warning: Citation `dr_Wells94a' on page 58 undefined on input li
-ne 526.
+Package natbib Warning: Citation `dr_Wells94a' on page 66 undefined on input li
+ne 765.
 
 
-LaTeX Warning: Reference `sec:event-catalogue' on page 58 undefined on input li
-ne 543.
+LaTeX Warning: Reference `sec:event-catalogue' on page 66 undefined on input li
+ne 782.
+
+[66] [67]
+
+LaTeX Warning: Reference `tab:site-loc-par-sourcezones' on page 68 undefined on
+ input line 889.
 
 
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 58 undefined o
-n input line 574.
+LaTeX Warning: Reference `tab:site-loc-par-sourcepolys' on page 68 undefined on
+ input line 897.
 
+[68] [69]
 
-LaTeX Warning: Reference `fig:source-catalogue-results4' on page 58 undefined o
-n input line 574.
+LaTeX Warning: Reference `app:discret-pdf' on page 70 undefined on input line 1
+011.
 
-[58]
-
-LaTeX Warning: Reference `sec:rup-location' on page 59 undefined on input line 
-589.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results1' on page 59 undefined o
-n input line 597.
-
-
-LaTeX Warning: Reference `fig:source-catalogue-results4' on page 59 undefined o
-n input line 597.
-
-
-LaTeX Warning: Reference `ch:atten' on page 59 undefined on input line 607.
-
-
-LaTeX Warning: Reference `sec:source-EQcat' on page 59 undefined on input line 
-616.
-
-
-LaTeX Warning: Reference `sec:rup-location' on page 59 undefined on input line 
-631.
-
-
-LaTeX Warning: Reference `sec:dim-rupture' on page 59 undefined on input line 6
-32.
-
-
-LaTeX Warning: Reference `sec:az-dip-rupture' on page 59 undefined on input lin
-e 633.
-
-
-LaTeX Warning: Reference `sec:magnitude_selection' on page 59 undefined on inpu
-t line 637.
-
-[59]
-
-LaTeX Warning: Reference `tab:site-loc-par-sourcezones' on page 60 undefined on
- input line 650.
-
-
-LaTeX Warning: Reference `tab:site-loc-par-sourcepolys' on page 60 undefined on
- input line 658.
-
-
-LaTeX Warning: Reference `sec:magnitude_selection' on page 60 undefined on inpu
-t line 677.
-
-
-LaTeX Warning: Reference `sec:magnitude_selection' on page 60 undefined on inpu
-t line 684.
-
-[60]
-
-LaTeX Warning: Reference `attn:uncert-randomchoice' on page 61 undefined on inp
-ut line 700.
-
-
-LaTeX Warning: Reference `attn:uncert-pdfchoice' on page 61 undefined on input 
-line 703.
-
-[61]
-
-LaTeX Warning: Reference `sec:magnitude_selection' on page 62 undefined on inpu
-t line 771.
-
-
-LaTeX Warning: Reference `app:discret-pdf' on page 62 undefined on input line 7
-72.
-
-
-LaTeX Warning: Reference `attn:uncert-pdfchoice' on page 62 undefined on input 
-line 793.
-
-
-LaTeX Warning: Reference `tab:evntdb-columns' on page 62 undefined on input lin
-e 803.
-
-[62]) [63] [64]
+[70]) [71] [72]
 \openout2 = `eqrmtech-hv-grids.aux'.
 
  (./eqrmtech-hv-grids.tex
 Chapter 4.
-
-LaTeX Warning: Reference `ch:risk' on page 65 undefined on input line 21.
-
-
-LaTeX Warning: Reference `ch:reg' on page 65 undefined on input line 38.
-
-[65
+[73
 
 
 
-]
+] [74] [75]
 
-LaTeX Warning: Reference `ch:risk' on page 66 undefined on input line 71.
-
-
-LaTeX Warning: Reference `sec:grids-constructionclass' on page 66 undefined on 
-input line 94.
-
-
-LaTeX Warning: Reference `sec:grids-usageclass' on page 66 undefined on input l
-ine 95.
-
-
-LaTeX Warning: Reference `sec:grids-constructionclass' on page 66 undefined on 
-input line 102.
-
-
-LaTeX Warning: Reference `sec:grids-replacecosts' on page 66 undefined on input
- line 103.
-
-
-LaTeX Warning: Reference `sec:grids-replacecosts' on page 66 undefined on input
- line 104.
-
-
-LaTeX Warning: Reference `sec:grids-usageclass' on page 66 undefined on input l
-ine 105.
-
-
-LaTeX Warning: Reference `tab:grids-bdatabasecolumns' on page 66 undefined on i
-nput line 119.
-
-[66]
-
-LaTeX Warning: Reference `ch:reg' on page 67 undefined on input line 123.
-
-
-LaTeX Warning: Reference `sec:loss-surveyfacts' on page 67 undefined on input l
-ine 133.
-
-[67]
-
-LaTeX Warning: Reference `ch:damage' on page 68 undefined on input line 147.
-
-
-Package natbib Warning: Citation `dr_FEMA99b' on page 68 undefined on input lin
+Package natbib Warning: Citation `dr_FEMA99b' on page 76 undefined on input lin
 e 148.
 
 
-Package natbib Warning: Citation `dr_Stehle01a' on page 68 undefined on input l
+Package natbib Warning: Citation `dr_Stehle01a' on page 76 undefined on input l
 ine 150.
 
 
-LaTeX Warning: Reference `tab:hazus-types' on page 68 undefined on input line 2
-21.
-
-
-Package natbib Warning: Citation `dr_Stehle01a' on page 68 undefined on input l
+Package natbib Warning: Citation `dr_Stehle01a' on page 76 undefined on input l
 ine 225.
 
+[76] [77]
 
-LaTeX Warning: Reference `tab:v-dam-allbtypes' on page 68 undefined on input li
-ne 238.
-
-[68] [69]
-
-Package natbib Warning: Citation `dr_Fulford02a' on page 70 undefined on input 
+Package natbib Warning: Citation `dr_Fulford02a' on page 78 undefined on input 
 line 272.
 
 
-LaTeX Warning: Reference `app:buildingpars' on page 70 undefined on input line 
+LaTeX Warning: Reference `app:buildingpars' on page 78 undefined on input line 
 273.
 
 
-LaTeX Warning: Reference `tab:vdam-building-parameters' on page 70 undefined on
+LaTeX Warning: Reference `tab:vdam-building-parameters' on page 78 undefined on
  input line 274.
 
 
-Package natbib Warning: Citation `dr_ABS01a' on page 70 undefined on input line
+Package natbib Warning: Citation `dr_ABS01a' on page 78 undefined on input line
  293.
 
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 70 undefined on input lin
+Package natbib Warning: Citation `dr_FEMA99b' on page 78 undefined on input lin
 e 295.
 
 
-Package natbib Warning: Citation `dr_ABS01a' on page 70 undefined on input line
+Package natbib Warning: Citation `dr_ABS01a' on page 78 undefined on input line
  302.
 
 
-Package natbib Warning: Citation `dr_ABS01a' on page 70 undefined on input line
+Package natbib Warning: Citation `dr_ABS01a' on page 78 undefined on input line
  302.
 
 
 LaTeX Warning: Float too large for page by 48.09898pt on input line 360.
 
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 70 undefined on input lin
+Package natbib Warning: Citation `dr_FEMA99b' on page 78 undefined on input lin
 e 367.
 
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 70 undefined on input lin
+Package natbib Warning: Citation `dr_FEMA99b' on page 78 undefined on input lin
 e 367.
 
-
-LaTeX Warning: Reference `tab:grids-FCB' on page 70 undefined on input line 416
-.
-
-
-LaTeX Warning: Reference `tab:grids-HAZUSusage' on page 70 undefined on input l
-ine 418.
-
-[70] [71] [72]
-
-LaTeX Warning: Reference `sec:grids-bdatabase' on page 73 undefined on input li
-ne 430.
-
-[73]
+[78] [79] [80] [81]
 Overfull \hbox (47.32198pt too wide) in paragraph at lines 450--450
 []\OT1/cmtt/m/n/12 */datacvt| 
  []
@@ -1148,26 +825,14 @@ Overfull \hbox (103.885pt too wide) in paragraph at lines 457--457
 []\OT1/cmtt/m/n/12 <site[]loc>[]par[]site| 
  []
 
-) [74
+) [82
 
 ]
 \openout2 = `eqrmtech-h-attn.aux'.
 
  (./eqrmtech-h-attn.tex
 Chapter 5.
-
-LaTeX Warning: Reference `sec:background' on page 75 undefined on input line 19
-.
-
-
-LaTeX Warning: Reference `sec:implemented' on page 75 undefined on input line 2
-0.
-
-
-LaTeX Warning: Reference `sec:implementation' on page 75 undefined on input lin
-e 21.
-
-[75
+[83
 
 
 
@@ -1175,41 +840,29 @@ e 21.
 Missing character: There is no â in font cmr12!
 Missing character: There is no € in font cmr12!
 Missing character: There is no ™ in font cmr12!
- [76]
-
-LaTeX Warning: Reference `fig:attn-distances' on page 77 undefined on input lin
-e 95.
-
-<diags/fig-hattn-distance.pdf, id=389, 614.295pt x 794.97pt>
+ [84] <diags/fig-hattn-distance.pdf, id=443, 614.295pt x 794.97pt>
 File: diags/fig-hattn-distance.pdf Graphic file (type pdf)
 
-<use diags/fig-hattn-distance.pdf>
+<use diags/fig-hattn-distance.pdf> [85] [86 <./diags/fig-hattn-distance.pdf>]
+[87]
 
-LaTeX Warning: Reference `NEHRP' on page 77 undefined on input line 136.
-
-[77]
-
-LaTeX Warning: Reference `GMPEs' on page 78 undefined on input line 182.
-
-[78 <./diags/fig-hattn-distance.pdf>] [79]
-
-Package natbib Warning: Citation `eqrm_Sadigh97a' on page 80 undefined on input
+Package natbib Warning: Citation `eqrm_Sadigh97a' on page 88 undefined on input
  line 201.
 
 
-Package natbib Warning: Citation `dr_Gaull90a' on page 80 undefined on input li
+Package natbib Warning: Citation `dr_Gaull90a' on page 88 undefined on input li
 ne 222.
 
 
-Package natbib Warning: Citation `dr_Atkinson97a' on page 80 undefined on input
+Package natbib Warning: Citation `dr_Atkinson97a' on page 88 undefined on input
  line 224.
 
 
-Package natbib Warning: Citation `eqrm_Toro97a' on page 80 undefined on input l
+Package natbib Warning: Citation `eqrm_Toro97a' on page 88 undefined on input l
 ine 226.
 
 
-Package natbib Warning: Citation `eqrm_Campbell03a' on page 80 undefined on inp
+Package natbib Warning: Citation `eqrm_Campbell03a' on page 88 undefined on inp
 ut line 228.
 
 
@@ -1220,22 +873,12 @@ Overfull \hbox (39.04825pt too wide) in paragraph at lines 190--248
 
 LaTeX Warning: Float too large for page by 32.602pt on input line 248.
 
-[80]
-
-LaTeX Warning: Reference `GMPEs' on page 81 undefined on input line 253.
-
-
-LaTeX Warning: Reference `GMPEs' on page 81 undefined on input line 271.
-
-
-LaTeX Warning: Reference `terms' on page 81 undefined on input line 276.
-
-[81
+[88] [89
 
 
 ]
 
-LaTeX Warning: Reference `tab:Somerville09_Non_Cratonic' on page 82 undefined o
+LaTeX Warning: Reference `tab:Somerville09_Non_Cratonic' on page 90 undefined o
 n input line 352.
 
 
@@ -1243,24 +886,12 @@ Overfull \hbox (9.49142pt too wide) in paragraph at lines 364--394
 [][] 
  []
 
-[82] [83]
+[90] [91]
 
-LaTeX Warning: Reference `inputs' on page 84 undefined on input line 449.
-
-
-LaTeX Warning: Reference `def' on page 84 undefined on input line 450.
-
-
-LaTeX Warning: Reference `GMPEs' on page 84 undefined on input line 454.
-
-
-Package natbib Warning: Citation `eqrm_Johnstone96a' on page 84 undefined on in
+Package natbib Warning: Citation `eqrm_Johnstone96a' on page 92 undefined on in
 put line 470.
 
-
-LaTeX Warning: Reference `eq:general' on page 84 undefined on input line 472.
-
-[84] [85]
+[92] [93]
 Overfull \hbox (71.55858pt too wide) in paragraph at lines 486--542
  [][] 
  []
@@ -1268,207 +899,91 @@ Overfull \hbox (71.55858pt too wide) in paragraph at lines 486--542
 
 LaTeX Warning: Float too large for page by 44.65213pt on input line 542.
 
-[86] [87
+[94] [95
 
 
 ]
 
-LaTeX Warning: Reference `attn:uncertainty' on page 88 undefined on input line 
-661.
-
-
-LaTeX Warning: Reference `sec:attn-multi-attnmodels' on page 88 undefined on in
-put line 661.
-
-
-LaTeX Warning: Reference `attn:atten-formula' on page 88 undefined on input lin
+LaTeX Warning: Reference `attn:atten-formula' on page 96 undefined on input lin
 e 676.
 
 
-LaTeX Warning: Reference `attn:implementation' on page 88 undefined on input li
+LaTeX Warning: Reference `attn:implementation' on page 96 undefined on input li
 ne 676.
 
-
-LaTeX Warning: Reference `attn:uncert-randomchoice' on page 88 undefined on inp
-ut line 677.
-
-
-LaTeX Warning: Reference `attn:uncert-pdfchoice' on page 88 undefined on input 
-line 677.
-
-
-LaTeX Warning: Reference `tab:attn-varmethods' on page 88 undefined on input li
-ne 680.
-
-
-LaTeX Warning: Reference `attn:uncert-pdfchoice' on page 88 undefined on input 
-line 690.
-
-
-LaTeX Warning: Reference `attn:uncert-randomchoice' on page 88 undefined on inp
-ut line 691.
-
-[88] <diags/fig-hattn-random.pdf, id=434, 614.295pt x 794.97pt>
+[96] <diags/fig-hattn-random.pdf, id=488, 614.295pt x 794.97pt>
 File: diags/fig-hattn-random.pdf Graphic file (type pdf)
 
-<use diags/fig-hattn-random.pdf>
-
-LaTeX Warning: Reference `fig:hattn-randomsamp' on page 89 undefined on input l
-ine 727.
-
-[89] [90 <./diags/fig-hattn-random.pdf>]
-
-LaTeX Warning: Reference `attn:attn-var' on page 91 undefined on input line 737
-.
-
-
-LaTeX Warning: Reference `source:spawning' on page 91 undefined on input line 7
-80.
-
-
-LaTeX Warning: Reference `source:spawning' on page 91 undefined on input line 7
-88.
-
-[91]
-
-LaTeX Warning: Reference `attn:uncertainty-pdfsample' on page 92 undefined on i
-nput line 814.
-
-
-LaTeX Warning: Reference `attn:uncertainty-def-epsilon' on page 92 undefined on
- input line 814.
-
-
-LaTeX Warning: Reference `fig:hattn-spawnsamp' on page 92 undefined on input li
-ne 817.
-
-
-LaTeX Warning: Reference `source:spawning' on page 92 undefined on input line 8
-17.
-
-
-LaTeX Warning: Reference `attn:uncertainty-pdfsample' on page 92 undefined on i
-nput line 819.
-
-<diags/fig-hattn-spawning.pdf, id=447, 614.295pt x 794.97pt>
+<use diags/fig-hattn-random.pdf> [97] [98 <./diags/fig-hattn-random.pdf>]
+[99] <diags/fig-hattn-spawning.pdf, id=501, 614.295pt x 794.97pt>
 File: diags/fig-hattn-spawning.pdf Graphic file (type pdf)
 
-<use diags/fig-hattn-spawning.pdf>
+<use diags/fig-hattn-spawning.pdf> [100] [101 <./diags/fig-hattn-spawning.pdf>]
 
-LaTeX Warning: Reference `attn:uncert-randomchoice' on page 92 undefined on inp
-ut line 866.
-
-[92] [93 <./diags/fig-hattn-spawning.pdf>]
 Overfull \hbox (1.12889pt too wide) in paragraph at lines 886--886
 []\OT1/cmr/bx/n/17.28 Using mul-ti-ple GM-PEs - In-cor-po-rat-ing epis-
  []
 
 
-LaTeX Warning: Reference `sec:application-setdata' on page 94 undefined on inpu
-t line 891.
+LaTeX Warning: Reference `sec:application-setdata' on page 102 undefined on inp
+ut line 891.
 
 
-LaTeX Warning: Reference `tab:attn-flags' on page 94 undefined on input line 90
-5.
+LaTeX Warning: Reference `tab:attn-flags' on page 102 undefined on input line 9
+05.
 
-
-LaTeX Warning: Reference `attn:uncert-pdfchoice' on page 94 undefined on input 
-line 917.
-
-
-LaTeX Warning: Reference `fig:attn-treecollapse' on page 94 undefined on input 
-line 925.
-
-
-LaTeX Warning: Reference `attn:uncert-pdfchoice' on page 94 undefined on input 
-line 931.
-
-
-LaTeX Warning: Reference `ch:risk' on page 94 undefined on input line 938.
-
-
-LaTeX Warning: Reference `fig:attn-treecollapse' on page 94 undefined on input 
-line 939.
-
-[94]
-
-LaTeX Warning: Reference `ch:risk' on page 95 undefined on input line 1052.
-
-
-LaTeX Warning: Reference `ch:risk' on page 95 undefined on input line 1052.
-
-) [95] [96]
+[102]) [103] [104]
 \openout2 = `eqrmtech-h-regolith.aux'.
 
  (./eqrmtech-h-regolith.tex
 Chapter 6.
 
-Package natbib Warning: Citation `dr_Borcherdt76a' on page 97 undefined on inpu
-t line 11.
+Package natbib Warning: Citation `dr_Borcherdt76a' on page 105 undefined on inp
+ut line 11.
 
 
-Package natbib Warning: Citation `dr_Murphy71a' on page 97 undefined on input l
-ine 11.
+Package natbib Warning: Citation `dr_Murphy71a' on page 105 undefined on input 
+line 11.
 
 
-Package natbib Warning: Citation `dr_Meremonte96a' on page 97 undefined on inpu
-t line 15.
+Package natbib Warning: Citation `dr_Meremonte96a' on page 105 undefined on inp
+ut line 15.
 
 
-Package natbib Warning: Citation `dr_Robinson06a' on page 97 undefined on input
- line 32.
+Package natbib Warning: Citation `dr_Robinson06a' on page 105 undefined on inpu
+t line 32.
 
 
-Package natbib Warning: Citation `dr_Dhu02b' on page 97 undefined on input line
- 34.
+Package natbib Warning: Citation `dr_Dhu02b' on page 105 undefined on input lin
+e 34.
 
-
-LaTeX Warning: Reference `fig:regolith-newcexample-crosssection' on page 97 und
-efined on input line 37.
-
-
-LaTeX Warning: Reference `fig:regolith-newcexample-ampfactors' on page 97 undef
-ined on input line 40.
-
-[97
+[105
 
 
 
-] <diags/fig-hregolith-crosssections.pdf, id=478, 614.295pt x 794.97pt>
+] <diags/fig-hregolith-crosssections.pdf, id=532, 614.295pt x 794.97pt>
 File: diags/fig-hregolith-crosssections.pdf Graphic file (type pdf)
 
 <use diags/fig-hregolith-crosssections.pdf>
 
-Package natbib Warning: Citation `dr_Dhu02b' on page 98 undefined on input line
- 49.
+Package natbib Warning: Citation `dr_Dhu02b' on page 106 undefined on input lin
+e 49.
 
 
-Package natbib Warning: Citation `dr_Dhu02b' on page 98 undefined on input line
- 49.
+Package natbib Warning: Citation `dr_Dhu02b' on page 106 undefined on input lin
+e 49.
 
-<diags/fig-hregolith-ampfactors.pdf, id=479, 614.295pt x 794.97pt>
+<diags/fig-hregolith-ampfactors.pdf, id=533, 614.295pt x 794.97pt>
 File: diags/fig-hregolith-ampfactors.pdf Graphic file (type pdf)
 
 <use diags/fig-hregolith-ampfactors.pdf>
 
-LaTeX Warning: Reference `fig:regolith-newcexample-crosssection' on page 98 und
-efined on input line 60.
+LaTeX Warning: Reference `app:regolith-datafile-complete' on page 106 undefined
+ on input line 75.
 
 
-LaTeX Warning: Reference `fig:regolith-newcexample-crosssection' on page 98 und
-efined on input line 60.
-
-
-LaTeX Warning: Reference `tab:reg-datafile' on page 98 undefined on input line 
-74.
-
-
-LaTeX Warning: Reference `app:regolith-datafile-complete' on page 98 undefined 
-on input line 75.
-
-
-Package natbib Warning: Citation `dr_Dhu02b' on page 98 undefined on input line
- 77.
+Package natbib Warning: Citation `dr_Dhu02b' on page 106 undefined on input lin
+e 77.
 
 LaTeX Font Info:    Try loading font information for OMS+cmtt on input line 93.
 
@@ -1497,305 +1012,179 @@ Underfull \hbox (badness 2460) in paragraph at lines 101--102
  []
 
 
-LaTeX Warning: Reference `attn:implementation' on page 98 undefined on input li
-ne 122.
+LaTeX Warning: Reference `attn:implementation' on page 106 undefined on input l
+ine 122.
 
-[98] [99 <./diags/fig-hregolith-crosssections.pdf>] [100 <./diags/fig-hregolith
--ampfactors.pdf>]
-
-LaTeX Warning: Reference `sec:regolith-incorp-unc' on page 101 undefined on inp
-ut line 149.
-
-
+[106] [107 <./diags/fig-hregolith-crosssections.pdf>] [108 <./diags/fig-hregoli
+th-ampfactors.pdf>]
 Overfull \hbox (12.7942pt too wide) in paragraph at lines 142--150
 []\OT1/cmr/m/n/12 . The ac-tual se-lec-tion made
  []
 
-
-LaTeX Warning: Reference `attn:uncertainty' on page 101 undefined on input line
- 160.
-
-
-LaTeX Warning: Reference `source:spawning' on page 101 undefined on input line 
-165.
-
-[101]
-
-LaTeX Warning: Reference `eq:regolith-maxampfactor' on page 102 undefined on in
-put line 187.
-
-
-LaTeX Warning: Reference `eq:regolith-minampfactor' on page 102 undefined on in
-put line 187.
-
-) [102] [103]
+[109]) [110] [111]
 \openout2 = `eqrmtech-v-damage.aux'.
 
  (./eqrmtech-v-damage.tex
 Chapter 7.
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 104 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 112 undefined on input li
 ne 8.
 
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 104 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 112 undefined on input li
 ne 13.
 
 
-Package natbib Warning: Citation `dr_Kircher97a' on page 104 undefined on input
+Package natbib Warning: Citation `dr_Kircher97a' on page 112 undefined on input
  line 13.
 
 
-Package natbib Warning: Citation `dr_Kircher97a' on page 104 undefined on input
+Package natbib Warning: Citation `dr_Kircher97a' on page 112 undefined on input
  line 17.
 
 
-LaTeX Warning: Reference `ch:grids' on page 104 undefined on input line 29.
-
-
-Package natbib Warning: Citation `dr_Chopra01c' on page 104 undefined on input 
+Package natbib Warning: Citation `dr_Chopra01c' on page 112 undefined on input 
 line 52.
 
-[104
+[112
 
 
 
-]
-
-LaTeX Warning: Reference `fig:vdamage-capspect' on page 105 undefined on input 
-line 67.
-
-
-LaTeX Warning: Reference `ch:grids' on page 105 undefined on input line 73.
-
-
-LaTeX Warning: Reference `subsec:v-dam-damping' on page 105 undefined on input 
-line 76.
-
-<diags/fig-vdamage-capspect.pdf, id=513, 614.295pt x 794.97pt>
+] <diags/fig-vdamage-capspect.pdf, id=567, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-capspect.pdf Graphic file (type pdf)
 
-<use diags/fig-vdamage-capspect.pdf>
-
-LaTeX Warning: Reference `fig:vdamage-capspect' on page 105 undefined on input 
-line 88.
-
-[105 <./diags/fig-vdamage-capspect.pdf>]
-
-LaTeX Warning: Reference `fig:vdamage-cap' on page 106 undefined on input line 
-112.
-
-<diags/fig-vdamage-cap.pdf, id=520, 614.295pt x 794.97pt>
+<use diags/fig-vdamage-capspect.pdf> [113 <./diags/fig-vdamage-capspect.pdf>]
+<diags/fig-vdamage-cap.pdf, id=574, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-cap.pdf Graphic file (type pdf)
 
-<use diags/fig-vdamage-cap.pdf> [106 <./diags/fig-vdamage-cap.pdf>]
+<use diags/fig-vdamage-cap.pdf> [114 <./diags/fig-vdamage-cap.pdf>] [115]
 
-LaTeX Warning: Reference `sec:grids-constructionclass' on page 107 undefined on
- input line 149.
-
-
-LaTeX Warning: Reference `eq:damage-dstate' on page 107 undefined on input line
- 151.
-
-[107]
-
-Package natbib Warning: Citation `dr_FEMA99b' on page 108 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 116 undefined on input li
 ne 211.
 
 
-Package natbib Warning: Citation `dr_Stehle01a' on page 108 undefined on input 
+Package natbib Warning: Citation `dr_Stehle01a' on page 116 undefined on input 
 line 215.
 
-
-LaTeX Warning: Reference `attn:uncert-randomchoice' on page 108 undefined on in
-put line 226.
-
-
-LaTeX Warning: Reference `fig:vdamage-capcurve-random' on page 108 undefined on
- input line 230.
-
-<diags/fig-vdamage-caprand.pdf, id=530, 614.295pt x 794.97pt>
+<diags/fig-vdamage-caprand.pdf, id=584, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-caprand.pdf Graphic file (type pdf)
 
-<use diags/fig-vdamage-caprand.pdf> [108]
+<use diags/fig-vdamage-caprand.pdf> [116]
 
-Package natbib Warning: Citation `dr_Stehle01a' on page 109 undefined on input 
+Package natbib Warning: Citation `dr_Stehle01a' on page 117 undefined on input 
 line 272.
 
 
-Package natbib Warning: Citation `Newmark82' on page 109 undefined on input lin
+Package natbib Warning: Citation `Newmark82' on page 117 undefined on input lin
 e 275.
 
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 109 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 117 undefined on input li
 ne 277.
 
 
-Package natbib Warning: Citation `Newmark82' on page 109 undefined on input lin
+Package natbib Warning: Citation `Newmark82' on page 117 undefined on input lin
 e 278.
 
-
-LaTeX Warning: Reference `fig:v-dam-damping-adrs' on page 109 undefined on inpu
-t line 285.
-
-[109 <./diags/fig-vdamage-caprand.pdf>]
-<diags/fig-vdamage-damping.pdf, id=540, 614.295pt x 794.97pt>
+[117 <./diags/fig-vdamage-caprand.pdf>]
+<diags/fig-vdamage-damping.pdf, id=594, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-damping.pdf Graphic file (type pdf)
 
-<use diags/fig-vdamage-damping.pdf> [110 <./diags/fig-vdamage-damping.pdf>]
+<use diags/fig-vdamage-damping.pdf> [118 <./diags/fig-vdamage-damping.pdf>]
 
-Package natbib Warning: Citation `Newmark82' on page 111 undefined on input lin
+Package natbib Warning: Citation `Newmark82' on page 119 undefined on input lin
 e 326.
 
 
-LaTeX Warning: Reference `sec:dam-hystericdamping' on page 111 undefined on inp
-ut line 355.
-
-
-Package natbib Warning: Citation `Newmark82' on page 111 undefined on input lin
+Package natbib Warning: Citation `Newmark82' on page 119 undefined on input lin
 e 361.
 
 
-LaTeX Warning: Reference `app:buildingpars' on page 111 undefined on input line
+LaTeX Warning: Reference `app:buildingpars' on page 119 undefined on input line
  369.
 
 
-LaTeX Warning: Reference `tab:vdam-bfactors-damping' on page 111 undefined on i
+LaTeX Warning: Reference `tab:vdam-bfactors-damping' on page 119 undefined on i
 nput line 369.
 
-
-LaTeX Warning: Reference `fig:vdamage-hystarea' on page 111 undefined on input 
-line 386.
-
-[111]
-
-LaTeX Warning: Reference `sec:damage-elasticdamping' on page 112 undefined on i
-nput line 396.
-
-<diags/fig-vdamage-hyst.pdf, id=551, 614.295pt x 794.97pt>
+[119] <diags/fig-vdamage-hyst.pdf, id=605, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-hyst.pdf Graphic file (type pdf)
 
-<use diags/fig-vdamage-hyst.pdf> [112 <./diags/fig-vdamage-hyst.pdf>]
-
-LaTeX Warning: Reference `fig:vdamage-hyst3' on page 113 undefined on input lin
-e 424.
-
-<diags/fig-vdamage-hyst3.pdf, id=558, 614.295pt x 794.97pt>
+<use diags/fig-vdamage-hyst.pdf> [120 <./diags/fig-vdamage-hyst.pdf>]
+<diags/fig-vdamage-hyst3.pdf, id=612, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-hyst3.pdf Graphic file (type pdf)
 
 <use diags/fig-vdamage-hyst3.pdf>
-
-LaTeX Warning: Reference `fig:vdamage-hyst2' on page 113 undefined on input lin
-e 443.
-
-<diags/fig-vdamage-hyst2.pdf, id=559, 614.295pt x 794.97pt>
+<diags/fig-vdamage-hyst2.pdf, id=613, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-hyst2.pdf Graphic file (type pdf)
 
-<use diags/fig-vdamage-hyst2.pdf> [113 <./diags/fig-vdamage-hyst3.pdf>]
+<use diags/fig-vdamage-hyst2.pdf> [121 <./diags/fig-vdamage-hyst3.pdf>]
 
-LaTeX Warning: Reference `app:buildingpars' on page 114 undefined on input line
+LaTeX Warning: Reference `app:buildingpars' on page 122 undefined on input line
  478.
 
 
-LaTeX Warning: Reference `tab:vdam-bfactors-damping' on page 114 undefined on i
+LaTeX Warning: Reference `tab:vdam-bfactors-damping' on page 122 undefined on i
 nput line 479.
 
 
-Package natbib Warning: Citation `dr_Fulford02a' on page 114 undefined on input
+Package natbib Warning: Citation `dr_Fulford02a' on page 122 undefined on input
  line 482.
 
-
-LaTeX Warning: Reference `fig:vdamage-intersection' on page 114 undefined on in
-put line 498.
-
-[114 <./diags/fig-vdamage-hyst2.pdf>]
-<diags/fig-vdamage-intersect.pdf, id=572, 614.295pt x 794.97pt>
+[122 <./diags/fig-vdamage-hyst2.pdf>]
+<diags/fig-vdamage-intersect.pdf, id=626, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-intersect.pdf Graphic file (type pdf)
 
-<use diags/fig-vdamage-intersect.pdf> [115 <./diags/fig-vdamage-intersect.pdf>]
+<use diags/fig-vdamage-intersect.pdf> [123 <./diags/fig-vdamage-intersect.pdf>]
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 116 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 124 undefined on input li
 ne 553.
 
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 116 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 124 undefined on input li
 ne 555.
 
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 116 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 124 undefined on input li
 ne 563.
 
-
-LaTeX Warning: Reference `fig:dam-fragility-var-dstate' on page 116 undefined o
-n input line 602.
-
-<diags/fig-vdamage-frag.pdf, id=578, 614.295pt x 794.97pt>
+<diags/fig-vdamage-frag.pdf, id=632, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-frag.pdf Graphic file (type pdf)
 
-<use diags/fig-vdamage-frag.pdf> [116]
+<use diags/fig-vdamage-frag.pdf> [124]
 
-LaTeX Warning: Reference `tab:vdam-building-parameters' on page 117 undefined o
+LaTeX Warning: Reference `tab:vdam-building-parameters' on page 125 undefined o
 n input line 642.
 
 
-LaTeX Warning: Reference `app:buildingpars' on page 117 undefined on input line
+LaTeX Warning: Reference `app:buildingpars' on page 125 undefined on input line
  646.
 
-[117 <./diags/fig-vdamage-frag.pdf>]
-
-LaTeX Warning: Reference `eq:vdamage-frag' on page 118 undefined on input line 
-654.
-
-
-LaTeX Warning: Reference `fig:vdamage-frag-var' on page 118 undefined on input 
-line 656.
-
-<diags/fig-vdamage-frag-step.pdf, id=589, 614.295pt x 794.97pt>
+[125 <./diags/fig-vdamage-frag.pdf>]
+<diags/fig-vdamage-frag-step.pdf, id=643, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-frag-step.pdf Graphic file (type pdf)
 
 <use diags/fig-vdamage-frag-step.pdf>
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 118 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 126 undefined on input li
 ne 669.
 
-[118 <./diags/fig-vdamage-frag-step.pdf>]
-
-LaTeX Warning: Reference `fig:vdamage-frag-inc' on page 119 undefined on input 
-line 692.
-
-<diags/fig-vdamage-frag-inc.pdf, id=596, 614.295pt x 794.97pt>
+[126 <./diags/fig-vdamage-frag-step.pdf>]
+<diags/fig-vdamage-frag-inc.pdf, id=650, 614.295pt x 794.97pt>
 File: diags/fig-vdamage-frag-inc.pdf Graphic file (type pdf)
 
 <use diags/fig-vdamage-frag-inc.pdf>
 
-LaTeX Warning: Reference `ch:atten' on page 119 undefined on input line 717.
-
-
-LaTeX Warning: Reference `ch:reg' on page 119 undefined on input line 717.
-
-
-Package natbib Warning: Citation `dr_Kircher97b' on page 119 undefined on input
+Package natbib Warning: Citation `dr_Kircher97b' on page 127 undefined on input
  line 725.
 
 
-LaTeX Warning: Reference `attn:uncertainty' on page 119 undefined on input line
- 740.
-
-
-LaTeX Warning: Reference `sec:regolith-incorp-unc' on page 119 undefined on inp
-ut line 740.
-
-
-LaTeX Warning: Reference `sec:dam-capacity-var' on page 119 undefined on input 
-line 741.
-
-
-Package natbib Warning: Citation `dr_Patchett04a' on page 119 undefined on inpu
+Package natbib Warning: Citation `dr_Patchett04a' on page 127 undefined on inpu
 t line 753.
 
-[119] [120 <./diags/fig-vdamage-frag-inc.pdf>]
+[127] [128 <./diags/fig-vdamage-frag-inc.pdf>]
 
-Package natbib Warning: Citation `dr_Edwards04a' on page 121 undefined on input
+Package natbib Warning: Citation `dr_Edwards04a' on page 129 undefined on input
  line 765.
 
 
@@ -1804,15 +1193,15 @@ Overfull \hbox (53.49698pt too wide) in paragraph at lines 788--788
  []
 
 
-LaTeX Warning: Reference `sec:application-setdata' on page 121 undefined on inp
+LaTeX Warning: Reference `sec:application-setdata' on page 129 undefined on inp
 ut line 789.
 
 
-LaTeX Warning: Reference `sec:application-setdata' on page 121 undefined on inp
+LaTeX Warning: Reference `sec:application-setdata' on page 129 undefined on inp
 ut line 790.
 
 
-LaTeX Warning: Reference `sec:application-setdata' on page 121 undefined on inp
+LaTeX Warning: Reference `sec:application-setdata' on page 129 undefined on inp
 ut line 791.
 
 )
@@ -1820,80 +1209,41 @@ Overfull \hbox (0.49799pt too wide) in paragraph at lines 773--136
 [] 
  []
 
-[121] [122]
+[129] [130]
 \openout2 = `eqrmtech-v-losses.aux'.
 
  (./eqrmtech-v-losses.tex
 Chapter 8.
-
-LaTeX Warning: Reference `ch:damage' on page 123 undefined on input line 23.
-
-
-LaTeX Warning: Reference `tab:grids-costproportions' on page 123 undefined on i
-nput line 30.
-
-[123
+[131
 
 
 
-] [124]
+] [132]
 
-Package natbib Warning: Citation `dr_Fulford02a' on page 125 undefined on input
+Package natbib Warning: Citation `dr_Fulford02a' on page 133 undefined on input
  line 128.
 
+(./tab-v-losses-repcosts.tex) [133]
 
-LaTeX Warning: Reference `tab:replace_costs' on page 125 undefined on input lin
-e 129.
-
-
-LaTeX Warning: Reference `tab:grids-bdatabasecolumns' on page 125 undefined on 
-input line 136.
-
-(./tab-v-losses-repcosts.tex) [125]
-
-Package natbib Warning: Citation `dr_FEMA99b' on page 126 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 134 undefined on input li
 ne 165.
 
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 126 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 134 undefined on input li
 ne 185.
 
 
-LaTeX Warning: Reference `tab:grids-bdatabasecolumns' on page 126 undefined on 
-input line 193.
-
-
-LaTeX Warning: Reference `tab:grids-bdatabasecolumns' on page 126 undefined on 
-input line 200.
-
-
-LaTeX Warning: Reference `tab:replace_costs' on page 126 undefined on input lin
-e 216.
-
-
-Package natbib Warning: Citation `dr_FEMA99b' on page 126 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 134 undefined on input li
 ne 217.
 
-[126]
+[134]
 
-Package natbib Warning: Citation `dr_FEMA99b' on page 127 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 135 undefined on input li
 ne 223.
 
+[135]
 
-LaTeX Warning: Reference `tab:grids-HAZUSusage' on page 127 undefined on input 
-line 229.
-
-
-LaTeX Warning: Reference `tab:grids-bdatabasecolumns' on page 127 undefined on 
-input line 242.
-
-[127]
-
-LaTeX Warning: Reference `sec:source-scenario' on page 128 undefined on input l
-ine 277.
-
-
-Package natbib Warning: Citation `dr_FEMA99b' on page 128 undefined on input li
+Package natbib Warning: Citation `dr_FEMA99b' on page 136 undefined on input li
 ne 295.
 
 
@@ -1948,58 +1298,24 @@ Overfull \hbox (68.56398pt too wide) in paragraph at lines 315--315
 []\OT1/cmtt/m/n/12 <site[]loc>[]db| 
  []
 
-) [128] [129] [130]
+) [136] [137] [138]
 \openout2 = `eqrmtech-v-risk.aux'.
 
  (./eqrmtech-v-risk.tex
 Chapter 9.
 
-Package natbib Warning: Citation `dr_McGuire90a' on page 131 undefined on input
+Package natbib Warning: Citation `dr_McGuire90a' on page 139 undefined on input
  line 27.
 
-
-LaTeX Warning: Reference `eq:risk-rptolambda' on page 131 undefined on input li
-ne 37.
-
-[131
+[139
 
 
 
-]
-
-LaTeX Warning: Reference `ch:source' on page 132 undefined on input line 45.
-
-
-LaTeX Warning: Reference `ch:atten' on page 132 undefined on input line 46.
-
-
-LaTeX Warning: Reference `ch:losses' on page 132 undefined on input line 46.
-
-
-LaTeX Warning: Reference `sec:magnitude_selection' on page 132 undefined on inp
-ut line 50.
-
-
-LaTeX Warning: Reference `eq:eva-vectors1' on page 132 undefined on input line 
-88.
-
-
-LaTeX Warning: Reference `eq:eva-vectors2' on page 132 undefined on input line 
-88.
-
-
-LaTeX Warning: Reference `eq:risk-rptolambda' on page 132 undefined on input li
-ne 98.
-
-[132] <diags/fig-risk-hzdmap.pdf, id=644, 614.295pt x 794.97pt>
+] [140] <diags/fig-risk-hzdmap.pdf, id=698, 614.295pt x 794.97pt>
 File: diags/fig-risk-hzdmap.pdf Graphic file (type pdf)
 
 <use diags/fig-risk-hzdmap.pdf>
-
-LaTeX Warning: Reference `fig:risk-hazardmap' on page 133 undefined on input li
-ne 127.
-
-<diags/fig-risk-hzdexceedcurve.pdf, id=645, 614.295pt x 794.97pt>
+<diags/fig-risk-hzdexceedcurve.pdf, id=699, 614.295pt x 794.97pt>
 File: diags/fig-risk-hzdexceedcurve.pdf Graphic file (type pdf)
 
 <use diags/fig-risk-hzdexceedcurve.pdf>
@@ -2010,12 +1326,8 @@ Overfull \hbox (201.72853pt too wide) in paragraph at lines 156--158
 
 LaTeX Warning: Float too large for page by 222.23383pt on input line 160.
 
-
-LaTeX Warning: Reference `fig:risk-hzdexceedcurve' on page 133 undefined on inp
-ut line 161.
-
-[133] [134 <./diags/fig-risk-hzdmap.pdf>]
-<diags/fig-risk-uhs.pdf, id=657, 614.295pt x 794.97pt>
+[141] [142 <./diags/fig-risk-hzdmap.pdf>]
+<diags/fig-risk-uhs.pdf, id=711, 614.295pt x 794.97pt>
 File: diags/fig-risk-uhs.pdf Graphic file (type pdf)
 
 <use diags/fig-risk-uhs.pdf>
@@ -2026,21 +1338,8 @@ Overfull \hbox (201.72853pt too wide) in paragraph at lines 173--175
 
 LaTeX Warning: Float too large for page by 224.56714pt on input line 177.
 
-
-LaTeX Warning: Reference `fig:risk-hazarduhs' on page 135 undefined on input li
-ne 178.
-
-[135] [136 <./diags/fig-risk-hzdexceedcurve.pdf>] [137 <./diags/fig-risk-uhs.pd
-f>]
-
-LaTeX Warning: Reference `eq:eva-vectors1' on page 138 undefined on input line 
-218.
-
-
-LaTeX Warning: Reference `eq:eva-vectors2' on page 138 undefined on input line 
-218.
-
-<diags/fig-risk-pml.pdf, id=674, 614.295pt x 794.97pt>
+[143] [144 <./diags/fig-risk-hzdexceedcurve.pdf>] [145 <./diags/fig-risk-uhs.pd
+f>] <diags/fig-risk-pml.pdf, id=728, 614.295pt x 794.97pt>
 File: diags/fig-risk-pml.pdf Graphic file (type pdf)
 
 <use diags/fig-risk-pml.pdf>
@@ -2051,16 +1350,8 @@ Overfull \hbox (201.72853pt too wide) in paragraph at lines 240--242
 
 LaTeX Warning: Float too large for page by 224.56714pt on input line 243.
 
-
-LaTeX Warning: Reference `fig-risk-pml' on page 138 undefined on input line 244
-.
-
-[138] [139 <./diags/fig-risk-pml.pdf>]
-
-LaTeX Warning: Reference `fig-risk-pml' on page 140 undefined on input line 294
-.
-
-<diags/fig-risk-deaggdistmag.pdf, id=685, 614.295pt x 794.97pt>
+[146] [147 <./diags/fig-risk-pml.pdf>]
+<diags/fig-risk-deaggdistmag.pdf, id=739, 614.295pt x 794.97pt>
 File: diags/fig-risk-deaggdistmag.pdf Graphic file (type pdf)
 
 <use diags/fig-risk-deaggdistmag.pdf>
@@ -2071,7 +1362,7 @@ Overfull \hbox (201.72853pt too wide) in paragraph at lines 306--309
 
 LaTeX Warning: Float too large for page by 224.56714pt on input line 310.
 
-<diags/fig-risk-deaggstruct.pdf, id=686, 614.295pt x 794.97pt>
+<diags/fig-risk-deaggstruct.pdf, id=740, 614.295pt x 794.97pt>
 File: diags/fig-risk-deaggstruct.pdf Graphic file (type pdf)
 
 <use diags/fig-risk-deaggstruct.pdf>
@@ -2083,26 +1374,13 @@ Overfull \hbox (201.72853pt too wide) in paragraph at lines 312--314
 LaTeX Warning: Float too large for page by 224.56714pt on input line 316.
 
 
-LaTeX Warning: Reference `fig-risk-deaggdistmag' on page 140 undefined on input
- line 321.
-
-
-LaTeX Warning: Reference `fig-risk-deaggstruct' on page 140 undefined on input 
-line 329.
-
-
 Overfull \hbox (5.252pt too wide) in paragraph at lines 327--334
 \OT1/cmr/m/n/12 alised loss into the four ma-jor con-struc-tion types; wood fra
 med, un-reinforced
  []
 
-[140] [141 <./diags/fig-risk-deaggdistmag.pdf>] [142 <./diags/fig-risk-deaggstr
-uct.pdf>]
-
-LaTeX Warning: Reference `sec:source-scenario' on page 143 undefined on input l
-ine 354.
-
-<diags/fig-risk-scen-hist.pdf, id=707, 614.295pt x 794.97pt>
+[148] [149 <./diags/fig-risk-deaggdistmag.pdf>] [150 <./diags/fig-risk-deaggstr
+uct.pdf>] <diags/fig-risk-scen-hist.pdf, id=761, 614.295pt x 794.97pt>
 File: diags/fig-risk-scen-hist.pdf Graphic file (type pdf)
 
 <use diags/fig-risk-scen-hist.pdf>
@@ -2112,18 +1390,6 @@ Overfull \hbox (201.72853pt too wide) in paragraph at lines 356--358
 
 
 LaTeX Warning: Float too large for page by 224.56714pt on input line 359.
-
-
-LaTeX Warning: Reference `fig:scenario-hist' on page 143 undefined on input lin
-e 361.
-
-
-LaTeX Warning: Reference `fig:scenario-hist' on page 143 undefined on input lin
-e 363.
-
-
-LaTeX Warning: Reference `fig:scenario-hist' on page 143 undefined on input lin
-e 365.
 
 
 Overfull \hbox (68.56398pt too wide) in paragraph at lines 382--382
@@ -2145,7 +1411,7 @@ Overfull \hbox (99.439pt too wide) in paragraph at lines 392--392
 []\OT1/cmtt/m/n/12 calc[]annloss[]deagg| 
  []
 
-) [143] [144 <./diags/fig-risk-scen-hist.pdf>] [145]
+) [151] [152 <./diags/fig-risk-scen-hist.pdf>] [153]
 No file eqrmtech.bbl.
 No file eqrmtech.ind.
 
@@ -2162,32 +1428,32 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 LaTeX Warning: There were undefined references.
 
 
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 4210 strings out of 94500
- 59048 string characters out of 1173670
- 134973 words of memory out of 1000000
- 7226 multiletter control sequences out of 10000+50000
- 13738 words of font info for 52 fonts, out of 500000 for 2000
+ 4295 strings out of 94500
+ 60415 string characters out of 1173670
+ 139481 words of memory out of 1000000
+ 7285 multiletter control sequences out of 10000+50000
+ 15455 words of font info for 58 fonts, out of 500000 for 2000
  580 hyphenation exceptions out of 1000
  35i,17n,42p,1179b,1425s stack positions out of 1500i,500n,5000p,200000b,5000s
 PDF statistics:
- 719 PDF objects out of 300000
+ 773 PDF objects out of 300000
  0 named destinations out of 131072
- 161 words of extra memory for PDF output out of 65536
+ 181 words of extra memory for PDF output out of 65536
 </usr/share/texmf/fonts/type1/bluesky/latex/line10.pfb></usr/share/texmf/font
 s/type1/bluesky/cm/cmr7.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr6.pfb><
 /usr/share/texmf/fonts/type1/bluesky/cm/cmsy6.pfb></usr/share/texmf/fonts/type1
-/bluesky/cm/cmex10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmmi6.pfb></usr
+/bluesky/cm/cmmi6.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmex10.pfb></usr
 /share/texmf/fonts/type1/bluesky/cm/cmbx10.pfb></usr/share/texmf/fonts/type1/bl
 uesky/cm/cmsy8.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmmi10.pfb></usr/sh
 are/texmf/fonts/type1/bluesky/cm/cmr10.pfb></usr/share/texmf/fonts/type1/bluesk
-y/cm/cmr8.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmmi8.pfb></usr/share/te
-xmf/fonts/type1/bluesky/cm/cmmi12.pfb></usr/share/texmf/fonts/type1/bluesky/cm/
-cmtt12.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmti12.pfb></usr/share/texm
+y/cm/cmr8.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmtt12.pfb></usr/share/t
+exmf/fonts/type1/bluesky/cm/cmti12.pfb></usr/share/texmf/fonts/type1/bluesky/cm
+/cmmi8.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmmi12.pfb></usr/share/texm
 f/fonts/type1/bluesky/cm/cmsy10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cm
 bx12.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/texmf/f
 onts/type1/bluesky/cm/cmr17.pfb>
-Output written on eqrmtech.pdf (150 pages, 2233521 bytes).
+Output written on eqrmtech.pdf (162 pages, 2328646 bytes).

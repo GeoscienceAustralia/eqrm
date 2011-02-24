@@ -23,81 +23,84 @@
 \contentsline {subsection}{\numberline {3.2.3}Location of events on fault sources}{48}
 \contentsline {subsubsection}{Crustal Faults and Subduction Interface Faults}{48}
 \contentsline {subsubsection}{Intraslab Faults}{49}
-\contentsline {subsection}{\numberline {3.2.4}Overlapping source zones}{50}
-\contentsline {subsection}{\numberline {3.2.5}Magnitude selection and event activity}{51}
-\contentsline {subsection}{\numberline {3.2.6}Dimensions and position of the rupture plane}{53}
-\contentsline {subsection}{\numberline {3.2.7}Azimuth and dip of rupture}{59}
-\contentsline {section}{\numberline {3.3}Using multiple source zones - Incorporating epistemic uncertainty}{59}
-\contentsline {section}{\numberline {3.4}Spawning events}{61}
-\contentsline {section}{\numberline {3.5}Analysing a scenario event}{62}
-\contentsline {section}{\numberline {3.6}Key functions, flags and parameters}{63}
-\contentsline {chapter}{\numberline {4}Grids and building databases}{65}
-\contentsline {section}{\numberline {4.1}Overview}{65}
-\contentsline {section}{\numberline {4.2}Hazard grids}{65}
-\contentsline {section}{\numberline {4.3}Building databases}{66}
-\contentsline {subsection}{\numberline {4.3.1}Building construction types}{68}
-\contentsline {subsection}{\numberline {4.3.2}Building usage types}{70}
-\contentsline {subsection}{\numberline {4.3.3}Replacement costs}{73}
-\contentsline {section}{\numberline {4.4}Key functions, flags and parameters}{74}
-\contentsline {chapter}{\numberline {5}Ground-Motion Prediction Equations}{75}
-\contentsline {section}{\numberline {5.1}Overview}{75}
-\contentsline {section}{\numberline {5.2}Background theory}{75}
-\contentsline {section}{\numberline {5.3}Implemented GMPEs in EQRM}{79}
-\contentsline {subsection}{\numberline {5.3.1}Further Comments on Specific GMPEs}{82}
-\contentsline {subsubsection}{Gaull...}{82}
-\contentsline {subsubsection}{Somerville09}{82}
-\contentsline {section}{\numberline {5.4}Implementation}{83}
-\contentsline {section}{\numberline {5.5}accounting for uncertainties}{88}
-\contentsline {section}{\numberline {5.6}Incorporating aleatory uncertainty}{89}
-\contentsline {subsection}{\numberline {5.6.1}Random sampling of a response spectral acceleration}{89}
-\contentsline {subsection}{\numberline {5.6.2}Sampling the probability density function of the response spectral acceleration (spawning)}{91}
-\contentsline {subsection}{\numberline {5.6.3}Recomendation for sampling GMPE aleatory Uncertainty}{94}
-\contentsline {section}{\numberline {5.7}Using multiple GMPEs - Incorporating epistemic uncertainty}{94}
-\contentsline {section}{\numberline {5.8}Collapse versus no-collapse}{95}
-\contentsline {chapter}{\numberline {6}Regolith amplification}{97}
-\contentsline {section}{\numberline {6.1}Overview}{97}
-\contentsline {subsection}{\numberline {6.1.1}Background theory}{97}
-\contentsline {section}{\numberline {6.2}The amplification factor input file}{98}
-\contentsline {section}{\numberline {6.3}Implementation}{98}
-\contentsline {section}{\numberline {6.4}Incorporating aleatory uncertainty}{102}
-\contentsline {section}{\numberline {6.5}Key functions, flags and parameters}{103}
-\contentsline {chapter}{\numberline {7}Building damage}{104}
-\contentsline {section}{\numberline {7.1}Introduction}{104}
-\contentsline {section}{\numberline {7.2}The capacity spectrum method}{105}
-\contentsline {subsection}{\numberline {7.2.1}The building capacity curve}{106}
-\contentsline {subsubsection}{Fitting the building capacity curve}{107}
-\contentsline {subsubsection}{Variability of the capacity curves}{108}
-\contentsline {subsection}{\numberline {7.2.2}Damping the demand curve}{108}
-\contentsline {subsubsection}{Modification of elastic damping}{109}
-\contentsline {subsubsection}{Hysteretic damping}{112}
-\contentsline {subsection}{\numberline {7.2.3}Finding the intersection point}{114}
-\contentsline {section}{\numberline {7.3}Fragility curves}{115}
-\contentsline {subsection}{\numberline {7.3.1}Form of fragility curves}{116}
-\contentsline {subsection}{\numberline {7.3.2}Damage state thresholds}{117}
-\contentsline {subsection}{\numberline {7.3.3}Variability of the damage states}{118}
-\contentsline {subsection}{\numberline {7.3.4}Incremental probabilities}{118}
-\contentsline {section}{\numberline {7.4}Differences from HAZUS methodology}{119}
-\contentsline {subsection}{\numberline {7.4.1}Extra features}{119}
-\contentsline {section}{\numberline {7.5}Key functions, flags and parameters}{122}
-\contentsline {chapter}{\numberline {8}Losses}{123}
-\contentsline {section}{\numberline {8.1}Overview}{123}
-\contentsline {section}{\numberline {8.2}Direct financial loss}{123}
-\contentsline {subsection}{\numberline {8.2.1}General financial loss equations: loss for a single building}{123}
-\contentsline {subsection}{\numberline {8.2.2}Aggregated loss and survey factors}{127}
-\contentsline {subsection}{\numberline {8.2.3}Cutoff values}{127}
-\contentsline {section}{\numberline {8.3}Social losses}{128}
-\contentsline {section}{\numberline {8.4}Key functions, flags and parameters}{129}
-\contentsline {chapter}{\numberline {9}Hazard and risk results}{131}
-\contentsline {section}{\numberline {9.1}Overview}{131}
-\contentsline {section}{\numberline {9.2}Calculating hazard and risk}{131}
-\contentsline {subsection}{\numberline {9.2.1}Computing the annual exceedance rate}{132}
-\contentsline {section}{\numberline {9.3}Earthquake hazard results}{133}
-\contentsline {subsection}{\numberline {9.3.1}Hazard maps}{133}
-\contentsline {subsection}{\numberline {9.3.2}Hazard exceedance curves}{135}
-\contentsline {subsection}{\numberline {9.3.3}Uniform hazard spectra}{135}
-\contentsline {section}{\numberline {9.4}Earthquake risk results}{135}
-\contentsline {subsection}{\numberline {9.4.1}Risk exceedance curve}{138}
-\contentsline {subsection}{\numberline {9.4.2}Annualised loss}{138}
-\contentsline {subsection}{\numberline {9.4.3}Disaggregated annualised loss}{140}
-\contentsline {section}{\numberline {9.5}Earthquake scenario results}{143}
-\contentsline {section}{\numberline {9.6}Key functions, flags and parameters}{145}
+\contentsline {subsection}{\numberline {3.2.4}Case if $0 \leq r_\theta \leq 90$}{50}
+\contentsline {subsection}{\numberline {3.2.5}Case if $90 < r_\theta \leq 180$}{54}
+\contentsline {subsection}{\numberline {3.2.6}Case if $180 < r_\theta \leq f_\theta + \omega $}{56}
+\contentsline {subsection}{\numberline {3.2.7}Overlapping source zones}{58}
+\contentsline {subsection}{\numberline {3.2.8}Magnitude selection and event activity}{59}
+\contentsline {subsection}{\numberline {3.2.9}Dimensions and position of the rupture plane}{61}
+\contentsline {subsection}{\numberline {3.2.10}Azimuth and dip of rupture}{67}
+\contentsline {section}{\numberline {3.3}Using multiple source zones - Incorporating epistemic uncertainty}{67}
+\contentsline {section}{\numberline {3.4}Spawning events}{69}
+\contentsline {section}{\numberline {3.5}Analysing a scenario event}{70}
+\contentsline {section}{\numberline {3.6}Key functions, flags and parameters}{71}
+\contentsline {chapter}{\numberline {4}Grids and building databases}{73}
+\contentsline {section}{\numberline {4.1}Overview}{73}
+\contentsline {section}{\numberline {4.2}Hazard grids}{73}
+\contentsline {section}{\numberline {4.3}Building databases}{74}
+\contentsline {subsection}{\numberline {4.3.1}Building construction types}{76}
+\contentsline {subsection}{\numberline {4.3.2}Building usage types}{78}
+\contentsline {subsection}{\numberline {4.3.3}Replacement costs}{81}
+\contentsline {section}{\numberline {4.4}Key functions, flags and parameters}{82}
+\contentsline {chapter}{\numberline {5}Ground-Motion Prediction Equations}{83}
+\contentsline {section}{\numberline {5.1}Overview}{83}
+\contentsline {section}{\numberline {5.2}Background theory}{83}
+\contentsline {section}{\numberline {5.3}Implemented GMPEs in EQRM}{87}
+\contentsline {subsection}{\numberline {5.3.1}Further Comments on Specific GMPEs}{90}
+\contentsline {subsubsection}{Gaull...}{90}
+\contentsline {subsubsection}{Somerville09}{90}
+\contentsline {section}{\numberline {5.4}Implementation}{91}
+\contentsline {section}{\numberline {5.5}accounting for uncertainties}{96}
+\contentsline {section}{\numberline {5.6}Incorporating aleatory uncertainty}{97}
+\contentsline {subsection}{\numberline {5.6.1}Random sampling of a response spectral acceleration}{97}
+\contentsline {subsection}{\numberline {5.6.2}Sampling the probability density function of the response spectral acceleration (spawning)}{99}
+\contentsline {subsection}{\numberline {5.6.3}Recomendation for sampling GMPE aleatory Uncertainty}{102}
+\contentsline {section}{\numberline {5.7}Using multiple GMPEs - Incorporating epistemic uncertainty}{102}
+\contentsline {section}{\numberline {5.8}Collapse versus no-collapse}{103}
+\contentsline {chapter}{\numberline {6}Regolith amplification}{105}
+\contentsline {section}{\numberline {6.1}Overview}{105}
+\contentsline {subsection}{\numberline {6.1.1}Background theory}{105}
+\contentsline {section}{\numberline {6.2}The amplification factor input file}{106}
+\contentsline {section}{\numberline {6.3}Implementation}{106}
+\contentsline {section}{\numberline {6.4}Incorporating aleatory uncertainty}{110}
+\contentsline {section}{\numberline {6.5}Key functions, flags and parameters}{111}
+\contentsline {chapter}{\numberline {7}Building damage}{112}
+\contentsline {section}{\numberline {7.1}Introduction}{112}
+\contentsline {section}{\numberline {7.2}The capacity spectrum method}{113}
+\contentsline {subsection}{\numberline {7.2.1}The building capacity curve}{114}
+\contentsline {subsubsection}{Fitting the building capacity curve}{115}
+\contentsline {subsubsection}{Variability of the capacity curves}{116}
+\contentsline {subsection}{\numberline {7.2.2}Damping the demand curve}{116}
+\contentsline {subsubsection}{Modification of elastic damping}{117}
+\contentsline {subsubsection}{Hysteretic damping}{120}
+\contentsline {subsection}{\numberline {7.2.3}Finding the intersection point}{122}
+\contentsline {section}{\numberline {7.3}Fragility curves}{123}
+\contentsline {subsection}{\numberline {7.3.1}Form of fragility curves}{124}
+\contentsline {subsection}{\numberline {7.3.2}Damage state thresholds}{125}
+\contentsline {subsection}{\numberline {7.3.3}Variability of the damage states}{126}
+\contentsline {subsection}{\numberline {7.3.4}Incremental probabilities}{126}
+\contentsline {section}{\numberline {7.4}Differences from HAZUS methodology}{127}
+\contentsline {subsection}{\numberline {7.4.1}Extra features}{127}
+\contentsline {section}{\numberline {7.5}Key functions, flags and parameters}{130}
+\contentsline {chapter}{\numberline {8}Losses}{131}
+\contentsline {section}{\numberline {8.1}Overview}{131}
+\contentsline {section}{\numberline {8.2}Direct financial loss}{131}
+\contentsline {subsection}{\numberline {8.2.1}General financial loss equations: loss for a single building}{131}
+\contentsline {subsection}{\numberline {8.2.2}Aggregated loss and survey factors}{135}
+\contentsline {subsection}{\numberline {8.2.3}Cutoff values}{135}
+\contentsline {section}{\numberline {8.3}Social losses}{136}
+\contentsline {section}{\numberline {8.4}Key functions, flags and parameters}{137}
+\contentsline {chapter}{\numberline {9}Hazard and risk results}{139}
+\contentsline {section}{\numberline {9.1}Overview}{139}
+\contentsline {section}{\numberline {9.2}Calculating hazard and risk}{139}
+\contentsline {subsection}{\numberline {9.2.1}Computing the annual exceedance rate}{140}
+\contentsline {section}{\numberline {9.3}Earthquake hazard results}{141}
+\contentsline {subsection}{\numberline {9.3.1}Hazard maps}{141}
+\contentsline {subsection}{\numberline {9.3.2}Hazard exceedance curves}{143}
+\contentsline {subsection}{\numberline {9.3.3}Uniform hazard spectra}{143}
+\contentsline {section}{\numberline {9.4}Earthquake risk results}{143}
+\contentsline {subsection}{\numberline {9.4.1}Risk exceedance curve}{146}
+\contentsline {subsection}{\numberline {9.4.2}Annualised loss}{146}
+\contentsline {subsection}{\numberline {9.4.3}Disaggregated annualised loss}{148}
+\contentsline {section}{\numberline {9.5}Earthquake scenario results}{151}
+\contentsline {section}{\numberline {9.6}Key functions, flags and parameters}{153}

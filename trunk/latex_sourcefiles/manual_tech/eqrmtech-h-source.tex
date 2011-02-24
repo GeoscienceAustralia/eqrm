@@ -301,6 +301,245 @@ We first take a uniform sample from the range [$\delta_\theta - \Delta_\theta, \
 the out of plane angle ($\omega$) and the dip of the rupture plane ($r_\theta$) :
 
 
+\begin{equation}
+\omega = 2\Delta_\theta  \times \mathtt{numpy.random.random\_sample()} + \delta_\theta - \Delta_\theta
+\end{equation}
+
+\begin{equation}
+r_\theta = \omega + f_\theta
+\end{equation}
+
+When dealing with out of plane ruptures we need to consider two cases:
+\begin{itemize} 
+\item $0 \leq r_\theta \leq 90:$ \\ In this instance the rupture plane will dip in the same direction as the fault plane and we need to project the new rupture plane to the surface to define the surface trace of the rupture.
+\item $90 <  r_\theta \leq 180:$ \\ In this case the rupture plane dips in the opposite direction to the fault plane and the local coordinate system must be transformed because the plane is no longer dipping to the right handside of the trace when looking from the start to the end of the trace. We must project the new rupture plane to the surface and then redefine the start and end locations of the rupture trace. This is because we always work in a right-handed local coordinate system with the rupture plane dipping to the right of the trace when looking along the trace from the start location to the end locatio (figure \ref{fig:intraslabGeom}).  
+\item $180 < r_\theta \leq f_\theta + \omega :$ \\ In this case the rupture plane dips in the same direction of the fault plane, but the rupture trace is projected in the negative y direction of the local coordinate system. 
+\end{itemize}
+\begin{figure}[htp]
+\centerline{\includegraphics[width=16cm]
+{geomoutplane}}
+\caption{A schematic diagram of the geometry of out of plane ruptures. Panel A shows the rupture plane dipping out of the fault plane that defines the dipping slab. Panel B is a zoom in of the angles that define the rupture plane geometry. The user defines the fault dip ($f_\theta$), which in this case represents the direction of the downgoing slab, and the out of plane dip ($\delta_\theta$) and a sampling range ($\Delta_\theta$) over which the EQRM will uniformly distribute the rupture plane. }
+\label{fig:intraslabGeom}
+\end{figure}
+
+
+
+%%%%%
+\subsection{Case if  $0 \leq r_\theta \leq 90$} \label{sec:0to90}
+%%%%%
+
+We follow a similar approach to that in section \ref{sec:faultplane} where we first define the rupture plane dimensions (area $r_A$, width $r_w$ and length $r_l$). We force the rupture dimensions to fall within the length of the fault, but this time we must also not allow it to extend outside of the width of the dipping slab ($S_w$) defined in the source file. As shown in figure \ref{fig:deltaeq} we can find the maximum width of the rupture plane ($r_w^{max}$) from:
+
+\begin{equation}\label{rwmax}
+r_w^{max} = 
+\begin{cases}
+ \frac{ S_w }{sin (\omega \times rad)}		& \quad \mbox{if $\omega$ $<$ 90} \\
+S_w							& \quad \mbox{if $\omega$ $=$ 90} \\
+ \frac{ S_w }{sin ((180 - \omega ) \times rad)}	& \quad \mbox{if $\omega$ $>$ 90} \\
+\end{cases}
+\end{equation}
+
+% old way
+%\begin{equation} 
+%r_w^{max} = \frac{ slab_w }{sin ((r_\theta - f_\theta) \times rad)}
+%\end{equation}
+
+\begin{figure}[htp]
+\centerline{\includegraphics[width=12cm]
+{geomwidth}}
+\caption{The geometry of determining the maximum rupture width ($r_w^{max}$) shown in the lower trigonometric geometry and the $r_z^{min}$ and $r_z^{max}$ shown in the upper part and equation \ref{drange2}.}
+\label{fig:deltaeq}
+\end{figure}
+
+We use equations \ref{ra} and \ref{rw} to calculate the rupture area ($r_A$) and rupture width ($r_w^{WC}$) from the Wells and Coppersmith, 1994 scaling laws. But for out of plane ruptures we must limit the rupture width ($r_w$) not to the fault width as is the case of on plane ruptures, but to not extend beyond the slab boundary. Therefore we use a slightly modified version of equation \ref{eq:rw} to solve for the rupture width:
+
+\begin{equation} \label{rw090}
+r_w = \mathbf{min}\{ r_w^{WC}, r_w^{max}\}
+\end{equation}
+
+now we can calculate the rupture length ($r_l$), making sure it does not extend beyond the fault length ($f_l$) from:
+
+\begin{equation}
+r_l = \mathbf{min}\left\{\frac{r_A}{r_w}, f_l\right\}
+\end{equation}
+
+We use equation \ref{ds} to calculate $D_s$, the distance (km) along the fault trace for the start of rupture trace and equations \ref{eq:newrs} and \ref{eq:newre} to find the position of the start and end of the rupture trace. Note that we use new notation to describe the location of the start and end of the rupture trace along the fault trace ($\hat{r}_e^{lon}$, $\hat{r}_e^{lat}$, $\hat{r}_e^{lon}$, $\hat{r}_e^{lat}$) this is because soon we will need to define the new location of the rupture trace ($r_s^{lon}$, $r_s^{lat}$ and $r_e^{lon}$, $r_e^{lat}$):
+
+\begin{equation}\label{eq:newrs2}
+\hat{r}_s^{lon},\hat{r}_s^{lat} =\mathtt{get\_new\_ll}(f_s^{lon}, f_s^{lat}, f_\phi, D_s)
+\end{equation}
+
+\begin{equation}\label{eq:newre2}
+\hat{r}_e^{lon}, \hat{r}_e^{lat} =\mathtt{get\_new\_ll}(\hat{r}_s^{lon}, \hat{r}_s^{lat}, f_\phi, r_l)
+\end{equation}
+
+Next we need to redefine the depth range of the random depth allocation similar to that of equation \ref{drange} to make sure the rupture trace does not go above or below the seismogenic zone of the fault. This is slightly different to equation \ref{drange} because the rupture plane is now dipping out of the fault plane (figure \ref{fig:deltaeq}).
+
+\begin{subequations} \label{drange2}
+\begin{align}
+r_z^{min} & = \mbox{minimum depth of rupture centroid}  \\
+r_z^{max} & = \mbox{maximum depth of rupture centroid}  \\
+r_z^{min} & = f_z^{top} + 0.5r_w  \times sin(r_\theta  \times \mbox{rad})    \\
+r_z^{max} & = f_z^{bot} - 0.5r_w  \times sin(r_\theta  \times \mbox{rad})  
+\end{align}
+\end{subequations}
+
+Using equation \ref{eq:rand} we can now randomly assign the rupture centroid depth using a uniform distribution between $r_z^{min}$ and $r_z^{max}$ using the \texttt{numpy} package in \texttt{python}:
+\begin{equation}
+r_z = ( r_z^{max}-r_z^{min} ) \times  \mathtt{numpy.random.random\_sample()} +   r_z^{min}
+\end{equation}
+
+We now need to project the rupture trace to the surface to obtain the surface trace, and then the rupture centroid. 
+We begin by finding the location of the rupture centroid referenced to the start position of the original fault plane:
+\begin{equation}\label{eq:ry}
+\hat{r}_y = r_z  \frac{cos(f_\theta  \times rad)}{sin(f_\theta \times rad)}
+\end{equation}
+
+and then:
+\begin{equation}
+\hat{r}_x = \frac{r_l}{2}
+\end{equation}
+
+We now need to determine the start and end position of the surface trace for the rupture plane. We do this by first 
+finding the location referenced to the start location of the rupture ($r_s^{lon}$, $r_s^{lat}$) along the fault 
+plane (equations \ref{eq:newrs} and \ref{eq:newre}) then convert to latitude and longitude.
+
+\begin{equation}\label{eq:rsx}
+\hat{r}_s^{x} = 0
+\end{equation}
+
+and now we substitute the dip of the rupture plane ($r_\theta$) into equation \ref{eq:ry}
+
+\begin{equation}
+\hat{r}_s^{y} = \hat{r}_y - r_z  \frac{cos(r_\theta \times rad)}{sin(r_\theta \times rad)}
+\end{equation}
+
+\begin{equation}\label{eq:rex}
+\hat{r}_e^{x} = r_l
+\end{equation}
+
+\begin{equation}\label{eq:rey}
+\hat{r}_e^{y} = \hat{r}_s^{y}
+\end{equation}
+
+Now we can calculate the longitude and latitude for the start and end of the rupture trace.
+
+
+Now all that is left is to redefine the location of the rupture centroid in local x and y coordinates relative to the origin 
+($r_s^{lon}$,$ r_s^{lat}$) of the new local coordinate system:
+\begin{equation}\label{eq:rx}
+r_x = 0.5 r_l
+\end{equation}
+
+\begin{equation}
+r_y = r_z  \frac{cos(r_\theta \times rad)}{sin(r_\theta \times rad)}
+\end{equation}
+
+and then transform this into longitude and latitude:
+\begin{equation}\label{eq:rcll}
+r_c^{lon}, r_c^{lat} = \mathtt{azimuthal\_orthographic\_xy\_to\_ll}(r_x, r_y,r_s^{lon},r_s^{lat},f_\phi,\mbox{R}=6367.0) .
+\end{equation}
+
+Note that $r_z = \hat{r}_z$.
+
+%%%%%
+\subsection{Case if $90 <  r_\theta \leq 180$} \label{sec:90t180}
+%%%%%
+
+In this instance the rupture plane is dipping in the opposite direction to the fault plane. Recall that if we look along 
+the rupture trace the plane always dips to the right hand side, therefore in the case here of rupture plane the dips 
+opposite to the project of the surface trace we need to re-project the rupture plane to the surface then swap the 
+start and end coordinates. 
+
+
+% $90 <  r_\theta \leq 180$
+
+After calculating $r_w^{max}$ from equation \ref{rwmax} we then must obtain $r_\theta$such that it lies between 5 and 90:
+
+\begin{equation}
+r_\theta = \mathbf{max} \{ 180 - f_\theta + \omega, 5 \} .
+\end{equation}
+
+
+%\begin{equation}
+%r_w^{max} = \frac{ slab_w }{sin ((180 - (r_\theta - f_\theta)) \times rad)}
+%\end{equation}
+
+\begin{figure}[htp]
+\centerline{\includegraphics[width=14cm]
+{gt90}}
+\caption{Fault and rupture plane geometry for. Lower panel shows cross section view and upper panel shows a plan view of the surface 
+projection. Note that in this case we need to re-project the rupture plane to the surface and redefine the start and end of the 
+rupture trace such that the plane dips to the right hand side of the fault trace when looking from the start to end of the trace.}
+\label{fig:gt90}
+\end{figure}
+
+
+We can follow the same approach as section \ref{sec:0to90} from equations \ref{rw090} to \ref{eq:rsx}. We need to slightly 
+modify the next steps as we need to add instead of subtract $r_y$ to the right handside of the equation: 
+
+\begin{equation}
+\hat{r}_s^{y} = \hat{r}_y + r_z  \frac{cos(r_\theta * rad)}{sin(r_\theta * rad)}
+\end{equation}
+
+And now we can again follow the method in section \ref{sec:0to90} from equations \ref{eq:rex} to \ref{eq:rey}. 
+But for equations \ref{eq:rsll} and \ref{eq:rell} we transform the coordinate system so the rupture start and end locations are swapped:
+
+\begin{equation}\label{eq:rsll2}
+r_e^{lon}, r_e^{lat } = \mathtt{azimuthal\_orthographic\_xy\_to\_ll}(\hat{r}_s^{x}, \hat{r}_s^{y}, \hat{r}_s^{lon},\hat{r}_s^{lat},f_\phi,\mbox{R}=6367.0)
+\end{equation}
+
+\begin{equation}\label{eq:rell2}
+r_s^{lon}, r_s^{lat} = \mathtt{azimuthal\_orthographic\_xy\_to\_ll}(\hat{r}_e^{x}, \hat{r}_e^{y}, \hat{r}_s^{lon},\hat{r}_s^{lat},f_\phi,\mbox{R}=6367.0)
+\end{equation}
+
+Now we redefine the location of the rupture centroid in local x and y coordinates relative to the new 
+origin ($r_s^{lon}$,$ r_s^{lat}$) of the new local coordinate system and then get the longitude and 
+latitude of this point using equations \ref{eq:rx} to \ref{eq:rcll}.
+
+%%%%%
+\subsection{Case if  $180 <  r_\theta \leq f_\theta + \omega$} \label{sec:180to270}
+%%%%%
+
+If the initial $r_\theta$ value is greater than 180 but less than $f_\theta + \omega$ then the rupture 
+plane dips in the same direction of the fault plane but the rupture trace lies behind the fault trace (figure \ref{fig:gt180}). 
+
+Here we first obtain the dip of the rupture plane and force the dip to be greater than 5$^\circ$ so 
+that the rupture trace projects to the surface:
+
+\begin{equation}
+r_\theta = \mathbf{max} \{ 180 - f_\theta + \omega, 5 \} .
+\end{equation}
+
+\begin{figure}[htp]
+\centerline{\includegraphics[width=14cm]
+{gt180}}
+\caption{Fault and rupture plane geometry for. Lower panel shows cross section view and upper panel shows 
+a plan view of the surface projection. Note that in this case we need to re-project the rupture plane to 
+the surface and redefine the start and end of the rupture trace.}
+\label{fig:gt180}
+\end{figure}
+
+We follow the same methods as above up to equation \ref{eq:rsx} but now we change the following equation 
+to solve for ($\hat{r}_y$) which in this case will be negative:
+
+\begin{equation}\label{eq:ry4}
+\hat{r}_s^y = \hat{r}_y -  r_z  \frac{cos(r_\theta  \times rad)}{sin(r_\theta \times rad)}.
+\end{equation}
+
+The end of the rupture trace in local coordinates ($\hat{r}_e^x$ and $\hat{r}_e^y$) referenced to the fault 
+trace can be found from:
+\begin{equation}
+\hat{r}_e^x = r_l
+\end{equation}
+
+\begin{equation}
+\hat{r}_e^y = \hat{r}_s^y
+\end{equation}
+
+Now we can follow equations \ref{eq:rsll} to \ref{eq:rcll} to get the remaining parameters.
+
+
 \subsection{Overlapping source zones}
 
 The concept of overlapping zones in a source model is useful for
