@@ -414,14 +414,14 @@ the recurrence relationship and hence the generated earthquake
 catalogue are based on moment magnitude scale. However, among the
 implemented GMPES \citet{eqrm_Gaull90a}, and \citet{eqrm_Liang08}
 models use $M_L$ scale. In this case, adjustment is done using the
-correlation relationship between and as suggested by Johnston
-(\textit{pers. comm.}, 2001):
-\begin{equation}
+correlation relationship between $M_L$ and $M_W$ as suggested by
+Johnston (\textit{pers. comm.}, 2001):
+\begin{equation}\label{ml-mw}
 M_L =
 \frac{0.473+\sqrt{0.473^2-4\times0.145(3.45-M_W)}}{2\times0.145};
 \end{equation}
-Equation 2 is developed for stable continental regions and is based
-on earlier work published by the same author
+Equation~\ref{ml-mw} is developed for stable continental regions and
+is based on earlier work published by the same author
 \citep{eqrm_Johnstone96a}. It is important to note that
 uncertainties in the explanatory variables are map to the response
 variable \citep{eqrm_Bommer05}. In other words, in equation
@@ -440,23 +440,23 @@ distance measures. \citet{eqrm_Scherbaum04b} and later
 \citet{eqrm_Kak11} proposed correlation relations among popular
 distance metrics. It is important to note that, as indicated by
 \citet{eqrm_Scherbaum05}, large penalties can be paid in terms of
-increased sigma values due to conversion of source-to-site distance
-measures. However, in EQRM distance measures conversions are not
-necessary, since virtual fault-planes are generated through
-simulation process. This enables EQRM to not only directly calculate
-the proper Finite-source distance measure for each GMPE, but also to
-estimate all the source geometry related parameters, i. e. $h$, $W$,
-$\delta$, $R_x$. It should be noted that \citet{eqrm_Gaull90a}, and
-\citet{eqrm_Liang08} models use point-source distance measures:
-$R_{hypo}$ and $R_{epi}$. There are two obvious techniques that
-could be used to approximate $\Repi$ and $\Rhyp$. The first
-technique approximates $\Repi$ and $\Rhyp$ using $\Rjb$ and $\Rrup$
-respectively. This technique is conservative since \mbox{$\Repi \geq
-\Rjb$} and \mbox{$\Rhyp \geq \Rrup$}. The second technique involves
-approximating $\Rhyp$ by using the distance to the rupture centroid
-and $\Repi$ with the distance to the vertical surface projection of
-the rupture centroid. The EQRM application currently uses the first
-(i.e. conservative) technique.
+increased standard deviation values due to conversion of
+source-to-site distance measures. However, in EQRM distance measures
+conversions are not necessary, since virtual fault-planes are
+generated through simulation process. This enables EQRM to not only
+directly calculate the proper Finite-source distance measure for
+each GMPE, but also to estimate all the source geometry related
+parameters, i. e. $h$, $W$, $\delta$, $R_x$. It should be noted that
+\citet{eqrm_Gaull90a}, and \citet{eqrm_Liang08} models use
+point-source distance measures: $R_{hypo}$ and $R_{epi}$. There are
+two obvious techniques that could be used to approximate $\Repi$ and
+$\Rhyp$. The first technique approximates $\Repi$ and $\Rhyp$ using
+$\Rjb$ and $\Rrup$ respectively. This technique is conservative
+since \mbox{$\Repi \geq \Rjb$} and \mbox{$\Rhyp \geq \Rrup$}. The
+second technique involves approximating $\Rhyp$ by using the
+distance to the rupture centroid and $\Repi$ with the distance to
+the vertical surface projection of the rupture centroid. The EQRM
+application currently uses the first (i.e. conservative) technique.
 
 The only remaining parameters to be determined are site parameters.
 The $V_{S30}$ parameter is the required INPUT parameter that should
@@ -504,7 +504,7 @@ Spectral Acceleration \citep{eqrm_Aus93}.
 parameter(s)' ($\sigma_{log(Y)}$) and indicate that they do not
 depend on $r_{m_l}$ or $\Rhyp$. Furthermore, when extending the PGA
 estimate to a complete $S_a$ it is assumed that $\sigma_{log(S_a)}$
-is not a function of $T_o$ and that
+is not a function of $T_o$, in other words:
 \begin{equation}
 \sigma_{log(S_a)}(T_o) = \sigma_{log(PGA)}.
 \end{equation}
@@ -640,14 +640,14 @@ km/s
 The \citet{eqrm_Somerville09} model is derived from broad-band
 strong ground motion simulations that use the Non-Cratonic and
 Cratonic earthquake source models together with crustal structure
-models representing different regions of Australia ( see
-\citet[Table 7-1]{eqrm_Somerville09}). Two general models are also
-developed: Yilgarn Craton model which is applicable to Yilgarn
-Craton and other cratonic regions of Australia, and Non-Cratonic
-model applicable in all non-cratonic regions of Australia. For
-completeness sake, the model coefficients for Non-Cratonic model is
-listed in Table~\ref{tab:Coeff-Somerville09_Non_Cratonic} because it
-was omitted from the original publication.
+models representing different regions of Australia (\citet[Table
+7-1]{eqrm_Somerville09}). Two general models are also developed:
+Yilgarn Craton model which is applicable to Yilgarn Craton and other
+cratonic regions of Australia, and Non-Cratonic model applicable in
+all non-cratonic regions of Australia. For completeness sake, the
+model coefficients for Non-Cratonic model is listed in
+Table~\ref{tab:Coeff-Somerville09_Non_Cratonic} because it was
+omitted from the original publication.
 
 \begin{table}
 \caption{Coeeficients for \texttt{Somerville09\_Non\_Cratonic}. The
@@ -700,19 +700,20 @@ observed ground-motions with respect to explanatory variables that
 cannot be reduced with increasing knowledge about the earthquake
 process. It is worth to mention that the aleatory variability can
 not be reduced with respect to a particular model, however in
-practice it is desirable to reduce the aleatory variability. The
-aleatory variability is represented by the standard deviation of the
-PDF for the GMPEs. Epistemic uncertainty is the uncertainty raised
-from our lack of knowledge about earthquake process. With increased
-data and knowledge, ideally, the epistemic uncertainty can be
-reduced to zero. The epistemic uncertainty is represented by means
-of logic-tree. In logic-tree approach, several GMPEs would be
-considered, and each equation is assigned a weighting factor that is
-interpreted as the relative likelihood of that equation being
-correct. It should be noted that selection of proper ground motion
-models has stronger influence on the final results than assigning
-weights to each model. The incorporation of aleatory variability and
-epistemic uncertainty in EQRM are discussed in
+practice it is desirable to reduce the aleatory variability
+\citep{eqrm_Atik10}. The aleatory variability is represented by the
+standard deviation of the PDF for the GMPEs. Epistemic uncertainty
+is the uncertainty raised from our lack of knowledge about
+earthquake process. With increased data and knowledge, ideally, the
+epistemic uncertainty can be reduced to zero. The epistemic
+uncertainty is represented by means of logic-tree. In logic-tree
+approach, several GMPEs would be considered, and each equation is
+assigned a weighting factor that is interpreted as the relative
+likelihood of that equation being correct. It should be noted that
+selection of proper ground motion models has stronger influence on
+the final results than assigning weights to each model
+\citep{eqrm_Scherbaum05}. The incorporation of aleatory variability
+and epistemic uncertainty in EQRM are discussed in
 ~\sref{attn:uncertainty} and ~\sref{sec:attn-multi-attnmodels}
 respectively.
 
@@ -728,7 +729,7 @@ developers.
 \sreftwo{attn:uncert-randomchoice}{attn:uncert-pdfchoice} describe
 two of the most commonly used techniques for incorporating aleatory
 variability when using the EQRM. The flag to control the variability
-method is \typepar{var}{\_attn}{\_method}(see
+method is \typepar{atten}{\_variability}{\_method}(see
 ~\sref{sec:application-EQRMcf}).
 
 \subsection{Random sampling of a response spectral acceleration\index{response spectral acceleration}}
