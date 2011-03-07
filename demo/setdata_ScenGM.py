@@ -7,7 +7,7 @@
  Acceleration values are in g.
  Angles, latitude and longitude are in decimal degrees.
 
- If a field is not used, set the value to None.
+ If a field is not used, set the value to None
 
 
 """
