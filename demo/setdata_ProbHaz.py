@@ -4,7 +4,7 @@
   resources/data directory, which is part of EQRM.
 
  All distances are in kilometers.
- Acceleration values are in g.
+ Acceleration values are in g
  Angles, latitude and longitude are in decimal degrees.
 
  If a field is not used, set the value to None.
