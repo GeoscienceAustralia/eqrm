@@ -4,15 +4,15 @@ import os
 from eqrm_code import eqrm_filesystem
 from eqrm_code import analysis
 
-def demo_run(verbose=True):
+plot_demo_run_names = ['plot_ProbRisk.py', 'plot_ProbHaz.py', 'plot_ScenGM.py',
+                 'plot_ScenRisk.py']
+                 
+def demo_run(verbose=True, plot_dir=eqrm_filesystem.demo_plot_path,
+             run_names=plot_demo_run_names):
     if verbose:
         print 'STARTING'  
 
-    # list of input parameter files to use in the batch run
-    run_names = ['plot_ProbRisk.py', 'plot_ProbHaz.py', 'plot_ScenGM.py',
-                 'plot_ScenRisk.py']
-    #run_names = ['plot_ScenGM.py']
-    plot_dir = os.path.join(eqrm_filesystem.demo_plot_path)
+    plot_dir = os.path.join(plot_dir) # Why do this?
     current_dir = os.getcwd()
     os.chdir(plot_dir)
     if verbose:
