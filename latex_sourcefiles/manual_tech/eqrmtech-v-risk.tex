@@ -23,14 +23,14 @@ as a percentage of building stock value.
 \end{itemize}
 
 A common way to represent $Y$ is in terms of a probability of
-exceedance in one one year. To achieve this we assume that
+exceedance in one year. To achieve this we assume that
 earthquakes occur as a Poisson process \citep{dr_McGuire90a}. This
 means that the earthquake process has no memory; or in other
 words, the probability of an earthquake today does not depend on
 whether or not an earthquake occurred yesterday. Mathematically,
 this assumption can be represented as follows:
 \begin{equation}
- \Pr(T, Y\ge y) = 1 - e^{\lambda_Y(y)t},
+ \Pr(T, Y\ge y) = 1 - e^{-\lambda_Y(y)t},
 \end{equation}
 where t is a time interval in years (typically 1 year) and
 $\lambda_Y(y)$ is the annual exceedance rate. The return period is
@@ -92,15 +92,15 @@ to re-ordered values.
 \section{Earthquake hazard results}
 \label{sec:risk-hzd-results} The EQRM estimates the earthquake
 hazard $E_H(R_Y)$ at the return periods $R_Y$ defined in the
-\typeself{set}{da}{ta} vector \typepar{rtrn}{\_}{per} by
+EQRM control file parameter \typepar{return\_periods}{}{} by    
 interpolating the values $\{ \lambda_{Y_i^*}\}_{i=1}^{N_s}$ and
 $\{Y_i^*\}_{i=1}^{N_s}$ to the values $1/R_Y$ (see
 \eref{eq:risk-rptolambda}). In the case of earthquake hazard the
 random variable $Y$ refers to the response spectral
 acceleration\index{response spectral acceleration} and is
 therefore a function of building period $T_o$. The earthquake
-hazard information is saved in the output file
-\typeoutput{<site\_loc>}{\_db}{\_hzd}{.mat}. It is important to
+hazard information is saved in the output files
+\typeoutput{<site\_loc>}{\_SA}{\_rp[return\_period].txt}. It is important to
 emphasise that only the hazard information is saved, the
 information for individual synthetic earthquakes is discarded.
 This means that the earthquake hazard information can not be
@@ -136,11 +136,8 @@ exceedance within 50 years. An exceedance probability of 10\% in
 exceedance probability of 2\% in 50 years corresponds to roughly
 2500 years.
 
-The EQRM post processing tool \typefunc{plot}{\_hzd}{\_map}  can
-be used to generate hazard maps. The tool
-\typefunc{create}{\_gis}{\_output} can be used to export the data
-in \typeoutput{<site\_loc>}{\_db}{\_hzd}{.mat} to a convenient
-file for plotting in GIS.
+The EQRM post processing tool \typefunc{plot\_api.fig\_hazard}{}{} can
+be used to generate hazard maps. 
 
 \subsection{Hazard exceedance curves}
 
@@ -153,38 +150,23 @@ that unlike the hazard map, the hazard exceedance curve presents
 the hazard corresponding to the `full' range of probability levels
 (return periods).
 \begin{figure}
-\includegraphics{fig-risk-hzdexceedcurve}
+%\includegraphics{fig-risk-hzdexceedcurve}
+\includegraphics{demo_hazard_exceedance}
 \caption{Peak ground acceleration hazard exceedance curve for the
 Newcastle central business district.}
 \label{fig:risk-hzdexceedcurve}
 \end{figure}
 \fref{fig:risk-hzdexceedcurve} provides an example of a hazard
 exceedance curve for the Newcastle central business district. The
-EQRM post processing tool \typefunc{plot}{\_singlesite}{\_hzd} can
+EQRM post processing tool \typefunc{plot\_api.fig\_hazard\_exceedance}{}{} can
 be used to generate hazard exceedance curves.
 
-\subsection{Uniform hazard spectra}
-
-The uniform hazard spectra represents another technique for
-visualising the earthquake hazard at a single location. The hazard
-for a specified probability level (return period) is plotted for
-all $S_a$ periods.
-\begin{figure}
-\includegraphics{fig-risk-uhs}
-\caption{Uniform hazard spectra for return period of 500 years for
-a single site on regolith in the Newcastle region.}
-\label{fig:risk-hazarduhs}
-\end{figure}
-\fref{fig:risk-hazarduhs} provides an example of an uniform hazard
-spectra for the Newcastle central business district. The EQRM post
-processing tool \typefunc{plot}{\_singlesite}{\_hzd} can also be
-used to generate uniform hazard spectra.
 
 \section{Earthquake risk results}
 
 The EQRM returns the loss for each earthquake-building pair. This
 information is saved in the file
-\typeoutput{<site\_loc>}{\_db\_saved}{ecloss}{.mat} along with
+\typeoutput{<site\_loc>}{\_total\_building\_loss.txt}{} along with
 other information such as building values, the event activity for
 each synthetic earthquake and the distance between the
 building-earthquake pair. It is important to note that this
@@ -202,8 +184,9 @@ earthquakes and/or the number of buildings in the building
 catalogue. If reducing the number of earthquake-building pairs is
 not possible the EQRM can be run in a cut-down mode that saves
 risk results rather than earthquake-building pairs by assigning
-the \typeself{set}{da}{ta} parameters
-\typepar{save}{\_ecloss}{\_flag} to 3.
+the EQRM control file parameter
+\typepar{save\_total\_financial\_loss}{}{}
+ to \typepar{True}{}{}.
 
 The EQRM is equipped with tools for visualising earthquake risk in
 the following forms:
@@ -212,16 +195,11 @@ the following forms:
 \item a variety of disaggregated annualised loss values.
 \end{enumerate}
 The manner in which the
-\typeoutput{<site\_loc>}{\_db\_saved}{ecloss}{.mat} is processed
+\typeoutput{<site\_loc>}{\_total\_building\_loss.txt}{} file is processed
 will vary slightly depending on the plotting tool being used.
 However, all of the plotting tools make use of the basic process
 described by \ereftwo{eq:eva-vectors1}{eq:eva-vectors2} where the
-random variable $Y$ describes the loss. A plot manager (or
-wrapper) \typefunc{wrap}{\_risk}{\_plots} has been developed to
-manage the plotting of all risk results. Essentially
-\typefunc{wrap}{\_risk}{\_plots} intelligently calls the
-individual plotting tools by reducing the repetition of common
-operations.
+random variable $Y$ describes the loss. 
 
 \subsection{Risk exceedance curve}
 
@@ -237,14 +215,16 @@ expresses $P(Y \ge y)$ as a function of the earthquake risk
 $Y=E_L$, where $E_L$ may be the percentage loss to the portfolio
 or the loss to a single building.
 \begin{figure}
-\includegraphics{fig-risk-pml}
+%\includegraphics{fig-risk-pml}
+\includegraphics{demo_loss_exceedance}
 \caption{Risk exceedance curve for all the buildings in the
 Newcastle and Lake Macquarie portfolio.} \label{fig-risk-pml}
 \end{figure}
 \fref{fig-risk-pml} provides an example of a risk exceedance curve
-for the Newcastle and Lake Macquarie portfolio. The EQRM post
-processing tool \typefunc{wrap}{\_risk}{\_plots} can be used with
-the individual plotting tool \typefunc{pl}{ot\_}{pml} to plot a
+for the Newcastle and Lake Macquarie portfolio.  The
+EQRM post processing tool
+\typefunc{plot\_api.fig\_loss\_exceedance}{}{} can be used
+ to plot a
 risk exceedance curve.
 
 \subsection{Annualised loss}
@@ -297,23 +277,18 @@ annualised loss associated with the PML in \fref{fig-risk-pml} is
 \subsection{Disaggregated annualised loss}
 
 Storing the loss results for all of the earthquake-building pairs
-allows the de-aggregation of annualised loss into a range of
+allows the de-aggregation of annualised loss into a couple of
 classes. The EQRM offers several tools to assist the
-de-aggregation into common classes all of which are managed
-through the plotting tool \typefunc{wrap}{\_risk}{\_plots}. These
+de-aggregation into common classes. These
 are described as follows:
 \begin{figure}
-\includegraphics{fig-risk-deaggdistmag}
+%\includegraphics{fig-risk-deaggdistmag}
+\includegraphics{demo_annloss_deagg_distmag}
  \caption{Annualised loss
 disaggregated by distance and magnitude for the Newcastle and Lake
 Macquarie region.} \label{fig-risk-deaggdistmag}
 \end{figure}
-\begin{figure}
-\includegraphics{fig-risk-deaggstruct}
-\caption{Annualised loss disaggregated by building construction
-type for the Newcastle and Lake Macquarie region.}
-\label{fig-risk-deaggstruct}
-\end{figure}
+
 \begin{enumerate}
 \item \textbf{disaggregation by distance and magnitude} allows the
 visualisation of magnitude-distance combinations which have the
@@ -321,41 +296,32 @@ greatest influence on risk assessments.
 \fref{fig-risk-deaggdistmag} illustrates the disaggregation by
 distance and magnitude for risk in the Newcastle and Lake
 Macquarie region. The individual plotting tool
-\typefunc{calc}{\_annloss}{\_deagg\_distmag} can be used with
-\typefunc{wrap}{\_risk}{\_plots} to de-aggregate the risk by
-distance and magnitude. \item \textbf{disaggregation by building
-construction type} separates the annualised loss into the four
-major construction types; wood framed, un-reinforced masonry,
-concrete and steel framed. \fref{fig-risk-deaggstruct} illustrates
-the annualised loss disaggregated by structural type for the
-Newcastle and Lake Macquarie region. The individual plotting tool
-\typefunc{calc}{\_annloss}{\_deagg\_structural} can be used with
-\typefunc{wrap}{\_risk}{\_plots} to de-aggregate the risk by
-structural type. \item \textbf{disaggregation by suburb} separates
-the annualised loss into different suburbs and allows the
+\typefunc{plot\_api.fig\_annloss\_deagg\_distmag}{}{} can be used
+to de-aggregate the risk by
+distance and magnitude. 
+
+\item \textbf{disaggregation by cells} separates
+the annualised loss into different cells and allows the
 visualisation of how earthquake risk varies spatially. The
-individual processing tool
-\typefunc{calc}{\_annloss}{\_deagg\_sub} can be used with
-\typefunc{wrap}{\_risk}{\_plots} to de-aggregate the risk by
-suburb. Note that \typefunc{calc}{\_annloss}{\_deagg\_sub}
+individual plotting tool
+\typefunc{plot\_api.fig\_annloss\_deagg\_cells}{}{} can be used 
+ to de-aggregate the risk by
+cells. [CHECK THIS Note that \typefunc{calc}{\_annloss}{\_deagg\_sub}
 produces a CSV file that can be plotted in GIS or some other
-environment.
+environment.]
 \end{enumerate}
 
 \section{Earthquake scenario results}
 
-The output for an earthquake scenario loss simulation is also
+The output for an earthquake scenario loss simulation is 
 stored in the file
-\typeoutput{<site\_loc>}{\_db\_saved}{ecloss}{.mat}. The format
-for this file is exactly the same as the format for the
-probabilistic risk output. Note, however, that each of the
-earthquakes in \typeoutput{<site\_loc>}{\_db\_saved}{ecloss}{.mat}
-represent different realisations of the same scenario (see
-\sref{sec:source-scenario}).
+\typeoutput{<output\_dir>}{}{} directory. 
 \begin{figure}
-\includegraphics{fig-risk-scen-hist}
+%\includegraphics{fig-risk-scen-hist}
+\includegraphics{demo_scenario_building_loss_percent}
 \caption{Histogram of loss estimates for a synthetic Newcastle
-1989 earthquake.} \label{fig:scenario-hist}
+1989 earthquake.[MAY HAVE TO CHANGE THE INPUT DATA USED SO THE CAPTION
+IS CORRECT, OR CHANGE THE CAPTION]} \label{fig:scenario-hist}
 \end{figure}
 The primary technique for visualising an EQRM scenario output is
 via a histogram such as that shown in \fref{fig:scenario-hist} for
@@ -364,32 +330,9 @@ histogram in \fref{fig:scenario-hist} represents the frequency of
 realisations which predicted a loss value within the bars domain.
 Histograms such as \fref{fig:scenario-hist} can be produced using
 the individual plotting tool
-\typefunc{calc\_scen}{\_loss}{\_stats} with
-\typefunc{wrap}{\_risk}{\_plots}. Note that
+\typefunc{plot\_api.fig\_scenario\_building\_loss\_percentage}{}{}.
+ [Note that
 \typefunc{calc\_scen}{\_loss}{\_stats} also produces basic
 statistics for the scenario realisations such as the mean and
-median.
+median. CHECK THIS]
 
-
-
-\section{Key functions, flags and parameters}
-
-\begin{tabular}{llp{0.5\textwidth}}
-\hline
-\textbf{Name} & \textbf{Type} & \textbf{Description} \\
-\hline
-\keyrowsep \typeoutput{<site\_loc>}{\_db}{\_hzd}{.mat} & Output& EQRM output file for a probabilistic earthquake hazard run.\\
-\keyrowsep \splitrowoutput{<site\_loc>\_db}{\_savedecloss}{.mat} & Output & EQRM output file for a probabilistic (or scenario) risk run. \\
-\keyrowsep \typepar{rtrn}{\_}{per} & Par & Vector whose elements represent the return periods to be considered. \\
-\keyrowsep \typefunc{plot}{\_hzd}{\_map} & Function& Post processing tool for plotting probabilistic earthquake hazard maps.\\
-\keyrowsep \typefunc{create}{\_gis}{\_output} & Function & Post processing tool to export probabilistic earthquake hazard data.\\
-\keyrowsep \typefunc{plot}{\_singlesite}{\_hzd} & Function & Post processing tool for plotting hazard exceedance curves or uniform hazard spectra.\\
-\keyrowsep \typefunc{wrap}{\_risk}{\_plots} & Function & Post processing tool to handle user interaction with risk processing/plotting tools. \\
-\keyrowsep \typefunc{pl}{ot\_}{pml} & Function & Post processing tool for plotting and computing the PML.\\
-\keyrowsep \typefunc{calc}{\_ann}{loss} & Function & Post processing tool for computing the annualised loss.\\
-\keyrowsep \splitrowfunc{calc\_annloss\_deagg}{\_distmag} & Function& Post processing tool for plotting the annualised loss disaggregated by distance and magnitude.\\
-\keyrowsep \splitrowfunc{calc\_annloss\_deagg}{\_structural} & Function & Post processing tool for plotting the annualised loss disaggregated by building structural type.\\
-\keyrowsep \splitrowfunc{calc\_annloss\_deagg}{\_sub} & Function & Post processing tool for computing the annualised loss disaggregated by suburb.\\
-\keyrowsep \typefunc{calc\_scen}{\_loss}{\_stats} & Function & Post processing tool for analysing and plotting loss data for earthquake scenario runs.\\
- \hline
-\end{tabular}
