@@ -30,10 +30,7 @@ the usage classification system. For example
 \tref{tab:grids-costproportions} illustrates the proportion of the
 replacement value corresponding to a couple of different buildings
 for both the HAZUS\index{building usgage!HAZUS} and
-FCB\index{building usgage!FCB} classification system. The
-\typeself{set}{da}{ta} flag \typepar{b\_usage}{\_type}{\_flag} can
-be used to select the usage classification system and consequently
-the desired cost proportions.
+FCB\index{building usgage!FCB} classification system. 
 
 \begin{table}
 \centering \caption{Examples of costing splits for the
@@ -169,27 +166,16 @@ that if the replacement cost for complete damage is \$500 per
 square metre, the repair cost would be $30/100\times\$500$.
 
 
-The directory \typedir{*/eqrm}{/datacvt}{/econsoclosspars}
-contains tools to assist the preparation of direct financial loss
-parameters. The files
-\typeparfile{RcPerWrt}{BuildCFCB}{usageEdwards}{.xls} and
-\typeparfile{RcPerWrt}{BuildCHazus}{usageEdwards}{.xls} contain
-the replacement cost component of the building per unit floor area
-$R_i$ for the FCB\index{building usgage!FCB} and
-HAZUS\index{building usgage!HAZUS} usage types respectively. The
-MATLAB function \typefunc{per\_replace}{\_cost\_wrt}{\_bc\_usage}
-converts these excel files to \texttt{*.MAT} that can be used by
-the EQRM. The EQRM assumes the replacement cost components to be
-independent of the construction type. There are a few exceptions,
+The EQRM assumes the replacement cost components to be
+independent of the construction type. There are however a few exceptions,
 which have not been implemented. These are based on the tables
 given in \cite{dr_FEMA99b}, in particular, Table 25.2a (page
 15-12), Table 13.3 (page 15-14) and Table 15.4 (page 15-15). In
-principle the tools in
-\typedir{*/eqrm}{/datacvt}{/econsoclosspars} allow the replacement
+principle the EQRM has an option that also allows the replacement
 cost components to be a function of both usage and construction
-type. Note that \typefunc{per\_replace}{\_cost\_wrt}{\_bc\_usage}
+type. This functionality
 attributes proportions of the building's total value to its
-different components. Recall form
+different components. Recall from
 \tref{tab:grids-bdatabasecolumns} that the replacement costs for
 each building is stored with the building database.
 
@@ -241,18 +227,8 @@ with each building, which represents the additional number of
 buildings that are represented by the modelled building (see
 \tref{tab:grids-bdatabasecolumns}). Typically the extra buildings
 are of the same type and are located in close proximity to the
-modelled building.
-
-The aggregated loss is therefore the weighted sum of the losses of
+modelled building. The aggregated loss is therefore the weighted sum of the losses of
 each building in the database with its corresponding survey factor.
-
-The aggregated financial loss values are saved to a file of form
-\typeoutput{<site\_loc>}{\_db\_save}{decloss}{.mat}. If the
-\typeself{set}{da}{ta} parameter
-$\typepar{save}{\_ecloss}{\_flag}=1$ a combined loss for the
-building and contents is saved; whereas if
-$\typepar{save}{\_ecloss}{\_flag}=2$ the losses for the building
-and contents are saved separately.
 
 
 \subsection{Cutoff values}
@@ -262,12 +238,11 @@ damage for very small ground accelerations. This arises due to the
 asymptotic nature of the fragility curves. A cutoff value has been
 implemented in the code to prevent such small values being
 calculated. The cutoff is in terms of PGA and is controlled by the
-\typeself{set}{da}{ta} parameter \typepar{pga}{\_min}{damage}. For
-all those events having peak ground acceleration (pga) values
-smaller than \typepar{pga}{\_min}{damage} at the building
+the user. For all those events having peak ground acceleration (pga) values
+smaller than the PGA cutoff at the building
 location, the financial loss is set to zero. Typically it is
 assumed that no damage worth reporting occurs for ground
-accelerations smaller than $\typepar{pga}{\_min}{damage}=0.05g$.
+accelerations smaller than 0.05g.
 
 
 \section{Social losses}
@@ -276,11 +251,7 @@ The EQRM includes a module for computing the injuries and
 casualties associated with a scenario simulation (see
 \sref{sec:source-scenario}). The code for considering social
 losses associated with probabilistic simulations has not yet been
-written. The social loss module is activated by setting the
-\typeself{set}{da}{ta} parameter \typepar{save}{\_socloss}{\_flag}
-to 1. When activated, the social loss module produces a file
-\typeoutput{<site\_loc>}{\_db\_save}{dsocloss}{.mat} that can be
-processed by the MATLAB script \typescript{newc}{89plot}{histsoc}.
+written. 
 
 For the Newcastle 1989 simulation the results are slightly greater
 than those observed in the actual earthquake (e.g. median of 45
@@ -295,23 +266,5 @@ distribution of injuries.
 Chapter 13 of \cite{dr_FEMA99b} provides a detailed description of
 the methodology behind social loss calculations.
 
-\section{Key functions, flags and parameters}
+ADD MORE HERE ABOUT NEW FATALITY MODEL BEING CODED BY VANESSA.
 
-\begin{tabular}{llp{0.5\textwidth}}
-\hline
-\textbf{Name} & \textbf{Type} & \textbf{Description} \\
-\hline
-\splitrowdir{*/eqrm/datacvt}{/econsoclosspars} & Dir & Tools to assist the preparation of direct financial loss parameters.\\
-\keyrowsep \splitrowfunc{per\_replace\_cost}{\_wrt\_bc\_usage} & Function & Converts the \typeparfile{RcPerWrt}{BuildCFCB}{usageEdwards}{.xls} and \typeparfile{RcPerWrt}{BuildCHazus}{usageEdwards}{.xls} to the required format for the EQRM.\\
-\keyrowsep \typefunc{so}{c}{loss} & Function & Function for calculating injury probabilities.\\
-\keyrowsep \typescript{newc}{89plot}{histsoc} & Script & MATLAB script to plot injury probabilities (for Newcastle scenario only).\\
-\keyrowsep \splitrowparfile{RcPerWrtBuildCFCB}{usageEdwards}{.xls} & Par File & Replacement cost component of the building per unit floor area for the HAZUS usage classification.\\
-\keyrowsep \splitrowparfile{RcPerWrtBuildCHazus}{usageEdwards}{.xls}  & Par File & Replacement cost component of the building per unit floor area for the FCB usage classification.\\
-\keyrowsep \typepar{c}{}{i} & Par & Regional cost index multiplier.\\
-\keyrowsep \typepar{aus}{\_contents}{\_flag} & Par & Contents value for residential buildings and salvageability after complete building damage.\\
-\keyrowsep \typepar{pga}{\_min}{damage} & Par & minimum PGA(g) below which financial loss is assigned to zero.\\
-\keyrowsep \typepar{save}{\_ecloss}{\_flag} & Par & Options for saving direct financial loss data.\\
-\keyrowsep \typepar{save}{\_socloss}{\_flag} & Par & Options for saving casualty and injury data.\\
-\keyrowsep \splitrowoutput{<site\_loc>\_db}{\_savedecloss}{.mat} & Output & Output file containing the loss estimates for an EQRM risk simulation.\\
-\hline
-\end{tabular}
