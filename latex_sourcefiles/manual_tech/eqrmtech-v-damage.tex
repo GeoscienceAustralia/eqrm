@@ -20,25 +20,6 @@ types of damage, structural (damage to main structure) and
 drift-sensitive and acceleration-sensitive non-structural damage
 (e.g. damage to non-structural internal walls).
 
-The main MATLAB function to calculate building damage is
-\typefunc{do}{\_anal}{ysis} which reads the earthquake catalogue,
-applies the attenuation and soil amplification, models the
-building damage and computes direct financial loss.
-
-The MATLAB function \typefunc{prep}{\_sit}{es} loads the buildings
-database file (\cref{ch:grids}) and
-\typefunc{prep}{\_build}{\_vuln} reads the building parameters
-file defining engineering parameters. The MATLAB function
-\typefunc{do}{\_build}{\_vuln} is a wrapper, called inside the
-main loop (over sites). The main work is done by
-\typefunc{make}{\_build}{\_dam\_rand} which calculates the peak
-values of spectral displacement\index{response spectral
-displacement} and acceleration\index{response spectral
-acceleration\index{response spectral acceleration}} as the
-intersection of the building capacity curve\index{capacity curve}
-with the suitably damped demand curve\index{demand curve} for the
-vector of all spectral accelerations from each synthetic
-earthquake.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 \section{The capacity spectrum method}
@@ -221,7 +202,7 @@ curve} is described by a log-normal distribution for the vertical
 component of the ultimate point. That is, $A_u=\bar A_u\times
 e^{\beta\phi}$, where $\bar A_u$ is the median value of $A_u$ and
 $\phi$ is a random number selected from a standardised normal
-distribution (see \typefunc{b}{cap}{\_rand}).This sampling is
+distribution.This sampling is
 analogous to the random sampling technique used elsewhere in the
 EQRM (e.g. \sref{attn:uncert-randomchoice}) because the median
  of a log-normally distributed random variable (e.g.$\ bar A_u$) is the
@@ -306,11 +287,10 @@ where $\Beff$ is the effective damping\index{effective damping},
 expressed as a decimal (not a percentage). Note that when $\Beff =
 0.05$, (5\%\ damping) then $R_a=R_v=R_d=1$.
 
-In the code the flag \verb|damp_flags(1)=1|\indexpar{damp\_flags}
-can be used to set $R_d=R_v$, (HAZUS doesn't use $R_d$), or
-\verb|damp_flags(1)=2| sets $R_a$ and $R_d$ to $R_v$. This might
+In the EQRM the can be set to $R_d=R_v$, (HAZUS doesn't use $R_d$), or
+$R_a$ and $R_d$ are set to $R_v$. This might
 be used used if there are problems with convergence. The default
-value \verb|damp_flags(1)=0| uses all 3 factors.
+ uses all 3 factors.
 
 
 The transition building periods (corner periods), $T_{av}$ and $T_{vd}$,
@@ -335,13 +315,6 @@ needed to account for the damping that has already occurred.
 However, since the damping ratios are applied to the original
 $5\%$ spectra, at each stage of the iteration, it should not be
 needed.
-
-In the code, the flag \verb|damp_flags(2)=0|\indexpar{damp\_flags}
-(default value) is used to modify $T_{av}$ to $T_{av\beta}$, at
-each iteration, whereas \verb|damp_flags(2)=1| does not do the
-modification. The corner periods are calculated in the file
-\typefunc{calc}{\_corner}{\_periods}.
-
 
 Note that the formulae for the corner periods are chosen (by
 HAZUS) to be consistent with the artificial standardised demand
@@ -462,10 +435,7 @@ The sub-areas are calculated as
  A_3 &= 2A_y(D-D_y).
 \end{align*}
 
-The calculation of the hysteretic area is implemented in the
-MATLAB function \typefunc{hyst}{\_area}{\_rand}. Note that this
-function has arguments to deal with a randomly sampled capacity
-curve\index{capacity curve}. Currently the code calculates
+Currently the EQRM calculates
 hysteretic damping for all events including those in the elastic
 region (where the hysteretic damping is zero), because the
 calculations are vectorised. Furthermore the code iterates until
@@ -624,14 +594,13 @@ For structural damage and non-structural drift-sensitive damage
 the damage state thresholds are determined from provided drift
 ratios for each building construction type. For non-structural
 acceleration-sensitive damage the damage state thresholds are
-obtained from specified acceleration thresholds. These are
-tabulated for different versions of the engineering parameters in
-\typeparfile{build}{facts}{<version>}{.xls}, in directory
-\typedir{*/data}{cvt}{/buildpars}. For example
+obtained from specified acceleration thresholds. For example
+
 \begin{equation}
 \label{eq:damage-dstate}
  S_T = \alpha_2 h\delta
 \end{equation}
+
 is used to compute the median damage state threshold for
 structural damage, where $\delta$ is the drift ratio, $h$ is the
 provided height of the building for the given building
@@ -750,13 +719,10 @@ methodology. Two of the more significant extra features are:
 \item The use of \textbf{uniform hazard spectra} instead of demand
 curve\index{demand curve}s. This effectively drives the risk
 calculation by hazard values rather than individual earthquakes.
-The process is discussed further in \citet{dr_Patchett04a}. The
-EQRM can be used in this fashion by setting the
-\typeself{set}{da}{ta} parameter \typepar{run}{\_type}{} to 3.
+The process is discussed further in \citet{dr_Patchett04a}. 
 \item The use of \textbf{Modified Mercali Intensity (MMI) damage
 curves} rather than the capacity spectrum method\index{capacity
-spectrum method}. When the user selects $100 \leq
-\typepar{atten}{uation}{\_flag} \leq 199$ the EQRM will use an MMI
+spectrum method}. The EQRM has the capability to use an MMI
 attenuation model (currently only Gaull is coded) and will compute
 risk using in-built damage curves that relate percentage damage to
 MMI. Note that the damage curves are exponential in shape and that
@@ -766,28 +732,3 @@ structure rather than components of the structure.
 curves with the EQRM.
 \end{enumerate}
 
-
-
-\section{Key functions, flags and parameters}
-
-\begin{tabular}{llp{0.52\textwidth}}
-\hline
-\textbf{Name} & \textbf{Type} & \textbf{Description} \\
-\hline
-\keyrowsep \typedir{*/data}{cvt}{/buildpars} & Dir & Directory containing tools to assist the preparation of engineering parameters.\\
-\keyrowsep \typefunc{do}{\_anal}{ysis} & Function & Higher order function of EQRM responsible for computing hazard and/or risk. \\
-\keyrowsep \typefunc{prep}{\_loc}{ations} & Function & Loads and prepares earthquake hazard grids and building databases\index{building database}.\\
-\keyrowsep \typefunc{prep}{\_build}{\_vuln} & Function & Loads and prepares engineering and financial loss parameters.\\
-\keyrowsep \typefunc{do}{\_build}{\_vuln} & Function & Models building damage, financial loss and social loss.\\
-\keyrowsep \typefunc{make}{\_build}{\_dam\_rand} & Function & Models building damage.\\
-\keyrowsep \typefunc{build}{\_cap}{\_rand} & Function & Calculates building capacity curve\index{capacity curve} as a function of spectral displacement\index{response spectral displacement} $S_d$.  \\
-\keyrowsep \typefunc{make}{\_frag}{ility} & Function & Calculates the fragility curve\index{fragility curves} and outputs probabilities of being in various damage states.\\
-\keyrowsep \typefunc{calc}{\_corner}{\_periods} & Function & Calculates the corner periods of the demand curve\index{demand curve}.\\
-\keyrowsep \typefunc{cvt}{\_bfac}{tors} & Function &  Converts Excel building paramter files to required *.MAT format.\\
-\keyrowsep \typefunc{hyst}{\_area}{\_rand} & Function & Incorporates hysteretic damping (called by \typefunc{nonlin}{\_damp}{\_rand}).\\
-\splitrowparfile{buildfacts}{\_<version>}{.mat}& Par File & Excel version of engineering parameters used by EQRM (e.g. buildfactors.xls or buildfactors-wshop.xls). Note that these Excel files are converted to the EQRM required *.MAT files using \typefunc{cvt}{\_bfac}{tors}.\\
-\keyrowsep \typepar{run}{\_type}{} & Par & Defines the operation mode of the EQRM (\sref{sec:application-setdata}).\\
-\keyrowsep \typepar{dam}{p}{\_flags} & Par & Vector to control nature of linear damping (\sref{sec:application-setdata}).\\
-\keyrowsep \typepar{qa}{\_switch}{\_vun}   & Par & Controls diagnostics for capacity spectrum method (\sref{sec:application-setdata}).\\
- \hline
-\end{tabular}
