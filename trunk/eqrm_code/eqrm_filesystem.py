@@ -67,4 +67,6 @@ Demo_Output_ScenRisk_Path = os.path.join(eqrm_path,
                                          'demo', 'output', 'scen_risk')
 plot_output_scen_risk_path = os.path.join(demo_plot_path,
                                              'output', 'plot_scenario_risk')
+demo_plot_scenarios = os.path.join(eqrm_path,
+                                         'demo', 'plot', 'plot_data')
 

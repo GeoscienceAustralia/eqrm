@@ -103,7 +103,7 @@ if __name__ == '__main__':
         #q = {'b':2}
         #sunny(1,**q, c=3)
 
-    if True:
+    if False:
         a = array([[[0],[1]],
                    [[2],[3]],
                    [[4],[5]]])
