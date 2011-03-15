@@ -100,16 +100,16 @@ random variable $Y$ refers to the response spectral
 acceleration\index{response spectral acceleration} and is
 therefore a function of building period $T_o$. The earthquake
 hazard information is saved in the output files
-\typeoutput{<site\_loc>}{\_SA}{\_rp[return\_period].txt}. It is important to
+\typepar{<site\_loc>}{\_SA}{\_rp[return\_period].txt}. It is important to
 emphasise that only the hazard information is saved, the
 information for individual synthetic earthquakes is discarded.
 This means that the earthquake hazard information can not be
 de-aggregated in terms of causative events.
 
-The EQRM offers three tools for visualising the earthquake hazard:
+The EQRM offers two tools for visualising the earthquake hazard:
 \begin{enumerate}
-\item the earthquake hazard map, \item the hazard exceedance
-curve, and \item the uniform hazard spectra.
+\item the earthquake hazard map and \item the hazard exceedance
+curve.
 \end{enumerate}
 
 \subsection{Hazard maps}
@@ -151,7 +151,7 @@ the hazard corresponding to the `full' range of probability levels
 (return periods).
 \begin{figure}
 %\includegraphics{fig-risk-hzdexceedcurve}
-\includegraphics{demo_hazard_exceedance}
+\includegraphics[width=1\textwidth]{demo_hazard_exceedance}
 \caption{Peak ground acceleration hazard exceedance curve for the
 Newcastle central business district.}
 \label{fig:risk-hzdexceedcurve}
@@ -166,7 +166,7 @@ be used to generate hazard exceedance curves.
 
 The EQRM returns the loss for each earthquake-building pair. This
 information is saved in the file
-\typeoutput{<site\_loc>}{\_total\_building\_loss.txt}{} along with
+\typepar{<site\_loc>}{\_total\_building\_loss.txt}{} along with
 other information such as building values, the event activity for
 each synthetic earthquake and the distance between the
 building-earthquake pair. It is important to note that this
@@ -195,7 +195,7 @@ the following forms:
 \item a variety of disaggregated annualised loss values.
 \end{enumerate}
 The manner in which the
-\typeoutput{<site\_loc>}{\_total\_building\_loss.txt}{} file is processed
+\typepar{<site\_loc>}{\_total\_building\_loss.txt}{} file is processed
 will vary slightly depending on the plotting tool being used.
 However, all of the plotting tools make use of the basic process
 described by \ereftwo{eq:eva-vectors1}{eq:eva-vectors2} where the
@@ -216,7 +216,7 @@ $Y=E_L$, where $E_L$ may be the percentage loss to the portfolio
 or the loss to a single building.
 \begin{figure}
 %\includegraphics{fig-risk-pml}
-\includegraphics{demo_loss_exceedance}
+\includegraphics[width=1\textwidth]{demo_loss_exceedance}
 \caption{Risk exceedance curve for all the buildings in the
 Newcastle and Lake Macquarie portfolio.} \label{fig-risk-pml}
 \end{figure}
@@ -268,11 +268,6 @@ $$
 which demonstrates that the mean value of the loss is the area
 under the risk exceedance curve (PML).
 
-The EQRM post processing tool \typefunc{wrap}{\_risk}{\_plots} can
-be used with the individual plotting tool
-\typefunc{calc}{\_ann}{loss} to compute the annualised loss.The
-annualised loss associated with the PML in \fref{fig-risk-pml} is
-0.03\%.
 
 \subsection{Disaggregated annualised loss}
 
@@ -283,7 +278,7 @@ de-aggregation into common classes. These
 are described as follows:
 \begin{figure}
 %\includegraphics{fig-risk-deaggdistmag}
-\includegraphics{demo_annloss_deagg_distmag}
+\includegraphics[width=1\textwidth]{demo_annloss_deagg_distmag}
  \caption{Annualised loss
 disaggregated by distance and magnitude for the Newcastle and Lake
 Macquarie region.} \label{fig-risk-deaggdistmag}
@@ -315,10 +310,10 @@ environment.]
 
 The output for an earthquake scenario loss simulation is 
 stored in the file
-\typeoutput{<output\_dir>}{}{} directory. 
+\typepar{<output\_dir>}{}{} directory. 
 \begin{figure}
 %\includegraphics{fig-risk-scen-hist}
-\includegraphics{demo_scenario_building_loss_percent}
+\includegraphics[width=1\textwidth]{demo_scenario_building_loss_percent}
 \caption{Histogram of loss estimates for a synthetic Newcastle
 1989 earthquake.[MAY HAVE TO CHANGE THE INPUT DATA USED SO THE CAPTION
 IS CORRECT, OR CHANGE THE CAPTION]} \label{fig:scenario-hist}
