@@ -252,10 +252,11 @@ $\lambda(\typepar{min}{\_mag}{\_cutoff})$, represents the number
 of earthquakes with magnitude greater than or equal to
 \typepar{min}{\_mag}{\_cutoff} and is computed differently for each source type (see below).
 
-\paragraph{Activity rate for areal sources} 
+\subsubsection{Activity rate for areal sources} 
 \label{sec:rv_areal_GR}
-\\
-This is computed by evaluating the bounded Gutenberg-Richter recurrence relationship
+
+
+This is computed by evaluating the bounded Gutenberg-Richter recurrence relationship:
 
 \begin{equation} \label{eq:amin_gr}
 \lambda(m) =
@@ -271,9 +272,8 @@ A_{min}\frac{e^{-\beta(m-m_{min})}-e^{-\beta(m_{max}-m_{min})}}{1-e^{-\beta(m_{m
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\paragraph{Activity rate for faults with bounded Gutenberg Richter model}
+\subsubsection{Activity rate for faults with bounded Gutenberg Richter model}
 \label{sec:rv_flt_GR}
-\\
 On the basis of equation \ref{eq:amin_gr},  \citet{dr_youngs85} developed a relationship between fault slip 
 rate and earthquake recurrence through the use of the total seismic moment rate along a fault ($M_o^T$)which can be found from:
 
@@ -322,10 +322,10 @@ In practical applications, the $b$-value can be obtained from historical seismic
 insufficient historical records near the fault, then it can be approximated by the $b$-value of the source zone that the fault lies within. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\paragraph{Activity rate for faults with bounded Characteristic Earthquake model} 
+\subsubsection{Activity rate for faults with bounded Characteristic Earthquake model} 
 \label{sec:rv_flt_ch}
 
-\\ Following the same approach as in equations \ref{eq:lam_exp1} and  \ref{eq:lam_exp}, and using the shape of the characteristic 
+Following the same approach as in equations \ref{eq:lam_exp1} and  \ref{eq:lam_exp}, and using the shape of the characteristic 
 earthquake density function in figure \ref{fig:pdf} we can relate the activity rate to the slip rate. To find the activity 
 rate ($\lambda m$) we require the slip rate ($S$), $b$ value, and $m_{max}$ for the fault. Young s and Coppersmith then use 
 a 3 step process where we first solve for the non-characteristic or exponential part of the distribution ($\lambda m_{min} - \lambda m_{c}$):
@@ -566,13 +566,13 @@ r_w = \textrm{min$\{f_1\sqrt{r_A},f_w\}$}.
 This scaling law is recommended for all intraplate settings. First the rupture area ($r_A$) is calculated from:
 
 \begin{equation}
-log(M_{0}) = 1.5  \times log(r_A} + 6.38
+log(M_{0}) = 1.5  \times log(r_A) + 6.38
 \end{equation}
 
 where $M_{0}$ is the seismic moment. Next the rupture length ($r_l$) is calculated from:
 
 \begin{equation}
-log(M_{0}) = 3.0  \times log(r_A} + 6.39
+log(M_{0}) = 3.0  \times log(r_A) + 6.39
 \end{equation}
 
 and then it is a trivial step to find the rupture width ($r_W$).
@@ -872,7 +872,7 @@ ensuring the start of the trace has an equal probability of occuring anywhere al
 calculated using the rupture length and azimuth of the fault (\ref{fig:traces}) and the known position of the fault trace as defined by the user. 
 
 \begin{figure}[htp]
-\centerline{\includegraphics[width=6cm]
+\centerline{\includegraphics[width=12cm]
 {fig-hsource-faulttrace}}
 \caption{A plan view of the fault trace and rupture trace defined by its start and end coordinates.}
 \label{fig:traces}
@@ -882,8 +882,8 @@ A similar process to equation \ref{ds} is followed to determine the depth of the
 
 \begin{figure}[htp]
 \centerline{\includegraphics[width=12cm]
-{fig-hsource-depthrange}}
-\caption{A schematic diagram of how we define the depth range of the rupture centroid.}
+{fig-hsource-faultdepth}}
+\caption{A schematic diagram of the depth range of the rupture centroid is calculated.}
 \label{fig:rzrange}
 \end{figure}
 
@@ -948,7 +948,7 @@ When dealing with out of plane ruptures we need to consider three cases:
 \end{itemize}
 \begin{figure}[htp]
 \centerline{\includegraphics[width=16cm]
-{fig-hsource-geomoutplane}}
+{fig-hsource-faultangles}}
 \caption{A schematic diagram of the geometry of out of plane ruptures. Panel A shows the rupture plane dipping out of the fault plane that defines the dipping slab. Panel B is a zoom in of the angles that define the rupture plane geometry. The user defines the fault dip ($f_\theta$), which in this case represents the direction of the downgoing slab, and the out of plane dip ($\delta_\theta$) and a sampling range ($\Delta_\theta$) over which the EQRM will uniformly distribute the rupture plane. }
 \label{fig:intraslabGeom}
 \end{figure}
@@ -973,7 +973,7 @@ S_w							& \quad \mbox{if $\omega$ $=$ 90} \\
 
 \begin{figure}[htp]
 \centerline{\includegraphics[width=12cm]
-{fig-hsource-geomwidth}}
+{fig-hsource-faultangles2}}
 \caption{The geometry of determining the maximum rupture width ($r_w^{max}$) shown in the lower trigonometric geometry and the $r_z^{min}$ and $r_z^{max}$ shown in the upper part and equation \ref{drange2}.}
 \label{fig:deltaeq}
 \end{figure}
@@ -1088,7 +1088,7 @@ r_\theta = \mathbf{max} \{ 180 - f_\theta + \omega, 5 \} .
 
 \begin{figure}[htp]
 \centerline{\includegraphics[width=14cm]
-{fig-hsource-gt90}}
+{fig-hsource-faultflip}}
 \caption{Fault and rupture plane geometry for. Lower panel shows cross section view and upper panel shows a plan view of the surface 
 projection. Note that in this case we need to re-project the rupture plane to the surface and redefine the start and end of the 
 rupture trace such that the plane dips to the right hand side of the fault trace when looking from the start to end of the trace.}
@@ -1127,7 +1127,7 @@ r_\theta = \mathbf{max} \{ 180 - f_\theta + \omega, 5 \} .
 
 \begin{figure}[htp]
 \centerline{\includegraphics[width=14cm]
-{fig-hsource-gt180}}
+{fig-hsource-faultflipbehind}}
 \caption{Fault and rupture plane geometry for. Lower panel shows cross section view and upper panel shows 
 a plan view of the surface projection. Note that in this case we need to re-project the rupture plane to 
 the surface and redefine the start and end of the rupture trace.}
