@@ -112,7 +112,7 @@ Finite-source distance measures:
  \centering \psfrag{Rjb}{$\Rjb$}
 \psfrag{Rhyp}{$\Rhyp$} \psfrag{Rrup}{$\Rrup$} \psfrag{Repi}{$\Repi$}
 \psfrag{site}{site} \psfrag{fault}{fault} \psfrag{d}{$h$}
-\includegraphics[width=0.7\textwidth]{diags/fig-hattn-distance}
+\includegraphics[width=0.7\textwidth]{diags/fig-hattn-distance.pdf}
 \caption{Diagram showing the distance measures used in various
   attenuation formulae.}
   \label{fig:attn-distances}
@@ -307,44 +307,44 @@ implemented GMPEs are given in the next section.
  Term &  Sa97&  Zh06
 & AS08& BA08&
  CB08& CY08&  AB10\\
-\hline  Near-fault & \multirow{2}{*}{\Checkmark} &
-\multirow{2}{*}{\Checkmark}& \multirow{2}{*}{\Checkmark}&
-\multirow{2}{*}{\Checkmark}& \multirow{2}{*}{\Checkmark}&
-\multirow{2}{*}{\Checkmark}&\multirow{2}{*}{\Checkmark}\\
+\hline  Near-fault & \multirow{2}{*}{\textbullet} &
+\multirow{2}{*}{\textbullet}& \multirow{2}{*}{\textbullet}&
+\multirow{2}{*}{\textbullet}& \multirow{2}{*}{\textbullet}&
+\multirow{2}{*}{\textbullet}&\multirow{2}{*}{\textbullet}\\
 
  Saturation \\
 
 \hline  Magnitude-dependent &
-\multirow{2}{*}{\XSolidBrush}&\multirow{2}{*}{\XSolidBrush} &
-\multirow{2}{*}{\Checkmark}& \multirow{2}{*}{\Checkmark}&
-\multirow{2}{*}{\Checkmark}&
-\multirow{2}{*}{\Checkmark}& \multirow{2}{*}{\Checkmark}\\
+\multirow{2}{*}{$\times$}&\multirow{2}{*}{$\times$} &
+\multirow{2}{*}{\textbullet}& \multirow{2}{*}{\textbullet}&
+\multirow{2}{*}{\textbullet}&
+\multirow{2}{*}{\textbullet}& \multirow{2}{*}{\textbullet}\\
  Distance Decay \\
 
 
-\hline  Style of Faulting &{\Checkmark}& {\Checkmark}& {\Checkmark}&
-{\Checkmark}& {\Checkmark}&{\Checkmark}&
- {\Checkmark}\\
+\hline  Style of Faulting &{\textbullet}& {\textbullet}&
+{\textbullet}& {\textbullet}& {\textbullet}&{\textbullet}&
+ {\textbullet}\\
 
-\hline  Depth-to-Top  &\multirow{2}{*}{\XSolidBrush} &
-\multirow{2}{*}{\XSolidBrush}&
-\multirow{2}{*}{\Checkmark}&\multirow{2}{*}{\XSolidBrush} &
-\multirow{2}{*}{\Checkmark}&\multirow{2}{*}{\Checkmark}&\multirow{2}{*}{\XSolidBrush} \\
+\hline  Depth-to-Top  &\multirow{2}{*}{$\times$} &
+\multirow{2}{*}{$\times$}&
+\multirow{2}{*}{\textbullet}&\multirow{2}{*}{$\times$} &
+\multirow{2}{*}{\textbullet}&\multirow{2}{*}{\textbullet}&\multirow{2}{*}{$\times$} \\
 
  of Rupture\\
 
-\hline  Hanging-Wall &{\XSolidBrush} &{\XSolidBrush} &
-{\Checkmark}&{\XSolidBrush} &
-{\Checkmark}& {\Checkmark}&{\XSolidBrush} \\
+\hline  Hanging-Wall &{$\times$} &{$\times$} &
+{\textbullet}&{$\times$} &
+{\textbullet}& {\textbullet}&{$\times$} \\
 
-\hline  Basin Effect &{\XSolidBrush} &{\XSolidBrush} &
-{\Checkmark}&{\XSolidBrush} &
-{\Checkmark}& {\Checkmark}& {\XSolidBrush}\\
+\hline  Basin Effect &{$\times$} &{$\times$} &
+{\textbullet}&{$\times$} &
+{\textbullet}& {\textbullet}& {$\times$}\\
 
-\hline  Nonlinear  & \multirow{2}{*}{\XSolidBrush}&
-\multirow{2}{*}{\XSolidBrush}& \multirow{2}{*}{\Checkmark}&
-\multirow{2}{*}{\Checkmark}&
-\multirow{2}{*}{\Checkmark}& \multirow{2}{*}{\Checkmark}&\multirow{2}{*}{\XSolidBrush}\\
+\hline  Nonlinear  & \multirow{2}{*}{$\times$}&
+\multirow{2}{*}{$\times$}& \multirow{2}{*}{\textbullet}&
+\multirow{2}{*}{\textbullet}&
+\multirow{2}{*}{\textbullet}& \multirow{2}{*}{\textbullet}&\multirow{2}{*}{$\times$}\\
 Site Response\\
 \end{tabular}}
 \end{table}
@@ -352,15 +352,12 @@ Site Response\\
 
 
 
-\section{Implementation}\label{sec:implementation} In the EQRM
-application the attenuation calculations are conducted within the
-main driving function \typefunc{do}{\_ana}{lysis} which computes the
-attenuation for one site at a time for all events and all
-fundamental (or building) periods. That is, for each site there
-exists a large matrix of modelled $S_a(T_o,r_m,R)$ (this matrix is
-\typevar{S}{}{A} or \typevar{SA}{ro}{ck} in the code) whose rows
-correspond to the events (i.e. an $r_m$-$R$ pair) and whose columns
-correspond to the $T_o$. That is
+\section{Implementation}\label{sec:implementation} the EQRM
+application computes the attenuation for one site at a time for all
+events and all fundamental (or building) periods. That is, for each
+site there exists a large matrix of modelled $S_a(T_o,r_m,R)$ whose
+rows correspond to the events (i.e. an $r_m$-$R$ pair) and whose
+columns correspond to the $T_o$. That is
 
 \begin{math}
 %\label{fig:attn-sa-matrix}
@@ -376,7 +373,8 @@ where $N_s$ refers to the number of events and $N_T$ refers to the
 number of periods. Note that the $r_m$-$R$ pair comes from the event
 catalogue and a calculation of distance, as described in this
 section. The $T_o$ are determined by the user using the EQRM control
-file parameter: \typeself{atten-periods}. Computationally the above
+file parameter: \typeself{atten-periods} (see
+~\sref{sec:application-EQRMcf}). Computationally the above
 calculation of attenuation is conducted in two parts as follows:
 \begin{enumerate}
 \item The preparation of the attenuation coefficients
@@ -607,7 +605,7 @@ rupture plane (km)}\\
 
 \hline $R_{rup}$ & {\small Closest distance to the rupture plane (km)}\\
 
-\hline $R_x$ & {\small Horizontal distance to top edge of rupture}\\
+\hline \multirow{2}{*}{$R_x$} & {\small Horizontal distance to top edge of rupture}\\
  &{\small measured
 perpendicular to the strike (km)}\\
 
@@ -750,7 +748,7 @@ where $\sigma_{log(S_a)}$ is usually assumed to be $\sigma_a$.
 \end{enumerate}
 
 \begin{figure}
-\includegraphics[width=1\textwidth]{diags/fig-hattn-random}
+\includegraphics[width=1\textwidth]{diags/fig-hattn-random.pdf}
 \caption{Selection of three different random samples from a PDF.}
 \label{fig:hattn-randomsamp}
 \end{figure}
@@ -817,9 +815,6 @@ attenuation PDF.
 \item Firstly the user must define a lower magnitude bound
 $m_{bnd}$, a number of samples $n_{smples}$ and a PDF range
 $n_\sigma$ (see \sref{source:spawning} for a complete definition).
-Recall that \typefunc{fuse}{\_4}{hzd} redefines the event activity
-$r_\nu$ using a weight $w_e$, derived by truncating and
-re-normalising a standard normal distribution to $\pm n_\sigma$.
 \item The $S_a$ is computed as follows
 \begin{equation}
 \label{attn:uncertainty-pdfsample}
@@ -913,16 +908,20 @@ intesive since the $S_a$ array is larger.
 \item use spawning for hazard - exaplin why
 \item use random sampling for risk - exaplain why
 \end{itemize}
-
+Using random sampling to capture aleatory variability may lead to
+highly spatially uncorrelated hazard maps. Hence it is recommended
+that spawning approach should be used for PSHA to create spatially
+correlated hazard maps. However for PSRA random sampling is
+recommended because the risk results will be aggregated, removing
+the need for spatially correlated maps.
 \section{Using multiple GMPEs - Incorporating epistemic uncertainty}
 \label{sec:attn-multi-attnmodels}
 
-The use of attenuation models in the EQRM is controlled by the
-\typeself{set}{da}{ta} parameter \typepar{atten}{uation}{\_flag}.
-Recall from \sref{sec:application-setdata} that
-\typepar{atten}{uation}{\_flag} is a two row matrix with one column
-for each attenuation model to be used. The format of
-\typepar{atten}{uation}{\_flag} is
+The use of GMPEs in the EQRM is controlled by the
+\typepar{event}{\_type}{\_control} file (see
+\sref{sec:event-type-control_file}). In this file the user must
+specify the pointers to selected GMPEs as well as the weights for
+each model:
 \begin{center}
 \begin{math}
 %\label{fig:attn-sa-matrix}
@@ -932,11 +931,10 @@ w_{a,1} & w_{a,2} &  \hdots & w_{a,n} \\
 \end{array} \right],
 \end{math}
 \end{center}
-where the integers $\{P_i\}_{i=1}^n$ are pointers to the attenuation
-model (see \tref{tab:attn-flags}) and the real numbers
-$\{w_{a,i}\}_{i=1}^n$ are weights for the respective attenuation
-models. Note that the weights $w_i$ must either be all positive or
-all negative and
+where the $\{P_i\}_{i=1}^n$ are corresponding labels of selected
+GMPEs and the real numbers $\{w_{a,i}\}_{i=1}^n$ are weights for the
+respective attenuation models. Note that the weights $w_i$ must
+either be all positive or all negative and
 \begin{equation}
 \left|\sum_{i=1}^{n}w_{a,i}\right| = 1.
 \end{equation}
@@ -1072,12 +1070,9 @@ we recomend the no-collapse option.
 
 
 \caption{The application of spawning to a single synthetic
-earthquake $E_{ij}$;(a) the collapse of spawned samples for hazard
-(\typeparcaption{src}{\_eps}{\_switch}$=1$); (b) hazard spawning
-without collapse (\typeparcaption{src}{\_eps}{\_switch}$=2$); (c)
-the collapse of spawned samples for risk
-(\typeparcaption{src}{\_eps}{\_switch}$=1$); and (d) risk spawning
-without collapse (\typeparcaption{src}{\_eps}{\_switch}$=2$). The
+earthquake $E_{ij}$;(a) the collapse of spawned samples for hazard;
+(b) hazard spawning without collapse; (c) the collapse of spawned
+samples for risk; and (d) risk spawning without collapse. The
 illustrated procedure is repeated for $N_s$ events in the event
 catalogue and the techniques of \cref{ch:risk} used to assess the
 hazard or risk.} \label{fig:attn-treecollapse}
