@@ -61,78 +61,32 @@ $0.25g$. } \label{fig:regolith-newcexample-ampfactors}
 \end{figure}
 
 
-
-\section{The amplification factor input file}
-
-The amplification factors are saved in a file with a name of the
-form \typeparfile{<site\_loc>}{\_par}{\_ampfactors}{.mat} where
-\typepar{site}{\_}{loc} is a variable in \typeself{set}{da}{ta}.
-For example if \mbox{\typepar{site}{\_}{loc} = \typenewc} then the
-file is called \typeparfile{newc}{\_par}{\_ampfactors}{.mat}. The
-contents of the
-\typeparfile{<site\_loc>}{\_par}{\_ampfactors}{.mat} include 5
-`variable types' that are explained in \tref{tab:reg-datafile}.
-\aref{app:regolith-datafile-complete} lists the contents for
-\typeparfile{newc}{\_par}{\_ampfactors}{.mat} as used in the
-Newcastle and Lake Macquarie study \citep{dr_Dhu02b}.
-
-\begin{table}
-\caption{Summary of the variables in
-\typeparfilecaption{<site\_loc>}{\_par}{\_ampfactors}{.mat}. The
-\{1\}, \{2\} and \{3\} represent input text strings that are
-pointers to the site class, moment magnitude bin and bedrock PGA
-bin respectively, for both the amplification factors and their
-standard deviation. The
-\typeparfilecaption{<site\_loc>}{\_par}{\_ampfactors}{.mat} file
-usually contains multiple `copies' of
-\typevarcaption{}{}{ln\_site\{1\}\_rockpga\{2\}\_momag\{3\}} and
-\typevarcaption{}{}{stdln\_site\{1\}\_rockpga\{2\}\_momag\{3\}},
-whereas it should only contain a single `copy' of the other
-variables. All variables are row vectors. The superscript `$\ast$'
-shown with some variables refers to the fact that these variables
-have been `binned'.} \vspace{0.8em} \label{tab:reg-datafile}
-\begin{tabular}{l|p{0.57\textwidth}}
-\hline Variable & Description \\
-\hline
-\keyrowsep \typevar{}{}{amp\_period} & Fundamental periods at which the amplification factors (and their standard deviations) are defined. \\
-\keyrowsep \splitrowfunc{ln\_site\{1\}}{\_rockpga\{2\}\_momag\{3\}} & The mean of the logarithm of the amplification factors $\mu_{amp}(T_o,r_m^*,PGA^*)$(at the periods defined in \typevar{}{}{amp\_period}) for the site class \{1\}, bedrock PGA bin \{2\} and moment magnitude bin \{3\} \\
-\keyrowsep \typevar{}{}{momag\_bin} & Bin centroids of moment magnitude bins\\
-\keyrowsep \typevar{}{}{pga\_bin} & Bin centroids of bedrock PGA bins\\
-\keyrowsep \splitrowfunc{stdln\_site\{1\}}{\_rockpga\{2\}\_momag\{3\}} & The standard deviation of the logarithm of the amplification factors $\sigma_{amp}(T_o,r_m^*,PGA^*)$(at the periods defined in \typevar{}{}{amp\_period}) for the site class \{1\}, bedrock PGA bin \{2\} and moment magnitude bin \{3\} \\
-\hline
-\end{tabular}
-\end{table}
-
 \section{Implementation}
 
 As with the attenuation, the implementation of the amplification
-factors is conducted within \typefunc{do}{\_ana}{lysis} (for both
-hazard and risk assessments) in a two step process as follows:
+factors (for both hazard and risk assessments) has been done in a
+two step process as follows:
 \begin{enumerate}
 \item The preparation of the amplification factors
-(\typefunc{prep}{\_}{amps}) conducted before entering a loop over
-sites. \item Application of the amplification factors to compute
-$A_{S_a,soil}(T_o,r_m,R)$ at each site
-(\typefunc{do}{\_amp}{lification}) conducted within a loop over
-sites.
+conducted before entering a loop over sites. \item Application of
+the amplification factors to compute $A_{S_a,soil}(T_o,r_m,R)$ at
+each site conducted within a loop over sites.
 \end{enumerate}
 
-The preparation of amplification factors involves interpolating
-each to the periods defined in the \typeself{set}{da}{ta}
-parameter \typepar{per}{io}{ds} (see \sref{attn:implementation})
-and is conducted by the function \typefunc{prep}{\_}{amps}. The
-application of the amplification factors is carried out
-immediately after the evaluation of the attenuation model and is
-implemented within \typefunc{do}{\_amp}{lification}. The process
-is described for a specific site located within a known Site
-Class:
+The preparation of amplification factors involves interpolating each
+to the periods defined in the the EQRM control file parameter:
+\typeself{atten-periods} (see ~\sref{sec:application-EQRMcf}). The
+application of the amplification factors is carried out immediately
+after the evaluation of the attenuation model. The process is
+described for a specific site located within a known Site Class:
 \begin{enumerate}
 \item Bin all of the events in the event catalogue into the
 bedrock PGA and moment magnitude bins defined by the bin centroids
-in \typevar{}{}{pga\_bin} and \typevar{}{}{momag\_bin}
-respectively. Note that the end points of the 'central' bins are
-assumed to be half way between the bin centroids. The first and
-last bins extend to negative and positive infinity respectively.
+in \typevar{}{}{pga\_bins} and \typevar{}{}{moment\_magnitude\_bins}
+respectively (see ~\sref{sec:-appl-amplification}). Note that the
+end points of the 'central' bins are assumed to be half way between
+the bin centroids. The first and last bins extend to negative and
+positive infinity respectively.
 \item Use a nested loop over all PGA bins (upper loop) and moment
 magnitude bins (lower loop) and apply the amplification factor as
 follows:
@@ -163,64 +117,45 @@ to be taken if the PDF sampling technique is to be used for
 incorporating uncertainty at several levels  of computation (e.g.
 for attenuation and amplification) due to the need to spawn the
 event catalogue (see \sref{source:spawning}) at every level. Such
-iterative spawning may lead to a `blow-out' in the size of the
-event catalogue and hence the computation time. sCurrently only
-the random selection technique is available for use with the
-amplification factors in the EQRM application.
+iterative spawning may lead to a `blow-out' in the size of the event
+catalogue and hence the computation time. Currently only the random
+selection technique is available for use with the amplification
+factors in the EQRM application.
 
 As with the application of an attenuation model, the EQRM applies
-\typefunc{pga}{\_cut}{off} to $S_{a,soil}(T_o,r_m,R)$ after
-applying the amplification factor. This accounts for any
-unrealistically high selection of amplification factor. A
-secondary upper cut-off facility exists and involves the use of
-the \typeself{set}{da}{ta} parameter \typepar{Max}{Amp}{Factor}.
-The \typepar{Max}{Amp}{Factor} parameter is applied directly to
+$PGA_{cut}$ to $S_{a,soil}(T_o,r_m,R)$ after applying the
+amplification factor. This accounts for any unrealistically high
+selection of amplification factor. A secondary upper cut-off
+facility exists and involves the use of the
+\typepar{amp}{\_max}{\_factor}(see \sref{sec:application-EQRMcf}).
+The \typepar{amp}{\_max}{\_factor} parameter is applied directly to
 the amplification factor as follows:
 \begin{equation}
 \label{eq:regolith-maxampfactor}
-F_{new}(T_o,r_m^*,PGA^*) = \left \{ \begin{array}{ll} F_{old} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old}<$\typepar{Max}{Amp}{Factor}} \\
-\textrm{\typepar{Max}{Amp}{Factor}} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} \geq $ \typepar{Max}{Amp}{Factor}} \\
+F_{new}(T_o,r_m^*,PGA^*) = \left \{ \begin{array}{ll} F_{old} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old}<$\typepar{amp}{\_max}{\_factor}} \\
+\textrm{\typepar{amp}{\_max}{\_factor}} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} \geq $ \typepar{amp}{\_max}{\_factor}} \\
 \end{array} \right.
 \end{equation}
 or brevity the functional reference to $r_m^*$ and $PGA^*$ in
 $F_{new}$ and $F_{old}$ in
-\ereftwo{eq:regolith-maxampfactor}{eq:regolith-minampfactor}
-refers to the fact that these values represent the bin centroids
-of \typevar{mo}{mag}{\_bin} and \typevar{p}{ga}{\_bin}
+\ereftwo{eq:regolith-maxampfactor}{eq:regolith-minampfactor} refers
+to the fact that these values represent the bin centroids of
+\typevar{}{}{moment\_magnitude\_bins} and \typevar{p}{ga}{\_bins}
 respectively. In most simulations the secondary cutoff is not used
-since \typefunc{pga}{\_cut}{off} handles scaling for an upper
-bound. Ignoring \typepar{Max}{Amp}{Factor} is achieved by setting
-it to to a very high number (e.g.
-\typepar{Max}{Amp}{Factor}=10000). In contrast, there is another
-parameter in \typeself{set}{da}{ta} known as
-\typepar{Min}{Amp}{Factor} which is commonly utilised within the
-EQRM application. This parameter stops the selection of any
+since $PGA_{cut}$ handles scaling for an upper bound. Ignoring
+\typepar{amp}{\_max}{\_factor} is achieved by setting it to to a
+very high number (e.g. \typepar{amp}{\_max}{\_factor}=10000). In
+contrast, there is another parameter in the EQRM control file known
+as \typepar{amp}{\_min}{\_factor} which is commonly utilised within
+the EQRM application. This parameter stops the selection of any
 unrealistically low selections of the amplification factor. The
-\typepar{Min}{Amp}{Factor} is commonly set to around 0.6. It is
+\typepar{amp}{\_min}{\_factor} is commonly set to around 0.6. It is
 applied as follows:
 \begin{equation}
 \label{eq:regolith-minampfactor}
-F_{new}(T_o,r_m^*,PGA^*) = \left \{ \begin{array}{ll} F_{old} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} >$\typepar{Min}{Amp}{Factor}} \\
-\textrm{\typepar{Min}{Amp}{Factor}} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} \leq $ \typepar{Min}{Amp}{Factor}} \\
+F_{new}(T_o,r_m^*,PGA^*) = \left \{ \begin{array}{ll} F_{old} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} >$\typepar{amp}{\_min}{\_factor}} \\
+\textrm{\typepar{amp}{\_min}{\_factor}} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} \leq $ \typepar{amp}{\_min}{\_factor}} \\
 \end{array} \right.
 \end{equation}
 Note that a value of \mbox{$F<1$} leads to a de-amplification of
 the bedrock motion.
-
-
-\section{Key functions, flags and parameters}
-
-\begin{tabular}{llp{0.55\textwidth}}
-\hline
-\textbf{Name} & \textbf{Type} & \textbf{Description} \\
-\hline
-\keyrowsep \typefunc{do}{\_ana}{lysis} & Function & The main driving function for modelling earthquake hazard or risk. \\
-\keyrowsep \typefunc{prep}{\_}{amps} & Function & Loads and prepare the amplification factors. \\
-\keyrowsep \typefunc{do}{\_amp}{lification} & Function & Applies the amplification factors and compute \typevar{SA}{so}{il}. \\
-\keyrowsep \typefunc{pga}{\_cut}{off} & Function & Re-scales the $S_a$ such that PGA $\leq$ \typepar{pga}{cut}{off} \\
-\keyrowsep \typepar{per}{io}{ds} & Par & Periods at which to compute $S_a$. \\
-\keyrowsep \typepar{Max}{Amp}{Factor} & Par & Maximum cutoff for all amplification factors (seldom used). \\
-\keyrowsep \typepar{Min}{Amp}{Factor} & Par & Minimum cutoff for all amplification factors (usually 0.6). \\
-\keyrowsep \typepar{pga}{cut}{off} & Par & The cutoff (or maximum) PGA for use with \typefunc{pga}{\_cut}{off}. \\
-\hline
-\end{tabular}
