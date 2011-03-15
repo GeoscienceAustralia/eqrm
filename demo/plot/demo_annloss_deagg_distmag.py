@@ -23,7 +23,7 @@ Zlim = [0, 8]
 R_extend_flag=True
 
 title = 'demo_annloss_deagg_distmag.py'
-output_file = 'demo_annloss_deagg_distmag.png'
+output_file = 'demo_annloss_deagg_distmag.eps'
 grid = None
 show_graph = len(sys.argv) > 1
 annotate = None

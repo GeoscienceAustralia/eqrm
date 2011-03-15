@@ -23,7 +23,7 @@ site_tag = 'newc'
 bins = 10
 
 # plot histogram wil auto-decided ranges
-plot_file = 'demo_scenario_building_loss_percent.png'
+plot_file = 'demo_scenario_building_loss_percent.eps'
 savefile = None
 title = 'demo_scenario_building_loss_percent.py'
 xlabel = 'percent of building value'

@@ -25,7 +25,7 @@ site_tag = 'newc'
 bins = 10
 
 # plot histogram wil auto-decided ranges
-plotfile = 'demo_scenario_building_loss.png'
+plotfile = 'demo_scenario_building_loss.eps'
 savefile = None
 title = 'demo_scenario_building_loss.py'
 xlabel = 'Loss in million$'

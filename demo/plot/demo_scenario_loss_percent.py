@@ -24,7 +24,7 @@ input_dir = plot_output_scen_risk_path
 site_tag = 'newc'
 
 title = 'demo_scenario_loss_percent.py'
-plot_file = 'demo_scenario_loss_percent.png'
+plot_file = 'demo_scenario_loss_percent.eps'
 collapse_function = 'mean'
 savefile = None
 np_posn = 'nw'

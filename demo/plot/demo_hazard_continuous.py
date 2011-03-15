@@ -19,7 +19,7 @@ return_period = 7500
 period = 1.0
 
 title = 'demo_hazard_continuous.py'
-plot_file = 'demo_hazard_continuous.png'
+plot_file = 'demo_hazard_continuous.eps'
 save_file = None
 np_posn = 'nw'
 s_posn = 'se'

@@ -19,7 +19,7 @@ return_period = 7500
 period = 1.0
 
 title = 'demo_hazard.py'
-plot_file = 'demo_hazard.png'
+plot_file = 'demo_hazard.eps'
 save_file = None
 np_posn = 'nw'
 #np_posn = (151.35, -32.82)
