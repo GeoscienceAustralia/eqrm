@@ -20,7 +20,7 @@ soil_amp = False
 period = 1.0
 
 title = 'demo_motion.py'
-plot_file = 'demo_motion.png'
+plot_file = 'demo_motion.eps'
 save_file = None
 np_posn = 'nw'
 s_posn = 'se'

@@ -26,7 +26,7 @@ period = 1.0
 show_graph = len(sys.argv) > 1
 
 # plot histogram wil auto-decided ranges
-plot_file = 'demo_histogram.png'
+plot_file = 'demo_histogram.eps'
 title = 'demo_histogram.py'
 savefile = None
 plot_api.fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,

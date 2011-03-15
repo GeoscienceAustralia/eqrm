@@ -18,7 +18,7 @@ site_tag = 'newc'
 
 soil_amp = True
 title = 'demo_hazard_sites.py'
-plot_file = 'demo_hazard_sites.png'
+plot_file = 'demo_hazard_sites.eps'
 save_file = None
 # override X range to show how it is done
 xrange = 1.1

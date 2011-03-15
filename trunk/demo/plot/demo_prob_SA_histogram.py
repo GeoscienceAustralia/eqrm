@@ -21,7 +21,7 @@ return_period = 7500
 period = 1.0
 
 title = 'demo_prob_SA_histogram.py'
-plot_file = 'demo_prob_SA_histogram.png'
+plot_file = 'demo_prob_SA_histogram.eps'
 save_file = None
 show_graph = len(sys.argv) > 1
 

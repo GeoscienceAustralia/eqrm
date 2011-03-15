@@ -16,7 +16,7 @@ input_dir = Demo_Output_PlotProbRisk_Path
 site_tag = 'newc'
 
 title = 'demo_loss_exceedance.py'
-output_file = 'demo_loss_exceedance.png'
+output_file = 'demo_loss_exceedance.eps'
 grid = False
 show_graph = len(sys.argv) > 1
 annotate = None
