@@ -301,22 +301,19 @@ visualisation of how earthquake risk varies spatially. The
 individual plotting tool
 \typefunc{plot\_api.fig\_annloss\_deagg\_cells}{}{} can be used 
  to de-aggregate the risk by
-cells. [CHECK THIS Note that \typefunc{calc}{\_annloss}{\_deagg\_sub}
-produces a CSV file that can be plotted in GIS or some other
-environment.]
+cells. 
 \end{enumerate}
 
 \section{Earthquake scenario results}
 
 The output for an earthquake scenario loss simulation is 
 stored in the file
-\typepar{<output\_dir>}{}{} directory. 
+\typepar{<output\_dir>} directory. 
 \begin{figure}
 %\includegraphics{fig-risk-scen-hist}
 \includegraphics[width=1\textwidth]{demo_scenario_building_loss_percent}
 \caption{Histogram of loss estimates for a synthetic Newcastle
-1989 earthquake.[MAY HAVE TO CHANGE THE INPUT DATA USED SO THE CAPTION
-IS CORRECT, OR CHANGE THE CAPTION]} \label{fig:scenario-hist}
+1989 earthquake.} \label{fig:scenario-hist}
 \end{figure}
 The primary technique for visualising an EQRM scenario output is
 via a histogram such as that shown in \fref{fig:scenario-hist} for
@@ -326,8 +323,5 @@ realisations which predicted a loss value within the bars domain.
 Histograms such as \fref{fig:scenario-hist} can be produced using
 the individual plotting tool
 \typefunc{plot\_api.fig\_scenario\_building\_loss\_percentage}{}{}.
- [Note that
-\typefunc{calc\_scen}{\_loss}{\_stats} also produces basic
-statistics for the scenario realisations such as the mean and
-median. CHECK THIS]
+
 
