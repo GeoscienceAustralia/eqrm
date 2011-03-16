@@ -3,8 +3,8 @@
 
 The Earthquake Risk Model (EQRM) is capable of:
 \begin{enumerate}
-\item earthquake scenario ground motion modeling; 
-\item scenario loss forecasts; 
+\item earthquake scenario ground motion modeling;
+\item scenario loss forecasts;
 \item probabilistic seismic hazard analysis (PSHA); and
 \item  probabilistic seismic risk analysis (PSRA).
 \end{enumerate}
@@ -67,7 +67,7 @@ requirement for which depends on settings in the EQRM control file}
 example of an EQRM controlfile to undertake a PSHA.
 
 % Use a real file that is exected during distribution.
-% This will automatically keep this small section 
+% This will automatically keep this small section
 % of the manual up-to-date.
 %\lstinputlisting{xml_examples/EQRM_controlfile.py}
 \lstinputlisting{../../demo/setdata_ProbHaz.py}
@@ -102,7 +102,7 @@ Otherwise the file name is:\\
 \texttt{<site\_tag>\_}\texttt{zone\_source}\texttt{.xml}\\
 \\
 \hline
-\end{tabular} 
+\end{tabular}
 \end{center}
 
 The source zone file is used to describe one or more areal source
@@ -123,8 +123,8 @@ recurrence parameters. NOTE - the EQRM only supports moment magnitude
 
 \textbf{General zone inputs} (\texttt{zone})
 \begin{itemize}
-\item \texttt{area}: Area of the source zone in km$^2$ 
-\item \texttt{name}: Name for the source zone 
+\item \texttt{area}: Area of the source zone in km$^2$
+\item \texttt{name}: Name for the source zone
 \item \texttt{event\_type}: Pointer to the collection of inputs described in the
 event type controlfile.
 \end{itemize}
@@ -134,7 +134,7 @@ event type controlfile.
 
 \item \texttt{azimuth}: Center azimuth for randomly generated
   synthetic ruptures (degrees).
-  
+
 \item \texttt{delta\_azimuth}: Range over which randomly generated
   azimuths will be sampled. That is, the azimuth of all synthetic
   earthquake will be randomly drawn from a uniform distribution
@@ -142,7 +142,7 @@ event type controlfile.
 
 \item \texttt{dip}: Center dip for randomly generated synthetic
   ruptures (degrees).
-  
+
 \item \texttt{delta\_dip}: Range over which randomly generated dips will
 be sampled. That is, the dip of all synthetic earthquake will be
 randomly drawn from a uniform distribution between
@@ -155,7 +155,7 @@ randomly drawn from a uniform distribution between
 \item \texttt{depth\_bottom\_seismogenic}: Depth (km) to the bottom of
   the seismogenic zone in km.  No component of a synthetic rupture
   will be located below this value.
- 
+
 \item \texttt{boundary}: Boundary of the areal source zone as
 defined on the surface of the Earth in longitude (column 1) and
 latitude (column 2). The first and last points must be the same to
@@ -175,24 +175,24 @@ close the polygon.
 \item \texttt{distribution}: Distribution used to define the magnitude recurrence relations. Note that
 the EQRM current only supports a Bounded Gutenberg-Richter recurrence
 relationship for source zones (i.e.
-\typepar{bounded}{\_gutenberg}{\_richter}) 
+\typepar{bounded}{\_gutenberg}{\_richter})
 \item \texttt{recurrence\_min\_mag}: Minimum magnitude used to
-define the recurrence relationship 
+define the recurrence relationship
 \item \texttt{recurrence\_max\_mag}: Maximum magnitude used to
 define the recurrence relationship. Typically, this is the magnitude
-of the largest earthquake expected in the zone. 
+of the largest earthquake expected in the zone.
 \item \texttt{A\_min}: Expected number of earthquakes with magnitude \texttt{recurrence\_min\_mag}
 or higher in the source zone per year.
 \item \texttt{b}: Gutenberg-Richter b value for bounded Gutenberg-Richter recurrence
-relationship 
+relationship
 \item \texttt{generation\_min\_mag}: Minimum magnitude for synthetic
 earthquake generation. The EQRM will only generate synthetic
 earthquakes with magnitudes equal to or greater than
-\texttt{generation\_min\_mag}. 
+\texttt{generation\_min\_mag}.
 \item \texttt{number\_of\_mag\_sample\_bins}: Number of magnitude
 bins used to discretise the recurrence relationship in the magnitude
 range \texttt{generation\_min\_mag} to
-\texttt{recurrence\_max\_mag} 
+\texttt{recurrence\_max\_mag}
 \item \texttt{number\_of\_events}: Number of syntectic ruptures to
 be generated in the source zone.
 \end{itemize}
@@ -211,7 +211,7 @@ Otherwise the file name is:\\
 \texttt{<site\_tag>\_}\texttt{fault\_source}\texttt{.xml}\\
 \\
 \hline
-\end{tabular} 
+\end{tabular}
 \end{center}
 
 
@@ -227,17 +227,17 @@ relationship. The following grey box provides an example of a source
 fault file with the following source types:
 \begin{enumerate}
 \item \textit{crustal fault} with recurrence defined by a bounded Gutenberg-Richter
-relationship (\texttt{fault 1}), 
+relationship (\texttt{fault 1}),
 \item \textit{crustal fault} with recurrence defined by a combined bounded Gutenberg-Richter
 (for small earthquakes) and a characteristic recurrence for larger
-earthquakes (\texttt{fault 2}), 
+earthquakes (\texttt{fault 2}),
 \item a \textit{3D dipping volume} to represent intraslab earthquakes in the
 subducting slab (\texttt{intraslab 1}).
 \end{enumerate}
 Many of the parameters in the source fault file are identical to
 those described in \sref{sec:source-zone-file} and are not described
 separately here. A description of the new parameters is provided
-below. 
+below.
 
 %\lstinputlisting{xml_examples/source_model_fault_example.xml}
 \lstinputlisting{../../demo/input/newc_fault_source.xml}
@@ -246,7 +246,7 @@ below.
 \begin{itemize}
 \item \texttt{dip}: Dip of fault, defined as angle in degrees from
   horizontal.
-  
+
 \item \texttt{out\_of\_dip\_theta}: Out of plane dip, used for
   intraslab events. Angle between fault plane and out of dip rupture
   plane (degrees).
@@ -281,7 +281,7 @@ subducting slab).
 \end{itemize}
 
 \section{Event Type Control File}
-
+\label{sec:event-type-control_file}
 \begin{center}
 \begin{tabular}{|c|}
 \hline
@@ -337,7 +337,7 @@ The parameters enclosed within \texttt{<scaling} and \texttt{/>}
 \item \texttt{scaling\_fault\_type}: Fault mechanism used with the scaling rule.
 Allowable options are \texttt{normal}, \texttt{reverse},
 \texttt{strike\_slip} and \texttt{unspecified}. Typically,
-\typepar{scaling}{\_fault}{\_type} will be the same as the GMPE 
+\typepar{scaling}{\_fault}{\_type} will be the same as the GMPE
 \typepar{fault}{\_type}, however the EQRM does not enforce this.  \\
 \end{itemize}
 
@@ -413,7 +413,7 @@ The site file for hazard is a csv file containing a list of points at which the 
 \item \texttt{SITE\_CLASS}: Regolith site class. Typically, this is defined
 by a letter. Note that the value of this parameter must match with
 an amplification factor defined in the amplification file (see
-\sref{sec:-appl-amplification}) 
+\sref{sec:-appl-amplification})
 \item \texttt{VS30}: Average velocity in the top 30\,m (i.e. $V_{s30}$). This is used
 to incorporate regolith for GMPEs with a $V_{s30}$ term.
 \end{itemize}
@@ -428,7 +428,7 @@ to incorporate regolith for GMPEs with a $V_{s30}$ term.
 Filename: \texttt{sitedb\_<site\_tag><site\_db\_tag>.csv} \\
 \\
 \hline
-\end{tabular} 
+\end{tabular}
 \end{center}
 
 The site file for risk is a csv file representing a building
@@ -448,7 +448,7 @@ portfolio. It contains a list of points at which the risk (PSHA simulation)
   building type. See \sref{sec:grids-constructionclass}
     \tref{tab:v-dam-allbtypes}, \tref{tab:hazus-types}) for a full
     description of the types.
-  
+
 \item \texttt{STRUCTURE\_CATEGORY}: Type of structure. Currently ``texttt{BUILDING} `` only
 \item \texttt{HAZUS\_USAGE}: Index to HAZUS usage\index{building usgage!HAZUS} classification (\sref{sec:grids-usageclass})
 \item \texttt{SUBURB}: within which building is located
@@ -466,7 +466,7 @@ portfolio. It contains a list of points at which the risk (PSHA simulation)
 \item \texttt{FCB\_USAGE}: FCB usage type. See
   (\sref{sec:grids-usageclass})  for a list of the usage
   classification
-  % FCB\index{building usgage!FCB} this could be a link? 
+  % FCB\index{building usgage!FCB} this could be a link?
 \item \texttt{SITE\_CLASS}:Regolith site class. Typically, this is defined
 by a letter. Note that the value of this parameter must match with
 an amplification factor defined in the amplification file (see
@@ -809,7 +809,7 @@ the EQRM appropriately for their own application.
 Filename: \texttt{<site\_tag>\_par\_ampfactors.xml} \\
 \\
 \hline
-\end{tabular} 
+\end{tabular}
 \end{center}
 
 Local soil conditions (or regolith) are capable of amplifying
@@ -825,43 +825,43 @@ to the regolith surface using a transfer function (or amplification factor).
 An example of an input file containing amplification factors is provided in the grey box below.
 \lstinputlisting{xml_examples/java_par_ampfactors.xml}
 
-The amplification of seismic ground motion depends on the composition 
-of the regolith. The EQRM accounts for variation in regolith material by assigning 
-amplification factors to different site classes. The EQRM also recognises that 
+The amplification of seismic ground motion depends on the composition
+of the regolith. The EQRM accounts for variation in regolith material by assigning
+amplification factors to different site classes. The EQRM also recognises that
 amplification of seismic waves is a non-linear process. That is, the degree
-of amplification is a function of the level of ground motion. To account for 
-this non-linearity, the EQRM allows users to specify a number of amplification 
-factors which are grouped according to the level of bedrock ground motion (as 
+of amplification is a function of the level of ground motion. To account for
+this non-linearity, the EQRM allows users to specify a number of amplification
+factors which are grouped according to the level of bedrock ground motion (as
 measured by PGA) and the size of the event (as measure by $M_w$).
 
-The amplification factor file must specify the following parameters at the beginning: 
-\begin{itemize} 
+The amplification factor file must specify the following parameters at the beginning:
+\begin{itemize}
 \item \texttt{moment\_magnitude\_bins}: centroids of the moment magnitude $M_w$ bins
- for which amplification factors are defined. 
+ for which amplification factors are defined.
 \item \texttt{pga\_bins}: centroids of the PGA bins for which amplification factors are defined.
-\item \texttt{site\_classes}: List of site classes for which amplification factors are defined. 
-The EQRM assumes that each site class is defined by a single letter (e.g. \texttt{site\_class} = B). 
-\item \texttt{periods}: RSA periods at which the amplification factors are defined. Note that 
-these periods need not be the same as those in \typepar{atten}{\_}{periods} from the 
-EQRM control file. The EQRM will interpolate as required. 
-\end{itemize} 
+\item \texttt{site\_classes}: List of site classes for which amplification factors are defined.
+The EQRM assumes that each site class is defined by a single letter (e.g. \texttt{site\_class} = B).
+\item \texttt{periods}: RSA periods at which the amplification factors are defined. Note that
+these periods need not be the same as those in \typepar{atten}{\_}{periods} from the
+EQRM control file. The EQRM will interpolate as required.
+\end{itemize}
 
-The xml amplification factor file is then composed of a sequence of blocks, each of which 
+The xml amplification factor file is then composed of a sequence of blocks, each of which
 defines:
-\begin{itemize} 
+\begin{itemize}
 \item the \texttt{site\_class} using the parameter \texttt{class}.
-\item the \texttt{moment\_magnitude} bin centroid using the parameter \texttt{mag\_bin}. 
-\item the \texttt{pga} bin centroid using the parameter \texttt{pga\_bin}. 
+\item the \texttt{moment\_magnitude} bin centroid using the parameter \texttt{mag\_bin}.
+\item the \texttt{pga} bin centroid using the parameter \texttt{pga\_bin}.
 \end{itemize}
 
 Finally the inside of each block specifies:
 \begin{itemize}
-\item \texttt{log\_amplification}: the logarithm of the median amplification factor defined at each 
+\item \texttt{log\_amplification}: the logarithm of the median amplification factor defined at each
 of the RSA periods in \texttt{periods}.
 \item \texttt{log\_std}: the standard deviation of the amplification factor. The EQRM assumes
- that the amplification factor is log-normally 
+ that the amplification factor is log-normally
 distributed when using this
-standard deviation. The standard deviation can be set to an arbitrarily small 
-number such as 0.01 (as shown in grey shaded box above) when not known. Use of this standard deviation is controlled by 
-the EQRM control file parameter \texttt{amp\_variability\_method} which can also be set to \texttt{None}. 
+standard deviation. The standard deviation can be set to an arbitrarily small
+number such as 0.01 (as shown in grey shaded box above) when not known. Use of this standard deviation is controlled by
+the EQRM control file parameter \texttt{amp\_variability\_method} which can also be set to \texttt{None}.
 \end{itemize}
