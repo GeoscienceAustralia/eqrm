@@ -27,6 +27,8 @@
 \usepackage{lscape}
 \usepackage{multirow}
 %\usepackage{bbding}
+%\usepackage{epstopdf}
+
 % set up some environments
 \definecolor{light-gray}{gray}{0.8}
 \lstset{basicstyle=\scriptsize}
@@ -131,7 +133,7 @@ reviews lead to substantial improvements to this manual.
 \include{eqrmtech-intro}
 \include{eqrmtech-hv-application}
 \include{eqrmtech-h-source}
-%\include{eqrmtech-h-attn}
+\include{eqrmtech-h-attn}
 %\include{eqrmtech-h-regolith}
 \include{eqrmtech-v-damage}
 \include{eqrmtech-v-losses}
@@ -141,8 +143,8 @@ reviews lead to substantial improvements to this manual.
 \include{eqrmtech-apps}
 
 \small
-\bibliography{EQRM_refs}
-
+\bibliography{drrefs,garefs,EQRM_refs}
+%\bibliography{eqrmtech.bbl}
 \printindex
 
 \end{document}
