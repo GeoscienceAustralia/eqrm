@@ -22,9 +22,9 @@ is_scenario = False
 max_width = 15
 site_tag = "newc" 
 site_db_tag = "" 
-return_periods = [10,25,50,100,200,500,1000,2000,5000,7500,10000]
+return_periods = [500]
 input_dir = r".\input/" 
-output_dir = r".\output\plot_prob_haz/" 
+output_dir = r".\output\plot_prob_haz2/" 
 use_site_indexes = False
 fault_source_tag = "no_fault" 
 
@@ -33,13 +33,14 @@ fault_source_tag = "no_fault"
 # Probabilistic input
 prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [5000, 1000, 1000, 3000, 1000, 1000]
+prob_number_of_events_in_zones = [5, 1, 1, 3, 1, 1]
 
 # Attenuation
 atten_models = ['Sadigh_97']
 atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 2
-atten_periods = [0.0, 0.01, 0.03, 0.05, 0.1, 0.2, 0.30303000000000002, 0.5, 0.75, 1.0]
+atten_periods = [0.0, 0.3]
 atten_threshold_distance = 400
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False

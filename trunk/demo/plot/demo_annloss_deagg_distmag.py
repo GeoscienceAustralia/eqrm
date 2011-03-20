@@ -22,8 +22,8 @@ range_bins = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45,
 Zlim = [0, 8]
 R_extend_flag=True
 
-title = 'demo_annloss_deagg_distmag.py'
-output_file = 'demo_annloss_deagg_distmag.eps'
+title = '' #'demo_annloss_deagg_distmag.py'
+output_file = 'demo_annloss_deagg_distmag.pdf'
 grid = None
 show_graph = len(sys.argv) > 1
 annotate = None

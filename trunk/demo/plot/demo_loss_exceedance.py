@@ -15,8 +15,8 @@ from eqrm_code.eqrm_filesystem import Demo_Output_PlotProbRisk_Path
 input_dir = Demo_Output_PlotProbRisk_Path
 site_tag = 'newc'
 
-title = 'demo_loss_exceedance.py'
-output_file = 'demo_loss_exceedance.eps'
+title = '' #'demo_loss_exceedance.py'
+output_file = 'demo_loss_exceedance.pdf'
 grid = False
 show_graph = len(sys.argv) > 1
 annotate = None
