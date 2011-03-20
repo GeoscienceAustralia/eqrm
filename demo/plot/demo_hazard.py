@@ -6,26 +6,29 @@ Demonstration of using the plot_hazard function.
 Copyright 2010 by Geoscience Australia
 
 """
-
+import os
 from eqrm_code.plotting import plot_api
 from eqrm_code.eqrm_filesystem import Demo_Output_PlotProbHaz_Path
 
 
 input_dir = Demo_Output_PlotProbHaz_Path
+input_dir = os.path.join('.','plot_data','output','plot_prob_haz3_low_events')
+input_dir = os.path.join('.','plot_data','output','plot_prob_haz2')
+input_dir = os.path.join('.','plot_data','output','plot_prob_haz4')
 site_tag = 'newc'
 
 soil_amp = False
-return_period = 7500
+return_period = 500
 period = 1.0
 
 title = 'demo_hazard.py'
-plot_file = 'demo_hazard.eps'
+plot_file = 'demo_hazard.pdf'
 save_file = None
 np_posn = 'nw'
 #np_posn = (151.35, -32.82)
 s_posn = 'se'
 #s_posn = (151.76, -33.175, 5)
-cb_steps = None
+cb_steps = [0.1,0.15,0.2,0.25]
 colourmap = 'hazmap'
 cb_label = 'Acceleration (g)'
 annotate = []

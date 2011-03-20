@@ -11,19 +11,19 @@ def create_demo_data():
     """
     run_scenarios(eqrm_filesystem.demo_plot_scenarios)
 
-def execute_demos():
-    files = os.listdir('.')
-    extension = 'py'
-    demo_files = [x for x in files if x.endswith('py')]
-    demo_files = [x for x in demo_files if 0 == string.find(x,'demo_')]
-    #demo_files = ['demo_histogram.py']
-    #demo_files.remove()
+def execute_demos(demo_files=None):
+    if demo_files is None:
+        files = os.listdir('.')
+        extension = 'py'
+        demo_files = [x for x in files if x.endswith('py')]
+        demo_files = [x for x in demo_files if 0 == string.find(x,'demo_')]
 
     for file in demo_files:
         command = 'python ' + file
         print "Doing ", command
         os.system(command)
 
+        
 #-------------------------------------------------------------
         
 if __name__ == "__main__":

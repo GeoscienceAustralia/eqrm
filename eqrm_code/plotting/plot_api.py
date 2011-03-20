@@ -253,6 +253,7 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
 
     # Load in the structure loss and structure value
     results = om.load_ecloss_and_sites(input_dir, site_tag)
+    
     # change dimensions(site, event) to dimensions(event, site)
     total_building_loss = scipy.transpose(results[0])
     total_building_value = results[1]
@@ -260,10 +261,6 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
     lat = results[3]
 
     # Load in the event activity
-######
-# NOTE: load_event_set_subset() changed to obsolete_load_event_set_subset()
-######
-    #out_dict = om.load_event_set_subset(input_dir, site_tag)
     out_dict = om.load_event_set(input_dir, site_tag)
     event_activity = out_dict['event_activity']
 

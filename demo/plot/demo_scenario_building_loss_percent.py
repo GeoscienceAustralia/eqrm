@@ -20,16 +20,17 @@ from eqrm_code.eqrm_filesystem import Demo_Output_ProbRisk_Path, \
 
 input_dir = Demo_Output_PlotProbRisk_Path
 site_tag = 'newc'
-bins = 10
+bins = 30
 
 # plot histogram wil auto-decided ranges
-plot_file = 'demo_scenario_building_loss_percent.eps'
+plot_file = 'demo_scenario_building_loss_percent.pdf'
 savefile = None
 title = 'demo_scenario_building_loss_percent.py'
-xlabel = 'percent of building value'
+title = ''
+xlabel = 'percent of building value (including contents)'
 ylabel = 'frequency'
-xrange = 50
-yrange = 1300
+xrange = 10
+yrange = 1000
 show_graph = len(sys.argv) > 1
 
 
