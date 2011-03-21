@@ -12,7 +12,6 @@ from eqrm_code.eqrm_filesystem import Demo_Output_PlotProbHaz_Path
 
 
 input_dir = Demo_Output_PlotProbHaz_Path
-input_dir = os.path.join('.','plot_data','output','plot_prob_haz3_low_events')
 input_dir = os.path.join('.','plot_data','output','plot_prob_haz2')
 site_tag = 'newc'
 
