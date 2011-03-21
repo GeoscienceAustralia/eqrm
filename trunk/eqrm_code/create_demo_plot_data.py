@@ -41,7 +41,7 @@ def demo_run(verbose=True, plot_dir=eqrm_filesystem.demo_plot_path,
     
 def run_scenarios(dir, file_start='plot_', extension='.py'):
     """
-    Run all of the EQRM control files in a directory.
+    Run all of the python files starting with [file_start] in a directory,.
     """
     
     # Make the current dir the dir this file is in.
