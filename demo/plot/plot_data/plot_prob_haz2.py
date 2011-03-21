@@ -21,10 +21,10 @@ run_type = "hazard"
 is_scenario = False
 max_width = 15
 site_tag = "newc" 
-site_db_tag = "" 
+site_db_tag = "work" 
 return_periods = [500]
-input_dir = r".\input/" 
-output_dir = r".\output\plot_prob_haz/" 
+input_dir = r".\rec_extent_input/" 
+output_dir = r".\output\plot_prob_haz2/" 
 use_site_indexes = False
 fault_source_tag = "no_fault" 
 
