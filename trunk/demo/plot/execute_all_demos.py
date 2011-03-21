@@ -7,7 +7,6 @@ from eqrm_code import eqrm_filesystem
 def create_demo_data():
     """
     Create the demo data if it is not already there.
-    Only checks one directory to see if the plot demo files have been executed.
     """
     run_scenarios(eqrm_filesystem.demo_plot_scenarios)
 
