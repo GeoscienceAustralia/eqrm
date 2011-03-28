@@ -21,8 +21,9 @@ the seismicity in the region. Typically the  model of seismicity comes
  from an interpretation of historical earthquakes,
  geology and neotectonics. The current version of the EQRM application requires a source model
 that consists of a set of areal source zones (defined by a polygon) with associated
-Gutenberg-Richter recurrence relationships and the option of including fault sources (defined by a plane) with associated 
-Gutenberg-Richter or characteristic earthquake recurrence relationships \citet{eqrm_Schwartz84}. 
+Gutenberg-Richter recurrence relationships and the option of including fault sources. Fault sources are defined by a plane
+and can use either a bounded Gutenberg-Richter \citep{dr_Kramer96a} or characteristic earthquake model \citep{eqrm_Schwartz84} 
+to describe the earthquake recurrence relationships. 
 
 \emph{Areal source zones} typically capture the background seismicity in an area and are decribed by the acitivty rate within
 each source zone through its Gutenberg-Richter \emph{a} and \emph{b} values. In event-based PSHA calculations, such as \typeself{E}{QR}{M},
@@ -35,11 +36,12 @@ In addition, a novel technique has been developed to generate synthetic ruptures
 features such as the intraplate environment of a subducting slab. Such events are often referred to as intraslab earthquakes and have been known
 to generate larger and devastating earthquakes (e.g. 30 September 2009 Padang earthquake in Indonesia). \\
 
-This chapter describes the process of creating an earthquake catalogue for probabilistic seismic hazard 
-analysis and for defining an individual scenario event. The chapter is organised as follows. First the 
-method of generating realistic ruptures in source zones and fault zones is discussed in Section \label{sec:source-EQgeom}. Second, the approach for 
-determining recurrence rates is presented in Section \label{sec:source-EQrec}. Lastly, Section \label{sec:source-scen} 
-describes scenario event generation.
+This chapter describes the process of creating a synthetic earthquake catalogue for probabilistic seismic hazard 
+analysis and for defining an individual scenario event. The chapter is organised as follows. First, the concept of a synthetic earhquake
+catalogue is discussed, then the approach for 
+determining earthquake magnitudes and recurrence rates is presented in Section \label{sec:magnitude_selection}. This is followed by a
+description of the method for generating realistic synthetic ruptures in source zones and on fault zones in Section \label{sec:areal_gen} and 
+\label{sec:fault_gen}. Lastly, Section \label{sec:source-scen} describes the approach for scenario event generation.
 
 \section{Creating an earthquake catalogue for probabilistic seismic hazard analysis}% a probabilistic seismic hazard analysis}
 \label{sec:source-EQcat}
@@ -169,7 +171,7 @@ fault\index{virtual fault} is the mechanism by which the
 of each rupture. The depth to the top of a virtual
 fault\index{virtual fault} is defined as the depth to the
 seismogenic region $f_z$ (see
-\tref{tab:site-loc-par-sourcezones}). Other geometrical parameters
+\tref{tab:parameters}). Other geometrical parameters
 of virtual fault\index{virtual fault}s include the width $f_w$ and
 length $f_l$. 
 
@@ -274,7 +276,7 @@ A_{min}\frac{e^{-\beta(m-m_{min})}-e^{-\beta(m_{max}-m_{min})}}{1-e^{-\beta(m_{m
 
 \subsection{Activity rate for faults with bounded Gutenberg Richter model}
 \label{sec:rv_flt_GR}
-On the basis of equation \ref{eq:amin_gr},  \citet{eqrm_Youngs85} developed a relationship between fault slip 
+On the basis of equation \ref{eq:amin_gr}, \citet{eqrm_Youngs85} developed a relationship between fault slip 
 rate and earthquake recurrence through the use of the total seismic moment rate along a fault ($M_o^T$)which can be found from:
 
 \begin{equation} \label{eq:mot}
@@ -297,15 +299,15 @@ empirical observations by:
 M_o = 10^{cm+d}
 \end{equation}
 
-where $c=1.5$ and $d=16.1$ from Hanks and Kanamori \citet{eqrm_Hanks1979}. Youngs and Coppersmith \citet{eqrm_Youngs1985} then showed that seismic 
+where $c=1.5$ and $d=16.1$ from \citet{eqrm_Hanks1979}. \citet{eqrm_Youngs1985} then showed that seismic 
 moment rate can be linked to the earthquake recurrence rate by:
 
 \begin{equation} \label{eq:mot_int}
 M_o^T = \int_{m_{min}}^{m_{max}} \; f(m) \; M_o(m) \; dm
 \end{equation}
 
-where $f(m)$ is the probability density function (PDF) of the earthquake recurrence rate from equation \ref{eq:pdf_exp} and figure \ref{fig:pdf}. 
-Youngs and Coppersmith show that by using equations \ref{eq:pdf_exp}, \ref{eq:mot} and \ref{eq:mo} we can rewrite equation \ref{eq:mot_int} as:
+where $f(m)$ is the probability density function (PDF) of the earthquake recurrence rate from equation \ref{eq:f_m} and figure \ref{fig:pdf}. 
+\citet{eqrm_Youngs1985} show that by using equations \ref{eq:mot}, \ref{eq:mo} and \ref{eq:f_m}, we can rewrite equation \ref{eq:mot_int} as:
 
 \begin{equation} \label{eq:lam_exp1}
 \mu f_A S= \frac{ b \lambda _{m_{min}} M_o^{max} e^{- \beta (m_{max} - m_{min} )} }  { (c - b) (1-e^{-\beta (m_{max} - m_{min}) })  }
@@ -318,8 +320,9 @@ to find the activity rate above the minimum magnitude ($\lambda m_0$) :
 \lambda _{m_{min}} = \frac{ \mu f_A S (c - b) (1-e^{-\beta (m_{max} - m_{min}) }) } { M_o^{max}  e^{- \beta (m_{max} - m_{min} )} }
 \end{equation}
 
-In practical applications, the $b$-value can be obtained from historical seismicity in a box bounding the fault \cite{eqrm_Schwartz1984,eqrm_Youngs1985} or if there is 
-insufficient historical records near the fault, then it can be approximated by the $b$-value of the source zone that the fault lies within. 
+In practical applications, the $b$-value can be obtained from historical seismicity in a box bounding the 
+fault \citep{eqrm_Schwartz84,eqrm_Youngs85} or if there is insufficient historical records near the fault, 
+then it can be approximated by the $b$-value of the source zone that the fault lies within. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Activity rate for faults with bounded Characteristic Earthquake model} 
@@ -352,7 +355,7 @@ and using the results from equations \ref{eq:lam_0} and \ref{eq:lam_c} we can fi
 
 \begin{figure}[htp]
 \centerline{\includegraphics[width=12cm]{fig-hsource-pdf_ch}}
-\caption{The magnitude-frequency relationship for the bounded G-R exponential model (equation \ref{eq:pdf_exp}) and the characteristic earthquake model (equation \ref{eq:pdf_ch}).}
+\caption{The magnitude-frequency relationship for the bounded G-R exponential model (equation \ref{eq:f_m}) and the characteristic earthquake model (equation \ref{eq:pdf_ch}).}
 \label{fig:pdf}
 \end{figure}
 
@@ -367,7 +370,7 @@ P_{GR}(r_m^*-\Delta<R_m<r_m^*+\Delta) =
 
 where
 
-\begin{equation}
+\begin{equation} \label{eq:f_m}
 f_M(r_m^*) = \frac{\beta
 e^{-\beta(r_m^*-m_{min})}}{1-e^{-\beta(m_{max}-m_{min})}},
 \end{equation}
@@ -485,7 +488,8 @@ The width and length of the rupture and position of the rupture
 centroid are computed using empirical
 rules based on the moment magnitude, $r_m$ of the event . In the current version of the EQRM, three scaling 
 rules are available for use; the \citet{eqrm_Wells94} emperical relationships, a modified version
-of these rules presented by Mendez, 2002 ([$\textit{pers. comm.}$]), and scaling laws for stable continental regions developed by \citet{eqrm_Leonard10}.
+of these rules presented by Mendez, 2002 ([$\textit{pers. comm.}$]), and scaling laws for stable continental regions developed 
+by \citet{eqrm_Leonard10}.
 
 The location of the rupture plane
 is constrained to lie within a virtual fault (Figure )
@@ -495,7 +499,7 @@ table, its length $f_l$, its width
 $f_w$ and its dip $r_{dip}$. Note that by default the dip of the
  rupture plane is defined to be the dip of the virtual fault. 
 
-\subsubsection{Wells and Coppersmith (1994) Scaling Laws}
+\subsubsection{\citep{eqrm_Wells94} Scaling Laws}
 
 Different scaling laws are used depending on the fault type specified by the user. First the rupture area ($r_A$) is calculated:
 
@@ -537,14 +541,14 @@ r_l = \mathbf{min}\left\{\frac{r_A}{r_w}, f_l\right\} .
 \end{equation}
 
 
-\subsubsection{Modified Wells and Coppersmith (1994) Scaling Laws}
+\subsubsection{Modified \citep{eqrm_Wells94} Scaling Laws}
 
 Firstly, the area of the rupture plane $r_A$ is defined as
 \begin{equation}
 r_A = 10^{r_m - 4.02}
 \end{equation}
 which represents a subtle change from that defined by
-\citet*{dr_Wells94a}. Empirical relationships for the width $r_w$
+\citep{eqrm_Wells94}. Empirical relationships for the width $r_w$
 and length $r_l$ of the rupture plane were defined by Mendez (2002
 [\textit{pers. comm.}]). The width is defined in a two step
 process as follows
@@ -618,8 +622,7 @@ minimum and maximum longitude of the source zone itself.
 % \end{figure}
 
 The rupture centroid of each event is then randomly placed within the box 
-using a discrete uniform probability density function
-(\fref{fig:source-trace-starts}b). The individual event is the checked to identify whether 
+using a discrete uniform probability density function. The individual event is then checked to identify whether 
 it falls within the source polygon or not. Events that fall within the source polygon 
 are kept and those that lie outside it are discarded. This process continues until the number of events 
 defined by the user for the source zone is reached.
@@ -630,13 +633,13 @@ length and azimuth of the rupture trace are already known (see
 \sref{sec:dim-rupture} and \sref{sec:az-dip-rupture} respectively
 for a description of how these are computed). It is then a trivial
 process to compute the start and end of the rupture trace
-$(r_s^{lat},r_s^{lon} and r_e^{lat},r_e^{lon})$. It is important to note that the \typeself{E}{QR}{M} will allow the 
+$(r_s^{lat},r_s^{lon}$ and $r_e^{lat},r_e^{lon})$. It is important to note that the \typeself{E}{QR}{M} will allow the 
 start or end points of the rupture trace to lie outside of the source polygon 
 providing the rupture centroid is located within the polygon. Therefore the source zone polygon 
 is only used to constrain the rupture centroid ($r_c^{lat},r_c^{lon}$).
 
 The next step involves determining the rupture centroid location.
-Recall from \sref{sec:event-catalogue} that the rupture centroid
+Recall from \sref{sec:source-EQcat} that the rupture centroid
 $(r_x,r_y,r_z)$ is defined in terms of a local coordinate system.
 The depth of the rupture centroid is determined in a two step
 process as follows:
@@ -792,7 +795,7 @@ polygon vertices could be listed in the input file.
 \subsection{Dimensions of the rupture plane}
 \label{sec:rup_dimn}
 
-The dimensions of the rupture plane are computed using the Wells and Coppersmith, 1994 scaling laws. 
+The dimensions of the rupture plane are computed using the \citet{eqrm_Wells94} scaling laws. 
 
 \begin{equation} \label{ra}
 r_A = 
@@ -804,7 +807,7 @@ r_A =
 \end{cases}
 \end{equation}
 
-Where $r_m$ is the moment magnitude of the rupture event determined in section \ref{ch:rec}. If the rupture area ($r_A$) is greater than the fault area ($f_A$) 
+Where $r_m$ is the moment magnitude of the rupture event determined in section \ref{sec:magnitude_selection}. If the rupture area ($r_A$) is greater than the fault area ($f_A$) 
 we force the rupture area to equal the fault area while still keeping the same magnitude. This has a non-trivial influence on the ground motion predictions.  
 This is because we keep the original magnitude but the fault dimensions will be smaller than that predicted for the defined magnitude. Effectively this 
 amounts to an event with larger slip over a smaller area
@@ -812,7 +815,7 @@ than suggested by the scaling laws (equation \ref{ra}). The onus is on the user 
 the maximum magnitude assigned to the fault. In practice most users will use the fault dimensions to calculate the maximum magnitude
 when creating the EQRM input file. \\
 
-We then calculate the rupture width ($r_w$) which is solved using the empirical relationships developed by Wells and Coppersmith \cite{eqrm_Wells94}  
+We then calculate the rupture width ($r_w$) which is solved using the empirical relationships developed by \citet{eqrm_Wells94}  
 but forces the rupture width ($r_w$) to be less than or equal to the fault width ($f_w$). Effectively this restriction stops the rupture from extending 
 outside the seismogenic zone defined by $f_z^{top}$ to ($f_z^{bot}$. The calculation of the rupture width is a two stage process:
 
@@ -878,7 +881,7 @@ calculated using the rupture length and azimuth of the fault (\ref{fig:traces}) 
 \label{fig:traces}
 \end{figure}
 
-A similar process to equation \ref{ds} is followed to determine the depth of the rupture centroid (\ref{fig:rzrange}). 
+A similar process to equation \ref{eq:ds} is followed to determine the depth of the rupture centroid (figure \ref{fig:rzrange}). 
 
 \begin{figure}[htp]
 \centerline{\includegraphics[width=12cm]
@@ -921,7 +924,7 @@ Where the rupture centroid location in local coordinates ($r_x$, $r_y$) can be c
 
 The concept of creating realistic ruptures that represent events in a subducting slab is achieved by considering these events as 
 out of plane ruptures. The subducting slab is defined as a 3D plane from which rupture planes extend out, at angles defined by
-the user (FIGURE PLOT). For this functionality an out of dip value must be defined ($\delta_\theta$). 
+the user (figure \ref{fig:intraslabGeom}). For this functionality an out of dip value must be defined ($\delta_\theta$). 
 This parameter defines the angle between the dipping fault and the rupture plane (figure \ref{fig:intraslabGeom}). If the rupture 
 plane is parallel to the fault plane $\delta_\theta$ will be zero. If the rupture plane is it an angle to the dipping plane then it 
 will be non-zero. When handling a non-zero $\delta_\theta$ we also need to consider another parameter, $\Delta_\theta$, which 
@@ -978,8 +981,9 @@ S_w							& \quad \mbox{if $\omega$ $=$ 90} \\
 \label{fig:deltaeq}
 \end{figure}
 
-Equations \ref{ra} and \ref{rw} are used to calculate the rupture area ($r_A$) and rupture width ($r_w^{WC}$) from the Wells and Coppersmith, 1994 scaling laws. But for out of plane ruptures 
-the rupture width ($r_w$) must be limited, not to the fault width as is the case of on plane ruptures, but to not extend beyond the slab boundary. Therefore a slightly modified version of 
+Equations \ref{ra} and \ref{rw} are used to calculate the rupture area ($r_A$) and rupture width ($r_w^{WC}$) from the \citep{eqrm_Wells94} 
+scaling laws. But for out of plane ruptures the rupture width ($r_w$) must be limited, not to the fault width as is the case 
+of on plane ruptures, but to not extend beyond the slab boundary. Therefore a slightly modified version of 
 equation \ref{eq:rw} is used to solve for the rupture width:
 
 \begin{equation} \label{rw090}
@@ -992,11 +996,10 @@ Now the rupture length ($r_l$) can be found, making sure it does not extend beyo
 r_l = \mathbf{min}\left\{\frac{r_A}{r_w}, f_l\right\}
 \end{equation}
 
-Equation \ref{ds} is used to calculate $D_s$, the distance (km) along the fault trace for the start of rupture trace and equations \ref{eq:newrs} and \ref{eq:newre} are used to find the position 
-of the start and end of the rupture trace. Note that we use new notation to describe the location of the start and end of the rupture trace along the 
+Equation \ref{eq:ds} is used to calculate $D_s$, the distance (km) along the fault trace for the start of rupture trace. Then the the position 
+of the start and end of the rupture trace can be found. Note that we use new notation to describe the location of the start and end of the rupture trace along the 
 fault trace ($\hat{r}_s^{lon}$, $\hat{r}_s^{lat}$, $\hat{r}_e^{lon}$, $\hat{r}_e^{lat}$) this is because following this step the new location of the rupture 
 trace ($r_s^{lon}$, $r_s^{lat}$ and $r_e^{lon}$, $r_e^{lat}$) will be calculated, which will not be located along the original fault trace. 
-
 
 
 Next the rupture centroid ($r_z$) depth range ($r_z^{min}$ to $r_z^{max}$) is defined , using a similar approach to that of equation \ref{drange}. This ensures 
@@ -1010,13 +1013,17 @@ r_z^{max} & = f_z^{bot} - 0.5r_w  \times sin(r_\theta  \times \mbox{rad})
 \end{align}
 \end{subequations}
 
-Using equation \ref{eq:rand} we can now randomly assign the rupture centroid depth using a uniform distribution between $r_z^{min}$ and $r_z^{max}$ using the \texttt{numpy} package in \texttt{python}:
+Using equation \ref{eq:rand} we can now randomly assign the rupture centroid depth using a uniform distribution 
+between $r_z^{min}$ and $r_z^{max}$:
+
 \begin{equation}
 r_z = ( r_z^{max}-r_z^{min} ) \times  \mathtt{X} +   r_z^{min}
 \end{equation}
 
-where $\mathtt{X}$ is a random variable from 0$\rightarrow$1. The rupture trace is projected to the surface to obtain the surface trace, and then to solve for the the rupture centroid. 
+where $\mathtt{X}$ is a random variable from 0$\rightarrow$1. The rupture trace is projected to the surface to obtain the 
+surface trace, and then to solve for the the rupture centroid. 
 We begin by finding the location of the rupture centroid referenced to the start position of the original fault plane:
+
 \begin{equation}\label{eq:ry}
 \hat{r}_y = r_z  \frac{cos(f_\theta  \times rad)}{sin(f_\theta \times rad)}
 \end{equation}
@@ -1028,7 +1035,7 @@ and then:
 
 Now the start and end position of the surface trace for the rupture plane can be calculated. This is done by first 
 finding the location referenced to the start location of the rupture ($r_s^{lon}$, $r_s^{lat}$) located along the fault 
-plane (equations \ref{eq:newrs} and \ref{eq:newre}) then converting this to latitude and longitude.
+plane then converting the local coordinates to latitude and longitude.
 
 \begin{equation}\label{eq:rsx}
 \hat{r}_s^{x} = 0
@@ -1057,7 +1064,7 @@ All that remains is to redefine the location of the rupture centroid in local x 
 r_x = 0.5 r_l
 \end{equation}
 
-\begin{equation}
+\begin{equation} \label{eq:ry2}
 r_y = r_z  \frac{cos(r_\theta \times rad)}{sin(r_\theta \times rad)}
 \end{equation}
 
@@ -1104,11 +1111,11 @@ modify to add instead of subtract $r_y$ to the right handside of the equation:
 \end{equation}
 
 And now the method in section \ref{sec:0to90} can again be followed from equations \ref{eq:rex} to \ref{eq:rey}. 
-Again, for equations \ref{eq:rsll} and \ref{eq:rell} the coordinate system must be transfored so the rupture start and end locations are swapped (Figure \ref{fig:gt180}).
+Again, the coordinate system must be transfored so the rupture start and end locations are swapped (Figure \ref{fig:gt180}).
 
 Now the location of the rupture centroid is redefined in local x and y coordinates relative to the new 
 origin ($r_s^{lon}$,$ r_s^{lat}$) of the new local coordinate system. The longitude and 
-latitude of this point is then found using equations \ref{eq:rx} to \ref{eq:rcll}.
+latitude of this point is then found using equations \ref{eq:rx} to \ref{eq:ry2}.
 
 %%%%%
 \subsubsection{Case if  $180 <  r_\theta \leq f_\theta + \omega$} \label{sec:180to270}
@@ -1151,7 +1158,7 @@ trace can be found from:
 \hat{r}_e^y = \hat{r}_s^y
 \end{equation}
 
-Now equations \ref{eq:rsll} to \ref{eq:rcll} can be followed to get the remaining parameters.
+These local coordinates can now be converted to latitude and longitude using the local reference system. 
 
 
 \section{Spawning events}
@@ -1249,7 +1256,7 @@ definition).
 \section{Analysing a scenario event}
 \label{sec:source-scenario} The EQRM application incorporates an option for considering
 a particular (or scenario) event. The earthquake catalogue takes the same
-form as that described in \tref{tab:evntdb-columns}. The scenario
+form as that described in \tref{tab:parameters}. The scenario
 event is constrained by user defined values for magnitude, position,
 depth and azimuth.
 
