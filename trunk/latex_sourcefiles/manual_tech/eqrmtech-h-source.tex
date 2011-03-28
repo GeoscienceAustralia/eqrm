@@ -22,7 +22,7 @@ the seismicity in the region. Typically the  model of seismicity comes
  geology and neotectonics. The current version of the EQRM application requires a source model
 that consists of a set of areal source zones (defined by a polygon) with associated
 Gutenberg-Richter recurrence relationships and the option of including fault sources (defined by a plane) with associated 
-Gutenberg-Richter or characteristic earthquake recurrence relationships \citet{dr_Schwartz84}. 
+Gutenberg-Richter or characteristic earthquake recurrence relationships \citet{eqrm_Schwartz84}. 
 
 \emph{Areal source zones} typically capture the background seismicity in an area and are decribed by the acitivty rate within
 each source zone through its Gutenberg-Richter \emph{a} and \emph{b} values. In event-based PSHA calculations, such as \typeself{E}{QR}{M},
@@ -198,7 +198,7 @@ this case a normal distribution is shown but any PDF can be used.}
 
 The Probability Density Function (PDF) for the event magnitudes is
 based on either the bounded Gutenberg-Richter model \citep{dr_Kramer96a} 
-or characteristic earthquake model \citep{dr_schwartz84}. The activity rates of an areal source are computed using the
+or characteristic earthquake model \citep{eqrm_Schwartz84}. The activity rates of an areal source are computed using the
 bounded Gutenberg-Richter earthquake frequency model which is represented by its \emph{a} and \emph{b} values. Where as 
 for fault sources, the magnitude-frequency model is based on either the bounded Gutenberg-Richter or Characteristic Earthquake model and 
 requires knowledge of the slip rate of the fault to calculate the activity rate. 
@@ -252,7 +252,7 @@ $\lambda(\typepar{min}{\_mag}{\_cutoff})$, represents the number
 of earthquakes with magnitude greater than or equal to
 \typepar{min}{\_mag}{\_cutoff} and is computed differently for each source type (see below).
 
-\subsubsection{Activity rate for areal sources} 
+\subsection{Activity rate for areal sources} 
 \label{sec:rv_areal_GR}
 
 
@@ -272,9 +272,9 @@ A_{min}\frac{e^{-\beta(m-m_{min})}-e^{-\beta(m_{max}-m_{min})}}{1-e^{-\beta(m_{m
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsubsection{Activity rate for faults with bounded Gutenberg Richter model}
+\subsection{Activity rate for faults with bounded Gutenberg Richter model}
 \label{sec:rv_flt_GR}
-On the basis of equation \ref{eq:amin_gr},  \citet{dr_youngs85} developed a relationship between fault slip 
+On the basis of equation \ref{eq:amin_gr},  \citet{eqrm_Youngs85} developed a relationship between fault slip 
 rate and earthquake recurrence through the use of the total seismic moment rate along a fault ($M_o^T$)which can be found from:
 
 \begin{equation} \label{eq:mot}
@@ -297,7 +297,7 @@ empirical observations by:
 M_o = 10^{cm+d}
 \end{equation}
 
-where $c=1.5$ and $d=16.1$ from Hanks and Kanamori \cite{hanks1979}. Youngs and Coppersmith \cite{youngs1985} then showed that seismic 
+where $c=1.5$ and $d=16.1$ from Hanks and Kanamori \citet{eqrm_Hanks1979}. Youngs and Coppersmith \citet{eqrm_Youngs1985} then showed that seismic 
 moment rate can be linked to the earthquake recurrence rate by:
 
 \begin{equation} \label{eq:mot_int}
@@ -318,11 +318,11 @@ to find the activity rate above the minimum magnitude ($\lambda m_0$) :
 \lambda _{m_{min}} = \frac{ \mu f_A S (c - b) (1-e^{-\beta (m_{max} - m_{min}) }) } { M_o^{max}  e^{- \beta (m_{max} - m_{min} )} }
 \end{equation}
 
-In practical applications, the $b$-value can be obtained from historical seismicity in a box bounding the fault \cite{schwartz1984,youngs1985} or if there is 
+In practical applications, the $b$-value can be obtained from historical seismicity in a box bounding the fault \cite{eqrm_Schwartz1984,eqrm_Youngs1985} or if there is 
 insufficient historical records near the fault, then it can be approximated by the $b$-value of the source zone that the fault lies within. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Activity rate for faults with bounded Characteristic Earthquake model} 
+\subsection{Activity rate for faults with bounded Characteristic Earthquake model} 
 \label{sec:rv_flt_ch}
 
 Following the same approach as in equations \ref{eq:lam_exp1} and  \ref{eq:lam_exp}, and using the shape of the characteristic 
@@ -385,7 +385,7 @@ f_M(r_m^*) = \left\{
  \right. 
 \end{equation}
 
-for the Characteristic Earthquake model\citep{dr_schwartz94}, where the constant C is given by:
+for the Characteristic Earthquake model\citep{eqrm_Schwartz84}, where the constant C is given by:
 
 \begin{equation}
 C = \frac{\beta e ^{- \beta (m_{max}-m_{min}-\Delta m_{1} - \Delta m_{2})}}  {1-e^{-\beta (m_{max} - m_{min} - \Delta m_{2})}}  \Delta m_{2} .
@@ -484,8 +484,8 @@ polygon.
 The width and length of the rupture and position of the rupture
 centroid are computed using empirical
 rules based on the moment magnitude, $r_m$ of the event . In the current version of the EQRM, three scaling 
-rules are available for use; the Wells and Coppersmith (1994) emperical relationships, a modified version
-of these rules presented by Mendez, 2002 ([$\textit{pers. comm.}$]), and scaling laws for stable continental regions developed by \citet{dr_leonard10}.
+rules are available for use; the \citet{eqrm_Wells94} emperical relationships, a modified version
+of these rules presented by Mendez, 2002 ([$\textit{pers. comm.}$]), and scaling laws for stable continental regions developed by \citet{eqrm_Leonard10}.
 
 The location of the rupture plane
 is constrained to lie within a virtual fault (Figure )
@@ -705,85 +705,85 @@ polygon vertices could be listed in the input file.
 
 
 
-\subsection{Using multiple source zones - Incorporating epistemic uncertainty}
-\label{sec:source-multizones}
+% \subsection{Using multiple source zones - Incorporating epistemic uncertainty}
+% \label{sec:source-multizones}
 
-Recall that \sref{sec:source-EQcat} introduced two techniques for
-passing source models to the EQRM:
-\begin{enumerate}
-\item the
-\typeparfilecaption{<site\_loc>}{\_par}{\_sourcezones}{.txt} and
-\typeparfile{<site\_loc>}{\_par\_sou}{rcepolys}{.txt} file pair,
-and \item the
-\typeparfilecaption{<site\_loc>}{\_par}{\_source}{.mat} file.
-\end{enumerate}
-Recall also that the notion of a `generation
-polygon'\index{generation polygon} was introduced where the
-generation polygons are simply the individual source zones when
-Technique 1 is used, and `generation polygon' refers to the
-polygons in the \typevar{gen}{erat}{ion} variable when Technique 2
-is used. This definition ensured that the discussion of earthquake
-location (\sref{sec:rup-location}), rupture geometry
-(\sref{sec:dim-rupture}), azimuth and dip
-(\sref{sec:az-dip-rupture}) described above is applicable to both
-of the two techniques for providing source information to the
-EQRM. When Technique 2 is used, however, a minor modification must
-be made to the algorithm described for magnitude and event
-activity determination (see \sref{sec:magnitude_selection}). To
-explain the differences in the algorithm and to explain the
-incorporation of multiple source zone models (epistemic
-uncertainty with source models) the reader will need to understand
-the contents of the
-\typeparfile{<site\_loc>}{\_par}{\_source}{.mat} file.
+% Recall that \sref{sec:source-EQcat} introduced two techniques for
+% passing source models to the EQRM:
+% \begin{enumerate}
+% \item the
+% \typeparfilecaption{<site\_loc>}{\_par}{\_sourcezones}{.txt} and
+% \typeparfile{<site\_loc>}{\_par\_sou}{rcepolys}{.txt} file pair,
+% and \item the
+% \typeparfilecaption{<site\_loc>}{\_par}{\_source}{.mat} file.
+% \end{enumerate}
+% Recall also that the notion of a `generation
+% polygon'\index{generation polygon} was introduced where the
+% generation polygons are simply the individual source zones when
+% Technique 1 is used, and `generation polygon' refers to the
+% polygons in the \typevar{gen}{erat}{ion} variable when Technique 2
+% is used. This definition ensured that the discussion of earthquake
+% location (\sref{sec:rup-location}), rupture geometry
+% (\sref{sec:dim-rupture}), azimuth and dip
+% (\sref{sec:az-dip-rupture}) described above is applicable to both
+% of the two techniques for providing source information to the
+% EQRM. When Technique 2 is used, however, a minor modification must
+% be made to the algorithm described for magnitude and event
+% activity determination (see \sref{sec:magnitude_selection}). To
+% explain the differences in the algorithm and to explain the
+% incorporation of multiple source zone models (epistemic
+% uncertainty with source models) the reader will need to understand
+% the contents of the
+% \typeparfile{<site\_loc>}{\_par}{\_source}{.mat} file.
 
-The \typeparfile{<site\_loc>}{\_par}{\_source}{.mat} file contains
-the following two variables:
-\begin{enumerate}
-\item The \typevar{gen}{erat}{ion} variable is a MATLAB structure
-containing the fields \texttt{zones} and \texttt{polys}. The field
-\texttt{zones} is a matrix containing the same format as that
-described in \tref{tab:site-loc-par-sourcezones}. The number of
-rows refers to the number of `generation polygons' to be used in
-the generation process. It is common to have 2 `generation
-polygons' arranged in a doughnut shape with an inner and outer
-polygon. The inner polygon is typically centered on the region of
-interest and can be used to simulate a larger number of
-earthquakes (hence higher spatial concentration) than the outer
-polygon. The field \texttt{polys} is a matrix using the same
-format as \tref{tab:site-loc-par-sourcepolys} to describe the
-vertices of the polygons in the field \texttt{zones}. \item The
-\typevar{sou}{rc}{e} variable is a MATLAB structure array
-containing one element for each source zone model to be used. The
-number of elements in the \typevar{sou}{rc}{e} structure array
-corresponds to the number of source zone models to be used in the
-simulation. Each element has fields \texttt{zones}, \texttt{polys}
-and \texttt{weight}. The fields \texttt{zones} and \texttt{polys}
-are similar to those described in 1 above, however this time they
-represent the individual source source zones for the source model.
-The field \texttt{weight} represents the weight to be applied to
-the source zone model.
-\end{enumerate}
+% The \typeparfile{<site\_loc>}{\_par}{\_source}{.mat} file contains
+% the following two variables:
+% \begin{enumerate}
+% \item The \typevar{gen}{erat}{ion} variable is a MATLAB structure
+% containing the fields \texttt{zones} and \texttt{polys}. The field
+% \texttt{zones} is a matrix containing the same format as that
+% described in \tref{tab:site-loc-par-sourcezones}. The number of
+% rows refers to the number of `generation polygons' to be used in
+% the generation process. It is common to have 2 `generation
+% polygons' arranged in a doughnut shape with an inner and outer
+% polygon. The inner polygon is typically centered on the region of
+% interest and can be used to simulate a larger number of
+% earthquakes (hence higher spatial concentration) than the outer
+% polygon. The field \texttt{polys} is a matrix using the same
+% format as \tref{tab:site-loc-par-sourcepolys} to describe the
+% vertices of the polygons in the field \texttt{zones}. \item The
+% \typevar{sou}{rc}{e} variable is a MATLAB structure array
+% containing one element for each source zone model to be used. The
+% number of elements in the \typevar{sou}{rc}{e} structure array
+% corresponds to the number of source zone models to be used in the
+% simulation. Each element has fields \texttt{zones}, \texttt{polys}
+% and \texttt{weight}. The fields \texttt{zones} and \texttt{polys}
+% are similar to those described in 1 above, however this time they
+% represent the individual source source zones for the source model.
+% The field \texttt{weight} represents the weight to be applied to
+% the source zone model.
+% \end{enumerate}
 
-When using Technique 2 the \typevar{gen}{er}{ation} is used to
-define the `generation polygons' and hence the location, geometry,
-azimuth and dip of the rupture. The variable
-\typevar{gen}{er}{ation} is also used to assign magnitudes to each
-synthetic event\index{synthetic event} using Steps 1 to 4 from
-\sref{sec:magnitude_selection}. Note that a synthetic earthquake
-generated in this fashion may lie in none, one or multiple source
-zones from the different source models. The calculation of an
-event activity involves identifying which zones the earthquake
-lies within and then computing the weighted sum of individual
-event activities for the zones within which it lies. The algorithm
-for computing the event activity for a single source zone is
-described in Step 5 of \sref{sec:magnitude_selection}. Note that
-an earthquake must fall within the polygon that defines the source
-zone and its magnitude must be within the magnitude bounds for the
-source zone before it is considered to lie within the source zone.
-More details of this process can be found by looking at the
-functions \typefunc{calc}{\_event}{\_activity} for the calculation
-of event activity and \typefunc{mke}{\_aseq}{4mat} for all of
-processes.
+% When using Technique 2 the \typevar{gen}{er}{ation} is used to
+% define the `generation polygons' and hence the location, geometry,
+% azimuth and dip of the rupture. The variable
+% \typevar{gen}{er}{ation} is also used to assign magnitudes to each
+% synthetic event\index{synthetic event} using Steps 1 to 4 from
+% \sref{sec:magnitude_selection}. Note that a synthetic earthquake
+% generated in this fashion may lie in none, one or multiple source
+% zones from the different source models. The calculation of an
+% event activity involves identifying which zones the earthquake
+% lies within and then computing the weighted sum of individual
+% event activities for the zones within which it lies. The algorithm
+% for computing the event activity for a single source zone is
+% described in Step 5 of \sref{sec:magnitude_selection}. Note that
+% an earthquake must fall within the polygon that defines the source
+% zone and its magnitude must be within the magnitude bounds for the
+% source zone before it is considered to lie within the source zone.
+% More details of this process can be found by looking at the
+% functions \typefunc{calc}{\_event}{\_activity} for the calculation
+% of event activity and \typefunc{mke}{\_aseq}{4mat} for all of
+% processes.
 
 
 \section{Generating synthetic earthquakes on fault sources}
@@ -812,7 +812,7 @@ than suggested by the scaling laws (equation \ref{ra}). The onus is on the user 
 the maximum magnitude assigned to the fault. In practice most users will use the fault dimensions to calculate the maximum magnitude
 when creating the EQRM input file. \\
 
-We then calculate the rupture width ($r_w$) which is solved using the empirical relationships developed by Wells and Coppersmith \cite{wells1994}  
+We then calculate the rupture width ($r_w$) which is solved using the empirical relationships developed by Wells and Coppersmith \cite{eqrm_Wells94}  
 but forces the rupture width ($r_w$) to be less than or equal to the fault width ($f_w$). Effectively this restriction stops the rupture from extending 
 outside the seismogenic zone defined by $f_z^{top}$ to ($f_z^{bot}$. The calculation of the rupture width is a two stage process:
 
