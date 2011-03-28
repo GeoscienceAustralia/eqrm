@@ -278,6 +278,13 @@ Lee, V.~W., M.~D. Trifunac, M.~Todorovska and E.~I. Novikova (1995).
   motion in terms of magnitude, distance, path effects and site conditions.
 \newblock Technical report, University of Southern California.
 
+\bibitem[\protect\citeauthoryear{Leonard}{Leonard}{2010}]{eqrm_Leonard10}
+Leonard, M. (2010).
+\newblock Earthquake fault scaling: self-consistent relating of rupture length,
+  width, average displacement, and moment release.
+\newblock {\em Bulletin of the Seismological Society of America\/}~{\em
+  100\/}(5a), 1971--1988.
+
 \bibitem[\protect\citeauthoryear{Liang, Hao, Gaull and Sinadinovski}{Liang {\em
   et~al.}}{2008}]{eqrm_Liang08}
 Liang, J.~Z., H.~Hao, B.~A. Gaull and C.~Sinadinovski (2008).
@@ -369,6 +376,13 @@ Scherbaum, F., J.~Schmedes and F.~Cotton (2004).
 \newblock {\em Bulletin of the Seismological Society of America\/}~{\em 94},
   1053--1069.
 
+\bibitem[\protect\citeauthoryear{Schwartz and Coppersmith}{Schwartz and
+  Coppersmith}{1984}]{eqrm_Schwartz84}
+Schwartz, D. and K.~Coppersmith (1984).
+\newblock Fault behaviour and characteristic earthquakes: examples from the
+  wasatch and san andreas fault zones.
+\newblock {\em Journal of Geophysical Research\/}~{\em 89\/}(B7), 5681--5698.
+
 \bibitem[\protect\citeauthoryear{Somerville}{Somerville}{2009}]{eqrm_Somervill%
 e09}
 Somerville, P.~G. (2009).
@@ -403,12 +417,26 @@ Toro, G.~R., N.~A. Abrahamson and J.~F. Schneider (1997).
 \newblock {\em Seismological Research Letters\/}~{\em 68\/}(1), 41--57.
 
 \bibitem[\protect\citeauthoryear{Wells and Coppersmith}{Wells and
-  Coppersmith}{1994}]{dr_Wells94a}
-Wells, D.~L. and K.~J. Coppersmith (1994).
+  Coppersmith}{1994a}]{eqrm_Wells94}
+Wells, D. and K.~Coppersmith (1994a).
+\newblock New empirical relationships among magnitude, rupture length, rupture
+  width, rupture area, and surface displacement.
+\newblock {\em BSSA\/}~{\em 84\/}(4), 974--1002.
+
+\bibitem[\protect\citeauthoryear{Wells and Coppersmith}{Wells and
+  Coppersmith}{1994b}]{dr_Wells94a}
+Wells, D.~L. and K.~J. Coppersmith (1994b).
 \newblock New empirical relationship among magnitude, rupture length, rupture
   width, rupture area, and surface displacement.
 \newblock {\em Bulletin of the Seismological Society of America\/}~{\em
   84\/}(4), 974--1002.
+
+\bibitem[\protect\citeauthoryear{Youngs and Coppersmith}{Youngs and
+  Coppersmith}{1985}]{eqrm_Youngs85}
+Youngs, R. and K.~Coppersmith (1985).
+\newblock Implications of fault slip rates and earthquake recurrence models to
+  probabilistic seismic hazard estimates.
+\newblock {\em BSSA\/}~{\em 75\/}(4), 939--964.
 
 \bibitem[\protect\citeauthoryear{Youngs, Chiou, Silva and Humphrey}{Youngs {\em
   et~al.}}{1997}]{eqrm_Youngs97}
