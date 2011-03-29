@@ -18,7 +18,8 @@
 """
 
 
-from scipy import vectorize, sqrt, sin, minimum, pi, array, tile, where
+from scipy import vectorize, sqrt, sin, minimum, pi, array, tile, where, \
+    log10
 
 ################  modified_Wells_and_Coppersmith_94  ############################
 
@@ -30,7 +31,7 @@ def modified_Wells_and_Coppersmith_94_rup_area(Mw, **kwargs):
 
 def modified_Wells_and_Coppersmith_94_rup_width(dip, Mw, area, max_rup_width,
                                                 **kwargs):
-    """
+    """    
     # FIXME This function needs a reference.
     
     parameters:
@@ -69,6 +70,7 @@ def Wells_and_Coppersmith_94_rup_area(Mw, **kwargs):
         area = 10**(-3.497+0.91*Mw)
     return area
 
+    
 def Wells_and_Coppersmith_94_rup_width(Mw, **kwargs):
     """Calculate the rupture width.
 
@@ -90,3 +92,93 @@ def Wells_and_Coppersmith_94_rup_width(Mw, **kwargs):
     else:
         widthWC = 10**(-1.01+(0.32*Mw))
     return widthWC
+
+    
+def Leonard_SCR_rup_area(Mw, **kwargs):
+    """
+    From:
+    Earthquake Fault Scaling; Self-Consistent relating of Rupture lenght
+    width, average Displacement.
+    Author: Mark Leonard
+    
+    returns: the rupture area, km2.
+    """
+    return 10.**(Mw-4.183333333333333333)
+    
+
+def Leonard_SCR_rup_width(dip, Mw, area, max_rup_width,
+                                                **kwargs):
+    """
+    From:
+    Earthquake Fault Scaling; Self-Consistent relating of Rupture lenght
+    width, average Displacement.
+    Author: Mark Leonard
+    
+    parameters:
+      area: the rupture area, km2
+    
+    returns:
+      the rupture width, km.
+    """
+    
+    # First the Length is calculated
+    e, f = Leonard_SCR_constants(Mw)
+    length = 10.**(e*Mw + f) # length is in km
+    if area is None:
+        area = Leonard_SCR_rup_area(Mw)
+    width = area/length
+       
+    if max_rup_width is not None:
+        return minimum(width,max_rup_width)
+    else:
+        return width
+        
+        
+def Leonard_SCR_constants(Mw):
+    """
+    From:
+    Earthquake Fault Scaling; Self-Consistent relating of Rupture length
+    width, average Displacement.
+    Author: Mark Leonard
+    
+    returns:
+      e, f - constants used to calculate the rupture length.
+      
+    """
+    # Scale it
+    a = where(Mw >  4.975, 2.5, 3.0)
+    b = where(Mw >  4.975, 8.08, 6.39)
+    
+    d = 1.5
+    c = 6.07
+    
+    e =d/a
+    f = (d*c-b)/a - 3.0
+    
+    return e, f
+
+        
+        
+
+def not_used_Mw_to_Mo(Mw):
+    """
+    
+   From an excel spreadsheet, from Mark L.
+    """   
+    c = 1.5
+    d = 9.105
+    Mo = 10**(c*Mw + d)
+    return Mo
+
+def not_used_Mw_to_Mo(Mw):
+    """
+    
+    Title: A moment magnitude scale 
+    Authors: Hanks, Thomac C.; Kanamori, Hiroo 
+    Publication: Journal of Geophysical Research, 1979, Volume 84, Issue B5, 
+                 p. 2348-2350
+    """   
+    c = 1.5
+    d = 16.1
+    Mo = 10**((c*Mw)+d)
+    return Mo

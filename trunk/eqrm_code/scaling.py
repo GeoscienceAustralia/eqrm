@@ -30,7 +30,8 @@ import copy
 NAME_BEGINNING = {'WEL':'Wells_and_Coppersmith_94',
                   'MOD':'modified_Wells_and_Coppersmith_94'}
 def scaling_calc_rup_area(Mw, scaling_dic):
-    """Calculate the rupture area, using a supplied scaling rule, given an Mw and
+    """
+    Calculate the rupture area, using a supplied scaling rule, given an Mw and
     various other parameters.
     
     parameters:
@@ -38,7 +39,7 @@ def scaling_calc_rup_area(Mw, scaling_dic):
     scaling_dic: a dictionary with various scaling parameters;
       scaling_rule: The name of the scaling rule to use. Currently only
         'Wells_and_Coppersmith_94' or 'modified_Wells_and_Coppersmith_94'.
-        'Wells_and_Coppersmith_94' needs the key 'scaling_fault_type' defined.      
+        'Wells_and_Coppersmith_94' needs the key 'scaling_fault_type' defined.
     """
     key = string.upper(scaling_dic['scaling_rule'][:3])
     if NAME_BEGINNING.has_key(key):
@@ -53,7 +54,8 @@ def scaling_calc_rup_area(Mw, scaling_dic):
 def scaling_calc_rup_width(Mw, scaling_dic, dip, rup_area=None,
                            max_rup_width=None):
     
-    """Calculate the rupture width, using a supplied scaling rule,
+    """
+    Calculate the rupture width, using a supplied scaling rule,
     given an Mw and various other parameters.
     
     parameters:
