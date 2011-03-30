@@ -156,29 +156,3 @@ def Leonard_SCR_constants(Mw):
     f = (d*c-b)/a - 3.0
     
     return e, f
-
-        
-        
-
-def not_used_Mw_to_Mo(Mw):
-    """
-    
-   From an excel spreadsheet, from Mark L.
-    """   
-    c = 1.5
-    d = 9.105
-    Mo = 10**(c*Mw + d)
-    return Mo
-
-def not_used_Mw_to_Mo(Mw):
-    """
-    
-    Title: A moment magnitude scale 
-    Authors: Hanks, Thomac C.; Kanamori, Hiroo 
-    Publication: Journal of Geophysical Research, 1979, Volume 84, Issue B5, 
-                 p. 2348-2350
-    """   
-    c = 1.5
-    d = 16.1
-    Mo = 10**((c*Mw)+d)
-    return Mo
