@@ -253,6 +253,7 @@ class Fault_Source_Generator(object):
         # now unpack the <event_generation> dictionary
         eg_dict = recurrence_model_dict['event_generation']
         self.generation_min_mag = self.n2t(eg_dict, 'generation_min_mag')
+        self.generation_min_mag = 'cows' # therefore not used. 
         self.number_of_mag_sample_bins = self.n2t(eg_dict,
                                                   'number_of_mag_sample_bins')
         self.number_of_events = self.n2t(eg_dict, 'number_of_events')
@@ -406,12 +407,15 @@ def polygons_from_xml(filename, prob_min_mag_cutoff=None):
 
 
 def xml_fault_generators(filename, prob_min_mag_cutoff=None):
-    """Read new-style XML.
+    """Read Horspool style XML.
 
-    filename             is the path to the XML file to read
-    prob_min_mag_cutoff  mimimum magnitude below which hazard is not considered
+    attributes:
+      filename -  the path to the XML file to read
+      prob_min_mag_cutoff - mimimum magnitude below which hazard is not
+                           considered
 
-    Returns a tuple (gen_objects, mag_type) where 'gen_objects' is a list of
+    Returns:
+     a tuple (gen_objects, mag_type) where 'gen_objects' is a list of
     Fault_Source_Generator objects and 'mag_type' is the magnitude type string.
     """
    
@@ -561,16 +565,20 @@ def polygons_from_xml_horspool(doc,
             'number_of_mag_sample_bins'])
         number_of_events = int(event_gen_atts['number_of_events'])
         recurrence_atts = recurrence.attributes
-        if prob_min_mag_cutoff is None:
-            minmag = float(recurrence_atts['recurrence_min_mag'])
+        
+        # DSG
+        if prob_min_mag_cutoff is not None:
+            generation_min_mag = prob_min_mag_cutoff
         else:
-            minmag = max(float(recurrence_atts['recurrence_min_mag']),
-                         float(prob_min_mag_cutoff))
+            generation_min_mag = float(event_gen_atts['generation_min_mag'])
+        minmag = max(float(recurrence_atts['recurrence_min_mag']),
+                     generation_min_mag)
         #maxmag = float(recurrence_atts['recurrence_max_mag'])
         maxmag = recurrence_atts['recurrence_max_mag']
         magnitude = {'distribution':'uniform',
                      'minimum':minmag,
                      'maximum': maxmag}
+        # magnitude = None This fails, so this is used.             
         azimuth = {'distribution':'uniform',
                    'minimum':azi - dazi,
                    'maximum':azi + dazi}       
