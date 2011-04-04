@@ -561,8 +561,11 @@ def polygons_from_xml_horspool(doc,
             'number_of_mag_sample_bins'])
         number_of_events = int(event_gen_atts['number_of_events'])
         recurrence_atts = recurrence.attributes
-        minmag = max(float(recurrence_atts['recurrence_min_mag']),
-                     float(prob_min_mag_cutoff))
+        if prob_min_mag_cutoff is None:
+            minmag = float(recurrence_atts['recurrence_min_mag'])
+        else:
+            minmag = max(float(recurrence_atts['recurrence_min_mag']),
+                         float(prob_min_mag_cutoff))
         #maxmag = float(recurrence_atts['recurrence_max_mag'])
         maxmag = recurrence_atts['recurrence_max_mag']
         magnitude = {'distribution':'uniform',
