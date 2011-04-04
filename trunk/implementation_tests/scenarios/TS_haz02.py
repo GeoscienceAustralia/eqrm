@@ -33,7 +33,6 @@ event_control_tag = "use"
 # Scenario input
 
 # Probabilistic input
-prob_min_mag_cutoff = 4.5
 
 # Attenuation
 atten_collapse_Sa_of_atten_models = True

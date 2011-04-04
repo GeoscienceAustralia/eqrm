@@ -541,6 +541,10 @@ def source_model_from_xml(filename, prob_min_mag_cutoff):
         event_gen = xml_polygon['recurrence_model'][0]['event_generation']
         number_of_mag_sample_bins = int(event_gen[0].attributes[
             'number_of_mag_sample_bins'])
+        if prob_min_mag_cutoff is None:
+           prob_min_mag_cutoff = float(event_gen[0].attributes[
+            'generation_min_mag'])
+        #prob_min_mag_cutoff=float(recurrence['prob_min_mag_cutoff'])
         
         exclude=[]
         for exclusion_zone in xml_polygon['excludes']:

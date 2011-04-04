@@ -36,7 +36,12 @@ def calc_event_activity(event_set, source_model):
     eqrmlog.resource_usage()
 
     for source in source_model: # loop over source zones 
+        print "source.prob_min_mag_cutoff", source.prob_min_mag_cutoff
+        print "source.min_magnitude", source.min_magnitude
+        if source.prob_min_mag_cutoff is None:
+            source.prob_min_mag_cutoff = 4.5
         zone_mlow = max(source.prob_min_mag_cutoff, source.min_magnitude)
+        print "zone_mlow", zone_mlow
         zone_mhgh = source.max_magnitude
                
         poly_ind = source.event_set_indexes
@@ -45,7 +50,7 @@ def calc_event_activity(event_set, source_model):
         
         if len(mag_ind)>0:
             zone_b = source.b
-            grfctr = grscale(zone_b,zone_mhgh,zone_mlow, source.min_magnitude)
+            grfctr = grscale(zone_b,zone_mhgh, zone_mlow, source.min_magnitude)
             A_mlow = source.A_min * grfctr
             
             event_ind= poly_ind[mag_ind]
