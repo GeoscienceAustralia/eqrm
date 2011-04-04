@@ -83,7 +83,7 @@ class Test_Generation_polygon(unittest.TestCase):
         generation_polygons, magnitude_type = polygons_from_xml(
             file_name,
             prob_min_mag_cutoff=prob_min_mag_cutoff)
-        os.remove(file_name)
+            
         boundary = [(151.1500, -32.4000), 
                     (152.1700, -32.7500),
                     (151.4300, -33.4500),
@@ -141,6 +141,15 @@ class Test_Generation_polygon(unittest.TestCase):
             'Failed!')
         self.failUnless(calc_gp.polygon_name=="bad zone",
             'Failed!')
+            
+        # testing that prob_min_mag_cutoff can be None
+        prob_min_mag_cutoff = None
+        
+        generation_polygons, magnitude_type = polygons_from_xml(
+            file_name,
+            prob_min_mag_cutoff=prob_min_mag_cutoff)
+            
+        os.remove(file_name)
 
     def test_xml_fault_generators(self):
         def dump_fault(fault):
