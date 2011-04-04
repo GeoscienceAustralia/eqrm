@@ -34,8 +34,6 @@ fault_source_tag = "no_fault"
 # Probabilistic input
 
 # Attenuation
-atten_models = ['Sadigh_97']
-atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 2
 atten_periods = [0.0, 0.30303000000000002, 1.0]

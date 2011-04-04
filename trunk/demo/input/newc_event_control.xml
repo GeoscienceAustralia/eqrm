@@ -3,7 +3,7 @@
      event_type = "crustal fault">
     <GMPE 
        fault_type = "reverse">
-      <branch model = "NOT USED" weight = "1.0"/> 
+      <branch model = "Sadigh_97" weight = "1.0"/> 
     </GMPE>
     <scaling scaling_rule = "modified_Wells_and_Coppersmith_94" />
   </event_group>
