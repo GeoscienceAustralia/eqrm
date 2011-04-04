@@ -29,10 +29,6 @@ use_site_indexes = True
 site_indexes = [2255, 11511, 10963, 686]
 fault_source_tag = "no_fault" 
 
-# Scenario input
-
-# Probabilistic input
-
 # Attenuation
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 2
@@ -49,12 +45,6 @@ use_amplification = True
 amp_variability_method = 2
 amp_min_factor = 0.6
 amp_max_factor = 10000
-
-# Buildings
-
-# Capacity Spectrum Method
-
-# Loss
 
 # Save
 save_hazard_map = True
