@@ -252,8 +252,10 @@ class Fault_Source_Generator(object):
        
         # now unpack the <event_generation> dictionary
         eg_dict = recurrence_model_dict['event_generation']
+        
+        # not currently used, except in tests
         self.generation_min_mag = self.n2t(eg_dict, 'generation_min_mag')
-        self.generation_min_mag = 'cows' # therefore not used. 
+        #self.generation_min_mag = 'cows' # therefore not used. 
         self.number_of_mag_sample_bins = self.n2t(eg_dict,
                                                   'number_of_mag_sample_bins')
         self.number_of_events = self.n2t(eg_dict, 'number_of_events')

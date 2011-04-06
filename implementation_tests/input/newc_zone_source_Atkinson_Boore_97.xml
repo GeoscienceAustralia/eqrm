@@ -24,7 +24,7 @@
 	  <event_generation 
           generation_min_mag = "4.5"
 	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "5"
+	  number_of_events = "500"
 	   /></recurrence_model>
     </zone>
     
@@ -59,7 +59,7 @@
 	  <event_generation 
           generation_min_mag = "4.5"
 	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "1" /></recurrence_model>
+	  number_of_events = "100" /></recurrence_model>
     </zone>
     
     
@@ -94,7 +94,7 @@
 	  <event_generation 
           generation_min_mag = "4.5"
 	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "10" /></recurrence_model>
+	  number_of_events = "100" /></recurrence_model>
     </zone>
     
     
@@ -124,7 +124,7 @@
 	  <event_generation 
           generation_min_mag = "4.5"
 	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "3" /></recurrence_model>	
+	  number_of_events = "300" /></recurrence_model>	
     </zone>
     
     
@@ -159,7 +159,7 @@
 	  <event_generation 
           generation_min_mag = "4.5"
 	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "1" /></recurrence_model>
+	  number_of_events = "100" /></recurrence_model>
     </zone>
     
     
@@ -194,6 +194,6 @@
 	  <event_generation 
           generation_min_mag = "4.5" 
 	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "10"/></recurrence_model>
+	  number_of_events = "100"/></recurrence_model>
     </zone>
 </source_model_zone>
