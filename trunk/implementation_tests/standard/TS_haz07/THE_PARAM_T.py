@@ -27,14 +27,12 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\current\TS_haz07/" 
 use_site_indexes = True
 site_indexes = [2255, 11511, 10963, 686, 1026, 6597, 12382, 314, 2040, 3318, 9934, 12225, 10506, 9934, 2841, 10420, 10314, 10612, 10316, 10313, 11863, 11523, 9736, 11702, 11862, 2562, 5963, 4550, 6737, 5214]
-zone_source_tag = "Toro_1997_midcontinent" 
+zone_source_tag = "TS_haz07" 
 event_control_tag = "use" 
 
 # Scenario input
 
 # Probabilistic input
-prob_min_mag_cutoff = 4.5
-prob_number_of_events_in_zones = [5, 10, 10, 30, 100, 1]
 
 # Attenuation
 atten_collapse_Sa_of_atten_models = True

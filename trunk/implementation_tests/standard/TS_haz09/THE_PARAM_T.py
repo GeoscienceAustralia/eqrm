@@ -33,7 +33,6 @@ event_control_tag = "use"
 # Scenario input
 
 # Probabilistic input
-prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [5, 2, 10, 3, 3, 7]
 
 # Attenuation

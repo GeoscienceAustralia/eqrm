@@ -94,7 +94,7 @@
 	  <event_generation 
           generation_min_mag = "4.5"
 	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "10" /></recurrence_model>
+	  number_of_events = "1" /></recurrence_model>
     </zone>
     
     
