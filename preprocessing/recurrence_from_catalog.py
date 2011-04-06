@@ -15,7 +15,9 @@ depth and location - i.e. this is not a tool for exploring the data.
 
 Usage: python recurrence_from_catalog.py <input_file>
 <minimum magnitude = minimum magnitude in catalogue>
-<maximum magnitude = maximum magnitude in catalogue + 0.1> <interval = 0.1>
+<maximum magnitude = maximum magnitude in catalogue + 0.1>
+<maximum magnitude for least squares analysis = maximum magnitude - 1.0>
+<interval = 0.1>
 
 Arguments:
 Required:
@@ -24,12 +26,12 @@ Input file: This is the file that contains the earthquake catalogue. It
             that the year of the earthquake will be in the 3rd column,
             and the magnitude in 6th column.
 Optional:
-minimum magnitude: The minumum magnitude for which the catalogue is complete.
+minimum magnitude: The minimum magnitude for which the catalogue is complete.
             Defaults to the minimum magnitude within the catalogue
-maximum magnitude: The maxumum magnitude expected for the source zone.
+maximum magnitude: The maximum magnitude expected for the source zone.
             Defaults to the maximum magnitude in the catalogue plus 0.1 magnitude
             units.
-maximum magnitude for least squares: The maxumum magnitude used in the least squares
+maximum magnitude for least squares: The maximum magnitude used in the least squares
             analysis. Defaults to the maximum magnitude in the catalogue minus 1.0
             magnitude units.
 interval: Width of magnitude bins for generating cumulative histogram
@@ -125,7 +127,7 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
             if (mag >= min_mag):
                 magnitudes.append(mag)
             year = int(line[0:5])
-            years.append(float(line[2:5]))
+            years.append(float(line[1:5]))
 
             depth = float(line[38:42])
             depths.append(depth)
@@ -144,6 +146,9 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
             if (mag >= min_mag):# and (depth <= max_depth):
                 magnitudes.append(mag)
             years.append(int(row[2]))
+            depth = float(row[6])
+            depths.append(depth)
+
 
     ###########################################################################
     # Handle catalogue completeness
@@ -196,6 +201,7 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
     print 'Minimum magnitude:', min_mag
     print 'Total number of earthquakes:', num_eq
     num_years = max(years)-min(years)
+    print 'years', num_years
     annual_num_eq = num_eq/num_years
     print 'Annual number of earthquakes greater than Mw', min_mag,':', \
     annual_num_eq
@@ -348,14 +354,14 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
     
     ax.set_yscale('log')
     ax.legend(loc=1)
-    ax.set_ylim([min(new_cum_annual_rate_plot) * 0.1, max(new_cum_annual_rate_plot) * 10.])
+    ax.set_ylim([min(log_ls_fit) * 0.1, max(log_ls_fit) * 10.])
     ax.set_xlim([min_mag - 0.5, max_mag + 0.5])
     ax.set_ylabel('Annual probability')
     ax.set_xlabel('Magnitude')
 
-    s = 'Minimum magnitude: %.1f \nNumber earthquakes > min mag: %i \nLS a,b: %.2f, %.2f \nMLE b: %.2f' \
-    % (min_mag, num_eq, a, -1. * b, b_mle)
-    ax.text(min_mag - 0.25, min(new_cum_annual_rate)* 0.5, s, fontsize = '14',
+    s = 'Minimum magnitude: %.1f \nAnnual number earthquakes > min mag: %.2f \nLS a,b: %.2f, %.2f \nMLE b: %.2f' \
+    % (min_mag, annual_num_eq, a, -1. * b, b_mle)
+    ax.text(min_mag - 0.25, min(log_ls_fit)* 0.5, s, fontsize = '14',
             bbox=dict(facecolor = 'white', alpha=0.5, pad = 10.))
     if savefig:
         py.savefig(figurepath)
@@ -371,7 +377,7 @@ if __name__=="__main__":
 
     if len(sys.argv) < 2:
         print 'Usage: python recurrence_from_catalog.py <input_file> <minimum magnitude = minimum magnitude in catalogue> \
-<maximum magnitude = maximum magnitude in catalogue + 0.1> <maximum magntiude for least squares analysis = maximum magnitude - 1.0> <interval = 0.1>'
+<maximum magnitude = maximum magnitude in catalogue + 0.1> <maximum magnitude for least squares analysis = maximum magnitude - 1.0> <interval = 0.1>'
         sys.exit(-1)
 
     infile  = sys.argv[1]
