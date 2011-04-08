@@ -101,7 +101,7 @@ class Test_Generation_polygon(unittest.TestCase):
                'maximum': float(dip)+float(delta_dip)}
         magnitude = {'distribution':'uniform',
                          'minimum':3.4,
-                         'maximum': '5.4'}
+                         'maximum': 5.4}
         polygon_name = 'bad zone'
         polygon_event_type = "crustal fault"
         number_of_events = 1000
@@ -133,7 +133,7 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnless(calc_gp.dip==dip,
             'Failed!')
         self.failUnless(calc_gp.magnitude==magnitude,
-            'Failed!')
+            'Failed, mag!')
         self.failUnless(calc_gp.number_of_events==number_of_events,
             'Failed!')
         self.failUnless(calc_gp.polygon_name=="bad zone",

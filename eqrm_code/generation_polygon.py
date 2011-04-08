@@ -126,7 +126,7 @@ class Fault_Source_Generator(object):
                     }
 
     def __init__(self, filename, fault_name, fault_event_type,
-                 prob_min_mag_cutoff, geometry_dict, recurrence_model_dict):
+                 geometry_dict, recurrence_model_dict):
         """Initialise a Fault_Source_Generator instance.
 
         fault_name             fault name
@@ -262,7 +262,7 @@ class Fault_Source_Generator(object):
         self.number_of_events = self.n2t(eg_dict, 'number_of_events')
 
         # calculate magnitude distribution
-        minmag = max(self.generation_min_mag, prob_min_mag_cutoff,
+        minmag = max(self.generation_min_mag, 
                      self.recurrence_min_mag)
         self.magnitude_dist = {'distribution': 'uniform',
                                'minimum': minmag,
@@ -515,7 +515,6 @@ def xml_fault_generators(filename, prob_min_mag_cutoff=None):
 
         fault_obj = Fault_Source_Generator(filename, fault_name,
                                            fault_event_type,
-                                           prob_min_mag_cutoff,
                                            geometry_dict,
                                            recurrence_model_dict)
         fsg_list.append(fault_obj)
@@ -570,15 +569,9 @@ def polygons_from_xml_horspool(doc,
         number_of_events = int(event_gen_atts['number_of_events'])
         recurrence_atts = recurrence.attributes
         
-        # DSG
-        if prob_min_mag_cutoff is not None:
-            generation_min_mag = prob_min_mag_cutoff
-        else:
-            generation_min_mag = float(event_gen_atts['generation_min_mag'])
         minmag = max(float(recurrence_atts['recurrence_min_mag']),
-                     generation_min_mag)
-        #maxmag = float(recurrence_atts['recurrence_max_mag'])
-        maxmag = recurrence_atts['recurrence_max_mag']
+                     float(event_gen_atts['generation_min_mag']))
+        maxmag = float(recurrence_atts['recurrence_max_mag'])
         magnitude = {'distribution':'uniform',
                      'minimum':minmag,
                      'maximum': maxmag}
