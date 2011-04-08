@@ -256,12 +256,14 @@ class Fault_Source_Generator(object):
         # not currently used, except in tests
         self.generation_min_mag = self.n2t(eg_dict, 'generation_min_mag')
         #self.generation_min_mag = 'cows' # therefore not used. 
+        
         self.number_of_mag_sample_bins = self.n2t(eg_dict,
                                                   'number_of_mag_sample_bins')
         self.number_of_events = self.n2t(eg_dict, 'number_of_events')
 
         # calculate magnitude distribution
-        minmag = max(self.recurrence_min_mag, prob_min_mag_cutoff)
+        minmag = max(self.generation_min_mag, prob_min_mag_cutoff,
+                     self.recurrence_min_mag)
         self.magnitude_dist = {'distribution': 'uniform',
                                'minimum': minmag,
                                'maximum': self.recurrence_max_mag}
