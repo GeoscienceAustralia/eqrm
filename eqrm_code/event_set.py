@@ -346,7 +346,6 @@ class Event_Set(object):
 
     @classmethod
     def generate_synthetic_events(cls, fid_genpolys,
-                                  prob_min_mag_cutoff,
                                   source_model,
                                   prob_number_of_events_in_zones=None):
         """Randomly generate the event_set parameters.
@@ -357,8 +356,6 @@ class Event_Set(object):
         
         Args:
           fid_genpolys: The full path name of the source polygon xml file
-          prob_min_mag_cutoff: Mimimum magnitude below which hazard is not
-            considered.
           source_model: Basically a list of sources.
           prob_number_of_events_in_zones: Vector whose elements represent
             the number of events for each generation.  Can be None.
@@ -394,8 +391,7 @@ class Event_Set(object):
         log.info('generating events')
         
         (generation_polygons,
-             magnitude_type) = polygons_from_xml(fid_genpolys,
-                                                 prob_min_mag_cutoff)
+             magnitude_type) = polygons_from_xml(fid_genpolys)
         num_polygons = len(generation_polygons)
         assert num_polygons == len(source_model)
         
@@ -761,20 +757,17 @@ def _add_sources(source_model_zone, source_model_fault,
     return mergedSourceMod
     
 def generate_synthetic_events_fault(fault_xml_file, event_control_file,
-                                    prob_min_mag_cutoff, 
                                     prob_number_of_events_in_faults=None):
     """Create Source objects from XML files for faults and events.
 
     fault_xml_file                   path to the FSG XML file
     event_control_file               path to the ETC XML file
-    prob_min_mag_cutoff              min mag below which hazard not considered
     prob_number_of_events_in_faults  ?
     """      
 
     log.info('generating events')
     
-    (fsg_list, magnitude_type) = xml_fault_generators(fault_xml_file, 
-                                                      prob_min_mag_cutoff)
+    (fsg_list, magnitude_type) = xml_fault_generators(fault_xml_file)
 
     source_mods = source_model.create_fault_sources(
         event_control_file, fsg_list,

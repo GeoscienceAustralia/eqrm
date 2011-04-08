@@ -202,8 +202,7 @@ def main(parameter_handle,
         # tell event set which source models to calculate activity with
         if fid_sourcepolys is not None:
             source_model_zone = source_model_from_xml(
-                fid_sourcepolys.name,
-                THE_PARAM_T.prob_min_mag_cutoff)
+                fid_sourcepolys.name)
        
             if fid_event_types is not None:
                 source_model_zone.add_event_type_atts_to_sources(
@@ -218,8 +217,6 @@ def main(parameter_handle,
 
             event_set_zone = Event_Set.generate_synthetic_events(
                 fid_genpolys=fid_sourcepolys,
-                prob_min_mag_cutoff=
-                THE_PARAM_T.prob_min_mag_cutoff,
                 source_model=source_model_zone,
                 prob_number_of_events_in_zones=\
                 THE_PARAM_T.prob_number_of_events_in_zones)
@@ -245,7 +242,6 @@ def main(parameter_handle,
             results = generate_synthetic_events_fault(
                 fid_sourcefaults, 
                 fid_event_types.name,
-                THE_PARAM_T.prob_min_mag_cutoff, 
                 THE_PARAM_T.prob_number_of_events_in_faults)
             (event_set_fault, source_model_fault) = results
         else:

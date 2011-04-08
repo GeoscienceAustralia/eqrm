@@ -78,9 +78,7 @@ class Test_Source_model(unittest.TestCase):
 """
         handle.write(sample)
         handle.close()
-        prob_min_mag_cutoff = 4.0
-        source_model = source_model_from_xml(file_name,
-                                             prob_min_mag_cutoff)
+        source_model = source_model_from_xml(file_name)
         os.remove(file_name)
         boundary = [(151.1500, -32.4000), 
                     (152.1700, -32.7500),
@@ -97,10 +95,10 @@ class Test_Source_model(unittest.TestCase):
         number_of_mag_sample_bins = 15
         event_type = 'fish'
         name = 'bake'
-        prob_min_mag_cutoff = 1.0
+        generation_min_mag = 1.0
         szp = Source_Zone(boundary,exclude,
                           min_magnitude,max_magnitude,
-                          prob_min_mag_cutoff,
+                          generation_min_mag,
                           A_min,b,
                           number_of_mag_sample_bins,
                           event_type,
@@ -124,7 +122,6 @@ class Test_Source_model(unittest.TestCase):
 
     
     def test_Source_Zone(self):
-        prob_min_mag_cutoff = 1.0
         boundary = [(0, 0.0), (100., 0.0), (100., 100.0), (0., 100.0) ]
         exclude = [[(10., 10.0),  (20., 10.0),(20., 20.0),(10., 20.0)]]
         min_magnitude = 5
@@ -134,10 +131,10 @@ class Test_Source_model(unittest.TestCase):
         number_of_mag_sample_bins = 15
         event_type = 'fish'
         name = 'Source_Zone'
-        prob_min_mag_cutoff = 1.0
+        generation_min_mag = 1.0
         szp = Source_Zone(boundary, exclude,
                           min_magnitude, max_magnitude,
-                          prob_min_mag_cutoff,
+                          generation_min_mag,
                           A_min, b,
                           number_of_mag_sample_bins, event_type,
                           name)

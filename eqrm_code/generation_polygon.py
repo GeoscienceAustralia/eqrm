@@ -388,7 +388,6 @@ def polygons_from_xml(filename, prob_min_mag_cutoff=None):
 #         dazi,
 #         fault_dip,
 #         fault_width,
-#         prob_min_mag_cutoff,
 #         override_xml)
 #     assert magnitude_type == magnitude_type_h
     
@@ -414,8 +413,6 @@ def xml_fault_generators(filename, prob_min_mag_cutoff=None):
 
     attributes:
       filename -  the path to the XML file to read
-      prob_min_mag_cutoff - mimimum magnitude below which hazard is not
-                           considered
 
     Returns:
      a tuple (gen_objects, mag_type) where 'gen_objects' is a list of
@@ -525,8 +522,6 @@ def polygons_from_xml_horspool(doc,
                                prob_min_mag_cutoff=None):
     """
     
-    fault_width and prob_min_mag_cutoff are lists of length len(xml_polygons)
-
     Returns a list of Generation_Polygon and magnitude_type
 
     Assumes only one source model

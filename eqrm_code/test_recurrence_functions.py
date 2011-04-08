@@ -41,7 +41,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         min_magnitude = 0
         max_magnitude = 6
         num_bins = 3
-        bins = make_bins(min_magnitude,max_magnitude,num_bins,
+        bins = make_bins(min_magnitude, max_magnitude, num_bins,
                          'bounded_gutenberg_richter')
         
         #print "bins", bins
@@ -63,61 +63,64 @@ class Test_Recurrence_functions(unittest.TestCase):
 
     def test_calc_A_min_from_slip_rate_GR(self):
         max_magnitude = 7.0
-        prob_min_mag_cutoff = 4.0
+        mMin = 4.0
         slip_rate_mm=2.0
         area_kms= float(30*10)
         
         b = 1.
-        A_min= calc_A_min_from_slip_rate_GR(b,prob_min_mag_cutoff,
+        A_min= calc_A_min_from_slip_rate_GR(b, mMin,
                                             max_magnitude,
-                                            slip_rate_mm,area_kms)
+                                            slip_rate_mm, area_kms)
         self.assert_(allclose(A_min,0.225843709057))
         
     def test_make_bins2(self):
         max_magnitude = 7.0
-        prob_min_mag_cutoff = 4.0
-        num_of_mag_sample_bins =4
-        magnitudes= array([5,5.25,5.5,5.75,6,6.25,6.5,6.75,7])
-        mag_bin_centroids=make_bins(prob_min_mag_cutoff,max_magnitude,
-                                        num_of_mag_sample_bins,
-                                        'characteristic')
-        event_bins= assign_event_bins(magnitudes, prob_min_mag_cutoff, 
+        min_magnitude = 4.0
+        num_of_mag_sample_bins = 4
+        magnitudes = array([5,5.25,5.5,5.75,6,6.25,6.5,6.75,7])
+        mag_bin_centroids = make_bins(min_magnitude, max_magnitude,
+                                      num_of_mag_sample_bins,
+                                      'characteristic')
+        event_bins = assign_event_bins(magnitudes, min_magnitude, 
                                       max_magnitude, num_of_mag_sample_bins,
               recurrence_model_dist = 'characteristic')
 #        print 'event_bins ',event_bins
         
     def test_calc_A_min_from_slip_rate_Characteristic(self):
         max_magnitude = 7.0
-        prob_min_mag_cutoff = 4.0
-        slip_rate_mm=2.0
-        area_kms= float(30*10)        
+        mMin = 4.0
+        slip_rate_mm = 2.0
+        area_kms = float(30*10)        
         b = 1.
-        A_min= calc_A_min_from_slip_rate_Characteristic(b,prob_min_mag_cutoff,
-                                            max_magnitude,
-                                            slip_rate_mm,area_kms)
+        A_min = calc_A_min_from_slip_rate_Characteristic(b, 
+                                                         mMin,
+                                                         max_magnitude,
+                                                         slip_rate_mm,
+                                                         area_kms)
         self.assert_(allclose(A_min,0.0253104984335))
 
     def test_calc_activities_Characteristic(self):
         max_magnitude = 7.0
-        prob_min_mag_cutoff = 4.0
-        slip_rate_mm=2.0
-        area_kms= float(30*10)
-        prob_number_of_mag_sample_bins=10
+        min_magnitude = 4.0
+        slip_rate_mm = 2.0
+        area_kms = float(30*10)
+        prob_number_of_mag_sample_bins = 10
         b = 1.
-        bin_centroids = make_bins(prob_min_mag_cutoff,max_magnitude,
+        bin_centroids = make_bins(min_magnitude, max_magnitude,
                                   prob_number_of_mag_sample_bins,
                                   'characteristic')
-        event_bins=r_[0:10]
-        event_bins=sorted(event_bins)
+        event_bins = r_[0:10]
+        event_bins = sorted(event_bins)
     
-        A_minCharacteristic= calc_A_min_from_slip_rate_Characteristic(b,prob_min_mag_cutoff,
-                                            max_magnitude,
-                                            slip_rate_mm,area_kms)
+        A_minCharacteristic = calc_A_min_from_slip_rate_Characteristic(
+            b, min_magnitude,
+            max_magnitude,
+            slip_rate_mm, area_kms)
         
-        pdfs= calc_activities_Characteristic(bin_centroids, b, 
-                                                              prob_min_mag_cutoff, 
-                                                              max_magnitude,
-                                                              prob_number_of_mag_sample_bins)
+        pdfs = calc_activities_Characteristic(bin_centroids, b, 
+                                              min_magnitude, 
+                                              max_magnitude,
+                                              prob_number_of_mag_sample_bins)
         
         event_activity_source = array(
                 [(A_minCharacteristic*pdfs[z]/(sum(where(

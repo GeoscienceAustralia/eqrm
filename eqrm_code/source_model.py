@@ -188,10 +188,9 @@ class Source(object):
         generation_min_mag - The minimum event generation specified
           by the user
         min_magnitude,max_magnitude,
-        prob_min_mag_cutoff,A_min,b are floats
+        A_min,b are floats
         
         #FIXME DSG-EQRM This class needs comments.
-        What is prob_min_mag_cutoff?
 
         And where are it's methods? recurrence_functions might have 1.
         """
@@ -254,7 +253,7 @@ class Source(object):
 class Source_Zone(Source, polygon_object):
     def __init__(self,boundary,exclude,
                  min_magnitude,max_magnitude,
-                 prob_min_mag_cutoff,
+                 generation_min_mag,
                  A_min,b,
                  number_of_mag_sample_bins,
                  event_type,
@@ -264,10 +263,9 @@ class Source_Zone(Source, polygon_object):
         boundary is a list of points that forms a polygon
         exclude is a list of polygons (so a list of a list of points)
         min_magnitude,max_magnitude,
-        prob_min_mag_cutoff,A_min,b are floats
+        A_min,b are floats
         
         #FIXME DSG-EQRM This class needs comments.
-        What is prob_min_mag_cutoff?
 
         And where are it's methods? recurrence_functions might have 1.
         """
@@ -275,7 +273,7 @@ class Source_Zone(Source, polygon_object):
         Source.__init__(self,
                         min_magnitude=min_magnitude,
                         max_magnitude=max_magnitude,
-                        generation_min_mag=prob_min_mag_cutoff,
+                        generation_min_mag=generation_min_mag,
                         A_min=A_min,
                         b=b,
                         number_of_mag_sample_bins=number_of_mag_sample_bins,
@@ -449,7 +447,7 @@ def create_fault_sources(event_control_file, fsg_list, magnitude_type):
     return source_model
 
 
-def source_model_from_xml(filename, prob_min_mag_cutoff):
+def source_model_from_xml(filename, prob_min_mag_cutoff=None):
     doc=Xml_Interface(filename=filename)
     
     xml_source_model=doc['source_model_zone'][0]
@@ -468,7 +466,6 @@ def source_model_from_xml(filename, prob_min_mag_cutoff):
         recurrence_model_distribution = recurrence['distribution']
         min_magnitude = float(recurrence['recurrence_min_mag'])
         max_magnitude = float(recurrence['recurrence_max_mag'])
-        #prob_min_mag_cutoff=float(recurrence['prob_min_mag_cutoff'])
         A_min=float(recurrence['A_min'])
         b=float(recurrence['b'])
         
@@ -478,10 +475,8 @@ def source_model_from_xml(filename, prob_min_mag_cutoff):
         event_gen = xml_polygon['recurrence_model'][0]['event_generation']
         number_of_mag_sample_bins = int(event_gen[0].attributes[
             'number_of_mag_sample_bins'])
-        if prob_min_mag_cutoff is None:
-           prob_min_mag_cutoff = float(event_gen[0].attributes[
+        generation_min_mag = float(event_gen[0].attributes[
             'generation_min_mag'])
-        #prob_min_mag_cutoff=float(recurrence['prob_min_mag_cutoff'])
         
         exclude=[]
         for exclusion_zone in xml_polygon['excludes']:
@@ -493,7 +488,7 @@ def source_model_from_xml(filename, prob_min_mag_cutoff):
             exclude,
             min_magnitude,
             max_magnitude,
-            prob_min_mag_cutoff,
+            generation_min_mag,
             A_min,b,
             number_of_mag_sample_bins,
             event_type,
