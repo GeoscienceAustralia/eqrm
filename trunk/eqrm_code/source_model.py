@@ -21,71 +21,7 @@ from eqrm_code.ground_motion_calculator import \
 from eqrm_code import parse_in_parameters
 
 
-class Obsolete_Source_Models(object):
-    """
-    Class to handle multiple Source Models.
-
-    Code can currently only handle one Source Model
-    """
-    def __init__(self,prob_min_mag_cutoff, weight,
-                              number_of_mag_sample_bins, *filenames):
-        #print "prob_min_mag_cutoff", prob_min_mag_cutoff
-        #print "weight", weight
-        #print "*filenames", filenames
-        self.weight = weight
-        source_models=[]
-        for fid_sourcepolys in filenames:
-            source_model = source_model_from_xml(fid_sourcepolys.name,
-                                               prob_min_mag_cutoff)
-            source_models.append(source_model)
-        self.source_models=source_models
-        
-        assert len(self.weight) == len(self.source_models)
-        
-    def __len__(self):
-        return len(self.source_models)
-
-    def __getitem__(self,key):
-        return self.source_models[key]
     
-    def calculate_recurrence(self, event_set, event_activity):
-        """
-        Calculate the normalized recurrence of the event set.
-
-        weight is the weight assigned to the respective models in
-        event_set.source_models.
-
-        This function is used by analysis
-        """
-        self.source_models[0].calculate_recurrence(event_set, event_activity)
-        
-        
-    
-    def stratify_source_models_obsolete(self,independent_polygons = None):
-        """
-        Stratify self.source_models.
-        
-        independent_polygons defaults to self.self.generation_polygons -
-        the usual case.
-        
-        Stratifies the sources, so that the source polygons are
-        independent, and do no source polygon crosses into more than
-        one independent polygon.
-        """
-        if independent_polygons is None:
-            from polygon_class import get_independent_polygons_obsolete \
-                 as independent
-            independent_polygons = independent(self.generation_polygons)
-            if not len(independent_polygons) == len(self.generation_polygons):
-                logging.info( \
-                    'Had to make the generation_polygons independent!!!')
-
-        for i in range(len(self.source_models)):
-            source_model = self.source_models[i]
-            source_model = source_model.stratified(independent_polygons)
-            self.source_models[i] = source_model
-
-
 class Source_Model(object):
     """
     This is now a wrapper for a loop over self.sources.
