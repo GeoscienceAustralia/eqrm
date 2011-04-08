@@ -36,7 +36,6 @@ def calc_event_activity(event_set, source_model):
     eqrmlog.resource_usage()
 
     for source in source_model: # loop over source zones 
-        #print "source.prob_min_mag_cutoff", source.prob_min_mag_cutoff
         #print "source.min_magnitude", source.min_magnitude
         #print "source.actual_min_mag_generation", source.actual_min_mag_generation
         zone_mlow = source.actual_min_mag_generation
@@ -46,14 +45,13 @@ def calc_event_activity(event_set, source_model):
         poly_ind = source.event_set_indexes
         mag_ind = where((zone_mlow < event_set.Mw[poly_ind])&
                         (event_set.Mw[poly_ind] < zone_mhgh))[0]
-        
+        min_magnitude = source.min_magnitude
         if len(mag_ind)>0:
             zone_b = source.b
             grfctr = grscale(zone_b,zone_mhgh, zone_mlow, source.min_magnitude)
             A_mlow = source.A_min * grfctr
             
             event_ind= poly_ind[mag_ind]
-            #event_ind=mag_ind[poly_ind]
             num_of_mag_sample_bins = source.number_of_mag_sample_bins
             
             mag_bin_centroids=make_bins(zone_mlow,zone_mhgh,
@@ -83,7 +81,8 @@ def calc_event_activity(event_set, source_model):
                         mag_bin_centroids[z])) for z in event_bins])
                     mag_bin_centroids= new_mag_bin_centroids
 
-            if source.recurrence_model_distribution=='bounded_gutenberg_richter':
+            if source.recurrence_model_distribution == \
+            'bounded_gutenberg_richter':
                 grpdf = m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
                 
             
