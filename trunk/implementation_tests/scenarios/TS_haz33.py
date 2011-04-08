@@ -21,27 +21,26 @@ run_type = "hazard"
 is_scenario = False
 max_width = 15
 site_tag = "newc" 
-return_periods = [10., 11., 19., 50.0, 55., 58., 15.0, 100.]
+return_periods = [10.0, 11.0, 19.0, 50.0, 55.0, 58.0, 15.0, 100.0]
 input_dir = r".\implementation_tests\input/" 
 output_dir = r".\implementation_tests\current\TS_haz33/" 
 use_site_indexes = True
-site_indexes = [1, 166] # site classes C (vs30 560) then D (vs30 270)
-zone_source_tag = "TS_haz33" 
+site_indexes = [1, 166]
 fault_source_tag = "TS_haz33" 
+zone_source_tag = "TS_haz33" 
 event_control_tag = "use" 
 
 # Scenario input
 
 # Probabilistic input
-prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [1, 1]
 prob_number_of_events_in_faults = [1]
 
 # Attenuation
 atten_collapse_Sa_of_atten_models = False
 atten_variability_method = 1
-atten_spawn_bins = 2
 atten_periods = [0.0, 1.0526, 2.0]
+atten_spawn_bins = 2
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
 atten_pga_scaling_cutoff = 999999
