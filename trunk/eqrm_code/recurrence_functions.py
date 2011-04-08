@@ -206,8 +206,9 @@ def grscale(b,max_magnitude,new_min,min_magnitude):
     return numerator/denominator
 
 
-def calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,recurr_dist,
-                              lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip):
+def calc_A_min_from_slip_rate(b, mMin, mMax, slip_rate_mm, recurr_dist,
+                              lat1, lon1, lat2, lon2, depth_top,
+                              depth_bottom, dip):
     """Calculate the the A_min for a fault using slip rate.
        to calculate the A_min you also need a reccurence distribution and the 
        area of a fault in kms.  To calculate area you need:  coords of the 
@@ -228,15 +229,17 @@ def calc_A_min_from_slip_rate(b,mMin,mMax,slip_rate_mm,recurr_dist,
 
     Returns A_min for a fault.
     """
-    area_kms=calc_fault_area(lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip)
+    area_kms = calc_fault_area(lat1, lon1, lat2, lon2, depth_top, 
+                               depth_bottom, dip)
     if recurr_dist == 'characteristic':
-        A_min = calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,
-                                                         slip_rate_mm,area_kms)
+        A_min = calc_A_min_from_slip_rate_Characteristic(b, mMin, mMax,
+                                                         slip_rate_mm, area_kms)
     else:
-        A_min = calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate_mm,area_kms)
+        A_min = calc_A_min_from_slip_rate_GR(b, mMin, mMax, slip_rate_mm, 
+                                             area_kms)
     return A_min
 
-def calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate_mm,area_kms):
+def calc_A_min_from_slip_rate_GR(b, mMin, mMax, slip_rate_mm, area_kms):
     """Calculate the the A_min for a fault using slip rate using the 
        bounded_gutenberg_richter reccurence distribution.  
        b             b
@@ -260,7 +263,8 @@ def calc_A_min_from_slip_rate_GR(b,mMin,mMax,slip_rate_mm,area_kms):
     return numerator/denominator
 
 
-def calc_A_min_from_slip_rate_Characteristic(b,mMin,mMax,slip_rate_mm,area_kms):
+def calc_A_min_from_slip_rate_Characteristic(b, mMin, mMax, slip_rate_mm, 
+                                             area_kms):
     """Calculate the the A_min for a fault using slip rate using the 
        characteristic reccurence distribution.  
        b             b

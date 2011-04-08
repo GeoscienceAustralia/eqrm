@@ -138,13 +138,9 @@ class Test_Generation_polygon(unittest.TestCase):
             'Failed!')
         self.failUnless(calc_gp.polygon_name=="bad zone",
             'Failed!')
-            
-        # testing that prob_min_mag_cutoff can be None
-        prob_min_mag_cutoff = None
         
         generation_polygons, magnitude_type = polygons_from_xml(
-            file_name,
-            prob_min_mag_cutoff=prob_min_mag_cutoff)
+            file_name)
             
         os.remove(file_name)
 
