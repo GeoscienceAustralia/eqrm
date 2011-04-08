@@ -253,9 +253,7 @@ class Fault_Source_Generator(object):
         # now unpack the <event_generation> dictionary
         eg_dict = recurrence_model_dict['event_generation']
         
-        # not currently used, except in tests
         self.generation_min_mag = self.n2t(eg_dict, 'generation_min_mag')
-        #self.generation_min_mag = 'cows' # therefore not used. 
         
         self.number_of_mag_sample_bins = self.n2t(eg_dict,
                                                   'number_of_mag_sample_bins')
@@ -267,6 +265,8 @@ class Fault_Source_Generator(object):
         self.magnitude_dist = {'distribution': 'uniform',
                                'minimum': minmag,
                                'maximum': self.recurrence_max_mag}
+        # Used for setting the Source values
+        
 
     def n2t(self, d, name):
         """Helper function to convert a named parameter to a typed value.
@@ -373,8 +373,7 @@ def polygons_from_xml(filename, prob_min_mag_cutoff=None):
         raise Exception('zone source file format incorrect.')
     else:
         generation_polygons, magnitude_type = polygons_from_xml_horspool(
-            doc,
-            prob_min_mag_cutoff)
+            doc)
     # Hacky checking code
 #     from eqrm_code.eqrm_filesystem import scenario_input_bridges_path
     
