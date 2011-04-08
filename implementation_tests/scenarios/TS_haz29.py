@@ -32,14 +32,13 @@ event_control_tag = "use"
 # Scenario input
 
 # Probabilistic input
-prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [1, 1, 0, 0, 0, 1]
 
 # Attenuation
 atten_collapse_Sa_of_atten_models = False
 atten_variability_method = 1
-atten_spawn_bins = 2
 atten_periods = [0.0, 1.0526, 2.0]
+atten_spawn_bins = 2
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
 atten_pga_scaling_cutoff = 999999

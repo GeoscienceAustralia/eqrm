@@ -21,18 +21,17 @@ run_type = "hazard"
 is_scenario = False
 max_width = 15
 site_tag = "newc" 
-return_periods = [10., 11., 19., 50.0, 55., 58., 15.0, 100.]
+return_periods = [10.0, 11.0, 19.0, 50.0, 55.0, 58.0, 15.0, 100.0]
 input_dir = r".\implementation_tests\input/" 
 output_dir = r".\implementation_tests\current\TS_haz32/" 
 use_site_indexes = True
-site_indexes = [1, 166] # site classes C (vs30 560) then D (vs30 270)
+site_indexes = [1, 166]
 zone_source_tag = "TS_haz32" 
 event_control_tag = "use" 
 
 # Scenario input
 
 # Probabilistic input
-prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [1]
 
 # Attenuation

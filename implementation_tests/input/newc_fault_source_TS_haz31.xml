@@ -24,7 +24,7 @@
        A_min = "0.1" 
        b = "1">
       <event_generation 
-        generation_min_mag = "4.0"
+        generation_min_mag = "4.5"
         number_of_mag_sample_bins = "25" 
         number_of_events = "1" />
     </recurrence_model>

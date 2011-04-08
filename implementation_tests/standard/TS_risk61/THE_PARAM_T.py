@@ -39,7 +39,6 @@ scenario_dip = 35
 scenario_number_of_events = 1
 
 # Probabilistic input
-prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [0, 0, 0, 0, 0, 1]
 
 # Attenuation

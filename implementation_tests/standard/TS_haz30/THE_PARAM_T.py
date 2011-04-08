@@ -26,21 +26,20 @@ input_dir = r".\implementation_tests\input/"
 output_dir = r".\implementation_tests\current\TS_haz30/" 
 use_site_indexes = True
 site_indexes = [2997, 2657, 3004, 3500]
-zone_source_tag = "nofile" 
 fault_source_tag = "faulting" 
+zone_source_tag = "nofile" 
 event_control_tag = "use" 
 
 # Scenario input
 
 # Probabilistic input
-prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_faults = [1, 1, 1]
 
 # Attenuation
 atten_collapse_Sa_of_atten_models = False
 atten_variability_method = 1
-atten_spawn_bins = 2
 atten_periods = [0.0, 1.0526, 2.0]
+atten_spawn_bins = 2
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
 atten_pga_scaling_cutoff = 999999

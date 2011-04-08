@@ -380,7 +380,10 @@ KNOWN_KWARGS = {'use_determ_seed':None,
 #   OR
 # the value has a dictinary where the the keys are the value of the
 # depreciated parameter and the values are attribute and value pairs
-# to use, based on the value of the parameter.  The
+# to use, based on the value of the parameter.  
+#   OR
+# True, which means a warming, and deleting the parameter.
+
 DEPRECIATED_PARAS = {'atten_use_variability':
                      {True:None,
                       False:('atten_variability_method', None)},
@@ -414,7 +417,8 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'prob_dip_in_zones':None,
                      'prob_number_of_mag_sample_bins':None,
                      'save_prob_strucutural_damage':
-                     'save_prob_structural_damage'
+                     'save_prob_structural_damage', 
+                     'prob_min_mag_cutoff':True
 #                      'csm_use_variability':
 #                      {True:None, # None means do nothing
 #                       None:('csm_variability_method', None), 
@@ -549,6 +553,9 @@ def depreciated_attributes(THE_PARAM_T):
                 # handle_logic is a replacement string
                 # for the parameter name
                 THE_PARAM_T[handle_logic] = THE_PARAM_T[item]
+                del THE_PARAM_T[item]
+            elif handle_logic is True:
+                # Delete the parameter
                 del THE_PARAM_T[item]
             else:                
                 # handle_logic is a dictionary

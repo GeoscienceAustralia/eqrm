@@ -349,7 +349,7 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.scenario_number_of_events == 1.)
         
         self.failUnless(allclose(TPT.prob_azimuth_in_zones, asarray([10,30])))
-        self.failUnless(TPT.prob_min_mag_cutoff == 4.5)
+        #self.failUnless(TPT.prob_min_mag_cutoff == 4.5)
         self.failUnless(TPT.prob_number_of_mag_sample_bins == 15)
         self.failUnless(TPT.max_width == 15)
         self.failUnless(allclose(TPT.prob_number_of_events_in_zones,
@@ -418,6 +418,7 @@ save_socloss_flag=[1]\n")
         set.atten_use_variability = False
         set.amp_use_variability = False
         TPT = create_parameter_data(set)
+        self.failUnless(TPT.prob_min_mag_cutoff == None)
         self.failUnless(TPT.atten_variability_method == None)
         self.failUnless(TPT.amp_variability_method == None)
 
