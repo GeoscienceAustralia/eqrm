@@ -73,16 +73,13 @@ class Test_Generation_polygon(unittest.TestCase):
 
         dip= 35
         delta_dip = 5
-        prob_min_mag_cutoff = 1.0
         azi=[45]
         dazi=[5]
         fault_dip=[60]
         fault_width=12
-        prob_min_mag_cutoff=2.1
         
         generation_polygons, magnitude_type = polygons_from_xml(
-            file_name,
-            prob_min_mag_cutoff=prob_min_mag_cutoff)
+            file_name)
             
         boundary = [(151.1500, -32.4000), 
                     (152.1700, -32.7500),

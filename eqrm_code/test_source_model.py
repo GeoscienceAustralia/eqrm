@@ -78,8 +78,7 @@ class Test_Source_model(unittest.TestCase):
 """
         handle.write(sample)
         handle.close()
-
-        prob_min_mag_cutoff = 1.0
+        prob_min_mag_cutoff = 4.0
         source_model = source_model_from_xml(file_name,
                                              prob_min_mag_cutoff)
         os.remove(file_name)
@@ -98,6 +97,7 @@ class Test_Source_model(unittest.TestCase):
         number_of_mag_sample_bins = 15
         event_type = 'fish'
         name = 'bake'
+        prob_min_mag_cutoff = 1.0
         szp = Source_Zone(boundary,exclude,
                           min_magnitude,max_magnitude,
                           prob_min_mag_cutoff,
@@ -117,9 +117,6 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         self.failUnless(result.A_min==szp.A_min,
             'Failed!')
-        self.failUnless(result.prob_min_mag_cutoff ==
-                         szp.prob_min_mag_cutoff,
-            'Failed!')
         self.failUnless(result.name == name,'Failed!')
         self.failUnless(szp.name == name,'Failed!')
         self.failUnless(source_model._magnitude_type == 'Mw','Failed!')
@@ -137,10 +134,11 @@ class Test_Source_model(unittest.TestCase):
         number_of_mag_sample_bins = 15
         event_type = 'fish'
         name = 'Source_Zone'
-        szp = Source_Zone(boundary,exclude,
-                          min_magnitude,max_magnitude,
+        prob_min_mag_cutoff = 1.0
+        szp = Source_Zone(boundary, exclude,
+                          min_magnitude, max_magnitude,
                           prob_min_mag_cutoff,
-                          A_min,b,
+                          A_min, b,
                           number_of_mag_sample_bins, event_type,
                           name)
         self.failUnless(boundary==szp._linestring,
@@ -155,78 +153,10 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         self.failUnless(A_min==szp.A_min,
             'Failed!')
-        self.failUnless(prob_min_mag_cutoff==szp.prob_min_mag_cutoff,
-            'Failed!')
         self.failUnless(szp.number_of_mag_sample_bins== \
                         number_of_mag_sample_bins,'Failed!')
 
-    # This test is only testing obsolete code 
-    def fix_test_Source_mini_check_gong(self):
-        # Might start off hacky
-
-        # this failed using the polygon contains point in shapely 1.03
-        
-        reset_seed(True)
-        
-        eqrm_dir = determine_eqrm_path()
-        file_name = join(eqrm_dir, 'implementation_tests', 'input',
-                         'newc_zone_source.xml')
-        fid_sourcepolys = open(file_name)
-        
-        prob_min_mag_cutoff = 4.5
-        weight = [1.0]
-        number_of_mag_sample_bins = 100000000
-        source_model = Obsolete_Source_Models(prob_min_mag_cutoff,
-                                     weight,
-                                     number_of_mag_sample_bins,
-                                     fid_sourcepolys)
-
-        max_width = 15
-        azi = [180, 180, 180, 180, 180, 180]
-        prob_delta_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
-        dip = [35, 35, 35, 35, 35, 35]
-        prob_min_mag_cutoff = 4.5
-        prob_number_of_events_in_zones = [2, 1, 1, 2, 2, 2]
-        prob_number_of_mag_sample_bins = 15
-       
-#         a = Dummy()
-#         b = Dummy()
-#         # Yes, the values will be overwritten.
-#         source_model = [a, b, a, b, a, b]
-        
-        events = Event_Set.generate_synthetic_events(
-            file_name,
-            prob_min_mag_cutoff,
-            source_model,
-            prob_number_of_events_in_zones=prob_number_of_events_in_zones)
-        
-        event_activity = Event_Activity(len(events))
-        new_event_set = source_model.calculate_recurrence(
-            events,
-            event_activity)
-        event_activity_calc = events.event_activity
-        # Warning - this is just the results from running
-        # calculate_recurrence at this version.
-        # It is not independantly calculated to be correct
-        #actual =  [0.0058021,   0.01526108,  0.12673276,
-        #          0.23324915,  0.00144009,  0.00121821,
-        #         0.0062062,   0.00902211,  0.00554215,
-        #        0.0097141 ]
-        actual =  [0.00869837,  0.02287905,  0.09860858,
-                   0.09665979,  0.00086677,  0.00073323,
-                   0.00570561,  0.00829439,  0.00312413,
-                   0.00547587]
-        self.failUnless(len(actual) == len(event_activity_calc), 'Failed!')
-        # this fails using self.__contains_point_geo(point)
-        msg = ('array(actual)=\n%s\nevent_activity=\n%s'
-               % (str(array(actual)), str(event_activity_calc)))
-        self.assert_(allclose(array(actual),event_activity_calc), msg)
-        
-        msg = ('array(actual)=\n%s\nevent_activity=\n%s'
-               % (str(array(actual)), str(event_activity.event_activity)))
-        self.assert_(allclose(array(actual),
-                              event_activity.event_activity[:,0,0]), msg)
-
+   
     def test_Source(self):
         def dump_etc(etc):
             """Helper function to dump info from EG object."""
