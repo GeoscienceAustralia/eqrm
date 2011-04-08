@@ -165,7 +165,7 @@ class Source_Model(object):
         # a ground motion model.  So split this class into two classes sometime
         source = Source(min_magnitude=None,
                         max_magnitude=None,
-                        prob_min_mag_cutoff=None,
+                        generation_min_mag=None,
                         A_min=None, b=None, number_of_mag_sample_bins=None,
                         name='scenario',
                         event_type=None)
@@ -181,10 +181,12 @@ class Source(object):
     The class is created with the FSG data, and the ETC data is added later.
     """
 
-    def __init__(self, min_magnitude, max_magnitude, prob_min_mag_cutoff,
+    def __init__(self, min_magnitude, max_magnitude, generation_min_mag,
                  A_min, b, number_of_mag_sample_bins, event_type, name,
                  recurrence_model_distribution='bounded_gutenberg_richter'):
         """
+        generation_min_mag - The minimum event generation specified
+          by the user
         min_magnitude,max_magnitude,
         prob_min_mag_cutoff,A_min,b are floats
         
@@ -196,7 +198,7 @@ class Source(object):
 
         self.min_magnitude = min_magnitude
         self.max_magnitude = max_magnitude
-        self.prob_min_mag_cutoff = prob_min_mag_cutoff
+        self.actual_min_mag_generation = max(generation_min_mag, min_magnitude)
         self.A_min = A_min
         self.b = b
         self.number_of_mag_sample_bins = number_of_mag_sample_bins
@@ -273,7 +275,7 @@ class Source_Zone(Source, polygon_object):
         Source.__init__(self,
                         min_magnitude=min_magnitude,
                         max_magnitude=max_magnitude,
-                        prob_min_mag_cutoff=prob_min_mag_cutoff,
+                        generation_min_mag=prob_min_mag_cutoff,
                         A_min=A_min,
                         b=b,
                         number_of_mag_sample_bins=number_of_mag_sample_bins,

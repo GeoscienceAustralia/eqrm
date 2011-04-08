@@ -38,9 +38,7 @@ def calc_event_activity(event_set, source_model):
     for source in source_model: # loop over source zones 
         #print "source.prob_min_mag_cutoff", source.prob_min_mag_cutoff
         #print "source.min_magnitude", source.min_magnitude
-        if source.prob_min_mag_cutoff is None:
-            source.prob_min_mag_cutoff = 4.5
-        zone_mlow = max(source.prob_min_mag_cutoff, source.min_magnitude)
+        zone_mlow = source.actual_min_mag_generation
         #print "zone_mlow", zone_mlow
         zone_mhgh = source.max_magnitude
                
