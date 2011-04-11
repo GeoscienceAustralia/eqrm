@@ -367,7 +367,7 @@ class Fault_Source_Generator(object):
         #see python tutorial s4.7.4
 
 
-def polygons_from_xml(filename, prob_min_mag_cutoff=None):
+def polygons_from_xml(filename):
     doc=Xml_Interface(filename=filename)
     if not doc['Source_Model'] == []:
         raise Exception('zone source file format incorrect.')
@@ -408,7 +408,7 @@ def polygons_from_xml(filename, prob_min_mag_cutoff=None):
     return generation_polygons, magnitude_type
 
 
-def xml_fault_generators(filename, prob_min_mag_cutoff=None):
+def xml_fault_generators(filename):
     """Read Horspool style XML.
 
     attributes:
@@ -518,8 +518,7 @@ def xml_fault_generators(filename, prob_min_mag_cutoff=None):
     return (fsg_list, magnitude_type)
 
 
-def polygons_from_xml_horspool(doc,
-                               prob_min_mag_cutoff=None):
+def polygons_from_xml_horspool(doc):
     """
     
     Returns a list of Generation_Polygon and magnitude_type
