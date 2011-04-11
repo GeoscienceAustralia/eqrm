@@ -45,7 +45,6 @@ return_periods=[10;50;100;200;250;474.56;500;974.79;1000;2474.9;2500;5000;7500;1
 grid_flag=[1]\n\n\
 [Source]\n\
 prob_azimuth_in_zones=[180]\n\
-prob_min_mag_cutoff=[4.5]\n\
 prob_number_of_mag_sample_bins=[15]\n\
 max_width=[15]\n\
 ftype=[2]\n\
@@ -148,7 +147,6 @@ return_periods=[10;50;100;200;250;474.56;500;974.79;1000;2474.9;2500;5000;7500;1
 grid_flag=[1]\n\n\
 [Source]\n\
 prob_azimuth_in_zones=[180]\n\
-prob_min_mag_cutoff=[4.5]\n\
 prob_number_of_mag_sample_bins=[15]\n\
 max_width=[15]\n\
 ftype=[2]\n\
@@ -267,7 +265,6 @@ save_socloss_flag=[1]\n")
 
         # Probabilistic input
         set.prob_azimuth_in_zones = [10,30]
-        set.prob_min_mag_cutoff = 4.5 
         set.prob_number_of_mag_sample_bins = 15
         set.max_width = 15
         set.prob_number_of_events_in_zones = [5000,1000]
@@ -349,7 +346,6 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.scenario_number_of_events == 1.)
         
         self.failUnless(allclose(TPT.prob_azimuth_in_zones, asarray([10,30])))
-        #self.failUnless(TPT.prob_min_mag_cutoff == 4.5)
         self.failUnless(TPT.prob_number_of_mag_sample_bins == 15)
         self.failUnless(TPT.max_width == 15)
         self.failUnless(allclose(TPT.prob_number_of_events_in_zones,
@@ -418,7 +414,6 @@ save_socloss_flag=[1]\n")
         set.atten_use_variability = False
         set.amp_use_variability = False
         TPT = create_parameter_data(set)
-        self.failUnless(TPT.prob_min_mag_cutoff == None)
         self.failUnless(TPT.atten_variability_method == None)
         self.failUnless(TPT.amp_variability_method == None)
 
@@ -474,7 +469,6 @@ save_socloss_flag=[1]\n")
 
         # Probabilistic input
         set.prob_azimuth_in_zones = [10,30]
-        set.prob_min_mag_cutoff = 4.5 
         set.prob_number_of_mag_sample_bins = 15
         set.max_width = 15
         set.prob_number_of_events_in_zones = [5000,1000]
@@ -555,7 +549,6 @@ return_periods=[10;50;100;200]\n\
 grid_flag=[1]\n\
 [Source]\n\
 prob_azimuth_in_zones=[10,30,70,100,150,15]\n\
-prob_min_mag_cutoff=[4.5]\n\
 prob_number_of_mag_sample_bins=[15]\n\
 max_width=[15]\n\
 ftype=[2]\n\
@@ -663,7 +656,6 @@ save_socloss_flag=[0]\n")
         
         
         set.prob_azimuth_in_zones = [10,30,70,100,150,15]
-        set.prob_min_mag_cutoff = 4.5 
         set.prob_number_of_mag_sample_bins = 15
         set.max_width = 15
         set.prob_number_of_events_in_zones = [5000,1000,1000,3000,1000,1000]
@@ -770,7 +762,6 @@ return_periods=[10;50;100;200]\n\
 grid_flag=[1]\n\
 [Source]\n\
 prob_azimuth_in_zones=[10,30,70,100,150,15]\n\
-prob_min_mag_cutoff=[4.5]\n\
 prob_number_of_mag_sample_bins=[15]\n\
 max_width=[15]\n\
 ftype=[2]\n\
@@ -888,7 +879,6 @@ save_socloss_flag=[0]\n")
         
         # Other stuff - needed?
         set.prob_azimuth_in_zones = [10,30,70,100,150,15]
-        set.prob_min_mag_cutoff = 4.5 
         set.prob_number_of_mag_sample_bins = 15
         set.max_width = 15
         set.prob_number_of_events_in_zones = [5000,1000,1000,3000,1000,1000]
@@ -931,7 +921,6 @@ save_socloss_flag=[0]\n")
         
         # Other stuff - needed?
         set.prob_azimuth_in_zones = [10,30,70,100,150,15]
-        set.prob_min_mag_cutoff = 4.5 
         set.prob_number_of_mag_sample_bins = 15
         set.max_width = 15
         set.prob_number_of_events_in_zones = [5000,1000,1000,3000,1000,1000]
@@ -968,7 +957,6 @@ save_socloss_flag=[0]\n")
                               'amp_use_variability': 0,
                               'amp_max_factor': 10000},
             'Source': {'prob_azimuth_in_zones': 180,
-                       'prob_min_mag_cutoff': 4.5,
                        'prob_number_of_mag_sample_bins': 15,
                        'max_width': 15,
                        'ftype': 2,

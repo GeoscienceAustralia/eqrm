@@ -158,7 +158,6 @@ class Test_Polygon_Class(unittest.TestCase):
                       dazi=[10,10],
                       fault_dip=[30,30],
                       fault_width=15,
-                      prob_min_mag_cutoff=4.5,
                       override_xml=True)
         independent_polygons=get_independent_polygons_obsolete(polygons)
         assert len(independent_polygons)==3
