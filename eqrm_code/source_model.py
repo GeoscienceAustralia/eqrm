@@ -447,7 +447,7 @@ def create_fault_sources(event_control_file, fsg_list, magnitude_type):
     return source_model
 
 
-def source_model_from_xml(filename, prob_min_mag_cutoff=None):
+def source_model_from_xml(filename):
     doc=Xml_Interface(filename=filename)
     
     xml_source_model=doc['source_model_zone'][0]
