@@ -13,6 +13,7 @@
 import os
 import math
 from scipy import where, asarray
+import exceptions
 
 from eqrm_code.distributions import distribution_functions
 from eqrm_code.polygon import populate_polygon
@@ -20,6 +21,8 @@ from eqrm_code.polygon_class import polygon_object
 from eqrm_code.xml_interface import Xml_Interface
 from eqrm_code.conversions import azimuth_of_trace
 from eqrm_code.recurrence_functions import calc_A_min_from_slip_rate
+
+class FileError(exceptions.Exception): pass
 
 ##############################################################################
 
@@ -432,14 +435,16 @@ def xml_fault_generators(filename):
                % (filename, doc.xml_node.documentElement.nodeName))
         raise Exception(msg)
 
-    # get magnitude type attribute
+    # get magnitude type attribute try:
     try:
         magnitude_type = top_tag.attributes['magnitude_type']
     except KeyError:
-        msg = ("Badly formed XML in file %s: no 'magnitude_type' attribute "
-               "for 'source_model_fault' tag"
-               % filename)
-        raise Exception(msg)
+        magnitude_type = 'Mw'
+    
+    if  magnitude_type != 'Mw':
+        msg = "XML Error: magnitude_type must be 'Mw'."
+        raise FileError(msg)
+        
 
     # check that we have one or more 'fault' tags
     faults = doc['fault']
@@ -525,9 +530,16 @@ def polygons_from_xml_horspool(doc):
 
     Assumes only one source model
     """
-    xml_Source_Model =doc['source_model_zone'][0]
-    magnitude_type=xml_Source_Model.attributes['magnitude_type']
+    xml_Source_Model = doc['source_model_zone'][0]
+    try:
+        magnitude_type = xml_Source_Model.attributes['magnitude_type']
+    except KeyError:
+        magnitude_type = 'Mw'
     
+    if  magnitude_type != 'Mw':
+        msg = "Badly formed XML: magnitude_type must be 'Mw'."
+        raise FileError(msg)
+        
     generation_polygons=[]
     xml_polygons = doc['zone']
     for i, xml_polygon in enumerate(xml_polygons):
