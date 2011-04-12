@@ -28,9 +28,10 @@ The process for computing earthquake hazard can be described by
 the following steps:
 \begin{enumerate}
 \item the generation of a catalogue of synthetic earthquakes (or
-events) (see \cref{ch:source}), \item the propagation or
+events) (see \cref{ch:source}), 
+\item the propagation or
 attenuation (see \cref{ch:atten}) of the `seismic wave' from each
-of the events in 1 to locations of interest (see \cref{ch:grids}),
+of the events in 1 to locations of interest (see \cref{ch:application}),
 \item accounting for the interactions between the propagating
 `seismic wave' and the local geology or regolith (see
 \cref{ch:reg}), and \item accounting for the probability of each
@@ -42,7 +43,7 @@ three steps as the earthquake hazard. The fourth step and onwards
 can be described as follows:
 \begin{enumerate}
 \item[4.] estimating the probability that the portfolio buildings
-(see \cref{ch:grids}) will experience different levels of damage
+(see \cref{ch:application}) will experience different levels of damage
 (see \cref{ch:damage}), \item[5.] the computation of direct
 financial loss as a result of the probabilities computed in 4 (see
 \cref{ch:losses}), and \item[6.] assembling the results to compute
@@ -67,10 +68,8 @@ manual. These features include:
 \item \textbf{Text highlighting -} Important parameters, file
 names and code are identified by a typeset font. \item
 \textbf{Index -} An index has been introduced to allow speedy of
-navigation of the manual. \item \textbf{Chapter summary - } Each
-chapter is concluded with a `Key functions, flags and parameters'
-section that summarises the key code related items that were
-discussed in the chapter.
+navigation of the manual.
+
 \end{itemize}
 
 
@@ -93,24 +92,12 @@ specific earthquake of interest (a scenario based simulation) or
 how it can model the effect of `all foreseeable' events (a
 probabilistic simulation).
 
-\textit{\cref{ch:grids}: Grids and building databases} describes
-how calculations of risk and hazard are conducted on a point by
-point basis. In the case of earthquake hazard,  a grid of points
-is created and hazard computed at each of the grid nodes.
-Typically a regular grid is used to improve the production of
-hazard maps, however this is not a requirement. Earthquake risk
-calculations are also performed on a grid. Each node of the grid
-represents the centroid of a building within a portfolio of
-interest. The chapter demonstrates how the grid points are
-associated with other attributes such as site--class or building
-construction type.
-
-\textit{\cref{ch:atten}: Attenuation} discusses the propagation
-(or attenuation) of the motion from each of the synthetic
-earthquakes in the event catalogue to locations of interest.
-Different measures of distance between an event and a site of
-interest are introduced. The chapter also describes the
-attenuation models that can be used with the EQRM application.
+\textit{\cref{ch:atten}: Ground-Motion Prediction Equations} discusses
+the propagation (or attenuation) of the motion from each of the
+synthetic earthquakes in the event catalogue to locations of interest.
+Different measures of distance between an event and a site of interest
+are introduced. The chapter also describes the attenuation models that
+can be used with the EQRM application.
 
 \textit{\cref{ch:reg}: Regolith amplification} discusses how local
 geology, or regolith, can be incorporated in an earthquake hazard
@@ -130,9 +117,9 @@ of buildings in a region of interest.
 direct financial loss as a result of the damage estimates
 described in \textit{\cref{ch:damage}}. The chapter also provides
 a brief description of how the EQRM application can estimate
-injuries and casualties.
+fatalities.
 
-\textit{\cref{ch:risk}: Displaying hazard and risk results}
+\textit{\cref{ch:risk}: Hazard and Risk Results}
 describes how the results from the EQRM application can be
 summarised and displayed. There are many ways to display estimates
 of earthquake hazard and risk. Earthquake hazard is commonly
@@ -140,9 +127,7 @@ modelled in terms of a probability (often 10\%) of a particular
 ground motion (usually acceleration) being exceeded in some time
 frame (often 50 years). In the case of a scenario based
 simulation, earthquake risk can be modelled in terms of dollar
-estimates of building loss. Such losses can be categorised by
-building type\index{building type}, geography or any other
-category of interest. In the case of a probabilistic simulation,
+estimates of building loss. In the case of a probabilistic simulation,
 earthquake risk is often modelled in terms of one or both of the
 following:
 \begin{enumerate}
