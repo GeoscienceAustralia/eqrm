@@ -19,7 +19,6 @@ from os.path import join
 # Operation Mode
 run_type = "hazard" 
 is_scenario = False
-max_width = 15
 site_tag = "newc" 
 return_periods = [100.0, 50.0, 15.0, 10]
 input_dir = r".\implementation_tests\input/" 
