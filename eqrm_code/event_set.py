@@ -209,24 +209,10 @@ class Event_Set(object):
             fault_width = (depth_bottom_seismogenic \
                            - depth_top_seismogenic)/ \
                            sin(dip*math.pi/180.)
-#         fault_width_old = (depth_bottom_seismogenic \
-#                            - depth_top_seismogenic)/ \
-#                            sin(dip*math.pi/180.)
-#         assert allclose(fault_width, fault_width_old)
         if width is None:
             width = conversions.\
                 modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
                                                         fault_width)
-#         print "dip", dip
-#         print "Mw", Mw
-#         print "area", area
-#         print "fault_width", fault_width
-#        Width_old = conversions.\
-#                modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
-#                                                        fault_width)
-#        print "width", width
-#        print "width_old", width_old
-#        assert allclose(width, width_old)
         if depth is None:
             depth = conversions.depth(depth_top_seismogenic,
                                       dip, Mw, fault_width)
