@@ -35,11 +35,11 @@ the preferred value for \typepar{csm\_}{hysteretic\_}{damping} is
 experimental purposes.
 
 A simulation can be started by executing an EQRM control file or by
-executing \texttt{analysis.py} and passing a control file in.  The
-control file is a Python script, so Python code can be used to
-manipulate parameter values.  Note though that all variables other
-than the parameter values must be deleted to avoid passing unknown
-variables into EQRM.
+executing \texttt{analysis.py} with a control file as the first
+parameter.  The control file is a Python script, so Python code can be
+used to manipulate parameter values.  Note though that all variables
+other than the parameter values must be deleted to avoid passing
+unknown variables into EQRM.
 
 \vspace{2em}
 
@@ -81,7 +81,7 @@ not exceed \typepar{max\_width}{}{} (km).\\
 \hline \vspace{0.1em} \texttt{site\_tag}: \\
 String used in input and
 output file
- names. Typically used to define the city or study of interest (e.g.
+ names. Typically used to define the city or region of interest (e.g.
  \texttt{newc} is used in the demos).\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{site\_db\_tag}: \\
@@ -117,20 +117,20 @@ List whose elements represent the site
 \vspace{2em}
 \begin{tabular}{|p{\textwidth}|}
 %---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{zone\_source\_tag}: \\
-Extra tag for specifying a unique source zone file. 
-If  \texttt{zone\_source\_tag} is defined the
-filename for the zone source file is
-\texttt{<site\_tag>\_zone\_source\_<fault\_source\_tag>.xml}.
-Otherwise it is \texttt{<site\_tag>\_zone\_source.xml}.
-\\
-%---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{fault\_source\_tag}: \\
 Extra tag for specifying a unique source fault file. 
 If  \texttt{fault\_source\_tag} is defined the
 filename for the fault source file is
 \texttt{<site\_tag>\_fault\_source\_<fault\_source\_tag>.xml}.
 Otherwise it is \texttt{<site\_tag>\_fault\_source.xml}.
+\\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{zone\_source\_tag}: \\
+Extra tag for specifying a unique source zone file. 
+If  \texttt{zone\_source\_tag} is defined the
+filename for the zone source file is
+\texttt{<site\_tag>\_zone\_source\_<fault\_source\_tag>.xml}.
+Otherwise it is \texttt{<site\_tag>\_zone\_source.xml}.
 \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{event\_control\_tag}: \\
@@ -159,6 +159,9 @@ Otherwise it is \texttt{<site\_tag>\_event\_control.xml}.
 \hline \vspace{0.1em} \texttt{scenario\_azimuth}: \\
 Azimuth of the scenario event (degrees from true North).   \\
 %---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{scenario\_depth}: \\
+Depth to event centroid (km).    \\
+%---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{scenario\_latitude}: \\
 Latitude of rupture centroid. \\
 %---------------------------------------------------------
@@ -167,9 +170,6 @@ Longitude of rupture centroid.    \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{scenario\_magnitude}: \\
  Moment magnitude of event.    \\
-%---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{scenario\_depth}: \\
-Depth to event centroid (km).    \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{scenario\_dip}: \\
 Dip of rupture plane (degrees from horizontal).  \\
