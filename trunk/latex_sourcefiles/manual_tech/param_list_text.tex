@@ -190,6 +190,30 @@ or the CSM (\typepar{csm\_}{variability\_}{method}$=3$).\\
 \begin{tabular}{|p{\textwidth}|}
 %---------------------------------------------------------
 \hline
+\vspace{0.3em} \noindent \Large \textbf{Probabalistic Input:} \normalsize \\
+%---------------------------------------------------------
+\hline \vspace{0.1em}
+
+All of the parameters in this section can be specified in the fault
+source or zone source xml files.  Specifying them here will override
+the values in the xml files.\\
+
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{prob\_number\_of\_events\_in\_zones}: \\
+A list, where each element is the desired number of events for each
+zone source.\\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{prob\_number\_of\_events\_in\_faults}: \\
+A list, where each element is the desired number of events for each
+fault source.\\
+%---------------------------------------------------------
+\hline
+ \end{tabular}
+ 
+\vspace{2em}
+\begin{tabular}{|p{\textwidth}|}
+%---------------------------------------------------------
+\hline
 \vspace{0.3em} \noindent \Large \textbf{Ground Motion Input:} \normalsize \\
 %---------------------------------------------------------
 \hline \vspace{0.1em}
@@ -211,7 +235,7 @@ incorporate GMPE aleatory uncertainty: \\
  \hspace{0.5em} 6 $\Rightarrow$ $-2\sigma$.\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_periods}: \\
-Periods for RSA. Values must ascend. \\
+Periods for RSA. Values must ascend. The first value must be 0.0.\\
 %---------------------------------------------------------
 \vspace{0.1em} \texttt{atten\_threshold\_distance}: \\
 DEFAULT $=$ 400 \\
@@ -221,7 +245,6 @@ Threshold distance (km) beyond which motion is assigned to zero. \\
 DEFAULT $=$ None \\
 Number of bins created when spawning. \\
 %---------------------------------------------------------
-\hline
 \hline \vspace{0.1em} \texttt{atten\_override\_RSA\_shape}: \\
 DEFAULT = \texttt{None} \\
 Use GMPE for PGA only and change shape of RSA. If `None' use RSA
@@ -301,7 +324,7 @@ Building usage classification system - \texttt{'HAZUS'} or \texttt{'FCB'} \\
 \hline \vspace{0.1em}
 \texttt{buildings\_set\_damping\_Be\_to\_5\_percent}: \\
 SUGGESTED = \texttt{False} \\
-If \texttt{True} use a damping $B_e$ of $5\%$ for all building structures.\\
+If \texttt{True} a damping $B_e$ of $5\%$ will be used for all building structures.\\
 \hline
 %---------------------------------------------------------
  \end{tabular}
@@ -331,7 +354,7 @@ SUGGESTED = 0.3 \\
 Standard deviation for capacity curve\index{capacity curve} log--normal PDF.      \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_regimes}: \\
-SUGGESTED = 0 \\
+PREFERRED = 0 \\
  Damping multiplicative formula to be
 used: \\
  \hspace{0.5em} 0 $\Rightarrow$ \small{PREFERRED}: use $R_a$, $R_v$, and $R_d$; \\
@@ -339,7 +362,7 @@ used: \\
  \hspace{0.5em} 2 $\Rightarrow$ use $R_v$ only and assign $R_a=R_d=R_v$. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_modify\_Tav}: \\
-SUGGESTED = \texttt{True} \\
+PREFERRED = \texttt{True} \\
 Modify transition building period i.e. corner period $T_{av}$: \\
  \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: modify as in HAZUS; \\
  \hspace{0.5em}  \texttt{False} $\Rightarrow$ do NOT modify. \\
@@ -353,12 +376,12 @@ Modify transition building period i.e. corner period $T_{av}$: \\
 \begin{tabular}{|p{\textwidth}|}
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_use\_smoothing}: \\
-SUGGESTED = \texttt{True} \\
+PREFERRED = \texttt{True} \\
 Smoothing of damped curve: \\
  \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: apply smoothing; \\
  \hspace{0.5em} \texttt{False} $\Rightarrow$ NO smoothing.\\
 \hline \vspace{0.1em} \texttt{csm\_hysteretic\_damping}: \\
-SUGGESTED = \texttt{`curve'} \\
+PREFERRED = \texttt{`curve'} \\
 Technique for Hysteretic  damping: \\
  \hspace{0.5em} \texttt{None} $\Rightarrow$ no hysteretic  damping \\
  \hspace{0.5em} \texttt{`trapezoidal'} $\Rightarrow$ Hysteretic  damping via trapezoidal approximation; \\

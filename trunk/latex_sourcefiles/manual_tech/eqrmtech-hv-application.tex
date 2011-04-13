@@ -171,9 +171,10 @@ close the polygon.
 \end{itemize}
 
 \textbf{Recurrence inputs} (\texttt{recurrence\_model})
+Note, there is only one recurrence model per zone.
 \begin{itemize}
 \item \texttt{distribution}: Distribution used to define the magnitude recurrence relations. Note that
-the EQRM current only supports a Bounded Gutenberg-Richter recurrence
+the EQRM currently only supports a Bounded Gutenberg-Richter recurrence
 relationship for source zones (i.e.
 \typepar{bounded}{\_gutenberg}{\_richter})
 \item \texttt{recurrence\_min\_mag}: Minimum magnitude used to
@@ -226,13 +227,21 @@ intraslab earthquakes must be defined by a bounded Gutenberg-Richter
 relationship. The following grey box provides an example of a source
 fault file with the following source types:
 \begin{enumerate}
-\item \textit{crustal fault} with recurrence defined by a bounded Gutenberg-Richter
-relationship (\texttt{fault 1}),
-\item \textit{crustal fault} with recurrence defined by a combined bounded Gutenberg-Richter
-(for small earthquakes) and a characteristic recurrence for larger
-earthquakes (\texttt{fault 2}),
-\item a \textit{3D dipping volume} to represent intraslab earthquakes in the
-subducting slab (\texttt{intraslab 1}).
+
+\item \textit{crustal fault} with recurrence defined by a bounded
+  Gutenberg-Richter relationship (\texttt{fault 1}),
+
+\item \textit{crustal fault} with recurrence defined by a combined
+  bounded Gutenberg-Richter (for small earthquakes) and a
+  characteristic recurrence for larger earthquakes (\texttt{fault 2}),
+
+\item a \textit{subduction interface} with recurrence defined by
+  Gutenberg-Richter (for small earthquakes) and/or a characteristic
+  recurrence for larger earthquakes (\texttt{fault 3}),
+
+\item a \textit{3D dipping volume} to represent intraslab earthquakes
+  in the subducting slab (\texttt{intraslab 1}).
+
 \end{enumerate}
 Many of the parameters in the source fault file are identical to
 those described in \sref{sec:source-zone-file} and are not described
@@ -243,6 +252,7 @@ below.
 \lstinputlisting{../../demo/input/newc_fault_source.xml}
 
 \textbf{Parameters unique to the source fault file}
+See \cref{ch:atten} for further detail.
 \begin{itemize}
 \item \texttt{dip}: Dip of fault, defined as angle in degrees from
   horizontal.
@@ -282,6 +292,25 @@ subducting slab).
 
 \section{Event Type Control File}
 \label{sec:event-type-control_file}
+
+
+
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+ \\
+ If \texttt{<event\_control\_tag>} is defined then the file name is:\\
+\texttt{<site\_tag>\_}\texttt{event\_control\_}\texttt{<event\_control\_tag>}\texttt{.xml}
+\\
+\\
+Otherwise the file name is:\\
+\texttt{<site\_tag>\_}\texttt{event\_control}\texttt{.xml}\\
+\\
+\hline
+\end{tabular}
+\end{center}
+
+
 \begin{center}
 \begin{tabular}{|c|}
 \hline
@@ -328,11 +357,10 @@ The parameters enclosed within \texttt{<scaling} and \texttt{/>}
 \begin{itemize}
 
 \item \texttt{scaling\_rule}: Defines the set of scaling rules which
-  link $M_w$ to area, length and/or width. Currently the only set of
-  scaling rules supported by the EQRM are those defined by Wells and
-  Coppersmith (1994). Therefore, the only allowable options are
-  \texttt{Wells\_and\_Coppersmith\_94} and
-  \texttt{modified\_Wells\_and\_Coppersmith\_94}.
+  link $M_w$ to area, length and/or width. Currently the only
+  allowable options are \texttt{Wells\_and\_Coppersmith\_94},
+   \texttt{modified\_Wells\_and\_Coppersmith\_94} and 
+  \texttt{Leonard\_SCR}.
 
 \item \texttt{scaling\_fault\_type}: Fault mechanism used with the scaling rule.
 Allowable options are \texttt{normal}, \texttt{reverse},
