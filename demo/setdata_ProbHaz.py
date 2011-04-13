@@ -30,9 +30,11 @@ site_indexes = [2255, 11511, 10963, 686]
 fault_source_tag = "no_fault" 
 
 # Attenuation
+atten_models = ['Sadigh_97']
+atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 2
-atten_periods = [0.0, 0.30303000000000002, 1.0]
+atten_periods = [0.0, 0.3, 1.0]
 atten_threshold_distance = 400
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
