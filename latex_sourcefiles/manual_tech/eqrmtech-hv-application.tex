@@ -123,8 +123,9 @@ recurrence parameters. NOTE - the EQRM only supports moment magnitude
 
 \textbf{General zone inputs} (\texttt{zone})
 \begin{itemize}
-\item \texttt{area}: Area of the source zone in km$^2$
-\item \texttt{name}: Name for the source zone
+\item \texttt{area}: Area of the source zone in km$^2$.  This is
+  optional.  Currently the value is not used.
+\item \texttt{name}: Name for the source zone.
 \item \texttt{event\_type}: Pointer to the collection of inputs described in the
 event type controlfile.
 \end{itemize}
@@ -388,7 +389,7 @@ Current options for the GMPE are: \\
 \texttt{"Sommerville09\_Non\_Cratonic"} $\Rightarrow$ Sommerville (2009) Average Non \\
     \hspace{8em} Cratonic model. \\
 \texttt{"AllenSEA06"} $\Rightarrow$ Allen \textit{et al.} (2006) model for South Eastern Australia \\
-\texttt{"Liang\_2008"} $\Rightarrow$ Liang \textit{et al.} (2006) \\
+\texttt{"Liang\_2008"} $\Rightarrow$ Liang \textit{et al.} (2008) \\
 \texttt{"Atkinson06\_hard\_bedrock"} $\Rightarrow$ Atkinson and Boore (2006) model for hard \\
     \hspace{8em} bedrock ($V_{s30}$=760\,ms$^{-1}$)\\
 \texttt{"Atkinson06\_bc\_boundary\_bedrock"} $\Rightarrow$ Atkinson and Boore (2006) model for \\
@@ -399,14 +400,14 @@ Current options for the GMPE are: \\
 \texttt{"Campbell08"} $\Rightarrow$ Campbell and Borzorgnia (2008) NGA model \\
 \texttt{"Akkar\_2010\_crustal"} $\Rightarrow$ Akkar and Bommer (2010) model for Mediterranean \\
     \hspace{8em} and Middle East\\
-\texttt{"Zhao\_2006\_interface"} $\Rightarrow$ Zhao \textit{et al.} (2006) model for earthquakes \\
-    \hspace{8em} on the subduction interface near Japan \\
+\texttt{"Zhao\_2006\_interface"} $\Rightarrow$ Atkinson and Boore (2003) model for \\
+    \hspace{8em} earthquakes in the subducting slab \\
 \texttt{"Atkinson\_2003\_intraslab"} $\Rightarrow$ Zhao \textit{et al.} (2006) model for \\
     \hspace{8em} earthquakes in the subducting slab near Japan\\
 \texttt{"Atkinson\_2003\_interface"} $\Rightarrow$ Atkinson and Boore (2003) model for \\
     \hspace{8em} earthquakes on the subduction interface\\
-\texttt{"Zhao\_2006\_intraslab"} $\Rightarrow$ Atkinson and Boore (2003) model for \\
-    \hspace{8em} earthquakes in the subducting slab \\
+\texttt{"Zhao\_2006\_intraslab"} $\Rightarrow$ Zhao \textit{et al.} (2006) model for earthquakes \\
+    \hspace{8em} on the subduction interface near Japan \\
 \hline
 \end{tabular}
 
@@ -429,9 +430,11 @@ Filename: \texttt{<site\_tag>\_par\_site.csv} \\
 \end{tabular}
 \end{center}
 
-The site file for hazard is a csv file containing a list of points at which the hazard (PSHA simulation)
- or ground motion (scenario simulation) will be computed. An example is
- given below in the grey shaded box:
+The site file for hazard is a csv file containing a header and a list
+of points at which the hazard (PSHA simulation) or ground motion
+(scenario simulation) will be computed. An example is given below in
+the grey shaded box:
+ 
 \lstinputlisting{xml_examples/java_par_site.csv}
 
 \textbf{Parameters in the hazard site file:}
@@ -477,7 +480,7 @@ portfolio. It contains a list of points at which the risk (PSHA simulation)
     \tref{tab:v-dam-allbtypes}, \tref{tab:hazus-types}) for a full
     description of the types.
 
-\item \texttt{STRUCTURE\_CATEGORY}: Type of structure. Currently ``texttt{BUILDING} `` only
+\item \texttt{STRUCTURE\_CATEGORY}: Type of structure. Currently texttt{BUILDING} only
 \item \texttt{HAZUS\_USAGE}: Index to HAZUS usage\index{building usgage!HAZUS} classification (\sref{sec:grids-usageclass})
 \item \texttt{SUBURB}: within which building is located
 \item \texttt{POSTCODE}: Postcode within which building is located
@@ -509,7 +512,9 @@ When creating a database that sub-samples a larger portfolio,
 individual database entries are used to represent more than one
 `real' building. Such sub-sampling is undertaken to reduce run
 times and memory requirements. Results from an EQRM  loss
-simulation are scaled to the full portfolio using the \typesf.
+simulation are scaled to the full portfolio using the \typesf.  The
+script \texttt{aggregate\_building\_db.py} in \texttt{eqrm\_code} can
+be used to produce a sub-sampled database.
 
 
 \subsubsection{Building construction types}
@@ -681,63 +686,63 @@ usage\index{building usgage!FCB} (ABS, 2001) %\citep{dr_ABS01a}
 
 \begin{table}
 \centering \caption{Functional classification of building
-(FCB)\index{building usgage!FCB} \citep{dr_ABS01a} and integer
-index used in the building database\index{building database}
-column 15.} \vspace{0.8em} \label{tab:grids-FCB}  {\footnotesize .
+(FCB)\index{building usgage!FCB} \citep{dr_ABS01a}
+  .} \vspace{0.8em} \label{tab:grids-FCB} 
+   {\footnotesize .
 \begin{tabular}{|c|p{0.8\textwidth}|}
  \hline
-& \textbf{Residential: Separate, kit and transportable homes} \\
-1 & 111: Separate Houses\\
-2 & 112: Kit Houses\\
-3 & 113: Transportable/relocatable homes\\
-& \textbf{Residential: Semi-detached, row or terrace houses, townhouses}  \\
-4 & 121: One storey\\
-5 & 122: Two or more storeys\\
-& \textbf{Residential: Flats, units or apartments} \\
-6 & 131:  In a one or two storey block\\
-7 & 132: In a three storey block\\
-8 & 133:  In a four or more storey block\\
-9 & 134:  Attached to a house\\
-& \textbf{Residential: Other residential buildings} \\
-10 & 191:  Residential: not otherwise classified \\
+\textbf{Residential: Separate, kit and transportable homes} \\
+ 111: Separate Houses\\
+ 112: Kit Houses\\
+ 113: Transportable/relocatable homes\\
+\textbf{Residential: Semi-detached, row or terrace houses, townhouses}  \\
+ 121: One storey\\
+ 122: Two or more storeys\\
+ \textbf{Residential: Flats, units or apartments} \\
+ 131:  In a one or two storey block\\
+ 132: In a three storey block\\
+ 133:  In a four or more storey block\\
+ 134:  Attached to a house\\
+ \textbf{Residential: Other residential buildings} \\
+ 191:  Residential: not otherwise classified \\
 \hline
-& \textbf{Commercial: Retail and wholesale trade building} \\
-11 & 211:  Retail and wholesale trade buildings \\
-& \textbf{Commercial: Transport buildings} \\
-12 & 221:  Passenger transport buildings\\
-13 & 222:  Non-passenger transport buildings\\
-14 & 223:  Commercial carparks\\
-15 & 224:  Transport: not otherwise classified\\
-& \textbf{Commercial: Offices} \\
-16 & 231:  Offices \\
-& \textbf{Commercial: Other commercial buildings} \\
-17 & 291:  Commercial: not otherwise classified\\
-& \textbf{Industrial: Factories and other secondary production buildings} \\
-18 & 311:  Factories and other secondary production buildings \\
-& \textbf{Industrial: Warehouses} \\
-19 & 321:  Warehouses (excluding produce storage) \\
-& \textbf{Industrial: Agricultural and aquacultural buildings} \\
-20 & 331:  Agricultural and aquacultural buildings \\
-& \textbf{Industrial: Other industrial buildings} \\
-21 & 391:  Industrial: not otherwise classified\\
+ \textbf{Commercial: Retail and wholesale trade building} \\
+ 211:  Retail and wholesale trade buildings \\
+ \textbf{Commercial: Transport buildings} \\
+ 221:  Passenger transport buildings\\
+ 222:  Non-passenger transport buildings\\
+ 223:  Commercial carparks\\
+ 224:  Transport: not otherwise classified\\
+ \textbf{Commercial: Offices} \\
+ 231:  Offices \\
+ \textbf{Commercial: Other commercial buildings} \\
+ 291:  Commercial: not otherwise classified\\
+ \textbf{Industrial: Factories and other secondary production buildings} \\
+ 311:  Factories and other secondary production buildings \\
+ \textbf{Industrial: Warehouses} \\
+ 321:  Warehouses (excluding produce storage) \\
+ \textbf{Industrial: Agricultural and aquacultural buildings} \\
+ 331:  Agricultural and aquacultural buildings \\
+ \textbf{Industrial: Other industrial buildings} \\
+ 391:  Industrial: not otherwise classified\\
 \hline
-& \textbf{Other Non-Residential: Education buildings} \\
-22 & 411:  Education buildings \\
-& \textbf{Other Non-Residential: Religion buildings} \\
-23 & 421:  Religion buildings \\
-& \textbf{Other Non-Residential: Aged care buildings} \\
-24 & 431:  Aged care buildings \\
-& \textbf{Other Non-Residential: Health facilities (not in 431)} \\
-25 & 441:  Hospitals \\
-26 & 442:  Health: not otherwise classified\\
-& \textbf{Other Non-Residential: Entertainment and recreation buildings} \\
-27 & 451:  Entertainment and recreation buildings \\
-& \textbf{Other Non-Residential: Short term accommodation buildings} \\
-28 & 461:  Self contained, short term apartments\\
-29 & 462:  Hotels (predominately accommodation), motels, boarding houses, hostels or lodges\\
-30 & 463:  Short Term: not otherwise classified\\
-& \textbf{Other Non-Residential: Other non-residential buildings} \\
-31 & 491:  Non-residential:not otherwise classified\\
+ \textbf{Other Non-Residential: Education buildings} \\
+ 411:  Education buildings \\
+ \textbf{Other Non-Residential: Religion buildings} \\
+ 421:  Religion buildings \\
+ \textbf{Other Non-Residential: Aged care buildings} \\
+ 431:  Aged care buildings \\
+ \textbf{Other Non-Residential: Health facilities (not in 431)} \\
+ 441:  Hospitals \\
+ 442:  Health: not otherwise classified\\
+ \textbf{Other Non-Residential: Entertainment and recreation buildings} \\
+ 451:  Entertainment and recreation buildings \\
+ \textbf{Other Non-Residential: Short term accommodation buildings} \\
+ 461:  Self contained, short term apartments\\
+ 462:  Hotels (predominately accommodation), motels, boarding houses, hostels or lodges\\
+ 463:  Short Term: not otherwise classified\\
+ \textbf{Other Non-Residential: Other non-residential buildings} \\
+ 491:  Non-residential:not otherwise classified\\
 \hline
 \end{tabular}
 }
@@ -746,52 +751,51 @@ column 15.} \vspace{0.8em} \label{tab:grids-FCB}  {\footnotesize .
 
 \begin{table}
 \centering \caption{HAZUS building usage
-classification\index{building usgage!HAZUS} \citep{dr_FEMA99b} and
-integer index used in the building database\index{building
-database} column 5.} \label{tab:grids-HAZUSusage} \vspace{0.8em}
+classification\index{building usgage!HAZUS} \citep{dr_FEMA99b}.}
+ \label{tab:grids-HAZUSusage} \vspace{0.8em}
 \begin{tabular}{|c|p{0.8\textwidth}|}
 \hline
-& \textbf{Residential}\\
-1 & RES1: Single family dwelling (house)\\
-2 & RES2: Mobile home\\
-3 & RES3: Multi family dwelling (apartment/condominium) \\
-4 & RES4: Temporary lodging (hotel/motel)\\
-5 & RES5: Institutional dormitory (jails, group housing - military, colleges)\\
-6 & RES6: Nursing home\\
+ \textbf{Residential}\\
+ RES1: Single family dwelling (house)\\
+ RES2: Mobile home\\
+ RES3: Multi family dwelling (apartment/condominium) \\
+ RES4: Temporary lodging (hotel/motel)\\
+ RES5: Institutional dormitory (jails, group housing - military, colleges)\\
+ RES6: Nursing home\\
 \hline
-& \textbf{Commercial}\\
-7 & COM1: Retail trade (store)\\
-8 & COM2: Wholesale trade (warehouse)\\
-9 & COM3: Personal and repair services (service station, shop)\\
-10 & COM4: Professional and technical services (offices)\\
-11 & COM5: Banks\\
-12 & COM6: Hospital\\
-13 & COM7: Medical office and clinic\\
-14 & COM8: Entertainment and recreation (restaurants, bars)\\
-15 & COM9: Theaters\\
-16 & COM10: Parking (garages)\\
+\textbf{Commercial}\\
+ COM1: Retail trade (store)\\
+ COM2: Wholesale trade (warehouse)\\
+ COM3: Personal and repair services (service station, shop)\\
+ COM4: Professional and technical services (offices)\\
+ COM5: Banks\\
+ COM6: Hospital\\
+ COM7: Medical office and clinic\\
+ COM8: Entertainment and recreation (restaurants, bars)\\
+ COM9: Theaters\\
+ COM10: Parking (garages)\\
 \hline
-& \textbf{Industrial}\\
-17 & IND1: Heavy (factory)\\
-18 & IND2: Light (factory)\\
-19 & IND3: Food, drugs and chemicals (factory)\\
-20 & IND4: Metals and mineral processing (factory)\\
-21 & IND5: High technology (factory)\\
-22 & IND6: Construction (office)\\
+ \textbf{Industrial}\\
+ IND1: Heavy (factory)\\
+ IND2: Light (factory)\\
+ IND3: Food, drugs and chemicals (factory)\\
+ IND4: Metals and mineral processing (factory)\\
+ IND5: High technology (factory)\\
+ IND6: Construction (office)\\
 \hline
-& \textbf{Agriculture}\\
-23 & AGR1: Agriculture\\
+ \textbf{Agriculture}\\
+ AGR1: Agriculture\\
 \hline
-& \textbf{Religion/Non/Profit}\\
-24 & REL1: Church and non-profit\\
+ \textbf{Religion/Non/Profit}\\
+ REL1: Church and non-profit\\
 \hline
-& \textbf{Government}\\
-25 & GOV1: General services (office)\\
-26 & GOV2: Emergency response (police, fire station, EOC)\\
+ \textbf{Government}\\
+ GOV1: General services (office)\\
+ GOV2: Emergency response (police, fire station, EOC)\\
 \hline
-& \textbf{Education}\\
-27 & EDU1: Grade schools\\
-28 & EDU2: Colleges and Universities (not group housing)\\
+ \textbf{Education}\\
+ EDU1: Grade schools\\
+ EDU2: Colleges and Universities (not group housing)\\
 \hline
 \end{tabular}
 \end{table}

@@ -36,7 +36,23 @@ experimental purposes.
 
 A simulation can be started by executing an EQRM control file or by
 executing \texttt{analysis.py} with a control file as the first
-parameter.  The control file is a Python script, so Python code can be
+parameter.  
+
+
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+ \\
+ Two ways of running EQRM:\\
+\texttt{>python EQRM\_control\_file.py}\\
+\\
+\texttt{>python analysis.py EQRM\_control\_file.py}\
+\\
+\hline
+\end{tabular}
+\end{center}
+
+The control file is a Python script, so Python code can be
 used to manipulate parameter values.  Note though that all variables
 other than the parameter values must be deleted to avoid passing
 unknown variables into EQRM.
