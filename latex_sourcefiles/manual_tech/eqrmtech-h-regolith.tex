@@ -74,19 +74,18 @@ each site conducted within a loop over sites.
 \end{enumerate}
 
 The preparation of amplification factors involves interpolating each
-to the periods defined in the the EQRM control file parameter:
-\typeself{atten-periods} (see ~\sref{sec:application-EQRMcf}). The
-application of the amplification factors is carried out immediately
-after the evaluation of the attenuation model. The process is
-described for a specific site located within a known Site Class:
+to the periods defined in the the EQRM control file parameter (see
+~\sref{sec:application-EQRMcf}). The application of the
+amplification factors is carried out immediately after the
+evaluation of the attenuation model. The process is described for a
+specific site located within a known Site Class:
 \begin{enumerate}
 \item Bin all of the events in the event catalogue into the
 bedrock PGA and moment magnitude bins defined by the bin centroids
-in \typevar{}{}{pga\_bins} and \typevar{}{}{moment\_magnitude\_bins}
-respectively (see ~\sref{sec:-appl-amplification}). Note that the
-end points of the 'central' bins are assumed to be half way between
-the bin centroids. The first and last bins extend to negative and
-positive infinity respectively.
+(see ~\sref{sec:-appl-amplification}). Note that the end points of
+the 'central' bins are assumed to be half way between the bin
+centroids. The first and last bins extend to negative and positive
+infinity respectively.
 \item Use a nested loop over all PGA bins (upper loop) and moment
 magnitude bins (lower loop) and apply the amplification factor as
 follows:
@@ -126,35 +125,34 @@ As with the application of an attenuation model, the EQRM applies
 $PGA_{cut}$ to $S_{a,soil}(T_o,r_m,R)$ after applying the
 amplification factor. This accounts for any unrealistically high
 selection of amplification factor. A secondary upper cut-off
-facility exists and involves the use of the
-\typepar{amp}{\_max}{\_factor}(see \sref{sec:application-EQRMcf}).
-The \typepar{amp}{\_max}{\_factor} parameter is applied directly to
-the amplification factor as follows:
+facility exists and involves the use of the amplification maximum
+factor (AmaxF) (see \sref{sec:application-EQRMcf}). The AmaxF
+parameter is applied directly to the amplification factor as
+follows:
 \begin{equation}
 \label{eq:regolith-maxampfactor}
-F_{new}(T_o,r_m^*,PGA^*) = \left \{ \begin{array}{ll} F_{old} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old}<$\typepar{amp}{\_max}{\_factor}} \\
-\textrm{\typepar{amp}{\_max}{\_factor}} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} \geq $ \typepar{amp}{\_max}{\_factor}} \\
+F_{new}(T_o,r_m^*,PGA^*) = \left \{ \begin{array}{ll} F_{old} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old}< $ AmaxF} \\
+\textrm{AmaxF} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} \geq $ AmaxF} \\
 \end{array} \right.
 \end{equation}
 or brevity the functional reference to $r_m^*$ and $PGA^*$ in
 $F_{new}$ and $F_{old}$ in
 \ereftwo{eq:regolith-maxampfactor}{eq:regolith-minampfactor} refers
 to the fact that these values represent the bin centroids of
-\typevar{}{}{moment\_magnitude\_bins} and \typevar{p}{ga}{\_bins}
-respectively. In most simulations the secondary cutoff is not used
-since $PGA_{cut}$ handles scaling for an upper bound. Ignoring
-\typepar{amp}{\_max}{\_factor} is achieved by setting it to to a
-very high number (e.g. \typepar{amp}{\_max}{\_factor}=10000). In
-contrast, there is another parameter in the EQRM control file known
-as \typepar{amp}{\_min}{\_factor} which is commonly utilised within
-the EQRM application. This parameter stops the selection of any
-unrealistically low selections of the amplification factor. The
-\typepar{amp}{\_min}{\_factor} is commonly set to around 0.6. It is
+magnitude and PGA bins, respectively. In most simulations the
+secondary cutoff is not used since $PGA_{cut}$ handles scaling for
+an upper bound. Ignoring AmaxF is achieved by setting it to to a
+very high number (e.g. AmaxF=10000). In contrast, there is another
+parameter in the EQRM control file known as amplification minimum
+factor (AminF) which is commonly utilised within the EQRM
+application (see \sref{sec:application-EQRMcf}). This parameter
+stops the selection of any unrealistically low selections of the
+amplification factor. The AminF is commonly set to around 0.6. It is
 applied as follows:
 \begin{equation}
 \label{eq:regolith-minampfactor}
-F_{new}(T_o,r_m^*,PGA^*) = \left \{ \begin{array}{ll} F_{old} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} >$\typepar{amp}{\_min}{\_factor}} \\
-\textrm{\typepar{amp}{\_min}{\_factor}} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} \leq $ \typepar{amp}{\_min}{\_factor}} \\
+F_{new}(T_o,r_m^*,PGA^*) = \left \{ \begin{array}{ll} F_{old} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} > $ AminF} \\
+\textrm{AminF} & \textrm{$\forall$ \hspace{0.2em} $T_o$ s.t. $F_{amp,old} \leq $ AminF} \\
 \end{array} \right.
 \end{equation}
 Note that a value of \mbox{$F<1$} leads to a de-amplification of
