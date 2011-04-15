@@ -57,16 +57,17 @@ Acceleration (PGA), and $5\%$ damped Pseudo Spectral Acceleration
 define the response variable based on two horizontal components as
 typically recorded in the field; Considering the perpendicular
 horizontal components to be independent, geometric mean or average
-of horizontal components, to name a few. Although using the
-geometric mean has the advantage that the standard deviation for the
-ground-motion models is smaller than for other measures
-\citep{eqrm_Beyer06}, this measurement nevertheless depends on the
-orientations of the sensors installed in the field. Recently,
-\citet{eqrm_Boore06} introduced an alternative definition of ground
-motion that is independent of the sensor orientation. They defined
-parameters, GMRotI50, and GMRotD50 based on a set of geometric means
-computed from the recorded orthogonal horizontal motions after
-rotating them through a non-redundant angle of 90 degrees.
+of horizontal components, to name a few (for example see
+Table~\ref{GMPEs}). Although using the geometric mean has the
+advantage that the standard deviation for the ground-motion models
+is smaller than for other measures \citep{eqrm_Beyer06}, this
+measurement nevertheless depends on the orientations of the sensors
+installed in the field. Recently, \citet{eqrm_Boore06} introduced an
+alternative definition of ground motion that is independent of the
+sensor orientation. They defined parameters, GMRotI50, and GMRotD50
+based on a set of geometric means computed from the recorded
+orthogonal horizontal motions after rotating them through a
+non-redundant angle of 90 degrees.
 
 The most widely used seismological parameters by GMPEs are
 earthquake magnitude (source parameter), source-to-site distance
@@ -112,12 +113,13 @@ Finite-source distance measures:
  \centering \psfrag{Rjb}{$\Rjb$}
 \psfrag{Rhyp}{$\Rhyp$} \psfrag{Rrup}{$\Rrup$} \psfrag{Repi}{$\Repi$}
 \psfrag{site}{site} \psfrag{fault}{fault} \psfrag{d}{$h$}
-\includegraphics[width=0.7\textwidth]{diags/fig-hattn-distance.pdf}
-\caption{Diagram showing the distance measures used in various
+\includegraphics[width=0.7\textwidth]{diags/fig-hattn-distance-test2.pdf}
+\caption{Diagram showing the source-to-site distance measures used
+in various
   attenuation formulae.}
   \label{fig:attn-distances}
 \end{figure}
-In case of small earthquake that can be represented by a point
+In the case of small earthquake that can be represented by a point
 source, the point source measures can be considered as
 source-to-site distance measure. However, the point source measures
 are not suitable to describe the attenuation of ground motion away
@@ -125,19 +127,19 @@ from large earthquakes. In this case, the finite source measures are
 preferred.
 
 Local site conditions profoundly affect the ground motion record
-characteristics. Several numerical and/or empirical techniques have
+characteristics. Several numerical and empirical techniques have
 been proposed to estimate local site responses. Such studies show
 distinct amplification levels in the sites of different geological
 and geotechnical characteristics; therefore, it is an ordinary
 practice to categorize sites into different general classes.
-Different sites of the same class are supposed to have local site
-responses with similar characteristics. The most commonly used site
-categorization schemes by GMPEs are based on geomatrix, surface
-geology, and average shear wave velocity over 30m ($V_{S30}$).
-Actually, many of the GMPEs follow exactly the same or similar
-classification criteria as suggested by the \citet{eqrm_NEHRP00}
-(Table ~\ref{NEHRP}). $V_{S30}$ has also been included directly in
-the functional form of several GMPEs. It is worth mentioning that in
+Different sites of the same class have local site responses with
+similar characteristics. The most commonly used site categorization
+schemes by GMPEs are based on geomatrix, surface geology, and
+average shear wave velocity over top 30m ($V_{S30}$). Actually, many
+of the GMPEs follow exactly the same or similar classification
+criteria as suggested by the \citet{eqrm_NEHRP00} (Table
+~\ref{NEHRP}). $V_{S30}$ has also been included directly in the
+functional form of several GMPEs. It is worth mentioning that in
 spite of $V_{S30}$ popularity as a site parameter, it has its own
 shortcomings. Several studies have suggested using other site
 parameters such as the average shear wave velocity over the depth
@@ -146,11 +148,10 @@ equal to a quarter-wavelength of the period of interest
 100-200m \citep{eqrm_Lee95}.
 \begin{table}[!t]
 \renewcommand{\arraystretch}{1.3}
-\caption{Site categories in NEHRP provisions} \label{NEHRP}
-\centering
+\caption{Site classes in NEHRP provisions} \label{NEHRP} \centering
 \begin{tabular}{|c|c|c|}
 \hline
-Site Category & Description & $V_{S30}$\\
+Site Class & Description & $V_{S30}$\\
 \hline
 A & Hard rock & $>1500 m/s$\\
 \hline
@@ -180,29 +181,30 @@ Australia, Eastern North America). The subduction zone earthquakes
 can be further divided into intraslab events and earthquakes along
 the interface of subducting plates (e.g. Japan, Chile, Indonesia).
 For details of the main characteristics of each category see
-\citet{eqrm_Campbell03}. For each tectonic region, a handful of
-GMPEs are available for use within EQRM software. Their main
+\citet{eqrm_Campbell03}. For each tectonic region, a range of GMPEs
+are available for use within EQRM software. Their main
 characteristics are summarized in Table~\ref{GMPEs}. All of these
 equations are widely used in engineering and engineering seismology.
 They reflect a broad variety of tastes in terms of their functional
-forms and databases.
+forms and strong motion databases. This facilitates capturing of
+epistemic uncertainty (see~\sref{sec:attn-multi-attnmodels}).
 
 Considering the general tectonic setting of the region of interest,
 the user may either select GMPEs from those listed in
-Table~\ref{GMPEs}, or implement his or her desirable model. It
-should be also noted that GMPEs have to be selected based on their
-magnitude and frequency validity ranges. In other words, GMPEs
-should not be used outside the ranges of their underlying dataset
-\citep{eqrm_Bommer07}. General guidelines on selection of GMPEs for
-seismic hazard analysis are provided by \citet{eqrm_Cotton06} and
-\citet{eqrm_Bommer10}. In addition, if strong motion data is
-available in the target region, it can be used to verify candidate
-GMPEs. To compare ground motions or GMPEs between regions, the main
-approaches are the direct comparison of median predictions from
-GMPEs for different regions \citep{eqrm_Stafford08}, analysis of
-variance \citep{eqrm_Douglas04}, and evaluation of the consistency
-of data distributions with respect to a GMPE using likelihood
-concepts \citep{eqrm_Scherbaum04} or information-theory approach
+Table~\ref{GMPEs}. It should be also noted that GMPEs have to be
+selected based on their magnitude and frequency validity ranges. In
+other words, GMPEs should not be used outside the ranges of their
+underlying dataset \citep{eqrm_Bommer07}. General guidelines on
+selection of GMPEs for seismic hazard analysis are provided by
+\citet{eqrm_Cotton06} and \citet{eqrm_Bommer10}. In addition, if
+strong motion data is available in the target region, it can be used
+to verify candidate GMPEs. To compare ground motions or GMPEs
+between regions, the main approaches are the direct comparison of
+median predictions from GMPEs for different regions
+\citep{eqrm_Stafford08}, analysis of variance
+\citep{eqrm_Douglas04}, and evaluation of the consistency of data
+distributions with respect to a GMPE using likelihood concepts
+\citep{eqrm_Scherbaum04} or information-theory approach
 \citep{eqrm_Scherbaum09}.
 
 The complexity of the implemented GMPEs varies based on the database
@@ -217,10 +219,11 @@ GMPEs, \citet{eqrm_Abrahamson08}, \citet{eqrm_Campbell08}, and
 \citet{eqrm_Chiou08} models can be considered as the most complex
 with many input parameters required. They notably require extra
 input parameters to model: (1) observed higher ground-motions on the
-hanging-wall of the fault-plane, (2) larger ground-motions generated
-by buried rupture earthquakes, and (3) basin effect which is
-believed to have significant impact on amplification of ground
-motion especially at longer period range.
+hanging-wall of the fault-plane ($R_x$), (2) larger ground-motions
+generated by buried rupture earthquakes ($Z_{TOR}$), and (3) basin
+effect which is believed to have significant impact on amplification
+of ground motion especially at longer period range ($Z_{1.0}$,
+$Z_{2.5}$).
 \begin{landscape}
 \begin{table}
 \centering
@@ -292,7 +295,7 @@ in California. In many regions, however, it is not possible to
 determine all the necessary input parameters for such complicated
 models. General guidelines on estimating unknown input parameters
 when implementing NGA GMPEs in engineering practice are presented in
-\citet{eqrm_Kak11}. The details on how EQRM feeds each of the
+\citet{eqrm_Kak11}. The details on how EQRM supplies each of the
 implemented GMPEs are given in the next section.
 %\begin{landscape}
 \begin{table}[!t]
@@ -352,29 +355,10 @@ Site Response\\
 
 
 
-\section{Implementation}\label{sec:implementation} the EQRM
-application computes the attenuation for one site at a time for all
-events and all fundamental (or building) periods. That is, for each
-site there exists a large matrix of modelled $S_a(T_o,r_m,R)$ whose
-rows correspond to the events (i.e. an $r_m$-$R$ pair) and whose
-columns correspond to the $T_o$. That is
-
-\begin{math}
-%\label{fig:attn-sa-matrix}
- SA = \left[ \begin{array}{ccccc}
-S_a(T_{o,1},r_{m,1},R_1) & S_a(T_{o,2},r_{m,1},R_1) &  \hdots & S_a(T_{o,N_T},r_{m,1},R_1) \\
-S_a(T_{o,1},r_{m,2},R_2) & S_a(T_{o,2},r_{m,2},R_2) &  \hdots & S_a(T_{o,N_T},r_{m,2},R_2) \\
-\vdots & \vdots &  \ddots & \vdots \\
-S_a(T_{o,1},r_{m,N_s},R_{N_s}) & S_a(T_{o,2},r_{m,N_s},R_{N_s}) & \hdots & S_a(T_{o,N_T},r_{m,N_s},R_{N_s}) \\
-\end{array} \right]
-\end{math}
-
-where $N_s$ refers to the number of events and $N_T$ refers to the
-number of periods. Note that the $r_m$-$R$ pair comes from the event
-catalogue and a calculation of distance, as described in this
-section. The $T_o$ are determined by the user using the EQRM control
-file parameter: \typeself{atten-periods} (see
-~\sref{sec:application-EQRMcf}). Computationally the above
+\section{Implementation}\label{sec:implementation} The EQRM
+application computes the attenuation for one site for all events and
+all user specified periods. That is, for each site there exists a
+large matrix of modelled $S_a(T_o,r_m,R)$. Computationally the above
 calculation of attenuation is conducted in two parts as follows:
 \begin{enumerate}
 \item The preparation of the attenuation coefficients
@@ -402,21 +386,31 @@ The required input parameters by implemented GMPEs in EQRM, to model
 source, path and site effects are listed in Table ~\ref{inputs}. The
 abbreviations used in this Table are defined in Table ~\ref{def}. As
 it can be seen GMPEs use different definitions for explanatory and
-response variables. Regarding response parameter,i.e. ground-motion
-parameter of interest, currently EQRM estimates $5 \%$ $S_a$ using
-GMPEs listed in Table \ref{GMPEs}. Conversion equations between
-different definitions of response variables are provided by
-\citet{eqrm_Beyer06}.  For each GMPE, EQRM should provide inputs
-respecting the original definition used within each model. In EQRM,
-the recurrence relationship and hence the generated earthquake
-catalogue are based on moment magnitude scale. However, among the
-implemented GMPES \citet{eqrm_Gaull90a}, and \citet{eqrm_Liang08}
-models use $M_L$ scale. In this case, adjustment is done using the
-correlation relationship between $M_L$ and $M_W$ as suggested by
-Johnston (\textit{pers. comm.}, 2001):
+response variables.
+
+Regarding response parameter,i.e. ground-motion parameter of
+interest, currently EQRM estimates $5 \%$ $S_a$ using GMPEs listed
+in Table \ref{GMPEs}. It should be noted that the EQRM estimates
+would be for the horizontal component type used by each GMPE. As can
+be seen in Table \ref{GMPEs} different horizontal component types
+are used by implemented GMPEs to define the response variable. Such
+incompatibilities become an issue as using multiple GMPEs is
+required (see ~\sref{sec:attn-multi-attnmodels}). A common target
+response parameter can be obtained using empirical correlations (see
+\citep{eqrm_Beyer06}). It is recommended that such empirical
+relationships be implemented in EQRM in the future.
+
+For each GMPE, EQRM should provide inputs respecting the original
+definition used within each model. In EQRM, the recurrence
+relationship and hence the generated earthquake catalogue are based
+on moment magnitude scale. However, among the implemented GMPES
+\citet{eqrm_Gaull90a}, and \citet{eqrm_Liang08} models use $M_L$
+scale. In this case, adjustment is done using the correlation
+relationship between $M_L$ and $M_W$ as suggested by Johnston
+(\textit{pers. comm.}, 2001):
 \begin{equation}\label{ml-mw}
 M_L =
-\frac{0.473+\sqrt{0.473^2-4\times0.145(3.45-M_W)}}{2\times0.145};
+\frac{0.473+\sqrt{0.473^2-4\times0.145(3.45-M_W)}}{2\times0.145}
 \end{equation}
 Equation~\ref{ml-mw} is developed for stable continental regions and
 is based on earlier work published by the same author
@@ -444,28 +438,29 @@ conversions are not necessary, since virtual fault-planes are
 generated through simulation process. This enables EQRM to not only
 directly calculate the proper Finite-source distance measure for
 each GMPE, but also to estimate all the source geometry related
-parameters, i. e. $h$, $W$, $\delta$, $R_x$. It should be noted that
-\citet{eqrm_Gaull90a}, and \citet{eqrm_Liang08} models use
-point-source distance measures: $R_{hypo}$ and $R_{epi}$. There are
-two obvious techniques that could be used to approximate $\Repi$ and
-$\Rhyp$. The first technique approximates $\Repi$ and $\Rhyp$ using
-$\Rjb$ and $\Rrup$ respectively. This technique is conservative
-since \mbox{$\Repi \geq \Rjb$} and \mbox{$\Rhyp \geq \Rrup$}. The
-second technique involves approximating $\Rhyp$ by using the
-distance to the rupture centroid and $\Repi$ with the distance to
-the vertical surface projection of the rupture centroid. The EQRM
-application currently uses the first (i.e. conservative) technique.
+parameters, i. e. $h$, $W$, $\delta$, $R_x$, and $Z_{TOR}$. It
+should be noted that \citet{eqrm_Gaull90a}, and \citet{eqrm_Liang08}
+models use point-source distance measures: $R_{hypo}$ and $R_{epi}$.
+There are two obvious techniques that could be used to approximate
+$\Repi$ and $\Rhyp$. The first technique approximates $\Repi$ and
+$\Rhyp$ using $\Rjb$ and $\Rrup$ respectively. This technique is
+conservative since \mbox{$\Repi \geq \Rjb$} and \mbox{$\Rhyp \geq
+\Rrup$}. The second technique involves approximating $\Rhyp$ by
+using the distance to the rupture centroid and $\Repi$ with the
+distance to the vertical surface projection of the rupture centroid.
+The EQRM application currently uses the first (i.e. conservative)
+technique.
 
 The only remaining parameters to be determined are site parameters.
-The $V_{S30}$ parameter is the required INPUT parameter that should
-be provided by the user. In the absence of shear-wave velocity
-measurements in the target region, several techniques exist to
-estimate $V_{S30}$; use of geological maps, geomorphological maps,
-topographic slope maps, to name a few. The Z1.0 and Z2.5 parameters
-are used by some of the NGA GMPEs to model the basin effects.
-Currently these parameters are not included in the INPUT file, and
-are estimated as follows: Z1.0 is estimated from Vs30 following the
-correlation relation suggested by \citet{eqrm_Chiou08}:
+The user supplies the vlues for $V_{S30}$ parameter. In the absence
+of shear-wave velocity measurements in the target region, several
+techniques exist to estimate $V_{S30}$; use of geological maps,
+geomorphological maps, topographic slope maps, to name a few. The
+Z1.0 and Z2.5 parameters are used by some of the NGA GMPEs to model
+the basin effects. Currently these parameters are not included in
+the control file, and are estimated as follows: Z1.0 is estimated
+from Vs30 following the correlation relation suggested by
+\citet{eqrm_Chiou08}:
 \begin{equation}
 ln(Z_{1.0}) = 28.5-0.4775ln(V_{S30}^8+38.7^8)
 \end{equation}
@@ -477,8 +472,9 @@ ln(Z_{2.5}) = 0.519+3.595Z_{1.0}
 \end{equation}
 It should be noted that by using these relations, we assume that the
 basin depths at target region and California are similar. However if
-it would not be the case this may introduce bias in predictions at
-longer periods, where the basin effects are most pronounced.
+this is not the case this assumption may introduce bias in
+predictions at longer periods, where the basin effects are most
+pronounced.
 
 \subsection{Further Comments on Specific GMPEs}
 
@@ -569,9 +565,6 @@ $Z_{1.0}$&&&\textbullet&&&\textbullet& &&&&&&&&
 &&\\
 $Z_{2.5}$&&&&&\textbullet&& &&&&&&&&
 &&\\
-$PGA_{rock}$&&&\textbullet&\textbullet&\textbullet&\textbullet&
-&&&&&\textbullet&&&
-&&\\
 \end{tabular}}
 \end{table}
 \end{landscape}
@@ -585,9 +578,11 @@ $PGA_{rock}$&&&\textbullet&\textbullet&\textbullet&\textbullet&
 
 \hline $M_L$ & {\small Local magnitude}\\
 
-\hline $h$ & {\small Focal depth (km)}\\
+\hline $h$ & {\small Focal depth (km); In EQRM: rupture centroid depth}\\
 
-\hline $W$ & {\small Down-dip rupture width (km)}\\
+\hline $Z_{TOR}$ & {\small Depth to the top of the rupture plane (km)}\\
+
+\hline $W$ & {\small Rupture width (km)}\\
 
 \hline $\delta$ & {\small Fault dip (degree)}\\
 
@@ -643,7 +638,7 @@ models representing different regions of Australia (\citet[Table
 Yilgarn Craton model which is applicable to Yilgarn Craton and other
 cratonic regions of Australia, and Non-Cratonic model applicable in
 all non-cratonic regions of Australia. For completeness sake, the
-model coefficients for Non-Cratonic model is listed in
+model coefficients for Non-Cratonic model are listed in
 Table~\ref{tab:Coeff-Somerville09_Non_Cratonic} because it was
 omitted from the original publication.
 
@@ -727,8 +722,7 @@ developers.
 \sreftwo{attn:uncert-randomchoice}{attn:uncert-pdfchoice} describe
 two of the most commonly used techniques for incorporating aleatory
 variability when using the EQRM. The flag to control the variability
-method is \typepar{atten}{\_variability}{\_method}(see
-~\sref{sec:application-EQRMcf}).
+method is defined by the user (see ~\sref{sec:application-EQRMcf}).
 
 \subsection{Random sampling of a response spectral acceleration\index{response spectral acceleration}}
 \label{attn:uncert-randomchoice}
@@ -764,9 +758,9 @@ random sampling exhibit a low level of spatial correlation.
 The number $n_{rand}$ can theoretically take on any value between
 $\pm \infty$. Therefore it is possible that estimates of $S_a$ using
 \eref{attn:attn-var} can be unrealistically large. The EQRM
-overcomes this problem by introducing a scaling factor
-$PGA_{cut}=$\typepar{atten}{\_pga}{\_scaling\_cutoff} which is
-applied to the RSA as follows:
+overcomes this problem by introducing a scaling factor $PGA_{cut}$
+(see ~\sref{sec:application-EQRMcf}) which is applied to the RSA as
+follows:
 \begin{equation}
  log(A_{S_a,new}(T_o,r_m,R)) = R_{scale} \times
 log(A_{S_a,old}(T_o,r_m,R))
@@ -813,7 +807,7 @@ calculation of hazard (or risk) using a different sample from the
 attenuation PDF.
 \begin{enumerate}
 \item Firstly the user must define a lower magnitude bound
-$m_{bnd}$, a number of samples $n_{smples}$ and a PDF range
+$m_{bnd}$, a number of samples $n_{samples}$ and a PDF range
 $n_\sigma$ (see \sref{source:spawning} for a complete definition).
 \item The $S_a$ is computed as follows
 \begin{equation}
@@ -821,20 +815,20 @@ $n_\sigma$ (see \sref{source:spawning} for a complete definition).
 \begin{array}{ll}
 log(A_{S_a,i}(T_o,r_m,R)) = \mu_{log(S_a)} - \epsilon_i
 \sigma_{log(S_a)}\ & \textrm{for $i=1 \ldots
-n_{smples}$} \\
+n_{samples}$} \\
 \end{array}
 \end{equation}
 where
 \begin{equation}
 \label{attn:uncertainty-def-epsilon}
 \begin{array}{ll}
-\epsilon_i = -n_\sigma + + (i-1)\Delta &
-\textrm{for $i=1 \ldots n_{smples}$} \\
+\epsilon_i = -n_\sigma + (i-1)\Delta &
+\textrm{for $i=1 \ldots n_{samples}$} \\
 \end{array}
 \end{equation}
 and
 \begin{equation}
-\Delta = \frac{2n_\sigma}{n_{smples}-1}.
+\Delta = \frac{2n_\sigma}{n_{samples}-1}.
 \end{equation}
 Note that
 \ereftwo{attn:uncertainty-pdfsample}{attn:uncertainty-def-epsilon}
@@ -842,8 +836,8 @@ ensure that the $S_a$ associated with each of the event copies are
 evenly spread across the domain of the attenuation PDF
 (\fref{fig:hattn-spawnsamp}). Recall from \sref{source:spawning}
 that the event activities $r_\nu$ giving rise to each of the $S_a$
-described in \eref{attn:uncertainty-pdfsample} are modified by
-\typefunc{fuse}{\_4}{hzd} as follows:
+described in \eref{attn:uncertainty-pdfsample} are modified as
+follows:
 \begin{equation}
 r_{\nu,i} = r_{\nu,original} \times w_{e,i}
 \end{equation}
@@ -854,7 +848,7 @@ gives rise to \mbox{$\mu_{log(S_a)}=[0.3g, 0.5g, 0.2g]$} at the
 periods \mbox{$T_o = [0s,0.3s,1s]$} respectively. Also assume that
 the estimates of $\mu_{log(S_a)}$ have the following standard
 deviations \mbox{$\sigma_{log(S_a)}=\sigma_a = [0.03,0.04,0.01]$}.
-Defining $m_{bnd}=0$, $n_{smples}=5$ and $n_\sigma=2.5$ gives
+Defining $m_{bnd}=0$, $n_{samples}=5$ and $n_\sigma=2.5$ gives
 \begin{equation}
 \Delta = \frac{2 \times 2.5}{5-1} = 1.25,
 \end{equation}
@@ -894,8 +888,8 @@ values is bounded by the $n_\sigma$. \item Estimates of all $S_a$
 are weighted against an event activity $r_\nu$ that accounts for the
 likelihood of a particular ground motion being observed. \item The
 nature of spawning means that there are more evaluations of the
-GMPE. This means that it is typically slower and more memory
-intesive since the $S_a$ array is larger.
+GMPE. This means that it is slower and more memory intesive since
+the $S_a$ array is larger.
 \end{enumerate}
 
 
@@ -903,11 +897,6 @@ intesive since the $S_a$ array is larger.
 
 \subsection{Recomendation for sampling GMPE aleatory Variability}
 
-\textbf{David to complete this section}
-\begin{itemize}
-\item use spawning for hazard - exaplin why
-\item use random sampling for risk - exaplain why
-\end{itemize}
 Using random sampling to capture aleatory variability may lead to
 highly spatially uncorrelated hazard maps. Hence it is recommended
 that spawning approach should be used for PSHA to create spatially
@@ -917,11 +906,9 @@ the need for spatially correlated maps.
 \section{Using multiple GMPEs - Incorporating epistemic uncertainty}
 \label{sec:attn-multi-attnmodels}
 
-The use of GMPEs in the EQRM is controlled by the
-\typepar{event}{\_type}{\_control} file (see
-\sref{sec:event-type-control_file}). In this file the user must
-specify the pointers to selected GMPEs as well as the weights for
-each model:
+The use of GMPEs in the EQRM is controlled by the user (see
+\sref{sec:event-type-control_file}). The user must specify the
+selected GMPEs as well as the weights for each model:
 \begin{center}
 \begin{math}
 %\label{fig:attn-sa-matrix}
@@ -931,12 +918,11 @@ w_{a,1} & w_{a,2} &  \hdots & w_{a,n} \\
 \end{array} \right],
 \end{math}
 \end{center}
-where the $\{P_i\}_{i=1}^n$ are corresponding labels of selected
-GMPEs and the real numbers $\{w_{a,i}\}_{i=1}^n$ are weights for the
-respective attenuation models. Note that the weights $w_i$ must
-either be all positive or all negative and
+where the $\{P_i\}_{i=1}^n$ are corresponding GMPEs and the real
+numbers $\{w_{a,i}\}_{i=1}^n$ are weights for the respective
+attenuation models. Note that the weights $w_i$ must sum to 1, i. e.
 \begin{equation}
-\left|\sum_{i=1}^{n}w_{a,i}\right| = 1.
+\sum_{i=1}^{n}w_{a,i} = 1.
 \end{equation}
 
 
@@ -947,11 +933,9 @@ to the mechanism used for spawning (see
 copied $n$ times (once for each attenuation model) and the
 appropriate attenuation model applied to its respective copy. The
 values of ground motion (loss for risk) can then be treated
-independently for the hazard/risk calculation (if
-$\sum_{i=1}^{n}w_{a,i} = -1$) or aggregated before the hazard/risk
-assessment is undertaken (if $\sum_{i=1}^{n}w_{a,i} = 1$). This
-notion of logic tree collapse is described by
-\fref{fig:attn-treecollapse}.
+independently for the hazard/risk calculation or aggregated before
+the hazard/risk assessment is undertaken. This notion of logic tree
+collapse is described by \fref{fig:attn-treecollapse}.
 
 
 \section{Collapse versus no-collapse}
