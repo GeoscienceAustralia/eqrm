@@ -20,6 +20,9 @@ import time
 import shutil
 import copy
 import datetime
+import RSA2MMI
+import fatalities
+import numpy
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
      arange, reshape, exp, tile
@@ -37,7 +40,7 @@ from eqrm_code.source_model import source_model_from_xml, Source_Model
 from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
          save_event_set, save_hazard, save_structures, save_val, \
          save_ecloss, join_parallel_files, join_parallel_files_column, \
-         save_damage, get_source_file_handle
+         save_damage, get_source_file_handle, save_fatalities
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
 from ground_motion_distribution import Distribution_Log_Normal
@@ -54,6 +57,9 @@ import eqrm_code.util as util
 import eqrm_filesystem as eq_fs
 
 
+class Dummy:
+    def __init__(self):
+        pass
     
 # data columns expected in a BRIDGE data file
 BridgeDataColumns = {'BID': int,
@@ -409,6 +415,9 @@ def main(parameter_handle,
     log.debug('Memory: save_motion array created')
     log.resource_usage()
 
+    if THE_PARAM_T.save_fatalities is True:
+        total_fatalities = zeros((array_size, num_psudo_events),
+                                    dtype=float)
 
     if THE_PARAM_T.save_total_financial_loss is True:
         total_building_loss_qw = zeros((array_size, num_spawning,
@@ -455,6 +464,14 @@ def main(parameter_handle,
         msg = 'Input data includes bridges, but number of events > 1?'
         raise RuntimeError(msg)
 
+    # if we're doing fatality calculation
+    # check the attenuation period is 1.0 seconds and only 1 dimension
+    if THE_PARAM_T.run_type == "fatality":
+        if not ((len(THE_PARAM_T.atten_periods)==1) and (THE_PARAM_T.atten_periods[0]==1.0)):
+            msg = "Attenuation period should be [1.0] for fatality calculation"
+            raise RuntimeError(msg)   
+         
+    
     for i in range(array_size):
         msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + str(array_size)
         log.info(msg)
@@ -496,6 +513,35 @@ def main(parameter_handle,
             event_activity,
             source_model)
 
+		# calculate fatality
+        if THE_PARAM_T.run_type == "fatality":
+            print 'STARTING fatality calculations'
+            # Decide which SA to use
+            if soil_SA is not None:
+                SA = soil_SA
+            else:
+                SA = bedrock_SA
+            
+            #print SA.shape
+            #print SA
+            MMI = RSA2MMI.rsa2mmi_array(SA)
+            #print MMI.shape
+            #print MMI
+            
+            #print sites, sites.attributes['POPULATION'][0]
+            
+            fatality = fatalities.forecast_fatality(MMI, sites.attributes['POPULATION'][0])
+            print fatality
+            #ind = numpy.nonzero(fatality>0)
+            #print ind
+            numelement = MMI.shape[1]
+            
+            print fatality.shape
+            if THE_PARAM_T.save_fatalities is True:
+                total_fatalities[rel_i,:] = numpy.reshape(fatality[0,:,0], numelement)
+                #temp = numpy.reshape(fatality[0,:,0], numelement)
+                #print temp.shape, total_fatalities[rel_i,:].shape
+            
         # calculate damage
         if THE_PARAM_T.run_type == "risk":
             #print 'STARTING building damage calculations'
@@ -736,7 +782,22 @@ def main(parameter_handle,
                            all_sites, compress=THE_PARAM_T.compress_output,
                            parallel_tag=parallel.file_tag)
         column_files_that_parallel_splits.append(file)
-
+        
+    if (THE_PARAM_T.save_fatalities is True and
+            parallel.lo != parallel.hi):
+        # note: will not handle multiple GMPES
+        file = save_fatalities('_fatalities',THE_PARAM_T,
+                           total_fatalities,
+                           sites=all_sites,
+                           compress=THE_PARAM_T.compress_output,
+                           parallel_tag=parallel.file_tag)
+        column_files_that_parallel_splits.append(file)
+        
+        files = save_distances(THE_PARAM_T, sites=all_sites,
+                               event_set=event_set,
+                               compress=THE_PARAM_T.compress_output,
+                               parallel_tag=parallel.file_tag)
+        column_files_that_parallel_splits.append(file)
 #        file = save_val(THE_PARAM_T,sum( \
 #             all_sites.cost_breakdown(
 # ci=THE_PARAM_T.loss_regional_cost_index_multiplier)[-1:]), '_cval',
@@ -1161,6 +1222,19 @@ def load_data(THE_PARAM_T):
         name = get_local_or_default(name, THE_PARAM_T.default_input_dir,
                                     THE_PARAM_T.input_dir)
         sites = Sites.from_csv(name, SITE_CLASS=str, VS30=float)
+        # FIXME this is a bit of a hack.  re Vs30 and VS30.
+        sites.attributes['Vs30'] = sites.attributes['VS30']
+    elif THE_PARAM_T.run_type == "fatality":
+		#raise RuntimeError('run_type "hazard" not yet modified for Bridges')
+
+        # we are running fatality calculation
+        name = THE_PARAM_T.site_tag + '_popexp.csv'
+
+        # find the location and FID for the grid file
+        # i.e. searches input_dir then defaultdir
+        name = get_local_or_default(name, THE_PARAM_T.default_input_dir,
+                                    THE_PARAM_T.input_dir)
+        sites = Sites.from_csv(name, SITE_CLASS=str, VS30=float, POPULATION=float)
         # FIXME this is a bit of a hack.  re Vs30 and VS30.
         sites.attributes['Vs30'] = sites.attributes['VS30']
     else:

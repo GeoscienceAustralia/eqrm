@@ -264,7 +264,6 @@ def load_ecloss_and_sites(save_dir, site_tag):
     assert total_building_loss.shape[0] == lat.shape[0]
     assert lat.shape[0] == lon.shape[0] == BID.shape[0]
     return total_building_loss, total_building_value, lon, lat
-
     
 def save_sites(output_dir, site_tag, sites, compress=False,
                 parallel_tag=None, write_title=True):
@@ -278,7 +277,7 @@ def save_sites(output_dir, site_tag, sites, compress=False,
         open = file
     if parallel_tag is None:
         parallel_tag = ''
-         
+        
     base_name =  output_dir + get_sites_file_name(site_tag)
     name = base_name + parallel_tag
     loc_file=open(name,'w')
@@ -1105,7 +1104,61 @@ def load_val(save_dir, site_tag, file_tag='_bval'):
         save_dir, get_val_file_name(site_tag, file_tag)),
                   dtype=scipy.float64, delimiter=',', skiprows=0)
     return val
+
+def save_fatalities(fatalities_name,THE_PARAM_T,fatalities,sites,compress=False,
+                parallel_tag=None, write_title=True):
+    """
+    Save fatalities and the list of sites (lat,lon).
     
+    parameters:
+      fatalities_name: a string tag, for the file name.
+      THE_PARAM_T - used to get output_dir and site_tag
+      fatalities - the fatality values to save.  2d array (location, events)
+    """
+
+    if compress:
+        open = myGzipFile
+    else:
+        open = file
+    if parallel_tag is None:
+        parallel_tag = ''  
+    base_name = os.path.join(THE_PARAM_T.output_dir, get_fatalities_file_name(
+        THE_PARAM_T.site_tag, fatalities_name))
+    name = base_name + parallel_tag
+    
+    if sites is not None:
+        save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+                       sites, compress, parallel_tag, write_title)
+                    
+    f=open(name,'w')
+    f.write('% This file contains the fatalities, subsequent rows are events\n')
+ 
+    for i in range(fatalities.shape[1]): # for all events
+        el=fatalities[:,i] # sites,event
+        f.write(' '.join(['%.10g'%(l) for l in el])+'\n')
+    f.close()
+    return base_name
+
+def get_fatalities_file_name(site_tag, fatalities_name):
+    return site_tag + fatalities_name + '.txt'    
+    
+def load_fatalities(fatalities_name, save_dir, site_tag):
+    """
+    
+    return:
+      fatalities: array with dimensions(events, sites)
+    """
+    file = os.path.join(
+        save_dir, get_fatalities_file_name(site_tag, fatalities_name))
+    BID_fatalities = scipy.loadtxt(file,
+                            dtype=scipy.float64, delimiter=' ', skiprows=1)
+    if len(BID_fatalities.shape) == 1: # one row file
+        BID_fatalities = reshape(BID_fatalities, (-1,1))
+    fatalities_loaded = scipy.transpose(BID_fatalities[0:,:])
+    
+    lat, lon = load_sites(save_dir, site_tag)
+    
+    return fatalities_loaded, lat, lon
     
 def join_parallel_files(base_names, size, compress=False):
     """

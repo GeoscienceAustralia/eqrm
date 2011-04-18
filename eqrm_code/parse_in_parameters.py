@@ -362,6 +362,10 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 100.06,
              'new_para': 'save_prob_structural_damage',
+             'default': False},
+             {'old_para': 'save_fatalities',
+             'order': 100.07,
+             'new_para': 'save_fatalities',
              'default': False}
             ]
 
