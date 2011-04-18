@@ -515,7 +515,7 @@ def main(parameter_handle,
 
 		# calculate fatality
         if THE_PARAM_T.run_type == "fatality":
-            print 'STARTING fatality calculations'
+            #print 'STARTING fatality calculations'
             # Decide which SA to use
             if soil_SA is not None:
                 SA = soil_SA
@@ -530,13 +530,16 @@ def main(parameter_handle,
             
             #print sites, sites.attributes['POPULATION'][0]
             
-            fatality = fatalities.forecast_fatality(MMI, sites.attributes['POPULATION'][0])
-            print fatality
+            fatality = fatalities.forecast_fatality(
+                MMI, 
+                sites.attributes['POPULATION'][0])
+                
+            #print fatality
             #ind = numpy.nonzero(fatality>0)
             #print ind
             numelement = MMI.shape[1]
             
-            print fatality.shape
+            #print fatality.shape
             if THE_PARAM_T.save_fatalities is True:
                 total_fatalities[rel_i,:] = numpy.reshape(fatality[0,:,0], numelement)
                 #temp = numpy.reshape(fatality[0,:,0], numelement)
