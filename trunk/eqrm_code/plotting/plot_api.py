@@ -25,10 +25,13 @@ import eqrm_code.plotting.plot_gmt_xyz_contour as pgxc
 import eqrm_code.plotting.calc_ignore_xyz as cix
 import eqrm_code.plotting.calc_annloss_deagg_distmag as cadd
 import eqrm_code.plotting.plot_annloss_deagg_distmag as padd
+import eqrm_code.plotting.calc_annfatalities_deagg_distmag as cafdd
+#import eqrm_code.plotting.plot_annloss_deagg_distmag as padd
 import eqrm_code.plotting.plot_barchart as pb
 import eqrm_code.plotting.utilities as util
 
 from eqrm_code.plotting import plot_pml
+from eqrm_code.plotting import plot_pml_fatalities
 from eqrm_code.plotting import calc_pml
 from eqrm_code.plotting import calc_annloss
 
@@ -178,7 +181,61 @@ def fig_loss_exceedance(input_dir, site_tag, title='',
     plot_pml.plot_pml(pml_curve, title=title,
                       output_file=output_file, grid=grid,
                       show_graph=show_graph, annotate=annotate)
+                      
+def fig_fatalities_exceedance(input_dir, site_tag, title='',
+                        output_file=None, grid=True,
+                        show_graph=False, annotate=[]):
+    """
 
+    This is also called the pml figure.  This is for fatalities
+    risk simulations.
+
+    Plot the PML data.  Optionally save a file or show the graph (or both).
+
+    Inputs:
+    input_dir    input directory
+    site_tag     event descriptor string    
+    title          if supplied, the graph title string
+    output_file    path of file to save plot picture in
+    grid           draw a grid on graph if True
+    show_graph     show graph on screen if True
+    annotate       an iterable like [(x, y, ann, dict), ...] where
+                       x    is X screen coordinate
+                       y    is Y screen coordinate
+                       ann  is the annotation string to display at (x, y)
+                       dict is a dictionary of key/value pairs as documented at
+                     http://matplotlib.sourceforge.net/api/pyplot_api.html
+                            (this is optional)
+                     NOTE: if annotate=None is used, no automatic
+                     annotation occurs.
+                     if annotate=[] is used, auto annotation is generated:
+                       timestamp
+                       clipping
+                       max input data value
+    """
+
+    # Load in the structure loss and structure value
+    (total_fatalities, _, _) = om.load_fatalities('_fatalities', input_dir, site_tag)
+    
+
+    # Load in the event activity
+    out_dict = om.load_event_set_subset(input_dir, site_tag)
+    event_activity = out_dict['event_activity']
+    
+    # Check array dimensions
+
+    # Do calculations
+    # aggregates fatalities across all sites
+    aggfatalities = numpy.sum(total_fatalities, axis=0) # sum rows
+    
+    pml_curve = calc_pml.calc_pml_fatalities(aggfatalities ,
+                                  event_activity)
+
+    # Plot it.
+    plot_pml_fatalities.plot_pmlf(pml_curve, title=title,
+                      output_file=output_file, grid=grid,
+                      show_graph=show_graph, annotate=annotate)
+    
 
 def fig_annloss_deagg_distmag(input_dir, site_tag, momag_labels,
                               momag_bin, range_bins, Zlim,
@@ -242,6 +299,69 @@ def fig_annloss_deagg_distmag(input_dir, site_tag, momag_labels,
                                     show_graph=show_graph,
                                     grid=grid, colormap=colormap,
                                     annotate=annotate)
+                                    
+
+def fig_annfatalities_deagg_distmag(input_dir, site_tag, momag_labels,
+                              momag_bin, range_bins, Zlim,
+                              R_extend_flag=True, 
+                              output_file=None, title=None,
+                              show_graph=False, grid=False,
+                              colormap=None,
+                              annotate=[]):
+    """Plot annualised fatalities deaggregated distance/magnitude data.
+    This is for probabalistic fatality simulations.
+
+    Inputs:   
+    input_dir    input directory
+    site_tag     event descriptor string
+    momag_labels an iterable containing the y-axis labels for each row of 'data'
+    range_bins   an iterable of range values for each column of 'data'
+    output_file  path to required output plot file
+    title        string used to title graph
+    show_graph   if True shows graph in window on screen
+    grid         if True puts a grid in the graph
+    colormap     name of the colormap to use
+    annotate     an iterable like [(x, y, str, dict), ...] where
+                     x    is X screen coordinate
+                     y    is Y screen coordinate
+                     str  is the annotation string to display at (x, y)
+                     dict is a dictionary of key/value pairs as documented at
+                          http://matplotlib.sourceforge.net/api/pyplot_api.html
+                          (this is optional)
+                 NOTE: if annotate=None is used, no automatic annotation occurs.
+                       if annotate=[] is used, auto annotation is generated:
+                           timestamp
+                           clipping
+                           max input data value   
+    """
+
+    # Load in the structure loss and structure value
+    results = om.load_fatalities('_fatalities', input_dir, site_tag)
+    total_fatalities = scipy.transpose(results[0])
+
+    # Load in the event activity, mag and distance
+    out_dict = om.load_event_set_subset(input_dir, site_tag)
+    event_activity = out_dict['event_activity']
+    Mw = out_dict['Mw']
+    distance = om.load_distance(input_dir, site_tag, True)
+
+    # Do calculations
+    NormDeAggFatalities = cafdd.calc_annfatalities_deagg_distmag(
+                                                    total_fatalities,
+                                                    event_activity,
+                                                    distance,
+                                                    Mw,
+                                                    momag_bin, range_bins, Zlim,
+                                                    R_extend_flag=R_extend_flag)
+
+    # Plot it.
+    padd.plot_annloss_deagg_distmag(NormDeAggFatalities, momag_labels,
+                                    range_bins, Zlim,
+                                    output_file=output_file,
+                                    title=title,
+                                    show_graph=show_graph,
+                                    grid=grid, colormap=colormap,
+                                    annotate=annotate)
 
 
 def fig_annloss_deagg_cells(input_dir, site_tag,
@@ -283,7 +403,102 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
                      title=title, np_posn=np_posn, s_posn=s_posn,
                      cb_label=cb_label, cb_steps=cb_steps, colourmap=colourmap,
                      annotate=annotate, show_graph=False)
+                     
+def fig_annfatalities_deagg_cells(input_dir, site_tag,
+                            output_file, save_file=None,
+                            title=None, np_posn=None, s_posn=None,
+                            cb_label=None, cb_steps=None,
+                            bins=10, scale=1.0, ignore=None, invert=False,
+                            colourmap=None, annotate=None):
 
+    # Load in the structure loss and structure value
+    results = om.load_fatalities('_fatalities', input_dir, site_tag)
+    # change dimensions(site, event) to dimensions(event, site)
+    total_fatalities = scipy.transpose(results[0])
+    lat = results[1]
+    lon = results[2]
+    
+    # Load in the event activity
+    out_dict = om.load_event_set_subset(input_dir, site_tag)
+    event_activity = out_dict['event_activity']
+    
+    print event_activity
+    
+    # Run annualised loss calc and bin data
+    percent_ann_loss, lat_lon, binx, _ = calc_annloss.calc_annfatalities_deagg_grid(
+        lat,
+        lon,
+        total_fatalities,
+        event_activity, bins=bins)
+    # check that the bins are equivalent
+    lon = lat_lon[:,1]
+    lat = lat_lon[:,0]
+    loss = scipy.reshape(percent_ann_loss, (-1,1))
+    lon = scipy.reshape(lon, (-1,1))
+    lat = scipy.reshape(lat, (-1,1))
+    lon_lat_ann_fatalities = scipy.concatenate((lon, lat, loss), axis=1)
+    #scipy.set_printoptions(threshold=scipy.nan)
+    pgx.plot_gmt_xyz(lon_lat_ann_fatalities, output_file, bins=binx,
+                     title=title, np_posn=np_posn, s_posn=s_posn,
+                     cb_label=cb_label, cb_steps=cb_steps, colourmap=colourmap,
+                     annotate=annotate, show_graph=False)
+                     
+def fig_fatalities_map(input_dir, site_tag,
+                            output_file, save_file=None, return_period=500, 
+                            title=None, np_posn=None, s_posn=None,
+                            cb_label=None, cb_steps=None,
+                            bins=10, scale=1.0, ignore=None, invert=False,
+                            colourmap=None, annotate=None):
+
+    # Load in the structure loss and structure value
+    results = om.load_fatalities('_fatalities', input_dir, site_tag)
+    # change dimensions(site, event) to dimensions(event, site)
+    total_fatalities = scipy.transpose(results[0])
+    lat = results[1]
+    lon = results[2]
+    
+    # Load in the event activity
+    out_dict = om.load_event_set_subset(input_dir, site_tag)
+    event_activity = out_dict['event_activity']
+    
+    columnscount = total_fatalities.shape[1]
+    #sites_pmlf = numpy.zeros(columnscount)
+    sites_data = numpy.zeros((columnscount, 3))
+    for i in range(columnscount):
+        temp = calc_pml.calc_pml_fatalities(total_fatalities[:,i], event_activity, return_period)
+        #sites_pmlf[i] = temp[1]
+        sites_data[i,0] = lon[i]
+        sites_data[i,1] = lat[i]
+        sites_data[i,2] = temp[1]
+        
+    #print sites_pmlf.shape
+    
+    pgxc.plot_gmt_xyz_contour(sites_data, output_file, title=title,
+                         np_posn=np_posn, s_posn=s_posn,
+                         cb_label=cb_label, cb_steps=cb_steps,
+                         colourmap=colourmap, annotate=annotate, linewidth=1.0,
+                         show_graph=False, map_extent=None)
+    """
+    # Run annualised loss calc and bin data
+    percent_ann_loss, lat_lon, binx, _ = calc_annloss.calc_annloss_deagg_grid(
+        lat,
+        lon,
+        total_building_loss,
+        total_building_value,
+        event_activity, bins=bins)
+    # check that the bins are equivalent
+    lon = lat_lon[:,1]
+    lat = lat_lon[:,0]
+    loss = scipy.reshape(percent_ann_loss, (-1,1))
+    lon = scipy.reshape(lon, (-1,1))
+    lat = scipy.reshape(lat, (-1,1))
+    lon_lat_ann_loss = scipy.concatenate((lon, lat, loss), axis=1)
+    #scipy.set_printoptions(threshold=scipy.nan)
+    pgx.plot_gmt_xyz(lon_lat_ann_loss, output_file, bins=binx,
+                     title=title, np_posn=np_posn, s_posn=s_posn,
+                     cb_label=cb_label, cb_steps=cb_steps, colourmap=colourmap,
+                     annotate=annotate, show_graph=False)
+    """
 
 def fig_xyz_histogram(input_dir, site_tag, soil_amp, period, return_period,
                       plot_file=None, savefile=None,

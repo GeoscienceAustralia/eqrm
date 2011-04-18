@@ -75,7 +75,9 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     c_map = ColourMap
     if colourmap is not None:
         c_map = colourmap
-    c_map = util.get_colourmap(c_map)
+    if not os.path.exists(c_map):
+        c_map = util.get_colourmap(c_map)
+    
 
     # get maximum and minimum values
     max_val = util.max_nan(data[:,2])
@@ -104,7 +106,10 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
         util.make_discrete_cpt(my_cpt_file, c_map, cb_steps)
     else:
         (start, stop, step) = util.get_scale_min_max_step(max_val, min_val)
-        cm = util.get_colourmap(c_map)
+        if os.path.exists(c_map):
+            cm = c_map
+        else:
+            cm = util.get_colourmap(c_map)
         util.do_cmd('makecpt -C%s.cpt -T%f/%f/%f > %s'
                     % (cm, start, stop, step, my_cpt_file))
 
