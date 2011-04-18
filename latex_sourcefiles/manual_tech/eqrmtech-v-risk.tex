@@ -14,12 +14,16 @@ for visualising earthquake hazard and risk.
 
 \section{Calculating hazard and risk}
 
-Consider a random variable $Y$ such that; \begin{itemize} \item
+Consider a random variable $Y$ such that; \begin{itemize} 
+
+\item
 $Y$ refers to the response spectral acceleration\index{response
 spectral acceleration} $S_a$ at a particular site in the case of
-hazard, or \item $Y$ indicates the loss, either at a particular
-simplicity we will assume that $Y$ represents the aggregated loss
-as a percentage of building stock value.
+hazard, or 
+\item $Y$ indicates the loss, either at a particular site or
+  aggregated building site.  For simplicity we will assume that $Y$
+  represents the aggregated loss as a percentage of building stock
+  value.
 \end{itemize}
 
 A common way to represent $Y$ is in terms of a probability of
@@ -92,15 +96,14 @@ to re-ordered values.
 \section{Earthquake hazard results}
 \label{sec:risk-hzd-results} The EQRM estimates the earthquake
 hazard $E_H(R_Y)$ at the return periods $R_Y$ defined in the
-EQRM control file parameter \typepar{return\_periods}{}{} by    
+EQRM control file by    
 interpolating the values $\{ \lambda_{Y_i^*}\}_{i=1}^{N_s}$ and
 $\{Y_i^*\}_{i=1}^{N_s}$ to the values $1/R_Y$ (see
 \eref{eq:risk-rptolambda}). In the case of earthquake hazard the
 random variable $Y$ refers to the response spectral
 acceleration\index{response spectral acceleration} and is
 therefore a function of building period $T_o$. The earthquake
-hazard information is saved in the output files
-\typepar{<site\_loc>}{\_SA}{\_rp[return\_period].txt}. It is important to
+hazard information is saved in output files. It is important to
 emphasise that only the hazard information is saved, the
 information for individual synthetic earthquakes is discarded.
 This means that the earthquake hazard information can not be
@@ -165,8 +168,7 @@ be used to generate hazard exceedance curves.
 \section{Earthquake risk results}
 
 The EQRM returns the loss for each earthquake-building pair. This
-information is saved in the file
-\typepar{<site\_loc>}{\_total\_building\_loss.txt}{} along with
+information is saved in an output file along with
 other information such as building values, the event activity for
 each synthetic earthquake and the distance between the
 building-earthquake pair. It is important to note that this
@@ -183,10 +185,7 @@ a risk simulation the user needs to reduce the number of synthetic
 earthquakes and/or the number of buildings in the building
 catalogue. If reducing the number of earthquake-building pairs is
 not possible the EQRM can be run in a cut-down mode that saves
-risk results rather than earthquake-building pairs by assigning
-the EQRM control file parameter
-\typepar{save\_total\_financial\_loss}{}{}
- to \typepar{True}{}{}.
+risk results rather than earthquake-building pairs.
 
 The EQRM is equipped with tools for visualising earthquake risk in
 the following forms:
@@ -194,12 +193,11 @@ the following forms:
 \item the risk exceedance curve (PML), \item annualised loss, and
 \item a variety of disaggregated annualised loss values.
 \end{enumerate}
-The manner in which the
-\typepar{<site\_loc>}{\_total\_building\_loss.txt}{} file is processed
-will vary slightly depending on the plotting tool being used.
-However, all of the plotting tools make use of the basic process
-described by \ereftwo{eq:eva-vectors1}{eq:eva-vectors2} where the
-random variable $Y$ describes the loss. 
+The manner in which the output file is processed will vary slightly
+depending on the plotting tool being used.  However, all of the
+plotting tools make use of the basic process described by
+\ereftwo{eq:eva-vectors1}{eq:eva-vectors2} where the random variable
+$Y$ describes the loss.
 
 \subsection{Risk exceedance curve}
 
