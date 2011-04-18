@@ -205,7 +205,7 @@ $\phi$ is a random number selected from a standardised normal
 distribution.This sampling is
 analogous to the random sampling technique used elsewhere in the
 EQRM (e.g. \sref{attn:uncert-randomchoice}) because the median
- of a log-normally distributed random variable (e.g.$\ bar A_u$) is the
+ of a log-normally distributed random variable (e.g.$\bar A_u$) is the
  same as the exponential of the mean of the log (e.g. $exp(\mu_{ln(A)})$).
  This is illustrated in
 \fref{fig:vdamage-capcurve-random}. The yield point $(D_y, A_y)$
@@ -287,9 +287,9 @@ where $\Beff$ is the effective damping\index{effective damping},
 expressed as a decimal (not a percentage). Note that when $\Beff =
 0.05$, (5\%\ damping) then $R_a=R_v=R_d=1$.
 
-In the EQRM the can be set to $R_d=R_v$, (HAZUS doesn't use $R_d$), or
-$R_a$ and $R_d$ are set to $R_v$. This might
-be used used if there are problems with convergence. The default
+In the EQRM the user can set $R_d=R_v$, (HAZUS doesn't use $R_d$), or
+$R_a$ and $R_d$ can be set to $R_v$. This might
+be used if there are problems with convergence. The default
  uses all 3 factors.
 
 
@@ -337,9 +337,6 @@ It would not be difficult, but it first needs to be determined
 whether it is already taken into account by the random capacity
 curve\index{capacity curve}s.
 
-Tables of the elastic damping parameter values, for different
-building construction types, are given in the
-\aref{app:buildingpars}; \tref{tab:vdam-bfactors-damping}.
 
 
 \subsubsection{Hysteretic damping}
@@ -443,14 +440,6 @@ the most nonlinear event has converged or the maximum iteration
 limit is reached. Some efficiencies might be gained by first
 filtering out those events in the elastic region, and then later
 filtering out those events which have converged.
-
-Tables of the hysteretic damping coefficients $\kappa_L$,
-$\kappa_M$ and $\kappa_L$ are given in \aref{app:buildingpars}.
-\tref{tab:vdam-bfactors-damping} provides the hysteretic damping
-coefficients $\kappa_L$, $\kappa_M$ and $\kappa_L$ corresponding
-to parameters used in the Newcastle and Lake Macquarie study
-\citep{dr_Fulford02a}.
-
 
 
 \subsection{Finding the intersection point}
@@ -714,21 +703,11 @@ the Monte-Carlo simulation.
 
 The risk component of the EQRM also has a number of extra features
 or alternative operation modes that are not offered by the HAZUS
-methodology. Two of the more significant extra features are:
+methodology. The most significant extra feature is:
 \begin{enumerate}
 \item The use of \textbf{uniform hazard spectra} instead of demand
 curve\index{demand curve}s. This effectively drives the risk
 calculation by hazard values rather than individual earthquakes.
 The process is discussed further in \citet{dr_Patchett04a}. 
-\item The use of \textbf{Modified Mercali Intensity (MMI) damage
-curves} rather than the capacity spectrum method\index{capacity
-spectrum method}. The EQRM has the capability to use an MMI
-attenuation model (currently only Gaull is coded) and will compute
-risk using in-built damage curves that relate percentage damage to
-MMI. Note that the damage curves are exponential in shape and that
-the percentage damage estimates represent damage to the entire
-structure rather than components of the structure.
-\cite{dr_Edwards04a} provide an example of the use of damage
-curves with the EQRM.
 \end{enumerate}
 
