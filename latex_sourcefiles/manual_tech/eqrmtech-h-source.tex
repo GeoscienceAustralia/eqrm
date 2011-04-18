@@ -15,8 +15,8 @@ motion in a pre-defined period of time. The traditional approach
 is introduced by \citet{dr_Cornell68a} and summarised by
 \citet{dr_McGuire90a}. A core component of any event based
 analysis with the EQRM is the generation of a simulated
-event\index{simulated event} (or earthquake) catalogue. The
-generation of the earthquake catalogue relies upon an existing model for
+event \index{simulated event} catalogue. The
+generation of the event catalogue relies upon an existing model for
 the seismicity in the region. Typically the  model of seismicity comes
  from an interpretation of historical earthquakes,
  geology and neotectonics. The current version of the EQRM application requires a source model
@@ -34,21 +34,20 @@ on the known fault plane. \\
 
 In addition, a novel technique has been developed to generate synthetic ruptures within a 3D volume that may represent seismotectonic 
 features such as the intraplate environment of a subducting slab. Such events are often referred to as intraslab earthquakes and have been known
-to generate larger and devastating earthquakes (e.g. 30 September 2009 Padang earthquake in Indonesia). \\
+to generate large and devastating earthquakes. \\
 
-This chapter describes the process of creating a synthetic earthquake catalogue for probabilistic seismic hazard 
-analysis and for defining an individual scenario event. The chapter is organised as follows. First, the concept of a synthetic earhquake
-catalogue is discussed, then the approach for 
-determining earthquake magnitudes and recurrence rates is presented in Section \label{sec:magnitude_selection}. This is followed by a
-description of the method for generating realistic synthetic ruptures in source zones and on fault zones in Section \label{sec:areal_gen} and 
-\label{sec:fault_gen}. Lastly, Section \label{sec:source-scen} describes the approach for scenario event generation.
+This chapter describes the process of creating a synthetic earthquake catalogue and for defining an individual scenario event. 
+The chapter is organised as follows. First, the concept of a synthetic earhquake catalogue is discussed, then the approach for 
+determining earthquake magnitudes and recurrence rates is presented in Section \sref{sec:magnitude_selection}. This is followed by a
+description of the method for generating realistic synthetic ruptures in source zones and on fault zones in Section \sref{sec:areal_gen} and 
+\sref{sec:fault_gen}. Lastly, Section \sref{sec:source-scen} describes the approach for scenario event generation.
 
 \section{Creating an earthquake catalogue for probabilistic seismic hazard analysis}% a probabilistic seismic hazard analysis}
 \label{sec:source-EQcat}
 
-This section describes the method to generate a synthetic earthquake catalog of plausible events. The event catalog can be
+This section describes the method to generate a synthetic catalog of plausible events. The event catalog can be
 created for events that are defined within an areal source or located on a known fault source. The recurrence relationship for the events
-can be defined as a Gutenberg-Richter or Characteristic earthquake relationships.
+can be defined as a bounded Gutenberg-Richter or Characteristic earthquake relationships.
 
 A simulated event\index{simulated event} is represented by a plane
 (or rupture) in 3D space that signifies the region where slip has
@@ -160,8 +159,8 @@ earthquake (i.e. one that has actually occurred rather than one
 that is simulated).
 
 A virtual fault\index{virtual fault} refers to a plane in 3D space upon which an event can
-occur.  The virtual fault can be located in within an areal source or defined by a known fault. 
-The \typeself{E}{QR}{M} works by first creating a virtual fault\index{virtual fault}, either within an
+occur.  The virtual fault can be located within an areal source or defined by a known fault. 
+The EQRM works by first creating a virtual fault\index{virtual fault}, either within an
 areal source zone, or by a user defined know fault. The rupture is then placed 
 on the virtual fault\index{virtual fault} (the
 rupture is not allowed to exceed the bounds of the virtual
@@ -283,7 +282,7 @@ rate and earthquake recurrence through the use of the total seismic moment rate 
 M_o^T = \mu f_A S
 \end{equation}
 
-where $\mu$ is the shear modulus (3x10$^{11}$ dyne/cm$^2$), $f_A$ is the fault area and $S$ is the slip rate (cm~/yr). 
+where $\mu$ is the shear modulus (often taken as 3x10$^{11}$ dyne/cm$^2$), $f_A$ is the fault area and $S$ is the slip rate (cm~/yr). 
 
 We can also find the seismic moment for any earthquake from:
 
@@ -398,18 +397,18 @@ C = \frac{\beta e ^{- \beta (m_{max}-m_{min}-\Delta m_{1} - \Delta m_{2})}}  {1-
 \citep{dr_Kramer96a} and $\Delta$ is the half width of the bins.
 Note that $r_\nu$ represents the frequency of occurence in terms
 of a number per year and can be thought of as the synthetic
-version of $\lambda$ for the simulated event catalogue.
+version of the activity rate ($\lambda$) for the simulated event catalogue.
 \end{enumerate}
 
 
 
-\Frefmulti{fig:source-catalogue-results1}{fig:source-catalogue-results3}(a)
+Figures \fref{fig:source-catalogue-results1}a to \fref{fig:source-catalogue-results4}a
 illustrate histograms of the event magnitudes simulated for three
 different source zone combinations. Note that the fifteen bars in
-\Freftwo{fig:source-catalogue-results1}{fig:source-catalogue-results2}(a)
+Figures \fref{fig:source-catalogue-results1}a to \fref{fig:source-catalogue-results4}a
 correspond to the fifteen different magnitude bins. The event
 activity $r_v$ for the same source zone combinations are shown in
-\Frefmulti{fig:source-catalogue-results1}{fig:source-catalogue-results3}(c).
+Figures \fref{fig:source-catalogue-results1}c to \fref{fig:source-catalogue-results4}c.
 
 \begin{figure}
   \vspace{0.8em}
@@ -424,7 +423,7 @@ relationship between the event magnitude $r_m$ and the event
 activity $r_\nu$, the depth to the rupture centroid $r_z$, the
 length of the rupture $r_l$ and the width of the rupture $r_w$
 respectively. The desired number of events $ntrgvector(1)$ was
-$5000$.} \label{fig:source-catalogue-results1}
+$5000$.} \label
 \end{figure}
 
 \begin{figure}
@@ -475,8 +474,8 @@ respectively.} \label{fig:source-catalogue-results4}
 \section{Generating synthetic earthquakes in areal sources}
 \label{sec:areal_gen}
 
-The location of each event is assigned randomly within an areal source zone. 
-This assignment is done in such a way that the event has
+The location of each event centroid is assigned randomly within an areal source zone. 
+This assignment is done in such a way that the event centroid has
 an equal probability of being located anywhere in the areal source
 polygon. 
 
@@ -492,10 +491,10 @@ of these rules presented by Mendez, 2002 ([$\textit{pers. comm.}$]), and scaling
 by \citet{eqrm_Leonard10}.
 
 The location of the rupture plane
-is constrained to lie within a virtual fault (Figure )
+is constrained to lie within a virtual fault
 which is described by the depth to its top (equivalent to the
 depth to the seismogenic region $f_z$, see
-table, its length $f_l$, its width
+table \ref{tab:parameters}, its length $f_l$, its width
 $f_w$ and its dip $r_{dip}$. Note that by default the dip of the
  rupture plane is defined to be the dip of the virtual fault. 
 
@@ -567,19 +566,23 @@ r_w = \textrm{min$\{f_1\sqrt{r_A},f_w\}$}.
 \end{equation}
 
 \subsubsection{Leonard (2010) Stable Continental Regions Scaling Law}
-This scaling law is recommended for all intraplate settings. First the rupture area ($r_A$) is calculated from:
+This scaling law is recommended for all intraplate settings. First the rupture area ($r_A$) is calculated from the magnitude ($r_m$) by:
 
 \begin{equation}
-log(M_{0}) = 1.5  \times log(r_A) + 6.38
+r_{A} = 10^{r_m-4.1833}
 \end{equation}
 
 where $M_{0}$ is the seismic moment. Next the rupture length ($r_l$) is calculated from:
 
-\begin{equation}
-log(M_{0}) = 3.0  \times log(r_A) + 6.39
+\begin{equation}\label{leonard_rw}
+r_w = 
+\begin{cases}
+10^{0.6r_m-2.59}	& \quad \mbox{if \texttt{$M_w \lt 4.975$}} \\
+10^{0.5r_m-2.095}	& \quad \mbox{if \texttt{$M_w \ge 4.975$}} \\
+\end{cases}
 \end{equation}
 
-and then it is a trivial step to find the rupture width ($r_W$).
+and then it is a trivial step to find the rupture width ($r_l$).
 
 \subsection{Azimuth and dip of rupture}
 \label{sec:az-dip-rupture}
@@ -587,12 +590,12 @@ and then it is a trivial step to find the rupture width ($r_W$).
 The rupture azimuth of each event may be forced to lie within a
 user defined range
 \begin{center} $\phi - \Delta_{\phi} \leq r_\phi \leq \phi + \Delta_{\phi}$ \end{center}
-where $\phi$ and $d_{\phi}$ are the azimuth and azimuth sampling range respectively. The
+where $\phi$ and $\Delta_{\phi}$ are the azimuth and azimuth sampling range respectively. The
 default values for $\phi$ and $\Delta_{\phi}$ are $180^o$ and $180^o$
 respectively. 
 
 The dip of the rupture, $r_{dip}$ and a sampling range, $\Delta_{dip}$, are assigned by the 
-user and are unique to each areal source zone. The dip of the rupture trace is measured from the
+user for each areal source zone. The dip of the rupture trace is measured from the
 ground surface and the direction of dip is such that the plane is
 located in the region of $y>0$ in the local coordinate system.
 Note that sampling across a dip range will impact the attenuation models in a variety of ways (see \sref{ch:atten}). 
@@ -817,7 +820,7 @@ when creating the EQRM input file. \\
 
 We then calculate the rupture width ($r_w$) which is solved using the empirical relationships developed by \citet{eqrm_Wells94}  
 but forces the rupture width ($r_w$) to be less than or equal to the fault width ($f_w$). Effectively this restriction stops the rupture from extending 
-outside the seismogenic zone defined by $f_z^{top}$ to ($f_z^{bot}$. The calculation of the rupture width is a two stage process:
+outside the seismogenic zone defined by $f_z^{top}$ to $f_z^{bot}$. The calculation of the rupture width is a two stage process:
 
 
 
@@ -863,7 +866,7 @@ different approach due to option of defining out of plane ruptures. In this seci
 a rupture is the area that is unique to an individual synthetic earthquake event. \\
 
 \subsection{Crustal Faults and Subduction Interface Faults}
-Assuming once again that we have already defined the length and width of the rupture plane, the distance ($D_s$) along the fault from the start of the fault trace to
+Assuming that we have already defined the length and width of the rupture plane, the distance ($D_s$) along the fault from the start of the fault trace to
 the start of the rupture trace is found using a uniform random distribution:
 
 \begin{equation} \label{eq:ds}
@@ -872,7 +875,7 @@ D_s = (f_l - r_l) \times \mathtt{X}
 
 where $\mathtt{X}$ is a random variable between 0$\rightarrow$1. This step forces the length of the rupture to not exceed the length of the fault trace, while 
 ensuring the start of the trace has an equal probability of occuring anywhere along the trace. Next the geographic location of the start and end of the rupture trace can be 
-calculated using the rupture length and azimuth of the fault (\ref{fig:traces}) and the known position of the fault trace as defined by the user. 
+calculated using the rupture length and azimuth of the fault (Figure \ref{fig:traces}) and the known position of the fault trace as defined by the user. 
 
 \begin{figure}[htp]
 \centerline{\includegraphics[width=12cm]
@@ -895,8 +898,8 @@ the rupture plane does not extend above or below the bounds of the seismogenic z
 
 \begin{subequations} \label{drange}
 \begin{align}
-r_z^{min} & = r_z^{top} + 0.5r_w  \times sin(r_\theta  \times \mbox{rad})    \\
-r_z^{max} & = r_z^{bot} - 0.5r_w  \times sin(r_\theta \times \mbox{rad})  
+r_z^{min} & = r_z^{top} + 0.5r_w  \times sin(r_\theta)    \\
+r_z^{max} & = r_z^{bot} - 0.5r_w  \times sin(r_\theta)  
 \end{align}
 \end{subequations}
 
@@ -911,7 +914,7 @@ where $\mathtt{X}$ is a random variable from 0$\rightarrow$1. The local x and y 
 centroid can be calculated by the employing the same equations as for the source zones:
 
 \begin{equation}
-r_y = r_z  \frac{cos(f_\theta  \times rad)}{sin(f_\theta  \times rad)}
+r_y = r_z  \frac{cos(f_\theta  \times rad)}{sin(f_\theta)}
 \end{equation}
 
 \begin{equation}
@@ -967,9 +970,9 @@ maximum width of the rupture plane ($r_w^{max}$) is found from:
 \begin{equation}\label{rwmax}
 r_w^{max} = 
 \begin{cases}
- \frac{ S_w }{sin (\omega \times rad)}		& \quad \mbox{if $\omega$ $<$ 90} \\
+ \frac{ S_w }{sin (\omega)}		& \quad \mbox{if $\omega$ $<$ 90} \\
 S_w							& \quad \mbox{if $\omega$ $=$ 90} \\
- \frac{ S_w }{sin ((180 - \omega ) \times rad)}	& \quad \mbox{if $\omega$ $>$ 90} \\
+ \frac{ S_w }{sin (180 - \omega ) }	& \quad \mbox{if $\omega$ $>$ 90} \\
 \end{cases}
 \end{equation}
 
@@ -1008,8 +1011,8 @@ plane is now dipping out of the fault plane (figure \ref{fig:deltaeq}).
 
 \begin{subequations} \label{drange2}
 \begin{align}
-r_z^{min} & = f_z^{top} + 0.5r_w  \times sin(r_\theta  \times \mbox{rad})    \\
-r_z^{max} & = f_z^{bot} - 0.5r_w  \times sin(r_\theta  \times \mbox{rad})  
+r_z^{min} & = f_z^{top} + 0.5r_w  \times sin(r_\theta)    \\
+r_z^{max} & = f_z^{bot} - 0.5r_w  \times sin(r_\theta)  
 \end{align}
 \end{subequations}
 
@@ -1025,7 +1028,7 @@ surface trace, and then to solve for the the rupture centroid.
 We begin by finding the location of the rupture centroid referenced to the start position of the original fault plane:
 
 \begin{equation}\label{eq:ry}
-\hat{r}_y = r_z  \frac{cos(f_\theta  \times rad)}{sin(f_\theta \times rad)}
+\hat{r}_y = r_z  \frac{cos(f_\theta)}{sin(f_\theta)}
 \end{equation}
 
 and then:
@@ -1044,7 +1047,7 @@ plane then converting the local coordinates to latitude and longitude.
 and now the dip of the rupture plane ($r_\theta$) is substituted into equation \ref{eq:ry}
 
 \begin{equation}
-\hat{r}_s^{y} = \hat{r}_y - r_z  \frac{cos(r_\theta \times rad)}{sin(r_\theta \times rad)}
+\hat{r}_s^{y} = \hat{r}_y - r_z  \frac{cos(r_\theta)}{sin(r_\theta)}
 \end{equation}
 
 \begin{equation}\label{eq:rex}
@@ -1065,7 +1068,7 @@ r_x = 0.5 r_l
 \end{equation}
 
 \begin{equation} \label{eq:ry2}
-r_y = r_z  \frac{cos(r_\theta \times rad)}{sin(r_\theta \times rad)}
+r_y = r_z  \frac{cos(r_\theta)}{sin(r_\theta)}
 \end{equation}
 
 and then transform this into longitude and latitude. Note that $r_z = \hat{r}_z$.
@@ -1096,7 +1099,7 @@ r_\theta = \mathbf{max} \{ 180 - f_\theta + \omega, 5 \} .
 \begin{figure}[htp]
 \centerline{\includegraphics[width=14cm]
 {fig-hsource-faultflip}}
-\caption{Fault and rupture plane geometry for. Lower panel shows cross section view and upper panel shows a plan view of the surface 
+\caption{Fault and rupture plane geometry. Lower panel shows cross section view and upper panel shows a plan view of the surface 
 projection. Note that in this case we need to re-project the rupture plane to the surface and redefine the start and end of the 
 rupture trace such that the plane dips to the right hand side of the fault trace when looking from the start to end of the trace.}
 \label{fig:gt90}
@@ -1107,7 +1110,7 @@ The same approach is followed as section \ref{sec:0to90} from equations \ref{rw0
 modify to add instead of subtract $r_y$ to the right handside of the equation: 
 
 \begin{equation}
-\hat{r}_s^{y} = \hat{r}_y + r_z  \frac{cos(r_\theta * rad)}{sin(r_\theta * rad)}
+\hat{r}_s^{y} = \hat{r}_y + r_z  \frac{cos(r_\theta)}{sin(r_\theta)}
 \end{equation}
 
 And now the method in section \ref{sec:0to90} can again be followed from equations \ref{eq:rex} to \ref{eq:rey}. 
@@ -1145,7 +1148,7 @@ The same methods as above, until equation \ref{eq:rsx} are used but now the foll
 to solve for ($\hat{r}_y$) which in this case will be negative:
 
 \begin{equation}\label{eq:ry4}
-\hat{r}_s^y = \hat{r}_y -  r_z  \frac{cos(r_\theta  \times rad)}{sin(r_\theta \times rad)}.
+\hat{r}_s^y = \hat{r}_y -  r_z  \frac{cos(r_\theta)}{sin(r_\theta)}.
 \end{equation}
 
 The end of the rupture trace in local coordinates ($\hat{r}_e^x$ and $\hat{r}_e^y$) referenced to the fault 
@@ -1199,8 +1202,8 @@ distribution via
 \begin{equation}
 erf(x) = 2P(X \leq x)-1.
 \end{equation}
-The function \typefunc{mke}{\_ct}{pdf} computes $P(-n_\sigma
-\sigma \leq X \leq n_\sigma \sigma)$ using the error function as
+Then $P(-n_\sigma
+\sigma \leq X \leq n_\sigma \sigma)$ is comptued using the error function as
 follows
 \begin{equation}
 \begin{array}{rcl}
