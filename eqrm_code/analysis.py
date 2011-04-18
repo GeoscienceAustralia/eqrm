@@ -20,9 +20,6 @@ import time
 import shutil
 import copy
 import datetime
-import RSA2MMI
-import fatalities
-import numpy
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
      arange, reshape, exp, tile
@@ -55,6 +52,8 @@ from eqrm_code.get_version import get_version
 from eqrm_code.bridges import Bridges
 import eqrm_code.util as util
 import eqrm_filesystem as eq_fs
+from eqrm_code.RSA2MMI import rsa2mmi_array
+from eqrm_code.fatalities import forecast_fatality
 
 
 class Dummy:
@@ -524,26 +523,21 @@ def main(parameter_handle,
             
             #print SA.shape
             #print SA
-            MMI = RSA2MMI.rsa2mmi_array(SA)
+            MMI = rsa2mmi_array(SA)
             #print MMI.shape
             #print MMI
             
             #print sites, sites.attributes['POPULATION'][0]
             
-            fatality = fatalities.forecast_fatality(
-                MMI, 
-                sites.attributes['POPULATION'][0])
+            fatality = forecast_fatality(MMI, 
+                                         sites.attributes['POPULATION'][0])
                 
             #print fatality
-            #ind = numpy.nonzero(fatality>0)
-            #print ind
             numelement = MMI.shape[1]
             
             #print fatality.shape
             if THE_PARAM_T.save_fatalities is True:
-                total_fatalities[rel_i,:] = numpy.reshape(fatality[0,:,0], numelement)
-                #temp = numpy.reshape(fatality[0,:,0], numelement)
-                #print temp.shape, total_fatalities[rel_i,:].shape
+                total_fatalities[rel_i,:] = reshape(fatality[0,:,0], numelement)
             
         # calculate damage
         if THE_PARAM_T.run_type == "risk":
