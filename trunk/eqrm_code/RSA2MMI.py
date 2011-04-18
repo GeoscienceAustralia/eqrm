@@ -61,11 +61,11 @@ def read_response_spectra_file(infile,defined_period = 1.0):
 # Convert RSA to MMI using Atkinson and Kaka (2007) formula
 # Currently only implemented for PGA, need to add for other periods
 def rsa2mmi(data,period = 1.0,include_uncertainty='n'):
-    
+    verbose = False
     MMI_list = []
     MMI_list = []
     if period == 1.0:
-        print 'doing period ',period
+        if verbose: print 'Doing period ',period
         C1 = 3.23
         C2 = 1.18
         C3 = 0.57
@@ -73,7 +73,7 @@ def rsa2mmi(data,period = 1.0,include_uncertainty='n'):
         logy15 = 1.50
         sigma1 = 0.84
     elif period == 0.0:
-        print 'doing period ',period
+        if verbose: print 'Doing period ',period
         C1 = 2.65
         C2 = 1.39
         C3 = -1.91
@@ -81,7 +81,7 @@ def rsa2mmi(data,period = 1.0,include_uncertainty='n'):
         logy15 = 1.69
         sigma1 = 1.01
     elif period == 2.0:
-        print 'doing period ',period
+        if verbose: print 'Doing period ',period
         C1 = 3.72
         C2 = 1.29
         C3 = 1.99
@@ -89,7 +89,7 @@ def rsa2mmi(data,period = 1.0,include_uncertainty='n'):
         logy15 = 1.00
         sigma1 = 0.86
     elif period == 0.3:
-        print 'doing period ',period
+        if verbose: print 'Doing period ',period
         C1 = 2.40
         C2 = 1.36
         C3 = -1.83
@@ -122,13 +122,13 @@ def rsa2mmi(data,period = 1.0,include_uncertainty='n'):
     return MMI_list
     
 # Convert RSA to MMI using Atkinson and Kaka (2007) formula
-# Currently only implemented for PGA, need to add for other periods
+# Currently only implemented for PGA, need to add for other periods.
 # 
 def rsa2mmi_array(data,period = 1.0,include_uncertainty='n'):
-    
+    verbose = False
     MMI_list = []
     if period == 1.0:
-        print 'doing period ',period
+        if verbose: print 'doing period ',period
         C1 = 3.23
         C2 = 1.18
         C3 = 0.57
@@ -136,7 +136,7 @@ def rsa2mmi_array(data,period = 1.0,include_uncertainty='n'):
         logy15 = 1.50
         sigma1 = 0.84
     elif period == 0.0:
-        print 'doing period ',period
+        if verbose: print 'doing period ',period
         C1 = 2.65
         C2 = 1.39
         C3 = -1.91
@@ -144,7 +144,7 @@ def rsa2mmi_array(data,period = 1.0,include_uncertainty='n'):
         logy15 = 1.69
         sigma1 = 1.01
     elif period == 2.0:
-        print 'doing period ',period
+        if verbose: print 'doing period ',period
         C1 = 3.72
         C2 = 1.29
         C3 = 1.99
@@ -152,7 +152,7 @@ def rsa2mmi_array(data,period = 1.0,include_uncertainty='n'):
         logy15 = 1.00
         sigma1 = 0.86
     elif period == 0.3:
-        print 'doing period ',period
+        if verbose: print 'doing period ',period
         C1 = 2.40
         C2 = 1.36
         C3 = -1.83
