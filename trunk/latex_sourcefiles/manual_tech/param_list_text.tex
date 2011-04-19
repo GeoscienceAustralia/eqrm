@@ -232,6 +232,16 @@ fault source.\\
 \hline
 \vspace{0.3em} \noindent \Large \textbf{Ground Motion Input:} \normalsize \\
 %---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{atten\_models}: \\ The list of GMPEs,
+for the logic tree.  Specifying them here will override the values in
+the xml files. This should only be used for scenario simulations. 
+See  \cref{sec:event-type-control_file} for GMPE name values.\\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{atten\_model\_weights}: \\ The list of
+GMPE weights, for the logic tree.  The weights must sum to
+one. Specifying them here will override the values in the xml
+files.This should only be used for scenario simulations. \\
+%---------------------------------------------------------
 \hline \vspace{0.1em}
 \texttt{atten\_collapse\_Sa\_of\_atten\_models}: \\
 DEFAULT $=$ \texttt{False} \\
