@@ -279,7 +279,7 @@ The damping formula are:
 \begin{align}
  R_a &= \frac{2.12}{3.21-0.68\ln(100\Beff)}, \quad 0\le T < T_{av}\\
 \hspace{0.3em}
- R_v &= \frac{1.65}{3.21-0.68\ln(100\Beff)}, \quad T_{av}\le T < T_{vd}\\
+ R_v &= \frac{1.65}{2.31-0.41\ln(100\Beff)}, \quad T_{av}\le T < T_{vd}\\
 \hspace{0.3em}
  R_d &= \frac{1.39}{1.82-0.27\ln(100\Beff)}, \quad T \ge T_{vd}
 \end{align}
@@ -360,7 +360,7 @@ damping\index{effective damping} is given by
 \end{equation}
 where
 \begin{equation}
-B_H = \frac{A_H}{2\pi DA}
+B_H = k \frac{A_H}{2\pi DA}
 \end{equation}
 and $B_E$ is defined by the process described in
 \sref{sec:damage-elasticdamping}.
@@ -536,10 +536,13 @@ parameters: the threshold value of displacement (or acceleration)
 and a variability parameter. The form of the fragility
 curve\index{fragility curves} is a cumulative log-normal
 distribution,
+
 \begin{equation}
-\label{eq:vdamage-frag} F(s_{dam} \Vert \bar S^*,\epsilon) =
-\ln\left[\Phi\left(\frac{S^*}{\bar S^*}; \epsilon\right)\right]
+\label{eq:vdamage-frag} P(damage \ge s_{dam} \Vert \bar S^*,S^*,\epsilon) =
+\ln\left[\Phi(\frac{ln(S^*) - ln(\bar S^*)}{\epsilon}]
 \end{equation}
+
+
 where $s_{dam}$ refers to the damage state of interest, $\Phi$ is
 the standard cumulative normal distribution function,
 $$
@@ -638,14 +641,14 @@ these values.
 \subsection{Incremental probabilities}
 
 The fragility curve\index{fragility curves}s give the probability
-of being in the given damage state or lower. That is, they are
+of being in the given damage state or a more destructive damage state. That is, they are
 cumulative probabilities. For our Monte Carlo simulation approach
 we need the incremental probabilities of the building being in the
 given damage state. For example,  suppose we have the fragility
 curve\index{fragility curves} for the extensive damage state,
 $\Pr(d \le E)$. To find $\Pr(d=E)$, we calculate
 $$
-\Pr(d=E) = \Pr(d\le E) - \Pr(d\le M).
+\Pr(d=E) = \Pr(d\le E) - \Pr(d\le C).
 $$
 This is illustrated in \fref{fig:vdamage-frag-inc}.
 
