@@ -1,11 +1,13 @@
-from numpy import *
+
 from scipy.stats import norm
+from scipy import zeros, nonzero, logical_and, log
 
-
-# forecast fatalities from MMI values and population
-# formula taken from USGS Open-File-Report 2009-1136
-# default value for beta and theta is for Indonesia
 def forecast_fatality(MMI, population, beta=0.17, theta=14.05):
+    """
+    Forecast fatalities from MMI values and population
+    formula taken from USGS Open-File-Report 2009-1136
+    default value for beta and theta is for Indonesia
+    """
     fatality_rate = zeros(MMI.shape)
     ind = nonzero(MMI<5)
     fatality_rate[ind] = 0
