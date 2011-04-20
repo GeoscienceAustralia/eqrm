@@ -1,6 +1,6 @@
 \chapter{Appendicies}
 
-\section{Attenuation formulae}
+\section{A selection of GMPE formulae}
 \label{app:GMPE_eqns}
 
 This appendex discusses individual GMPE's described in the previous
@@ -9,24 +9,24 @@ available for use within EQRM, but rather a subset of the available
 models.
 
 
-\subsection{Toro attenuation formula}
+\subsection{Toro ground motion formula}
 
-The \citet{dr_Toro97a} attenuation relation used in the EQRM code
+The \citet{dr_Toro97a} ground motion relation used in the EQRM code
 is based on the Joyner-Boore distance $\Rjb$ and moment-magnitude.
 Note that this reference largely describes the variability and not
 how the coefficients were derived. \citet{dr_EPRI93a} describes
 how the coefficients were derived.
 
-The \citet{dr_Toro97a} attenuation model divides North America
+The \citet{dr_Toro97a} ground motion model divides North America
 into two regions (Gulf and Mid-Continent) and can  be used with
 two different measures of magnitude (local and moment). Currently
 the EQRM can only use the Mid-Continent -- moment magnitude
-version of the attenuation model. This version of the attenuation
+version of the ground motion model. This version of the ground motion
 model is used because the earthquake mechanism in Mid-Continent
 USA is believed to be similar to that in Australia (i.e. both are
 intraplate settings).
 
-The attenuation formula is
+The ground motion formula is
 \begin{equation}
 \begin{split}
 \mu_{log(S_a)}(T_o,r_m,\Rjb) &= C_1 + C_2(r_m-6) + C_3(r_m-6)^2 - C_4\ln(R_M) \\
@@ -67,21 +67,21 @@ $\sigma_{a,r_m}$ is a function of $T_o$ and $r_m$;
 $\sigma_{a,\Rjb}$ is a function of $T_o$ and $\Rjb$; and
 $\sigma_{e,r_m}$ is a function of $r_m$ only.
 
-\subsection{Gaull attenuation formula}
+\subsection{Gaull ground motion formula}
 \label{attn:atten-formula-Gaull}
 
 
-The \citet{dr_Gaull90a} attenuation relation, as used in the EQRM
+The \citet{dr_Gaull90a} ground motion relation, as used in the EQRM
 code, is based on hypocentral distance $\Rhyp$ and local magnitude
-$r_{m_l}$.The Gaull attenuation model can be used to compute (i)
+$r_{m_l}$.The Gaull ground motion model can be used to compute (i)
 the mean of the logarithm of PGA $\mu_{log(PGA)}$ or (ii) the mean
 of the logarithm of the Modified Mercalli Intensity
 $\mu_{log(\Imm)}$. The formula is based on empirical intensity
 data in the Australian region and the PGA extension created using
-Papua New Guinea data. For the purpose of this attenuation model
+Papua New Guinea data. For the purpose of this ground motion model
 the Australian region is divided into four sub-regions, Western
 Australia, Southeastern Australia, Northeastern Australia and
-Indonesia. The attenuation formulae is:
+Indonesia. The ground motion formulae is:
 \begin{equation}
 lnY = \ln a-c\ln \Rhyp + br_{m_l}
 \end{equation}
@@ -90,9 +90,9 @@ magnitude of the rupture and $lnY$ represents $\mu_{log(PGA)}$ or
 $\mu_{log(MMI)}$ depending on the value of the constants. The
 constants are tabulated in \citet[Table 4]{dr_Gaull90a}.
 
-Note that in the case of the \citet{dr_Gaull90a} attenuation model
-(PGA version) there is no need to prepare the attenuation
-coefficients because the attenuation model is only defined for
+Note that in the case of the \citet{dr_Gaull90a} ground motion model
+(PGA version) there is no need to prepare the ground motion
+coefficients because the ground motion model is only defined for
 $T_o=0 sec$ (PGA). To compute $S_a(T_o,r_m,R)$ (more specifically,
 $\mu_{log(S_a)}$), we can extend the $PGA$ estimate using the
 Australian Standard Response Spectral Acceleration
@@ -112,9 +112,9 @@ PGA) and 0.925 (for $\Imm$) should be used in preference to the
 published values of 0.28 and 0.37 respectively.
 
 
-\subsection{Atkinson and Boore attenuation formula}
+\subsection{Atkinson and Boore ground motion formula}
 
-The \cite{dr_Atkinson97a} attenuation relation, as used in the
+The \cite{dr_Atkinson97a} ground motion relation, as used in the
 EQRM code, is based on hypocentral distance $\Rhyp$ and moment
 magnitude $r_m$. The formula is
 \begin{equation}
@@ -130,12 +130,12 @@ $\sigma_a$ and no attempt is made to separate it into into source
 and path components (see \citealt[Table 2]{dr_Atkinson79a}).
 
 
-\subsection{Sadigh attenuation formula}
+\subsection{Sadigh ground motion formula}
 
-The \cite{dr_Sadigh97a} attenuation relation, as used in the EQRM
+The \cite{dr_Sadigh97a} ground motion relation, as used in the EQRM
 code, is based on rupture distance $\Rrup$ and moment-magnitude
 $r_m$. Using the convention defined by \citet{dr_Campbell03a} (in
-accompanying appendix), the attenuation formula is
+accompanying appendix), the ground motion formula is
 \begin{equation}
 \begin{split}
 \mu_{log(S_a)}(T_o,r_m,\Rrup) & = C_1F +C_2 + C_3r_m
@@ -164,17 +164,17 @@ consistency, $\sigma(r_m,T_o)$ is assumed to be the aleatory
 uncertainty $\sigma_a$.
 
 
-\subsection{Somerville attenuation formula}
-The \citet{dr_Somerville01a} attenuation relation, as used in the
+\subsection{Somerville ground motion formula}
+The \citet{dr_Somerville01a} ground motion relation, as used in the
 EQRM code, is based on Joyner--Boore distance $R_{jb}$ and moment
-magnitude $r_m$. The \citet{dr_Somerville01a} attenuation model
+magnitude $r_m$. The \citet{dr_Somerville01a} ground motion model
 can be used for rift or nonrift zones and for vertical or
 horizontal shaking (i.e. four seperate versions). The default
 setting in the EQRM is nonrift.
 
 
 
-The attenuation formula is
+The ground motion formula is
 \begin{equation}
 \begin{split}
 \mu_{log(S_a)}(T_o,r_m,\Rjb) &= C_1 + C_2(r_m-6.4) + C_3ln(R_M) + C_4(r_m-6.4))\ln(R_M) \\
@@ -200,8 +200,8 @@ of $T_o$ and are tabulated in \citet[Table 9]{dr_Somerville01a}.
 follows:
 
 \begin{supertabular}{ll}
-$\sigma_{\mu}$ & uncertainty in the median attenuation = 0.2. \\
-$\sigma_{\sigma}$ & uncertainty in the scatter about median attenuation = 0.15. \\
+$\sigma_{\mu}$ & uncertainty in the median ground motion = 0.2. \\
+$\sigma_{\sigma}$ & uncertainty in the scatter about median ground motion = 0.15. \\
 $\sigma_{modeling}(T_o)$ & representing the discrepancy between
 actual
 physical processes \\
@@ -228,8 +228,3 @@ is taken to be:
 
 
 
-
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: "eqrmtech"
-%%% End:
