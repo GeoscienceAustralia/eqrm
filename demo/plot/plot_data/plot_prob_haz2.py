@@ -31,7 +31,6 @@ fault_source_tag = "no_fault"
 # Scenario input
 
 # Probabilistic input
-prob_min_mag_cutoff = 4.5
 prob_number_of_events_in_zones = [5000, 1000, 1000, 3000, 1000, 1000]
 
 # Attenuation
