@@ -18,8 +18,10 @@ import sys
 
 from eqrm_code.plotting import plot_api
 from eqrm_code.eqrm_filesystem import plot_output_scen_risk_path
+from eqrm_code.eqrm_filesystem import Demo_Output_ScenRisk_Path
 
 
+input_dir = Demo_Output_ScenRisk_Path
 input_dir = plot_output_scen_risk_path
 site_tag = 'newc'
 

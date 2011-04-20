@@ -8,13 +8,9 @@
  Angles, latitude and longitude are in decimal degrees.
 
  If a field is not used, set the value to None.
-
-
 """
 
 from eqrm_code.parse_in_parameters import eqrm_data_home, get_time_user
-from os.path import join
-
 
 # Operation Mode
 run_type = "hazard" 
