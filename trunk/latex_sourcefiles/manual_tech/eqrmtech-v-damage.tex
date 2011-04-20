@@ -539,7 +539,7 @@ distribution,
 
 \begin{equation}
 \label{eq:vdamage-frag} 
-P(damage > s_{dam} \Vert \bar S^*,S^*,\epsilon) =
+P(damage \ge s_{dam} \Vert \bar S^*,S^*,\epsilon) =
 [\Phi(\frac{ln(S^*) - ln(\bar S^*)}{\epsilon}]
 \end{equation}
 
@@ -647,9 +647,9 @@ cumulative probabilities. For our Monte Carlo simulation approach
 we need the incremental probabilities of the building being in the
 given damage state. For example,  suppose we have the fragility
 curve\index{fragility curves} for the extensive damage state,
-$\Pr(d \le E)$. To find $\Pr(d=E)$, we calculate
+$\Pr(d gle E)$. To find $\Pr(d=E)$, we calculate
 $$
-\Pr(d=E) = \Pr(d\le E) - \Pr(d\le C).
+\Pr(d=E) = \Pr(d\ge E) - \Pr(d\ge C).
 $$
 This is illustrated in \fref{fig:vdamage-frag-inc}.
 
