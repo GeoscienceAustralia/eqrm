@@ -935,8 +935,8 @@ def load_event_set(saved_dir, site_tag):
     return attribute_dic
      
 
-def obsolete_load_event_set_subset(saved_dir, site_tag):
-#def load_event_set_subset_OLD(saved_dir, site_tag):
+#def obsolete_load_event_set_subset(saved_dir, site_tag):
+def load_event_set_subset(saved_dir, site_tag):
     """
     Load the Mw, and event activity.
 
