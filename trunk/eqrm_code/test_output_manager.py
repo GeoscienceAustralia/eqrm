@@ -768,7 +768,7 @@ class Test_Output_manager(unittest.TestCase):
             'output_managertest_load_event_set_subset') + os.sep
         THE_PARAM_T.site_tag = "site_tag"
         file_full_name = obsolete_save_event_set(THE_PARAM_T,set, event_activity)
-        out = obsolete_load_event_set_subset(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
+        out = load_event_set_subset(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
         msg = 'loaded Mw=%s, expected Mw=%s' % (str(out['Mw']), str(set.Mw))
         #self.failUnless(allclose(out['Mw'], set.Mw), msg)
         #self.assert_ (allclose(out['Mw'], set.Mw)), msg
