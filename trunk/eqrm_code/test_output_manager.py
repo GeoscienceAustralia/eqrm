@@ -737,7 +737,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(file_full_name)
         os.rmdir(THE_PARAM_T.output_dir)
 
-    def test_load_event_set_subset(self):
+    def obsolete_test_load_event_set_subset(self):
         rupture_centroid_lat = [-33.351170370959323, -32.763381339789468]
         rupture_centroid_lon = [151.45946928787703, 151.77787395867014]
         azimuth = [162.8566392635347, 201.51805898897854]
