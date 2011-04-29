@@ -351,13 +351,14 @@ def calc_recurrence(infile, min_mag = None, max_mag = None, max_mag_ls = None, i
     ax.plot(bins_plot, log_mle_fit, c = 'g', label = 'Maximum Likelihood')
     ax.plot(bins_plot, mle_bounded, c = 'g', linestyle ='--', label = 'Maximum Likelihood Bounded')
     ax.plot(bins_plot, log_fit_data, c = 'b', label = 'b = 1')
-    
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_fontsize(20) 
     ax.set_yscale('log')
     ax.legend(loc=1)
     ax.set_ylim([min(log_ls_fit) * 0.1, max(log_ls_fit) * 10.])
     ax.set_xlim([min_mag - 0.5, max_mag + 0.5])
-    ax.set_ylabel('Annual probability')
-    ax.set_xlabel('Magnitude')
+    ax.set_ylabel('Annual probability', fontsize = '20')
+    ax.set_xlabel('Magnitude', fontsize = '20')
 
     s = 'Minimum magnitude: %.1f \nAnnual number earthquakes > min mag: %.2f \nLS a,b: %.2f, %.2f \nMLE b: %.2f' \
     % (min_mag, annual_num_eq, a, -1. * b, b_mle)
