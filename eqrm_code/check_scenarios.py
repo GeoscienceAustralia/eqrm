@@ -501,6 +501,7 @@ def check_scenarios_main(scenario_dir=SCENARIO_DIR,
         check_times=False
     if len(sys.argv) > 1 and sys.argv[1][0].upper() == 'N':
         check_times = False
+        output_dirs = None
     else:
         para = Parallel()
         if para.is_parallel is True:
@@ -516,7 +517,7 @@ def check_scenarios_main(scenario_dir=SCENARIO_DIR,
         scenario_times.compare_times(standard_string)
     return c_failed_missing_file
 
-# Note,  the constants are different
+# Note, the constants are different
 def mini_check_scenarios_main():
     c_failed_missing_file =check_scenarios_main(
         files=MINI_PAR_FILES)
