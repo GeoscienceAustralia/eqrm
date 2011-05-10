@@ -70,24 +70,23 @@ eqrm_path = util.determine_eqrm_path()
 
 IMP_DIR = join(eqrm_path, 'implementation_tests')
 SCENARIO_DIR = join(IMP_DIR, 'scenarios')
-MINI_SCENARIO_DIR = join(IMP_DIR, 'mini_scenarios')
 
 STANDARD_DIR = join(IMP_DIR, 'standard')
-MINI_STANDARD_DIR = join(IMP_DIR, 'mini_standard')
 
 CURRENT_DIR = join(IMP_DIR, 'current')
-MINI_CURRENT_DIR = join(IMP_DIR, 'mini_current')
-TIMING_DIR = join(IMP_DIR, 'timing')
 
+TIMING_DIR = join(IMP_DIR, 'timing')
 
 STANDARD_STRING = "standard_timings_"
 CURRENT_STRING = "current_timings_"
 MINI_STANDARD_STRING = "mini_standard_timings_"
 MINI_CURRENT_STRING = "mini_current_timings_"
 FILE_EXTENTION = '.asc'
+
 MINI_PAR_FILES = ['TS_haz38.py',
                   'TS_haz39.py',
                   'TS_risk63.py']
+                  
 PARALLEL_FILES = ['TS_haz05.py', 'TS_haz09.py', 'TS_haz12.py',
                   'TS_haz19.py',
                   'TS_risk20.py',
