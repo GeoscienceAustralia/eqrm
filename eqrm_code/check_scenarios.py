@@ -32,6 +32,7 @@ Title: check_scenarios.py - Run the implementation scenarios then check
   This can be run in parallel, to test running parallel scenarios,
   rather than for speed.  For example;
   mpirun -np 4 -hostfile ~/.machines_cyclone python check_scenarios.py
+  [Running this is parallel is now broken.]
 
   Note: Running the tests in parallel is a bit iffy, since some nodes
   can start checing if the tests pass before process 0 has produced
@@ -49,6 +50,8 @@ import time
 from os import sep, walk, listdir, path, remove
 import socket
 import csv
+import os
+
 from os.path import join, splitext, abspath
 
 from scipy import asarray, allclose
@@ -58,6 +61,7 @@ from eqrm_code.get_version import get_version
 from eqrm_code.parallel import Parallel
 from eqrm_code import util
 from eqrm_code.ANUGA_utilities import log
+from eqrm_code import parse_in_parameters
 
 log.console_logging_level = log.WARNING
 log.default_to_console = False
@@ -81,6 +85,9 @@ CURRENT_STRING = "current_timings_"
 MINI_STANDARD_STRING = "mini_standard_timings_"
 MINI_CURRENT_STRING = "mini_current_timings_"
 FILE_EXTENTION = '.asc'
+MINI_PAR_FILES = ['TS_haz38.py',
+                  'TS_haz39.py',
+                  'TS_risk63.py']
 PARALLEL_FILES = ['TS_haz05.py', 'TS_haz09.py', 'TS_haz12.py',
                   'TS_haz19.py',
                   'TS_risk20.py',
@@ -88,29 +95,35 @@ PARALLEL_FILES = ['TS_haz05.py', 'TS_haz09.py', 'TS_haz12.py',
                   'TS_risk32.py',
                   'TS_risk33.py', 'TS_risk34.py', 'TS_risk58.py',
                   'TS_risk60.py' ]
-
-def par_files(path='.', extension=".py"):
+                  
+class BadDirectoryStructure(Exception):
+    pass
+                  
+def par_files(path='.', extension=".py", files=None):
     """ Find all the parameter data files in the scenario dir
     """
-    files = listdir(path)
-    par_files = [x for x in files if x[-3:] == extension]
-
-    # if this is being run is parallel,
-    # only do the scenarios with no variability.
-    para = Parallel()
-    if para.is_parallel is True:
-        if path is SCENARIO_DIR:
-            par_files = PARALLEL_FILES
-            print "WARNING: Running in parallel mode"
-            print "Only scenarios with no randomness will be executed"
-    #par_files = ['TS_haz20.py']
-    #par_files = ['TS_risk60.py',''TS_haz20.py']
-    par_files.sort()
-    par_files.reverse()
+    if files is None:
+        files = listdir(path)
+        par_files = [x for x in files if x[-3:] == extension]
+        
+        # if this is being run is parallel,
+        # only do the scenarios with no variability.
+        para = Parallel()
+        if para.is_parallel is True:
+            if path is SCENARIO_DIR:
+                par_files = PARALLEL_FILES
+                print "WARNING: Running in parallel mode"
+                print "Only scenarios with no randomness will be executed"
+        #par_files = ['TS_haz20.py']
+        #par_files = ['TS_risk60.py',''TS_haz20.py']
+        par_files.sort()
+        par_files.reverse()
+    else:
+        par_files = files
     return par_files
 
 def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
-                  extension='.py'):  
+                  extension='.py', files=None):  
     """
     Run all of the the scenario's in the scenario_dir.
 
@@ -132,14 +145,18 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
              "modification_status" + delimiter +
              "scenario_file" + delimiter +
              "scenario_time" + "\n")
-    files = par_files(scenario_dir, extension=extension)
+    files = par_files(scenario_dir, extension=extension, files=files)
+    output_dirs = []
     for file in files:
+        pull_path = join(scenario_dir, file)
+        THE_PARAM_T = parse_in_parameters.create_parameter_data(pull_path)
+        output_dirs.append(join(THE_PARAM_T['output_dir']))
         print "Running scenario", file
         #Initial time and memory
         t0 = time.clock()
         
         # Run the scenarios
-        analysis.main(join(scenario_dir, file), True)
+        analysis.main(pull_path, True)
         root, ext = splitext(file)
         time_taken_sec = (time.clock()-t0)
         timings[root] = time_taken_sec
@@ -150,7 +167,8 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
                  str(file) + delimiter +
                  str(time_taken_sec) + "\n")
     fd.close()
-    return Scenario_times(timings, current_string=current_string)
+    timings =  Scenario_times(timings, current_string=current_string)
+    return timings, output_dirs
         
 def file_diff(fileA, fileB):
     """
@@ -233,29 +251,61 @@ def print_diff_results(diff_results):
         print "Standard line:", diff_result[1]
         print " Current line:", diff_result[2]
         print
+     
+     
+def check_dir_names(dir_list, current_dir):
+    """
+    Given a list of directory paths this function returns a list of
+     last directory names, and checks that these directories are in the
+    current_dir.
+    eg dir_list = ['./implementation_tests/current/TS_haz38/', 
+    './implementation_tests/current/TS_haz39/', 
+    './implementation_tests/current/TS_risk63/']
+    current_dir = './implementation_tests/current'
+        Returns    ['TS_haz38', 'TS_haz39', 'TS_risk63']
+        
+    parameters
+    dir_list - a list of directory paths.
+    current_dir - a directory path.
+    """
+    last_dir = []
+    for path in dir_list:
+        path, folder = os.path.split(path)
+        if folder == "":
+            path, folder = os.path.split(path)        
+        last_dir.append(folder)
+        if not os.path.abspath(path) == os.path.abspath(current_dir):
+            msg = "os.path.abspath(path)", os.path.abspath(path)
+            msg += "does not equal os.path.abspath(current_dir)", \
+                os.path.abspath(current_dir)
+            raise BadDirectoryStructure(msg)
+    #print "last_dir", last_dir
+    return last_dir
     
-def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR):
+def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR,
+                    scenario_dirs=None):
     """
     Go into each results dir from the current and standard dirs
     And in each dir check that all the files are the same
     
     """
-
-    # determine all the test dir names in the standard dir
-    #current_root, current_dirs, files = walk(CURRENT_DIR)
-
-    standard_dirs = listdir(standard_dir)
+    # Create a list of the directories the test results are in.
+    if scenario_dirs is None:
+        scenario_dirs = listdir(standard_dir)
+    else:
+        scenario_dirs = check_dir_names(scenario_dirs, current_dir)
+        
     missing_current_files = []
     diff_results = [] # the dir and name of the different file, and the
                       # lines that are different
     files_checked = 0
     diff_files = 0
-    #print "standard_dirs", standard_dirs
+    #print "scenario_dirs", scenario_dirs
     try:
-        standard_dirs.remove('.svn')
+        scenario_dirs.remove('.svn')
     except:
         pass
-    for dir in standard_dirs:
+    for dir in scenario_dirs:
         result_files = listdir(join(standard_dir, dir))
         result_files = [x for x in result_files if not x[-4:] == '.lic']
         result_files = [x for x in result_files if not x[0] == '.']
@@ -441,7 +491,8 @@ def check_scenarios_main(scenario_dir=SCENARIO_DIR,
                          standard_dir=STANDARD_DIR,
                          standard_string=STANDARD_STRING,
                          current_dir=CURRENT_DIR,
-                         current_string=CURRENT_STRING): 
+                         current_string=CURRENT_STRING,
+                         files=None): 
     
     try:
         import planning.is_sandpit
@@ -454,12 +505,13 @@ def check_scenarios_main(scenario_dir=SCENARIO_DIR,
         para = Parallel()
         if para.is_parallel is True:
             check_times = False 
-        scenario_times = run_scenarios(scenario_dir,
-                                       current_string,
-                                       extension='.py')
-                                       #extension='par')
+        scenario_times, output_dirs = run_scenarios(scenario_dir,
+                                                    current_string,
+                                                    extension='.py',
+                                                    files=files)
     c_failed_missing_file = check_scenarios(standard_dir,
-                                            current_dir)
+                                            current_dir,
+                                            scenario_dirs=output_dirs)
     if check_times is True:
         scenario_times.compare_times(standard_string)
     return c_failed_missing_file
@@ -467,11 +519,7 @@ def check_scenarios_main(scenario_dir=SCENARIO_DIR,
 # Note,  the constants are different
 def mini_check_scenarios_main():
     c_failed_missing_file =check_scenarios_main(
-        scenario_dir=MINI_SCENARIO_DIR,
-        standard_dir=MINI_STANDARD_DIR,
-        standard_string=MINI_STANDARD_STRING,
-        current_dir=MINI_CURRENT_DIR,
-        current_string=MINI_CURRENT_STRING)
+        files=MINI_PAR_FILES)
     return c_failed_missing_file
         
 #-------------------------------------------------------------
