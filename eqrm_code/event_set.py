@@ -199,11 +199,6 @@ class Event_Set(object):
             
         if area is None:
             area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
-        #print "Mw", Mw
-#        area_old = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
-#        assert allclose(area, area_old)
-            
-        # finish turning into arrays arrays
                 
         if fault_width is None and depth_bottom_seismogenic is not None \
                 and depth_top_seismogenic is not None:
