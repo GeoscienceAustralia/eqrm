@@ -205,7 +205,8 @@ class Event_Set(object):
             
         # finish turning into arrays arrays
                 
-        if fault_width is None:
+        if fault_width is None and depth_bottom_seismogenic is not None \
+                and depth_top_seismogenic is not None:
             fault_width = (depth_bottom_seismogenic \
                            - depth_top_seismogenic)/ \
                            sin(dip*math.pi/180.)
