@@ -260,7 +260,7 @@ def main(parameter_handle,
                 raise RuntimeError(msg)
             event_set = event_set_zone
             source_model = source_model_zone
-        elif event_set_zone is None: # assume no zone aources
+        elif event_set_zone is None: # assume no zone sources
             event_set = event_set_fault
             source_model = source_model_fault
         else:
