@@ -414,6 +414,64 @@ class Test_Event_Set(unittest.TestCase):
                       THE_PARAM_T.scenario_magnitude [0])
         self.assert_ (len(event_set) == 1)
         
+        
+    def test_scenario_event_max_width(self):
+        THE_PARAM_T = Dummy()
+        THE_PARAM_T.scenario_latitude = -32.95
+        THE_PARAM_T.scenario_longitude = 151.61
+        THE_PARAM_T.scenario_azimuth = 340
+        THE_PARAM_T.dip = 35
+        THE_PARAM_T.scenario_magnitude = 8
+        THE_PARAM_T.max_width = None
+        THE_PARAM_T.scenario_depth = 11.5
+        THE_PARAM_T.scenario_number_of_events = 1
+        
+        event_set = Event_Set.create_scenario_events(
+            rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
+            rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
+            azimuth=[THE_PARAM_T.scenario_azimuth],
+            dip=[THE_PARAM_T.dip],
+            Mw=[THE_PARAM_T.scenario_magnitude],
+            fault_width=THE_PARAM_T.max_width,
+            depth=[THE_PARAM_T.scenario_depth],
+            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
+
+        #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
+        answer = array(THE_PARAM_T.scenario_latitude)
+        self.assert_(allclose(event_set.rupture_centroid_lat, answer))
+        
+        answer = array(THE_PARAM_T.scenario_longitude)
+        self.assert_(allclose(event_set.rupture_centroid_lon, answer))
+        
+        answer = array(THE_PARAM_T.scenario_azimuth)
+        self.assert_(allclose(event_set.azimuth, answer))
+        
+        answer = array(THE_PARAM_T.dip)
+        self.assert_(allclose(event_set.dip, answer))
+        
+        answer = array(THE_PARAM_T.scenario_magnitude)
+        self.assert_(allclose(event_set.Mw, answer))
+        
+        self.assertEqual(event_set.fault_width, THE_PARAM_T.max_width)
+        
+        answer = array(THE_PARAM_T.scenario_depth)
+        self.assert_(allclose(event_set.depth, answer))
+        
+        self.assert_(THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
+
+        area = array(conversions.modified_Wells_and_Coppersmith_94_area(
+            THE_PARAM_T.scenario_magnitude))
+        self.assert_(allclose(event_set.area, area))
+
+        width = array(conversions.modified_Wells_and_Coppersmith_94_width(
+            THE_PARAM_T.dip,
+            THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
+        self.assert_ (allclose(event_set.width, width))
+        
+        answer = area/width 
+        self.assert_(allclose(event_set.length, answer))
+  
+  
     def test_generate_synthetic_events(self):
         
         
@@ -979,7 +1037,6 @@ class Test_Event_Set(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Event_Set,'test')
-    #suite = unittest.makeSuite(Test_Event_Set,'test_generate_synthetic_events')
-    
+    #suite = unittest.makeSuite(Test_Event_Set,'test_scenario_event_max_width')    
     runner = unittest.TextTestRunner()
     runner.run(suite)
