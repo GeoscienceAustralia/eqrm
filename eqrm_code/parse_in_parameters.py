@@ -592,29 +592,12 @@ def att_value_fixes(THE_PARAM_T):
     THE_PARAM_T['return_periods'] = [ \
         array([x]) for x in THE_PARAM_T['return_periods']]
 
-    # Convert scaler values into arrays
-    try:
-        len_prob_number_of_events_in_zones = len(
-            THE_PARAM_T.prob_number_of_events_in_zones)
-    except:
-        len_prob_number_of_events_in_zones=1 # if only 1 zone
-    
-    if THE_PARAM_T.is_scenario ==0:
-        THE_PARAM_T['prob_dip_in_zones'] = scalar2vec(
-            THE_PARAM_T.prob_dip_in_zones,len_prob_number_of_events_in_zones)
-        THE_PARAM_T['prob_azimuth_in_zones'] = scalar2vec(
-            THE_PARAM_T.prob_azimuth_in_zones,
-            len_prob_number_of_events_in_zones)
-        THE_PARAM_T['prob_delta_azimuth_in_zones'] = scalar2vec(
-            THE_PARAM_T.prob_delta_azimuth_in_zones,
-            len_prob_number_of_events_in_zones)
     
     # FIXME this should happen to the weights from sources as well. 
     weights = THE_PARAM_T.atten_model_weights
     
     if weights is not None:        
         THE_PARAM_T['atten_model_weights'] = check_sum_1_normalise(weights)
-
     
     # if periods is collapsed (into a scalar), turn it into a vector
     if not isinstance(THE_PARAM_T.atten_periods,ndarray):
