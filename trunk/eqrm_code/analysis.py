@@ -177,10 +177,6 @@ def main(parameter_handle,
         # Rupture area, length, and width are calculated from Mw
         # using Wells and Coppersmith 94 (modified so rupture
         # width is less than fault_width).
-        if THE_PARAM_T.atten_spawn_bins is not None:
-            num_spawning = THE_PARAM_T.atten_spawn_bins
-        else:
-            num_spawning = 1
         event_activity = Event_Activity(len(event_set))
         event_activity.set_scenario_event_activity()
         event_set.scenario_setup()
@@ -269,11 +265,7 @@ def main(parameter_handle,
                 event_set_zone, event_set_fault,
                 source_model_zone, source_model_fault)
         
-        # event activity is calculated 
-        if THE_PARAM_T.atten_spawn_bins == None:
-            num_spawning = 1
-        else:
-            num_spawning = THE_PARAM_T.atten_spawn_bins
+        # event activity is calculated
         event_activity = Event_Activity(len(event_set))
         source_model.calculate_recurrence(
             event_set,
@@ -308,6 +300,8 @@ def main(parameter_handle,
     
     num_gmm_max = source_model.get_max_num_atten_models()
     num_events = len(event_set)
+    num_spawning = THE_PARAM_T.atten_spawn_bins
+   
     num_psudo_events = num_gmm_max * num_events * \
                        num_spawning
     

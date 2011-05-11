@@ -204,7 +204,7 @@ CONV_NEW = [{'order': 10.0,
              'default': 400},
             {'order': 50.08,
              'new_para': 'atten_spawn_bins',
-             'default': None},
+             'default': 1}, # Needed to get array dimensions right.
             {'old_para': 'resp_crv_flag',
              'values': {0: None,
                         2: 'Aust_standard_Sa',
@@ -586,13 +586,13 @@ def att_value_fixes(THE_PARAM_T):
         att_val = getattr(THE_PARAM_T, att)
         if isinstance(att_val, list):
             THE_PARAM_T[att] = asarray(THE_PARAM_T[att])
-
+            
     # FIXME Change the format to an array or
     # state why this format is needed.
     THE_PARAM_T['return_periods'] = [ \
         array([x]) for x in THE_PARAM_T['return_periods']]
 
-    
+            
     # FIXME this should happen to the weights from sources as well. 
     weights = THE_PARAM_T.atten_model_weights
     
