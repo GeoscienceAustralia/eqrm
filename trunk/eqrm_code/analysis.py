@@ -613,14 +613,14 @@ def main(parameter_handle,
     row_files_that_parallel_splits = []
     column_files_that_parallel_splits = []
 
-    loop_time = (time.clock() - t0)
-    #time_taken_site_loop = loop_time - time_taken_pre_site_loop
-    time_pre_site_loop_fraction = time_taken_pre_site_loop/loop_time
+    event_loop_time = (time.clock() - t0)
+    #time_taken_site_loop = event_loop_time - time_taken_pre_site_loop
+    time_pre_site_loop_fraction = time_taken_pre_site_loop/event_loop_time
 
     msg = "time_pre_site_loop_fraction " + str(time_pre_site_loop_fraction)
     log.info(msg)
-    msg = "loop_time (excluding file saving) " + \
-           str(datetime.timedelta(seconds=loop_time)) + " hr:min:sec"
+    msg = "event_loop_time (excluding file saving) " + \
+           str(datetime.timedelta(seconds=event_loop_time)) + " hr:min:sec"
     log.info(msg)
 
     #print "time_taken_pre_site_loop", time_taken_pre_site_loop
