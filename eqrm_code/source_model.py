@@ -432,7 +432,7 @@ def create_fault_sources(event_control_file, fsg_list, magnitude_type):
         # create a Source object with some FSG attributes
         min_magnitude = fsg.magnitude_dist['minimum']
         max_magnitude = fsg.magnitude_dist['maximum']
-        source = Source(fsg.recurrence_min_mag, fsg.recurrence_max_mag,
+        source = Source(min_magnitude, max_magnitude,
                         fsg.generation_min_mag, fsg.A_min, fsg.b,
                         fsg.number_of_mag_sample_bins, fsg.event_type,
                         fsg.name,

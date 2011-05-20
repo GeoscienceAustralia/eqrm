@@ -18,7 +18,7 @@
       
     <recurrence_model
        distribution = "bounded_gutenberg_richter"
-       recurrence_min_mag = "4.5" 
+       recurrence_min_mag = "3.5" 
        recurrence_max_mag = "6.5" 
        A_min = "0.001" 
        b = "1">
@@ -49,7 +49,7 @@
       
     <recurrence_model
        distribution = "characteristic"
-       recurrence_min_mag = "4.5" 
+       recurrence_min_mag = "3.5" 
        recurrence_max_mag = "6.5" 
        A_min = "0.01" 
        b = "1">
@@ -80,7 +80,7 @@
       
     <recurrence_model
        distribution = "bounded_gutenberg_richter"
-       recurrence_min_mag = "4.5" 
+       recurrence_min_mag = "4.0" 
        recurrence_max_mag = "8.5" 
        A_min = "0.1" 
        b = "1">
