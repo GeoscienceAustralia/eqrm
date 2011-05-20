@@ -60,6 +60,19 @@ class Test_Recurrence_functions(unittest.TestCase):
         test = (exp(-1*beta*(m-m0))-tmp)/(1-tmp)
         self.assertEqual(test, grscale(b,mmax,m,m0))     
 
+    def test_grscaleB(self):
+        m = 7.9
+        b = 1.2
+        mmin = 4.
+        mmax = 8.
+        # gives a grscale of -.1
+        
+        beta = b *log(10)
+        
+        tmp = exp(-1*beta*(mmax-mmin))
+        test = (exp(-1*beta*(m-mmin))-tmp)/(1-tmp)
+        self.assertEqual(test, grscale(b,mmax,m,mmin))   
+        
 
     def test_calc_A_min_from_slip_rate_GR(self):
         max_magnitude = 7.0
