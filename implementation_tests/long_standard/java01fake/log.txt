@@ -1,0 +1,123 @@
+2011-05-18 15:19:10,888 Level 29                  analysis:155 |Logfile is './implementation_tests/java_current/java01fake/log.txt' with logging level of DEBUG, console logging level is WARNING
+2011-05-18 15:19:10,889 DEBUG                     analysis:156 |host name: tornado.agso.gov.au
+2011-05-18 15:19:11,080 DEBUG                     analysis:158 |SVN version: 1821
+2011-05-18 15:19:11,081 DEBUG                     analysis:159 |SVN date: None
+2011-05-18 15:19:11,082 DEBUG                     analysis:160 |SVN modified: None
+2011-05-18 15:19:11,082 DEBUG                     analysis:161 |Memory: Initial
+2011-05-18 15:19:11,083 DEBUG                     analysis:162 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,090 DEBUG                     analysis:221 |Memory: source_model_zone created
+2011-05-18 15:19:11,091 DEBUG                     analysis:222 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,091 INFO                     event_set:400 |generating events
+2011-05-18 15:19:11,095 DEBUG                    event_set:454 |Memory: populate_depth_top_seismogenic created
+2011-05-18 15:19:11,096 DEBUG                    event_set:455 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,099 DEBUG                    event_set:457 |Memory: populate_azimuth created
+2011-05-18 15:19:11,099 DEBUG                    event_set:458 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,101 DEBUG                    event_set:461 |Memory: populate_dip created
+2011-05-18 15:19:11,102 DEBUG                    event_set:462 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,104 DEBUG                    event_set:464 |Memory: populate_magnitude created
+2011-05-18 15:19:11,105 DEBUG                    event_set:465 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,265 DEBUG                    event_set:472 |Memory: lat,lon created
+2011-05-18 15:19:11,266 DEBUG                    event_set:473 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,267 DEBUG                    event_set:499 |Memory: event set lists have been combined
+2011-05-18 15:19:11,268 DEBUG                    event_set:500 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,270 DEBUG                    event_set:530 |Memory: finished generating events
+2011-05-18 15:19:11,271 DEBUG                    event_set:531 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,272 DEBUG                     analysis:232 |Memory: event_set_zone created
+2011-05-18 15:19:11,272 DEBUG                     analysis:233 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,273 INFO                     event_set:806 |generating events
+2011-05-18 15:19:11,288 DEBUG                    event_set:1021|Memory: lat,lon created
+2011-05-18 15:19:11,289 DEBUG                    event_set:1022|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,290 DEBUG                    event_set:1054|Memory: event set lists have been combined
+2011-05-18 15:19:11,290 DEBUG                    event_set:1055|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,292 DEBUG                    event_set:1021|Memory: lat,lon created
+2011-05-18 15:19:11,293 DEBUG                    event_set:1022|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,293 DEBUG                    event_set:1054|Memory: event set lists have been combined
+2011-05-18 15:19:11,294 DEBUG                    event_set:1055|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,296 DEBUG                    event_set:1021|Memory: lat,lon created
+2011-05-18 15:19:11,296 DEBUG                    event_set:1022|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,297 DEBUG                    event_set:1054|Memory: event set lists have been combined
+2011-05-18 15:19:11,297 DEBUG                    event_set:1055|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,299 DEBUG                    event_set:1021|Memory: lat,lon created
+2011-05-18 15:19:11,300 DEBUG                    event_set:1022|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,300 DEBUG                    event_set:1054|Memory: event set lists have been combined
+2011-05-18 15:19:11,301 DEBUG                    event_set:1055|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,303 DEBUG                    event_set:1021|Memory: lat,lon created
+2011-05-18 15:19:11,303 DEBUG                    event_set:1022|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,304 DEBUG                    event_set:1054|Memory: event set lists have been combined
+2011-05-18 15:19:11,304 DEBUG                    event_set:1055|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,307 DEBUG                    event_set:1021|Memory: lat,lon created
+2011-05-18 15:19:11,307 DEBUG                    event_set:1022|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,308 DEBUG                    event_set:1054|Memory: event set lists have been combined
+2011-05-18 15:19:11,309 DEBUG                    event_set:1055|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,315 DEBUG                    event_set:1021|Memory: lat,lon created
+2011-05-18 15:19:11,315 DEBUG                    event_set:1022|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,316 DEBUG                    event_set:1054|Memory: event set lists have been combined
+2011-05-18 15:19:11,317 DEBUG                    event_set:1055|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,321 DEBUG                    event_set:1021|Memory: lat,lon created
+2011-05-18 15:19:11,321 DEBUG                    event_set:1022|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,322 DEBUG                    event_set:1054|Memory: event set lists have been combined
+2011-05-18 15:19:11,322 DEBUG                    event_set:1055|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,323 DEBUG                    event_set:1102|Memory: finished generating events
+2011-05-18 15:19:11,324 DEBUG                    event_set:1103|Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,326 DEBUG         recurrence_functions:37  |Memory: event_activity_matrix weight_matrix created
+2011-05-18 15:19:11,327 DEBUG         recurrence_functions:38  |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,622 DEBUG         recurrence_functions:122 |Memory: Out of the event_activity loop
+2011-05-18 15:19:11,622 DEBUG         recurrence_functions:123 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,623 DEBUG                     analysis:285 |Memory: event activity has been calculated
+2011-05-18 15:19:11,624 DEBUG                     analysis:286 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,624 INFO                      analysis:300 |Event set created. Number of events=2550
+2011-05-18 15:19:11,624 DEBUG                     analysis:301 |Memory: Event Set created
+2011-05-18 15:19:11,625 DEBUG                     analysis:302 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,687 INFO                      analysis:315 |Sites set created. Number of sites=31
+2011-05-18 15:19:11,688 DEBUG                     analysis:316 |Memory: Sites created
+2011-05-18 15:19:11,688 DEBUG                     analysis:317 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,704 DEBUG                     analysis:331 |Pseudo event set created. Number of pseudo_events=38250
+2011-05-18 15:19:11,705 DEBUG                     analysis:332 |Memory: Pseudo Event Set created
+2011-05-18 15:19:11,705 DEBUG                     analysis:333 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,807 DEBUG                     analysis:381 |blocking over sites if running in parallel. block_size=31
+2011-05-18 15:19:11,807 DEBUG                     analysis:384 |Number of atten_periods=3
+2011-05-18 15:19:11,808 DEBUG                     analysis:390 |Number of SA_surfaces=2
+2011-05-18 15:19:11,808 DEBUG                     analysis:410 |Memory: hazard_map array created
+2011-05-18 15:19:11,809 DEBUG                     analysis:411 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,809 DEBUG                     analysis:429 |Memory: save_motion array created
+2011-05-18 15:19:11,810 DEBUG                     analysis:430 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,810 DEBUG                     analysis:460 |Memory: Created all data collection arrays.
+2011-05-18 15:19:11,811 DEBUG                     analysis:461 |Resource usage: memory=429.1MB resident=35.5MB stacksize=0.3MB
+2011-05-18 15:19:11,811 INFO                      analysis:477 |P0: do site 1 of 31
+2011-05-18 15:19:12,271 INFO                      analysis:477 |P0: do site 2 of 31
+2011-05-18 15:19:12,729 INFO                      analysis:477 |P0: do site 3 of 31
+2011-05-18 15:19:13,190 INFO                      analysis:477 |P0: do site 4 of 31
+2011-05-18 15:19:13,648 INFO                      analysis:477 |P0: do site 5 of 31
+2011-05-18 15:19:14,107 INFO                      analysis:477 |P0: do site 6 of 31
+2011-05-18 15:19:14,566 INFO                      analysis:477 |P0: do site 7 of 31
+2011-05-18 15:19:15,024 INFO                      analysis:477 |P0: do site 8 of 31
+2011-05-18 15:19:15,484 INFO                      analysis:477 |P0: do site 9 of 31
+2011-05-18 15:19:15,942 INFO                      analysis:477 |P0: do site 10 of 31
+2011-05-18 15:19:16,400 INFO                      analysis:477 |P0: do site 11 of 31
+2011-05-18 15:19:16,858 INFO                      analysis:477 |P0: do site 12 of 31
+2011-05-18 15:19:17,317 INFO                      analysis:477 |P0: do site 13 of 31
+2011-05-18 15:19:17,777 INFO                      analysis:477 |P0: do site 14 of 31
+2011-05-18 15:19:18,235 INFO                      analysis:477 |P0: do site 15 of 31
+2011-05-18 15:19:18,692 INFO                      analysis:477 |P0: do site 16 of 31
+2011-05-18 15:19:19,151 INFO                      analysis:477 |P0: do site 17 of 31
+2011-05-18 15:19:19,609 INFO                      analysis:477 |P0: do site 18 of 31
+2011-05-18 15:19:20,068 INFO                      analysis:477 |P0: do site 19 of 31
+2011-05-18 15:19:20,534 INFO                      analysis:477 |P0: do site 20 of 31
+2011-05-18 15:19:20,993 INFO                      analysis:477 |P0: do site 21 of 31
+2011-05-18 15:19:21,453 INFO                      analysis:477 |P0: do site 22 of 31
+2011-05-18 15:19:21,911 INFO                      analysis:477 |P0: do site 23 of 31
+2011-05-18 15:19:22,372 INFO                      analysis:477 |P0: do site 24 of 31
+2011-05-18 15:19:22,830 INFO                      analysis:477 |P0: do site 25 of 31
+2011-05-18 15:19:23,290 INFO                      analysis:477 |P0: do site 26 of 31
+2011-05-18 15:19:23,749 INFO                      analysis:477 |P0: do site 27 of 31
+2011-05-18 15:19:24,209 INFO                      analysis:477 |P0: do site 28 of 31
+2011-05-18 15:19:24,667 INFO                      analysis:477 |P0: do site 29 of 31
+2011-05-18 15:19:25,127 INFO                      analysis:477 |P0: do site 30 of 31
+2011-05-18 15:19:25,587 INFO                      analysis:477 |P0: do site 31 of 31
+2011-05-18 15:19:26,046 DEBUG                     analysis:578 |Memory: Ended looping over sites
+2011-05-18 15:19:26,047 DEBUG                     analysis:579 |Resource usage: memory=429.1MB resident=35.6MB stacksize=0.3MB
+2011-05-18 15:19:26,048 INFO                      analysis:589 |time_pre_site_loop_fraction 0.0494652406417
+2011-05-18 15:19:26,048 INFO                      analysis:592 |loop_time (excluding file saving) 0:00:14.960000 hr:min:sec
+2011-05-18 15:19:26,789 INFO                      analysis:779 |On node 0, tornado.agso.gov.au time_taken_overall 0:00:15.680000 hr:min:sec
+2011-05-18 15:19:26,789 DEBUG                     analysis:782 |Memory: End
+2011-05-18 15:19:26,790 DEBUG                     analysis:783 |Resource usage: memory=429.1MB resident=35.6MB stacksize=0.3MB
