@@ -30,26 +30,17 @@ site_tag = "java"
 return_periods = [500,1000,2500]
 
 input_dir = r".\implementation_tests\long_input/" 
-output_dir = r".\implementation_tests\long_current\java01fake/" 
+output_dir = r".\implementation_tests\long_current\java01/" 
 use_site_indexes = False
-use_site_indexes = True
+#use_site_indexes = True
 site_indexes = range(1,3241)
 site_indexes = range(1,32)
 zone_source_tag = "div100_local_mag_min"
 fault_source_tag = "div100_local_mag_min" 
-#event_control_tag = "test48"
 
 # Scenario input
 
-
-
 # Probabilistic input
-# prob_azimuth_in_zones = [10, 30, 70, 100, 150, 15]
-# prob_delta_azimuth_in_zones = [5, 10, 20, 25, 50, 0]
-prob_min_mag_cutoff = 5.0
-# prob_number_of_mag_sample_bins = 15
-# prob_number_of_events_in_zones = [5000, 1000, 1000, 3000, 1000, 1000]
-# prob_dip_in_zones = [35, 40, 45, 50, 55, 60]
 
 # Attenuation
 #atten_models = ['Campbell08']

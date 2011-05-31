@@ -445,12 +445,85 @@ class Test_Source_model(unittest.TestCase):
             self.failUnless(i in setups_dic[key])
             setups_dic[key].remove(i)
             
+    def test_create_fault_sources(self):
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            '  <event_group event_type = "background">'
+                            '    <GMPE fault_type = "reverseft">'
+                            '      <branch model = "Campbel8" weight = "0.8"/>'
+                            '      <branch model = "Boore08" weight = "0.2"/>'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "background" scaling_fault_type = "reverse" />'
+                            '  </event_group>'
+                            '  <event_group event_type = "intraslab">'
+                            '    <GMPE fault_type = "reverse2">'
+                            '      <branch model = "Zhao06" weight = "0.5"/>'
+                            '      <branch model = "Atkin" weight = "0.5"/>'
+                            '    </GMPE>'
+                            '    <scaling scaling_rule = "intraslab" scaling_fault_type = "unspecified" />'
+                            '  </event_group>'
+                            '</event_type_controlfile>'])
+
+        handle.write(sample)
+        handle.close()
         
+        generation_min_mag = 7.9
+        recurrence_min_mag = 4
+        actual_generation_min_mag = max(generation_min_mag, recurrence_min_mag)
+        recurrence_max_mag = 8.0
+        A_min = 10
+        b = 1.4
+        number_of_mag_sample_bins = 4
+        distribution = 'distribution'
+        
+        fsg_list = []
+        for i,event_type in enumerate(['background', 'intraslab',
+         'intraslab']):
+            dummy = Dummy()
+            dummy.magnitude_dist = {}
+            dummy.magnitude_dist['minimum'] = actual_generation_min_mag + i
+            dummy.magnitude_dist['maximum'] = recurrence_max_mag + i        
+            dummy.generation_min_mag = generation_min_mag + i
+            dummy.A_min = A_min + i
+            dummy.b = b + i
+            dummy.number_of_mag_sample_bins = number_of_mag_sample_bins + i
+            dummy.event_type = event_type
+            dummy.name = 'name' + str(i)
+            dummy.distribution = 'distribution' + str(i)
+            fsg_list.append(dummy)
             
+        magnitude_type = 'Mw'
+        
+        source_model = create_fault_sources(file_name, 
+                                           fsg_list, 
+                                           magnitude_type)
+        for i, model in enumerate(source_model):
+            #self.failUnless(mod.min_magnitude  == )
+            self.failUnless(model.max_magnitude == recurrence_max_mag + i)
+            self.failUnless(model.actual_min_mag_generation == \
+                               actual_generation_min_mag + i)
+            self.failUnless(model.A_min == A_min + i)
+            self.failUnless(model.b == b + i)
+            self.failUnless(model.number_of_mag_sample_bins == \
+                                number_of_mag_sample_bins + i)
+            self.failUnless(model.name == 'name' + str(i))
+            self.failUnless(model.recurrence_model_distribution == \
+                                'distribution' +  str(i))
+            self.failUnless(model.scaling['scaling_rule'] == model.event_type)
+            
+        self.failUnless(source_model[0].scaling['scaling_rule'] == 'background')
+            
+        os.remove(file_name)
+        
+        
 ################################################################################
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Source_model,'test')
-    #suite = unittest.makeSuite(Test_Source_model,'test_add_event_type_atts_to_sources')
+    #suite = unittest.makeSuite(Test_Source_model,'test_create_fault_sources')
     runner = unittest.TextTestRunner()
     runner.run(suite)
