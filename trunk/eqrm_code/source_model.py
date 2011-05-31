@@ -144,9 +144,9 @@ class Source_Model(object):
 
     def sources_of_event_set(self, event_length):
         """
-        Return a list the length of the event_set with values being the Source
-        the event came from.  Return None if the event has no Source (currently this
-        should not be possible).
+        Return a list the length of the event_set with values being
+        the Source the event came from.  Return None if the event has
+        no Source (currently this should not be possible).
         """
         sources = [None] * event_length
         for source in self._sources:
@@ -187,7 +187,8 @@ class Source(object):
         """
         generation_min_mag - The minimum event generation specified
           by the user
-        min_magnitude,max_magnitude,
+        min_magnitude - The recurrence_min_mag
+        max_magnitude - The recurrence_max_mag
         A_min,b are floats
         
         #FIXME DSG-EQRM This class needs comments.

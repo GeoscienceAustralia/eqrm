@@ -38,30 +38,35 @@ def calc_event_activity(event_set, source_model):
     for source in source_model: # loop over source zones 
         #print "source.prob_min_mag_cutoff", source.prob_min_mag_cutoff
         #print "source.min_magnitude", source.min_magnitude
-        #print "source.actual_min_mag_generation", source.actual_min_mag_generation
-        zone_mlow = source.actual_min_mag_generation
-        #print "zone_mlow", zone_mlow
-        zone_mhgh = source.max_magnitude
+        #print "source.act_min_mag_gen", source.actual_min_mag_generation
+        actual_min_mag_generation = source.actual_min_mag_generation
+        #print "actual_min_mag_generation", actual_min_mag_generation
+        recurrence_max_mag = source.max_magnitude
                
         poly_ind = source.event_set_indexes
-        mag_ind = where((zone_mlow < event_set.Mw[poly_ind])&
-                        (event_set.Mw[poly_ind] < zone_mhgh))[0]
+        mag_ind = where((actual_min_mag_generation < event_set.Mw[poly_ind])&
+                        (event_set.Mw[poly_ind] < recurrence_max_mag))[0]
         
         if len(mag_ind)>0:
             zone_b = source.b
-            grfctr = grscale(zone_b,zone_mhgh, zone_mlow, source.min_magnitude)
+            grfctr = grscale(zone_b,
+                             recurrence_max_mag, 
+                             actual_min_mag_generation, 
+                             source.min_magnitude)
             A_mlow = source.A_min * grfctr
             
             event_ind= poly_ind[mag_ind]
             #event_ind=mag_ind[poly_ind]
             num_of_mag_sample_bins = source.number_of_mag_sample_bins
             
-            mag_bin_centroids=make_bins(zone_mlow,zone_mhgh,
+            mag_bin_centroids=make_bins(actual_min_mag_generation,
+                                        recurrence_max_mag,
                                         num_of_mag_sample_bins,
                                         source.recurrence_model_distribution)
 
             event_bins =assign_event_bins(event_set.Mw[event_ind],
-                                          zone_mlow,zone_mhgh,
+                                          actual_min_mag_generation,
+                                          recurrence_max_mag,
                                           num_of_mag_sample_bins,
                                           source.recurrence_model_distribution)
            
@@ -83,15 +88,19 @@ def calc_event_activity(event_set, source_model):
                         mag_bin_centroids[z])) for z in event_bins])
                     mag_bin_centroids= new_mag_bin_centroids
 
-            if source.recurrence_model_distribution=='bounded_gutenberg_richter':
-                grpdf = m2grpdfb(zone_b,mag_bin_centroids,zone_mlow,zone_mhgh)
+            if source.recurrence_model_distribution == \
+                    'bounded_gutenberg_richter':
+                grpdf = m2grpdfb(zone_b,
+                                 mag_bin_centroids,
+                                 actual_min_mag_generation,
+                                 recurrence_max_mag)
                 
             
-            elif source.recurrence_model_distribution=='characteristic':
+            elif source.recurrence_model_distribution == 'characteristic':
                 grpdf=calc_activities_Characteristic(
                     mag_bin_centroids, 
-                    zone_b, zone_mlow,
-                    zone_mhgh,
+                    zone_b, actual_min_mag_generation,
+                    recurrence_max_mag,
                     num_of_mag_sample_bins)
             else:
                 raise IOError(source.recurrence_model_distribution,
@@ -110,7 +119,7 @@ def calc_event_activity(event_set, source_model):
     return event_activity_matrix 
     
 
-def m2grpdfb(b,m,m0,mmax):
+def m2grpdfb(b, m, m0, mmax):
     """
     from matlab;
     Computes the PDF, fm for the bounded Gutenberg-Richter distribution.
@@ -308,17 +317,17 @@ def calc_activities_Characteristic(magnitude,b,m0,mMax,
     
     Returns A_min for a fault.
     """
-    m2=0.5
-    m_c=mMax-m2
+    m2 = 0.5
+    m_c = mMax - m2
         
-    n_bin_width= (m_c-m0)/(num_of_bins)
-    char_bin_width=m2
+    n_bin_width = (m_c - m0)/(num_of_bins)
+    char_bin_width = m2
 
-    pdfs_tmp =calc_activity_Characteristic(magnitude,b,m0,mMax)          
+    pdfs_tmp = calc_activity_Characteristic(magnitude, b, m0 ,mMax)          
     i = where(magnitude > m_c)
-    pdfs_tmp[i]= pdfs_tmp[i] *(char_bin_width/n_bin_width)
+    pdfs_tmp[i] = pdfs_tmp[i] * (char_bin_width/n_bin_width)
     
-    pdfs=pdfs_tmp/sum(pdfs_tmp)
+    pdfs = pdfs_tmp/sum(pdfs_tmp)
     return pdfs
 
 def calc_activity_Characteristic(magnitude,b,m0,mMax):
