@@ -202,6 +202,8 @@ class Test_Recurrence_functions(unittest.TestCase):
         dummy.magnitude_dist['minimum'] = actual_generation_min_mag
         dummy.magnitude_dist['maximum'] = recurrence_max_mag        
         dummy.generation_min_mag = generation_min_mag
+        dummy.recurrence_max_mag  = recurrence_max_mag  
+        dummy.recurrence_min_mag  = recurrence_min_mag  
         dummy.A_min = A_min
         dummy.b = b
         dummy.number_of_mag_sample_bins = number_of_mag_sample_bins
@@ -221,6 +223,70 @@ class Test_Recurrence_functions(unittest.TestCase):
         lamba = A_min * grscale(b, recurrence_max_mag, 
                                 generation_min_mag, recurrence_min_mag)
         self.assertEqual(lamba, sum(event_activity_matrix))
+        
+
+    def test_calc_event_activity_generation_min_mag(self):
+    
+        # Create an event set
+        Mw = [4.5, 5.5, 6.5, 7.5]
+        Mw = [7.65, 7.75, 7.85, 7.95 ]
+        event_set = Dummy_event_set(array(Mw))
+        
+        # Create a list of Sources  - eventually
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            ' <event_group event_type = "background">'
+                            '  <GMPE fault_type = "normal">'
+                            '     <branch model = "Toro" weight = "1.0"/>'
+                            '  </GMPE>'
+                            '  <scaling scaling_rule = "Wells_and_Coppersmith_94" scaling_fault_type = "unspecified" />'
+                            ' </event_group>'
+                            '</event_type_controlfile>'])
+        handle.write(sample)
+        handle.close()
+        
+        generation_min_mag = 7.6
+        recurrence_min_mag = 4
+        #recurrence_min_mag = 7.6
+        actual_generation_min_mag = max(generation_min_mag, recurrence_min_mag)
+        recurrence_max_mag = 8.0
+        A_min = 10
+        b = 1.4
+        number_of_mag_sample_bins = 4
+        distribution = 'distribution'
+        
+        dummy = Dummy()
+        dummy.magnitude_dist = {}
+        dummy.magnitude_dist['minimum'] = actual_generation_min_mag
+        dummy.magnitude_dist['maximum'] = recurrence_max_mag        
+        dummy.generation_min_mag = generation_min_mag
+        dummy.recurrence_max_mag  = recurrence_max_mag  
+        dummy.recurrence_min_mag  = recurrence_min_mag  
+        dummy.A_min = A_min
+        dummy.b = b
+        dummy.number_of_mag_sample_bins = number_of_mag_sample_bins
+        dummy.event_type = "background"
+        dummy.name = 'name'
+        dummy.distribution = 'bounded_gutenberg_richter'
+        fsg_list = [dummy]
+            
+        magnitude_type = 'Mw'
+        
+        source_model = create_fault_sources(file_name, 
+                                           fsg_list, 
+                                           magnitude_type)
+        for sm in source_model:
+            sm.set_event_set_indexes( range(len(event_set)))
+        event_activity_matrix = calc_event_activity(event_set, source_model)
+        lamba = A_min * grscale(b, recurrence_max_mag, 
+                                generation_min_mag, recurrence_min_mag)
+        
+        self.assert_(allclose(lamba, sum(event_activity_matrix)))
+
         
 
         

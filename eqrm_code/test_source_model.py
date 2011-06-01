@@ -488,6 +488,8 @@ class Test_Source_model(unittest.TestCase):
             dummy.magnitude_dist['minimum'] = actual_generation_min_mag + i
             dummy.magnitude_dist['maximum'] = recurrence_max_mag + i        
             dummy.generation_min_mag = generation_min_mag + i
+            dummy.recurrence_max_mag  = recurrence_max_mag + i
+            dummy.recurrence_min_mag  = recurrence_min_mag + i
             dummy.A_min = A_min + i
             dummy.b = b + i
             dummy.number_of_mag_sample_bins = number_of_mag_sample_bins + i
