@@ -29,14 +29,14 @@ site_tag = "java"
 #site_db_tag = "_small" 
 return_periods = [500,1000,2500]
 
-input_dir = r".\implementation_tests\java_input/" 
-output_dir = r".\implementation_tests\java_current\java01fake/" 
+input_dir = r".\implementation_tests\long_input/" 
+output_dir = r".\implementation_tests\long_current\java01fake/" 
 use_site_indexes = False
 use_site_indexes = True
 site_indexes = range(1,3241)
 site_indexes = range(1,32)
-zone_source_tag = "div100"
-fault_source_tag = "div100" 
+zone_source_tag = "div100_local_mag_min"
+fault_source_tag = "div100_local_mag_min" 
 #event_control_tag = "test48"
 
 # Scenario input
