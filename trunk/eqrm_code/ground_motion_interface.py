@@ -111,7 +111,8 @@ from copy import  deepcopy
 from scipy import where, sqrt, array, asarray, exp, log, newaxis, zeros, \
                   log10, isfinite, weave, ones, shape, reshape, concatenate, \
                   tanh, cosh, power, shape, tile, cos, pi, copy, resize, \
-                  logical_and, logical_or, sum, minimum, maximum, ones_like
+                  logical_and, logical_or, sum, minimum, maximum, ones_like, \
+                  seterr, allclose
  
 from eqrm_code.ground_motion_misc import linear_interpolation, \
                                          Australian_standard_model, \
@@ -119,6 +120,11 @@ from eqrm_code.ground_motion_misc import linear_interpolation, \
 from eqrm_code import util 
 from eqrm_code import conversions
 from eqrm_code import ground_motion_misc
+
+# Note, this is covering up, in Abrahamson08_distribution, Ztor being 0,
+# causing divide by 0 errors.  It may be covering up other things.
+# This is to suppress warnings in Windows.
+#seterr(divide='ignore')
 
 
 LOG10E = math.log10(math.e)
@@ -3806,7 +3812,7 @@ def Abrahamson08_distribution(**kwargs):
         Ground-Motion Relations", Earthquake Spectra, Volume 24, No. 1,
         pp 67-97, February 2008
     """
-
+    #import pdb; pdb.set_trace();
     # get args
     Per = kwargs['periods']
     Mw = kwargs['mag']
@@ -3936,7 +3942,10 @@ def Abrahamson08_distribution(**kwargs):
     T2 = 0.5 + Rx/(2.0*RxTest)
     T2 = where(logical_or(Rx > RxTest, Dip == 90.0), 1.0, T2)
 
+    oldsettings = seterr(divide='ignore')
     T3 = Rx/Ztor
+    seterr(**oldsettings)
+    
     T3 = where(Rx >= Ztor, 1.0, T3)
 
     T4 = ones(Mw.shape)
@@ -4125,7 +4134,10 @@ def Abrahamson08_distribution(**kwargs):
     T2 = 0.5 + Rx/(2.0*RxTest)
     T2 = where(logical_or(Rx > RxTest, Dip == 90.0), 1.0, T2)
 
+    oldsettings = seterr(divide='ignore')
     T3 = Rx/Ztor
+    seterr(**oldsettings)
+    
     T3 = where(Rx >= Ztor, 1.0, T3)
 
     T4 = ones(Mw.shape)
@@ -4308,10 +4320,15 @@ def Abrahamson08_distribution(**kwargs):
                e2*log((Z10+c2T)/(Z10_med+c2T)))
 
     a21 = e2
+    
+    oldsettings = seterr(invalid='ignore')
+    seterr(divide='ignore')
     a21 = where(a21Test < 0.0,
                 -(a10T + bT*nT) *
                     log(V30/minimum(V1,1000.0))/log((Z10+c2T)/(Z10_med+c2T)),
                 a21)
+    seterr(**oldsettings)
+    
     XVs30 = Vs30 + zeros(a21.shape)
     #a21 = where(Vs30 >= 1000.0, 0.0, a21)
     a21 = where(XVs30 >= 1000.0, 0.0, a21)

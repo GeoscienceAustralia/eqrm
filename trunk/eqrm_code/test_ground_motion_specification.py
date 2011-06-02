@@ -1385,5 +1385,5 @@ class Test_ground_motion_specification(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_specification, 'test')
-    runner = unittest.TextTestRunner()
+    runner = unittest.TextTestRunner() #verbosity=2)
     runner.run(suite)
