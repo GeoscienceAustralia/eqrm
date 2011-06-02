@@ -18,7 +18,7 @@ from gzip import GzipFile
 from os import listdir
 
 from scipy import isfinite, array, allclose, asarray, swapaxes, transpose, \
-     newaxis, reshape, nan, isnan, zeros, rollaxis
+     newaxis, reshape, nan, isnan, zeros, rollaxis, string_
 import numpy as np
 
 from csv_interface import csv2dict
@@ -605,14 +605,12 @@ def save_structures(THE_PARAM_T,structures,compress=False,
         nan_values = ['1.#QNAN', '-1.#IND'] #,'nan','1.#QNB']
         for title_string in maybe_nan:
             string_value = structures.attributes[title_string][i]
-            if isnan(string_value) and (string_value in nan_values or \
-                                        not isinstance(string_value,str)):
-                # This is a bit of a hack
-                # It will set the survey factor of bridges to 1.
-                if title_string == 'SURVEY_FACTOR':
-                    maybe_nan[title_string] = 1
-                else:
-                    maybe_nan[title_string] = 'nan'                    
+            
+            if isinstance(string_value, string_) and \
+                    (string_value in nan_values or \
+                         not isinstance(string_value,str)):
+                
+                maybe_nan[title_string] = 'nan'                    
             else:
                 maybe_nan[title_string] = structures.attributes[title_string][i]
     #print "structures.latitude[i]",   structures.latitude[i]         

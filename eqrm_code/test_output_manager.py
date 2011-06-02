@@ -1384,6 +1384,6 @@ if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Output_manager, 'test')
     #suite=unittest.makeSuite(Test_Output_manager,'test_load_collapsed_motion_sitess')
     #suite=unittest.makeSuite(Test_Output_manager,'test_save_event_set_new')
-    runner = unittest.TextTestRunner()  #verbosity=2) #verbosity=2
+    runner = unittest.TextTestRunner() #verbosity=2) #verbosity=2
     runner.run(suite)
 
