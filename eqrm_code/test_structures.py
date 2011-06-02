@@ -88,7 +88,7 @@ class Test_Structures(unittest.TestCase):
             try:
                 self.assert_(allclose(array(attribute_dic[key]),
                                       sites.attributes[key]))
-            except (IndexError, TypeError):
+            except (IndexError, TypeError, NotImplementedError):
                 # this checks the string stuff
                 self.assertEqual(attribute_dic[key],
                                       sites.attributes[key].tolist())
