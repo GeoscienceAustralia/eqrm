@@ -13,7 +13,8 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import exp, log, where, isfinite, reshape, array, r_, rollaxis
+from scipy import exp, log, where, isfinite, reshape, array, r_, rollaxis, \
+    seterr
 from scipy.stats import norm
 
 SPAWN = 1 
@@ -104,7 +105,10 @@ class Distribution_Log_Normal(object):
             # size sets the shape of the returned array
             variate_site = self.rvs(size=log_sigma.size)
             variate_site = variate_site.reshape(log_sigma.shape)
-        sample_values = exp(log_mean + variate_site * log_sigma)        
+            
+        oldsettings = seterr(over='ignore')
+        sample_values = exp(log_mean + variate_site * log_sigma)
+        seterr(**oldsettings)
         return sample_values
 
     

@@ -4,7 +4,7 @@ import sys
 import unittest
 from ground_motion_distribution import *
 from scipy import array, log, exp, newaxis, concatenate, allclose, sqrt, \
-     r_, alltrue, where, arange, resize, sum, ones
+     r_, alltrue, where, arange, resize, sum, ones, seterr
 
 
 class Test_Log_normal_distribution(unittest.TestCase):
@@ -53,6 +53,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         dist.set_log_mean_log_sigma_etc(log_mean,log_sigma)
 
         sample_values = dist._monte_carlo_intra_inter()
+        
         actual = exp(
             log_mean + atten_log_sigma_eq_weight*variate_eq*log_sigma)      
         assert allclose(sample_values,actual)
@@ -170,7 +171,9 @@ class Test_Log_normal_distribution(unittest.TestCase):
         sample_values = dist._monte_carlo(log_mean,log_sigma,
                                           variate_site=variate)
         
+        oldsettings = seterr(over='ignore')
         actual = exp(log_mean + variate*log_sigma)
+        seterr(**oldsettings)
         self.assert_(allclose(sample_values, actual))
         self.assert_(sample_values.shape == dim)
 
@@ -316,5 +319,5 @@ class Test_Log_normal_distribution(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Log_normal_distribution,'test')
     #suite = unittest.makeSuite(Test_Log_normal_distribution,'test_DLN_monte_carlo')
-    runner = unittest.TextTestRunner()
+    runner = unittest.TextTestRunner() #verbosity=2
     runner.run(suite)
