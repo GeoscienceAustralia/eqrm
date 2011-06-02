@@ -10,9 +10,6 @@ import types
 from scipy import ndarray, array, sum, ravel, sqrt, searchsorted, sort, \
      concatenate,  arange, inner
 
-# Getting an infinite number to use when using Numeric
-INF = (array([1])/0.)[0]
-
 
 
 def angle(v1, v2=None):
