@@ -12,7 +12,7 @@
   ModifiedDate: $Date: 2009-09-18 17:10:15 +1000 (Fri, 18 Sep 2009) $
 """
 
-from scipy import nan_to_num, where, array, zeros, indices, ndarray
+from scipy import nan_to_num, where, array, zeros, indices, ndarray, seterr
 
 def solve(SA,SD,SAcap,update_function,rtol=0.05,maxits=100):
     """
@@ -48,7 +48,9 @@ def solve(SA,SD,SAcap,update_function,rtol=0.05,maxits=100):
         SA,SD,SAcap,exit_flag=update_function(intersection_x) # update curves
        
         intersection_x=find_intersection(SD,SA,SAcap) # get new intersection
+        oldsettings = seterr(invalid='ignore')
         diff=abs(intersection_x-old_intersection_x)/old_intersection_x # diff
+        seterr(**oldsettings)
         # This is needed in windows to stop nan's setting the diff to -1.#IND
         diff=nan_to_num(diff)
         max_diff=diff.max() # find the relative change in intersection_x
@@ -136,15 +138,17 @@ def get_intersection_indices(condition,axis=-1):
 
 def get_interpolated_SD(SD,SAdiff,id0,id1):
     # Select points for interpolation:
-    x0=SD[id0]
-    y0=SAdiff[id0]
-    x1=SD[id1]
-    y1=SAdiff[id1]
-    dx=x1-x0
-    dy=y1-y0
+    x0 = SD[id0]
+    y0 = SAdiff[id0]
+    x1 = SD[id1]
+    y1 = SAdiff[id1]
+    dx = x1-x0
+    dy = y1-y0
     
     # interpolate SD
-    SDcr=x1-y1*(dx/dy)
+    oldsettings = seterr(invalid='ignore')
+    SDcr = x1-y1*(dx/dy)
+    seterr(**oldsettings)
     return SDcr
 
 def find_intersection(SD,SA,SAcap,axis=-1):
