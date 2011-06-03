@@ -70,7 +70,6 @@ def scaling_calc_rup_width(Mw, scaling_dic, dip, rup_area=None,
     max_rup_width: The maximum width possible, km.
         
     """
-
     func_name = scaling_dic['scaling_rule'] + '_rup_width'
     para_dic = copy.copy(scaling_dic)
     para_dic['Mw'] = Mw

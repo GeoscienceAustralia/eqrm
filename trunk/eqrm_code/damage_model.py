@@ -15,7 +15,7 @@
 """
 
 from scipy.stats import norm
-from scipy import where, newaxis, array, asarray, log, shape
+from scipy import where, newaxis, array, asarray, log, shape, seterr
 import numpy as np
 
 from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
@@ -326,8 +326,10 @@ def cumulative_state_probability(threshold, beta,value):
     from scipy.special import erf
     return 0.5*(1+erf(x/sqrt(2)))
     """
-
+    
+    oldsettings = seterr(divide='ignore')
     temp = (1/beta)*log(value/threshold)
+    seterr(**oldsettings)
 
     return norm.cdf(temp)
 

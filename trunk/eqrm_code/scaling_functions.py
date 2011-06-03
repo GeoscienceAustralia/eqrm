@@ -17,7 +17,7 @@
   Copyright 2007 by Geoscience Australia
 """
 
-
+import numpy as np
 from scipy import vectorize, sqrt, sin, minimum, pi, array, tile, where, \
     log10
 
@@ -40,7 +40,11 @@ def modified_Wells_and_Coppersmith_94_rup_width(dip, Mw, area, max_rup_width,
     returns:
       the rupture width, km.
     """
-    f = where(Mw > 5.5, sqrt(sqrt(1+2*(Mw-5.5)*sin(dip*pi/180.)))**-1, 1.0)
+    # This is to avoid complex numbers,
+    # Which effect the type of width e.g. end up with  1.00000000+0.j madness.
+    Mw_mod = where(Mw <= 5.5, 5.5, Mw)  
+    f = where(Mw > 5.5, sqrt(sqrt(1+2*(Mw_mod-5.5)*sin(dip*pi/180.)))**-1, 1.0)
+    
     width = f*sqrt(area)
     if max_rup_width is not None:
         return minimum(f*sqrt(area),max_rup_width)

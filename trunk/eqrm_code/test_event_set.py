@@ -8,7 +8,7 @@ from os import sep
 import types
 import tempfile
 
-from scipy import array, allclose, asarray, arange, sum
+from scipy import array, allclose, asarray, arange, sum, seterr
 
 from xml_interface import Xml_Interface
 from source_model import source_model_from_xml, Source_Model
@@ -1036,7 +1036,8 @@ class Test_Event_Set(unittest.TestCase):
         
 #-------------------------------------------------------------
 if __name__ == "__main__":
+    seterr(all='warn')
     suite = unittest.makeSuite(Test_Event_Set,'test')
-    #suite = unittest.makeSuite(Test_Event_Set,'test_scenario_event_max_width')    
-    runner = unittest.TextTestRunner()
+    #suite = unittest.makeSuite(Test_Event_Set,'test_generate_synthetic_events_horspool')    
+    runner = unittest.TextTestRunner() #verbosity=2
     runner.run(suite)

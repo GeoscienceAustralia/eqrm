@@ -20,7 +20,7 @@ import scipy
 
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
-     int64, reshape, arange, append, radians, where, minimum
+     int64, reshape, arange, append, radians, where, minimum, seterr
 from numpy import random
 
 from eqrm_code.ANUGA_utilities import log
@@ -464,7 +464,8 @@ class Event_Set(object):
             #print "magnitude[start:end]", magnitude[start:end]
             #print "dip[start:end]", dip[start:end]
             #print "rup_area=area[start:end", area[start:end]
-            #print "max_rup_width=fault_width[start:end]", fault_width[start:end]
+            #print "max_rup_width=fault_width[s:e]", fault_width[start:end]
+            
             width[start:end] = scaling.scaling_calc_rup_width(
                 magnitude[start:end], source.scaling, dip[start:end],
                 rup_area=area[start:end], max_rup_width=fault_width[start:end])

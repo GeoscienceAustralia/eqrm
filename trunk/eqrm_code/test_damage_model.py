@@ -14,7 +14,7 @@ import sys
 import unittest
 from os.path import join
 from numpy import array, where, allclose, asarray
-from scipy import array, allclose, sqrt, log, newaxis
+from scipy import array, allclose, sqrt, log, newaxis, seterr
 from scipy.special import erf
 
 from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model
@@ -129,10 +129,10 @@ class Test_damage_model(unittest.TestCase):
     '''[BH, Harea, kappa, Harea0] = ...
                   nonlin_damp_rand( SDcrNew,               ...
                                     SAcrNew,               ...
-                                    BCAP_PARAMS_T.('kappa'), ...                 ...
+                                    BCAP_PARAMS_T.('kappa'),  ...
                                     BCAP_PARAMS_T.('DyV'), ...
                                     BCAP_PARAMS_T.('AyV'), ...
-                                    THE_PARAM_T.('csm_hysteretic_damping'),            ...
+                                    THE_PARAM_T.('csm_hysteretic_damping'), ...
                                     SDnew,                 ...
                                     SAnew,                 ...
                                     SAcapNew  );'''
@@ -341,6 +341,7 @@ class Test_damage_model(unittest.TestCase):
 
 
     def test_cumulative_state_probability(self):
+        blocking_block_comments = True
         """Test that cumulative_state_probability works the same way
         as matlab function.
 
@@ -354,7 +355,9 @@ class Test_damage_model(unittest.TestCase):
         value = 5.0
         threshold = array((0.0, 0.00001, 1, 1.5, 2, 3, 4, 5, 10, 100, 1000))
 
+        oldsettings = seterr(divide='ignore')
         x = (1/beta)*log(value/threshold)
+        seterr(**oldsettings)
         # matlab:
         # Pr11 = normcdf2(1/THE_VUN_T.('beta_nsd_d')*log(SDcrAll./Thresh))
 
@@ -462,8 +465,9 @@ class Test_damage_model(unittest.TestCase):
 
 
     def test_calc_total_loss_OS_bug_search(self):
+        blocking_block_comments = True
         """plugging in results from TS_risk57.par"""
-
+        
         SA =array([[[0.14210731, 0.29123634, 0.23670422, 0.13234554,
                      0.08648546, 0.06338455, 0.04945741, 0.04140068,
                      0.03497466, 0.02969136, 0.02525473, 0.02151188,
@@ -583,6 +587,6 @@ class Test_damage_model(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_damage_model,'test')
     #suite = unittest.makeSuite(Test_damage_model,'test_calc_total_loss_OS_bug_search')
-    runner = unittest.TextTestRunner()
+    runner = unittest.TextTestRunner() #verbosity=2)
     runner.run(suite)
 

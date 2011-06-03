@@ -13,7 +13,7 @@
 import exceptions
 
 from scipy import where, exp, pi, newaxis, stats, weave, zeros, log, \
-     asarray, array
+     asarray, array, seterr
 from interp import interp
 
 from eqrm_code import util 
@@ -51,7 +51,9 @@ def nonlin_damp(capacity_parameters,kappa,acceleration,displacement,
     DyV,AyV,DuV,AuV,a,b,c=capacity_parameters    
     Harea=hyst_area_rand(displacement,acceleration,DyV,AyV,DuV,AuV,
                          csm_hysteretic_damping)
+    oldsettings = seterr(invalid='ignore')
     BH = kappa*Harea/(2*pi*displacement*acceleration)
+    seterr(**oldsettings)
     return BH
 
 def hyst_area_rand(D,A,DyV,AyV,DuV,AuV,csm_hysteretic_damping):
@@ -125,7 +127,9 @@ The hysteresis area = 2(A1+A2-A3)
         bb=ky/(A-AyV)
         aa=-ky/bb
         
+        oldsettings = seterr(under='ignore')
         Harea1=cc*x1+aa/bb*(1-exp(-bb*x1))
+        seterr(**oldsettings)
         Harea2=0.5*y1*y1/ky
         Harea3=2*x2*AyV
 
@@ -536,7 +540,9 @@ def calculate_corner_periods(periods, ground_motion, magnitude):
 
     #print 'S10',S10[:,0:5]
     # interpolate the ground motion at reference periods
+    oldsettings = seterr(invalid='ignore')
     acceleration_dependent=(S10/S03)
+    seterr(**oldsettings)
     acceleration_dependent[where(S03<0.00000000000001)]=0.0
     acceleration_dependent=acceleration_dependent[...,0] # and collapse
 

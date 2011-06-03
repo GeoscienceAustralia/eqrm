@@ -3,7 +3,7 @@ import os
 import sys
 import unittest
 
-from scipy import array,allclose,newaxis,exp,pi,nan_to_num
+from scipy import array,allclose,newaxis,exp,pi,nan_to_num, seterr
 from numpy import nanmax
 
 from eqrm_code.equivalent_linear_solver import find_intersection, \
@@ -124,11 +124,13 @@ class Test_damage_solver(unittest.TestCase):
     def test_array_ab_diff(self):
         a = array([7.35287023,  3.98947559,  0.])
         b = array([ 7.38625883, 3.98947559, 0.])
-        diff=abs(a-b)/b
+        oldsettings = seterr(invalid='ignore')
+        diff = abs(a-b)/b
+        seterr(**oldsettings)
         # diff [ 0.00452037  0.                 NaN]
         # Windows can't handle the NaN,
         # so it has to be set to zero
-        diff=nan_to_num(diff)
+        diff = nan_to_num(diff)
         #print "diff", diff
 
         # this would return max_diff -1.#IND if NaN's aren't removed,
