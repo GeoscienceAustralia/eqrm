@@ -15,10 +15,17 @@ from eqrm_code.util import dict2csv, determine_eqrm_path
 import eqrm_code.eqrm_filesystem as efs
 
 
+
 class Dummy:
     def __init__(self):
-        pass
-
+        pass      
+        
+    def set_event_set_indexes(self,indexes):
+        self.event_set_indexes = indexes
+        
+    def get_event_set_indexes(self):
+        return self.event_set_indexes
+    
 
 def get_bridges_from_dic(attributes=None):
     """Get a Bridges object from a dictionary.

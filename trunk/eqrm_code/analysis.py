@@ -900,7 +900,7 @@ def calc_and_save_SA(THE_PARAM_T,
         soil_SA_overloaded = None
     
     for source in source_model:
-        event_inds = source.event_set_indexes
+        event_inds = source.get_event_set_indexes()
         if len(event_inds) == 0:
             continue
         sub_event_set = event_set[event_inds]

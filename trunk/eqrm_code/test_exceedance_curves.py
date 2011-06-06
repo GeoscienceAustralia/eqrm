@@ -9,9 +9,17 @@ from eqrm_code.exceedance_curves import *
 from eqrm_code.exceedance_curves import _collapse_att_model_dimension
 
 
+
 class Dummy:
     def __init__(self):
-        pass
+        pass      
+        
+    def set_event_set_indexes(self,indexes):
+        self.event_set_indexes = indexes
+        
+    def get_event_set_indexes(self):
+        return self.event_set_indexes
+    
     
 class Test_Exceedance(unittest.TestCase):
     def test_exceedance_curve(self):

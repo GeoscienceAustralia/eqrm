@@ -100,7 +100,7 @@ class Source_Model(object):
         This function is used by analysis
         """
         for szp in self._sources:
-            if szp.event_set_indexes is None:
+            if szp.get_event_set_indexes() is None:
                 szp.determine_event_set_indexes(event_set)
                 
         event_activity_matrix = calc_event_activity(
@@ -150,7 +150,7 @@ class Source_Model(object):
         """
         sources = [None] * event_length
         for source in self._sources:
-            for event_ind in source.event_set_indexes:
+            for event_ind in source.get_event_set_indexes():
                 sources[event_ind] = source
         return sources
         
@@ -163,14 +163,18 @@ class Source_Model(object):
         # activities
         # calculating an event activity and associating an event with
         # a ground motion model.  So split this class into two classes sometime
-        source = Source(min_magnitude=None,
-                        max_magnitude=None,
-                        generation_min_mag=None,
-                        A_min=None, b=None, number_of_mag_sample_bins=None,
-                        name='scenario',
-                        event_type=None)
+        if False:
+            source = Source(min_magnitude=None,
+                            max_magnitude=None,
+                            generation_min_mag=None,
+                            A_min=None, b=None, number_of_mag_sample_bins=None,
+                            name='scenario',
+                            event_type=None)
+        else:
+            source = Event_Zone(name='scenario')
         source.set_event_set_indexes(arange(0, num_events))
         source_model = cls([source])
+            
         return source_model
 
             
@@ -178,7 +182,8 @@ class Source(object):
     """A class that combines fault source generator data with that from the 
     event type control file.
 
-    The class is created with the FSG data, and the ETC data is added later.
+    The class is created with the fault source generator data, and the
+    event type control data is added later.
     """
 
     def __init__(self, min_magnitude, max_magnitude, generation_min_mag,
@@ -205,8 +210,78 @@ class Source(object):
         self.event_type = event_type
         self.name = name
         self.recurrence_model_distribution = recurrence_model_distribution
+        self.event_zone = Event_Zone(name)
 
         # indexes to the event sets in this source zone
+        self.event_set_indexes = None
+
+        # The Att's that come from event type control file
+        self.fault_type = None
+        self.atten_models = None
+        self.atten_model_weights = None
+        self.scaling = None
+
+        # A Multiple_ground_motion_calculator representing the
+        # ground motion models
+        self.ground_motion_calculator = None
+
+    def set_event_set_indexes(self, event_indexes):
+        """Add event integer indices list as an attribute.
+
+        The integers are indexes into an event set.
+        
+        event_indexes  list of integers that are indexes into an event set.
+        """
+        self.event_zone.set_event_set_indexes(event_indexes)
+        
+    def get_event_set_indexes(self):
+        return self.event_zone.get_event_set_indexes()
+
+    def set_atten_models_and_weights(self, atten_models, atten_model_weights):
+        """Add attenuation model and weight attribute lists.
+
+        atten_models   list of ground motion models
+        atten_weights  list of ground motion model weights
+
+        Also ensure that the sum of weights is 1.0.
+        """
+
+        self.atten_models = atten_models
+        self.atten_model_weights = parse_in_parameters.check_sum_1_normalise(
+            atten_model_weights)
+
+    def set_ground_motion_calcs(self, periods):
+        
+        self.ground_motion_calculator = Multiple_ground_motion_calculator(
+            self.atten_models,
+            periods,
+            self.atten_model_weights)
+
+
+class Event_Zone(object):
+    """A class that holds common information for a set of
+    events. Currently this is the multiple gmm's associated with a set
+    of events and their weights.
+    
+    The name of the zone, as well as the events in the zone are also known.
+    """
+
+    def __init__(self, name):
+        """
+        generation_min_mag - The minimum event generation specified
+          by the user
+        min_magnitude - The recurrence_min_mag
+        max_magnitude - The recurrence_max_mag
+        A_min,b are floats
+        
+        #FIXME DSG-EQRM This class needs comments.
+
+        And where are it's methods? recurrence_functions might have 1.
+        """
+
+        self.name = name
+        
+        # indexes to the event sets in this event zone
         self.event_set_indexes = None
 
         # The Att's that come from event type control file
@@ -229,6 +304,9 @@ class Source(object):
 
         self.event_set_indexes = asarray(event_indexes)
 
+    def get_event_set_indexes(self):
+        return self.event_set_indexes
+        
     def set_atten_models_and_weights(self, atten_models, atten_model_weights):
         """Add attenuation model and weight attribute lists.
 
@@ -252,6 +330,10 @@ class Source(object):
 
         
 class Source_Zone(Source, polygon_object):
+    """
+    Source_Zone adds boundary ploygon and exclude polygon to source,
+    to describe the area of a Source.
+    """
     def __init__(self,boundary,exclude,
                  min_magnitude,max_magnitude,
                  generation_min_mag,

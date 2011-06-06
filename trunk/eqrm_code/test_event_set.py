@@ -19,9 +19,13 @@ from eqrm_code.event_set import * #Event_Set, Pseudo_Event_Set
 
 class Dummy:
     def __init__(self):
-        pass
-    def set_event_set_indexes(self,foo):
-        pass
+        pass      
+        
+    def set_event_set_indexes(self,indexes):
+        self.event_set_indexes = indexes
+        
+    def get_event_set_indexes(self):
+        return self.event_set_indexes
     
 def event_from_csv_long():
     # Values tightly coupled with event_from_csv_short

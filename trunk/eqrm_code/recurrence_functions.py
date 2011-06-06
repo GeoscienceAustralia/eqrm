@@ -43,7 +43,7 @@ def calc_event_activity(event_set, source_model):
         #print "actual_min_mag_generation", actual_min_mag_generation
         recurrence_max_mag = source.max_magnitude
                
-        poly_ind = source.event_set_indexes
+        poly_ind = source.get_event_set_indexes()
         mag_ind = where((actual_min_mag_generation < event_set.Mw[poly_ind])&
                         (event_set.Mw[poly_ind] < recurrence_max_mag))[0]
         

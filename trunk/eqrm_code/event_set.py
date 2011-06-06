@@ -728,8 +728,8 @@ def _add_sources(source_model_zone, source_model_fault,
     source_list = []
     for source in source_model_fault:
         # array add, adds the others_event_set_length to all the elements
-        source.event_set_indexes=(source.event_set_indexes + \
-                                  source_model_zone_event_set_length)
+        source.set_event_set_indexes((source.get_event_set_indexes() + \
+                                  source_model_zone_event_set_length))
         source_list.append(source)
     
     # list add concatenates
@@ -1147,15 +1147,17 @@ class Event_Activity(object):
             
             for szp in source_model:
                 assert sum(szp.atten_model_weights) == 1
-                #self.event_activity[szp.event_set_indexes] =
-                sub_activity = self.event_activity[0,0,szp.event_set_indexes]
+               
+                sub_activity = \
+                    self.event_activity[0,0,szp.get_event_set_indexes()]
                 # going from e.g. [0.2, 0.8] to [0.2, 0.8, 0.0]
                 maxed_weights = zeros((max_num_models))
                 maxed_weights[0:len(szp.atten_model_weights)] = \
                                                  szp.atten_model_weights
                 activities = sub_activity * reshape(maxed_weights, (-1,1))
-                overwrite = new_event_activity[0,:,szp.event_set_indexes]
-                new_event_activity[0,:,szp.event_set_indexes] = activities.T
+                overwrite = new_event_activity[0,:,szp.get_event_set_indexes()]
+                new_event_activity[0,:,szp.get_event_set_indexes()] = \
+                    activities.T
             assert allclose(scipy.sum(new_event_activity, axis=GMMODEL),
                             self.event_activity)
             self.event_activity = new_event_activity
