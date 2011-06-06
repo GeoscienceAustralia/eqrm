@@ -16,9 +16,17 @@ from eqrm_code.util import reset_seed, determine_eqrm_path
 
 #***************************************************************
 
+
 class Dummy:
     def __init__(self):
-        pass
+        pass      
+        
+    def set_event_set_indexes(self,indexes):
+        self.event_set_indexes = indexes
+        
+    def get_event_set_indexes(self):
+        return self.event_set_indexes
+    
     
 class Test_Source_model(unittest.TestCase):
     
@@ -428,14 +436,14 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless(allclose(source_model[0].event_set_indexes,
                                      array([0,1,2])))
 
+            
     def test_sources_of_event_set(self):
         setups = [('5,3,2', [5,3,2]), ('6,4',[6, 4]), ('0,1',[0,1])]
         setups_dic = dict(setups)
         sources = []
         for setup in setups:
-            d = Dummy()
-            d.name = setup[0]
-            d.event_set_indexes = setup[1]
+            d = Event_Zone(setup[0])
+            d.set_event_set_indexes(setup[1])
             sources.append(d)
         sm = Source_Model(sources)
         sources_wrt_events = sm.sources_of_event_set(7)
@@ -444,6 +452,7 @@ class Test_Source_model(unittest.TestCase):
             self.failUnless(setups_dic.has_key(key))
             self.failUnless(i in setups_dic[key])
             setups_dic[key].remove(i)
+            
             
     def test_create_fault_sources(self):
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')

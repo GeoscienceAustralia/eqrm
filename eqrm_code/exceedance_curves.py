@@ -165,7 +165,7 @@ def collapse_source_gmms(data, source_model, do_collapse):
         return data
     
     for source in source_model:
-        event_ind = source.event_set_indexes
+        event_ind = source.get_event_set_indexes()
         col_data = collapse_att_model(data[...,event_ind, :],
                                       source.atten_model_weights, do_collapse)
         data[...,0:1,:,event_ind, :] = col_data
