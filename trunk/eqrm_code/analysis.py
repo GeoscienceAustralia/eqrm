@@ -264,6 +264,7 @@ def main(parameter_handle,
             event_set, source_model = merge_events_and_sources(
                 event_set_zone, event_set_fault,
                 source_model_zone, source_model_fault)
+                
         
         # event activity is calculated
         event_activity = Event_Activity(len(event_set))
@@ -272,6 +273,10 @@ def main(parameter_handle,
             event_activity)
         log.debug('Memory: event activity has been calculated')
         log.resource_usage()
+        
+        # At this stage all the event generation has occured
+        # So the Source classes should be 'downsized' to Event_Zones
+        
         
     #  event_activity.event_activity[drop down to one dimension],
     event_activity.ground_motion_model_logic_split(
@@ -282,7 +287,14 @@ def main(parameter_handle,
     log.info(msg)
     log.debug('Memory: Event Set created')
     log.resource_usage()
+    
+    # Want to be able to save and load event sets here
+    # Need to save event_zone/Source as well.
+    # And THE_PARAM_T.
 
+    # Add the ground motion models to the source
+    source_model.set_ground_motion_calcs(THE_PARAM_T.atten_periods)
+    
     # load all data into a 'sites' object
     # if we have bridge data, 'have_bridge_data' will be True
     (sites, have_bridge_data) = load_data(THE_PARAM_T)
@@ -315,8 +327,6 @@ def main(parameter_handle,
         THE_PARAM_T.atten_spawn_bins)
     event_activity.spawn(ground_motion_distribution.spawn_weights)
 
-    # Add the ground motion models to the source
-    source_model.set_ground_motion_calcs(THE_PARAM_T.atten_periods)
     
     # Initialise the ground motion object
     # Tasks here include
