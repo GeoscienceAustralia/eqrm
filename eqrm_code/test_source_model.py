@@ -442,7 +442,7 @@ class Test_Source_model(unittest.TestCase):
         setups_dic = dict(setups)
         sources = []
         for setup in setups:
-            d = Event_Zone(setup[0])
+            d = EventZone(setup[0])
             d.set_event_set_indexes(setup[1])
             sources.append(d)
         sm = Source_Model(sources)
@@ -529,6 +529,28 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless(source_model[0].scaling['scaling_rule'] == 'background')
             
         os.remove(file_name)
+        
+        
+    def test_get_EventZone_instance(self):
+        name = 'eggs'
+        indexes = [5, 4]
+        souce = Source(1, 2, 3, 4, 5, 6, 7, name=name)
+        souce.set_event_set_indexes(indexes)
+        event_zone = souce.get_event_zone_instance()
+        
+        # Check atts have been removed
+        try:
+            event_zone.min_magnitude
+        except AttributeError:
+            pass
+        except e:
+            self.fail('Unexpected exception thrown:', e)
+        else:
+            self.fail('ExpectedException not thrown')
+            
+        self.failUnless(allclose(event_zone.get_event_set_indexes(),
+                                     array(indexes)))
+
         
         
 ################################################################################
