@@ -44,9 +44,10 @@ def calc_event_activity(event_set, source_model):
         recurrence_max_mag = source.max_magnitude
                
         poly_ind = source.get_event_set_indexes()
+        #print "poly_ind", poly_ind
         mag_ind = where((actual_min_mag_generation < event_set.Mw[poly_ind])&
                         (event_set.Mw[poly_ind] < recurrence_max_mag))[0]
-        
+        #print "mag_ind",mag_ind 
         if len(mag_ind)>0:
             zone_b = source.b
             grfctr = grscale(zone_b,
@@ -107,10 +108,20 @@ def calc_event_activity(event_set, source_model):
                               " is not a valid recurrence model distribution.")
                 
                 
-        
-            event_activity_source = array( [(A_mlow*grpdf[z]/(sum(where(
-                                               event_bins == z, 1,0)))) 
-                                              for z in event_bins])
+            #Build a dic of the sum of event activities, for all bins
+            event_activity_sum = {}
+            for i in range(num_of_mag_sample_bins):
+                event_activity_sum[i] = sum(where( event_bins == i, 1,0))
+                
+            build = []
+            for z in event_bins:  
+                term = A_mlow*grpdf[z]/event_activity_sum[z]
+                build.append(term) 
+            event_activity_source =  array(build)
+            # Too slow
+            #event_activity_source = array( [(A_mlow*grpdf[z]/(sum(where(
+             #                                  event_bins == z, 1,0)))) 
+              #                                for z in event_bins])
             event_activity_matrix[event_ind] = event_activity_source
             
     eqrmlog.debug('Memory: Out of the event_activity loop')

@@ -129,6 +129,7 @@ class Event_Set(object):
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
         self.event_num = r_[0:len(self.depth)] # gives every event an id
+        
         self.check_arguments() 
 
 
@@ -382,14 +383,7 @@ class Event_Set(object):
                                                    dtype=EVENT_INT)
             for i,gen_poly in enumerate(generation_polygons):
                 prob_number_of_events_in_zones[i] = gen_poly.number_of_events
-            # The number of events is not specified in the control file
-            # use the number of events in the xml file.
-#             prob_number_of_events_in_zones = 1
-#         prob_number_of_events_in_zones = asarray(prob_number_of_events_in_zones)
-#         if (not prob_number_of_events_in_zones.shape or
-#             prob_number_of_events_in_zones.shape[0]) == 1:
-#             prob_number_of_events_in_zones = prob_number_of_events_in_zones* \
-#                                                 asarray([1]*num_polygons)
+        
         
         #initialise new attributes
         num_events = sum(prob_number_of_events_in_zones)
@@ -403,11 +397,10 @@ class Event_Set(object):
         width = zeros((num_events), dtype=EVENT_FLOAT)
         fault_width = zeros((num_events), dtype=EVENT_FLOAT)
         magnitude = zeros((num_events), dtype=EVENT_FLOAT)
+        
+        
         source_zone_id = zeros((num_events), dtype=EVENT_INT)
         
-        #number_of_mag_sample_bins = zeros((num_events), dtype=EVENT_INT)
-
-        #print "magnitude.dtype.name", magnitude.dtype.name
         start = 0
         for i, source in enumerate(source_model):
             gp = generation_polygons[i]
@@ -429,7 +422,6 @@ class Event_Set(object):
             eqrmlog.debug('Memory: populate_azimuth created')
             eqrmlog.resource_usage()
             polygon_dip = gp.populate_dip(num)
-            #rint "polygon_dip", polygon_dip
             eqrmlog.debug('Memory: populate_dip created')
             eqrmlog.resource_usage()
             polygon_magnitude = gp.populate_magnitude(num)
@@ -474,7 +466,7 @@ class Event_Set(object):
 
             
             # Does this mean source zone objects know nothing about
-            # their id?
+            # their id? Yes
             source_zone_id[start:end] = [i]*num
             
             
