@@ -305,9 +305,71 @@ CD
             self.failUnless(False, "KeyError not raised")
             
         
+    def test_site_class_names(self):
+        # test it all!
+        pga=array((0.05,0.1))
+        moment_magnitude=array((4.5,5.5,6.5))
+        periods=array((0.0,0.01))
+
+        log_ampC=array((((0.36327,0.36327+1),(0.33203,0.33203+1),
+                         (0.29231,0.29231+1)),
+                        ((0.36298,0.36298+1),(0.34226,0.34226+1),
+                         (0.31896,0.31896+1)))).swapaxes(0,1)
+
+        log_ampD=array((((0.74521,0.74521),(0.78958,0.78958),
+                         (0.80831,0.80831)),
+                        ((0.61605,0.61605),(0.66287,0.66287),
+                         (0.69683,0.69683)))).swapaxes(0,1)
+
+        log_stdC=array((((0.26331,0.26331),(0.25138,0.25138),
+                         (0.23645,0.23645)),
+                        ((0.26153,0.26153),(0.2527,0.2527),
+                         (0.24392,0.24392)))).swapaxes(0,1)
+
+        log_stdD=array((((0.18982,0.18982),(0.17712,0.17712),
+                         (0.16832,0.16832)),
+                        ((0.20337,0.20337),(0.19081,0.19081),
+                         (0.18001,0.18001)))).swapaxes(0,1)
+
+        log_amplifications={'CD':log_ampC,'D':log_ampD}
+        log_stds={'CD':log_stdC,'D':log_stdD}
+        
+        regolith_amp_distribution = Log_normal_distribution(
+            None,
+            num_psudo_events=2,
+            num_sites_per_site_loop=5)
+        
+        amp_model = Regolith_amplification_model(
+            pga,moment_magnitude,periods,
+            log_amplifications,log_stds,
+            distribution_instance=regolith_amp_distribution)
+        
+        log_ground_motion = log(array([[[0.05,0.1],[0.1,0.1]],
+                                     [[0.05,0.05],[0.05,0.1]]]))
+        # add periods dimension
+        log_ground_motion = log_ground_motion[...,newaxis] 
+        # 2 spawnings
+        site_classes=array(('CD','D'))
+        site_classes=array(('WATER',''))
+        Mw=array((4.5,6.5))
+        event_periods=array([0,0.01])
+
+        dist, log_mean, log_sigma = amp_model.distribution(
+            exp(log_ground_motion),
+            site_classes,
+            Mw,event_periods)
+        #print "dist.median", dist.median
+        mean_log_amp=array([[[0.36327,0.36327+1],[0.31896,0.31896+1]],
+                            [[0.74521,0.74521],
+                             [0.80831,0.80831]]])[...,newaxis]
+
+        #assert allclose((exp(mean_log_amp)*exp(log_ground_motion)), 
+         #               dist.median)
+        
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Regolith_Amplification_Model,'test')
+    #suite = unittest.makeSuite(Test_Regolith_Amplification_Model,'test_site_class_names')
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
