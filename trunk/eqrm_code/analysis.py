@@ -560,7 +560,8 @@ def main(parameter_handle,
                                 0.50*SA[...,1:-2] +
                                 0.25*SA[...,2:-1])
             
-            
+            # This means calc_total_loss does not know about the
+            # dimensions of multiple gmms and spawning.
             overloaded_MW = tile(event_set.Mw, num_gmm_max * num_spawning)
             
             (total_loss, damage,
