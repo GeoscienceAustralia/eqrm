@@ -933,35 +933,6 @@ def load_event_set(saved_dir, site_tag):
     return attribute_dic
      
 
-#def obsolete_load_event_set_subset(saved_dir, site_tag):
-def load_event_set_subset(saved_dir, site_tag):
-    """
-    Load the Mw, and event activity.
-
-    Returns:
-      out: A dictionary with labels 'Mw' and 'event_activity'
-           and values of 1D arrays of this info.
-    """
-    f=open(os.path.join(saved_dir, site_tag + '_event_set.txt'),'r')
-    text = f.read().splitlines()
-    # ditch the comment lines
-    #for i in range(18):
-    #    text.pop(0)
-    
-    #Now only skips 1 line
-    text.pop(0)
-    out = {}
-    for line in text:
-        split_line = line.split(',')
-        out.setdefault('Mw',[]).append(float(split_line[7]))
-        # Trying to get 7.6 instead of 7.5999999999999996
-        # this did not work
-        #out.setdefault('Mw',[]).append(array(split_line[9], dtype=float))
-        out.setdefault('event_activity',[]).append(float(split_line[6]))
-    # Convert to scipy arrays
-    for k, v in out.items():
-        v = array(v,dtype=float)
-    return out      
 
 def save_damage(save_dir, site_tag, damage_name, damage, building_ids,
                  compress=False, parallel_tag=None, write_title=True):
