@@ -219,7 +219,7 @@ def fig_fatalities_exceedance(input_dir, site_tag, title='',
     
 
     # Load in the event activity
-    out_dict = om.load_event_set_subset(input_dir, site_tag)
+    out_dict = om.load_event_set(input_dir, site_tag)
     event_activity = out_dict['event_activity']
     
     # Check array dimensions
@@ -340,7 +340,7 @@ def fig_annfatalities_deagg_distmag(input_dir, site_tag, momag_labels,
     total_fatalities = scipy.transpose(results[0])
 
     # Load in the event activity, mag and distance
-    out_dict = om.load_event_set_subset(input_dir, site_tag)
+    out_dict = om.load_event_set(input_dir, site_tag)
     event_activity = out_dict['event_activity']
     Mw = out_dict['Mw']
     distance = om.load_distance(input_dir, site_tag, True)
@@ -419,7 +419,7 @@ def fig_annfatalities_deagg_cells(input_dir, site_tag,
     lon = results[2]
     
     # Load in the event activity
-    out_dict = om.load_event_set_subset(input_dir, site_tag)
+    out_dict = om.load_event_set(input_dir, site_tag)
     event_activity = out_dict['event_activity']
     
     print event_activity
@@ -458,7 +458,7 @@ def fig_fatalities_map(input_dir, site_tag,
     lon = results[2]
     
     # Load in the event activity
-    out_dict = om.load_event_set_subset(input_dir, site_tag)
+    out_dict = om.load_event_set(input_dir, site_tag)
     event_activity = out_dict['event_activity']
     
     columnscount = total_fatalities.shape[1]
