@@ -15,8 +15,8 @@
 """
 
 from scipy import vectorize, sqrt, sin, minimum, pi, where, asarray,array, \
-         exp, log, power, cos, arccos, arcsin, arctan2, zeros, radians
-import math
+         exp, log, power, cos, arccos, arcsin, arctan2, zeros, radians, degrees
+#import math
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll
 
 def Johnston_01_ML(Mw):
@@ -168,14 +168,14 @@ def calc_depth_to_top(depth, width, delta):
     assert depth.shape == delta.shape, msg
 
     # convert dip angle in degrees to radians
-    delta_rad = delta*math.pi/180.0
+    delta_rad = delta*pi/180.0
 
     # get and return Rtor
     return depth - (width/2)*sin(delta_rad)
 
 
 # precalculate constants for convert_Vs30_to_Z10()
-Ch_378_7_pow_8 = math.pow(378.7, 8)
+Ch_378_7_pow_8 = pow(378.7, 8)
 Ch_3_82_div_8 = 3.82/8.0
 
 def convert_Vs30_to_Z10(Vs30):
@@ -250,7 +250,7 @@ def azimuth_of_trace(start_lat, start_lon, end_lat, end_lon):
 
     dx = end_lon - start_lon
     dy = end_lat - start_lat
-    azimuth = math.atan2(dx*math.cos(start_lat*math.pi/180.0), dy)*180.0/math.pi
+    azimuth = arctan2(dx*cos(start_lat*pi/180.0), dy)*180.0/pi
     if azimuth < 0.0:
         azimuth += 360.0
 
@@ -267,10 +267,10 @@ def calc_ll_dist(lat1,lon1,lat2,lon2):
     Returns length from start point in kms.
     """
     R = 6371
-    dLat = math.radians(abs(lat2-lat1))
-    dLon = math.radians(abs(lon2-lon1))
+    dLat = radians(abs(lat2-lat1))
+    dLon = radians(abs(lon2-lon1))
     a = (sin(dLat/2) * sin(dLat/2) +
-            cos(math.radians(lat1)) * cos(math.radians(lat2)) *
+            cos(radians(lat1)) * cos(radians(lat2)) *
             sin(dLon/2) * sin(dLon/2))
     c = 2 * arctan2(sqrt(a), sqrt(1-a))
     return R * c
@@ -290,7 +290,7 @@ def calc_fault_area(lat1,lon1,lat2,lon2,depth_top,depth_bottom,dip):
     Returns area of fault in kms.
     """
     fault_length = calc_ll_dist(lat1,lon1,lat2,lon2)
-    fault_width = (depth_bottom - depth_top) / sin(math.radians(dip))
+    fault_width = (depth_bottom - depth_top) / sin(radians(dip))
     fault_area = fault_length * fault_width
     return fault_area
 
@@ -305,7 +305,7 @@ def calc_fault_width(depth_top,depth_bottom,dip):
 
     Returns width of fault in kms.
     """
-    fault_width = (depth_bottom - depth_top) / sin(math.radians(dip))
+    fault_width = (depth_bottom - depth_top) / sin(radians(dip))
     return fault_width
 
 def calc_fault_length(lat1,lon1,lat2,lon2): 
@@ -413,14 +413,14 @@ def obsolete_calc_azimuth(lat1,lon1,lat2,lon2):
     
     Returns azimuth at start point in degrees, in range [0, 360).
     """
-    lat1 = math.radians(lat1)  
-    lon1 = math.radians(lon1)  
-    lat2 = math.radians(lat2) 
-    lon2 = math.radians(lon2)
+    lat1 = radians(lat1)  
+    lon1 = radians(lon1)  
+    lat2 = radians(lat2) 
+    lon2 = radians(lon2)
     numerator = sin(lon1 -lon2) * cos(lat2)
     denominator = sin(arccos((sin(lat2)*sin(lat1))+(cos(lat1)*cos(lat2)* 
                                                     cos(lon2-lon1))))
-    azimuth = math.degrees(arcsin(numerator/denominator))  
+    azimuth = degrees(arcsin(numerator/denominator))  
     return azimuth
 
 def obsolete_calc_azimuth2(lat1,lon1,lat2,lon2):
@@ -442,7 +442,7 @@ def obsolete_calc_azimuth2(lat1,lon1,lat2,lon2):
     elif x==0:
         azimuth=0
     else:
-        azimuth=math.degrees(arctan2(x,y))
+        azimuth=degrees(arctan2(x,y))
     return azimuth
 
 def obsolete_calc_azimuth3(lat1,lon1,lat2,lon2):
@@ -464,7 +464,7 @@ def obsolete_calc_azimuth3(lat1,lon1,lat2,lon2):
     elif x==0:
         azimuth=0
     else:
-        azimuth=math.degrees(arctan2(x,y))
+        azimuth=degrees(arctan2(x,y))
     return azimuth
 
 ###################
