@@ -129,14 +129,14 @@ class Test_Recurrence_functions(unittest.TestCase):
         min_magnitude = 4.0
         slip_rate_mm = 2.0
         area_kms = float(30*10)
-        prob_number_of_mag_sample_bins = 10
         b = 1.
+        prob_number_of_mag_sample_bins = 10
         bin_centroids = make_bins(min_magnitude, max_magnitude,
                                   prob_number_of_mag_sample_bins,
                                   'characteristic')
-        event_bins = r_[0:10]
-        event_bins = sorted(event_bins)
-    
+#        event_bins = r_[0:10]
+#        event_bins = sorted(event_bins)
+#    
         A_minCharacteristic = calc_A_min_from_slip_rate_Characteristic(
             b, min_magnitude,
             max_magnitude,
@@ -144,23 +144,25 @@ class Test_Recurrence_functions(unittest.TestCase):
         
         pdfs = calc_activities_Characteristic(bin_centroids, b, 
                                               min_magnitude, 
-                                              max_magnitude,
-                                              prob_number_of_mag_sample_bins)
+                                              max_magnitude)
         
-        event_activity_source = array(
-                [(A_minCharacteristic*pdfs[z]/(sum(where(
-                event_bins == z, 1,0)))) for z in event_bins])
-        
-        self.assert_(allclose(event_activity_source,[1.07157089e-02,
-                                                     6.02588592e-03,
-                                                     3.38860467e-03,
-                                                     1.90555244e-03,
-                                                     1.07157089e-03,
-                                                     6.02588592e-04,
-                                                     3.38860467e-04,
-                                                     1.90555244e-04,
-                                                     1.07157089e-04,
-                                                     6.02588592e-05]))
+#        event_activity_source = array(
+#                [(A_minCharacteristic*pdfs[z]/(sum(where(
+#                event_bins == z, 1,0)))) for z in event_bins])
+        event_activity_source = array(A_minCharacteristic*pdfs)
+        self.assert_(allclose(sum(event_activity_source),A_minCharacteristic))
+        self.assert_(allclose(event_activity_source,[1.09104980e-02,
+                                                     6.13542392e-03,
+                                                     3.45020242e-03,
+                                                     1.94019140e-03,
+                                                     1.09104980e-03,
+                                                     6.13542392e-04,
+                                                     3.45020242e-04,
+                                                     1.94019140e-04,
+                                                     1.09104980e-04,
+                                                     6.13542392e-05,
+                                                     4.60091887e-04]))
+
 
     def test_calc_event_activity(self):
     
@@ -287,9 +289,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         self.assert_(allclose(lamba, sum(event_activity_matrix)))
 
         
-
-
-    def test_calc_event_activity_suss_summing(self):
+    def test_calc_event_activity_summing(self):
     
         # Create an event set
         Mw = [4.5, 5.5, 6.5, 7.5]
@@ -354,7 +354,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         lamba = A_min * grscale(b, recurrence_max_mag, 
                                 generation_min_mag, recurrence_min_mag)
         
-        #self.assert_(allclose(lamba, sum(event_activity_matrix)))
+        self.assert_(allclose(lamba, sum(event_activity_matrix)))
 
         
 

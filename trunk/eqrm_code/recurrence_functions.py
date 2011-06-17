@@ -47,6 +47,7 @@ def calc_event_activity(event_set, source_model):
         #print "poly_ind", poly_ind
         mag_ind = where((actual_min_mag_generation < event_set.Mw[poly_ind])&
                         (event_set.Mw[poly_ind] < recurrence_max_mag))[0]
+        num_events=len(mag_ind)
         #print "mag_ind",mag_ind 
         if len(mag_ind)>0:
             zone_b = source.b
@@ -58,70 +59,70 @@ def calc_event_activity(event_set, source_model):
             
             event_ind= poly_ind[mag_ind]
             #event_ind=mag_ind[poly_ind]
-            num_of_mag_sample_bins = source.number_of_mag_sample_bins
-            
-            mag_bin_centroids=make_bins(actual_min_mag_generation,
-                                        recurrence_max_mag,
-                                        num_of_mag_sample_bins,
-                                        source.recurrence_model_distribution)
+#            num_of_mag_sample_bins = source.number_of_mag_sample_bins
+#            
+#            mag_bin_centroids=make_bins(actual_min_mag_generation,
+#                                        recurrence_max_mag,
+#                                        num_of_mag_sample_bins,
+#                                        source.recurrence_model_distribution)
 
-            event_bins =assign_event_bins(event_set.Mw[event_ind],
-                                          actual_min_mag_generation,
-                                          recurrence_max_mag,
-                                          num_of_mag_sample_bins,
-                                          source.recurrence_model_distribution)
+#            event_bins =assign_event_bins(event_set.Mw[event_ind],
+#                                          actual_min_mag_generation,
+#                                          recurrence_max_mag,
+#                                          num_of_mag_sample_bins,
+#                                          source.recurrence_model_distribution)
+#           
            
-           
-            # Check to see if all mag_bin_centroids have events
-            # Assume that if there are 50 events for every bin
-            # all bins will have events.
-            if len(event_bins)<(50*num_of_mag_sample_bins):
-                new_mag_bin_centroids = array(
-                    [where((sum(
-                    where(event_bins == [z], 1,0)))>0,
-                           mag_bin_centroids[z],0)for z in event_bins])
-                
-                new_mag_bin_centroids=unique(new_mag_bin_centroids)
-                if len(mag_bin_centroids) <> len(new_mag_bin_centroids):
-                    list_mag_bin_centroids = new_mag_bin_centroids.tolist()
-                    event_bins = array(
-                        [(list_mag_bin_centroids.index(
-                        mag_bin_centroids[z])) for z in event_bins])
-                    mag_bin_centroids= new_mag_bin_centroids
+#            # Check to see if all mag_bin_centroids have events
+#            # Assume that if there are 50 events for every bin
+#            # all bins will have events.
+#            if len(event_bins)<(50*num_of_mag_sample_bins):
+#                new_mag_bin_centroids = array(
+#                    [where((sum(
+#                    where(event_bins == [z], 1,0)))>0,
+#                           mag_bin_centroids[z],0)for z in event_bins])
+#                
+#                new_mag_bin_centroids=unique(new_mag_bin_centroids)
+#                if len(mag_bin_centroids) <> len(new_mag_bin_centroids):
+#                    list_mag_bin_centroids = new_mag_bin_centroids.tolist()
+#                    event_bins = array(
+#                        [(list_mag_bin_centroids.index(
+#                        mag_bin_centroids[z])) for z in event_bins])
+#                    mag_bin_centroids= new_mag_bin_centroids
 
             if source.recurrence_model_distribution == \
                     'bounded_gutenberg_richter':
                 grpdf = m2grpdfb(zone_b,
-                                 mag_bin_centroids,
+                                 event_set.Mw[event_ind],
                                  actual_min_mag_generation,
                                  recurrence_max_mag)
                 
             
             elif source.recurrence_model_distribution == 'characteristic':
                 grpdf=calc_activities_Characteristic(
-                    mag_bin_centroids, 
+                    event_set.Mw[event_ind], 
                     zone_b, actual_min_mag_generation,
-                    recurrence_max_mag,
-                    num_of_mag_sample_bins)
+                    recurrence_max_mag)
             else:
                 raise IOError(source.recurrence_model_distribution,
                               " is not a valid recurrence model distribution.")
                 
-            #Build a dic of the sum of event activities, for all bins
-            event_activity_sum = {}
-            for i in range(num_of_mag_sample_bins + 1):
-                event_activity_sum[i] = sum(where( event_bins == i, 1,0))
                 
-            build = []
-            for z in event_bins:  
-                term = A_mlow*grpdf[z]/event_activity_sum[z]
-                build.append(term) 
-            event_activity_source =  array(build)
-            # Too slow
+            #Build a dic of the sum of event activities, for all bins
+#            event_activity_sum = {}
+#            for i in range(num_of_mag_sample_bins + 1):
+#                event_activity_sum[i] = sum(where( event_bins == i, 1,0))
+#                
+#            build = []
+#            for z in event_bins:  
+#                term = A_mlow*grpdf[z]/event_activity_sum[z]
+#                build.append(term) 
+#            event_activity_source =  array(build)
+#            # Too slow
             #event_activity_source = array( [(A_mlow*grpdf[z]/(sum(where(
              #                                  event_bins == z, 1,0)))) 
               #                                for z in event_bins])
-            event_activity_matrix[event_ind] = event_activity_source
+            event_activity_matrix[event_ind] = A_mlow*grpdf
             
     eqrmlog.debug('Memory: Out of the event_activity loop')
     eqrmlog.resource_usage()
@@ -316,7 +317,7 @@ def calc_A_min_from_slip_rate_Characteristic(b, mMin, mMax, slip_rate_mm,
     return lambda_m
 
 def calc_activities_Characteristic(magnitude,b,m0,mMax,
-                                                  num_of_bins):
+                                                  ):
     """Calculate the the A_min for a fault using slip rate using the 
        characteristic reccurence distribution.  
        b             b
@@ -330,12 +331,12 @@ def calc_activities_Characteristic(magnitude,b,m0,mMax,
     m2 = 0.5
     m_c = mMax - m2
         
-    n_bin_width = (m_c - m0)/(num_of_bins)
+    #n_bin_width = (m_c - m0)/(num_of_bins)
     char_bin_width = m2
 
     pdfs_tmp = calc_activity_Characteristic(magnitude, b, m0 ,mMax)          
     i = where(magnitude > m_c)
-    pdfs_tmp[i] = pdfs_tmp[i] * (char_bin_width/n_bin_width)
+    #pdfs_tmp[i] = pdfs_tmp[i] * (char_bin_width/n_bin_width)
     
     pdfs = pdfs_tmp/sum(pdfs_tmp)
     return pdfs
