@@ -4,7 +4,7 @@ from scipy import ones, array
 import time
 import tempfile
 
-from eqrm_code.event_set import Event_Set, Pseudo_Event_Set
+from eqrm_code.event_set import Event_Set
 from eqrm_code.output_manager import save_event_set
 
 class Dummy:
@@ -53,7 +53,7 @@ def main_loop():
     
     THE_PARAM_T=Dummy()      
     THE_PARAM_T.output_dir = tempfile.mkdtemp(
-        'output_managertest_load_event_set_subset') + os.sep
+        'output_managertest_load_event_set') + os.sep
     THE_PARAM_T.site_tag = "site_tag"
 
     print "enents","time - sec"
