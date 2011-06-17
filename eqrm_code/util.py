@@ -128,14 +128,14 @@ def get_weave_dir():
     version = platform.python_version().split(".")
     python_tag = "python" + str(version[0]) + str(version[1])
 
-    if sys.platform == 'linux2':
-        python_dir = "." + python_tag + "_compiled"
-        weave_path = os.path.join(os.environ["HOME"], python_dir)
-    else:
+    if sys.platform == 'win32' or sys.platform == 'win64':        
         python_dir = python_tag + "_compiled"
         weave_path = os.path.join(tempfile.gettempdir(),
                                   os.environ["USERNAME"],
-                                  python_dir)
+                                  python_dir)        
+    else:
+        python_dir = "." + python_tag + "_compiled"
+        weave_path = os.path.join(os.environ["HOME"], python_dir)
     return weave_path
 
 class WeaveIOError(exceptions.Exception):
