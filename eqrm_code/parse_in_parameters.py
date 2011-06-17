@@ -31,7 +31,7 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
 from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING, \
      CSM_DAMPING_DO_NOT_USE_SMOOTHING
 from eqrm_code.ANUGA_utilities import log
-
+from eqrm_code.util import convert_path_string_to_join
 # DSG-DSG this needs more comments.
 """
 Principals of the set_data.py file format.
@@ -759,6 +759,7 @@ def old_set_data_py_2_new_set_data_py(file_name_path,
     if new_file_name_path is None:
         new_file_name_path = file_name_path
     parameters = from_file_get_params(file_name_path)
+    
     # Remove depreciated attributes
     depreciated_attributes(parameters)
     convert_attribute_dic_to_set_data_py(new_file_name_path, parameters)
@@ -904,27 +905,12 @@ def convert_attribute_dic_to_set_data_py(py_file_name, attribute_dic):
         elif attribute_dic.has_key(para_dic['new_para']):
             line = [para_dic['new_para']]
             val = attribute_dic[para_dic['new_para']]
-#             if not attribute_dic['is_scenario'] and \
-#                    (para_dic['new_para'] == 'atten_models' or
-#                     para_dic['new_para'] == 'atten_model_weights'):
-#                 pass
-#             else:
+            if line[0] == 'input_dir' or line[0] == 'output_dir':
+                if not 'join' in val:
+                    val = convert_path_string_to_join(val)
             line.append(val)
             paras2print.append(line)
-            # Hack to add zone source tag
-            if False and not attribute_dic['is_scenario']:
-                print "not a scenario" 
-                if para_dic['new_para'] == 'atten_models':
-                    if len(val)  == 1:
-                        line = ['zone_source_tag', val[0]]
-                    else:
-                        line = ['zone_source_tag', '3_mods_TAS']
-                    print "doing zone_source_tag" 
-                    paras2print.append(line)
-                    line = ['event_control_tag',  "use" ]
-                    paras2print.append(line)
-                    
-  
+            
     writer = Write_no_instance_python_par_file(py_file_name)
     writer.write_top()
     writer.write_middle(paras2print)    
@@ -1032,12 +1018,7 @@ from os.path import join\n\
         """
         for line in para_data:
             if isinstance(line, list):
-                if line[0] == 'input_dir' or line[0] == 'output_dir':
-                    add_raw = 'r'
-                else:
-                    add_raw = ''
                 self.handle.write(self.var_name + '.' + line[0] + ' = ' +
-                                  add_raw +
                                   add_value(line[1]) + '\n')
             else:    
                 self.handle.write(line)
@@ -1098,12 +1079,7 @@ from os.path import join\n\
         """
         for line in para_data:
             if isinstance(line, list):
-                if line[0] == 'input_dir' or line[0] == 'output_dir':
-                    add_raw = 'r'
-                else:
-                    add_raw = ''
                 self.handle.write(line[0] + ' = ' +
-                                  add_raw +
                                   add_value(line[1]) + '\n')
             else:    
                 self.handle.write(line)
@@ -1127,7 +1103,12 @@ def add_value(val):
     """Given a value of unknown type, write it in python syntax.
     """
     if isinstance(val, str):
-        val_str = '"' + val + '" '
+        if 'join' in val:
+            # This is hacky.  Is is assuming the string join means
+            # the join command is being used.
+            val_str = val
+        else: 
+            val_str = '"' + val + '" '
     else:
         if  isinstance(val, ndarray):
             val_str = str(val.tolist())

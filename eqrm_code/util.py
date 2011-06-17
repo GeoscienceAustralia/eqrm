@@ -242,6 +242,29 @@ def find_bridge_sa_indices(SA, epsilon=1.0e-3):
         raise RuntimeError(msg)
 
     return (i03, i10)
+    
+def convert_path_string_to_join(path):
+    """
+    This is to modify python scripts, changing r"./foo/bar" to
+    'join('.','foo','bar')'
+    
+    
+    """
+    
+    seps = ['/','\\']
+    out = multi_split(path, seps)
+    out = [x for x in out if x != '']
+    out = "', '".join(out)
+    out = "join('" + out + "')"
+    return out
+    
+def multi_split(s, seps):
+    res = [s]
+    for sep in seps:
+        s, res = res, []
+        for seq in s:
+            res += seq.split(sep)
+    return res
 
 ################################################################################
 
