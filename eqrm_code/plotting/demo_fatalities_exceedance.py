@@ -9,7 +9,7 @@ from eqrm_code.plotting import plot_api
 from eqrm_code.eqrm_filesystem import Demo_Output_ProbRisk_Path
 
 input_dir = Demo_Output_ProbRisk_Path
-site_tag = 'newc'
+site_tag = 'java'
 
 title = ''
 output_file = 'fig_from_demo_loss_exceedance.png'
