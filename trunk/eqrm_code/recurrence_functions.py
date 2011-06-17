@@ -107,10 +107,9 @@ def calc_event_activity(event_set, source_model):
                 raise IOError(source.recurrence_model_distribution,
                               " is not a valid recurrence model distribution.")
                 
-                
             #Build a dic of the sum of event activities, for all bins
             event_activity_sum = {}
-            for i in range(num_of_mag_sample_bins):
+            for i in range(num_of_mag_sample_bins + 1):
                 event_activity_sum[i] = sum(where( event_bins == i, 1,0))
                 
             build = []
