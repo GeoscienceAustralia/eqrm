@@ -58,7 +58,7 @@ def current2standard(current_dir, standard_dir):
         for file in cur_files:
             move_file = path.join(current_dir, dir, file)
             move_to_here = path.join(standard_dir, dir, file)
-            copyfile(move_file,move_to_here)
+            #copyfile(move_file,move_to_here)
 
 
 #-------------------------------------------------------------
