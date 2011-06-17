@@ -205,7 +205,7 @@ class Event_Set(object):
                 and depth_top_seismogenic is not None:
             fault_width = (depth_bottom_seismogenic \
                            - depth_top_seismogenic)/ \
-                           sin(dip*math.pi/180.)
+                           sin(dip*pi/180.)
         if width is None:
             width = conversions.\
                 modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
@@ -449,7 +449,7 @@ class Event_Set(object):
             #print "magnitude.dtype.name", magnitude.dtype.name
             fault_width[start:end] = (depth_bottom_seismogenic[start:end] \
                            - depth_top_seismogenic[start:end])/ \
-                           sin(dip[start:end]*math.pi/180.)
+                           sin(dip[start:end]*pi/180.)
             area[start:end] = scaling.scaling_calc_rup_area(
                 magnitude[start:end], source.scaling)
             #print "source.scaling", source.scaling
