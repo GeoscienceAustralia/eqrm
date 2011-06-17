@@ -21,19 +21,18 @@ from os.path import join
 run_type = "hazard" 
 is_scenario = False
 max_width = 15
-
-# Scenario input
-scenario_azimuth = 340
-scenario_depth = 11.5
-scenario_latitude = -32.95
-scenario_longitude = 151.61
-scenario_magnitude = 5.6
-scenario_number_of_events = 2
+zone_source_tag = "TS_haz08" 
+event_control_tag = "use" 
+input_dir = r"..\implementation_tests\input/" 
+output_dir = r".\benchmark_output\TS_haz08/" 
+site_tag = "newc" 
+return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
+use_site_indexes = True
+use_site_indexes = False
 
 # Probabilistic input
 prob_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
 prob_delta_azimuth_in_zones = [180, 180, 180, 180, 180, 180]
-prob_min_mag_cutoff = 4.5
 prob_number_of_mag_sample_bins = 15
 prob_number_of_events_in_zones = [5, 2, 10, 3, 3, 7]
 prob_dip_in_zones = [35, 35, 35, 35, 35, 35]
@@ -90,9 +89,6 @@ save_motion = False
 save_prob_structural_damage = None
 
 # General
-site_tag = "newc" 
-return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
-use_site_indexes = True
 site_indexes = [
   2929 , 2655 , 946 , 5273 , 4990 , 4301 , 3432 , 4434 , 847 , 5241 , 
   1093 , 3191 , 1996 , 6129 , 2859 , 1974 , 837 , 1128 , 1212 , 4605 , 

@@ -21,6 +21,15 @@ from os.path import join
 run_type = "risk" 
 is_scenario = False
 max_width = 15
+site_db_tag = "" 
+input_dir = r"..\implementation_tests\input/" 
+output_dir = r".\benchmark_output\TS_risk56/" 
+site_tag = "newc" 
+return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
+use_site_indexes = True
+use_site_indexes = False
+zone_source_tag = "3_mods_TAS_benchmark" 
+event_control_tag = "use" 
 
 # Scenario input
 scenario_azimuth = 340
@@ -91,9 +100,6 @@ save_motion = False
 save_prob_structural_damage = False
 
 # General
-site_tag = "newc" 
-return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
-use_site_indexes = True
 site_indexes = [
   1840 , 5318 , 3128 , 5766 , 6236 , 3932 , 5389 , 4990 , 5668 , 5521 , 
   4711 , 6047 , 4291 , 2335 , 4589 , 3946 , 3697 , 4562 , 5171 , 3606 , 
@@ -252,9 +258,6 @@ site_indexes = [
   2774 , 1836 , 3356 , 1151 , 3698 , 977 , 4587 , 4342 , 5592 , 562 , 
   2302 , 6038 , 6078 , 3924 , 906 , 5114 , 6246 , 5316 , 2415 , 205
   ]
-site_db_tag = "" 
-input_dir = r"..\implementation_tests\input/" 
-output_dir = r".\benchmark_output\TS_risk56/" 
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 
