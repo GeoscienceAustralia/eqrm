@@ -24,12 +24,13 @@ Title: set_current_to_standard - move the current scenario result
 
 from os import listdir, path
 from eqrm_code.check_scenarios import STANDARD_DIR, CURRENT_DIR, \
-     MINI_STANDARD_DIR, MINI_CURRENT_DIR
+     LONG_STANDARD_DIR,LONG_CURRENT_DIR
+
 from shutil import copyfile
 
 def main():
     current2standard(CURRENT_DIR, STANDARD_DIR)
-    current2standard(MINI_CURRENT_DIR, MINI_STANDARD_DIR)
+    current2standard(LONG_CURRENT_DIR, LONG_STANDARD_DIR)
     
 def current2standard(current_dir, standard_dir):
     current_dirs = listdir(current_dir)

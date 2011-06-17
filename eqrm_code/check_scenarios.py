@@ -81,6 +81,14 @@ STANDARD_STRING = "standard_timings_"
 CURRENT_STRING = "current_timings_"
 MINI_STANDARD_STRING = "mini_standard_timings_"
 MINI_CURRENT_STRING = "mini_current_timings_"
+
+LONG_SCENARIO_DIR = join(IMP_DIR, 'long_scenarios')
+LONG_STANDARD_DIR = join(IMP_DIR, 'long_standard')
+LONG_CURRENT_DIR = join(IMP_DIR, 'long_current')
+LONG_STANDARD_STRING = "long_standard_timings_"
+LONG_CURRENT_STRING = "long_current_timings_"
+
+
 FILE_EXTENTION = '.asc'
 
 MINI_PAR_FILES = ['TS_haz38.py',
