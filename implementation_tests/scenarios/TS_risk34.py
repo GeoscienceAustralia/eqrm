@@ -23,8 +23,8 @@ max_width = 15
 site_tag = "newc" 
 site_db_tag = "" 
 return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
-input_dir = r".\implementation_tests\input/" 
-output_dir = r".\implementation_tests\current\TS_risk34/" 
+input_dir = join('.', 'implementation_tests', 'input')
+output_dir = join('.', 'implementation_tests', 'current', 'TS_risk34')
 use_site_indexes = True
 site_indexes = [291, 2372]
 

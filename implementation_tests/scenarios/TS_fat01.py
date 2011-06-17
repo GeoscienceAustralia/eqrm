@@ -9,16 +9,11 @@
 
  If a field is not used, set the value to None.
 
- This control file is for the Java Tengah PSHA
- 
- 
 
 """
 
 from eqrm_code.parse_in_parameters import eqrm_data_home, get_time_user
 from os.path import join
-
-
 
 
 # Operation Mode
@@ -27,25 +22,27 @@ is_scenario = False
 max_width = 15
 site_tag = "java" 
 site_db_tag = "" 
-return_periods = [500,1000,2500]
-input_dir = r".\implementation_tests\input/java" 
-output_dir = r".\implementation_tests\current\TS_fat01/" 
+return_periods = [500, 1000, 2500]
+input_dir = join('.', 'implementation_tests', 'input', 'java')
+output_dir = join('.', 'implementation_tests', 'current', 'TS_fat01')
+use_site_indexes = False
+site_indexes = [1, 1001, 2001, 3001, 4001, 5001, 6001, 7001, 8001, 9001, 10001, 11001, 12001, 13001, 14001, 15001, 16001, 17001, 18001, 19001, 20001, 21001, 22001, 23001, 24001, 25001, 26001, 27001, 28001, 29001, 30001, 31001, 32001, 33001, 34001, 35001, 36001, 37001, 38001, 39001, 40001, 41001, 42001, 43001, 44001, 45001, 46001, 47001, 48001, 49001, 50001, 51001, 52001, 53001, 54001, 55001, 56001, 57001, 58001, 59001, 60001, 61001, 62001, 63001, 64001]
 
-use_site_indexes = False #True
-site_indexes = range(1, 64580, 1000) #[1, 10, 100, 1000,1100]
+# Scenario input
 
+# Probabilistic input
 
 # Attenuation
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 2
-atten_periods = [1.0] #[0.0, 0.2, 1.0]
+atten_periods = [1.0]
 atten_threshold_distance = 400
+atten_spawn_bins = 1
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
 atten_pga_scaling_cutoff = 2
 atten_smooth_spectral_acceleration = None
 atten_log_sigma_eq_weight = 0
-atten_spawn_bins = 1
 
 # Amplification
 use_amplification = True

@@ -23,8 +23,8 @@ max_width = 15
 site_tag = "newc" 
 site_db_tag = "" 
 return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9099999999999, 2500, 5000, 7500, 10000]
-input_dir = r".\input/" 
-output_dir = r".\output\plot_prob_risk/" 
+input_dir = join('.', 'input')
+output_dir = join('.', 'output', 'plot_prob_risk')
 use_site_indexes = False
 fault_source_tag = "no_fault" 
 
