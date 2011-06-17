@@ -32,12 +32,13 @@ def rewrite_set_data_py(path=None):
     set_data_files = find_set_data_py_files(path)
     #print "set_data_files", set_data_files
     for file in set_data_files:
+        #print "file", file
         old_set_data_py_2_new_set_data_py(file)
         
 
 #-------------------------------------------------------------
 if __name__ == "__main__":
-    #rewrite_set_data_py(path=demo_path)
+    rewrite_set_data_py(path=demo_path)
     #rewrite_set_data_py(path=Implementation_Path)
     #rewrite_set_data_py(path=scenario_scenarios_path)
-    rewrite_set_data_py(path=mini_scenario_Path)
+    #rewrite_set_data_py(path=mini_scenario_Path)

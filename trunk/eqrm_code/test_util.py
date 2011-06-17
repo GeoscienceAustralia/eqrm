@@ -106,11 +106,25 @@ class Test_Util(unittest.TestCase):
     def dont_test_run_call(self):
         # Too flaky for a test.
         retcode = run_call('get_python_version.py', 'python')
+        
+    def test_string_convert(self):
+        
+        s = r'foo\bar'
+        out = convert_path_string_to_join(s)
+        self.failUnlessEqual(out, "join('foo', 'bar')")
+        
+        s = r'.\s\i/'
+        out = convert_path_string_to_join(s)
+        self.failUnlessEqual(out, "join('.', 's', 'i')")
 
+        s = r'.\i\s'
+        out = convert_path_string_to_join(s)
+        self.failUnlessEqual(out, "join('.', 'i', 's')")
 ################################################################################
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Util,'test')
+    #suite = unittest.makeSuite(Test_Util,'test_string_convert')
     runner = unittest.TextTestRunner() #verbosity=2)
     runner.run(suite)
 
