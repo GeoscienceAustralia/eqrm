@@ -318,16 +318,16 @@ def main(parameter_handle,
     num_psudo_events = num_gmm_max * num_events * \
                        num_spawning
     
-    msg = ('Pseudo event set created. Number of pseudo_events=' +
-           str(num_psudo_events))
-    log.debug(msg)
-    log.debug('Memory: Pseudo Event Set created')
-    log.resource_usage()
     ground_motion_distribution = Distribution_Log_Normal(
         THE_PARAM_T.atten_variability_method,
         THE_PARAM_T.atten_spawn_bins)
     event_activity.spawn(ground_motion_distribution.spawn_weights)
 
+    msg = ('Pseudo event set created. Number of pseudo_events=' +
+           str(num_psudo_events))
+    log.debug(msg)
+    log.debug('Memory: Pseudo Event Set created')
+    log.resource_usage()
     
     # Initialise the ground motion object
     # Tasks here include
