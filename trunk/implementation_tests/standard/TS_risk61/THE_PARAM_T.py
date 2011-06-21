@@ -26,7 +26,7 @@ return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 
 input_dir = join('.', 'implementation_tests', 'input_bridges')
 output_dir = join('.', 'implementation_tests', 'current', 'TS_risk61')
 use_site_indexes = True
-site_indexes = 6315
+site_indexes = [6315, 6316, 6317]
 event_control_tag = "use" 
 
 # Scenario input
