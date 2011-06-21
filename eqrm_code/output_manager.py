@@ -24,6 +24,7 @@ import numpy as np
 from csv_interface import csv2dict
 
 EXTENSION = '.txt'
+CSV_EXTENSION = '.csv'
 FILE_TAG_DELIMITER = '-'
 FAULT_SOURCE_FILE = '_fault_source' #'_fault_source.xml'
 ZONE_SOURCE_FILE = '_zone_source' #'_zone_source.xml'
@@ -72,12 +73,11 @@ def save_hazard(soil_amp,THE_PARAM_T,
     for i in range(len(THE_PARAM_T.return_periods)):
         rp=str(THE_PARAM_T.return_periods[i])
         if rp[-2:-1] == '.':
+            # get rid of the . if it is the second last character.
+            # Why?
             rp = rp[:-2] + rp[-1]
         base_name = THE_PARAM_T.output_dir + get_hazard_file_name(
             THE_PARAM_T.site_tag, hazard_name, rp, EXTENSION)
-        #base_name = THE_PARAM_T.output_dir+THE_PARAM_T.site_tag+ '_'+ \
-        #      hazard_name+'_rp' + \
-        #     rp.replace('.','pt').replace(' ','') + EXTENSION
         base_names.append(base_name)
         name = base_name + parallel_tag
         f=open(name,'w')
@@ -1300,7 +1300,68 @@ def get_source_file_handle(THE_PARAM_T, source_file_type='zone'):
     return open(source_file)
     
     
+def save_bridge_days_to_complete(THE_PARAM_T,
+                days_to_complete, compress=False,
+                parallel_tag=None, write_title=True):
+    """
+    writes [site_tag]_fp[functional percentage].txt files
 
+    Additionally, writes several files of bridge days to complete.
+    There is one file per functional percentage.
+    In these files columns are the event, rows are the location and the
+    data is days to complete.
+    
+    """   
+    base_names = []
+    if compress:
+        open = myGzipFile
+    else:
+        open = file
+    if parallel_tag is None:
+        parallel_tag = '' 
+    for i, func_p in enumerate(THE_PARAM_T.bridges_functional_percentages):
+       
+        base_name = THE_PARAM_T.output_dir + get_days_to_complete_file_name(
+            THE_PARAM_T.site_tag, func_p, CSV_EXTENSION)
+        base_names.append(base_name)
+        name = base_name + parallel_tag
+        f=open(name,'w')
+        if write_title:
+            f.write(
+                '% functional percentage = '+ str(func_p).replace(' ','')+'\n')
+            f.write(
+                '% Columns are events, rows are sites.\n')
+        for j in range(len(days_to_complete)):
+            # days_to_complete(sites, num_psudo_events, func_p)  
+            dtc_wrt_events = days_to_complete[j,:,i] 
+            #hi=days_to_complete[j,:,i] # sites,rsa_per,rtrn            
+            f.write(', '.join(['%.10g'%(h) for h in dtc_wrt_events])+'\n')
+        f.close()
+    return base_names
+
+
+def get_days_to_complete_file_name(site_tag, func_p,
+                                    extension=CSV_EXTENSION):
+    """Create the _bridge_days_to_complete file name.
+    """
+    func_p = float_as_string_no_points(func_p)
+    if func_p[0] is not '[':
+        func_p = '[' + func_p + ']'
+    base_name = site_tag + '_' + 'bridge_days_to_complete' +'_rp' + \
+        func_p + extension
+    return base_name
+    
+    
+def float_as_string_no_points(x):    
+    x = floatstrip(x)
+    x = x.replace('.','p')
+    return x
+
+def floatstrip(x):
+    if x == int(x):
+        return str(int(x))
+    else:
+        return str(x)   
 ################################################################################
 
 if __name__ == "__main__":
