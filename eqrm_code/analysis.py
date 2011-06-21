@@ -37,7 +37,8 @@ from eqrm_code.source_model import source_model_from_xml, Source_Model
 from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
          save_event_set, save_hazard, save_structures, save_val, \
          save_ecloss, join_parallel_files, join_parallel_files_column, \
-         save_damage, get_source_file_handle, save_fatalities
+         save_damage, get_source_file_handle, save_fatalities, \
+         save_bridge_days_to_complete
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
 from ground_motion_distribution import Distribution_Log_Normal
@@ -785,6 +786,14 @@ def main(parameter_handle,
                            parallel_tag=parallel.file_tag)
         column_files_that_parallel_splits.append(file)
         
+    if THE_PARAM_T.bridges_functional_percentages is not None and \
+           have_bridge_data and parallel.lo != parallel.hi:  
+        files = save_bridge_days_to_complete(
+            THE_PARAM_T,
+            saved_days_to_complete, compress=THE_PARAM_T.compress_output,
+            parallel_tag=parallel.file_tag)
+        row_files_that_parallel_splits.extend(files)
+            
     if (THE_PARAM_T.save_fatalities is True and
             parallel.lo != parallel.hi):
         # note: will not handle multiple GMPES
@@ -800,16 +809,6 @@ def main(parameter_handle,
                                compress=THE_PARAM_T.compress_output,
                                parallel_tag=parallel.file_tag)
         column_files_that_parallel_splits.append(file)
-#        file = save_val(THE_PARAM_T,sum( \
-#             all_sites.cost_breakdown(
-# ci=THE_PARAM_T.loss_regional_cost_index_multiplier)[-1:]), '_cval',
-#                   compress=THE_PARAM_T.compress_output,
-#                         parallel_tag=parallel.file_tag)
-#         row_files_that_parallel_splits.append(file)
-
-#???
-    # output "days to complete" data here
-#???
 
     if parallel.rank == 0:		# No site component
         # So just get one process to write these files.

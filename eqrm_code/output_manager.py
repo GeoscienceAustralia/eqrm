@@ -1330,11 +1330,10 @@ def save_bridge_days_to_complete(THE_PARAM_T,
             f.write(
                 '% functional percentage = '+ str(func_p).replace(' ','')+'\n')
             f.write(
-                '% Columns are events, rows are sites.\n')
+                '% Columns are events. Rows are sites.\n')
         for j in range(len(days_to_complete)):
             # days_to_complete(sites, num_psudo_events, func_p)  
-            dtc_wrt_events = days_to_complete[j,:,i] 
-            #hi=days_to_complete[j,:,i] # sites,rsa_per,rtrn            
+            dtc_wrt_events = days_to_complete[j,:,i]           
             f.write(', '.join(['%.10g'%(h) for h in dtc_wrt_events])+'\n')
         f.close()
     return base_names

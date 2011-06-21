@@ -78,23 +78,23 @@ CSM is capacity spectrum method \\
 \hline
 \vspace{0.3em} \noindent \Large \textbf{General Input:} \normalsize \\
 %---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{run\_type}: \\
+\hline \vspace{0.1em} \texttt{run\_type}: (Mandatory) \\
 Defines the operation mode of the EQRM: \\
   \hspace{0.5em} `hazard' $\Rightarrow$ Scenario RSA and PSHA (probabilistic hazard); \\
   \hspace{0.5em} `risk' $\Rightarrow$ Scenario Loss and PSRA (probabilistic risk); \\
 %---------------------------------------------------------
  \hline
-\vspace{0.1em} \texttt{is\_scenario}: \\
+\vspace{0.1em} \texttt{is\_scenario}: (Mandatory) \\
 Event simulation type: \\
   \hspace{0.5em} True $\Rightarrow$ a specific scenario event (Use Scenario input); \\
   \hspace{0.5em} False $\Rightarrow$ probabilistic simulation, PSHA or PSRA (Use Probabilistic input) \\
 %---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{max\_width}: \\
+\hline \vspace{0.1em} \texttt{max\_width}: (Optional)\\
 Maximum width along
 virtual faults i.e. synthetic rupture width can
 not exceed \typepar{max\_width}{}{} (km).\\
 %---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{site\_tag}: \\
+\hline \vspace{0.1em} \texttt{site\_tag}: (Mandatory)\\
 String used in input and
 output file
  names. Typically used to define the city or region of interest (e.g.
@@ -103,7 +103,9 @@ output file
 \hline \vspace{0.1em} \texttt{site\_db\_tag}: \\
 DEFAULT = `' \\
  String used to specify the
- exposure or building data base.  The file name is \texttt{sitedb\_<site\_tag><site\_db\_tag>.csv}\\
+ exposure or building data base.  The building data base file name is
+ \texttt{sitedb\_<site\_tag><site\_db\_tag>.csv}  The exposure data base file name is
+ \texttt{<site\_tag>\_par\_site<site\_db\_tag>.csv}\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{return\_periods}: \\
 List whose
