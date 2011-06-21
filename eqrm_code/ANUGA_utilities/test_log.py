@@ -5,6 +5,7 @@ import sys
 import unittest
 import logging
 from eqrm_code.ANUGA_utilities import log
+import tempfile
 
 
 
@@ -26,16 +27,23 @@ class Test_Log(unittest.TestCase):
 #         if os.path.exists(STDOUT_LOG_NAME):
 #             os.remove(STDOUT_LOG_NAME)
 
-    
+    # see ticket #177
     def FIXME_test_simple(self):
 
         current_default_to_console = log.default_to_console
         log.default_to_console = True
+
+        # don't change the file names, they are used in the log files
         LOGFILE_NAME = 'test.log'
         STDOUT_LOG_NAME = 'stdout.log'
-        
-        # Check that logging works in simple case.
 
+        print os.getcwd()
+
+        # get a temporary file
+        (handle, filename) = tempfile.mkstemp('.log','get_bridges_')
+        os.close(handle)
+        # Check that logging works in simple case.
+        
         # just in case
         if os.path.exists(LOGFILE_NAME):
             os.remove(LOGFILE_NAME)
@@ -76,16 +84,11 @@ test at level INFO'''
         sys.stderr = save_stderr
         sys.stdout = save_stdout
 
-        # check logfile is as expected
-        fd = open(LOGFILE_NAME, 'r')
-        lines = fd.readlines()
-        fd.close()
+        if os.path.exists(LOGFILE_NAME):
+            print "I found a log file"
+        else:
+            print "NOOOOOOO  log file"
 
-        result = strip_log(lines)
-        expected = strip_log(log_expect.split('\n'))
-        
-        self.failUnlessEqual(result, expected)
-        
         # check that captured stdout is as expected
         fd = open(STDOUT_LOG_NAME, 'r')
         lines = fd.readlines()
@@ -99,9 +102,23 @@ test at level INFO'''
             expected.append(line)
         self.failUnlessEqual(result, expected)
 
+        # check logfile is as expected
+        fd = open(LOGFILE_NAME, 'r')
+        lines = fd.readlines()
+        print "lines",lines
+        fd.close()
+
+        result = strip_log(lines)
+        expected = strip_log(log_expect.split('\n'))
+        
+        self.failUnlessEqual(result, expected)
+        
+      
+
         log.default_to_console = current_default_to_console
 
         
+    # see ticket #177
     def FIXME_test_set_log_file(self):
         # Since there are two tests,  set_log_file
         # is actually tested, though not be running twince in here.
