@@ -1,6 +1,5 @@
 """
-  Author:  Peter Row, peter.row@ga.gov.au
-           Duncan Gray, duncan.gray@ga.gov.au
+  Author:  Duncan Gray, duncan.gray@ga.gov.au
            
   Description: Parse in the parameter file.
 
@@ -33,6 +32,7 @@ from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING, \
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code.util import convert_path_string_to_join
 # DSG-DSG this needs more comments.
+
 """
 Principals of the set_data.py file format.
 

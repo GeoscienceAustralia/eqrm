@@ -1341,8 +1341,89 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(THE_PARAM_T.output_dir)
         
 
+    def test_get_days_to_complete_file_name(self):
+        site_tag = 'a'
+        functional_percentage = 50
+        extension = 'b'
+        base_name = get_days_to_complete_file_name(
+            site_tag, 
+            functional_percentage,
+            extension)
+        self.failUnlessEqual('a_bridge_days_to_complete_rp[50]b',
+                             base_name)
+        site_tag = 'a'
+        functional_percentage = 50.
+        extension = 'b'
+        base_name = get_days_to_complete_file_name(
+            site_tag, 
+            functional_percentage,
+            extension)
+        self.failUnlessEqual('a_bridge_days_to_complete_rp[50]b',
+                             base_name)
         
-    
+        site_tag = 'a'
+        functional_percentage = 50.0
+        extension = 'b'
+        base_name = get_days_to_complete_file_name(
+            site_tag, 
+            functional_percentage,
+            extension)
+        self.failUnlessEqual('a_bridge_days_to_complete_rp[50]b',
+                             base_name)
+            
+        site_tag = 'a'
+        functional_percentage = 50.01
+        extension = 'b'
+        base_name = get_days_to_complete_file_name(
+            site_tag, 
+            functional_percentage,
+            extension)
+        self.failUnlessEqual('a_bridge_days_to_complete_rp[50p01]b',
+                             base_name)
+                             
+ 
+    def test_save_bridge_days_to_complete(self):
+        THE_PARAM_T=Dummy()
+        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+            'output_manager_test_save_bridge_days_to_complete') + os.sep
+        THE_PARAM_T.site_tag = "site_tag"
+
+        THE_PARAM_T.bridges_functional_percentages = array(
+            [0.0, 0.05, 0.5, 1.0])
+            
+        sites = array([1,2,3])
+        events = array([500, 700])
+        d2c = zeros((len(sites),len(events),
+                        len(THE_PARAM_T.bridges_functional_percentages)), float)
+        #hazard[j,:,i] # sites,rsa_per,rtrn
+        for i,site in enumerate(sites):
+            for j,event in enumerate(events):
+                for k,bfp in enumerate(THE_PARAM_T.bridges_functional_percentages):
+                    d2c[i,j,k] = event + site * bfp
+        base_names = save_bridge_days_to_complete(THE_PARAM_T, d2c, 
+                                                  compress=False)
+                                                  
+        # check the site files
+        for bfp in THE_PARAM_T.bridges_functional_percentages:
+           file_name = get_days_to_complete_file_name(THE_PARAM_T.site_tag, 
+                                                      bfp)
+           file_name = os.path.join(THE_PARAM_T.output_dir, file_name)
+           f = open(file_name, 'r')
+           text = f.read().splitlines()
+            # ditch the comment lines
+           text.pop(0)
+           text.pop(0)
+           
+           for j, site in enumerate(sites):
+               split = text[j].split(', ')
+               for k, event in enumerate(events):
+                    #hazard[i,j,k] = site*period*int(rtrn[0])
+                   self.assert_ (allclose(array(float(split[k])),
+                                          array(float(event + site * bfp))))
+                   f.close()
+           os.remove(file_name)
+        os.rmdir(THE_PARAM_T.output_dir)
+                            
 ################################################################################
 
 if __name__ == "__main__":
