@@ -36,42 +36,39 @@ def building_params_from_csv(csv_name,
     
     # Get the data out of _params.csv
     attribute_conversions={}
-    attribute_conversions['structure_class']=str
-    attribute_conversions['structure_classification']=str
+    attribute_conversions['structure_class'] = str
+    attribute_conversions['structure_classification'] = str
     for name in ['design_strength','height','natural_elastic_period',
                  'fraction_in_first_mode','height_to_displacement',
                  'yield_to_design','ultimate_to_yield','ductility',
                  'damping_s','damping_m','damping_l','damping_Be',
                  'structural_damage_slight','structural_damage_moderate',
                  'structural_damage_extreme','structural_damage_complete']:
-        attribute_conversions[name]=float
-    fid = get_local_or_default(csv_name+'_params.csv',
+        attribute_conversions[name] = float
+    fid = get_local_or_default(csv_name + '_params.csv',
                                default_input_dir,
                                input_dir)
 
     #file_location = join(default_input_dir, csv_name+'_params.csv')
-    building_parameters=csv_to_arrays(fid,
-                                      **attribute_conversions)
-
-    
+    building_parameters=csv_to_arrays(fid, **attribute_conversions)
+  
     # Get the data out of _non_structural_damage_params.csv
-    attribute_conversions={}    
+    attribute_conversions = {}    
     for name in ['non_residential_drift_threshold',
                  'residential_drift_threshold'
                  ,'acceleration_threshold']:
-        attribute_conversions[name]=float    
+        attribute_conversions[name] = float    
     file_location = join(
         default_input_dir,
         'building_parameters_workshop_3_non_structural_damage_params.csv')    
-    building_nsd_parameters=csv_to_arrays(
-        (file_location),
-         **attribute_conversions)
+    building_nsd_parameters = csv_to_arrays(file_location,
+                                            **attribute_conversions)
 
     
     for name in ['non_residential_drift_threshold',
                  'residential_drift_threshold',
                  'acceleration_threshold']:
-         building_parameters[name]=building_nsd_parameters[name][newaxis,:]
+         building_parameters[name] = building_nsd_parameters[name][newaxis,:]
 
 
     # transform the data:
@@ -79,30 +76,30 @@ def building_params_from_csv(csv_name,
     #     multiply drift damage by height
     #return building_parameters
     cvt_in2mm = 25.40
-    # Conversion for structural damage    
-    building_parameters['height']*=12*cvt_in2mm
+    # Conversion for structural damage
     #building height: convert feet to inches to mm
-    height_to_displacement=building_parameters['height_to_displacement']
-    height=building_parameters['height']
+    building_parameters['height'] *= 12 * cvt_in2mm
+    height_to_displacement = building_parameters['height_to_displacement']
+    height = building_parameters['height']
 
     #setup damage state median thresholds (also feet -> mm)
-    structural_damage_slight=building_parameters.pop(
+    structural_damage_slight = building_parameters.pop(
         'structural_damage_slight')
-    structural_damage_moderate=building_parameters.pop(
+    structural_damage_moderate = building_parameters.pop(
         'structural_damage_moderate')
-    structural_damage_extreme=building_parameters.pop(
+    structural_damage_extreme = building_parameters.pop(
         'structural_damage_extreme')
-    structural_damage_complete=building_parameters.pop(
+    structural_damage_complete = building_parameters.pop(
         'structural_damage_complete')
-    structural_damage_threshold=asarray((structural_damage_slight,
-                                         structural_damage_moderate,
-                                         structural_damage_extreme,
-                                         structural_damage_complete))    
-    structural_damage_threshold=structural_damage_threshold.swapaxes(0,1)
+    structural_damage_threshold = asarray((structural_damage_slight,
+                                           structural_damage_moderate,
+                                           structural_damage_extreme,
+                                           structural_damage_complete))    
+    structural_damage_threshold = structural_damage_threshold.swapaxes(0,1)
     
-    structural_damage_threshold=structural_damage_threshold*(
+    structural_damage_threshold = structural_damage_threshold*(
         (height_to_displacement*height)[:,newaxis])
-    building_parameters['structural_damage_threshold']=structural_damage_threshold
+    building_parameters['structural_damage_threshold'] = structural_damage_threshold
 
     #setup damage state median thresholds (also feet -> inches)    
     non_residential_drift_threshold=building_parameters ['non_residential_drift_threshold']    
