@@ -9,48 +9,38 @@
   ModifiedDate: $Date: 2010-04-25 20:05:29 +1000 (Sun, 25 Apr 2010) $
   
   Copyright 2007 by Geoscience Australia
+
+  Principals of the set_data.py file format.
+
+  All attributes are specified in CONV_DIC_NEW.
   
-"""
+  If an attribute is not present in the set_data.py file and the
+  attribute has a default value, this value will be used in THE_PARAM_T.
+  
+  Setting an attribute to None is not equivaluent to removing the
+  attribute from the set_data.py file, since not all attributes default
+  to None.
+  
+  If an attribute does not have to be defined it is given a default
+  value of None.  An attribute without a default has to be defined.
+  
+  Lists are automatically converted to arrays.  
+ 
+ """
 
 import sys
-from sys import path
 import os
 import imp
-from os import sep, getenv, listdir
-from os.path import join, splitext, normpath
+from os.path import join
 from time import strftime, localtime
-from operator import itemgetter
 from scipy import allclose, array, sort, asarray, ndarray
 from numpy import ndarray
 import copy
 
 from eqrm_code.eqrm_filesystem import eqrm_path
-from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
-     CSM_DAMPING_MODIFY_TAV, CSM_DAMPING_DO_NOT_MODIFY_TAV
-from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING, \
-     CSM_DAMPING_DO_NOT_USE_SMOOTHING
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code.util import convert_path_string_to_join
-# DSG-DSG this needs more comments.
 
-"""
-Principals of the set_data.py file format.
-
-All attributes are specified in CONV_DIC_NEW.
-
-If an attribute is not present in the set_data.py file and the
-attribute has a default value, this value will be used in THE_PARAM_T.
-
-Setting an attribute to None is not equivaluent to removing the
-attribute from the set_data.py file, since not all attributes default
-to None.
-
-If an attribute does not have to be defined it is given a default
-value of None.  An attribute without a default has to be defined.
-
-Lists are automatically converted to arrays.
-
-"""
 
 ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
@@ -479,7 +469,7 @@ def create_parameter_data(parameters, **kwargs):
         default_input_dir
 
     Return:
-      THE_PARAM_T, which is a Dict_key_as_attributes object.
+      THE_PARAM_T, which is a DictKeyAsAttributes object.
     """
     if isinstance(parameters, str) and parameters[-3:] == ".py":
         parameters = from_file_get_params(parameters)
@@ -492,7 +482,7 @@ def create_parameter_data(parameters, **kwargs):
     
     # The parameters value have presidence/overwrite the kwargs
     kwargs.update(parameters)
-    THE_PARAM_T = Dict_key_as_attributes(kwargs)
+    THE_PARAM_T = DictKeyAsAttributes(kwargs)
 
     # Add Hard-wired results  
     THE_PARAM_T.update(OLD_STYLE_PARAS_HARD_WIRED)
@@ -506,7 +496,6 @@ def create_parameter_data(parameters, **kwargs):
 
    
     # Check att names
-    conv_new_dic = {}
     for key in THE_PARAM_T:
         if not CONV_DIC_NEW.has_key(key):
             msg = ("Parameter Error: Attribute " + key + " is unknown.")
@@ -516,31 +505,33 @@ def create_parameter_data(parameters, **kwargs):
     att_value_fixes(THE_PARAM_T)
 
     # Check if values are consistant
-    verify_THE_PARAM_T(THE_PARAM_T)
+    verify_the_param_t(THE_PARAM_T)
     
     return THE_PARAM_T
 
 def get_no_instance_params(parameters):
+    """
+    Filter out all callable or special atts.
+    """
     # Assume locals() has been called.
-    locals = copy.copy(parameters)
-    for key in locals.keys():
-        if key[-2:] == '__' or callable(locals[key]):
-            del locals[key]
-    return locals
+    local_paras = copy.copy(parameters)
+    for key in local_paras.keys():
+        if key[-1:] == '_' or callable(local_paras[key]):
+            del local_paras[key]
+    return local_paras
 
 
 def att_default_values(THE_PARAM_T):
     """Add default values
-    """
-        
-    for item in CONV_NEW: 
-        if item.has_key('new_para') and \
-               not THE_PARAM_T.has_key(item['new_para']):
-            if item.has_key('default'):
-                THE_PARAM_T[item['new_para']] = item['default']
+    """        
+    for param in CONV_NEW: 
+        if param.has_key('new_para') and \
+               not THE_PARAM_T.has_key(param['new_para']):
+            if param.has_key('default'):
+                THE_PARAM_T[param['new_para']] = param['default']
             else:
                 raise ParameterSyntaxError(
-                "Parameter Error: Attribute "  + item['new_para']
+                "Parameter Error: Attribute "  + param['new_para']
                 + " must be defined.")
 
 def depreciated_attributes(THE_PARAM_T):
@@ -548,29 +539,29 @@ def depreciated_attributes(THE_PARAM_T):
     Remove/fix depreciated attributes.
     Give a warning.
     """
-    for item in DEPRECIATED_PARAS:
-        if THE_PARAM_T.has_key(item):
-            handle_logic = DEPRECIATED_PARAS[item]
+    for param in DEPRECIATED_PARAS:
+        if THE_PARAM_T.has_key(param):
+            handle_logic = DEPRECIATED_PARAS[param]
             if handle_logic is None:
                 pass
             elif isinstance(handle_logic, str):
                 # handle_logic is a replacement string
                 # for the parameter name
-                THE_PARAM_T[handle_logic] = THE_PARAM_T[item]
-                del THE_PARAM_T[item]
+                THE_PARAM_T[handle_logic] = THE_PARAM_T[param]
+                del THE_PARAM_T[param]
             elif handle_logic is True:
                 # Delete the parameter
-                del THE_PARAM_T[item]
+                del THE_PARAM_T[param]
             else:                
                 # handle_logic is a dictionary
-                what_to_do = handle_logic[THE_PARAM_T[item]]
+                what_to_do = handle_logic[THE_PARAM_T[param]]
                 if what_to_do is not None:
                     # The value is a tuple.
                     # the first value is the att name
                     # the second value is the att value
                     THE_PARAM_T[what_to_do[0]] = what_to_do[1]                
-                del THE_PARAM_T[item]
-            msg = 'WARNING: ' + item + \
+                del THE_PARAM_T[param]
+            msg = 'WARNING: ' + param + \
                   ' term in set data files is depreciated.'
             # logging is only set-up after the para file has been passed.
             # So these warnings will not in in the logs.
@@ -600,7 +591,7 @@ def att_value_fixes(THE_PARAM_T):
         THE_PARAM_T['atten_model_weights'] = check_sum_1_normalise(weights)
     
     # if periods is collapsed (into a scalar), turn it into a vector
-    if not isinstance(THE_PARAM_T.atten_periods,ndarray):
+    if not isinstance(THE_PARAM_T.atten_periods, ndarray):
         THE_PARAM_T['atten_periods'] = array([THE_PARAM_T.atten_periods])
 
     # Fix the string specifying the directory structure
@@ -625,54 +616,41 @@ def check_sum_1_normalise(weights, msg=None):
     """   
     # test if attenuation weights are close to 1 (with 0.01 absolute tolerance)
     # this means that 3 weights with 0.33 should pass  
-    if not allclose(weights.sum(),1.0,atol=0.01):
+    if not allclose(weights.sum(), 1.0, atol=0.01):
         if msg == None:
-            msg =  'Weights should sum to 1.0, got ',weight
+            msg =  'Weights should sum to 1.0, got ', weights
         raise ValueError(msg)
     
     # Re-normalise weights so they do sum to 1
     return weights/abs(weights.sum()) # normalize
     
-
-        
-def isscalar(x):
-    if isinstance(x,int) or isinstance(x,float):
-        return True
-    else:
-        return not hasattr(x,'__len__')
-
-            
-def scalar2vec(x,leny):       
-    if isscalar(x):
-        xtmp = x
-        x=[]
-        for k in range(leny):
-            x.append(xtmp)
-        x=array(x)
-    return x
-
-
+    
 def change_slashes(path):
     """Swap from windows to linux file slashes
     """
     if sys.platform == 'linux2':
         split_path = path.split('\\')
         if len(split_path) >= 2:
-            path = apply(join, split_path)
+            path = join(*split_path)
     return path
 
 
-unique_load_source_int = 0            
+UNIQUE_LOAD_SOURCE_INT = 0            
 def from_file_get_params(path_file):
-    global unique_load_source_int
-    head, tail = os.path.split(os.path.abspath(path_file))
-    name = 'name_' + str(unique_load_source_int)
-    unique_load_source_int += 1
+    """
+    Convert an EQRM control file to dictionary of parameters.
+     
+    para:
+      path_file - the location of the eqrm control file.
+    """
+    global UNIQUE_LOAD_SOURCE_INT
+    name = 'name_' + str(UNIQUE_LOAD_SOURCE_INT)
+    UNIQUE_LOAD_SOURCE_INT += 1
     para_imp = imp.load_source(name, path_file)
-    # FIXME big hack.  The Parameter_data instance name is hard-wired
-    # Have it parse the 'sdp = Parameter_data()' line for the name
+    # FIXME big hack.  The ParameterData instance name is hard-wired
+    # Have it parse the 'sdp = ParameterData()' line for the name
     try:
-        para_imp = getattr(para_imp,VAR_NAME_IN_SET_DATA_FILE)
+        para_imp = getattr(para_imp, VAR_NAME_IN_SET_DATA_FILE)
     except AttributeError:
         pass
         # Assume this is a no instance file
@@ -680,8 +658,10 @@ def from_file_get_params(path_file):
     return parameters
 
 
-def verify_THE_PARAM_T(THE_PARAM_T):
-
+def verify_the_param_t(THE_PARAM_T):
+    """
+    Check that the values in THE_PARAM_T are consistant with how EQRM works.
+    """
     # Value verification, expanding and fixing.
     if not allclose(THE_PARAM_T.atten_periods,
                     sort(THE_PARAM_T.atten_periods)):
@@ -696,8 +676,8 @@ def verify_THE_PARAM_T(THE_PARAM_T):
 #                        ' with more than one event.')
     
     if THE_PARAM_T.save_hazard_map == True and THE_PARAM_T.is_scenario == True:
-      raise ParameterSyntaxError(
-      'Cannot save the hazard map for a scenario.')
+        raise ParameterSyntaxError(
+            'Cannot save the hazard map for a scenario.')
   
 #     if THE_PARAM_T.save_motion == True and THE_PARAM_T.is_scenario == False:
 #       raise ParameterSyntaxError(
@@ -705,12 +685,12 @@ def verify_THE_PARAM_T(THE_PARAM_T):
 
     if THE_PARAM_T.atten_variability_method == 1 and \
            THE_PARAM_T.run_type == 'risk':
-      raise ParameterSyntaxError(
-      'Cannot use spawning when doing a risk simulation.')
+        raise ParameterSyntaxError(
+            'Cannot use spawning when doing a risk simulation.')
 
     if THE_PARAM_T.amp_variability_method == 1:
-      raise ParameterSyntaxError(
-      'Cannot spawn on amplification.')
+        raise ParameterSyntaxError(
+            'Cannot spawn on amplification.')
   
     # need to change some array sizes, e.g. bedrock_SA_all
 #     if THE_PARAM_T.save_motion == True and \
@@ -734,16 +714,16 @@ def find_set_data_py_files(path=None):
         path = eqrm_path
         
     set_data_files = []
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            if file[-3:] == extension:
-                file_path_name = join(root, file)
-                f = open(file_path_name,'r')
-                _ = f.readline()
-                snd_line = f.readline()
+    for root, _, files in os.walk(path):
+        for afile in files:
+            if afile[-3:] == extension:
+                file_path_name = join(root, afile)
+                fref = open(file_path_name,'r')
+                _ = fref.readline()
+                snd_line = fref.readline()
                 if SECOND_LINE in snd_line:
                     set_data_files.append(file_path_name)  
-                f.close()
+                fref.close()
     return set_data_files
 
 def old_set_data_py_2_new_set_data_py(file_name_path,
@@ -762,7 +742,7 @@ def old_set_data_py_2_new_set_data_py(file_name_path,
     
     # Remove depreciated attributes
     depreciated_attributes(parameters)
-    convert_attribute_dic_to_set_data_py(new_file_name_path, parameters)
+    the_param_t_dic_to_set_data_py(new_file_name_path, parameters)
     
     
 def introspect_attribute_values(instance):
@@ -780,12 +760,12 @@ def introspect_attribute_values(instance):
 
  
     
-class Dict_key_as_attributes(dict):
+class DictKeyAsAttributes(dict):
     """
     Expose the dictionary keys as attributes.
     Do not let the attributes be set
     """
-    def __getattribute__(self,key):
+    def __getattribute__(self, key):
         try:
             return self[key]
         except:
@@ -794,7 +774,7 @@ class Dict_key_as_attributes(dict):
                     return self[k][key]
                 except:
                     pass
-            return object.__getattribute__(self,key)
+            return object.__getattribute__(self, key)
         #raise AttributeError(str(key)+ ' was not found')
 
     def __delattr__(self, name):       
@@ -824,10 +804,10 @@ class Dict_key_as_attributes(dict):
 def eqrm_data_home():
     """Return the EQRM data directory
     """
-    results = getenv(ENV_EQRMDATAHOME)
+    results = os.getenv(ENV_EQRMDATAHOME)
     if results is None:
         print 'The environmental variable ' + ENV_EQRMDATAHOME + \
-              ' , used by Parameter_data.eqrm_data_home() is not set.'
+              ' , used by ParameterData.eqrm_data_home() is not set.'
         print 'Define this variable error before continuing.'
         ###FIXME raise an error instead
         sys.exit(1)            
@@ -840,14 +820,14 @@ def get_time_user():
     """
     time = strftime('%Y%m%d_%H%M%S', localtime())
     if sys.platform == "win32":
-        cmd="USERNAME"
+        cmd = "USERNAME"
     elif sys.platform == "linux2":
-        cmd="USER"
+        cmd = "USER"
     user = os.getenv(cmd)
     return "_".join((time, user))
 
 
-class Parameter_data(object):
+class ParameterData(object):
     """Class to build the parameter_data 'onto'.
     The user will add attributes to this class.
     These attributes are used by ?? to create THE_PARAM_T data structure
@@ -860,10 +840,10 @@ class Parameter_data(object):
     def eqrm_data_home(self):
         """Return the EQRM data directory
         """
-        results = getenv(ENV_EQRMDATAHOME)
+        results = os.getenv(ENV_EQRMDATAHOME)
         if results is None:
             print 'The environmental variable ' + ENV_EQRMDATAHOME + \
-                  ' , used by Parameter_data.eqrm_data_home() is not set.'
+                  ' , used by ParameterData.eqrm_data_home() is not set.'
             print 'Define this variable error before continuing.'
             ###FIXME raise an error instead
             sys.exit(1)            
@@ -876,13 +856,13 @@ class Parameter_data(object):
         """
         time = strftime('%Y%m%d_%H%M%S', localtime())
         if sys.platform == "win32":
-            cmd="USERNAME"
+            cmd = "USERNAME"
         elif sys.platform == "linux2":
-            cmd="USER"
+            cmd = "USER"
         user = os.getenv(cmd)
         return "_".join((time, user))
         
-def convert_attribute_dic_to_set_data_py(py_file_name, attribute_dic):
+def the_param_t_dic_to_set_data_py(py_file_name, attribute_dic):
     """ Given a dictionary of the set data attribute values convert it
     to a set data .py file.  set data .py files describe the EQRM
     parameters.
@@ -952,94 +932,7 @@ def convert_THE_PARAM_T_to_py(py_file_name, THE_PARAM_T):
 
     return py_file_name
 
-
-def todo__convert_par_to_py(par_file_name, old_para_instance=None):
-    """
-    Note, this function can be brought back to life based on
-    convert_par_to_py in the repository round  revision 1561.
-
-    
-    Given a par file, or THE_PARAM_T convert it to a .py file.
-
-    Warning this is going to be a rough function, since I don't want
-    to spend too much time on it. (This code is being used
-    more than I thought it would - I'm concerned it's unit tests
-    aren't up to scratch.)
-
-    par_file_name: Name of the old style para file.
-      The extension is changed to .py to get the output file name 
-      eg 'risk.par' to 'risk.py'
-
-    Output:
-      A .py file, based on the par_file_name. eg 'risk.py'
-    """
-    pass 
-
-
-
-# Warning, this is the old-style format
-class write_python_par_file(object):
-    def __init__(self, file_name, instance_name = VAR_NAME_IN_SET_DATA_FILE):
-        """ Write a pthon parameter file
-        """
-        self.handle = open(file_name, 'w')
-        self.var_name = instance_name
-
-    def write_top(self):
-        """ Write the imports ect. at the beginning of the par file
-        """
- 
-        self.handle.write('"""\n')
-
-        self.handle.write(SECOND_LINE)
-
-        self.handle.write('\n\
-  All input files are first searched for in the input_dir, then in the\n\
-  resources/data directory, which is part of EQRM.\n\
-\n\
- All distances are in kilometers.\n\
- Acceleration values are in g.\n\
- Angles, latitude and longitude are in decimal degrees.\n\
-\n\
- If a field is not used, set the value to None.\n\
-\n\
-\n\
-"""\n\
-\n\
-from eqrm_code.parse_in_parameters import Parameter_data\n\
-from os.path import join\n\
-\n')        
-        self.handle.write(self.var_name + ' = Parameter_data()\n')
-
-    def write_middle(self, para_data):
-        """ Writes the attribute lines
-        para_data: If this is a list of strings, write the strings to the file,
-        adding the instance name at the beginning.
-        """
-        for line in para_data:
-            if isinstance(line, list):
-                self.handle.write(self.var_name + '.' + line[0] + ' = ' +
-                                  add_value(line[1]) + '\n')
-            else:    
-                self.handle.write(line)
-                
-            #self.handle.write('\n')
         
-    def write_bottom(self):
-
-        """ Write the end of the par file
-        """
-        self.handle.write("\n\
-# If this file is executed the simulation will start\n\
-if __name__ == '__main__':\n\
-    from eqrm_code.analysis import main\n\
-    main(")
-        self.handle.write(self.var_name)
-        self.handle.write(")\n")
-        self.handle.close()
-        
-
-#class write_par_file(object):
 class Write_no_instance_python_par_file(object):
     def __init__(self, file_name, instance_name = VAR_NAME_IN_SET_DATA_FILE):
         """ Write a python parameter file
@@ -1113,8 +1006,8 @@ def add_value(val):
         if  isinstance(val, ndarray):
             val_str = str(val.tolist())
         elif isinstance(val, list) and isinstance(val[0], ndarray):
-                # Assume all elements are ndarrays, with one element
-                 val_str = str([x[0] for x in val])
+            # Assume all elements are ndarrays, with one element
+            val_str = str([x[0] for x in val])
                 
         else:
             # bool, None

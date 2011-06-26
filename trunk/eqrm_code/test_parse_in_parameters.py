@@ -232,8 +232,8 @@ save_socloss_flag=[1]\n")
             self.failUnless(False, "ParameterSyntaxError not raised")
        
      
-    def test_Parameter_data_eqrm_data_home(self):
-        pd = Parameter_data()
+    def test_ParameterData_eqrm_data_home(self):
+        pd = ParameterData()
         # Not keen on testing this.  It does not
         # have to be set.
         #pd.eqrm_data_home()
@@ -627,10 +627,10 @@ save_socloss_flag=[0]\n")
         para_old = create_parameter_data(file_name)
         os.remove(file_name)
         
-        from eqrm_code.parse_in_parameters import Parameter_data
+        from eqrm_code.parse_in_parameters import ParameterData
         from os.path import join
 
-        set = Parameter_data()
+        set = ParameterData()
 
         # Operation_Mode
         set.run_type = 'hazard'   # ('risk'|'hazard')
@@ -845,8 +845,8 @@ save_socloss_flag=[0]\n")
         os.remove(file_name)
         os.remove(py_file_name)
         
-    def test_Dict_key_as_attributes(self):
-        dic = Dict_key_as_attributes()
+    def test_DictKeyAsAttributes(self):
+        dic = DictKeyAsAttributes()
         leg = 12
         dic['leg'] = leg
         self.assert_(dic.leg == leg)
@@ -860,7 +860,7 @@ save_socloss_flag=[0]\n")
             self.failUnless(False, "Error not raised")
         
     def test_att_default_values_raise(self):
-        set = Parameter_data()
+        set = ParameterData()
         try:
             para_new = create_parameter_data(set)
         except ParameterSyntaxError:
@@ -870,7 +870,7 @@ save_socloss_flag=[0]\n")
 
    
     def small_set_data(self):
-        set = Parameter_data()
+        set = ParameterData()
         set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False
         set.use_amplification = False
@@ -910,7 +910,7 @@ save_socloss_flag=[0]\n")
 
     def test_fail_on_bad_att(self):
         #
-        set = Parameter_data()
+        set = ParameterData()
         set.run_type = 'hazard'
         set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False
@@ -946,7 +946,7 @@ save_socloss_flag=[0]\n")
    
     def test_not_really_a_test(self):
         # Create an example of a python setdata file.
-        para_old = Dict_key_as_attributes( {
+        para_old = DictKeyAsAttributes( {
             'Bclasses': {'buildings_set_damping_Be_to_5_percent': 0,
                          'hazus_btypes_flag': 0,
                          'buildpars_flag': 4,
