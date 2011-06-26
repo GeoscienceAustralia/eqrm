@@ -1,7 +1,7 @@
 """
   Author:  Duncan Gray, duncan.gray@ga.gov.au
            
-  Description: Parse in the parameter file.
+  Description: Parse in the EQRM control file.
 
  
   Version: $Revision: 1643 $  
@@ -10,7 +10,7 @@
   
   Copyright 2007 by Geoscience Australia
 
-  Principals of the set_data.py file format.
+  Principals of the EQRM control file format.
 
   All attributes are specified in CONV_DIC_NEW.
   
@@ -450,6 +450,7 @@ class ParameterSyntaxError(Error):
     """There is a syntax Error in the parameters file."""
     def __init__(self, value):
         self.value = value
+        super(ParameterSyntaxError, self).__init__()
         
     def __str__(self):
         return repr(self.value)
@@ -562,7 +563,7 @@ def depreciated_attributes(THE_PARAM_T):
                     THE_PARAM_T[what_to_do[0]] = what_to_do[1]                
                 del THE_PARAM_T[param]
             msg = 'WARNING: ' + param + \
-                  ' term in set data files is depreciated.'
+                  ' term in EQRM control file is depreciated.'
             # logging is only set-up after the para file has been passed.
             # So these warnings will not in in the logs.
             log.warning(msg)
@@ -726,7 +727,7 @@ def find_set_data_py_files(path=None):
                 fref.close()
     return set_data_files
 
-def old_set_data_py_2_new_set_data_py(file_name_path,
+def update_control_file(file_name_path,
                                       new_file_name_path=None):
     """Open a set data .py file and then save it again,
     using the CONV_NEW rules and depreciation rules.
@@ -891,7 +892,7 @@ def the_param_t_dic_to_set_data_py(py_file_name, attribute_dic):
             line.append(val)
             paras2print.append(line)
             
-    writer = Write_no_instance_python_par_file(py_file_name)
+    writer = WriteEqrmControlFile(py_file_name)
     writer.write_top()
     writer.write_middle(paras2print)    
     writer.write_bottom()
@@ -925,7 +926,7 @@ def convert_THE_PARAM_T_to_py(py_file_name, THE_PARAM_T):
             line.append(val)
             paras2print.append(line)
   
-    writer = Write_no_instance_python_par_file(py_file_name)
+    writer = WriteEqrmControlFile(py_file_name)
     writer.write_top()
     writer.write_middle(paras2print)    
     writer.write_bottom()
@@ -933,12 +934,15 @@ def convert_THE_PARAM_T_to_py(py_file_name, THE_PARAM_T):
     return py_file_name
 
         
-class Write_no_instance_python_par_file(object):
-    def __init__(self, file_name, instance_name = VAR_NAME_IN_SET_DATA_FILE):
+class WriteEqrmControlFile(object):
+    """
+    Write an EQRM control file.
+    
+    """
+    def __init__(self, file_name):
         """ Write a python parameter file
         """
         self.handle = open(file_name, 'w')
-        self.var_name = instance_name
 
     def write_top(self):
         """ Write the imports ect. at the beginning of the par file
@@ -966,9 +970,13 @@ from os.path import join\n\
 \n')        
 
     def write_middle(self, para_data):
-        """ Writes the attribute lines
-        para_data: If this is a list of strings, write the strings to the file,
-        adding the instance name at the beginning.
+        """ Writes the attribute lines 
+        
+        Parameters:
+        para_data: A list of strings or lists.  If an element is a
+        string it is written as one row.  If the element is a list,
+        the element[0] is a variable name and element[1] is the
+        variable value.
         """
         for line in para_data:
             if isinstance(line, list):
