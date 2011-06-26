@@ -10,7 +10,7 @@ from eqrm_code.eqrm_filesystem import eqrm_path, demo_path, \
      Implementation_Path, mini_scenario_Path, scenario_scenarios_path, \
      mini_scenario_scenarios_path
 from eqrm_code.parse_in_parameters import find_set_data_py_files, \
-     old_set_data_py_2_new_set_data_py
+     update_control_file
 
 def rewrite_set_data_py(path=None):
     """
@@ -33,7 +33,7 @@ def rewrite_set_data_py(path=None):
     #print "set_data_files", set_data_files
     for file in set_data_files:
         #print "file", file
-        old_set_data_py_2_new_set_data_py(file)
+        update_control_file(file)
         
 
 #-------------------------------------------------------------

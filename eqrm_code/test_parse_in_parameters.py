@@ -1068,12 +1068,12 @@ save_socloss_flag=[0]\n")
                         files_num +1, "find_set_data_py_files fail.")
 
         
-    def test_old_set_data_py_2_new_set_data_py(self):
+    def test_update_control_file(self):
         set = self.small_set_data()
         file, file_name = tempfile.mkstemp('.py', __name__+'_')
         os.close(file)
         convert_THE_PARAM_T_to_py(file_name, set)
-        old_set_data_py_2_new_set_data_py(file_name)
+        update_control_file(file_name)
         new_set = create_parameter_data(file_name)
         self.failUnlessEqual(set.csm_damping_regimes,
                              new_set.csm_damping_regimes)
