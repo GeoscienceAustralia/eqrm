@@ -20,40 +20,19 @@ from os.path import join
 run_type = "fatality" 
 is_scenario = False
 max_width = 15
-reset_seed_using_time = True
-compress_output = False
 site_tag = "java" 
 site_db_tag = "" 
 return_periods = [500, 1000, 2500]
-input_dir = r"./implementation_tests/input/java/" 
-output_dir = r"./implementation_tests/current/TS_fat01/" 
+input_dir = join('.', 'implementation_tests', 'input', 'java')
+output_dir = join('.', 'implementation_tests', 'current', 'TS_fat01')
 use_site_indexes = False
 site_indexes = [1, 1001, 2001, 3001, 4001, 5001, 6001, 7001, 8001, 9001, 10001, 11001, 12001, 13001, 14001, 15001, 16001, 17001, 18001, 19001, 20001, 21001, 22001, 23001, 24001, 25001, 26001, 27001, 28001, 29001, 30001, 31001, 32001, 33001, 34001, 35001, 36001, 37001, 38001, 39001, 40001, 41001, 42001, 43001, 44001, 45001, 46001, 47001, 48001, 49001, 50001, 51001, 52001, 53001, 54001, 55001, 56001, 57001, 58001, 59001, 60001, 61001, 62001, 63001, 64001]
-fault_source_tag = None
-zone_source_tag = None
-event_control_tag = None
 
 # Scenario input
-scenario_azimuth = None
-scenario_depth = None
-scenario_latitude = None
-scenario_longitude = None
-scenario_magnitude = None
-scenario_dip = None
-scenario_number_of_events = None
 
 # Probabilistic input
-prob_azimuth_in_zones = [None]
-prob_delta_azimuth_in_zones = [None]
-prob_min_mag_cutoff = None
-prob_number_of_mag_sample_bins = None
-prob_number_of_events_in_zones = None
-prob_number_of_events_in_faults = None
-prob_dip_in_zones = [None]
 
 # Attenuation
-atten_models = None
-atten_model_weights = None
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 2
 atten_periods = [1.0]
@@ -72,25 +51,10 @@ amp_min_factor = 0.6
 amp_max_factor = 10000
 
 # Buildings
-buildings_usage_classification = None
-buildings_set_damping_Be_to_5_percent = None
-bridges_functional_percentages = None
 
 # Capacity Spectrum Method
-csm_use_variability = None
-csm_variability_method = 3
-csm_standard_deviation = None
-csm_damping_regimes = None
-csm_damping_modify_Tav = None
-csm_damping_use_smoothing = None
-csm_hysteretic_damping = None
-csm_SDcr_tolerance_percentage = None
-csm_damping_max_iterations = None
 
 # Loss
-loss_min_pga = None
-loss_regional_cost_index_multiplier = None
-loss_aus_contents = None
 
 # Save
 save_hazard_map = False
