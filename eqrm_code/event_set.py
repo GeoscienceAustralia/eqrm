@@ -499,7 +499,7 @@ class Event_Set(object):
 
     
     def scenario_setup(self):
-        """make the event activity a vector
+        """
         
         setup event ids (for scenario simulations each id
         points to a new copy of the same event.
@@ -561,7 +561,7 @@ class Event_Set(object):
         """Get slice of this Event_Set.
 
         Returns a new Event_Set object containing the sliced data.
-        Additional attributes aren't carried over. eg event_id, activity.
+        Additional attributes aren't carried over. eg event_id.
         """
 
         # 'key' has to be an array.
@@ -626,6 +626,9 @@ class Event_Set(object):
                 % (self.check_arguments(), str(self.rupture_centroid_lat),
                    str(self.rupture_centroid_lon), str(self.Mw)))
 
+    def get_Mw(self):
+        pass
+        
     def __call__(self, *multi_multi_polygons_list):
         """
         WARNING: not tested/ used.  probably broken.
