@@ -55,8 +55,8 @@ def run_scenarios(dir, file_start='plot_', extension='.py'):
     plot_files = [x for x in plot_files if x.endswith(extension)]
     plot_files = [x for x in plot_files if 0 == string.find(x,file_start)]
     for plot_file in plot_files:
-        THE_PARAM_T = parse_in_parameters.create_parameter_data(plot_file)
-        plot_output_dir = os.path.join(THE_PARAM_T['output_dir'])
+        eqrm_flags = parse_in_parameters.create_parameter_data(plot_file)
+        plot_output_dir = os.path.join(eqrm_flags['output_dir'])
         files = os.listdir(plot_output_dir)
         demo_files = [x for x in files if x[-3:] == 'txt']
         #print "len(demo_files)", len(demo_files)

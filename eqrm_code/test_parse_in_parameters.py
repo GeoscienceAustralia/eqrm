@@ -239,7 +239,7 @@ save_socloss_flag=[1]\n")
         #pd.eqrm_data_home()
         #print "pd.get_time_user()", pd.get_time_user()
 
-    def build_instance_to_THE_PARAM_T(self):
+    def build_instance_to_eqrm_flags(self):
         set = Dummy()
         # Operation_Mode
         set.run_type = 'risk'
@@ -324,7 +324,7 @@ save_socloss_flag=[1]\n")
         return set
 
         
-    def check_THE_PARAM_T(self, TPT):
+    def check_eqrm_flags(self, TPT):
         # Check results
         self.failUnless(TPT.run_type == 'risk')
         self.failUnless(TPT.site_tag == 'newc')
@@ -403,14 +403,14 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.atten_model_weights[1] == 0.7)
 
 
-    def test_instance_to_THE_PARAM_T(self):
-        set = self.build_instance_to_THE_PARAM_T()
+    def test_instance_to_eqrm_flags(self):
+        set = self.build_instance_to_eqrm_flags()
         TPT = create_parameter_data(set)
-        self.check_THE_PARAM_T(TPT)
+        self.check_eqrm_flags(TPT)
 
 
-    def test_instance_to_THE_PARAM_T_depreciated_atts(self):
-        set = self.build_instance_to_THE_PARAM_T()
+    def test_instance_to_eqrm_flags_depreciated_atts(self):
+        set = self.build_instance_to_eqrm_flags()
         set.atten_use_variability = False
         set.amp_use_variability = False
         TPT = create_parameter_data(set)
@@ -418,26 +418,26 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.amp_variability_method == None)
 
 
-    def test_convert_THE_PARAM_T_to_py(self):
+    def test_convert_eqrm_flags_to_py(self):
 
         # turn logging WARNINGS off
         # This is to stop warning messages appearing when testing
         console_logging_level = log.console_logging_level
         log.console_logging_level = log.ERROR
         
-        set = self.build_instance_to_THE_PARAM_T()
+        set = self.build_instance_to_eqrm_flags()
         TPT = create_parameter_data(set)
 
         file, file_name = tempfile.mkstemp('.py', 'test_parse_in_para_')
         os.close(file)
         
-        convert_THE_PARAM_T_to_py(file_name, TPT)
+        convert_eqrm_flags_to_py(file_name, TPT)
         TPT = create_parameter_data(file_name)
         
         os.remove(file_name)
         os.remove(file_name[:-3]+ '.pyc')
         
-        self.check_THE_PARAM_T(TPT)
+        self.check_eqrm_flags(TPT)
 
         # turn logging back to previous levels
         log.console_logging_level = console_logging_level
@@ -527,7 +527,7 @@ save_socloss_flag=[1]\n")
         set.save_prob_structural_damage = True
 
 
-        convert_THE_PARAM_T_to_py('here.py', set)
+        convert_eqrm_flags_to_py('here.py', set)
 
         
         # need some more tests.
@@ -1039,7 +1039,7 @@ save_socloss_flag=[0]\n")
         eqrm_dir = determine_eqrm_path()
         output_base_name = join(eqrm_dir, 'Documentation',
                                 'set_data_example.py')
-        convert_THE_PARAM_T_to_py(output_base_name, para_old)
+        convert_eqrm_flags_to_py(output_base_name, para_old)
 
    
     def test_find_set_data_py_files(self):
@@ -1072,7 +1072,7 @@ save_socloss_flag=[0]\n")
         set = self.small_set_data()
         file, file_name = tempfile.mkstemp('.py', __name__+'_')
         os.close(file)
-        convert_THE_PARAM_T_to_py(file_name, set)
+        convert_eqrm_flags_to_py(file_name, set)
         update_control_file(file_name)
         new_set = create_parameter_data(file_name)
         self.failUnlessEqual(set.csm_damping_regimes,
@@ -1089,7 +1089,7 @@ save_socloss_flag=[0]\n")
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Parse_in_parameters,'test')
     
-    #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_instance_to_THE_PARAM_T')
+    #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_instance_to_eqrm_flags')
     #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_convert_par_to_py')
     runner = unittest.TextTestRunner() #verbosity=2)
     runner.run(suite)

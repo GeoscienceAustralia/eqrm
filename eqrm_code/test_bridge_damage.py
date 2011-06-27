@@ -1794,16 +1794,16 @@ class TestBridgeDamage(unittest.TestCase):
                                    1.7544,  1.9298,  2.1053, 2.2807,  2.4561,
                                    2.6316,  2.807,   2.9825, 3.1579,  3.3333 ])
 
-        # fudge up a THE_PARAM_T object, anything with required attributes is OK
+        # fudge up a eqrm_flags object, anything with required attributes is OK
         # (run test adding required attributes until no errors)
         fp = np.array([20, 30, 40, 50, 60, 70, 80])
-        THE_PARAM_T = DataObj(atten_periods=atten_periods,
+        eqrm_flags = DataObj(atten_periods=atten_periods,
                               bridges_functional_percentages=fp)
         pseudo_event_set_Mw = None		# not needed for bridges
        
         # now call calc_total_loss, check results 
         (total_loss, damage,
-             days_to_complete) = dm.calc_total_loss(sites, SA, THE_PARAM_T,
+             days_to_complete) = dm.calc_total_loss(sites, SA, eqrm_flags,
                                                     pseudo_event_set_Mw,
                                                     bridge_SA_indices)
         (structure_state, non_structural_state,

@@ -16,7 +16,7 @@ from scipy import allclose, isfinite, array, newaxis, zeros, ndarray, \
      asarray, where, concatenate, allclose, reshape, ones
 
 def do_collapse_logic_tree(data, event_num, weights,
-                           THE_PARAM_T, use_C=True):
+                           eqrm_flags, use_C=True):
     """
     Collapse data, such as when several events are used to repressent
     one event.
@@ -26,7 +26,7 @@ def do_collapse_logic_tree(data, event_num, weights,
     """
     if len(data.shape) >= 4:
         # Assume the extra dimension is the ground motion model
-        if THE_PARAM_T.atten_collapse_Sa_of_atten_models is True:
+        if eqrm_flags.atten_collapse_Sa_of_atten_models is True:
             new_data = _collapse_att_model_dimension(data,
                                                      weights)
         else:       
@@ -37,7 +37,7 @@ def do_collapse_logic_tree(data, event_num, weights,
         # if there is only one attenuation model.
         no_attn_collapse = (
             (len(weights) == 1) or
-            THE_PARAM_T.atten_collapse_Sa_of_atten_models is False)
+            eqrm_flags.atten_collapse_Sa_of_atten_models is False)
         
         if no_attn_collapse:        
             new_data = data 

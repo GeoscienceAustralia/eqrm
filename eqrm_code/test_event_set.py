@@ -145,115 +145,115 @@ class Test_Event_Set(unittest.TestCase):
         os.remove(file_name)
 
     def test_scenario_event(self):
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.scenario_latitude = -32.95
-        THE_PARAM_T.scenario_longitude = 151.61
-        THE_PARAM_T.scenario_azimuth = 340
-        THE_PARAM_T.dip = 35
-        THE_PARAM_T.scenario_magnitude = 8
-        THE_PARAM_T.max_width = 15
-        THE_PARAM_T.scenario_depth = 11.5
-        THE_PARAM_T.scenario_number_of_events = 1
+        eqrm_flags = Dummy()
+        eqrm_flags.scenario_latitude = -32.95
+        eqrm_flags.scenario_longitude = 151.61
+        eqrm_flags.scenario_azimuth = 340
+        eqrm_flags.dip = 35
+        eqrm_flags.scenario_magnitude = 8
+        eqrm_flags.max_width = 15
+        eqrm_flags.scenario_depth = 11.5
+        eqrm_flags.scenario_number_of_events = 1
         
         event_set = Event_Set.create_scenario_events(
-            rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
-            rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
-            azimuth=[THE_PARAM_T.scenario_azimuth],
-            dip=[THE_PARAM_T.dip],
-            Mw=[THE_PARAM_T.scenario_magnitude],
-            fault_width=THE_PARAM_T.max_width,
-            depth=[THE_PARAM_T.scenario_depth],
-            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
+            rupture_centroid_lat=[eqrm_flags.scenario_latitude],
+            rupture_centroid_lon=[eqrm_flags.scenario_longitude],
+            azimuth=[eqrm_flags.scenario_azimuth],
+            dip=[eqrm_flags.dip],
+            Mw=[eqrm_flags.scenario_magnitude],
+            fault_width=eqrm_flags.max_width,
+            depth=[eqrm_flags.scenario_depth],
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
 
         #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
-        answer = array(THE_PARAM_T.scenario_latitude)
+        answer = array(eqrm_flags.scenario_latitude)
         self.assert_(allclose(event_set.rupture_centroid_lat, answer))
         
-        answer = array(THE_PARAM_T.scenario_longitude)
+        answer = array(eqrm_flags.scenario_longitude)
         self.assert_(allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array(THE_PARAM_T.scenario_azimuth)
+        answer = array(eqrm_flags.scenario_azimuth)
         self.assert_(allclose(event_set.azimuth, answer))
         
-        answer = array(THE_PARAM_T.dip)
+        answer = array(eqrm_flags.dip)
         self.assert_(allclose(event_set.dip, answer))
         
-        answer = array(THE_PARAM_T.scenario_magnitude)
+        answer = array(eqrm_flags.scenario_magnitude)
         self.assert_(allclose(event_set.Mw, answer))
         
-        answer = array(THE_PARAM_T.max_width)
+        answer = array(eqrm_flags.max_width)
         self.assert_(allclose(event_set.fault_width, answer))
         
-        answer = array(THE_PARAM_T.scenario_depth)
+        answer = array(eqrm_flags.scenario_depth)
         self.assert_(allclose(event_set.depth, answer))
         
-        self.assert_(THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
+        self.assert_(eqrm_flags.scenario_number_of_events, len(event_set.Mw))
 
         area = array(conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.scenario_magnitude))
+            eqrm_flags.scenario_magnitude))
         self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip,
-            THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
+            eqrm_flags.dip,
+            eqrm_flags.scenario_magnitude, area, eqrm_flags.max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
         self.assert_(allclose(event_set.length, answer))
   
     def test_scenario_event_II(self):
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.scenario_latitude = [-30., -32.]
-        THE_PARAM_T.scenario_longitude = [150., -151.]
-        THE_PARAM_T.scenario_azimuth = [340, 330]
-        THE_PARAM_T.dip = [37, 30]
-        THE_PARAM_T.scenario_magnitude = [8, 7.5]
-        THE_PARAM_T.max_width = [15, 7]
-        THE_PARAM_T.scenario_depth = [11.5, 11.0]
-        THE_PARAM_T.scenario_number_of_events = 1 # If this is 2 it fails
+        eqrm_flags = Dummy()
+        eqrm_flags.scenario_latitude = [-30., -32.]
+        eqrm_flags.scenario_longitude = [150., -151.]
+        eqrm_flags.scenario_azimuth = [340, 330]
+        eqrm_flags.dip = [37, 30]
+        eqrm_flags.scenario_magnitude = [8, 7.5]
+        eqrm_flags.max_width = [15, 7]
+        eqrm_flags.scenario_depth = [11.5, 11.0]
+        eqrm_flags.scenario_number_of_events = 1 # If this is 2 it fails
         
         event_set = Event_Set.create_scenario_events(
-            rupture_centroid_lat=THE_PARAM_T.scenario_latitude,
-            rupture_centroid_lon=THE_PARAM_T.scenario_longitude,
-            azimuth=THE_PARAM_T.scenario_azimuth,
-            dip=THE_PARAM_T.dip,
-            Mw=THE_PARAM_T.scenario_magnitude,
-            fault_width=THE_PARAM_T.max_width,
-            depth=THE_PARAM_T.scenario_depth,
-            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
+            rupture_centroid_lat=eqrm_flags.scenario_latitude,
+            rupture_centroid_lon=eqrm_flags.scenario_longitude,
+            azimuth=eqrm_flags.scenario_azimuth,
+            dip=eqrm_flags.dip,
+            Mw=eqrm_flags.scenario_magnitude,
+            fault_width=eqrm_flags.max_width,
+            depth=eqrm_flags.scenario_depth,
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
     
-        answer = array(THE_PARAM_T.scenario_latitude)
+        answer = array(eqrm_flags.scenario_latitude)
         self.assert_(allclose(event_set.rupture_centroid_lat, answer))
         
-        answer = array(THE_PARAM_T.scenario_longitude)
+        answer = array(eqrm_flags.scenario_longitude)
         self.assert_(allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array(THE_PARAM_T.scenario_azimuth)
+        answer = array(eqrm_flags.scenario_azimuth)
         self.assert_(allclose(event_set.azimuth, answer))
         
-        answer = array(THE_PARAM_T.dip)
+        answer = array(eqrm_flags.dip)
         self.assert_(allclose(event_set.dip, answer))
         
-        answer = array(THE_PARAM_T.scenario_magnitude)
+        answer = array(eqrm_flags.scenario_magnitude)
         self.assert_(allclose(event_set.Mw, answer))
         
-        answer = array(THE_PARAM_T.max_width)
+        answer = array(eqrm_flags.max_width)
         self.assert_(allclose(event_set.fault_width, answer))
         
-        answer = array(THE_PARAM_T.scenario_depth)
+        answer = array(eqrm_flags.scenario_depth)
         self.assert_(allclose(event_set.depth, answer))
         
-        self.assert_(THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
+        self.assert_(eqrm_flags.scenario_number_of_events, len(event_set.Mw))
 
         area = array((conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.scenario_magnitude[0]),
+            eqrm_flags.scenario_magnitude[0]),
             conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.scenario_magnitude[1])))
+            eqrm_flags.scenario_magnitude[1])))
         self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude, area,
-            THE_PARAM_T.max_width ))
+            eqrm_flags.dip, eqrm_flags.scenario_magnitude, area,
+            eqrm_flags.max_width ))
         self.assert_(allclose(event_set.width, width))
         
         answer = area/width 
@@ -261,64 +261,64 @@ class Test_Event_Set(unittest.TestCase):
 
     def test_scenario_event_III(self):
         
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.scenario_latitude = -32.95
-        THE_PARAM_T.scenario_longitude = 151.61
-        THE_PARAM_T.scenario_azimuth = 340
-        THE_PARAM_T.dip = 35
-        THE_PARAM_T.scenario_magnitude = 8
-        THE_PARAM_T.max_width = 15
-        THE_PARAM_T.scenario_depth = 11.5
-        THE_PARAM_T.scenario_number_of_events = 2
+        eqrm_flags = Dummy()
+        eqrm_flags.scenario_latitude = -32.95
+        eqrm_flags.scenario_longitude = 151.61
+        eqrm_flags.scenario_azimuth = 340
+        eqrm_flags.dip = 35
+        eqrm_flags.scenario_magnitude = 8
+        eqrm_flags.max_width = 15
+        eqrm_flags.scenario_depth = 11.5
+        eqrm_flags.scenario_number_of_events = 2
         
         event_set = Event_Set.create_scenario_events(
-            rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
-            rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
-            azimuth=[THE_PARAM_T.scenario_azimuth],
-            dip=[THE_PARAM_T.dip],
-            Mw=[THE_PARAM_T.scenario_magnitude],
-            fault_width=THE_PARAM_T.max_width,
-            depth=[THE_PARAM_T.scenario_depth],
-            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
+            rupture_centroid_lat=[eqrm_flags.scenario_latitude],
+            rupture_centroid_lon=[eqrm_flags.scenario_longitude],
+            azimuth=[eqrm_flags.scenario_azimuth],
+            dip=[eqrm_flags.dip],
+            Mw=[eqrm_flags.scenario_magnitude],
+            fault_width=eqrm_flags.max_width,
+            depth=[eqrm_flags.scenario_depth],
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
 
         #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
-        answer = array((THE_PARAM_T.scenario_latitude,
-                        THE_PARAM_T.scenario_latitude))
+        answer = array((eqrm_flags.scenario_latitude,
+                        eqrm_flags.scenario_latitude))
         self.assert_ (allclose(event_set.rupture_centroid_lat, answer))
         
-        answer = array((THE_PARAM_T.scenario_longitude,
-                        THE_PARAM_T.scenario_longitude))
+        answer = array((eqrm_flags.scenario_longitude,
+                        eqrm_flags.scenario_longitude))
         self.assert_ (allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array([THE_PARAM_T.scenario_azimuth,
-                        THE_PARAM_T.scenario_azimuth])
+        answer = array([eqrm_flags.scenario_azimuth,
+                        eqrm_flags.scenario_azimuth])
         self.assert_ (allclose(event_set.azimuth, answer))
         
-        answer = array([THE_PARAM_T.dip, THE_PARAM_T.dip])
+        answer = array([eqrm_flags.dip, eqrm_flags.dip])
         ###print "event_set.dip", event_set.dip
         self.assert_ (allclose(event_set.dip, answer))
         
-        answer = array(THE_PARAM_T.scenario_magnitude)
+        answer = array(eqrm_flags.scenario_magnitude)
         #print "answer", answer
         #print "event_set.Mw", event_set.Mw
         # in allclose [8 8] == 8
         self.assert_ (allclose(event_set.Mw, answer))
         
-        answer = array(THE_PARAM_T.max_width)
+        answer = array(eqrm_flags.max_width)
         self.assert_ (allclose(event_set.fault_width, answer))
         
-        answer = array(THE_PARAM_T.scenario_depth)
+        answer = array(eqrm_flags.scenario_depth)
         self.assert_ (allclose(event_set.depth, answer))
         
-        self.assert_ (THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
+        self.assert_ (eqrm_flags.scenario_number_of_events, len(event_set.Mw))
 
         area = array(conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.scenario_magnitude))
+            eqrm_flags.scenario_magnitude))
         self.assert_ (allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude,
-            area, THE_PARAM_T.max_width ))
+            eqrm_flags.dip, eqrm_flags.scenario_magnitude,
+            area, eqrm_flags.max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
@@ -326,43 +326,43 @@ class Test_Event_Set(unittest.TestCase):
 
 
         self.assert_ (len(event_set.length)== \
-                      THE_PARAM_T.scenario_number_of_events)
+                      eqrm_flags.scenario_number_of_events)
         
     def test_scenario_event_4(self):
         
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.scenario_latitude = [-30.]
-        THE_PARAM_T.scenario_longitude = [150.]
-        THE_PARAM_T.scenario_azimuth = [0]
-        THE_PARAM_T.dip = [45]
-        THE_PARAM_T.scenario_magnitude = [6.02]
-        THE_PARAM_T.max_width = [5]
-        THE_PARAM_T.scenario_depth = [7]
-        THE_PARAM_T.scenario_number_of_events = 1 # If this is 2 it fails
+        eqrm_flags = Dummy()
+        eqrm_flags.scenario_latitude = [-30.]
+        eqrm_flags.scenario_longitude = [150.]
+        eqrm_flags.scenario_azimuth = [0]
+        eqrm_flags.dip = [45]
+        eqrm_flags.scenario_magnitude = [6.02]
+        eqrm_flags.max_width = [5]
+        eqrm_flags.scenario_depth = [7]
+        eqrm_flags.scenario_number_of_events = 1 # If this is 2 it fails
         
         event_set = Event_Set.create_scenario_events(
-            rupture_centroid_lat=THE_PARAM_T.scenario_latitude,
-            rupture_centroid_lon=THE_PARAM_T.scenario_longitude,
-            azimuth=THE_PARAM_T.scenario_azimuth,
-            dip=THE_PARAM_T.dip,
-            Mw=THE_PARAM_T.scenario_magnitude,
-            fault_width=THE_PARAM_T.max_width,
-            depth=THE_PARAM_T.scenario_depth,
-            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
+            rupture_centroid_lat=eqrm_flags.scenario_latitude,
+            rupture_centroid_lon=eqrm_flags.scenario_longitude,
+            azimuth=eqrm_flags.scenario_azimuth,
+            dip=eqrm_flags.dip,
+            Mw=eqrm_flags.scenario_magnitude,
+            fault_width=eqrm_flags.max_width,
+            depth=eqrm_flags.scenario_depth,
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
 
     
-        answer = array(THE_PARAM_T.max_width)
+        answer = array(eqrm_flags.max_width)
         self.assert_ (allclose(event_set.width, answer))
         
         area = array((conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.scenario_magnitude[0])))
+            eqrm_flags.scenario_magnitude[0])))
         self.assert_ (allclose(100., area))
         self.assert_ (allclose(event_set.area, area))
 
         width = array(
             conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip, THE_PARAM_T.scenario_magnitude,
-            area, THE_PARAM_T.max_width ))
+            eqrm_flags.dip, eqrm_flags.scenario_magnitude,
+            area, eqrm_flags.max_width ))
         self.assert_ (allclose(5., width))
         self.assert_ (allclose(event_set.width, width))
         
@@ -409,67 +409,67 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_ (int(results[1]) == 1)
         results = repr_list[2].split(':')
         self.assert_ (float(results[1].strip('[]')) == \
-                      THE_PARAM_T.scenario_latitude[0])
+                      eqrm_flags.scenario_latitude[0])
         results = repr_list[3].split(':')
         self.assert_ (float(results[1].strip('[]')) == \
-                      THE_PARAM_T.scenario_longitude[0])
+                      eqrm_flags.scenario_longitude[0])
         results = repr_list[4].split(':')
         self.assert_ (float(results[1].strip('[]')) == \
-                      THE_PARAM_T.scenario_magnitude [0])
+                      eqrm_flags.scenario_magnitude [0])
         self.assert_ (len(event_set) == 1)
         
         
     def test_scenario_event_max_width(self):
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.scenario_latitude = -32.95
-        THE_PARAM_T.scenario_longitude = 151.61
-        THE_PARAM_T.scenario_azimuth = 340
-        THE_PARAM_T.dip = 35
-        THE_PARAM_T.scenario_magnitude = 8
-        THE_PARAM_T.max_width = None
-        THE_PARAM_T.scenario_depth = 11.5
-        THE_PARAM_T.scenario_number_of_events = 1
+        eqrm_flags = Dummy()
+        eqrm_flags.scenario_latitude = -32.95
+        eqrm_flags.scenario_longitude = 151.61
+        eqrm_flags.scenario_azimuth = 340
+        eqrm_flags.dip = 35
+        eqrm_flags.scenario_magnitude = 8
+        eqrm_flags.max_width = None
+        eqrm_flags.scenario_depth = 11.5
+        eqrm_flags.scenario_number_of_events = 1
         
         event_set = Event_Set.create_scenario_events(
-            rupture_centroid_lat=[THE_PARAM_T.scenario_latitude],
-            rupture_centroid_lon=[THE_PARAM_T.scenario_longitude],
-            azimuth=[THE_PARAM_T.scenario_azimuth],
-            dip=[THE_PARAM_T.dip],
-            Mw=[THE_PARAM_T.scenario_magnitude],
-            fault_width=THE_PARAM_T.max_width,
-            depth=[THE_PARAM_T.scenario_depth],
-            scenario_number_of_events=THE_PARAM_T.scenario_number_of_events)
+            rupture_centroid_lat=[eqrm_flags.scenario_latitude],
+            rupture_centroid_lon=[eqrm_flags.scenario_longitude],
+            azimuth=[eqrm_flags.scenario_azimuth],
+            dip=[eqrm_flags.dip],
+            Mw=[eqrm_flags.scenario_magnitude],
+            fault_width=eqrm_flags.max_width,
+            depth=[eqrm_flags.scenario_depth],
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
 
         #print "event_set.rupture_centroid_lat", event_set.rupture_centroid_lat
-        answer = array(THE_PARAM_T.scenario_latitude)
+        answer = array(eqrm_flags.scenario_latitude)
         self.assert_(allclose(event_set.rupture_centroid_lat, answer))
         
-        answer = array(THE_PARAM_T.scenario_longitude)
+        answer = array(eqrm_flags.scenario_longitude)
         self.assert_(allclose(event_set.rupture_centroid_lon, answer))
         
-        answer = array(THE_PARAM_T.scenario_azimuth)
+        answer = array(eqrm_flags.scenario_azimuth)
         self.assert_(allclose(event_set.azimuth, answer))
         
-        answer = array(THE_PARAM_T.dip)
+        answer = array(eqrm_flags.dip)
         self.assert_(allclose(event_set.dip, answer))
         
-        answer = array(THE_PARAM_T.scenario_magnitude)
+        answer = array(eqrm_flags.scenario_magnitude)
         self.assert_(allclose(event_set.Mw, answer))
         
-        self.assertEqual(event_set.fault_width, THE_PARAM_T.max_width)
+        self.assertEqual(event_set.fault_width, eqrm_flags.max_width)
         
-        answer = array(THE_PARAM_T.scenario_depth)
+        answer = array(eqrm_flags.scenario_depth)
         self.assert_(allclose(event_set.depth, answer))
         
-        self.assert_(THE_PARAM_T.scenario_number_of_events, len(event_set.Mw))
+        self.assert_(eqrm_flags.scenario_number_of_events, len(event_set.Mw))
 
         area = array(conversions.modified_Wells_and_Coppersmith_94_area(
-            THE_PARAM_T.scenario_magnitude))
+            eqrm_flags.scenario_magnitude))
         self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
-            THE_PARAM_T.dip,
-            THE_PARAM_T.scenario_magnitude, area, THE_PARAM_T.max_width ))
+            eqrm_flags.dip,
+            eqrm_flags.scenario_magnitude, area, eqrm_flags.max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
