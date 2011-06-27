@@ -889,6 +889,7 @@ def calc_and_save_SA(THE_PARAM_T,
     num_periods = len(THE_PARAM_T.atten_periods)
     
     # Build some arrays to save into.
+    # NUM_SITES IS 1
     coll_rock_SA_all_events = zeros(
         (num_spawn, num_gmm_after_collapsing,
          num_sites, num_events, num_periods),
