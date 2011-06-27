@@ -32,22 +32,22 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 0, 0]
         event_activity = [ -0.33333333, -0.33333333,
                                                -0.33333333]
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.atten_models = ['Toro_1997_midcontinent',
+        eqrm_flags = Dummy()
+        eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
-        THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
+        eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models = False
-        THE_PARAM_T.src_eps_switch = 1
-        THE_PARAM_T.atten_use_variability = True  
-        THE_PARAM_T.atten_variability_method = 2 
-        THE_PARAM_T.nsamples = 5
-        #THE_PARAM_T. = 
+        eqrm_flags.atten_collapse_Sa_of_atten_models = False
+        eqrm_flags.src_eps_switch = 1
+        eqrm_flags.atten_use_variability = True  
+        eqrm_flags.atten_variability_method = 2 
+        eqrm_flags.nsamples = 5
+        #eqrm_flags. = 
         new_total_building_loss, _, _ = do_collapse_logic_tree( \
             total_building_loss,
             index,
             event_activity,
-            THE_PARAM_T)
+            eqrm_flags)
         self.assert_ (allclose(new_total_building_loss, total_building_loss))
 
         
@@ -91,16 +91,16 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1]
         event_activity = array([ 0.33333333, 0.33333333, 0.33333333,
                                  0.33333333, 0.33333333, 0.33333333])
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.atten_models = ['Toro_1997_midcontinent',
+        eqrm_flags = Dummy()
+        eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
-        THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
+        eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
-        THE_PARAM_T.src_eps_switch = 0
-        THE_PARAM_T.atten_use_variability = True  
-        THE_PARAM_T.atten_variability_method = 2 
-        THE_PARAM_T.nsamples = 5
+        eqrm_flags.atten_collapse_Sa_of_atten_models = True
+        eqrm_flags.src_eps_switch = 0
+        eqrm_flags.atten_use_variability = True  
+        eqrm_flags.atten_variability_method = 2 
+        eqrm_flags.nsamples = 5
 
         new_soil_SA = [[[0.70820126, 1.48997287, 1.20191183, 0.79781543,
                          0.52165442, 0.39265408
@@ -116,7 +116,7 @@ class Test_Exceedance(unittest.TestCase):
             soil_SA,
             index,
             event_activity,
-            THE_PARAM_T)
+            eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
         
     def test_exceedance_curveIII(self):
@@ -160,16 +160,16 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1]
         event_activity = [ 0.33333333, 0.33333333, 0.33333333,
                            0.33333333, 0.33333333, 0.33333333]
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.atten_models = ['Gaull_1990_WA', 'Toro_1997_midcontinent',
+        eqrm_flags = Dummy()
+        eqrm_flags.atten_models = ['Gaull_1990_WA', 'Toro_1997_midcontinent',
                                    'Atkinson_Boore_97']
-        THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
+        eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
-        THE_PARAM_T.src_eps_switch = 0
-        THE_PARAM_T.atten_use_variability = True  
-        THE_PARAM_T.atten_variability_method = 2 
-        THE_PARAM_T.nsamples = 5
+        eqrm_flags.atten_collapse_Sa_of_atten_models = True
+        eqrm_flags.src_eps_switch = 0
+        eqrm_flags.atten_use_variability = True  
+        eqrm_flags.atten_variability_method = 2 
+        eqrm_flags.nsamples = 5
 
         new_soil_SA = [[[0.70820126, 1.48997287, 1.20191183, 0.79781543,
                          0.52165442, 0.39265408
@@ -185,7 +185,7 @@ class Test_Exceedance(unittest.TestCase):
             soil_SA,
             index,
             event_activity,
-            THE_PARAM_T)
+            eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
         
     def test_exceedance_curve4(self):
@@ -204,17 +204,17 @@ class Test_Exceedance(unittest.TestCase):
         # The length is used, not the values
         event_activity = [ 0.33333333, 0.33333333, 0.33333333,
                            0.33333333, 0.33333333, 0.33333333]
-        THE_PARAM_T = Dummy()
+        eqrm_flags = Dummy()
         
-        THE_PARAM_T.atten_models = ['Toro_1997_midcontinent',
+        eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
-        THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
+        eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
-        THE_PARAM_T.src_eps_switch = 0
-        THE_PARAM_T.atten_use_variability = True  
-        THE_PARAM_T.atten_variability_method = 2 
-        THE_PARAM_T.nsamples = 5
+        eqrm_flags.atten_collapse_Sa_of_atten_models = True
+        eqrm_flags.src_eps_switch = 0
+        eqrm_flags.atten_use_variability = True  
+        eqrm_flags.atten_variability_method = 2 
+        eqrm_flags.nsamples = 5
 
         new_soil_SA = [[[0.70820126]
 , [ 0.61732583]]]
@@ -223,7 +223,7 @@ class Test_Exceedance(unittest.TestCase):
             soil_SA,
             index,
             event_activity,
-            THE_PARAM_T)
+            eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
         
     def test_exceedance_curve5(self):
@@ -239,16 +239,16 @@ class Test_Exceedance(unittest.TestCase):
         # The length is used, not the values
         event_activity = [ 0.33333333, 0.33333333, 0.33333333,
                            0.33333333, 0.33333333, 0.33333333]
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.atten_models = ['Toro_1997_midcontinent',
+        eqrm_flags = Dummy()
+        eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
-        THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
+        eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
-        THE_PARAM_T.src_eps_switch = 0
-        THE_PARAM_T.atten_use_variability = True  
-        THE_PARAM_T.atten_variability_method = 2 
-        THE_PARAM_T.nsamples = 5
+        eqrm_flags.atten_collapse_Sa_of_atten_models = True
+        eqrm_flags.src_eps_switch = 0
+        eqrm_flags.atten_use_variability = True  
+        eqrm_flags.atten_variability_method = 2 
+        eqrm_flags.nsamples = 5
 
         new_soil_SA = [[[2]
                         , [ 70]]]
@@ -256,7 +256,7 @@ class Test_Exceedance(unittest.TestCase):
             soil_SA,
             index,
             event_activity,
-            THE_PARAM_T)
+            eqrm_flags)
         #print "results", results
         self.assert_ (allclose(results, new_soil_SA))
         
@@ -272,17 +272,17 @@ class Test_Exceedance(unittest.TestCase):
         event_activity = [10., 10., 1, 1., .1, .1]
 
         
-        THE_PARAM_T = Dummy()
+        eqrm_flags = Dummy()
         
-        THE_PARAM_T.atten_models = ['Gaull_1990_WA', 'Toro_1997_midcontinent',
+        eqrm_flags.atten_models = ['Gaull_1990_WA', 'Toro_1997_midcontinent',
                                    'Atkinson_Boore_97']
-        THE_PARAM_T.atten_model_weights = [10., 1.,
+        eqrm_flags.atten_model_weights = [10., 1.,
                                                0.1]
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
-        THE_PARAM_T.src_eps_switch = 0
-        THE_PARAM_T.atten_use_variability = True  
-        THE_PARAM_T.atten_variability_method = 2 
-        THE_PARAM_T.nsamples = 5
+        eqrm_flags.atten_collapse_Sa_of_atten_models = True
+        eqrm_flags.src_eps_switch = 0
+        eqrm_flags.atten_use_variability = True  
+        eqrm_flags.atten_variability_method = 2 
+        eqrm_flags.nsamples = 5
 
         new_soil_SA = [[[13.5]
                         , [ 24.6]]]
@@ -290,7 +290,7 @@ class Test_Exceedance(unittest.TestCase):
             soil_SA,
             index,
             event_activity,
-            THE_PARAM_T)
+            eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
         
     def test_exceedance_curve7(self):
@@ -306,18 +306,18 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1] # The event id
         event_activity = [-999, -999, -9993, -99,-99,-99]
 
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.atten_model_weights = [1., 0., 0.1]
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models = False
+        eqrm_flags = Dummy()
+        eqrm_flags.atten_model_weights = [1., 0., 0.1]
+        eqrm_flags.atten_collapse_Sa_of_atten_models = False
         
-        THE_PARAM_T.atten_models = ['Toro_1997_midcontinent',
+        eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
         
         #  don't collapse.
-        THE_PARAM_T.src_eps_switch = 0
-        THE_PARAM_T.atten_use_variability = True  
-        THE_PARAM_T.atten_variability_method = 2 
-        THE_PARAM_T.nsamples = 5
+        eqrm_flags.src_eps_switch = 0
+        eqrm_flags.atten_use_variability = True  
+        eqrm_flags.atten_variability_method = 2 
+        eqrm_flags.nsamples = 5
 
         new_soil_SA = [[[5.6]
                         , [ 12.7]]]
@@ -325,7 +325,7 @@ class Test_Exceedance(unittest.TestCase):
             soil_SA,
             index,
             event_activity,
-            THE_PARAM_T)
+            eqrm_flags)
         #print "results", results
         self.assert_ (allclose(results, soil_SA))
 
@@ -341,18 +341,18 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1] # The event id
         event_activity = [0.33333, 0.33333, 0.33333, 0.33333, 0.33333, 0.33333]
 
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.atten_models = ['Toro_1997_midcontinent',
+        eqrm_flags = Dummy()
+        eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
-        THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
+        eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
+        eqrm_flags.atten_collapse_Sa_of_atten_models = True
         
         #  don't collapse.
-        THE_PARAM_T.src_eps_switch = 0
-        THE_PARAM_T.atten_use_variability = True  
-        THE_PARAM_T.atten_variability_method = 2 
-        THE_PARAM_T.nsamples = 5
+        eqrm_flags.src_eps_switch = 0
+        eqrm_flags.atten_use_variability = True  
+        eqrm_flags.atten_variability_method = 2 
+        eqrm_flags.nsamples = 5
 
         new_soil_SA = [[[2.]
                         , [ 100]]]
@@ -360,7 +360,7 @@ class Test_Exceedance(unittest.TestCase):
             soil_SA,
             index,
             event_activity,
-            THE_PARAM_T)
+            eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
 
         
@@ -405,16 +405,16 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1]
         event_activity = [ 0.33333333, 0.33333333, 0.33333333,
                            0.33333333, 0.33333333, 0.33333333]
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.atten_models = ['Toro_1997_midcontinent',
+        eqrm_flags = Dummy()
+        eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
-        THE_PARAM_T.atten_model_weights = [0.33333333, 0.33333333,
+        eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
                                                0.33333333]
-        THE_PARAM_T.atten_collapse_Sa_of_atten_models = True
-        THE_PARAM_T.src_eps_switch = 0
-        THE_PARAM_T.atten_use_variability = True  
-        THE_PARAM_T.atten_variability_method = 2 
-        THE_PARAM_T.nsamples = 5
+        eqrm_flags.atten_collapse_Sa_of_atten_models = True
+        eqrm_flags.src_eps_switch = 0
+        eqrm_flags.atten_use_variability = True  
+        eqrm_flags.atten_variability_method = 2 
+        eqrm_flags.nsamples = 5
         
         new_soil_SA = [[[0.70820126, 1.48997287, 1.20191183, 0.79781543,
                          0.52165442, 0.39265408
@@ -430,7 +430,7 @@ class Test_Exceedance(unittest.TestCase):
             soil_SA,
             index,
             event_activity,
-            THE_PARAM_T, use_C=False)
+            eqrm_flags, use_C=False)
         self.assert_ (allclose(results, new_soil_SA))
 
     def test_hzd_do_value(self):

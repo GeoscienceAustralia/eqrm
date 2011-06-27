@@ -132,7 +132,7 @@ class Test_damage_model(unittest.TestCase):
                                     BCAP_PARAMS_T.('kappa'),  ...
                                     BCAP_PARAMS_T.('DyV'), ...
                                     BCAP_PARAMS_T.('AyV'), ...
-                                    THE_PARAM_T.('csm_hysteretic_damping'), ...
+                                    eqrm_flags.('csm_hysteretic_damping'), ...
                                     SDnew,                 ...
                                     SAnew,                 ...
                                     SAcapNew  );'''
@@ -485,28 +485,28 @@ class Test_damage_model(unittest.TestCase):
                      0.00144737, 0.00129929, 0.00117312, 0.00105988]]])
         event_set = array([6.0201519, 6.0201519, 6.0201519])
 
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.csm_variability_method = 3
-        THE_PARAM_T.atten_periods = array([0., 0.17544,0.35088, 0.52632,
+        eqrm_flags = Dummy()
+        eqrm_flags.csm_variability_method = 3
+        eqrm_flags.atten_periods = array([0., 0.17544,0.35088, 0.52632,
                                            0.70175, 0.87719, 1.0526, 1.2281,
                                            1.4035, 1.5789, 1.7544, 1.9298,
                                            2.1053, 2.2807, 2.4561, 2.6316,
                                            2.807,  2.9825, 3.1579, 3.3333 ])
-        THE_PARAM_T.csm_use_variability = True
-        THE_PARAM_T.csm_standard_deviation = 0.3
-        THE_PARAM_T.csm_damping_regimes = CSM_DAMPING_REGIMES_USE_ALL
-        THE_PARAM_T.csm_damping_modify_Tav = CSM_DAMPING_MODIFY_TAV
-        THE_PARAM_T.csm_damping_use_smoothing = CSM_DAMPING_USE_SMOOTHING
-        THE_PARAM_T.csm_SDcr_tolerance_percentage = 1
-        THE_PARAM_T.csm_damping_max_iterations = 7
-        THE_PARAM_T.csm_hysteretic_damping = 'Error'
-        THE_PARAM_T.bridges_functional_percentages = None
-        THE_PARAM_T.atten_override_RSA_shape = None
-        THE_PARAM_T.atten_pga_scaling_cutoff = False
-        THE_PARAM_T.atten_cutoff_max_spectral_displacement = False
-        THE_PARAM_T.loss_min_pga = 0.05
-        THE_PARAM_T.loss_regional_cost_index_multiplier = 1.4516
-        THE_PARAM_T.loss_aus_contents = 0
+        eqrm_flags.csm_use_variability = True
+        eqrm_flags.csm_standard_deviation = 0.3
+        eqrm_flags.csm_damping_regimes = CSM_DAMPING_REGIMES_USE_ALL
+        eqrm_flags.csm_damping_modify_Tav = CSM_DAMPING_MODIFY_TAV
+        eqrm_flags.csm_damping_use_smoothing = CSM_DAMPING_USE_SMOOTHING
+        eqrm_flags.csm_SDcr_tolerance_percentage = 1
+        eqrm_flags.csm_damping_max_iterations = 7
+        eqrm_flags.csm_hysteretic_damping = 'Error'
+        eqrm_flags.bridges_functional_percentages = None
+        eqrm_flags.atten_override_RSA_shape = None
+        eqrm_flags.atten_pga_scaling_cutoff = False
+        eqrm_flags.atten_cutoff_max_spectral_displacement = False
+        eqrm_flags.loss_min_pga = 0.05
+        eqrm_flags.loss_regional_cost_index_multiplier = 1.4516
+        eqrm_flags.loss_aus_contents = 0
 
         building_parameters = {'residential_drift_threshold':
                                    array([[21.9456, 43.8912,
@@ -563,7 +563,7 @@ class Test_damage_model(unittest.TestCase):
         bridge_sa_indices = array((0,1))
 
         reset_seed(True)
-        (total_loss, _, _) = calc_total_loss(sites, SA, THE_PARAM_T, event_set,
+        (total_loss, _, _) = calc_total_loss(sites, SA, eqrm_flags, event_set,
                                              bridge_sa_indices)
 
         total_loss_windows = (array([[5.56013748, 0.00899564, 0.]]),

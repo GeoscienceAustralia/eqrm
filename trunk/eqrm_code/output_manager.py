@@ -35,7 +35,7 @@ class myGzipFile(GzipFile):
     def __init__(self,name,mode='r'):
         GzipFile.__init__(self,name+'.gz',mode)
     
-def save_hazard(soil_amp,THE_PARAM_T,
+def save_hazard(soil_amp,eqrm_flags,
                 hazard,sites=None,compress=False,
                 parallel_tag=None, write_title=True):
     """
@@ -61,7 +61,7 @@ def save_hazard(soil_amp,THE_PARAM_T,
         raise IOError("soil_amp must be True or False")  
     base_names = []
     if sites is not None:
-        file_name = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+        file_name = save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
                    sites, compress, parallel_tag, write_title)
         base_names.append(file_name)
     if compress:
@@ -70,14 +70,14 @@ def save_hazard(soil_amp,THE_PARAM_T,
         open = file
     if parallel_tag is None:
         parallel_tag = '' 
-    for i in range(len(THE_PARAM_T.return_periods)):
-        rp=str(THE_PARAM_T.return_periods[i])
+    for i in range(len(eqrm_flags.return_periods)):
+        rp=str(eqrm_flags.return_periods[i])
         if rp[-2:-1] == '.':
             # get rid of the . if it is the second last character.
             # Why?
             rp = rp[:-2] + rp[-1]
-        base_name = THE_PARAM_T.output_dir + get_hazard_file_name(
-            THE_PARAM_T.site_tag, hazard_name, rp, EXTENSION)
+        base_name = eqrm_flags.output_dir + get_hazard_file_name(
+            eqrm_flags.site_tag, hazard_name, rp, EXTENSION)
         base_names.append(base_name)
         name = base_name + parallel_tag
         f=open(name,'w')
@@ -85,7 +85,7 @@ def save_hazard(soil_amp,THE_PARAM_T,
             f.write('% Return period = '+str(rp).replace(' ','')+'\n')
             f.write(
                 '% First row are rsa periods - subsequent rows are sites\n')
-            f.write(' '.join([str(p) for p in THE_PARAM_T.atten_periods])+'\n')
+            f.write(' '.join([str(p) for p in eqrm_flags.atten_periods])+'\n')
         for j in range(len(hazard)):
             hi=hazard[j,:,i] # sites,rsa_per,rtrn            
             f.write(' '.join(['%.10g'%(h) for h in hi])+'\n')
@@ -314,11 +314,11 @@ def load_sites(output_dir, site_tag):
     return lat, lon
     
 
-def save_distances(THE_PARAM_T,sites,event_set,compress=False,
+def save_distances(eqrm_flags,sites,event_set,compress=False,
                 parallel_tag=None):
     """
     This funtion is called in eqrm analysis.
-    if THE_PARAM_T.save_motion is True: this is called.
+    if eqrm_flags.save_motion is True: this is called.
 
     This saves two files! break it up into two functions.
     """
@@ -338,8 +338,8 @@ def save_distances(THE_PARAM_T,sites,event_set,compress=False,
             is_rjb = True
         else:
             is_rjb = False
-        file_name = get_distance_file_name(is_rjb, THE_PARAM_T.site_tag)
-        base_name =  os.path.join(THE_PARAM_T.output_dir, file_name)
+        file_name = get_distance_file_name(is_rjb, eqrm_flags.site_tag)
+        base_name =  os.path.join(eqrm_flags.output_dir, file_name)
         base_names.append(base_name)
         name = base_name + parallel_tag
         dist_file = open(name,'w')
@@ -377,7 +377,7 @@ def load_distance(save_dir, site_tag, is_rjb):
         dist = reshape(dist, (-1,1))
     return dist
 
-def save_motion(soil_amp, THE_PARAM_T, motion, compress=False,
+def save_motion(soil_amp, eqrm_flags, motion, compress=False,
                 parallel_tag=None, write_title=True):
     """
     Who creates this motion data structure?
@@ -386,7 +386,7 @@ def save_motion(soil_amp, THE_PARAM_T, motion, compress=False,
     There is a file for each event.
     First row are rsa periods - subsequent rows are sites.
     
-    There is a THE_PARAM_T.save_motion.  If it is equal to 1 a
+    There is a eqrm_flags.save_motion.  If it is equal to 1 a
     motion file is created.
 
     parameters:
@@ -415,7 +415,7 @@ def save_motion(soil_amp, THE_PARAM_T, motion, compress=False,
         for i_gmm in range(motion.shape[1]): # ground motion model
             for i in range(motion.shape[3]): # events
                 # for all events
-                base_name =  THE_PARAM_T.output_dir + THE_PARAM_T.site_tag + \
+                base_name =  eqrm_flags.output_dir + eqrm_flags.site_tag + \
                             '_' + \
                             motion_name + '_motion_' + str(i) + '_spawn_' + \
                             str(i_spawn) + '_gmm_' + \
@@ -431,7 +431,7 @@ def save_motion(soil_amp, THE_PARAM_T, motion, compress=False,
                     f.write('% First row are rsa periods, then rows are sites'
                             '\n')
                     f.write(
-                        ' '.join([str(p) for p in THE_PARAM_T.atten_periods]) \
+                        ' '.join([str(p) for p in eqrm_flags.atten_periods]) \
                             + '\n')
                 for j in range(motion.shape[2]):
                     mi=motion[i_spawn,i_gmm,j,i,:] # sites,event,periods 
@@ -579,7 +579,7 @@ def load_motion_file(file_full_name):
     
 
 
-def save_structures(THE_PARAM_T,structures,compress=False,
+def save_structures(eqrm_flags,structures,compress=False,
                 parallel_tag=None, write_title=True):
     """
     Save structure information to file.
@@ -589,8 +589,8 @@ def save_structures(THE_PARAM_T,structures,compress=False,
     else: open = file
     if parallel_tag is None:
         parallel_tag = ''
-    base_name =  os.path.join(THE_PARAM_T.output_dir,
-                              get_structures_file_name(THE_PARAM_T.site_tag))
+    base_name =  os.path.join(eqrm_flags.output_dir,
+                              get_structures_file_name(eqrm_flags.site_tag))
     name = base_name + parallel_tag
     loc_file=open(name,'w')
     if write_title:
@@ -698,10 +698,10 @@ def load_structures(save_dir, site_tag):
 def get_event_set_file_name(site_tag):
     return site_tag + '_event_set.txt'
 
-#def save_event_set_new(THE_PARAM_T, event_set, event_activity, source_model,
+#def save_event_set_new(eqrm_flags, event_set, event_activity, source_model,
 #                      compress=False):
 
-def save_event_set(THE_PARAM_T, event_set, event_activity, source_model,
+def save_event_set(eqrm_flags, event_set, event_activity, source_model,
                        compress=False):
     """Save event_set information to a file.
 
@@ -724,8 +724,8 @@ def save_event_set(THE_PARAM_T, event_set, event_activity, source_model,
         open = myGzipFile
 
     # prepare output file
-    file_full_name = THE_PARAM_T.output_dir + \
-                     get_event_set_file_name(THE_PARAM_T.site_tag)
+    file_full_name = eqrm_flags.output_dir + \
+                     get_event_set_file_name(eqrm_flags.site_tag)
     event_file = open(file_full_name, 'w')    
 
     # write column header line
@@ -789,8 +789,8 @@ def save_event_set(THE_PARAM_T, event_set, event_activity, source_model,
 
     return file_full_name        # Used in testing
 
-#def save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
-def obsolete_save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
+#def save_event_set(eqrm_flags,event_set,r_new,compress=False):
+def obsolete_save_event_set(eqrm_flags,event_set,r_new,compress=False):
     """
     Save event_set information to file.
     This function is called in eqrm analysis.
@@ -801,7 +801,7 @@ def obsolete_save_event_set(THE_PARAM_T,event_set,r_new,compress=False):
     if compress: open = myGzipFile
     else: open = file
 
-    file_full_name = THE_PARAM_T.output_dir + THE_PARAM_T.site_tag + \
+    file_full_name = eqrm_flags.output_dir + eqrm_flags.site_tag + \
                      '_event_set.txt'
     event_file=open(file_full_name, 'w')    
 
@@ -968,7 +968,7 @@ def save_damage(save_dir, site_tag, damage_name, damage, building_ids,
     f.close()
     return base_name
       
-def save_ecloss(ecloss_name,THE_PARAM_T,ecloss,structures,compress=False,
+def save_ecloss(ecloss_name,eqrm_flags,ecloss,structures,compress=False,
                 parallel_tag=None):
     """
     Save economic loss.
@@ -982,7 +982,7 @@ def save_ecloss(ecloss_name,THE_PARAM_T,ecloss,structures,compress=False,
             struct/non-struct drift sensitive/non-struct accel' sensitive
           '_contents' - contents loss
         These 'definitions' are in analysis.py
-      THE_PARAM_T - used to get output_dir and site_tag
+      eqrm_flags - used to get output_dir and site_tag
       ecloss - the economic values to save.  2d array (location, events)
       structures - Structures instance.  Used to get the BID - building ID 
     """
@@ -993,8 +993,8 @@ def save_ecloss(ecloss_name,THE_PARAM_T,ecloss,structures,compress=False,
         open = file
     if parallel_tag is None:
         parallel_tag = ''  
-    base_name = os.path.join(THE_PARAM_T.output_dir, get_ecloss_file_name(
-        THE_PARAM_T.site_tag, ecloss_name))
+    base_name = os.path.join(eqrm_flags.output_dir, get_ecloss_file_name(
+        eqrm_flags.site_tag, ecloss_name))
     name = base_name + parallel_tag
     f=open(name,'w')
     f.write('% First row is bid (building id) - subsequent rows are events\n')
@@ -1026,7 +1026,7 @@ def load_ecloss(ecloss_name, save_dir, site_tag):
     return ecloss_loaded, BID_ecloss[0,:]
         
     
-def save_val(THE_PARAM_T, val, file_tag, compress=False, parallel_tag=None):
+def save_val(eqrm_flags, val, file_tag, compress=False, parallel_tag=None):
     """
     General file to save one vector of values.
 
@@ -1034,7 +1034,7 @@ def save_val(THE_PARAM_T, val, file_tag, compress=False, parallel_tag=None):
     flie_tag is '_bval'
     Writes a file of the total building cost, (3 building costs plus
     contents cost for all sites), assuming val is
-    all_sites.cost_breakdown(ci=THE_PARAM_T.ci)
+    all_sites.cost_breakdown(ci=eqrm_flags.ci)
     
     """
     if compress:
@@ -1044,9 +1044,9 @@ def save_val(THE_PARAM_T, val, file_tag, compress=False, parallel_tag=None):
     if parallel_tag is None:
         parallel_tag = ''
 
-    base_name =  get_val_file_name(THE_PARAM_T.site_tag,
+    base_name =  get_val_file_name(eqrm_flags.site_tag,
                                    file_tag)
-    base_name = os.path.join(THE_PARAM_T.output_dir, base_name)
+    base_name = os.path.join(eqrm_flags.output_dir, base_name)
     name = base_name + parallel_tag
     f=open(name,'w')
     for value in val:
@@ -1077,14 +1077,14 @@ def load_val(save_dir, site_tag, file_tag='_bval'):
                   dtype=scipy.float64, delimiter=',', skiprows=0)
     return val
 
-def save_fatalities(fatalities_name,THE_PARAM_T,fatalities,sites,compress=False,
+def save_fatalities(fatalities_name,eqrm_flags,fatalities,sites,compress=False,
                 parallel_tag=None, write_title=True):
     """
     Save fatalities and the list of sites (lat,lon).
     
     parameters:
       fatalities_name: a string tag, for the file name.
-      THE_PARAM_T - used to get output_dir and site_tag
+      eqrm_flags - used to get output_dir and site_tag
       fatalities - the fatality values to save.  2d array (location, events)
     """
 
@@ -1094,12 +1094,12 @@ def save_fatalities(fatalities_name,THE_PARAM_T,fatalities,sites,compress=False,
         open = file
     if parallel_tag is None:
         parallel_tag = ''  
-    base_name = os.path.join(THE_PARAM_T.output_dir, get_fatalities_file_name(
-        THE_PARAM_T.site_tag, fatalities_name))
+    base_name = os.path.join(eqrm_flags.output_dir, get_fatalities_file_name(
+        eqrm_flags.site_tag, fatalities_name))
     name = base_name + parallel_tag
     
     if sites is not None:
-        save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+        save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
                        sites, compress, parallel_tag, write_title)
                     
     f=open(name,'w')
@@ -1204,11 +1204,11 @@ def get_bridges_file_name(site_tag):
     return site_tag + '_bridges.txt'
 
 
-def save_bridges(THE_PARAM_T, bridges, compress=False, parallel_tag=None,
+def save_bridges(eqrm_flags, bridges, compress=False, parallel_tag=None,
                  write_title=True):
     """Save bridge information to file.
 
-    THE_PARAM_T   global parameters reference
+    eqrm_flags   global parameters reference
     bridges       the bridges data to save
     compress      flag - True if output file is compressed
     parallel_tag  ??
@@ -1220,8 +1220,8 @@ def save_bridges(THE_PARAM_T, bridges, compress=False, parallel_tag=None,
     if parallel_tag is None:
         parallel_tag = ''
 
-    base_name =  os.path.join(THE_PARAM_T.output_dir,
-                              get_bridges_file_name(THE_PARAM_T.site_tag))
+    base_name =  os.path.join(eqrm_flags.output_dir,
+                              get_bridges_file_name(eqrm_flags.site_tag))
     name = base_name + parallel_tag
 
     if compress:
@@ -1275,32 +1275,32 @@ def load_bridges(save_dir, site_tag):
 
     return attributes
 
-def get_source_file_handle(THE_PARAM_T, source_file_type='zone'):
+def get_source_file_handle(eqrm_flags, source_file_type='zone'):
     """
     Return a file handle of a source xml file.
     """
     
     if source_file_type == 'fault':
-        source_tag = THE_PARAM_T.fault_source_tag
+        source_tag = eqrm_flags.fault_source_tag
         file_constant = FAULT_SOURCE_FILE
     elif source_file_type == 'zone':
-        source_tag = THE_PARAM_T.zone_source_tag
+        source_tag = eqrm_flags.zone_source_tag
         file_constant = ZONE_SOURCE_FILE
     elif source_file_type == 'event_type':
-        source_tag = THE_PARAM_T.event_control_tag
+        source_tag = eqrm_flags.event_control_tag
         file_constant = EVENT_CONTROL_FILE
     else:
         raise IOError(source_file_type, " is not a valid source file type.")
     if source_tag is None:
-        source_file = THE_PARAM_T.site_tag + file_constant + '.xml'
+        source_file = eqrm_flags.site_tag + file_constant + '.xml'
     else:
-        source_file = THE_PARAM_T.site_tag  + file_constant + '_' \
+        source_file = eqrm_flags.site_tag  + file_constant + '_' \
                       + source_tag + '.xml'
-    source_file = os.path.join(THE_PARAM_T.input_dir, source_file)
+    source_file = os.path.join(eqrm_flags.input_dir, source_file)
     return open(source_file)
     
     
-def save_bridge_days_to_complete(THE_PARAM_T,
+def save_bridge_days_to_complete(eqrm_flags,
                 days_to_complete, compress=False,
                 parallel_tag=None, write_title=True):
     """
@@ -1319,10 +1319,10 @@ def save_bridge_days_to_complete(THE_PARAM_T,
         open = file
     if parallel_tag is None:
         parallel_tag = '' 
-    for i, func_p in enumerate(THE_PARAM_T.bridges_functional_percentages):
+    for i, func_p in enumerate(eqrm_flags.bridges_functional_percentages):
        
-        base_name = THE_PARAM_T.output_dir + get_days_to_complete_file_name(
-            THE_PARAM_T.site_tag, func_p, CSV_EXTENSION)
+        base_name = eqrm_flags.output_dir + get_days_to_complete_file_name(
+            eqrm_flags.site_tag, func_p, CSV_EXTENSION)
         base_names.append(base_name)
         name = base_name + parallel_tag
         f=open(name,'w')

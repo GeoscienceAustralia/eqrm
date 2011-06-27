@@ -334,20 +334,20 @@ def cumulative_state_probability(threshold, beta,value):
     return norm.cdf(temp)
 
 
-def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
+def calc_total_loss(sites, SA, eqrm_flags, event_set_Mw, bridge_sa_indices):
     """Calculate the economic loss and damage state at a site.
     Where the site is one of: Structure
                               Bridge
 
     sites              a Structures/Bridge instance
-    THE_PARAM_T        high level controlling object
+    eqrm_flags        high level controlling object
     SA                 array of Spectral Acceleration, in g, with axis;
                            sites, events, periods
                        the site axis usually has a size of 1
     event_set_Mw       array of Mw, 1D, dimension (events)
                        (used only by buildings)
     bridge_sa_indices  a tuple (0.3, 1.0) of indices into
-                       THE_PARAM_T.atten_periods for bridge SA values
+                       eqrm_flags.atten_periods for bridge SA values
                        (used only by bridges)
 
     Returns a tuple (total_loss, damage_model) where:
@@ -368,62 +368,62 @@ def calc_total_loss(sites, SA, THE_PARAM_T, event_set_Mw, bridge_sa_indices):
         #       parameters
         # csm_params are parameters for the capacity_spectrum_model
         csm_params = {'csm_damping_regimes':
-                          THE_PARAM_T.csm_damping_regimes,
+                          eqrm_flags.csm_damping_regimes,
                       'csm_damping_modify_Tav':
-                          THE_PARAM_T.csm_damping_modify_Tav,
+                          eqrm_flags.csm_damping_modify_Tav,
                       'csm_damping_use_smoothing':
-                          THE_PARAM_T.csm_damping_use_smoothing,
+                          eqrm_flags.csm_damping_use_smoothing,
                       'rtol':
-                          THE_PARAM_T.csm_SDcr_tolerance_percentage/100.0,
+                          eqrm_flags.csm_SDcr_tolerance_percentage/100.0,
                       'csm_damping_max_iterations':
-                          THE_PARAM_T.csm_damping_max_iterations,
+                          eqrm_flags.csm_damping_max_iterations,
                       'sdtcap':			#FIXME sdt -> std
-                          THE_PARAM_T.csm_standard_deviation,
+                          eqrm_flags.csm_standard_deviation,
                       'csm_use_variability':
-                          THE_PARAM_T.csm_use_variability,
+                          eqrm_flags.csm_use_variability,
                       'csm_variability_method':
-                          THE_PARAM_T.csm_variability_method,
+                          eqrm_flags.csm_variability_method,
                       'csm_hysteretic_damping':
-                          THE_PARAM_T.csm_hysteretic_damping,
+                          eqrm_flags.csm_hysteretic_damping,
                       'atten_override_RSA_shape':
-                          THE_PARAM_T.atten_override_RSA_shape,
+                          eqrm_flags.atten_override_RSA_shape,
                       'atten_cutoff_max_spectral_displacement':
-                          THE_PARAM_T.atten_cutoff_max_spectral_displacement,
-                      'loss_min_pga': THE_PARAM_T.loss_min_pga}
+                          eqrm_flags.atten_cutoff_max_spectral_displacement,
+                      'loss_min_pga': eqrm_flags.loss_min_pga}
 
-        damage_model = Damage_model(sites, SA, THE_PARAM_T.atten_periods,
+        damage_model = Damage_model(sites, SA, eqrm_flags.atten_periods,
                                     event_set_Mw,
-                                    THE_PARAM_T.csm_use_variability,
-                                    float(THE_PARAM_T.csm_standard_deviation),
+                                    eqrm_flags.csm_use_variability,
+                                    float(eqrm_flags.csm_standard_deviation),
                                     csm_params=csm_params)
 
         # Note, aggregate slight, medium, critical damage
         # Compute building damage and loss (LOTS done here!)
         total_loss = \
             damage_model.aggregated_building_loss(
-                        ci=THE_PARAM_T.loss_regional_cost_index_multiplier,
-                        loss_aus_contents=THE_PARAM_T.loss_aus_contents)
+                        ci=eqrm_flags.loss_regional_cost_index_multiplier,
+                        loss_aus_contents=eqrm_flags.loss_aus_contents)
 
-        if THE_PARAM_T.bridges_functional_percentages is not None:
+        if eqrm_flags.bridges_functional_percentages is not None:
             # get NaN array for 'days_to_complete'
             dtc_shape = list(total_loss[0].shape)
-            dtc_shape.append(len(THE_PARAM_T.bridges_functional_percentages))
+            dtc_shape.append(len(eqrm_flags.bridges_functional_percentages))
             days_to_complete = np.ones(dtc_shape) * np.nan
         else:
             days_to_complete = None
     elif sites.attributes['STRUCTURE_CATEGORY'][0].upper() == 'BRIDGE':
-        # until we *have* a THE_PARAM_T.bridge_model value, pass None for model
-        #damage_model = Bridge_damage_model(sites, THE_PARAM_T.bridge_model, SA,
+        # until we *have* a eqrm_flags.bridge_model value, pass None for model
+        #damage_model = Bridge_damage_model(sites, eqrm_flags.bridge_model, SA,
         damage_model = Bridge_damage_model(sites, None, SA,
-                                           THE_PARAM_T.atten_periods,
+                                           eqrm_flags.atten_periods,
                                            bridge_sa_indices)
         states = damage_model.get_states()	# to set up self.structure_state
         state = bridge_damage.choose_random_state(states[0])
         total_loss = damage_model.aggregated_loss()
 
-        if THE_PARAM_T.bridges_functional_percentages is not None:
+        if eqrm_flags.bridges_functional_percentages is not None:
             # calculate days to complete for each bridge
-            days_to_complete = time_to_complete(THE_PARAM_T.bridges_functional_percentages,
+            days_to_complete = time_to_complete(eqrm_flags.bridges_functional_percentages,
                                                 state)
         else:
             days_to_complete = None

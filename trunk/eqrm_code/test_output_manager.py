@@ -107,38 +107,38 @@ class Test_Output_manager(unittest.TestCase):
         pass
 
     def test_save_hazard(self):
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = True
         hazard_name = 'soil_SA'
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_hazard') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         lat = array([-32,-31])
         lon = array([120,121])
         sites = Sites(lat,lon)
 
-        THE_PARAM_T.return_periods = [array([100]), array([500.])]
-        THE_PARAM_T.atten_periods = [0.3, 0.5, 0.9]
+        eqrm_flags.return_periods = [array([100]), array([500.])]
+        eqrm_flags.atten_periods = [0.3, 0.5, 0.9]
 
-        hazard = zeros((len(lon),len(THE_PARAM_T.atten_periods),
-                        len(THE_PARAM_T.return_periods)), float)
+        hazard = zeros((len(lon),len(eqrm_flags.atten_periods),
+                        len(eqrm_flags.return_periods)), float)
         #hazard[j,:,i] # sites,rsa_per,rtrn
         for i,site in enumerate(lon):
-            for j,period in enumerate(THE_PARAM_T.atten_periods):
-                for k,rtrn in enumerate(THE_PARAM_T.return_periods):
+            for j,period in enumerate(eqrm_flags.atten_periods):
+                for k,rtrn in enumerate(eqrm_flags.return_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
 
-        save_hazard(soil_amp,THE_PARAM_T,
+        save_hazard(soil_amp,eqrm_flags,
                 hazard,sites,compress=False)
 
 
         # check the site files
-        for i in range(len(THE_PARAM_T.return_periods)):
-            rp=str(THE_PARAM_T.return_periods[i])
+        for i in range(len(eqrm_flags.return_periods)):
+            rp=str(eqrm_flags.return_periods[i])
             if rp[-2:-1] == '.':
                 rp = rp[:-2] + rp[-1]
-            file_name = THE_PARAM_T.output_dir+THE_PARAM_T.site_tag+ '_'+ \
+            file_name = eqrm_flags.output_dir+eqrm_flags.site_tag+ '_'+ \
                         hazard_name+'_rp' + \
                         rp.replace('.','pt').replace(' ','') + EXTENSION
             f=open(file_name,'r')
@@ -151,207 +151,207 @@ class Test_Output_manager(unittest.TestCase):
             # Check the periods
             # Convert a space separated text line into a numeric float array
             periods_f = array([float(ix) for ix in text[0].split(' ')])
-            self.assert_ (allclose(periods_f,array(THE_PARAM_T.atten_periods)))
+            self.assert_ (allclose(periods_f,array(eqrm_flags.atten_periods)))
             text.pop(0)
 
             for j,site in enumerate(lon):
                 split = text[j].split(' ')
-                for k,period in enumerate(THE_PARAM_T.atten_periods):
+                for k,period in enumerate(eqrm_flags.atten_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     self.assert_ (allclose(array(float(split[k])),
-                           array(float(site * period * THE_PARAM_T.return_periods[i]))))
+                           array(float(site * period * eqrm_flags.return_periods[i]))))
                     f.close()
             os.remove(file_name)
         # remove the locations file that is also produced.
-        os.remove(THE_PARAM_T.output_dir+ THE_PARAM_T.site_tag + '_locations.txt')
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_load_SA(self):
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = False
         hazard_name = 'bedrock_SA'
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazard_1') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         lat = array([-32,-31])
         lon = array([120,121])
         sites = Sites(lat,lon)
 
-        THE_PARAM_T.return_periods = [array([.025])]
-        THE_PARAM_T.atten_periods = [0.3, 0.5, 0.9]
+        eqrm_flags.return_periods = [array([.025])]
+        eqrm_flags.atten_periods = [0.3, 0.5, 0.9]
 
-        hazard = zeros((len(lon),len(THE_PARAM_T.atten_periods),
-                        len(THE_PARAM_T.return_periods)), float)
+        hazard = zeros((len(lon),len(eqrm_flags.atten_periods),
+                        len(eqrm_flags.return_periods)), float)
         #hazard[j,:,i] # sites,rsa_per,rtrn
         for i,site in enumerate(lon):
-            for j,period in enumerate(THE_PARAM_T.atten_periods):
-                for k,rtrn in enumerate(THE_PARAM_T.return_periods):
+            for j,period in enumerate(eqrm_flags.atten_periods):
+                for k,rtrn in enumerate(eqrm_flags.return_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
-        save_hazard(soil_amp,THE_PARAM_T,
+        save_hazard(soil_amp,eqrm_flags,
                 hazard,sites,compress=False)
 
         # delete site files
-        for i in range(len(THE_PARAM_T.return_periods)):
-            rp=THE_PARAM_T.return_periods[i]
-            file_full_name = THE_PARAM_T.output_dir + THE_PARAM_T.site_tag + '_' \
+        for i in range(len(eqrm_flags.return_periods)):
+            rp=eqrm_flags.return_periods[i]
+            file_full_name = eqrm_flags.output_dir + eqrm_flags.site_tag + '_' \
                         + hazard_name + '_rp' + \
                         str(rp).replace('.','pt').replace(' ','') + '.txt'
             SA, periods_f = load_SA(file_full_name)
             self.assert_ (allclose(SA, hazard))
             self.assert_ (allclose(array(periods_f),
-                                   array(THE_PARAM_T.atten_periods)))
+                                   array(eqrm_flags.atten_periods)))
 
             os.remove(file_full_name)
         # remove the locations file that is also produced.
-        os.remove(THE_PARAM_T.output_dir+ THE_PARAM_T.site_tag + '_locations.txt')
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_load_hazards_1(self):
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = True
         hazard_name = 'soil_SA'
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazard_1') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         lat = array([-32])#,-31])
         lon = array([120])#,121])
         sites = Sites(lat,lon)
 
-        THE_PARAM_T.return_periods = [array([.025]), array([0.5])]#, array([1.00]),
+        eqrm_flags.return_periods = [array([.025]), array([0.5])]#, array([1.00]),
                                 #array([2]), array([2.5]), array([2000])]
-        THE_PARAM_T.atten_periods = [0.3, 0.5, 0.9]
+        eqrm_flags.atten_periods = [0.3, 0.5, 0.9]
 
-        hazard = zeros((len(lon),len(THE_PARAM_T.atten_periods),
-                        len(THE_PARAM_T.return_periods)), float)
+        hazard = zeros((len(lon),len(eqrm_flags.atten_periods),
+                        len(eqrm_flags.return_periods)), float)
         #hazard[j,:,i] # sites,rsa_per,rtrn
         for i,site in enumerate(lon):
-            for j,period in enumerate(THE_PARAM_T.atten_periods):
-                for k,rtrn in enumerate(THE_PARAM_T.return_periods):
+            for j,period in enumerate(eqrm_flags.atten_periods):
+                for k,rtrn in enumerate(eqrm_flags.return_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
-        save_hazard(soil_amp,THE_PARAM_T,
+        save_hazard(soil_amp,eqrm_flags,
                 hazard,sites,compress=False)
-        SA, periods, return_p = load_hazards(THE_PARAM_T.output_dir,
-                         THE_PARAM_T.site_tag, soil_amp)
+        SA, periods, return_p = load_hazards(eqrm_flags.output_dir,
+                         eqrm_flags.site_tag, soil_amp)
         self.assert_ (allclose(SA, hazard))
-        self.assert_ (allclose(array(periods), array(THE_PARAM_T.atten_periods)))
-        self.assert_ (allclose(return_p, THE_PARAM_T.return_periods))
+        self.assert_ (allclose(array(periods), array(eqrm_flags.atten_periods)))
+        self.assert_ (allclose(return_p, eqrm_flags.return_periods))
 
         # delete site files
-        for i in range(len(THE_PARAM_T.return_periods)):
-            rp=THE_PARAM_T.return_periods[i]
-            file_full_name = THE_PARAM_T.output_dir + THE_PARAM_T.site_tag + '_' \
+        for i in range(len(eqrm_flags.return_periods)):
+            rp=eqrm_flags.return_periods[i]
+            file_full_name = eqrm_flags.output_dir + eqrm_flags.site_tag + '_' \
                         + hazard_name + '_rp' + \
                         str(rp).replace('.','pt').replace(' ','') + '.txt'
             os.remove(file_full_name)
         # remove the locations file that is also produced.
-        os.remove(THE_PARAM_T.output_dir+ THE_PARAM_T.site_tag + '_locations.txt')
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_load_hazardsII(self):
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = False
         hazard_name = 'bedrock_SA'
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazardsII') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         lat = array([-32])#,-31])
         lon = array([120])#,121])
         sites = Sites(lat,lon)
 
-        THE_PARAM_T.return_periods = [array([.025]), array([0.5]), array([1.00]),
+        eqrm_flags.return_periods = [array([.025]), array([0.5]), array([1.00]),
                                 array([2]), array([2.5]), array([2000])]
-        THE_PARAM_T.atten_periods = [0.3, 0.5, 0.9]
+        eqrm_flags.atten_periods = [0.3, 0.5, 0.9]
 
-        hazard = zeros((len(lon),len(THE_PARAM_T.atten_periods),
-                        len(THE_PARAM_T.return_periods)), float)
+        hazard = zeros((len(lon),len(eqrm_flags.atten_periods),
+                        len(eqrm_flags.return_periods)), float)
         #hazard[j,:,i] # sites,rsa_per,rtrn
         for i,site in enumerate(lon):
-            for j,period in enumerate(THE_PARAM_T.atten_periods):
-                for k,rtrn in enumerate(THE_PARAM_T.return_periods):
+            for j,period in enumerate(eqrm_flags.atten_periods):
+                for k,rtrn in enumerate(eqrm_flags.return_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
-        save_hazard(soil_amp,THE_PARAM_T,
+        save_hazard(soil_amp,eqrm_flags,
                 hazard,sites,compress=False)
-        SA, periods, return_p = load_hazards(THE_PARAM_T.output_dir,
-                         THE_PARAM_T.site_tag, soil_amp)
+        SA, periods, return_p = load_hazards(eqrm_flags.output_dir,
+                         eqrm_flags.site_tag, soil_amp)
         self.assert_ (allclose(SA, hazard))
-        self.assert_ (allclose(array(periods), array(THE_PARAM_T.atten_periods)))
-        self.assert_ (allclose(return_p, THE_PARAM_T.return_periods))
+        self.assert_ (allclose(array(periods), array(eqrm_flags.atten_periods)))
+        self.assert_ (allclose(return_p, eqrm_flags.return_periods))
 
         # delete site files
-        for i in range(len(THE_PARAM_T.return_periods)):
-            rp=str(THE_PARAM_T.return_periods[i])
+        for i in range(len(eqrm_flags.return_periods)):
+            rp=str(eqrm_flags.return_periods[i])
             if rp[-2:-1] == '.':
                 rp = rp[:-2] + rp[-1]
-            file_name = THE_PARAM_T.output_dir+THE_PARAM_T.site_tag+ '_'+ \
+            file_name = eqrm_flags.output_dir+eqrm_flags.site_tag+ '_'+ \
                         hazard_name+'_rp' + \
                         rp.replace('.','pt').replace(' ','') + EXTENSION
             os.remove(file_name)
         # remove the locations file that is also produced.
-        os.remove(THE_PARAM_T.output_dir+ THE_PARAM_T.site_tag + '_locations.txt')
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_load_hazardsIII(self):
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = True
         hazard_name = 'soil_SA'
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazardsIII') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         lat = array([-32, -31, -30])
         lon = array([120, 121, 122])
         sites = Sites(lat,lon)
 
-        THE_PARAM_T.return_periods = [array([.025]), array([0.5])]
-        THE_PARAM_T.atten_periods = [0.3, 0.5]
+        eqrm_flags.return_periods = [array([.025]), array([0.5])]
+        eqrm_flags.atten_periods = [0.3, 0.5]
 
-        hazard = zeros((len(lon),len(THE_PARAM_T.atten_periods),
-                        len(THE_PARAM_T.return_periods)), float)
+        hazard = zeros((len(lon),len(eqrm_flags.atten_periods),
+                        len(eqrm_flags.return_periods)), float)
         #hazard[j,:,i] # sites,rsa_per,rtrn
         for i,site in enumerate(lon):
-            for j,period in enumerate(THE_PARAM_T.atten_periods):
-                for k,rtrn in enumerate(THE_PARAM_T.return_periods):
+            for j,period in enumerate(eqrm_flags.atten_periods):
+                for k,rtrn in enumerate(eqrm_flags.return_periods):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
-        save_hazard(soil_amp,THE_PARAM_T,
+        save_hazard(soil_amp,eqrm_flags,
                 hazard,sites,compress=False)
-        SA, periods, return_p = load_hazards(THE_PARAM_T.output_dir,
-                         THE_PARAM_T.site_tag, soil_amp)
+        SA, periods, return_p = load_hazards(eqrm_flags.output_dir,
+                         eqrm_flags.site_tag, soil_amp)
         self.assert_ (allclose(SA, hazard))
-        self.assert_ (allclose(array(periods), array(THE_PARAM_T.atten_periods)))
-        self.assert_ (allclose(return_p, THE_PARAM_T.return_periods))
+        self.assert_ (allclose(array(periods), array(eqrm_flags.atten_periods)))
+        self.assert_ (allclose(return_p, eqrm_flags.return_periods))
 
         # delete site files
-        for i in range(len(THE_PARAM_T.return_periods)):
-            rp=THE_PARAM_T.return_periods[i]
-            file_name = THE_PARAM_T.output_dir + THE_PARAM_T.site_tag + '_' \
+        for i in range(len(eqrm_flags.return_periods)):
+            rp=eqrm_flags.return_periods[i]
+            file_name = eqrm_flags.output_dir + eqrm_flags.site_tag + '_' \
                         + hazard_name + '_rp' + \
                         str(rp).replace('.','pt').replace(' ','') + '.txt'
 
             os.remove(file_name)
         # remove the locations file that is also produced.
-        os.remove(THE_PARAM_T.output_dir+ THE_PARAM_T.site_tag + '_locations.txt')
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_load_hazards_no_files(self):
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = False
         hazard_name = 'bedrock_SA'
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_hazards_no_files') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         try:
-            SA, periods, return_p = load_hazards(THE_PARAM_T.output_dir,
-                                                THE_PARAM_T.site_tag,
+            SA, periods, return_p = load_hazards(eqrm_flags.output_dir,
+                                                eqrm_flags.site_tag,
                                                 soil_amp)
         except IOError:
             pass
         else:
             self.failUnless(1==0,
                         'empty directory did not cause an error')
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_save_sites(self):
@@ -417,10 +417,10 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_save_distances(self):
 
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_distances') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         lat = [-32,-31]
         lon = [120,121]
         sites = Sites(lat,lon)
@@ -446,11 +446,11 @@ class Test_Output_manager(unittest.TestCase):
             rupture_centroid_lon=lon0,azimuth=azimuth,
             dip=dip,Mw=Mw,fault_width=15.0)
         event_set.source_zone_id = array([0])
-        save_distances(THE_PARAM_T,sites,event_set,compress=False)
+        save_distances(eqrm_flags,sites,event_set,compress=False)
 
         # Check the file output
-        file_name = THE_PARAM_T.output_dir+ \
-                   THE_PARAM_T.site_tag+'_distance_rjb.txt'
+        file_name = eqrm_flags.output_dir+ \
+                   eqrm_flags.site_tag+'_distance_rjb.txt'
         file_h=open(file_name,'r')
 
         text = file_h.read().splitlines()
@@ -467,8 +467,8 @@ class Test_Output_manager(unittest.TestCase):
         # Del the file output
         os.remove(file_name)
 
-        file_name = THE_PARAM_T.output_dir + \
-                    THE_PARAM_T.site_tag + '_distance_rup.txt'
+        file_name = eqrm_flags.output_dir + \
+                    eqrm_flags.site_tag + '_distance_rup.txt'
         file_h=open(file_name,'r')
 
         text = file_h.read().splitlines()
@@ -484,14 +484,14 @@ class Test_Output_manager(unittest.TestCase):
         file_h.close()
         # Del the file output
         os.remove(file_name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_save_distancesII(self):
 
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_distances') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         lat = [-32,-31]
         lon = [120,121]
         sites = Sites(lat,lon)
@@ -517,11 +517,11 @@ class Test_Output_manager(unittest.TestCase):
             rupture_centroid_lon=lon0,azimuth=azimuth,
             dip=dip,Mw=Mw,fault_width=15.0)
         event_set.source_zone_id = array([0,0])
-        save_distances(THE_PARAM_T,sites,event_set,compress=False)
+        save_distances(eqrm_flags,sites,event_set,compress=False)
 
         # Check the file output
-        file_name = THE_PARAM_T.output_dir+ \
-                   THE_PARAM_T.site_tag+'_distance_rjb.txt'
+        file_name = eqrm_flags.output_dir+ \
+                   eqrm_flags.site_tag+'_distance_rjb.txt'
         file_h=open(file_name,'r')
 
         text = file_h.read().splitlines()
@@ -537,8 +537,8 @@ class Test_Output_manager(unittest.TestCase):
         # Del the file output
         os.remove(file_name)
 
-        file_name = THE_PARAM_T.output_dir + \
-                    THE_PARAM_T.site_tag + '_distance_rup.txt'
+        file_name = eqrm_flags.output_dir + \
+                    eqrm_flags.site_tag + '_distance_rup.txt'
         file_h=open(file_name,'r')
 
         text = file_h.read().splitlines()
@@ -554,15 +554,15 @@ class Test_Output_manager(unittest.TestCase):
         file_h.close()
         # Del the file output
         os.remove(file_name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_load_distances(self):
 
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_distances') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         lat = [-32,-31]
         lon = [120,121]
         sites = Sites(lat,lon)
@@ -588,20 +588,20 @@ class Test_Output_manager(unittest.TestCase):
             rupture_centroid_lon=lon0,azimuth=azimuth,
             dip=dip,Mw=Mw,fault_width=15.0)
         event_set.source_zone_id = array([0])
-        save_distances(THE_PARAM_T,sites,event_set,compress=False)
+        save_distances(eqrm_flags,sites,event_set,compress=False)
 
-        dist = load_distance(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag, True)
+        dist = load_distance(eqrm_flags.output_dir, eqrm_flags.site_tag, True)
 
         distance_calc = sites.distances_from_event_set(event_set).distance(
             'Joyner_Boore').swapaxes(0,1)
         self.assert_ (allclose(array([dist]),
                                distance_calc,0.1))
         # Del the file output
-        file = get_distance_file_name(True,  THE_PARAM_T.site_tag)
-        os.remove(os.path.join(THE_PARAM_T.output_dir, file))
-        file = get_distance_file_name(False,  THE_PARAM_T.site_tag)
-        os.remove(os.path.join(THE_PARAM_T.output_dir, file))
-        os.rmdir(THE_PARAM_T.output_dir)
+        file = get_distance_file_name(True,  eqrm_flags.site_tag)
+        os.remove(os.path.join(eqrm_flags.output_dir, file))
+        file = get_distance_file_name(False,  eqrm_flags.site_tag)
+        os.remove(os.path.join(eqrm_flags.output_dir, file))
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_save_motion(self):
@@ -609,18 +609,18 @@ class Test_Output_manager(unittest.TestCase):
         # which is not present in the actual data, I suspect.
 
         # The demos use save motion, the imp' tests don't though
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_motion') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
-        THE_PARAM_T.atten_periods = [0.3, 0.5, 0.9]
+        eqrm_flags.site_tag = "site_tag"
+        eqrm_flags.atten_periods = [0.3, 0.5, 0.9]
         soil_amp = True
         motion_name = "soil_SA"
         motion = array([[[[[4,5]],[[2,7,]]]]])# spawn,gmm,sites,event.periods
-        save_motion(soil_amp, THE_PARAM_T, motion)
+        save_motion(soil_amp, eqrm_flags, motion)
         # Check the file output
         for i in range(motion.shape[3]):
-            file_name = THE_PARAM_T.output_dir+THE_PARAM_T.site_tag+ '_' \
+            file_name = eqrm_flags.output_dir+eqrm_flags.site_tag+ '_' \
                    + motion_name + '_motion_' + \
                    str(i) + '_spawn_0_gmm_0.txt'
             file_h=open(file_name,'r')
@@ -633,7 +633,7 @@ class Test_Output_manager(unittest.TestCase):
             text.pop(0)
             # Convert a space separated text line into a numeric float array
             periods_f = array([float(ix) for ix in text[0].split(' ')])
-            self.assert_ (allclose(periods_f,array(THE_PARAM_T.atten_periods)))
+            self.assert_ (allclose(periods_f,array(eqrm_flags.atten_periods)))
             text.pop(0)
 
             for line_i,line in enumerate(text):
@@ -641,7 +641,7 @@ class Test_Output_manager(unittest.TestCase):
                 self.assert_ (allclose( num_f, motion[0,0,line_i,0,:]))
             file_h.close()
             os.remove(file_name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_load_save_damage(self):
         save_dir = tempfile.mkdtemp('test_load_save_damage') + os.sep
@@ -704,14 +704,14 @@ class Test_Output_manager(unittest.TestCase):
         ea = Event_Activity(len(Mw))
         ea.set_event_activity(event_activity)
         
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_event_set') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         file_full_name = save_event_set(
-            THE_PARAM_T,set, ea, sm)
+            eqrm_flags,set, ea, sm)
         out = load_event_set(
-            THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
+            eqrm_flags.output_dir, eqrm_flags.site_tag)
         #print "out", out
         msg = 'loaded Mw=%s, expected Mw=%s' % (str(out['Mw']), \
                                                 str(set.Mw))
@@ -742,7 +742,7 @@ class Test_Output_manager(unittest.TestCase):
             else:
                 self.fail()
         os.remove(file_full_name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_join_parallel_files(self):
@@ -812,10 +812,10 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(base_file_name)
 
     def test_save_structures(self):
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp('test_save_structures') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
-        #THE_PARAM_T.atten_periods = [0.3, 0.5, 0.9]
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp('test_save_structures') + os.sep
+        eqrm_flags.site_tag = "site_tag"
+        #eqrm_flags.atten_periods = [0.3, 0.5, 0.9]
 
         attribute_dic={
             'BID':[1,2,3],
@@ -840,7 +840,7 @@ class Test_Output_manager(unittest.TestCase):
             buildings_usage_classification='HAZUS' # HAZUS usage
             )
         parallel_tag = 'test_output_manager'
-        base_file = save_structures(THE_PARAM_T, sites, compress=False,
+        base_file = save_structures(eqrm_flags, sites, compress=False,
                 parallel_tag=parallel_tag, write_title=True)
         name = base_file + parallel_tag
 
@@ -869,19 +869,19 @@ class Test_Output_manager(unittest.TestCase):
 
         # clean up
         os.remove(name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_save_ecloss(self):
         ecloss_name = '_total_building'
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp('test_save_ecloss') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags = Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp('test_save_ecloss') + os.sep
+        eqrm_flags.site_tag = "site_tag"
 
         ecloss = array([[1, 2, 3, 4], [10, 20, 30, 40]])
         structures = Dummy()
         structures.attributes = {'BID': array([10, 20])}
         parallel_tag = 'yeah'
-        name = save_ecloss(ecloss_name, THE_PARAM_T, ecloss, structures, compress=False,
+        name = save_ecloss(ecloss_name, eqrm_flags, ecloss, structures, compress=False,
                 parallel_tag=parallel_tag)
 
         # Check the file output
@@ -899,117 +899,117 @@ class Test_Output_manager(unittest.TestCase):
             self.assert_ (allclose(cost, ecloss[i]))
         file_h.close()
         os.remove(name + parallel_tag)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_save_eclossII(self):
         ecloss_name = '_total_building'
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp('test_save_ecloss') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags = Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp('test_save_ecloss') + os.sep
+        eqrm_flags.site_tag = "site_tag"
 
         ecloss = array([[1, 2, 3, 4], [10, 20, 30, 40]])
         structures = Dummy()
         structures.attributes = {'BID': array([10, 20])}
-        name = save_ecloss(ecloss_name, THE_PARAM_T, ecloss, structures,
+        name = save_ecloss(ecloss_name, eqrm_flags, ecloss, structures,
                            compress=False)
 
         # Check the file output
         ecloss_loaded, bid = load_ecloss(
             ecloss_name,
-            THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
+            eqrm_flags.output_dir, eqrm_flags.site_tag)
         self.assert_ (allclose(array(structures.attributes['BID']),bid))
         self.assert_ (allclose(ecloss_loaded, ecloss))
 
         os.remove(name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_save_eclossIII(self):
         # testing a one row file
         ecloss_name = '_total_building'
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp('test_save_ecloss') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags = Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp('test_save_ecloss') + os.sep
+        eqrm_flags.site_tag = "site_tag"
 
         ecloss = array([[1, 2, 3, 4]])
         structures = Dummy()
         structures.attributes = {'BID': array([10])}
-        name = save_ecloss(ecloss_name, THE_PARAM_T, ecloss, structures,
+        name = save_ecloss(ecloss_name, eqrm_flags, ecloss, structures,
                            compress=False)
 
         # Check the file output
         ecloss_loaded, bid = load_ecloss(
             ecloss_name,
-            THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
+            eqrm_flags.output_dir, eqrm_flags.site_tag)
         self.assert_ (allclose(array(structures.attributes['BID']),bid))
         self.assert_ (allclose(ecloss_loaded, ecloss))
 
         os.remove(name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_load_lat_long_haz_SA(self):
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = True
         hazard_name = 'soil_SA'
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_manager_test_load_lat_long_haz_SA') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         lat = array([-32, -31, -30])
         lon = array([120, 121, 122])
         sites = Sites(lat,lon)
 
-        THE_PARAM_T.return_periods = [array([.025]), array([0.5])]
-        THE_PARAM_T.atten_periods = [0.3, 0.5]
+        eqrm_flags.return_periods = [array([.025]), array([0.5])]
+        eqrm_flags.atten_periods = [0.3, 0.5]
 
-        hazard = zeros((len(lon),len(THE_PARAM_T.atten_periods),
-                        len(THE_PARAM_T.return_periods)), float)
+        hazard = zeros((len(lon),len(eqrm_flags.atten_periods),
+                        len(eqrm_flags.return_periods)), float)
         for i,site_lon in enumerate(lon):
-            for j,period in enumerate(THE_PARAM_T.atten_periods):
-                for k,rtrn in enumerate(THE_PARAM_T.return_periods):
+            for j,period in enumerate(eqrm_flags.atten_periods):
+                for k,rtrn in enumerate(eqrm_flags.return_periods):
                     hazard[i,j,k] = site_lon*period #*rtrn[0]
-        save_hazard(soil_amp,THE_PARAM_T,
+        save_hazard(soil_amp,eqrm_flags,
                 hazard,sites,compress=False)
-        lon_lat_SA = load_lat_long_haz_SA(THE_PARAM_T.output_dir,
-                         THE_PARAM_T.site_tag, soil_amp, 0.5, 0.025)
+        lon_lat_SA = load_lat_long_haz_SA(eqrm_flags.output_dir,
+                         eqrm_flags.site_tag, soil_amp, 0.5, 0.025)
         self.assert_ (allclose(array(lon), array(lon_lat_SA[:,0])))
         self.assert_ (allclose(array(lat), array(lon_lat_SA[:,1])))
         self.assert_ (allclose(array(hazard[:,1,0]),
                                array(lon_lat_SA[:,2])))
-        #self.assert_ (allclose(return_p, THE_PARAM_T.return_periods))
+        #self.assert_ (allclose(return_p, eqrm_flags.return_periods))
 
         # delete site files
-        for i in range(len(THE_PARAM_T.return_periods)):
-            rp=THE_PARAM_T.return_periods[i]
-            file_name = THE_PARAM_T.output_dir + THE_PARAM_T.site_tag + '_' \
+        for i in range(len(eqrm_flags.return_periods)):
+            rp=eqrm_flags.return_periods[i]
+            file_name = eqrm_flags.output_dir + eqrm_flags.site_tag + '_' \
                         + hazard_name + '_rp' + \
                         str(rp).replace('.','pt').replace(' ','') + '.txt'
 
             os.remove(file_name)
         # remove the locations file that is also produced.
-        os.remove(THE_PARAM_T.output_dir+ THE_PARAM_T.site_tag + '_locations.txt')
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
+        os.rmdir(eqrm_flags.output_dir)
 
     def Xtest_load_val(self):
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_manager_test_test_load_val') + os.sep
-        THE_PARAM_T.site_tag = 'site_tag'
+        eqrm_flags.site_tag = 'site_tag'
         file_tag = 'ham'
         val_actual = array([3.4, 3.5, 3.6])
-        base_name = save_val(THE_PARAM_T, val_actual, file_tag)
-        val = load_val(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+        base_name = save_val(eqrm_flags, val_actual, file_tag)
+        val = load_val(eqrm_flags.output_dir, eqrm_flags.site_tag,
                        file_tag=file_tag)
         self.assert_ (allclose(val_actual, val))
         os.remove(base_name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_load_structures(self):
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             prefix='test_output_man_test_load_structures') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         attribute_dic={
             'BID':[1,2,3],
             'LATITUDE':[-32.9,-32.7,-32.5],
@@ -1032,9 +1032,9 @@ class Test_Output_manager(unittest.TestCase):
             attribute_dic,
             buildings_usage_classification='HAZUS' # HAZUS usage
             )
-        base_file = save_structures(THE_PARAM_T, sites, compress=False,
+        base_file = save_structures(eqrm_flags, sites, compress=False,
                                     write_title=True)
-        att_dic = load_structures(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag)
+        att_dic = load_structures(eqrm_flags.output_dir, eqrm_flags.site_tag)
         #att_dic['SITE_CLASS'] = ['A','B','c']
         #att_dic['LATITUDE'] = [-32.9,-32.7,-32.7]
         for key in iter(att_dic):
@@ -1044,14 +1044,14 @@ class Test_Output_manager(unittest.TestCase):
 
         # clean up
         os.remove(base_file)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_load_ecloss_and_sites(self):
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_manager_test_load_ecloss_and_sites') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
         attribute_dic={
             'BID':[1,2,3],
             'LATITUDE':[-32.9,-32.7,-32.5],
@@ -1074,21 +1074,21 @@ class Test_Output_manager(unittest.TestCase):
             attribute_dic,
             buildings_usage_classification='HAZUS' # HAZUS usage
             )
-        base_file = save_structures(THE_PARAM_T, sites, compress=False,
+        base_file = save_structures(eqrm_flags, sites, compress=False,
                                     write_title=True)
         # dimensions(site, event)
         ecloss = array([[1, 2, 3, 4], [10, 20, 30, 40], [100,200, 300, 400]])
         structures = Dummy()
         structures.attributes = {'BID': array([1, 2, 3])}
         ecloss_name =  '_total_building'
-        ecloss_file = save_ecloss(ecloss_name, THE_PARAM_T, ecloss, structures,
+        ecloss_file = save_ecloss(ecloss_name, eqrm_flags, ecloss, structures,
                            compress=False)
 
         val_actual = array([3.4, 3.5, 3.6])
         file_tag = '_bval'
-        val_file = save_val(THE_PARAM_T, val_actual, file_tag)
-        results = load_ecloss_and_sites(THE_PARAM_T.output_dir,
-                                        THE_PARAM_T.site_tag)
+        val_file = save_val(eqrm_flags, val_actual, file_tag)
+        results = load_ecloss_and_sites(eqrm_flags.output_dir,
+                                        eqrm_flags.site_tag)
         total_building_loss, total_building_value, lon, lat = results
 
         self.assert_ (allclose(lon, attribute_dic['LONGITUDE']))
@@ -1097,10 +1097,10 @@ class Test_Output_manager(unittest.TestCase):
         self.assert_ (allclose(total_building_value, val_actual))
 
         # Access denied error in windows
-        #shutil.rmtree(THE_PARAM_T.output_dir)
+        #shutil.rmtree(eqrm_flags.output_dir)
 
         # Remove a directory and it's contents
-        folder = THE_PARAM_T.output_dir
+        folder = eqrm_flags.output_dir
         for the_file in os.listdir(folder):
             file_path = os.path.join(folder, the_file)
             try:
@@ -1108,13 +1108,13 @@ class Test_Output_manager(unittest.TestCase):
                     os.unlink(file_path)
             except Exception, e:
                 print e
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_save_bridges(self):
-        THE_PARAM_T = Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp('test_save_bridges') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags = Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp('test_save_bridges') + os.sep
+        eqrm_flags.site_tag = "site_tag"
 
         attributes = {'BID': [1,2,3],
                       'LATITUDE': [-32.9,-32.7,-32.5],
@@ -1127,7 +1127,7 @@ class Test_Output_manager(unittest.TestCase):
 
         (bridges, _) = get_bridges_from_dic(attributes)
         parallel_tag = 'test_save_bridges'
-        base_file = save_bridges(THE_PARAM_T, bridges, compress=False,
+        base_file = save_bridges(eqrm_flags, bridges, compress=False,
                                  parallel_tag=parallel_tag, write_title=True)
         name = base_file + parallel_tag
 
@@ -1153,40 +1153,40 @@ class Test_Output_manager(unittest.TestCase):
 
         # clean up
         os.remove(name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
 
     def test_load_motion(self):       
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = False
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
-        THE_PARAM_T.atten_periods = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+        eqrm_flags.site_tag = "site_tag"
+        eqrm_flags.atten_periods = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
         
         def digital(sp, gmm, site, ev, pd):
             return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
         # (spawn, gmm, sites, events, periods)
         motion = fromfunction(digital, (2,3,4,5,6))
-        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
-        SA, periods = load_motion(THE_PARAM_T.output_dir,  THE_PARAM_T.site_tag,
+        base_names = save_motion(soil_amp, eqrm_flags, motion)
+        SA, periods = load_motion(eqrm_flags.output_dir,  eqrm_flags.site_tag,
                                   soil_amp)
         
-        self.assert_(allclose(array(THE_PARAM_T.atten_periods),
+        self.assert_(allclose(array(eqrm_flags.atten_periods),
                               periods))
         self.assert_(allclose(SA, motion))
         for name in base_names:
             os.remove(name)
-        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
-        os.rmdir(THE_PARAM_T.output_dir)
+        #print "eqrm_flags.output_dir", eqrm_flags.output_dir
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_load_collapsed_motion_sitess(self):      
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = True
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
-        THE_PARAM_T.atten_periods = [0.1, 0.2, 0.3, 0.4]
+        eqrm_flags.site_tag = "site_tag"
+        eqrm_flags.atten_periods = [0.1, 0.2, 0.3, 0.4]
         
         def digital(sp, gmm, site, ev, pd):
             return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
@@ -1196,12 +1196,12 @@ class Test_Output_manager(unittest.TestCase):
         lat_actual = array([-32., -31.])
         lon_actual = array([120., 121.])
         sites = Sites(lat_actual,lon_actual)
-        base_name = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+        base_name = save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
                    sites)
         
-        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
-        tmp = load_collapsed_motion_sites(THE_PARAM_T.output_dir,
-                                          THE_PARAM_T.site_tag,
+        base_names = save_motion(soil_amp, eqrm_flags, motion)
+        tmp = load_collapsed_motion_sites(eqrm_flags.output_dir,
+                                          eqrm_flags.site_tag,
                                           soil_amp)
         SA, periods, lat, lon = tmp
         self.assert_(allclose(lat, lat_actual))
@@ -1209,7 +1209,7 @@ class Test_Output_manager(unittest.TestCase):
         #print "SA", SA
         #print "motion[0,0,...]", motion[0,0,...]
         self.assert_(allclose(SA, motion[0,0,...]))
-        self.assert_(allclose(array(THE_PARAM_T.atten_periods),
+        self.assert_(allclose(array(eqrm_flags.atten_periods),
                               periods))
 
         
@@ -1217,17 +1217,17 @@ class Test_Output_manager(unittest.TestCase):
         for name in base_names:
             #pass
             os.remove(name)
-        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
-        os.rmdir(THE_PARAM_T.output_dir)
+        #print "eqrm_flags.output_dir", eqrm_flags.output_dir
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_load_collapsed_motion_sitesII(self):      
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = True
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
-        THE_PARAM_T.atten_periods = [0.1]
+        eqrm_flags.site_tag = "site_tag"
+        eqrm_flags.atten_periods = [0.1]
         
         def digital(sp, gmm, site, ev, pd):
             return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
@@ -1237,11 +1237,11 @@ class Test_Output_manager(unittest.TestCase):
         lat_actual = array([-32., -31., -32., -31.])
         lon_actual = array([120., 121., 3., 4.])
         sites = Sites(lat_actual,lon_actual)
-        base_name = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+        base_name = save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
                    sites)
         
-        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
-        tmp = load_collapsed_motion_sites(THE_PARAM_T.output_dir,  THE_PARAM_T.site_tag,
+        base_names = save_motion(soil_amp, eqrm_flags, motion)
+        tmp = load_collapsed_motion_sites(eqrm_flags.output_dir,  eqrm_flags.site_tag,
                           soil_amp)
         SA, periods, lat, lon = tmp
         self.assert_(allclose(lat, lat_actual))
@@ -1256,24 +1256,24 @@ class Test_Output_manager(unittest.TestCase):
                                   motion.shape[3]* motion.shape[1]*spawn_i
                     self.assert_(allclose(motion[spawn_i, gmm_i, :, event_i, :],
                                           SA[:, overload_i, :]))
-        self.assert_(allclose(array(THE_PARAM_T.atten_periods),
+        self.assert_(allclose(array(eqrm_flags.atten_periods),
                               periods))
 
         
         os.remove(base_name)
         for name in base_names:
             os.remove(name)
-        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
-        os.rmdir(THE_PARAM_T.output_dir)
+        #print "eqrm_flags.output_dir", eqrm_flags.output_dir
+        os.rmdir(eqrm_flags.output_dir)
 
 
     def test_load_motion_sites(self):      
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = True
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
-        THE_PARAM_T.atten_periods = [0.1, 0.2]
+        eqrm_flags.site_tag = "site_tag"
+        eqrm_flags.atten_periods = [0.1, 0.2]
         
         def digital(sp, gmm, site, ev, pd):
             return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
@@ -1283,11 +1283,11 @@ class Test_Output_manager(unittest.TestCase):
         lat_actual = array([-32., -31., -32., -31.])
         lon_actual = array([120., 121., 3., 4.])
         sites = Sites(lat_actual,lon_actual)
-        base_name = save_sites(THE_PARAM_T.output_dir, THE_PARAM_T.site_tag,
+        base_name = save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
                    sites)
         
-        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
-        tmp = load_motion_sites(THE_PARAM_T.output_dir,  THE_PARAM_T.site_tag,
+        base_names = save_motion(soil_amp, eqrm_flags, motion)
+        tmp = load_motion_sites(eqrm_flags.output_dir,  eqrm_flags.site_tag,
                           soil_amp=True, period=0.2)
         SA, lat, lon = tmp
         self.assert_(allclose(lat, lat_actual))
@@ -1307,28 +1307,28 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(base_name)
         for name in base_names:
             os.remove(name)
-        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
-        os.rmdir(THE_PARAM_T.output_dir)
+        #print "eqrm_flags.output_dir", eqrm_flags.output_dir
+        os.rmdir(eqrm_flags.output_dir)
         
     def test_load_motion_file(self):
-        THE_PARAM_T=Dummy()
+        eqrm_flags=Dummy()
         soil_amp = False
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
-        THE_PARAM_T.atten_periods = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+        eqrm_flags.site_tag = "site_tag"
+        eqrm_flags.atten_periods = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
         
         def digital(sp, gmm, site, ev, pd):
             return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
         # (spawn, gmm, sites, events, periods)
         motion = fromfunction(digital, (1,1,5,2,6))
         SA_answer = motion[0, 0, :,1,:]
-        base_names = save_motion(soil_amp, THE_PARAM_T, motion)
+        base_names = save_motion(soil_amp, eqrm_flags, motion)
 
         ans = load_motion_file(base_names[1]) # 1, so event_index == 1
         SA, periods, event_index, spawn_index, gmm_index = ans
         
-        self.assert_(allclose(array(THE_PARAM_T.atten_periods),
+        self.assert_(allclose(array(eqrm_flags.atten_periods),
                               periods))
         self.assert_(allclose(SA, SA_answer))
         self.assert_(event_index == 1)
@@ -1337,8 +1337,8 @@ class Test_Output_manager(unittest.TestCase):
         
         for name in base_names:
             os.remove(name)
-        #print "THE_PARAM_T.output_dir", THE_PARAM_T.output_dir
-        os.rmdir(THE_PARAM_T.output_dir)
+        #print "eqrm_flags.output_dir", eqrm_flags.output_dir
+        os.rmdir(eqrm_flags.output_dir)
         
 
     def test_get_days_to_complete_file_name(self):
@@ -1383,31 +1383,31 @@ class Test_Output_manager(unittest.TestCase):
                              
  
     def test_save_bridge_days_to_complete(self):
-        THE_PARAM_T=Dummy()
-        THE_PARAM_T.output_dir = tempfile.mkdtemp(
+        eqrm_flags=Dummy()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_manager_test_save_bridge_days_to_complete') + os.sep
-        THE_PARAM_T.site_tag = "site_tag"
+        eqrm_flags.site_tag = "site_tag"
 
-        THE_PARAM_T.bridges_functional_percentages = array(
+        eqrm_flags.bridges_functional_percentages = array(
             [0.0, 0.05, 0.5, 1.0])
             
         sites = array([1,2,3])
         events = array([500, 700])
         d2c = zeros((len(sites),len(events),
-                        len(THE_PARAM_T.bridges_functional_percentages)), float)
+                        len(eqrm_flags.bridges_functional_percentages)), float)
         #hazard[j,:,i] # sites,rsa_per,rtrn
         for i,site in enumerate(sites):
             for j,event in enumerate(events):
-                for k,bfp in enumerate(THE_PARAM_T.bridges_functional_percentages):
+                for k,bfp in enumerate(eqrm_flags.bridges_functional_percentages):
                     d2c[i,j,k] = event + site * bfp
-        base_names = save_bridge_days_to_complete(THE_PARAM_T, d2c, 
+        base_names = save_bridge_days_to_complete(eqrm_flags, d2c, 
                                                   compress=False)
                                                   
         # check the site files
-        for bfp in THE_PARAM_T.bridges_functional_percentages:
-           file_name = get_days_to_complete_file_name(THE_PARAM_T.site_tag, 
+        for bfp in eqrm_flags.bridges_functional_percentages:
+           file_name = get_days_to_complete_file_name(eqrm_flags.site_tag, 
                                                       bfp)
-           file_name = os.path.join(THE_PARAM_T.output_dir, file_name)
+           file_name = os.path.join(eqrm_flags.output_dir, file_name)
            f = open(file_name, 'r')
            text = f.read().splitlines()
             # ditch the comment lines
@@ -1422,7 +1422,7 @@ class Test_Output_manager(unittest.TestCase):
                                           array(float(event + site * bfp))))
                    f.close()
            os.remove(file_name)
-        os.rmdir(THE_PARAM_T.output_dir)
+        os.rmdir(eqrm_flags.output_dir)
                             
 ################################################################################
 

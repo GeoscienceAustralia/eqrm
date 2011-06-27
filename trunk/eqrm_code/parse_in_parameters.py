@@ -15,7 +15,7 @@
   All attributes are specified in CONV_DIC_NEW.
   
   If an attribute is not present in the set_data.py file and the
-  attribute has a default value, this value will be used in THE_PARAM_T.
+  attribute has a default value, this value will be used in eqrm_flags.
   
   Setting an attribute to None is not equivaluent to removing the
   attribute from the set_data.py file, since not all attributes default
@@ -461,7 +461,7 @@ def create_parameter_data(parameters, **kwargs):
     parameters: Has 2 forms:
       A string of the .py file to load
       or an instance with the required attributes.
-    **kwargs:  This are attributes that are attached to THE_PARAM_T
+    **kwargs:  This are attributes that are attached to eqrm_flags
       the known **kwargs are;
         use_determ_seed
         compress_output
@@ -470,7 +470,7 @@ def create_parameter_data(parameters, **kwargs):
         default_input_dir
 
     Return:
-      THE_PARAM_T, which is a DictKeyAsAttributes object.
+      eqrm_flags, which is a DictKeyAsAttributes object.
     """
     if isinstance(parameters, str) and parameters[-3:] == ".py":
         parameters = from_file_get_params(parameters)
@@ -483,32 +483,32 @@ def create_parameter_data(parameters, **kwargs):
     
     # The parameters value have presidence/overwrite the kwargs
     kwargs.update(parameters)
-    THE_PARAM_T = DictKeyAsAttributes(kwargs)
+    eqrm_flags = DictKeyAsAttributes(kwargs)
 
     # Add Hard-wired results  
-    THE_PARAM_T.update(OLD_STYLE_PARAS_HARD_WIRED)
+    eqrm_flags.update(OLD_STYLE_PARAS_HARD_WIRED)
 
     # Remove depreciated attributes
-    depreciated_attributes(THE_PARAM_T)
+    depreciated_attributes(eqrm_flags)
     
-    #print "THE_PARAM_T", THE_PARAM_T
+    #print "eqrm_flags", eqrm_flags
     # Add default values
-    att_default_values(THE_PARAM_T)
+    att_default_values(eqrm_flags)
 
    
     # Check att names
-    for key in THE_PARAM_T:
+    for key in eqrm_flags:
         if not CONV_DIC_NEW.has_key(key):
             msg = ("Parameter Error: Attribute " + key + " is unknown.")
             raise ParameterSyntaxError(msg)
             
     # Do attribute value fixes    
-    att_value_fixes(THE_PARAM_T)
+    att_value_fixes(eqrm_flags)
 
     # Check if values are consistant
-    verify_the_param_t(THE_PARAM_T)
+    verify_eqrm_flags(eqrm_flags)
     
-    return THE_PARAM_T
+    return eqrm_flags
 
 def get_no_instance_params(parameters):
     """
@@ -522,89 +522,89 @@ def get_no_instance_params(parameters):
     return local_paras
 
 
-def att_default_values(THE_PARAM_T):
+def att_default_values(eqrm_flags):
     """Add default values
     """        
     for param in CONV_NEW: 
         if param.has_key('new_para') and \
-               not THE_PARAM_T.has_key(param['new_para']):
+               not eqrm_flags.has_key(param['new_para']):
             if param.has_key('default'):
-                THE_PARAM_T[param['new_para']] = param['default']
+                eqrm_flags[param['new_para']] = param['default']
             else:
                 raise ParameterSyntaxError(
                 "Parameter Error: Attribute "  + param['new_para']
                 + " must be defined.")
 
-def depreciated_attributes(THE_PARAM_T):
+def depreciated_attributes(eqrm_flags):
     """
     Remove/fix depreciated attributes.
     Give a warning.
     """
     for param in DEPRECIATED_PARAS:
-        if THE_PARAM_T.has_key(param):
+        if eqrm_flags.has_key(param):
             handle_logic = DEPRECIATED_PARAS[param]
             if handle_logic is None:
                 pass
             elif isinstance(handle_logic, str):
                 # handle_logic is a replacement string
                 # for the parameter name
-                THE_PARAM_T[handle_logic] = THE_PARAM_T[param]
-                del THE_PARAM_T[param]
+                eqrm_flags[handle_logic] = eqrm_flags[param]
+                del eqrm_flags[param]
             elif handle_logic is True:
                 # Delete the parameter
-                del THE_PARAM_T[param]
+                del eqrm_flags[param]
             else:                
                 # handle_logic is a dictionary
-                what_to_do = handle_logic[THE_PARAM_T[param]]
+                what_to_do = handle_logic[eqrm_flags[param]]
                 if what_to_do is not None:
                     # The value is a tuple.
                     # the first value is the att name
                     # the second value is the att value
-                    THE_PARAM_T[what_to_do[0]] = what_to_do[1]                
-                del THE_PARAM_T[param]
+                    eqrm_flags[what_to_do[0]] = what_to_do[1]                
+                del eqrm_flags[param]
             msg = 'WARNING: ' + param + \
                   ' term in EQRM control file is depreciated.'
             # logging is only set-up after the para file has been passed.
             # So these warnings will not in in the logs.
             log.warning(msg)
 
-def att_value_fixes(THE_PARAM_T):
+def att_value_fixes(eqrm_flags):
     """
     Change the attribute values so they are in the correct format for EQRM
       e.g. scaler values into arrays
     """
     # convert all lists into arrays
-    for att in THE_PARAM_T:
-        att_val = getattr(THE_PARAM_T, att)
+    for att in eqrm_flags:
+        att_val = getattr(eqrm_flags, att)
         if isinstance(att_val, list):
-            THE_PARAM_T[att] = asarray(THE_PARAM_T[att])
+            eqrm_flags[att] = asarray(eqrm_flags[att])
             
     # FIXME Change the format to an array or
     # state why this format is needed.
-    THE_PARAM_T['return_periods'] = [ \
-        array([x]) for x in THE_PARAM_T['return_periods']]
+    eqrm_flags['return_periods'] = [ \
+        array([x]) for x in eqrm_flags['return_periods']]
 
             
     # FIXME this should happen to the weights from sources as well. 
-    weights = THE_PARAM_T.atten_model_weights
+    weights = eqrm_flags.atten_model_weights
     
     if weights is not None:        
-        THE_PARAM_T['atten_model_weights'] = check_sum_1_normalise(weights)
+        eqrm_flags['atten_model_weights'] = check_sum_1_normalise(weights)
     
     # if periods is collapsed (into a scalar), turn it into a vector
-    if not isinstance(THE_PARAM_T.atten_periods, ndarray):
-        THE_PARAM_T['atten_periods'] = array([THE_PARAM_T.atten_periods])
+    if not isinstance(eqrm_flags.atten_periods, ndarray):
+        eqrm_flags['atten_periods'] = array([eqrm_flags.atten_periods])
 
     # Fix the string specifying the directory structure
-    if not THE_PARAM_T.output_dir[-1] == '/':
-        THE_PARAM_T['output_dir'] = THE_PARAM_T.output_dir+'/'
-    if not THE_PARAM_T.input_dir[-1] == '/':
-        THE_PARAM_T['input_dir'] = THE_PARAM_T.input_dir+ '/'
-    THE_PARAM_T['output_dir'] = change_slashes(THE_PARAM_T.output_dir)
-    THE_PARAM_T['input_dir'] = change_slashes(THE_PARAM_T.input_dir)
+    if not eqrm_flags.output_dir[-1] == '/':
+        eqrm_flags['output_dir'] = eqrm_flags.output_dir+'/'
+    if not eqrm_flags.input_dir[-1] == '/':
+        eqrm_flags['input_dir'] = eqrm_flags.input_dir+ '/'
+    eqrm_flags['output_dir'] = change_slashes(eqrm_flags.output_dir)
+    eqrm_flags['input_dir'] = change_slashes(eqrm_flags.input_dir)
     
-    if THE_PARAM_T.atten_variability_method == None:
-        THE_PARAM_T.atten_spawn_bins = None
+    if eqrm_flags.atten_variability_method == None:
+        eqrm_flags.atten_spawn_bins = None
 
     
 def check_sum_1_normalise(weights, msg=None):
@@ -659,49 +659,49 @@ def from_file_get_params(path_file):
     return parameters
 
 
-def verify_the_param_t(THE_PARAM_T):
+def verify_eqrm_flags(eqrm_flags):
     """
-    Check that the values in THE_PARAM_T are consistant with how EQRM works.
+    Check that the values in eqrm_flags are consistant with how EQRM works.
     """
     # Value verification, expanding and fixing.
-    if not allclose(THE_PARAM_T.atten_periods,
-                    sort(THE_PARAM_T.atten_periods)):
+    if not allclose(eqrm_flags.atten_periods,
+                    sort(eqrm_flags.atten_periods)):
         raise ParameterSyntaxError(
             "Syntax Error: Period values are not ascending")
 
                 
-#     if THE_PARAM_T.save_motion == True and THE_PARAM_T.is_scenario == True \
-#             and THE_PARAM_T.scenario_number_of_events > 1:
+#     if eqrm_flags.save_motion == True and eqrm_flags.is_scenario == True \
+#             and eqrm_flags.scenario_number_of_events > 1:
 #       raise ParameterSyntaxError(
 #       'Cannot save motion for a scenario' + 
 #                        ' with more than one event.')
     
-    if THE_PARAM_T.save_hazard_map == True and THE_PARAM_T.is_scenario == True:
+    if eqrm_flags.save_hazard_map == True and eqrm_flags.is_scenario == True:
         raise ParameterSyntaxError(
             'Cannot save the hazard map for a scenario.')
   
-#     if THE_PARAM_T.save_motion == True and THE_PARAM_T.is_scenario == False:
+#     if eqrm_flags.save_motion == True and eqrm_flags.is_scenario == False:
 #       raise ParameterSyntaxError(
 #       'Cannot save the RSA values unless you are doing a scenario.')
 
-    if THE_PARAM_T.atten_variability_method == 1 and \
-           THE_PARAM_T.run_type == 'risk':
+    if eqrm_flags.atten_variability_method == 1 and \
+           eqrm_flags.run_type == 'risk':
         raise ParameterSyntaxError(
             'Cannot use spawning when doing a risk simulation.')
 
-    if THE_PARAM_T.amp_variability_method == 1:
+    if eqrm_flags.amp_variability_method == 1:
         raise ParameterSyntaxError(
             'Cannot spawn on amplification.')
   
     # need to change some array sizes, e.g. bedrock_SA_all
-#     if THE_PARAM_T.save_motion == True and \
-#            THE_PARAM_T.atten_variability_method == 1:
+#     if eqrm_flags.save_motion == True and \
+#            eqrm_flags.atten_variability_method == 1:
 #       raise ParameterSyntaxError(
 #       'Cannot save the RSA values and spawn.')
 
   
     # FIXME This needs to be done, and be updated.
-    #assert not ((THE_PARAM_T.save_ecloss_flag)>0 and (THE_PARAM_T.run_type<2))
+    #assert not ((eqrm_flags.save_ecloss_flag)>0 and (eqrm_flags.run_type<2))
 
 def find_set_data_py_files(path=None):
     """Return a list of all the set_data .py files in a path directory.
@@ -743,7 +743,7 @@ def update_control_file(file_name_path,
     
     # Remove depreciated attributes
     depreciated_attributes(parameters)
-    the_param_t_dic_to_set_data_py(new_file_name_path, parameters)
+    eqrm_flags_dic_to_set_data_py(new_file_name_path, parameters)
     
     
 def introspect_attribute_values(instance):
@@ -796,7 +796,7 @@ class DictKeyAsAttributes(dict):
             
 #         def __setattr__(self,key,value):
 #             # FIXME DSG Should this be used?
-#             # It gets messy if the values of THE_PARAM_T can be changed.
+#             # It gets messy if the values of eqrm_flags can be changed.
             
 #             self[key]=value
 #             # object.__setattr__(self, key, value)
@@ -831,7 +831,7 @@ def get_time_user():
 class ParameterData(object):
     """Class to build the parameter_data 'onto'.
     The user will add attributes to this class.
-    These attributes are used by ?? to create THE_PARAM_T data structure
+    These attributes are used by ?? to create eqrm_flags data structure
 
     This class should not have a lot in it.
     """
@@ -863,7 +863,7 @@ class ParameterData(object):
         user = os.getenv(cmd)
         return "_".join((time, user))
         
-def the_param_t_dic_to_set_data_py(py_file_name, attribute_dic):
+def eqrm_flags_dic_to_set_data_py(py_file_name, attribute_dic):
     """ Given a dictionary of the set data attribute values convert it
     to a set data .py file.  set data .py files describe the EQRM
     parameters.
@@ -900,9 +900,9 @@ def the_param_t_dic_to_set_data_py(py_file_name, attribute_dic):
     return py_file_name
 
 # Used in analysis.py 
-def convert_THE_PARAM_T_to_py(py_file_name, THE_PARAM_T):
+def convert_eqrm_flags_to_py(py_file_name, eqrm_flags):
     """
-    Given THE_PARAM_T convert it to a set data .py file.
+    Given eqrm_flags convert it to a set data .py file.
     set data .py files describe the EQRM parameters.
 
     py_file_name: Name of the new file.
@@ -920,9 +920,9 @@ def convert_THE_PARAM_T_to_py(py_file_name, THE_PARAM_T):
         if not para_dic.has_key('new_para'):
             # Add a title from PAR_STYLE_TITLES
             paras2print.append(para_dic['title'])
-        elif hasattr(THE_PARAM_T, para_dic['new_para']):
+        elif hasattr(eqrm_flags, para_dic['new_para']):
             line = [para_dic['new_para']]
-            val = getattr(THE_PARAM_T, para_dic['new_para'])
+            val = getattr(eqrm_flags, para_dic['new_para'])
             line.append(val)
             paras2print.append(line)
   

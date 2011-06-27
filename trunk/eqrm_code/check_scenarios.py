@@ -22,7 +22,7 @@ Title: check_scenarios.py - Run the implementation scenarios then check
   python check_scenarios.py no_run OR
   python check_scenarios.py n
 
-  The THE_PARAM_T.txt files are skipped.
+  The eqrm_flags.txt files are skipped.
 
   Timings are also measured and stored in scenario_performance.asc.
 
@@ -156,8 +156,8 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
     output_dirs = []
     for file in files:
         pull_path = join(scenario_dir, file)
-        THE_PARAM_T = parse_in_parameters.create_parameter_data(pull_path)
-        output_dirs.append(join(THE_PARAM_T['output_dir']))
+        eqrm_flags = parse_in_parameters.create_parameter_data(pull_path)
+        output_dirs.append(join(eqrm_flags['output_dir']))
         print "Running scenario", file
         #Initial time and memory
         t0 = time.clock()
@@ -208,7 +208,7 @@ def file_diff(fileA, fileB):
                 float_same = False
             if lineA is not None and lineA.find(".input_dir") >= 0:
                 # This line has linux/windows / \ differences
-                # in THE_PARAM_T.py
+                # in eqrm_flags.py
                 # So let's not care if it is different!
                 return True, None, None
             if not float_same:
@@ -324,11 +324,11 @@ def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR,
         except:
             pass
         try:
-            result_files.remove('THE_PARAM_T.pyc')
+            result_files.remove('eqrm_flags.pyc')
         except:
             pass
         try:
-            result_files.remove('THE_PARAM_T.txt')
+            result_files.remove('eqrm_flags.txt')
         except:
             pass
         try:
