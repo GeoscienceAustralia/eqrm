@@ -284,6 +284,9 @@ def main(parameter_handle,
         source_model,
         not eqrm_flags.atten_collapse_Sa_of_atten_models)
     
+    log.debug('Memory: Event activities split due to gmms.')
+    log.resource_usage()
+    
     msg = 'Event set created. Number of events=' + str(len(event_set.depth))
     log.info(msg)
     log.debug('Memory: Event Set created')
@@ -477,8 +480,12 @@ def main(parameter_handle,
          
     
     for i in range(array_size):
-        msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + str(array_size)
+        msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + \
+            str(array_size)
         log.info(msg)
+        
+        log.debug('Memory: site ' + str(i+1))
+        log.resource_usage()
         rel_i = i #- parallel.lo
 
         sites = all_sites[i:i+1] # take site i
