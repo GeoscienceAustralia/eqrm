@@ -1078,6 +1078,10 @@ class Event_Activity(object):
          
 
     def set_scenario_event_activity(self):
+        """
+        Set the event activity for a scenario run.
+       
+        """
         event_indexes = arange(self.num_events)
         self.set_event_activity(ones((self.num_events)), event_indexes)
 
@@ -1085,7 +1089,8 @@ class Event_Activity(object):
     def set_event_activity(self, event_activities, event_indexes=None):
         """
 
-        Assumes that spawning has not occured yet.
+        Assumes that spawning has not occured yet, or splitting due to 
+        ground motion models.
         
         Parameters
         event_indexes - the indexes of the events relating to the
