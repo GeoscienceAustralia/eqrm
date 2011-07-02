@@ -79,15 +79,6 @@ class Test_check_scenarios(unittest.TestCase):
         actual = ['TS_haz38', 'TS_haz39', 'TS_risk63']
         self.assertEqual(results, actual)
         
-    def test_check_dir_names3(self):    
-        dir_list = ['./foo/TS_haz38', 
-                    './implementation_tests/current/TS_haz39', 
-                    './implementation_tests/current/TS_risk63']
-        standard_dir = './implementation_tests/current'
-        self.assertRaises(BadDirectoryStructure,
-                          check_dir_names,dir_list, standard_dir)
-        #results = check_dir_names(dir_list, standard_dir)
-        
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_check_scenarios,'test')
