@@ -281,11 +281,12 @@ def check_dir_names(dir_list, current_dir):
         if folder == "":
             path, folder = os.path.split(path)        
         last_dir.append(folder)
-        if not os.path.abspath(path) == os.path.abspath(current_dir):
-            msg = "os.path.abspath(path)", os.path.abspath(path)
-            msg += "does not equal os.path.abspath(current_dir)", \
-                os.path.abspath(current_dir)
-            raise BadDirectoryStructure(msg)
+        #
+#         if not os.path.abspath(path) == os.path.abspath(current_dir):
+#             msg = "os.path.abspath(path)", os.path.abspath(path)
+#             msg += "does not equal os.path.abspath(current_dir)", \
+#                 os.path.abspath(current_dir)
+#             raise BadDirectoryStructure(msg)
     #print "last_dir", last_dir
     return last_dir
     
