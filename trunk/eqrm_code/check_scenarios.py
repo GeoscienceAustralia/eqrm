@@ -281,7 +281,9 @@ def check_dir_names(dir_list, current_dir):
         if folder == "":
             path, folder = os.path.split(path)        
         last_dir.append(folder)
-        #
+        
+        # This check was more strict than the os.
+        # eg c: does not equal C:, so I removed it.
 #         if not os.path.abspath(path) == os.path.abspath(current_dir):
 #             msg = "os.path.abspath(path)", os.path.abspath(path)
 #             msg += "does not equal os.path.abspath(current_dir)", \
