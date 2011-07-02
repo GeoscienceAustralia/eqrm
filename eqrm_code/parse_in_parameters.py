@@ -1,7 +1,12 @@
 """
   Author:  Duncan Gray, duncan.gray@ga.gov.au
            
-  Description: Parse in the EQRM control file.
+  Description: Parse in the EQRM control file.  The control file is a
+  python file, so vectors can be passed in easily and if necessary a
+  scripting language can be used.
+
+  For verification purposes the parameters are read and added to a
+  dictionary, rather than just being used as is.
 
  
   Version: $Revision: 1643 $  
@@ -39,13 +44,21 @@ import copy
 
 from eqrm_code.eqrm_filesystem import eqrm_path
 from eqrm_code.ANUGA_utilities import log
-from eqrm_code.util import convert_path_string_to_join
 
 
 ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
 SECOND_LINE = '  EQRM parameter file'
 
+# A list of paramter names and title names.
+#
+# Originally used to convert old parameter values, to the new
+# parameter values.  Now it is used to describe the parameters default
+# values and describing how to print out the parameters.
+# new_para - the parameter name
+# order - The order in which an EQRM control file is automatically generated.
+#         Lower numbers printed first.
+# values - Obsolete. Used to convert from the old style to the new.
 
 CONV_NEW = [{'order': 10.0,
              'title': '\n# Operation Mode\n'},
@@ -359,14 +372,19 @@ CONV_NEW = [{'order': 10.0,
              'default': False}
             ]
 
-OLD_STYLE_PARAS_HARD_WIRED = {'hazus_btypes_flag':0, 'force_btype_flag':0,
-                              'buildpars_flag':4, 'grid_flag':1}
+# Old style parameters that have not been removed yet.
+OLD_STYLE_PARAS_HARD_WIRED = {'buildpars_flag':4, 'grid_flag':1}
+
+# 'parameters' that can be added when executed on the command-line.
 KNOWN_KWARGS = {'use_determ_seed':None,
                      'compress_output':None,
                      'eqrm_dir':None,
                      'is_parallel':None,
                      'default_input_dir':None}
-# The key is the depreciated parameter.
+
+
+# In the dictionary DEPRECIATED_PARAS
+# the key is the depreciated parameter.
 # the value is
 # None, which means the only action is a warming,
 #   OR
@@ -385,13 +403,13 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      {True:None,
                       False:('amp_variability_method', None)},
                      'atten_use_rescale_curve_from_pga':
-                     {True:None, # None means do nothing
+                     {True:None, # Do nothing
                       False:('atten_override_RSA_shape', None)},
                      'csm_use_hysteretic_damping':
-                     {True:None, # None means do nothing
+                     {True:None, # Do nothing
                       False:('csm_hysteretic_damping', None)},
                      'atten_use_pga_scaling_cutoff':
-                     {True:None, # None means do nothing
+                     {True:None, # Do nothing
                       False:('atten_pga_scaling_cutoff', None)},
                      'atten_aggregate_Sa_of_atten_models':
                      'atten_collapse_Sa_of_atten_models',
@@ -413,13 +431,9 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'save_prob_strucutural_damage':
                      'save_prob_structural_damage', 
                      'prob_min_mag_cutoff':True
-#                      'csm_use_variability':
-#                      {True:None, # None means do nothing
-#                       None:('csm_variability_method', None), 
-#                       False:('csm_variability_method', None)},
                      }
 
-# This has all allowable set_data variables
+# CONV_DIC_NEW has all allowable set_data variables
 CONV_DIC_NEW = {}
 for item in CONV_NEW:
     if item.has_key('new_para'):
@@ -428,25 +442,12 @@ CONV_DIC_NEW.update(KNOWN_KWARGS)
 CONV_DIC_NEW.update(OLD_STYLE_PARAS_HARD_WIRED)
 
 
-PAR_STYLE_TITLES = [{'title':'\n# Operation Mode\n', 'order':10.0},
-                    {'title':'\n# Scenario input\n', 'order':30.0},
-                    {'title':'\n# Probabilistic input\n', 'order':40.0},
-                    {'title':'\n# Attenuation\n', 'order':50.0},
-                    {'title':'\n# Amplification\n', 'order':60.0},
-                    {'title':'\n# Buildings\n', 'order':70.0},
-                    {'title':'\n# Bridges\n', 'order':75.0},
-                    {'title':'\n# Capacity Spectrum Method\n', 'order':80.0},
-                    {'title':'\n# Loss\n', 'order':90.0},
-                    {'title':'\n# Save\n', 'order':100.0},
-                    {'title':'\n# General\n', 'order':110.0}]
-
-
 class Error(Exception):
     """Base exception for all exceptions raised in parse_in_parameters."""
     pass
 
 
-class ParameterSyntaxError(Error):
+class ParameterSyntaxError(Exception):
     """There is a syntax Error in the parameters file."""
     def __init__(self, value):
         self.value = value
@@ -727,8 +728,8 @@ def find_set_data_py_files(path=None):
                 fref.close()
     return set_data_files
 
-def update_control_file(file_name_path,
-                                      new_file_name_path=None):
+
+def update_control_file(file_name_path, new_file_name_path=None):
     """Open a set data .py file and then save it again,
     using the CONV_NEW rules and depreciation rules.
 
@@ -865,30 +866,23 @@ class ParameterData(object):
         
 def eqrm_flags_dic_to_set_data_py(py_file_name, attribute_dic):
     """ Given a dictionary of the set data attribute values convert it
-    to a set data .py file.  set data .py files describe the EQRM
-    parameters.
+    to an EQRM control file. 
 
     py_file_name: Name of the new file.
 
-    Output:
-      A .py set_data file
     """
     
-     # A list of lists
-     # The inner list should be 2 long.
+     # paras2print is a list of lists.
+     # The inner list is 2 elements long.
      #  index 0 is the parameter name
      #  index 1 is the value
     paras2print = []
     for para_dic in CONV_NEW:
         if not para_dic.has_key('new_para'):
-            # Add a title from PAR_STYLE_TITLES
             paras2print.append(para_dic['title'])
         elif attribute_dic.has_key(para_dic['new_para']):
             line = [para_dic['new_para']]
             val = attribute_dic[para_dic['new_para']]
-            if line[0] == 'input_dir' or line[0] == 'output_dir':
-                if not 'join' in val:
-                    val = convert_path_string_to_join(val)
             line.append(val)
             paras2print.append(line)
             
@@ -896,43 +890,7 @@ def eqrm_flags_dic_to_set_data_py(py_file_name, attribute_dic):
     writer.write_top()
     writer.write_middle(paras2print)    
     writer.write_bottom()
-
-    return py_file_name
-
-# Used in analysis.py 
-def convert_eqrm_flags_to_py(py_file_name, eqrm_flags):
-    """
-    Given eqrm_flags convert it to a set data .py file.
-    set data .py files describe the EQRM parameters.
-
-    py_file_name: Name of the new file.
-
-    Output:
-      A .py set_data file
-    """
     
-     # A list of lists
-     # The inner list should be 2 long.
-     #  index 0 is the parameter name
-     #  index 1 is the value
-    paras2print = []
-    for para_dic in CONV_NEW:
-        if not para_dic.has_key('new_para'):
-            # Add a title from PAR_STYLE_TITLES
-            paras2print.append(para_dic['title'])
-        elif hasattr(eqrm_flags, para_dic['new_para']):
-            line = [para_dic['new_para']]
-            val = getattr(eqrm_flags, para_dic['new_para'])
-            line.append(val)
-            paras2print.append(line)
-  
-    writer = WriteEqrmControlFile(py_file_name)
-    writer.write_top()
-    writer.write_middle(paras2print)    
-    writer.write_bottom()
-
-    return py_file_name
-
         
 class WriteEqrmControlFile(object):
     """
