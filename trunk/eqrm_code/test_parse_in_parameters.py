@@ -25,213 +25,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         
     def tearDown(self):
         pass
-        
-  
-    def update_test_create_parameter_data_BA08_error(self):
-        file, file_name = tempfile.mkstemp('.par', __name__+'_')
-        os.close(file)
-        #file_name = './songs.par'
-        file = open(file_name,"w")
-        file.write("[Operation_Mode]\n\
-run_type=[2]\n\n\
-[General]\n\
-destring=no description sring set\n\
-use_site_indexes=[3]\n\
-site_tag=newc\n\
-site_indexes=[2997,2657,3004,3500]\n\
-input_dir=./implementation_tests/input\n\
-output_dir=./implementation_tests/current/TS_risk56\n\
-return_periods=[10;50;100;200;250;474.56;500;974.79;1000;2474.9;2500;5000;7500;10000]\n\
-grid_flag=[1]\n\n\
-[Source]\n\
-prob_azimuth_in_zones=[180]\n\
-prob_number_of_mag_sample_bins=[15]\n\
-max_width=[15]\n\
-ftype=[2]\n\
-prob_number_of_events_in_zones=[500,100,100,300,100,100]\n\
-prob_delta_azimuth_in_zones=[180]\n\
-prob_dip_in_zones=[35]\n\
-[Event_Spawn]\n\
-src_eps_switch=[0]\n\
-mbnd=[4]\n\
-nsigma=[2.5]\n\
-nsamples=[5]\n\n\
-[Scenario]\n\
-scenario_azimuth=[340]\n\
-scenario_depth=[11.5]\n\
-scenario_latitude=[-32.95]\n\
-scenario_magnitude=[5.6]\n\
-scenario_number_of_events=[167]\n\
-scenario_longitude=[151.61]\n\
-is_scenario=[0]\n\n\
-[Attenuation]\n\
-atten_smooth_spectral_acceleration=[0]\n\
-atten_pga_scaling_cutoff=[2]\n\
-attenuation_flag=[1,2,8;-0.33333,-0.33333,-0.33333]\n\
-atten_use_variability=[1]\n\
-atten_variability_method=[2]\n\
-atten_periods=[0,0.17544,0.35088,0.52632,0.70175,0.87719,1.0526,1.2281,1.4035,1.5789,1.7544,1.9298,2.1053,2.2807,2.4561,2.6316,2.807,2.9825,3.1579,3.3333]\n\
-atten_override_RSA_shape=[0]\n\
-atten_threshold_distance=[400]\n\
-atten_log_sigma_eq_weight=[0]\n\n\
-[Amplification]\n\
-amp_min_factor=[0.6]\n\
-amp_variability_method=[2]\n\
-use_amplification=[1]\n\
-amp_use_variability=[1]\n\
-amp_max_factor=[10000]\n\n\
-[Bclasses]\n\
-buildings_set_damping_Be_to_5_percent=[0]\n\
-buildpars_flag=[4]\n\
-hazus_btypes_flag=[0]\n\
-buildings_usage_classification=[1]\n\n\
-[Bclasses2]\n\
-determ_buse=[1]\n\
-force_btype_flag=[0]\n\
-determ_btype=[34]\n\n\
-[CSM]\n\
-csm_use_variability=[1]\n\
-csm_standard_deviation=[0.3]\n\
-csm_variability_method=[3]\n\
-damp_flags=[0,0,0]\n\
-csm_hysteretic_damping=[1]\n\
-csm_damping_max_iterations=[7]\n\
-csm_SDcr_tolerance_percentage=[1]\n\n\
-[Diagnostics]\n\
-qa_switch_map=[0]\n\
-qa_switch_attn=[0]\n\
-qa_switch_ampfactors=[0]\n\
-qa_switch_vun=[0]\n\
-qa_switch_soc=[0]\n\
-qa_switch_mke_evnts=[0]\n\
-qa_switch_watercheck=[0]\n\
-qa_switch_fuse=[0]\n\n\
-[Loss]\n\
-loss_regional_cost_index_multiplier=[1.4516]\n\
-loss_min_pga=[0.05]\n\
-loss_aus_contents=[0]\n\n\
-[Save]\n\
-save_prob_structural_damage=[0]\n\
-save_probdam_flag=[0]\n\
-save_hazard_map=[0]\n\
-save_motion=[0]\n\
-save_ecloss_flag=[1]\n\
-save_socloss_flag=[1]\n")
-        file.close()
-        #file_name = 'TS_risk56.par'
-        #file_name = 'usongs.par'
-        try:
-            paras = create_parameter_data(file_name)
-        except ParameterSyntaxError:
-            os.remove(file_name)
-            pass
-        else:
-            os.remove(file_name)
-            self.failUnless(False, "ParameterSyntaxError not raised")
-                    
-    def update_test_create_parameter_data_BA08_error2(self):
-        file, file_name = tempfile.mkstemp('.par', __name__+'_')
-        os.close(file)
-        #file_name = './songs.par'
-        file = open(file_name,"w")
-        file.write("[Operation_Mode]\n\
-run_type=[2]\n\n\
-[General]\n\
-destring=no description sring set\n\
-use_site_indexes=[3]\n\
-site_tag=newc\n\
-site_indexes=[2997,2657,3004,3500]\n\
-input_dir=./implementation_tests/input\n\
-output_dir=./implementation_tests/current/TS_risk56\n\
-return_periods=[10;50;100;200;250;474.56;500;974.79;1000;2474.9;2500;5000;7500;10000]\n\
-grid_flag=[1]\n\n\
-[Source]\n\
-prob_azimuth_in_zones=[180]\n\
-prob_number_of_mag_sample_bins=[15]\n\
-max_width=[15]\n\
-ftype=[2]\n\
-prob_number_of_events_in_zones=[500,100,100,300,100,100]\n\
-prob_delta_azimuth_in_zones=[180]\n\
-prob_dip_in_zones=[35]\n\
-[Event_Spawn]\n\
-src_eps_switch=[0]\n\
-mbnd=[4]\n\
-nsigma=[2.5]\n\
-nsamples=[5]\n\n\
-[Scenario]\n\
-scenario_azimuth=[340]\n\
-scenario_depth=[11.5]\n\
-scenario_latitude=[-32.95]\n\
-scenario_magnitude=[5.6]\n\
-scenario_number_of_events=[167]\n\
-scenario_longitude=[151.61]\n\
-is_scenario=[0]\n\n\
-[Attenuation]\n\
-atten_smooth_spectral_acceleration=[0]\n\
-atten_pga_scaling_cutoff=[2]\n\
-attenuation_flag=[8;-1]\n\
-atten_use_variability=[1]\n\
-atten_variability_method=[2]\n\
-atten_periods=[0,0.17544,0.35088,0.52632,0.70175,0.87719,1.0526,1.2281,1.4035,1.5789,1.7544,1.9298,2.1053,2.2807,2.4561,2.6316,2.807,2.9825,3.1579,3.3333]\n\
-atten_override_RSA_shape=[0]\n\
-atten_threshold_distance=[400]\n\
-atten_log_sigma_eq_weight=[0]\n\n\
-[Amplification]\n\
-amp_min_factor=[0.6]\n\
-amp_variability_method=[2]\n\
-use_amplification=[1]\n\
-amp_use_variability=[1]\n\
-amp_max_factor=[10000]\n\n\
-[Bclasses]\n\
-buildings_set_damping_Be_to_5_percent=[0]\n\
-buildpars_flag=[4]\n\
-hazus_btypes_flag=[0]\n\
-buildings_usage_classification=[1]\n\n\
-[Bclasses2]\n\
-determ_buse=[1]\n\
-force_btype_flag=[0]\n\
-determ_btype=[34]\n\n\
-[CSM]\n\
-csm_use_variability=[1]\n\
-csm_standard_deviation=[0.3]\n\
-csm_variability_method=[3]\n\
-damp_flags=[0,0,0]\n\
-csm_hysteretic_damping=[1]\n\
-csm_damping_max_iterations=[7]\n\
-csm_SDcr_tolerance_percentage=[1]\n\n\
-[Diagnostics]\n\
-qa_switch_map=[0]\n\
-qa_switch_attn=[0]\n\
-qa_switch_ampfactors=[0]\n\
-qa_switch_vun=[0]\n\
-qa_switch_soc=[0]\n\
-qa_switch_mke_evnts=[0]\n\
-qa_switch_watercheck=[0]\n\
-qa_switch_fuse=[0]\n\n\
-[Loss]\n\
-loss_regional_cost_index_multiplier=[1.4516]\n\
-loss_min_pga=[0.05]\n\
-loss_aus_contents=[0]\n\n\
-[Save]\n\
-save_prob_structural_damage=[0]\n\
-save_probdam_flag=[0]\n\
-save_hazard_map=[0]\n\
-save_motion=[0]\n\
-save_ecloss_flag=[1]\n\
-save_socloss_flag=[1]\n")
-        file.close()
-        #file_name = 'TS_risk56.par'
-        #file_name = 'usongs.par'
-        try:
-            paras = create_parameter_data(file_name)
-        except ParameterSyntaxError:
-            os.remove(file_name)
-            pass
-        else:
-            os.remove(file_name)
-            self.failUnless(False, "ParameterSyntaxError not raised")
-       
-     
+    
     def test_ParameterData_eqrm_data_home(self):
         pd = ParameterData()
         # Not keen on testing this.  It does not
@@ -368,8 +162,6 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.amp_max_factor == 2)
         
         self.failUnless(TPT.buildings_usage_classification is 'HAZUS')
-        self.failUnless(TPT.force_btype_flag == 0)
-        self.failUnless(TPT.hazus_btypes_flag == 0)
         self.failUnless(TPT.buildings_set_damping_Be_to_5_percent == 0)
         self.failUnless(TPT.buildpars_flag == 4)
 
@@ -418,7 +210,7 @@ save_socloss_flag=[1]\n")
         self.failUnless(TPT.amp_variability_method == None)
 
 
-    def test_convert_eqrm_flags_to_py(self):
+    def test_eqrm_flags_dic_to_set_data_py(self):
 
         # turn logging WARNINGS off
         # This is to stop warning messages appearing when testing
@@ -431,7 +223,7 @@ save_socloss_flag=[1]\n")
         file, file_name = tempfile.mkstemp('.py', 'test_parse_in_para_')
         os.close(file)
         
-        convert_eqrm_flags_to_py(file_name, TPT)
+        eqrm_flags_dic_to_set_data_py(file_name, TPT)
         TPT = create_parameter_data(file_name)
         
         os.remove(file_name)
@@ -444,407 +236,93 @@ save_socloss_flag=[1]\n")
         
         
     def test_instance_to_py_file(self):
-        set = Dummy()
+        set = {} #Dummy()
         # Operation_Mode
-        set.run_type = 'risk'
-        set.is_scenario = True    # If False, probabilistic input used
+        set['run_type'] = 'risk'
+        set['is_scenario'] = True    # If False, probabilistic input used
 
         # General
-        set.use_site_indexes = True
-        set.site_tag= 'newc'
-        set.site_db_tag = 'fish'
-        set.site_indexes = [2255,11511]
-        set.input_dir = 'read in'
-        set.output_dir = 'read out'
-        set.return_periods = [22,11]
+        set['use_site_indexes'] = True
+        set['site_tag'] = 'newc'
+        set['site_db_tag'] = 'fish'
+        set['site_indexes'] = [2255,11511]
+        set['input_dir'] = 'read in'
+        set['output_dir'] = 'read out'
+        set['return_periods'] = [22,11]
         
         # Scenario input 
-        set.scenario_azimuth = 20
-        set.scenario_depth = 11.5
-        set.scenario_latitude = 32.
-        set.scenario_longitude = 151.
-        set.scenario_magnitude = 5.
-        set.scenario_dip= 35  
-        set.scenario_number_of_events = 1
+        set['scenario_azimuth'] = 20
+        set['scenario_depth'] = 11.5
+        set['scenario_latitude'] = 32.
+        set['scenario_longitude'] = 151.
+        set['scenario_magnitude'] = 5.
+        set['scenario_dip'] = 35  
+        set['scenario_number_of_events'] = 1
 
         # Probabilistic input
-        set.prob_azimuth_in_zones = [10,30]
-        set.prob_number_of_mag_sample_bins = 15
-        set.max_width = 15
-        set.prob_number_of_events_in_zones = [5000,1000]
-        set.prob_delta_azimuth_in_zones = [5,10]
-        set.prob_dip_in_zones = [35,40]
+        set['prob_azimuth_in_zones'] = [10,30]
+        set['prob_number_of_mag_sample_bins'] = 15
+        set['max_width'] = 15
+        set['prob_number_of_events_in_zones'] = [5000,1000]
+        set['prob_delta_azimuth_in_zones'] = [5,10]
+        set['prob_dip_in_zones'] = [35,40]
         
         #  Attenuation   
-        set.atten_models = ['my_attenuation_model','Gaull_1990_WA']
-        set.atten_model_weights = [0.3,0.7]
-        set.atten_collapse_Sa_of_atten_models = False 
-        set.atten_use_variability = True
-        set.atten_variability_method = 2 
-        set.atten_periods = [0,0.30303,1]
-        set.atten_threshold_distance = 400
-        set.atten_cutoff_max_spectral_displacement  = True
-        set.atten_pga_scaling_cutoff = 4.3  # None or a value
-        set.atten_override_RSA_shape = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
-        set.atten_smooth_spectral_acceleration = True
-        set.atten_log_sigma_eq_weight = 1.0
+        set['atten_models'] = ['my_attenuation_model','Gaull_1990_WA']
+        set['atten_model_weights'] = [0.3,0.7]
+        set['atten_collapse_Sa_of_atten_models'] = False 
+        set['atten_use_variability'] = True
+        set['atten_variability_method'] = 2 
+        set['atten_periods'] = [0,0.30303,1]
+        set['atten_threshold_distance'] = 400
+        set['atten_cutoff_max_spectral_displacement '] = True
+        set['atten_pga_scaling_cutoff'] = 4.3  # None or a value
+        set['atten_override_RSA_shape'] = 'HAZUS_Sa' # ('Aust_standard_Sa'|'HAZUS_Sa')
+        set['atten_smooth_spectral_acceleration'] = True
+        set['atten_log_sigma_eq_weight'] = 1.0
 
         #  Amplification  
-        set.use_amplification = True  
-        set.amp_use_variability = True
-        set.amp_variability_method = 2 
-        set.amp_min_factor = 0.6
-        set.amp_max_factor = 2
+        set['use_amplification'] = True  
+        set['amp_use_variability'] = True
+        set['amp_variability_method'] = 2 
+        set['amp_min_factor'] = 0.6
+        set['amp_max_factor'] = 2
 
         # Buildings
-        set.buildings_usage_classification = 'HAZUS'   # ('HAZUS'|'FCB')
-        set.buildings_set_damping_Be_to_5_percent = False
+        set['buildings_usage_classification'] = 'HAZUS'   # ('HAZUS'|'FCB')
+        set['buildings_set_damping_Be_to_5_percent'] = False
         # has not been implemented.
-        #set.building_paramters_file = "workshop_3"   # 'workshop'+(''|'_1'|'_2'|'_3')
+        #set['building_paramters_file'] = "workshop_3"   # 'workshop'+(''|'_1'|'_2'|'_3')
 
         # Building capacity curve
-        set.csm_use_variability = True
-        set.csm_variability_method = 3
-        set.csm_standard_deviation = 0.3
-        set.csm_damping_regimes = 0       # (0|1|2) See manual for this
-        set.csm_damping_modify_Tav = True 
-        set.csm_damping_use_smoothing = True
-        set.csm_hysteretic_damping = 'curve'    # ('curve'|'trapezoidal'|None)
-        set.csm_SDcr_tolerance_percentage = 2
-        set.csm_damping_max_iterations = 7
+        set['csm_use_variability'] = True
+        set['csm_variability_method'] = 3
+        set['csm_standard_deviation'] = 0.3
+        set['csm_damping_regimes'] = 0       # (0|1|2) See manual for this
+        set['csm_damping_modify_Tav'] = True 
+        set['csm_damping_use_smoothing'] = True
+        set['csm_hysteretic_damping'] = 'curve'    # ('curve'|'trapezoidal'|None)
+        set['csm_SDcr_tolerance_percentage'] = 2
+        set['csm_damping_max_iterations'] = 7
         
         # Loss
-        set.loss_min_pga = 0.05 # May be a crap value to use
-        set.loss_regional_cost_index_multiplier = 3.2
-        set.loss_aus_contents = 0   # (0|1)
+        set['loss_min_pga'] = 0.05 # May be a crap value to use
+        set['loss_regional_cost_index_multiplier'] = 3.2
+        set['loss_aus_contents'] = 0   # (0|1)
 
         #  Save
-        set.save_hazard_map = True
-        set.save_total_financial_loss = True
-        set.save_building_loss = True
-        set.save_contents_loss = True
-        set.save_motion = True
-        set.save_prob_structural_damage = True
+        set['save_hazard_map'] = True
+        set['save_total_financial_loss'] = True
+        set['save_building_loss'] = True
+        set['save_contents_loss'] = True
+        set['save_motion'] = True
+        set['save_prob_structural_damage'] = True
 
 
-        convert_eqrm_flags_to_py('here.py', set)
-
+        eqrm_flags_dic_to_set_data_py('here.py', set)
         
-        # need some more tests.
-    def do_not_test_create_parameter_data_setdata_probhaz(self):
-        file, file_name = tempfile.mkstemp('.par', __name__+'_')
-        os.close(file)
-        #file_name = './songs.par'
-        file = open(file_name,"w")
-        file.write("[Operation_Mode]\n\
-run_type='hazard'\n\n\
-[General]\n\
-destring=no description sring set\n\
-use_site_indexes=[1]\n\
-site_tag=newc\n\
-site_indexes=[2255,11511,10963]\n\
-input_dir=.\input\n\
-output_dir=.\output\prob_haz\n\
-return_periods=[10;50;100;200]\n\
-grid_flag=[1]\n\
-[Source]\n\
-prob_azimuth_in_zones=[10,30,70,100,150,15]\n\
-prob_number_of_mag_sample_bins=[15]\n\
-max_width=[15]\n\
-ftype=[2]\n\
-prob_number_of_events_in_zones=[5000,1000,1000,3000,1000,1000]\n\
-prob_delta_azimuth_in_zones=[5,10,20,25,50,0]\n\
-prob_dip_in_zones=[35,40,45,50,55,60]\n\
-[Event_Spawn]\n\
-src_eps_switch=[0]\n\
-mbnd=[4]\n\
-nsigma=[2.5]\n\
-nsamples=[5]\n\
-[Scenario]\n\
-scenario_azimuth=[340]\n\
-scenario_depth=[11.5]\n\
-scenario_latitude=[-32.95]\n\
-scenario_magnitude=[5.6]\n\
-scenario_number_of_events=[167]\n\
-scenario_longitude=[151.61]\n\
-is_scenario=[1]\n\
-[Attenuation]\n\
-atten_smooth_spectral_acceleration=[1]\n\
-atten_pga_scaling_cutoff=[2]\n\
-attenuation_flag=[3;1]\n\
-attn_region=[1]\n\
-atten_use_variability=[1]\n\
-atten_variability_method=[2]\n\
-atten_periods=[0,0.30303,1]\n\
-atten_override_RSA_shape=[5]\n\
-atten_threshold_distance=[400]\n\
-atten_log_sigma_eq_weight=[1.0]\n\
-[Amplification]    \n\
-amp_min_factor=[0.6]\n\
-amp_variability_method=[2]\n\
-use_amplification=[1]\n\
-amp_use_variability=[1]\n\
-amp_max_factor=[10000]\n\
-[Bclasses]    \n\
-buildings_set_damping_Be_to_5_percent=[0]\n\
-buildpars_flag=[4]\n\
-hazus_btypes_flag=[0]\n\
-buildings_usage_classification=[1]\n\
-[Bclasses2]    \n\
-determ_buse=[0]\n\
-force_btype_flag=[0]\n\
-determ_btype=[0]\n\
-[CSM]\n\
-csm_use_variability=[1]\n\
-csm_standard_deviation=[0.3]\n\
-csm_variability_method=[3]\n\
-damp_flags=[0,0,0]\n\
-csm_hysteretic_damping=[3]\n\
-csm_damping_max_iterations=[7]\n\
-csm_SDcr_tolerance_percentage=[2]\n\
-[Diagnostics]\n\
-qa_switch_map=[1]\n\
-qa_switch_attn=[0]\n\
-qa_switch_ampfactors=[0]\n\
-qa_switch_vun=[0]\n\
-qa_switch_soc=[0]\n\
-qa_switch_mke_evnts=[0]\n\
-qa_switch_watercheck=[0]\n\
-qa_switch_fuse=[0]\n\
-[Loss]\n\
-loss_regional_cost_index_multiplier=[3.2]\n\
-loss_min_pga=[0.05]\n\
-loss_aus_contents=[0]\n\
-[Save]\n\
-save_prob_structural_damage=[0]\n\
-save_probdam_flag=[0]\n\
-save_hazard_map=[1]\n\
-save_motion=[0]\n\
-save_ecloss_flag=[0]\n\
-save_socloss_flag=[0]\n")
-        file.close()
-        
-        para_old = create_parameter_data(file_name)
-        os.remove(file_name)
-        
-        from eqrm_code.parse_in_parameters import ParameterData
-        from os.path import join
-
-        set = ParameterData()
-
-        # Operation_Mode
-        set.run_type = 'hazard'   # ('risk'|'hazard')
-        
-        # General
-        set.use_site_indexes = True # Only use this for testing
-        set.site_tag = 'newc'
-        set.site_indexes = [2255,11511,10963]
-        set.site_db_tag = "" # file nam is sitedb_[site_tag][site_db_tag].csv
-        set.input_dir = join(set.eqrm_home(), 'demo', 'input')
-        set.output_dir = join(set.eqrm_home(), 'demo', 'output','prob_haz')
-        set.return_periods = [10,50,100,200]
-        
-        # Scenario input   (single event input, with event_azimuth ect.)
-        set.is_scenario = True   # If False, probabilistic input used
-        set.scenario_azimuth = 340
-        set.scenario_depth = 11.5
-        set.scenario_latitude = -32.95
-        set.scenario_longitude = 151.61
-        set.scenario_magnitude = 5.6
-        set.scenario_dip= 35  
-        set.scenario_number_of_events = 167
-        
-        
-        set.prob_azimuth_in_zones = [10,30,70,100,150,15]
-        set.prob_number_of_mag_sample_bins = 15
-        set.max_width = 15
-        set.prob_number_of_events_in_zones = [5000,1000,1000,3000,1000,1000]
-        set.prob_delta_azimuth_in_zones = [5,10,20,25,50,0]
-        set.prob_dip_in_zones = [35,40,45,50,55,60]
-        
-        #  Attenuation   
-        set.atten_models = [3]
-        set.atten_model_weights = [1]
-        set.atten_collapse_Sa_of_atten_models = True
-        set.atten_use_variability = True
-        set.atten_variability_method = 2 
-        set.atten_periods = [0,0.30303,1]
-        set.atten_threshold_distance = 400
-        set.atten_cutoff_max_spectral_displacement = True 
-        set.atten_pga_scaling_cutoff = 2.0  # Float
-        set.atten_smooth_spectral_acceleration = True
-        set.atten_log_sigma_eq_weight = 1.0
-        
-        #  Amplification  
-        set.use_amplification = True  
-        set.amp_use_variability = True
-        set.amp_variability_method = 2  # (2-6) 2 is random sampling. More above
-        set.amp_min_factor = 0.6
-        set.amp_max_factor = 10000
-        
-        # Buildings
-        set.buildings_usage_classification = 'HAZUS'   # ('HAZUS'|'FCB')
-        set.buildings_set_damping_Be_to_5_percent = False
-        
-        # Building capacity curve
-        set.csm_use_variability = True
-        set.csm_variability_method = 3
-        set.csm_standard_deviation = 0.3
-        set.csm_damping_regimes = 0   
-        set.csm_damping_modify_Tav = True 
-        set.csm_damping_use_smoothing = True
-        set.csm_hysteretic_damping = 'curve'
-        set.csm_SDcr_tolerance_percentage = 2
-        set.csm_damping_max_iterations = 7
-        
-        # Loss
-        set.loss_min_pga = 0.05 # May be a crap value to use
-        set.loss_regional_cost_index_multiplier = 3.2
-        set.loss_aus_contents = 0   # (0|1)
-        
-        #  Save
-        set.save_hazard_map = True
-        set.save_total_financial_loss = False
-        set.save_building_loss = False
-        set.save_contents_loss = False
-        set.save_motion = False
-        set.save_prob_structural_damage = False
-        
-        para_new = create_parameter_data(set)
-        
-        # Don't worry about the dir stuff
-        del para_new['input_dir']
-        del para_new['output_dir']
-
-        # I don't know why these values are not the same
-        # print them and they look the same.
-        # So it is not so good taking them out...
-        del para_new['site_db_tag']
-        del para_new['site_tag']
-        
-        for key in para_new:
-            # skip the string values.
-            if key in ['run_type', 'atten_cutoff_max_spectral_displacement',
-                       'atten_override_RSA_shape',
-                       'csm_hysteretic_damping',
-                       'buildings_usage_classification']:
-                continue
-            if isinstance(getattr(para_new, key), str) or \
-                   isinstance(getattr(para_old, key), str) and \
-                   not getattr(para_new, key) == getattr(para_old, key):
-                print "key", key
-                print "str getattr(para_new, key)", getattr(para_new, key)
-                print "str getattr(para_old, key)", getattr(para_old, key)
-                self.assert_(False)
-                
-            elif not allclose(asarray(getattr(para_new, key)),
-                              asarray(getattr(para_old, key))):
-                print "key", key
-                print "getattr(para_new, key)", getattr(para_new, key)
-                print "getattr(para_old, key)", getattr(para_old, key)
-                self.assert_(False)
   
-    def do_not_test_convert_par_to_py(self):
-        file, file_name = tempfile.mkstemp('.par', __name__+'_')
-        os.close(file)
-        #file_name = './songs.par'
-        file = open(file_name,"w")
-        file.write("[Operation_Mode]\n\
-run_type=[1]\n\n\
-[General]\n\
-destring=no description sring set\n\
-use_site_indexes=[1]\n\
-site_tag=newc\n\
-site_indexes=[2255,11511,10963]\n\
-input_dir=.\input\n\
-output_dir=.\output\prob_haz\n\
-return_periods=[10;50;100;200]\n\
-grid_flag=[1]\n\
-[Source]\n\
-prob_azimuth_in_zones=[10,30,70,100,150,15]\n\
-prob_number_of_mag_sample_bins=[15]\n\
-max_width=[15]\n\
-ftype=[2]\n\
-prob_number_of_events_in_zones=[5000,1000,1000,3000,1000,1000]\n\
-prob_delta_azimuth_in_zones=[5,10,20,25,50,0]\n\
-prob_dip_in_zones=[35,40,45,50,55,60]\n\
-[Event_Spawn]\n\
-src_eps_switch=[0]\n\
-mbnd=[4]\n\
-nsigma=[2.5]\n\
-nsamples=[5]\n\
-[Scenario]\n\
-scenario_azimuth=[340]\n\
-scenario_depth=[11.5]\n\
-scenario_latitude=[-32.95]\n\
-scenario_magnitude=[5.6]\n\
-scenario_number_of_events=[167]\n\
-scenario_longitude=[151.61]\n\
-is_scenario=[0]\n\
-[Attenuation]\n\
-atten_smooth_spectral_acceleration=[1]\n\
-atten_pga_scaling_cutoff=[2]\n\
-attenuation_flag=[3,2;0.3,0.7]\n\
-attn_region=[1]\n\
-atten_use_variability=[1]\n\
-atten_variability_method=[2]\n\
-atten_periods=[0,0.30303,1]\n\
-atten_override_RSA_shape=[0]\n\
-atten_threshold_distance=[400]\n\
-atten_log_sigma_eq_weight=[1.0]\n\
-[Amplification]    \n\
-amp_min_factor=[0.6]\n\
-amp_variability_method=[2]\n\
-use_amplification=[1]\n\
-amp_use_variability=[1]\n\
-amp_max_factor=[10000]\n\
-[Bclasses]    \n\
-buildings_set_damping_Be_to_5_percent=[0]\n\
-buildpars_flag=[4]\n\
-hazus_btypes_flag=[0]\n\
-buildings_usage_classification=[1]\n\
-[Bclasses2]    \n\
-determ_buse=[0]\n\
-force_btype_flag=[0]\n\
-determ_btype=[0]\n\
-[CSM]\n\
-csm_use_variability=[1]\n\
-csm_standard_deviation=[0.3]\n\
-csm_variability_method=[3]\n\
-damp_flags=[0,0,0]\n\
-csm_hysteretic_damping=[3]\n\
-csm_damping_max_iterations=[7]\n\
-csm_SDcr_tolerance_percentage=[2]\n\
-[Diagnostics]\n\
-qa_switch_map=[1]\n\
-qa_switch_attn=[0]\n\
-qa_switch_ampfactors=[0]\n\
-qa_switch_vun=[0]\n\
-qa_switch_soc=[0]\n\
-qa_switch_mke_evnts=[0]\n\
-qa_switch_watercheck=[0]\n\
-qa_switch_fuse=[0]\n\
-[Loss]\n\
-loss_regional_cost_index_multiplier=[3.2]\n\
-loss_min_pga=[0.05]\n\
-loss_aus_contents=[0]\n\
-[Save]\n\
-save_prob_structural_damage=[0]\n\
-save_probdam_flag=[0]\n\
-save_hazard_map=[1]\n\
-save_motion=[0]\n\
-save_ecloss_flag=[0]\n\
-save_socloss_flag=[0]\n")
-        file.close()
-        
-        #para_old = create_parameter_data(file_name)
-        py_file_name = convert_par_to_py(file_name)
-
-        #So this isn't really a test
-
-        os.remove(file_name)
-        os.remove(py_file_name)
-        
+  
     def test_DictKeyAsAttributes(self):
         dic = DictKeyAsAttributes()
         leg = 12
@@ -944,11 +422,10 @@ save_socloss_flag=[0]\n")
             self.failUnless(False, "SystemExit not raised")
 
    
-    def test_not_really_a_test(self):
+    def test_create_an_example(self):
         # Create an example of a python setdata file.
         para_old = DictKeyAsAttributes( {
             'Bclasses': {'buildings_set_damping_Be_to_5_percent': 0,
-                         'hazus_btypes_flag': 0,
                          'buildpars_flag': 4,
                          'buildings_usage_classification': 2},
             'Amplification': {'amp_variability_method': 2,
@@ -978,7 +455,6 @@ save_socloss_flag=[0]\n")
                             'atten_use_variability': 0,
                             'atten_log_sigma_eq_weight':0.0},
             'Bclasses2': {'determ_buse': -9999,
-                          'force_btype_flag': 0,
                           'determ_btype': -9999},
             'site_db_tag': '',
             'Event_Spawn': {'src_eps_switch': 0,
@@ -1039,7 +515,7 @@ save_socloss_flag=[0]\n")
         eqrm_dir = determine_eqrm_path()
         output_base_name = join(eqrm_dir, 'Documentation',
                                 'set_data_example.py')
-        convert_eqrm_flags_to_py(output_base_name, para_old)
+        eqrm_flags_dic_to_set_data_py(output_base_name, para_old)
 
    
     def test_find_set_data_py_files(self):
@@ -1070,9 +546,10 @@ save_socloss_flag=[0]\n")
         
     def test_update_control_file(self):
         set = self.small_set_data()
+        para_new = create_parameter_data(set)
         file, file_name = tempfile.mkstemp('.py', __name__+'_')
         os.close(file)
-        convert_eqrm_flags_to_py(file_name, set)
+        eqrm_flags_dic_to_set_data_py(file_name, para_new)
         update_control_file(file_name)
         new_set = create_parameter_data(file_name)
         self.failUnlessEqual(set.csm_damping_regimes,
@@ -1088,8 +565,5 @@ save_socloss_flag=[0]\n")
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Parse_in_parameters,'test')
-    
-    #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_instance_to_eqrm_flags')
-    #suite = unittest.makeSuite(Test_Parse_in_parameters,'test_convert_par_to_py')
     runner = unittest.TextTestRunner() #verbosity=2)
     runner.run(suite)

@@ -25,7 +25,7 @@ from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
      arange, reshape, exp, tile
 
 from eqrm_code.parse_in_parameters import  \
-    ParameterSyntaxError, create_parameter_data, convert_eqrm_flags_to_py
+    ParameterSyntaxError, create_parameter_data, eqrm_flags_dic_to_set_data_py
 from eqrm_code.event_set import Event_Set, Event_Activity, \
      generate_synthetic_events_fault, merge_events_and_sources
 from eqrm_code.ground_motion_calculator import \
@@ -141,8 +141,8 @@ def main(parameter_handle,
                         eqrm_flags.output_dir+'eqrm_flags.py')
     else:
         para_instance = copy.deepcopy(eqrm_flags)
-        convert_eqrm_flags_to_py(
-            os.path.join(eqrm_flags.output_dir, 'eqrm_flags.txt'),
+        eqrm_flags_dic_to_set_data_py(
+            os.path.join(eqrm_flags.output_dir, 'eqrm_flags.py'),
             para_instance)
 
     # Set up the logging
@@ -1162,18 +1162,14 @@ def load_data(eqrm_flags):
             sites = Structures.from_csv(
                 site_file,
                 building_parameters_table=building_par_file,
-                default_input_dir=
-                eqrm_flags.default_input_dir,
+                default_input_dir=eqrm_flags.default_input_dir,
                 input_dir=eqrm_flags.input_dir,
                 eqrm_dir=eqrm_flags.eqrm_dir,
                 buildings_usage_classification=
                 eqrm_flags.buildings_usage_classification,
-                use_refined_btypes=
-                not eqrm_flags.hazus_btypes_flag,
-                force_btype_flag=
-                eqrm_flags.force_btype_flag,
-                loss_aus_contents=
-                eqrm_flags.loss_aus_contents)
+                use_refined_btypes=True,
+                force_btype_flag=False,
+                loss_aus_contents=eqrm_flags.loss_aus_contents)
 
             #FIXME do this after subsampling the sites
             # Hard wires the Demand Curve damping to 5%
