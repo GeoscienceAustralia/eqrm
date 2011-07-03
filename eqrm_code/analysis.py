@@ -25,7 +25,7 @@ from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
      arange, reshape, exp, tile
 
 from eqrm_code.parse_in_parameters import  \
-    ParameterSyntaxError, create_parameter_data, eqrm_flags_dic_to_set_data_py
+    AttributeSyntaxError, create_parameter_data, eqrm_flags_dic_to_set_data_py
 from eqrm_code.event_set import Event_Set, Event_Activity, \
      generate_synthetic_events_fault, merge_events_and_sources
 from eqrm_code.ground_motion_calculator import \
@@ -105,15 +105,15 @@ def main(parameter_handle,
     # Note that arrays and floating point numbers will be converted,
     # everthing else will be a string.
     try:
-        eqrm_flags=create_parameter_data(parameter_handle,
-                                          default_input_dir=
-                                              os.path.join(eqrm_dir,
-                                                   eq_fs.Resources_Data_Path),
-                                          use_determ_seed=use_determ_seed,
-                                          compress_output=compress_output,
-                                          eqrm_dir=eqrm_dir,
-                                          is_parallel=is_parallel)
-    except ParameterSyntaxError, e:
+        eqrm_flags = create_parameter_data(
+            parameter_handle,
+            default_input_dir=os.path.join(eqrm_dir,
+                                           eq_fs.Resources_Data_Path),
+            use_determ_seed=use_determ_seed,
+            compress_output=compress_output,
+            eqrm_dir=eqrm_dir,
+            is_parallel=is_parallel)
+    except AttributeSyntaxError, e:
         print 'File parameter error:', e
         import sys
         sys.exit(1)

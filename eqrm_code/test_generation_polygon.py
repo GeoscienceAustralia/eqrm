@@ -204,7 +204,7 @@ class Test_Generation_polygon(unittest.TestCase):
             os.remove(file_name)
         else:  
             os.remove(file_name)
-            self.failUnless(False, "ParameterSyntaxError not raised")
+            self.failUnless(False, "FileError not raised")
             
 
     def test_polygons_from_xml_no_magnitude_type_ok(self):
@@ -517,7 +517,7 @@ class Test_Generation_polygon(unittest.TestCase):
             os.remove(file_name)
         else:  
             os.remove(file_name)
-            self.failUnless(False, "ParameterSyntaxError not raised")
+            self.failUnless(False, "FileError not raised")
             
         
     def test_xml_fault_generators_magnitude_type_left_out(self):

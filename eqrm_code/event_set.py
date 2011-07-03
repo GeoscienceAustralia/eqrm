@@ -166,7 +166,6 @@ class Event_Set(object):
     parameters will be repeated.  But __init__ fails if the parameters
     represent more than 1 event and scenario_number_of_events > 1.
 
-    Should accept a fault type and use that instead of hardcoded 'reverse'.
         """
         
 
@@ -1184,8 +1183,6 @@ class Event_Activity(object):
         return scipy.sum(scipy.sum(self.event_activity, axis=SPAWN_D),
                          axis=(GMMODEL-1))  
         
-        
-
 ####################################################################
 # this will run if this is called from DOS prompt or double clicked
 if __name__ == '__main__':

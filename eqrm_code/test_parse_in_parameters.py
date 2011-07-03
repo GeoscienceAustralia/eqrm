@@ -5,12 +5,8 @@ import unittest
 
 from scipy import array, allclose, asarray
 
-from eqrm_code.parse_in_parameters import *
+from parse_in_parameters import *
 from eqrm_code.util import determine_eqrm_path
-from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
-     CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
-from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING
-
 from eqrm_filesystem import eqrm_path, Resources_Data_Path    
 from eqrm_code.ANUGA_utilities import log
 
@@ -58,12 +54,12 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.scenario_number_of_events = 1
 
         # Probabilistic input
-        set.prob_azimuth_in_zones = [10,30]
-        set.prob_number_of_mag_sample_bins = 15
+        #set.prob_azimuth_in_zones = [10,30]
+        #set.prob_number_of_mag_sample_bins = 15
         set.max_width = 15
         set.prob_number_of_events_in_zones = [5000,1000]
-        set.prob_delta_azimuth_in_zones = [5,10]
-        set.prob_dip_in_zones = [35,40]
+        #set.prob_delta_azimuth_in_zones = [5,10]
+        #set.prob_dip_in_zones = [35,40]
         
         #  Attenuation   
         set.atten_models = ['my_attenuation_model','Gaull_1990_WA']
@@ -126,7 +122,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(allclose(TPT.site_indexes, asarray([2255,11511])))
         self.failUnless(TPT.input_dir == 'c:/in/')
         self.failUnless(TPT.output_dir == 'c:/out/')        
-        self.failUnless(TPT.return_periods == [22,11])        
+        self.failUnless(allclose(TPT.return_periods, asarray([22,11])))        
         self.failUnless(TPT.grid_flag == 1)
         
         self.failUnless(TPT.use_site_indexes == 1)
@@ -139,15 +135,9 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.scenario_magnitude == 5.)
         self.failUnless(TPT.scenario_number_of_events == 1.)
         
-        self.failUnless(allclose(TPT.prob_azimuth_in_zones, asarray([10,30])))
-        self.failUnless(TPT.prob_number_of_mag_sample_bins == 15)
         self.failUnless(TPT.max_width == 15)
         self.failUnless(allclose(TPT.prob_number_of_events_in_zones,
                                  asarray([5000,1000])))
-        self.failUnless(allclose(TPT.prob_delta_azimuth_in_zones,
-                                 asarray([5,10])))
-        self.failUnless(allclose(TPT.prob_dip_in_zones, asarray([35, 40])))
-        
         self.failUnless(allclose(TPT.atten_periods, asarray([0,0.30303,1])))
         self.failUnless(TPT.atten_threshold_distance == 400)
         self.failUnless(TPT.atten_pga_scaling_cutoff ==  4.3)
@@ -249,6 +239,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set['input_dir'] = 'read in'
         set['output_dir'] = 'read out'
         set['return_periods'] = [22,11]
+        set['max_width'] = 15
         
         # Scenario input 
         set['scenario_azimuth'] = 20
@@ -260,12 +251,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set['scenario_number_of_events'] = 1
 
         # Probabilistic input
-        set['prob_azimuth_in_zones'] = [10,30]
-        set['prob_number_of_mag_sample_bins'] = 15
-        set['max_width'] = 15
         set['prob_number_of_events_in_zones'] = [5000,1000]
-        set['prob_delta_azimuth_in_zones'] = [5,10]
-        set['prob_dip_in_zones'] = [35,40]
         
         #  Attenuation   
         set['atten_models'] = ['my_attenuation_model','Gaull_1990_WA']
@@ -337,11 +323,11 @@ class Test_Parse_in_parameters(unittest.TestCase):
         else:
             self.failUnless(False, "Error not raised")
         
-    def test_att_default_values_raise(self):
+    def test_add_default_values_raise(self):
         set = ParameterData()
         try:
             para_new = create_parameter_data(set)
-        except ParameterSyntaxError:
+        except AttributeSyntaxError:
             pass
         else:
             self.failUnless(False, "SystemExit not raised")
@@ -356,12 +342,6 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.run_type = 'risk'
         
         # Other stuff - needed?
-        set.prob_azimuth_in_zones = [10,30,70,100,150,15]
-        set.prob_number_of_mag_sample_bins = 15
-        set.max_width = 15
-        set.prob_number_of_events_in_zones = [5000,1000,1000,3000,1000,1000]
-        set.prob_delta_azimuth_in_zones = [5,10,20,25,50,0]
-        set.prob_dip_in_zones = [35,40,45,50,55,60]
         set.csm_damping_regimes = 0
         set.csm_damping_modify_Tav = True
         set.csm_damping_use_smoothing = True
@@ -397,14 +377,6 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.use_amplification = False
         set.site_tag = 'test_fail_on_bad_att'
         
-        # Other stuff - needed?
-        set.prob_azimuth_in_zones = [10,30,70,100,150,15]
-        set.prob_number_of_mag_sample_bins = 15
-        set.max_width = 15
-        set.prob_number_of_events_in_zones = [5000,1000,1000,3000,1000,1000]
-        set.prob_delta_azimuth_in_zones = [5,10,20,25,50,0]
-        set.prob_dip_in_zones = [35,40,45,50,55,60]
-
         # Other stuff - needed
         set.return_periods = [10,50,100]
         set.atten_periods = [0,0.30303,1]
@@ -416,7 +388,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.output_dir = '.'        
         try:
             para_new = create_parameter_data(set)
-        except ParameterSyntaxError:
+        except AttributeSyntaxError:
             pass
         else:
             self.failUnless(False, "SystemExit not raised")
