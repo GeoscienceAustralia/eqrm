@@ -1,12 +1,14 @@
+#!/usr/bin/python
 """
   Author:  Duncan Gray, duncan.gray@ga.gov.au
            
-  Description: Parse in the EQRM control file.  The control file is a
+  Description: This module reads in the EQRM control file which
+  describes the settings of a simulation.  The control file is a
   python file, so vectors can be passed in easily and if necessary a
   scripting language can be used.
 
-  For verification purposes the parameters are read and added to a
-  dictionary, rather than just being used as is.
+  For verification purposes the settings are read and added to a
+  dictionary (eqrm_flags), rather than just being used as is.
 
  
   Version: $Revision: 1643 $  
@@ -42,7 +44,6 @@ from scipy import allclose, array, sort, asarray, ndarray
 from numpy import ndarray
 import copy
 
-from eqrm_code.eqrm_filesystem import eqrm_path
 from eqrm_code.ANUGA_utilities import log
 
 
@@ -52,10 +53,10 @@ SECOND_LINE = '  EQRM parameter file'
 
 # A list of paramter names and title names.
 #
-# Originally used to convert old parameter values, to the new
-# parameter values.  Now it is used to describe the parameters default
-# values and describing how to print out the parameters.
-# new_para - the parameter name
+# Originally used to convert old attribute values, to the new
+# attribute values.  Now it is used to describe the attributes default
+# values and describing how to print out the attributes.
+# new_para - the attribute name
 # order - The order in which an EQRM control file is automatically generated.
 #         Lower numbers printed first.
 # values - Obsolete. Used to convert from the old style to the new.
@@ -372,10 +373,10 @@ CONV_NEW = [{'order': 10.0,
              'default': False}
             ]
 
-# Old style parameters that have not been removed yet.
+# Old style attributes that have not been removed yet.
 OLD_STYLE_PARAS_HARD_WIRED = {'buildpars_flag':4, 'grid_flag':1}
 
-# 'parameters' that can be added when executed on the command-line.
+# 'attributes' that are added to eqrm_flags when executed on the command-line.
 KNOWN_KWARGS = {'use_determ_seed':None,
                      'compress_output':None,
                      'eqrm_dir':None,
@@ -383,18 +384,139 @@ KNOWN_KWARGS = {'use_determ_seed':None,
                      'default_input_dir':None}
 
 
+# CONV_DIC_NEW has all allowable eqrm_flags attributes
+CONV_DIC_NEW = {}
+for item in CONV_NEW:
+    if item.has_key('new_para'):
+        CONV_DIC_NEW[item['new_para']] = item
+CONV_DIC_NEW.update(KNOWN_KWARGS)
+CONV_DIC_NEW.update(OLD_STYLE_PARAS_HARD_WIRED)
+
+
+class AttributeSyntaxError(Exception):
+    pass
+    
+
+def create_parameter_data(handle, **kwargs):
+    """
+    Given an EQRM control file, return a DictKeyAsAttributes instance which
+    has all the information of the control file.
+
+    Args:
+      handle: A string of the .py file to load
+        OR an instance with the required attributes.
+      **kwargs:  These are additional attributes that are attached to
+        eqrm_flags.  Examples of **kwargs are;
+          use_determ_seed
+          compress_output
+          eqrm_dir
+          is_parallel
+          default_input_dir
+
+    Returns:
+      eqrm_flags, which is a DictKeyAsAttributes object.
+    """
+    if isinstance(handle, str) and handle[-3:] == ".py":
+        attributes = _from_file_get_params(handle)
+    elif isinstance(handle, dict):
+        attributes = _filter_local_dictionary(handle)
+    else:
+        attributes = introspect_attribute_values(handle)
+        
+    # attributes is now a dictionary
+    
+    # The attributes value have presidence/overwrite the kwargs
+    kwargs.update(attributes)
+    eqrm_flags = DictKeyAsAttributes(kwargs)
+
+    # Add Hard-wired results  
+    eqrm_flags.update(OLD_STYLE_PARAS_HARD_WIRED)
+
+    # Remove or fix depreciated attributes
+    _depreciated_attributes(eqrm_flags)
+    
+    _add_default_values(eqrm_flags)
+   
+    # Check attattribute names
+    for key in eqrm_flags:
+        if not CONV_DIC_NEW.has_key(key):
+            msg = ("Attribute Error: Attribute " + key + " is unknown.")
+            raise AttributeSyntaxError(msg)
+            
+    # Do attribute value fixes    
+    _att_value_fixes(eqrm_flags)
+
+    # Check if values are consistant
+    _verify_eqrm_flags(eqrm_flags)
+    
+    return eqrm_flags
+
+
+def update_control_file(file_name_path, new_file_name_path=None):
+    """Open an EQRM control file and then save it again,
+    applying the CONV_NEW rules to order the lines
+    and depreciation rules.
+
+    Used to move attributes position around for all of the
+    set_data.py files in the sandpit.
+
+    Args:
+      file_name_path: The EQRM control file.
+      new_file_name_path: The new EQRM control file.
+    """
+    
+    if new_file_name_path is None:
+        new_file_name_path = file_name_path
+    attributes = _from_file_get_params(file_name_path)
+    
+    # Remove depreciated attributes
+    _depreciated_attributes(attributes)
+    eqrm_flags_dic_to_set_data_py(new_file_name_path, attributes)
+
+    
+def _filter_local_dictionary(attributes):
+    """
+    Filter out all callable or special atts.
+
+    Args:
+      attributes - dictionary of varriables and functions in a file namespace.
+    """
+    # Assume locals() has been called.
+    local_paras = copy.copy(attributes)
+    for key in local_paras.keys():
+        if key[-1:] == '_' or callable(local_paras[key]):
+            del local_paras[key]
+    return local_paras
+
+
+def _add_default_values(eqrm_flags):
+    """Add default values
+
+    Args:
+      eqrm_flags: A DictKeyAsAttributes instance.
+    """        
+    for param in CONV_NEW: 
+        if param.has_key('new_para') and \
+               not eqrm_flags.has_key(param['new_para']):
+            if param.has_key('default'):
+                eqrm_flags[param['new_para']] = param['default']
+            else:
+                raise AttributeSyntaxError(
+                "Attribute Error: Attribute "  + param['new_para']
+                + " must be defined.")
+
 # In the dictionary DEPRECIATED_PARAS
-# the key is the depreciated parameter.
+# the key is the depreciated attribute.
 # the value is
 # None, which means the only action is a warming,
 #   OR
-# a string, which replaces the depreciated parameter,
+# a string, which replaces the depreciated attribute,
 #   OR
 # the value has a dictinary where the the keys are the value of the
-# depreciated parameter and the values are attribute and value pairs
-# to use, based on the value of the parameter.  
+# depreciated attribute and the values are attribute and value pairs
+# to use, based on the value of the attribute.  
 #   OR
-# True, which means a warming, and deleting the parameter.
+# True, which means a warming, and deleting the attribute.
 
 DEPRECIATED_PARAS = {'atten_use_variability':
                      {True:None,
@@ -433,113 +555,12 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'prob_min_mag_cutoff':True
                      }
 
-# CONV_DIC_NEW has all allowable set_data variables
-CONV_DIC_NEW = {}
-for item in CONV_NEW:
-    if item.has_key('new_para'):
-        CONV_DIC_NEW[item['new_para']] = item
-CONV_DIC_NEW.update(KNOWN_KWARGS)
-CONV_DIC_NEW.update(OLD_STYLE_PARAS_HARD_WIRED)
-
-
-class Error(Exception):
-    """Base exception for all exceptions raised in parse_in_parameters."""
-    pass
-
-
-class ParameterSyntaxError(Exception):
-    """There is a syntax Error in the parameters file."""
-    def __init__(self, value):
-        self.value = value
-        super(ParameterSyntaxError, self).__init__()
-        
-    def __str__(self):
-        return repr(self.value)
+def _depreciated_attributes(eqrm_flags):
+    """
+    Remove/fix/Give a warning about depreciated attributes.
     
-
-def create_parameter_data(parameters, **kwargs):
-    """
-    parameters: Has 2 forms:
-      A string of the .py file to load
-      or an instance with the required attributes.
-    **kwargs:  This are attributes that are attached to eqrm_flags
-      the known **kwargs are;
-        use_determ_seed
-        compress_output
-        eqrm_dir
-        is_parallel
-        default_input_dir
-
-    Return:
-      eqrm_flags, which is a DictKeyAsAttributes object.
-    """
-    if isinstance(parameters, str) and parameters[-3:] == ".py":
-        parameters = from_file_get_params(parameters)
-        #print "parameters", parameters
-    elif isinstance(parameters, dict):
-        parameters = get_no_instance_params(parameters)
-    else:
-        parameters = introspect_attribute_values(parameters)
-    # parameters is now a dictionary
-    
-    # The parameters value have presidence/overwrite the kwargs
-    kwargs.update(parameters)
-    eqrm_flags = DictKeyAsAttributes(kwargs)
-
-    # Add Hard-wired results  
-    eqrm_flags.update(OLD_STYLE_PARAS_HARD_WIRED)
-
-    # Remove depreciated attributes
-    depreciated_attributes(eqrm_flags)
-    
-    #print "eqrm_flags", eqrm_flags
-    # Add default values
-    att_default_values(eqrm_flags)
-
-   
-    # Check att names
-    for key in eqrm_flags:
-        if not CONV_DIC_NEW.has_key(key):
-            msg = ("Parameter Error: Attribute " + key + " is unknown.")
-            raise ParameterSyntaxError(msg)
-            
-    # Do attribute value fixes    
-    att_value_fixes(eqrm_flags)
-
-    # Check if values are consistant
-    verify_eqrm_flags(eqrm_flags)
-    
-    return eqrm_flags
-
-def get_no_instance_params(parameters):
-    """
-    Filter out all callable or special atts.
-    """
-    # Assume locals() has been called.
-    local_paras = copy.copy(parameters)
-    for key in local_paras.keys():
-        if key[-1:] == '_' or callable(local_paras[key]):
-            del local_paras[key]
-    return local_paras
-
-
-def att_default_values(eqrm_flags):
-    """Add default values
-    """        
-    for param in CONV_NEW: 
-        if param.has_key('new_para') and \
-               not eqrm_flags.has_key(param['new_para']):
-            if param.has_key('default'):
-                eqrm_flags[param['new_para']] = param['default']
-            else:
-                raise ParameterSyntaxError(
-                "Parameter Error: Attribute "  + param['new_para']
-                + " must be defined.")
-
-def depreciated_attributes(eqrm_flags):
-    """
-    Remove/fix depreciated attributes.
-    Give a warning.
+    Args:
+      eqrm_flags: A DictKeyAsAttributes instance.
     """
     for param in DEPRECIATED_PARAS:
         if eqrm_flags.has_key(param):
@@ -548,11 +569,11 @@ def depreciated_attributes(eqrm_flags):
                 pass
             elif isinstance(handle_logic, str):
                 # handle_logic is a replacement string
-                # for the parameter name
+                # for the attribute name
                 eqrm_flags[handle_logic] = eqrm_flags[param]
                 del eqrm_flags[param]
             elif handle_logic is True:
-                # Delete the parameter
+                # Delete the attribute
                 del eqrm_flags[param]
             else:                
                 # handle_logic is a dictionary
@@ -566,13 +587,16 @@ def depreciated_attributes(eqrm_flags):
             msg = 'WARNING: ' + param + \
                   ' term in EQRM control file is depreciated.'
             # logging is only set-up after the para file has been passed.
-            # So these warnings will not in in the logs.
+            # So these warnings will not be in the logs.
             log.warning(msg)
 
-def att_value_fixes(eqrm_flags):
+def _att_value_fixes(eqrm_flags):
     """
     Change the attribute values so they are in the correct format for EQRM
       e.g. scaler values into arrays
+      
+    Args:
+      eqrm_flags: A DictKeyAsAttributes instance.
     """
     # convert all lists into arrays
     for att in eqrm_flags:
@@ -582,15 +606,12 @@ def att_value_fixes(eqrm_flags):
             
     # FIXME Change the format to an array or
     # state why this format is needed.
-    eqrm_flags['return_periods'] = [ \
-        array([x]) for x in eqrm_flags['return_periods']]
+    #eqrm_flags['return_periods'] = [ \
+     #   array([x]) for x in eqrm_flags['return_periods']]
 
-            
-    # FIXME this should happen to the weights from sources as well. 
-    weights = eqrm_flags.atten_model_weights
-    
-    if weights is not None:        
-        eqrm_flags['atten_model_weights'] = check_sum_1_normalise(weights)
+    if eqrm_flags.atten_model_weights is not None:        
+        eqrm_flags['atten_model_weights'] = check_sum_1_normalise(
+            eqrm_flags.atten_model_weights)
     
     # if periods is collapsed (into a scalar), turn it into a vector
     if not isinstance(eqrm_flags.atten_periods, ndarray):
@@ -601,23 +622,27 @@ def att_value_fixes(eqrm_flags):
         eqrm_flags['output_dir'] = eqrm_flags.output_dir+'/'
     if not eqrm_flags.input_dir[-1] == '/':
         eqrm_flags['input_dir'] = eqrm_flags.input_dir+ '/'
-    eqrm_flags['output_dir'] = change_slashes(eqrm_flags.output_dir)
-    eqrm_flags['input_dir'] = change_slashes(eqrm_flags.input_dir)
+    eqrm_flags['output_dir'] = _change_slashes(eqrm_flags.output_dir)
+    eqrm_flags['input_dir'] = _change_slashes(eqrm_flags.input_dir)
     
     if eqrm_flags.atten_variability_method == None:
         eqrm_flags.atten_spawn_bins = None
 
     
 def check_sum_1_normalise(weights, msg=None):
-    """
-    
-    Check that a list or array basically sums to one.Normalise so it
+    """    
+    Check that a list or array basically sums to one. Normalise so it
     exactly sums to one.
 
-    return a 1D array that sums to one.
+    Args:
+      weights: A list or array that sould sum to 1.
+      msg: An error message if the array is not close to summing to 1.
+
+    Returns:
+      A 1D array that sums to one.
     """   
     # test if attenuation weights are close to 1 (with 0.01 absolute tolerance)
-    # this means that 3 weights with 0.33 should pass  
+    # this means that 3 weights with 0.33 passes  
     if not allclose(weights.sum(), 1.0, atol=0.01):
         if msg == None:
             msg =  'Weights should sum to 1.0, got ', weights
@@ -627,8 +652,11 @@ def check_sum_1_normalise(weights, msg=None):
     return weights/abs(weights.sum()) # normalize
     
     
-def change_slashes(path):
+def _change_slashes(path):
     """Swap from windows to linux file slashes
+
+    Arg:
+      path: A string representing a file path.
     """
     if sys.platform == 'linux2':
         split_path = path.split('\\')
@@ -637,84 +665,74 @@ def change_slashes(path):
     return path
 
 
-UNIQUE_LOAD_SOURCE_INT = 0            
-def from_file_get_params(path_file):
+unique_load_source_int = 0            
+def _from_file_get_params(path_file):
     """
-    Convert an EQRM control file to dictionary of parameters.
+    Convert an EQRM control file to dictionary of attributes.
      
     para:
-      path_file - the location of the eqrm control file.
+      path_file - the eqrm control file, which is a python file.
+
+    returns:
+      A dictionary of attribute values from the path_file file.
     """
-    global UNIQUE_LOAD_SOURCE_INT
-    name = 'name_' + str(UNIQUE_LOAD_SOURCE_INT)
-    UNIQUE_LOAD_SOURCE_INT += 1
+    global unique_load_source_int
+    name = 'name_' + str(unique_load_source_int)
+    unique_load_source_int += 1
     para_imp = imp.load_source(name, path_file)
-    # FIXME big hack.  The ParameterData instance name is hard-wired
+
+    # Initially the attribute info was added to an AttributeData instance,
+    # with a known name (VAR_NAME_IN_SET_DATA_FILE), when using control files.
+    # Now the attributes are just in the file namespace.
+    # Both ways still work.
+    # Hacky.  The AttributeData instance name is hard-wired
     # Have it parse the 'sdp = ParameterData()' line for the name
     try:
         para_imp = getattr(para_imp, VAR_NAME_IN_SET_DATA_FILE)
     except AttributeError:
         pass
         # Assume this is a no instance file
-    parameters = introspect_attribute_values(para_imp)
-    return parameters
+    attributes = introspect_attribute_values(para_imp)
+    return attributes
 
 
-def verify_eqrm_flags(eqrm_flags):
+def _verify_eqrm_flags(eqrm_flags):
     """
     Check that the values in eqrm_flags are consistant with how EQRM works.
+    
+    Args:
+      eqrm_flags: A DictKeyAsAttributes instance.
     """
-    # Value verification, expanding and fixing.
     if not allclose(eqrm_flags.atten_periods,
                     sort(eqrm_flags.atten_periods)):
-        raise ParameterSyntaxError(
+        raise AttributeSyntaxError(
             "Syntax Error: Period values are not ascending")
-
-                
-#     if eqrm_flags.save_motion == True and eqrm_flags.is_scenario == True \
-#             and eqrm_flags.scenario_number_of_events > 1:
-#       raise ParameterSyntaxError(
-#       'Cannot save motion for a scenario' + 
-#                        ' with more than one event.')
-    
+       
     if eqrm_flags.save_hazard_map == True and eqrm_flags.is_scenario == True:
-        raise ParameterSyntaxError(
+        raise AttributeSyntaxError(
             'Cannot save the hazard map for a scenario.')
   
-#     if eqrm_flags.save_motion == True and eqrm_flags.is_scenario == False:
-#       raise ParameterSyntaxError(
-#       'Cannot save the RSA values unless you are doing a scenario.')
-
     if eqrm_flags.atten_variability_method == 1 and \
            eqrm_flags.run_type == 'risk':
-        raise ParameterSyntaxError(
+        raise AttributeSyntaxError(
             'Cannot use spawning when doing a risk simulation.')
 
     if eqrm_flags.amp_variability_method == 1:
-        raise ParameterSyntaxError(
+        raise AttributeSyntaxError(
             'Cannot spawn on amplification.')
-  
-    # need to change some array sizes, e.g. bedrock_SA_all
-#     if eqrm_flags.save_motion == True and \
-#            eqrm_flags.atten_variability_method == 1:
-#       raise ParameterSyntaxError(
-#       'Cannot save the RSA values and spawn.')
 
   
-    # FIXME This needs to be done, and be updated.
-    #assert not ((eqrm_flags.save_ecloss_flag)>0 and (eqrm_flags.run_type<2))
-
-def find_set_data_py_files(path=None):
+def find_set_data_py_files(path):
     """Return a list of all the set_data .py files in a path directory.
 
     Based on the file having a .py extension and
     the second line in the file being == SECOND_LINE.
+
+    Args:
+      path: directory to search in.
     """
     extension = '.py'
     
-    if path is None:
-        path = eqrm_path
-        
     set_data_files = []
     for root, _, files in os.walk(path):
         for afile in files:
@@ -727,32 +745,15 @@ def find_set_data_py_files(path=None):
                     set_data_files.append(file_path_name)  
                 fref.close()
     return set_data_files
-
-
-def update_control_file(file_name_path, new_file_name_path=None):
-    """Open a set data .py file and then save it again,
-    using the CONV_NEW rules and depreciation rules.
-
-    Used to move attributes position around for all of the
-    set_data.py files in the sandpit
-
-    Why is this labeled as old? Because its the old set data format.
-    """
-    if new_file_name_path is None:
-        new_file_name_path = file_name_path
-    parameters = from_file_get_params(file_name_path)
-    
-    # Remove depreciated attributes
-    depreciated_attributes(parameters)
-    eqrm_flags_dic_to_set_data_py(new_file_name_path, parameters)
     
     
 def introspect_attribute_values(instance):
     """
-    Puts all the attribite values of the instance into a dictionary
+    Puts all the attribite values of the instance into a dictionary.
+
+    Args:
+      instance: The instance who's values will go into the return dictionary.
     """
-    #for att in dir(instance):
-     #   print "att", att
     attributes = [att for att in dir(instance) if not callable(
         getattr(instance, att)) and not att[-2:] == '__']
     att_values = {}
@@ -763,42 +764,29 @@ def introspect_attribute_values(instance):
  
     
 class DictKeyAsAttributes(dict):
+
+    """ An object to hold the EQRM control file data.  It is created
+    in this module and not changed afterwards.
+    
+    It is really a dictionary with the dictionary keys exposed as
+    attributes where the attributes can not be set.
     """
-    Expose the dictionary keys as attributes.
-    Do not let the attributes be set
-    """
+    # Note, there is obsolete code.
+    # Ini
     def __getattribute__(self, key):
         try:
             return self[key]
         except:
-            for k in dict.keys(self):
-                try:
-                    return self[k][key]
-                except:
-                    pass
+            # Used when calling dictionary functions.
             return object.__getattribute__(self, key)
-        #raise AttributeError(str(key)+ ' was not found')
 
     def __delattr__(self, name):       
         if self.has_key(name):
             del self[name]
         else:
-            deleted = False
-            for key in self:
-                if isinstance(self[key], dict) and \
-                       self[key].has_key(name):
-                    del self[key][name]
-                    deleted = True
-                    continue
-            if not deleted:
-                # Sparse.  Probably means functions can't be deleted.
-                # print "Attribute can not be deleted ",name 
-                raise AttributeError
+            raise AttributeError
             
-#         def __setattr__(self,key,value):
-#             # FIXME DSG Should this be used?
-#             # It gets messy if the values of eqrm_flags can be changed.
-            
+#         def __setattr__(self,key,value):          
 #             self[key]=value
 #             # object.__setattr__(self, key, value)
 
@@ -830,7 +818,7 @@ def get_time_user():
 
 
 class ParameterData(object):
-    """Class to build the parameter_data 'onto'.
+    """Class to build the attribute_data 'onto'.
     The user will add attributes to this class.
     These attributes are used by ?? to create eqrm_flags data structure
 
@@ -874,7 +862,7 @@ def eqrm_flags_dic_to_set_data_py(py_file_name, attribute_dic):
     
      # paras2print is a list of lists.
      # The inner list is 2 elements long.
-     #  index 0 is the parameter name
+     #  index 0 is the attribute name
      #  index 1 is the value
     paras2print = []
     for para_dic in CONV_NEW:
@@ -951,7 +939,7 @@ from os.path import join\n\
         """
         self.handle.write("\n\
 # If this file is executed the simulation will start.\n\
-# Delete all variables that are not EQRM parameters variables. \n\
+# Delete all variables that are not EQRM attributes variables. \n\
 if __name__ == '__main__':\n\
     from eqrm_code.analysis import main\n\
     main(locals())\n")
