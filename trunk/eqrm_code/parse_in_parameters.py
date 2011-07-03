@@ -57,7 +57,7 @@ except ImportError:
         A join statement, as a string.
         """
         
-        sep = ['/','\\']
+        seps = ['/','\\']
         out = multi_split(path, seps)
         out = [x for x in out if x != '']
         out = "', '".join(out)
