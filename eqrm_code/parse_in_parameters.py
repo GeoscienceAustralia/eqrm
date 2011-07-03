@@ -901,22 +901,27 @@ class WriteEqrmControlFile(object):
 
         self.handle.write(SECOND_LINE)
 
-        self.handle.write('\n\
-  All input files are first searched for in the input_dir, then in the\n\
-  resources/data directory, which is part of EQRM.\n\
-\n\
- All distances are in kilometers.\n\
- Acceleration values are in g.\n\
- Angles, latitude and longitude are in decimal degrees.\n\
-\n\
- If a field is not used, set the value to None.\n\
-\n\
-\n\
-"""\n\
-\n\
-from eqrm_code.parse_in_parameters import eqrm_data_home, get_time_user\n\
-from os.path import join\n\
-\n')        
+        self.handle.write(
+            '\n'
+            'All input files are first searched for in the input_dir,'
+            'then in the\n'
+            'resources/data directory, which is part of EQRM.\n'
+            '\n'
+            'All distances are in kilometers.\n'
+            'Acceleration values are in g.\n'
+            'Angles, latitude and longitude are in decimal degrees.\n'
+            '\n'
+            'If a field is not used, set the value to None.\n'
+            '\n'
+            '\n'
+            '"""\n'
+            '\n'
+            'from os.path import join\n')
+        if log_imported: # as a proxy for the PYTHONPATH being set up.
+            self.handle.write('from eqrm_code.parse_in_parameters import '
+                              'eqrm_data_home, get_time_user\n')
+                
+        self.handle.write('\n')        
 
     def write_middle(self, para_data):
         """ Writes the attribute lines 

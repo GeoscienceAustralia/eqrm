@@ -36,8 +36,8 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.site_tag= 'newc'
         set.site_db_tag = 'fish'
         set.site_indexes = [2255,11511]
-        set.input_dir = 'C:/in/'
-        set.output_dir = 'C:/out/'
+        set.input_dir = join('.','in')
+        set.output_dir = join('.','out')
         set.return_periods = [22,11]
         
         # Scenario input 
@@ -112,9 +112,9 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.site_db_tag == 'fish')
         self.failUnless(allclose(TPT.site_indexes, asarray([2255,11511])))
         self.failUnless(os.path.abspath(TPT.input_dir) ==
-                        os.path.abspath('C:/in/'))
+                        os.path.abspath(join('.','in')))
         self.failUnless(os.path.abspath(TPT.output_dir) ==
-                        os.path.abspath('C:/out/'))        
+                        os.path.abspath(join('.','out')))   
         self.failUnless(allclose(TPT.return_periods, asarray([22,11])))        
         self.failUnless(TPT.grid_flag == 1)
         
