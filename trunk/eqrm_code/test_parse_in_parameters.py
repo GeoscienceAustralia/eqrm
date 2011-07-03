@@ -21,13 +21,6 @@ class Test_Parse_in_parameters(unittest.TestCase):
         
     def tearDown(self):
         pass
-    
-    def test_ParameterData_eqrm_data_home(self):
-        pd = ParameterData()
-        # Not keen on testing this.  It does not
-        # have to be set.
-        #pd.eqrm_data_home()
-        #print "pd.get_time_user()", pd.get_time_user()
 
     def build_instance_to_eqrm_flags(self):
         set = Dummy()
@@ -40,8 +33,8 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.site_tag= 'newc'
         set.site_db_tag = 'fish'
         set.site_indexes = [2255,11511]
-        set.input_dir = 'c:/in/'
-        set.output_dir = 'c:/out/'
+        set.input_dir = 'C:/in/'
+        set.output_dir = 'C:/out/'
         set.return_periods = [22,11]
         
         # Scenario input 
@@ -120,8 +113,10 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.site_tag == 'newc')
         self.failUnless(TPT.site_db_tag == 'fish')
         self.failUnless(allclose(TPT.site_indexes, asarray([2255,11511])))
-        self.failUnless(TPT.input_dir == 'c:/in/')
-        self.failUnless(TPT.output_dir == 'c:/out/')        
+        self.failUnless(os.path.abspath(TPT.input_dir) ==
+                        os.path.abspath('C:/in/'))
+        self.failUnless(os.path.abspath(TPT.output_dir) ==
+                        os.path.abspath('C:/out/'))        
         self.failUnless(allclose(TPT.return_periods, asarray([22,11])))        
         self.failUnless(TPT.grid_flag == 1)
         
@@ -324,7 +319,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
             self.failUnless(False, "Error not raised")
         
     def test_add_default_values_raise(self):
-        set = ParameterData()
+        set = Dummy()
         try:
             para_new = create_parameter_data(set)
         except AttributeSyntaxError:
@@ -334,7 +329,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
 
    
     def small_set_data(self):
-        set = ParameterData()
+        set = Dummy()
         set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False
         set.use_amplification = False
@@ -368,7 +363,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
 
     def test_fail_on_bad_att(self):
         #
-        set = ParameterData()
+        set = Dummy()
         set.run_type = 'hazard'
         set.atten_override_RSA_shape = None
         set.atten_cutoff_max_spectral_displacement = False

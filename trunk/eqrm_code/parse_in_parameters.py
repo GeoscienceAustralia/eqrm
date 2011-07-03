@@ -45,7 +45,7 @@ from numpy import ndarray
 import copy
 
 from eqrm_code.ANUGA_utilities import log
-
+from eqrm_code.util import convert_path_string_to_join
 
 ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
@@ -460,6 +460,11 @@ def update_control_file(file_name_path, new_file_name_path=None):
     Used to move attributes position around for all of the
     set_data.py files in the sandpit.
 
+    WARNING: This function is not very robust.
+    For example if you run it on any EQRM control files that use
+    functions the updated files will not use functions.
+
+    
     Args:
       file_name_path: The EQRM control file.
       new_file_name_path: The new EQRM control file.
@@ -774,6 +779,9 @@ class DictKeyAsAttributes(dict):
     # Note, there is obsolete code.
     # Ini
     def __getattribute__(self, key):
+        """
+        Try to get the value from the dictionary first.
+        """
         try:
             return self[key]
         except:
@@ -807,6 +815,8 @@ def eqrm_data_home():
 def get_time_user():
     """Return string of date, time and user.  Used to create
     time and user stamped directories.
+
+    WARNING: Does not work in parallel runs.
     """
     time = strftime('%Y%m%d_%H%M%S', localtime())
     if sys.platform == "win32":
@@ -818,46 +828,20 @@ def get_time_user():
 
 
 class ParameterData(object):
-    """Class to build the attribute_data 'onto'.
+    """OBSOLETE
+    Class to build the attribute_data 'onto'.
     The user will add attributes to this class.
-    These attributes are used by ?? to create eqrm_flags data structure
-
-    This class should not have a lot in it.
     """
     def __init__(self):
         pass
 
-    def eqrm_data_home(self):
-        """Return the EQRM data directory
-        """
-        results = os.getenv(ENV_EQRMDATAHOME)
-        if results is None:
-            print 'The environmental variable ' + ENV_EQRMDATAHOME + \
-                  ' , used by ParameterData.eqrm_data_home() is not set.'
-            print 'Define this variable error before continuing.'
-            ###FIXME raise an error instead
-            sys.exit(1)            
-        return results
-
-    
-    def get_time_user(self):
-        """Return string of date, time and user.  Used to create
-        time and user stamped directories.
-        """
-        time = strftime('%Y%m%d_%H%M%S', localtime())
-        if sys.platform == "win32":
-            cmd = "USERNAME"
-        elif sys.platform == "linux2":
-            cmd = "USER"
-        user = os.getenv(cmd)
-        return "_".join((time, user))
-        
-def eqrm_flags_dic_to_set_data_py(py_file_name, attribute_dic):
-    """ Given a dictionary of the set data attribute values convert it
+def eqrm_flags_dic_to_set_data_py(py_file_name, eqrm_flags):
+    """ Given a dictionary of the EQRM flag values convert it
     to an EQRM control file. 
 
-    py_file_name: Name of the new file.
-
+    Args:
+      py_file_name: Name of the EQRM control file.
+      eqrm_flags: dictionary of EQRM attributes.
     """
     
      # paras2print is a list of lists.
@@ -868,9 +852,12 @@ def eqrm_flags_dic_to_set_data_py(py_file_name, attribute_dic):
     for para_dic in CONV_NEW:
         if not para_dic.has_key('new_para'):
             paras2print.append(para_dic['title'])
-        elif attribute_dic.has_key(para_dic['new_para']):
+        elif eqrm_flags.has_key(para_dic['new_para']):
             line = [para_dic['new_para']]
-            val = attribute_dic[para_dic['new_para']]
+            val = eqrm_flags[para_dic['new_para']]
+            if line[0] == 'input_dir' or line[0] == 'output_dir':
+                if not 'join' in val:
+                    val = convert_path_string_to_join(val)
             line.append(val)
             paras2print.append(line)
             
@@ -886,12 +873,12 @@ class WriteEqrmControlFile(object):
     
     """
     def __init__(self, file_name):
-        """ Write a python parameter file
+        """ Create the file handle.
         """
         self.handle = open(file_name, 'w')
 
     def write_top(self):
-        """ Write the imports ect. at the beginning of the par file
+        """ Write the imports ect. at the beginning of the py file.
         """
  
         self.handle.write('"""\n')
@@ -918,11 +905,11 @@ from os.path import join\n\
     def write_middle(self, para_data):
         """ Writes the attribute lines 
         
-        Parameters:
-        para_data: A list of strings or lists.  If an element is a
-        string it is written as one row.  If the element is a list,
-        the element[0] is a variable name and element[1] is the
-        variable value.
+        Args:
+          para_data: A list of strings or lists.  If an element is a
+            string it is written as one row.  If the element is a list,
+            the element[0] is a variable name and element[1] is the
+            variable value.
         """
         for line in para_data:
             if isinstance(line, list):
@@ -935,7 +922,7 @@ from os.path import join\n\
         
     def write_bottom(self):
 
-        """ Write the end of the par file
+        """ Write the end of the EQRM control file.
         """
         self.handle.write("\n\
 # If this file is executed the simulation will start.\n\
@@ -947,7 +934,9 @@ if __name__ == '__main__':\n\
         
 
 def add_value(val):
-    """Given a value of unknown type, write it in python syntax.
+    """
+    Given a value of unknown type, write it in python syntax.
+    This function is not very robust.
     """
     if isinstance(val, str):
         if 'join' in val:
