@@ -247,8 +247,12 @@ def convert_path_string_to_join(path):
     """
     This is to modify python scripts, changing r"./foo/bar" to
     'join('.','foo','bar')'
-    
-    
+
+      Args:
+        path: The string value to change to a join
+
+      Returns:
+        A join statement, as a string.
     """
     
     seps = ['/','\\']
@@ -258,13 +262,23 @@ def convert_path_string_to_join(path):
     out = "join('" + out + "')"
     return out
     
-def multi_split(s, seps):
-    res = [s]
-    for sep in seps:
-        s, res = res, []
-        for seq in s:
-            res += seq.split(sep)
-    return res
+def multi_split(split_this, seps):
+    """
+    Split a string based on multiple seperators.
+
+    Args:
+      split_this: the string to split.
+      seps: A list of seperators.
+
+    Returns:
+     A list of strings.
+    """
+    results = [split_this]
+    for seperator in seps:
+        so_far, results = results, []
+        for seq in so_far:
+            results += seq.split(seperator)
+    return results
 
 ################################################################################
 

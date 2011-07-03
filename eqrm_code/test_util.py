@@ -120,6 +120,11 @@ class Test_Util(unittest.TestCase):
         s = r'.\i\s'
         out = convert_path_string_to_join(s)
         self.failUnlessEqual(out, "join('.', 'i', 's')")
+
+    def test_multi_split(self):
+        out = multi_split('1a2b3a4b',['a','b'])
+        self.failUnlessEqual(out, ['1','2','3','4',''])
+        
 ################################################################################
 
 if __name__ == "__main__":

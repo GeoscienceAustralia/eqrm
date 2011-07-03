@@ -25,7 +25,7 @@ from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
      arange, reshape, exp, tile
 
 from eqrm_code.parse_in_parameters import  \
-    AttributeSyntaxError, create_parameter_data, eqrm_flags_dic_to_set_data_py
+    AttributeSyntaxError, create_parameter_data, eqrm_flags_to_control_file
 from eqrm_code.event_set import Event_Set, Event_Activity, \
      generate_synthetic_events_fault, merge_events_and_sources
 from eqrm_code.ground_motion_calculator import \
@@ -141,7 +141,7 @@ def main(parameter_handle,
                         eqrm_flags.output_dir+'eqrm_flags.py')
     else:
         para_instance = copy.deepcopy(eqrm_flags)
-        eqrm_flags_dic_to_set_data_py(
+        eqrm_flags_to_control_file(
             os.path.join(eqrm_flags.output_dir, 'eqrm_flags.py'),
             para_instance)
 

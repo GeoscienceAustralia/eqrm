@@ -10,14 +10,7 @@
   For verification purposes the settings are read and added to a
   dictionary (eqrm_flags), rather than just being used as is.
 
- 
-  Version: $Revision: 1643 $  
-  ModifiedBy: $Author: dgray $
-  ModifiedDate: $Date: 2010-04-25 20:05:29 +1000 (Sun, 25 Apr 2010) $
-  
-  Copyright 2007 by Geoscience Australia
-
-  Principals of the EQRM control file format.
+  Notes on the EQRM control file format.
 
   All attributes are specified in CONV_DIC_NEW.
   
@@ -33,6 +26,7 @@
   
   Lists are automatically converted to arrays.  
  
+  Copyright 2007 by Geoscience Australia
  """
 
 import sys
@@ -41,11 +35,53 @@ import imp
 from os.path import join
 from time import strftime, localtime
 from scipy import allclose, array, sort, asarray, ndarray
-from numpy import ndarray
 import copy
+try:
+    from eqrm_code.ANUGA_utilities import log
+    log_imported = True
+except ImportError:
+    log_imported = False
+    
+try:
+    from eqrm_code.util import convert_path_string_to_join
+except ImportError:
+    def convert_path_string_to_join(path):
+        """
+        This is to modify python scripts, changing r"./foo/bar" to
+        'join('.','foo','bar')'
+        
+        Args:
+        path: The string value to change to a join
+        
+        Returns:
+        A join statement, as a string.
+        """
+        
+        sep = ['/','\\']
+        out = multi_split(path, seps)
+        out = [x for x in out if x != '']
+        out = "', '".join(out)
+        out = "join('" + out + "')"
+        return out
+    
+    def multi_split(split_this, seps):
+        """
+        Split a string based on multiple seperators.
+        
+        Args:
+          split_this: the string to split.
+          seps: A list of seperators.
+        
+        Returns:
+          A list of strings.
+        """
+        results = [split_this]
+        for seperator in seps:
+            so_far, results = results, []
+            for seq in so_far:
+                results += seq.split(seperator)
+        return results
 
-from eqrm_code.ANUGA_utilities import log
-from eqrm_code.util import convert_path_string_to_join
 
 ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
@@ -397,6 +433,33 @@ class AttributeSyntaxError(Exception):
     pass
     
 
+def eqrm_data_home():
+    """Return the EQRM data directory
+    """
+    results = os.getenv(ENV_EQRMDATAHOME)
+    if results is None:
+        print 'The environmental variable ' + ENV_EQRMDATAHOME + \
+              ' , used by ParameterData.eqrm_data_home() is not set.'
+        print 'Define this variable error before continuing.'
+        ###FIXME raise an error instead
+        sys.exit(1)            
+    return results
+
+    
+def get_time_user():
+    """Return string of date, time and user.  Used to create
+    time and user stamped directories.
+
+    WARNING: Does not work in parallel runs.
+    """
+    time = strftime('%Y%m%d_%H%M%S', localtime())
+    if sys.platform == "win32":
+        cmd = "USERNAME"
+    elif sys.platform == "linux2":
+        cmd = "USER"
+    user = os.getenv(cmd)
+    return "_".join((time, user))
+
 def create_parameter_data(handle, **kwargs):
     """
     Given an EQRM control file, return a DictKeyAsAttributes instance which
@@ -416,6 +479,7 @@ def create_parameter_data(handle, **kwargs):
     Returns:
       eqrm_flags, which is a DictKeyAsAttributes object.
     """
+    
     if isinstance(handle, str) and handle[-3:] == ".py":
         attributes = _from_file_get_params(handle)
     elif isinstance(handle, dict):
@@ -476,7 +540,7 @@ def update_control_file(file_name_path, new_file_name_path=None):
     
     # Remove depreciated attributes
     _depreciated_attributes(attributes)
-    eqrm_flags_dic_to_set_data_py(new_file_name_path, attributes)
+    eqrm_flags_to_control_file(new_file_name_path, attributes)
 
     
 def _filter_local_dictionary(attributes):
@@ -593,7 +657,8 @@ def _depreciated_attributes(eqrm_flags):
                   ' term in EQRM control file is depreciated.'
             # logging is only set-up after the para file has been passed.
             # So these warnings will not be in the logs.
-            log.warning(msg)
+            if log_imported:
+                log.warning(msg)
 
 def _att_value_fixes(eqrm_flags):
     """
@@ -609,11 +674,6 @@ def _att_value_fixes(eqrm_flags):
         if isinstance(att_val, list):
             eqrm_flags[att] = asarray(eqrm_flags[att])
             
-    # FIXME Change the format to an array or
-    # state why this format is needed.
-    #eqrm_flags['return_periods'] = [ \
-     #   array([x]) for x in eqrm_flags['return_periods']]
-
     if eqrm_flags.atten_model_weights is not None:        
         eqrm_flags['atten_model_weights'] = check_sum_1_normalise(
             eqrm_flags.atten_model_weights)
@@ -685,19 +745,8 @@ def _from_file_get_params(path_file):
     name = 'name_' + str(unique_load_source_int)
     unique_load_source_int += 1
     para_imp = imp.load_source(name, path_file)
-
-    # Initially the attribute info was added to an AttributeData instance,
-    # with a known name (VAR_NAME_IN_SET_DATA_FILE), when using control files.
-    # Now the attributes are just in the file namespace.
-    # Both ways still work.
-    # Hacky.  The AttributeData instance name is hard-wired
-    # Have it parse the 'sdp = ParameterData()' line for the name
-    try:
-        para_imp = getattr(para_imp, VAR_NAME_IN_SET_DATA_FILE)
-    except AttributeError:
-        pass
-        # Assume this is a no instance file
     attributes = introspect_attribute_values(para_imp)
+    
     return attributes
 
 
@@ -776,8 +825,7 @@ class DictKeyAsAttributes(dict):
     It is really a dictionary with the dictionary keys exposed as
     attributes where the attributes can not be set.
     """
-    # Note, there is obsolete code.
-    # Ini
+    
     def __getattribute__(self, key):
         """
         Try to get the value from the dictionary first.
@@ -793,38 +841,6 @@ class DictKeyAsAttributes(dict):
             del self[name]
         else:
             raise AttributeError
-            
-#         def __setattr__(self,key,value):          
-#             self[key]=value
-#             # object.__setattr__(self, key, value)
-
-
-def eqrm_data_home():
-    """Return the EQRM data directory
-    """
-    results = os.getenv(ENV_EQRMDATAHOME)
-    if results is None:
-        print 'The environmental variable ' + ENV_EQRMDATAHOME + \
-              ' , used by ParameterData.eqrm_data_home() is not set.'
-        print 'Define this variable error before continuing.'
-        ###FIXME raise an error instead
-        sys.exit(1)            
-    return results
-
-    
-def get_time_user():
-    """Return string of date, time and user.  Used to create
-    time and user stamped directories.
-
-    WARNING: Does not work in parallel runs.
-    """
-    time = strftime('%Y%m%d_%H%M%S', localtime())
-    if sys.platform == "win32":
-        cmd = "USERNAME"
-    elif sys.platform == "linux2":
-        cmd = "USER"
-    user = os.getenv(cmd)
-    return "_".join((time, user))
 
 
 class ParameterData(object):
@@ -835,7 +851,7 @@ class ParameterData(object):
     def __init__(self):
         pass
 
-def eqrm_flags_dic_to_set_data_py(py_file_name, eqrm_flags):
+def eqrm_flags_to_control_file(py_file_name, eqrm_flags):
     """ Given a dictionary of the EQRM flag values convert it
     to an EQRM control file. 
 
@@ -937,6 +953,9 @@ def add_value(val):
     """
     Given a value of unknown type, write it in python syntax.
     This function is not very robust.
+
+    Return:
+      A string value, which will be written to represent the passed in value.
     """
     if isinstance(val, str):
         if 'join' in val:
@@ -949,13 +968,10 @@ def add_value(val):
         if  isinstance(val, ndarray):
             val_str = str(val.tolist())
         elif isinstance(val, list) and isinstance(val[0], ndarray):
-            # Assume all elements are ndarrays, with one element
+            # Assume all elements are arrays, with one element
             val_str = str([x[0] for x in val])
                 
         else:
-            # bool, None
-            if val == -999 or val == -9999 or val == 999 or val == 9999:
-                val = None
             val_str = str(val) 
     return val_str
     
