@@ -193,13 +193,17 @@ def main(parameter_handle,
         try:
             fid_event_types = get_source_file_handle(eqrm_flags,
                                                  source_file_type='event_type')
-        except IOError:
+        except IOError, e:
             fid_event_types = None
+            log.debug('No event typlecontrol XML file found')
+            log.debug(e)
         try:
             fid_sourcepolys = get_source_file_handle(eqrm_flags, 
                                                      source_file_type='zone')
-        except IOError:
+        except IOError, e:
             fid_sourcepolys = None
+            log.debug('No zone source XML file found')
+            log.debug(e)
       
         # tell event set which source models to calculate activity with
         if fid_sourcepolys is not None:
@@ -233,11 +237,12 @@ def main(parameter_handle,
         #generate event set and source_models for the fault sources
         
         try:
-            fid_sourcefaults = get_source_file_handle(eqrm_flags, 
-                                                 source_file_type='fault')
-        except IOError:
+            fid_sourcefaults  = get_source_file_handle(
+                eqrm_flags, source_file_type='fault')
+        except IOError, e:
             fid_sourcefaults = None
             log.debug('No fault source XML file found')
+            log.debug(e)
         if (fid_event_types is not None) and (fid_sourcefaults is not None):
             # fid_event_types.name since the zone code leaves
             # the handle at the end of the file. (I think)
