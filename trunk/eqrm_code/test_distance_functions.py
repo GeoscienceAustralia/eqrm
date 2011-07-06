@@ -95,10 +95,10 @@ class Test_Distance_functions(unittest.TestCase):
                                           rupture_centroid_lat,
                                           rupture_centroid_lon,
                                           lengths,azimuths,widths,dips,depths,
-                                          'Mendez_epicentral',projection,
+                                          'Obsolete_Mendez_epicentral',projection,
                                           trace_start_lat=rupture_centroid_lat,
                                           trace_start_lon=rupture_centroid_lon,
-                                          trace_start_x=0.0,trace_start_y=0.0)
+                                          rupture_centroid_x=0.0,rupture_centroid_y=0.0)
 
         assert allclose(distance1,distance2)
         

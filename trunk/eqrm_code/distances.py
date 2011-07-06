@@ -24,7 +24,7 @@ class Distances(object):
     def __init__(self, site_latitude, site_longitude, rupture_centroids_lat,
                  rupture_centroids_lon, lengths, azimuths, widths, dips, depths,
                  projection, trace_start_lat=None, trace_start_lon=None,
-                 trace_start_x=None, trace_start_y=None):
+                 rupture_centroid_x=None, rupture_centroid_y=None):
 
         self.distance_functions = distance_functions
 
@@ -49,12 +49,12 @@ class Distances(object):
         if self.trace_start_lon is not None:
             self.trace_start_lon = array(self.trace_start_lon)
 
-        self.trace_start_x = trace_start_x
-        self.trace_start_y = trace_start_y
-        if self.trace_start_x is not None:
-            self.trace_start_x = array(self.trace_start_x)
-        if self.trace_start_y is not None:
-            self.trace_start_y = array(self.trace_start_y)
+        self.rupture_centroid_x = rupture_centroid_x
+        self.rupture_centroid_y = rupture_centroid_y
+        if self.rupture_centroid_x is not None:
+            self.rupture_centroid_x = array(self.rupture_centroid_x)
+        if self.rupture_centroid_y is not None:
+            self.rupture_centroid_y = array(self.rupture_centroid_y)
 
     def __getattr__(self, distance_type):
         """self.Epicentral = self.distance['Epicentral'])"""
@@ -77,14 +77,14 @@ class Distances(object):
                                   distance_type=distance_type,
                                   trace_start_lat=self.trace_start_lat,
                                   trace_start_lon=self.trace_start_lon,
-                                  trace_start_x=self.trace_start_x,
-                                  trace_start_y=self.trace_start_y)
+                                  rupture_centroid_x=self.rupture_centroid_x,
+                                  rupture_centroid_y=self.rupture_centroid_y)
 
     def raw_distances(self, site_latitude, site_longitude, rupture_centroid_lat,
                       rupture_centroid_lon, lengths, azimuths, widths, dips,
                       depths, distance_type, projection, trace_start_lat=None,
-                      trace_start_lon=None, trace_start_x=None,
-                      trace_start_y=None):
+                      trace_start_lon=None, rupture_centroid_x=None,
+                      rupture_centroid_y=None):
         """Calculate the distance from 'locations' to 'rupture_centroid'.
 
         A big array, not an array-like object
@@ -95,7 +95,7 @@ class Distances(object):
                                  rupture_centroid_lat, rupture_centroid_lon,
                                  lengths, azimuths, widths, dips, depths,
                                  projection, trace_start_lat, trace_start_lon,
-                                 trace_start_x, trace_start_y)
+                                 rupture_centroid_x, rupture_centroid_y)
 
     def __getitem__(self, key):
         try:
@@ -117,21 +117,21 @@ class Distances(object):
 
         trace_start_lat = None
         trace_start_lon = None
-        trace_start_x = None
-        trace_start_y = None
+        rupture_centroid_x = None
+        rupture_centroid_y = None
 
         # for backwards testing with matlab
         if self.trace_start_lat is not None:
             trace_start_lat = self.trace_start_lat[event]
             trace_start_lon = self.trace_start_lon[event]
-        if self.trace_start_x is not None:
-            trace_start_x = self.trace_start_x[event]
-            trace_start_y = self.trace_start_y[event]
+        if self.rupture_centroid_x is not None:
+            rupture_centroid_x = self.rupture_centroid_x[event]
+            rupture_centroid_y = self.rupture_centroid_y[event]
 
         return Distances(site_latitude, site_longitude, rupture_centroid_lat,
                          rupture_centroid_lon, lengths, azimuths, widths, dips,
                          depths, projection, trace_start_lat=trace_start_lat,
                          trace_start_lon=trace_start_lon,
-                         trace_start_x=trace_start_x,
-                         trace_start_y=trace_start_y)
+                         rupture_centroid_x=rupture_centroid_x,
+                         rupture_centroid_y=rupture_centroid_y)
 
