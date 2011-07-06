@@ -59,7 +59,6 @@ class Event_Set(object):
                  trace_start_lat, trace_start_lon,
                  trace_end_lat, trace_end_lon,
                  rupture_centroid_x, rupture_centroid_y,
-                 rupture_x, rupture_y,
                  rupture_centroid_lat, rupture_centroid_lon):
         """
     A set of seismic events. Can be created  either directly or from an
@@ -95,8 +94,8 @@ class Event_Set(object):
           rupture_centroid_lat
           rupture_centroid_lon
         or        
-          rupture_x
-          rupture_y
+          rupture_centroid_x
+          rupture_centroid_y
           
 
     generation parameters
@@ -124,8 +123,6 @@ class Event_Set(object):
         self.trace_end_lon = trace_end_lon
         self.rupture_centroid_x = rupture_centroid_x
         self.rupture_centroid_y = rupture_centroid_y
-        self.rupture_x = rupture_x
-        self.rupture_y = rupture_y
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
         self.event_num = r_[0:len(self.depth)] # gives every event an id
@@ -230,8 +227,6 @@ class Event_Set(object):
         rad = pi/180.
         x = length/2.
         y = depth*cos(dip*rad)/sin(dip*rad)
-        rupture_x = x
-        rupture_y = y
 
         rupture_centroid_x = x
         rupture_centroid_y = y
@@ -265,8 +260,6 @@ class Event_Set(object):
                         trace_end_lon,
                         rupture_centroid_x,
                         rupture_centroid_y,
-                        rupture_x,
-                        rupture_y,
                         rupture_centroid_lat,
                         rupture_centroid_lon)
         return event_set
@@ -599,8 +592,6 @@ class Event_Set(object):
                          self.trace_end_lon[key],
                          self.rupture_centroid_x[key],
                          self.rupture_centroid_y[key],
-                         self.rupture_x[key],
-                         self.rupture_y[key],
                          self.rupture_centroid_lat[key],
                          self.rupture_centroid_lon[key])
    
@@ -781,8 +772,6 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     trace_end_lon =zeros((num_events), dtype=EVENT_FLOAT)
     rupture_centroid_x =zeros((num_events), dtype=EVENT_FLOAT)
     rupture_centroid_y =zeros((num_events), dtype=EVENT_FLOAT)
-    rupture_x =zeros((num_events), dtype=EVENT_FLOAT)
-    rupture_y =zeros((num_events), dtype=EVENT_FLOAT)
     
     start=0
 
@@ -982,10 +971,8 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         trace_start_lon[start:end] = r_start_lon
         trace_end_lat[start:end] = r_end_lat
         trace_end_lon[start:end] = r_end_lon
-        rupture_centroid_x[start:end] = -r_x_start
-        rupture_centroid_y[start:end] = -r_y_start
-        rupture_x[start:end] = r_x_centroid
-        rupture_y[start:end] = r_y_centroid
+        rupture_centroid_x[start:end] = r_x_centroid
+        rupture_centroid_y[start:end] = r_y_centroid
         #magnitude[start:end] = polygon_magnitude
             #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
@@ -1029,8 +1016,6 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                         trace_end_lon,
                         rupture_centroid_x,
                         rupture_centroid_y,
-                        rupture_x,
-                        rupture_y,
                         rupture_centroid_lat,
                         rupture_centroid_lon)
 

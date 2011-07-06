@@ -559,8 +559,8 @@ class Test_Event_Set(unittest.TestCase):
 #         print "events.trace_end_lon", events.trace_end_lon
 #         print "events.rupture_centroid_lat", events.rupture_centroid_lat
 #         print "events.rupture_centroid_lon", events.rupture_centroid_lon
-#         print "events.rupture_centroid_x", events.rupture_x
-#         print "events.rupture_centroid_y", events.rupture_y
+#         print "events.rupture_centroid_x", events.rupture_centroid_x
+#         print "events.rupture_centroid_y", events.rupture_centroid_y
 #         print "events.trace_start_x", events.trace_start_x
 #         print " events.trace_start_y", events.trace_start_y
         self.assert_(events.rupture_centroid_lat <= -32.0)
@@ -724,8 +724,6 @@ class Test_Event_Set(unittest.TestCase):
             self.assert_(event.trace_start_lat == set.trace_start_lat[i])
             self.assert_(event.rupture_centroid_lat == set.rupture_centroid_lat[i])
             self.assert_(event.rupture_centroid_lon == set.rupture_centroid_lon[i])
-            self.assert_(event.rupture_y == set.rupture_y[i])
-            self.assert_(event.rupture_x == set.rupture_x[i])
             self.assert_(event.rupture_centroid_y == set.rupture_centroid_y[i])
             self.assert_(event.rupture_centroid_x == set.rupture_centroid_x[i])
             self.assert_(event.source_zone_id == set.source_zone_id[i])
@@ -994,10 +992,10 @@ class Test_Event_Set(unittest.TestCase):
 
     def test_merge_events_and_sources(self):
         para = array([0, 1., 2.])
-        para_list = [para]*22
+        para_list = [para]*20
         events_zone = Event_Set(*para_list)
         para = array([3., 4., 5., 6.])
-        para_list = [para]*22
+        para_list = [para]*20
         events_fault = Event_Set(*para_list)
 
         atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
