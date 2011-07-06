@@ -139,8 +139,8 @@ class Sites(object):
                              projection,
                              trace_start_lat=event_set.trace_start_lat,
                              trace_start_lon=event_set.trace_start_lon,
-                             trace_start_x=event_set.trace_start_x,
-                             trace_start_y=event_set.trace_start_y)
+                             rupture_centroid_x=event_set.rupture_centroid_x,
+                             rupture_centroid_y=event_set.rupture_centroid_y)
         else:
             return Distances(self.latitude,
                              self.longitude,

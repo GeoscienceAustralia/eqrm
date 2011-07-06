@@ -20,8 +20,10 @@ consisting of the following parameters:
   projection       ??
   trace_start_lat  array of trace start latitudes
   trace_start_lon  array of trace start longitudes
-  trace_start_x    array of trace start eastings (?)
-  trace_start_y    array of trace start northings (?)
+  rupture_centroid_x    array of the x of the rupture centroid in local coordinates
+                        the start of the trace is the origin of the local coords
+  rupture_centroid_y    array of the y of the rupture centroid in local coordinates
+                        the start of the trace is the origin of the local coords
 
 These functions are built into a dictionary.
 
@@ -43,7 +45,7 @@ DegreesToRadians = pi / 180.0
 
 def Hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
                 widths, dips, depths, projection, trace_start_lat,
-                trace_start_lon, trace_start_x, trace_start_y):
+                trace_start_lon, rupture_centroid_x, rupture_centroid_y):
     # Increase the rank of lat_sites to (num_sites,1)
     # Now (lat_sites+lat_events).shape = (num_sites,num_events)
     lat_sites = lat_sites[:,newaxis]
@@ -56,10 +58,10 @@ def Hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
     
     return sqrt(site_x*site_x + site_y*site_y + depths*depths)
 
-def Mendez_hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths,
+def Obsolete_Mendez_hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths,
                        azimuths, widths, dips, depths, projection,
-                       trace_start_lat, trace_start_lon, trace_start_x,
-                       trace_start_y):
+                       trace_start_lat, trace_start_lon, rupture_centroid_x,
+                       rupture_centroid_y):
     # Increase the rank of lat_sites to (num_sites,1)
     # Now (lat_sites+lat_events).shape = (num_sites,num_events)
     lat_sites = lat_sites[:,newaxis]
@@ -67,8 +69,8 @@ def Mendez_hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths,
     
     # find vector from site to event_centroid
     # using the same values as Matlab
-    x0 = -trace_start_x
-    y0 = -trace_start_y
+    x0 = rupture_centroid_x
+    y0 = rupture_centroid_y
     
     (x, y) =projection.angular_to_cartesian(lat_sites, lon_sites,
                                             trace_start_lat, trace_start_lon,
@@ -78,7 +80,7 @@ def Mendez_hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths,
 
 def Epicentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
                widths, dips, depths, projection, trace_start_lat,
-               trace_start_lon, trace_start_x, trace_start_y):
+               trace_start_lon, rupture_centroid_x, rupture_centroid_y):
     lat_sites = lat_sites[:,newaxis]
     lon_sites = lon_sites[:,newaxis]
     
@@ -89,17 +91,17 @@ def Epicentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
     
     return sqrt(site_x*site_x + site_y*site_y)
 
-def Mendez_epicentral(lat_sites, lon_sites, lat_events, lon_events, lengths,
+def Obsolete_Mendez_epicentral(lat_sites, lon_sites, lat_events, lon_events, lengths,
                       azimuths, widths, dips, depths, projection,
-                      trace_start_lat, trace_start_lon, trace_start_x,
-                      trace_start_y):
+                      trace_start_lat, trace_start_lon, rupture_centroid_x,
+                      rupture_centroid_y):
     lat_sites = lat_sites[:,newaxis]
     lon_sites = lon_sites[:,newaxis]
     
     # find vector from site to event_centroid
     # using the same values as Matlab
-    x0 = -trace_start_x
-    y0 = -trace_start_y
+    x0 = rupture_centroid_x
+    y0 = rupture_centroid_y
     
     (x, y) = projection.angular_to_cartesian(lat_sites, lon_sites,
                                              trace_start_lat, trace_start_lon,
@@ -111,7 +113,7 @@ def Mendez_epicentral(lat_sites, lon_sites, lat_events, lon_events, lengths,
 
 def Mendez_rupture(lat_sites, lon_sites, lat_events, lon_events, lengths,
                    azimuths, widths, dips, depths, projection, trace_start_lat,
-                   trace_start_lon, trace_start_x, trace_start_y):
+                   trace_start_lon, rupture_centroid_x, rupture_centroid_y):
     lat_sites = lat_sites[:,newaxis]
     lon_sites = lon_sites[:,newaxis]
     
@@ -119,8 +121,8 @@ def Mendez_rupture(lat_sites, lon_sites, lat_events, lon_events, lengths,
     cos_dip = cos(dips*rad)
     sin_dip = sin(dips*rad)
 
-    x0 = -trace_start_x
-    y0 = -trace_start_y
+    x0 = rupture_centroid_x
+    y0 = rupture_centroid_y
     
     (x, y) = projection.angular_to_cartesian(lat_sites, lon_sites,
                                              trace_start_lat, trace_start_lon,
@@ -133,7 +135,7 @@ def Mendez_rupture(lat_sites, lon_sites, lat_events, lon_events, lengths,
 
 def Rupture(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
             widths, dips, depths, projection, trace_start_lat, trace_start_lon,
-            trace_start_x, trace_start_y):  
+            rupture_centroid_x, rupture_centroid_y):  
     lat_sites = lat_sites[:,newaxis]
     lon_sites = lon_sites[:,newaxis]
     
@@ -212,7 +214,7 @@ def Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths):
 
 def Joyner_Boore(lat_sites, lon_sites, lat_events, lon_events, lengths,
                  azimuths, widths, dips, depths, projection, trace_start_lat,
-                 trace_start_lon, trace_start_x, trace_start_y):
+                 trace_start_lon, rupture_centroid_x, rupture_centroid_y):
     """ #FIXME This code needs comments """
 
     #import copy
@@ -232,8 +234,8 @@ def Joyner_Boore(lat_sites, lon_sites, lat_events, lon_events, lengths,
     cos_dip = cos(dips*rad)
     sin_dip = sin(dips*rad)
     
-    x0 = -trace_start_x
-    y0 = -trace_start_y
+    x0 = rupture_centroid_x
+    y0 = rupture_centroid_y
     
     (x ,y) = ll2xy(lat_sites, lon_sites, trace_start_lat,
                    trace_start_lon, azimuths)
@@ -261,7 +263,7 @@ def Joyner_Boore(lat_sites, lon_sites, lat_events, lon_events, lengths,
 
 def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
                azimuths, widths, dips, depths, projection, trace_start_lat,
-               trace_start_lon, trace_start_x, trace_start_y):
+               trace_start_lon, rupture_centroid_x, rupture_centroid_y):
     """Distance function that calculates 'Rx'.
 
     Rx is the shortest horizontal distance (km) from a site to the line defined

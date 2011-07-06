@@ -58,7 +58,7 @@ class Event_Set(object):
                  source_zone_id,
                  trace_start_lat, trace_start_lon,
                  trace_end_lat, trace_end_lon,
-                 trace_start_x, trace_start_y,
+                 rupture_centroid_x, rupture_centroid_y,
                  rupture_x, rupture_y,
                  rupture_centroid_lat, rupture_centroid_lon):
         """
@@ -122,8 +122,8 @@ class Event_Set(object):
         self.trace_start_lon = trace_start_lon
         self.trace_end_lat = trace_end_lat
         self.trace_end_lon = trace_end_lon
-        self.trace_start_x = trace_start_x
-        self.trace_start_y = trace_start_y
+        self.rupture_centroid_x = rupture_centroid_x
+        self.rupture_centroid_y = rupture_centroid_y
         self.rupture_x = rupture_x
         self.rupture_y = rupture_y
         self.rupture_centroid_lat = rupture_centroid_lat
@@ -233,16 +233,16 @@ class Event_Set(object):
         rupture_x = x
         rupture_y = y
 
-        trace_start_x = -x
-        trace_start_y = -y
+        rupture_centroid_x = x
+        rupture_centroid_y = y
 
         (trace_start_lat,
-         trace_start_lon) = xy_to_ll(trace_start_x,trace_start_y,
+         trace_start_lon) = xy_to_ll(-rupture_centroid_x,-rupture_centroid_y,
                                      rupture_centroid_lat,rupture_centroid_lon,
                                      azimuth)
 
         (trace_end_lat,
-         trace_end_lon) = xy_to_ll(-trace_start_x,trace_start_y,
+         trace_end_lon) = xy_to_ll(rupture_centroid_x,-rupture_centroid_y,
                                    rupture_centroid_lat,rupture_centroid_lon,
                                    azimuth)  
 
@@ -263,8 +263,8 @@ class Event_Set(object):
                         trace_start_lon,
                         trace_end_lat,
                         trace_end_lon,
-                        trace_start_x,
-                        trace_start_y,
+                        rupture_centroid_x,
+                        rupture_centroid_y,
                         rupture_x,
                         rupture_y,
                         rupture_centroid_lat,
@@ -597,8 +597,8 @@ class Event_Set(object):
                          self.trace_start_lon[key],
                          self.trace_end_lat[key],
                          self.trace_end_lon[key],
-                         self.trace_start_x[key],
-                         self.trace_start_y[key],
+                         self.rupture_centroid_x[key],
+                         self.rupture_centroid_y[key],
                          self.rupture_x[key],
                          self.rupture_y[key],
                          self.rupture_centroid_lat[key],
@@ -779,8 +779,8 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
     trace_start_lon =zeros((num_events), dtype=EVENT_FLOAT)
     trace_end_lat =zeros((num_events), dtype=EVENT_FLOAT)
     trace_end_lon =zeros((num_events), dtype=EVENT_FLOAT)
-    trace_start_x =zeros((num_events), dtype=EVENT_FLOAT)
-    trace_start_y =zeros((num_events), dtype=EVENT_FLOAT)
+    rupture_centroid_x =zeros((num_events), dtype=EVENT_FLOAT)
+    rupture_centroid_y =zeros((num_events), dtype=EVENT_FLOAT)
     rupture_x =zeros((num_events), dtype=EVENT_FLOAT)
     rupture_y =zeros((num_events), dtype=EVENT_FLOAT)
     
@@ -982,8 +982,8 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         trace_start_lon[start:end] = r_start_lon
         trace_end_lat[start:end] = r_end_lat
         trace_end_lon[start:end] = r_end_lon
-        trace_start_x[start:end] = r_x_start
-        trace_start_y[start:end] = r_y_start
+        rupture_centroid_x[start:end] = -r_x_start
+        rupture_centroid_y[start:end] = -r_y_start
         rupture_x[start:end] = r_x_centroid
         rupture_y[start:end] = r_y_centroid
         #magnitude[start:end] = polygon_magnitude
@@ -1027,8 +1027,8 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                         trace_start_lon,
                         trace_end_lat,
                         trace_end_lon,
-                        trace_start_x,
-                        trace_start_y,
+                        rupture_centroid_x,
+                        rupture_centroid_y,
                         rupture_x,
                         rupture_y,
                         rupture_centroid_lat,

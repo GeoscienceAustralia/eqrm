@@ -103,7 +103,7 @@ class Test_Event_Set(unittest.TestCase):
         # as event_set2.depth (as opposed to whether they are numerically
         # the same). 
         assert event_set1.depth is not event_set2.depth
-        assert event_set1.trace_start_x is not event_set2.trace_start_x
+        assert event_set1.rupture_centroid_x is not event_set2.rupture_centroid_x
         
         # Testing that the values were saved with good precision
         assert allclose(event_set1.depth,event_set2.depth)
@@ -368,10 +368,10 @@ class Test_Event_Set(unittest.TestCase):
         
         self.assert_ (allclose(event_set.length, 20.))
         
-        self.assert_ (allclose(event_set.trace_start_x, -10.))
+        self.assert_ (allclose(event_set.rupture_centroid_x, 10.))
 
         # Due to the 45 deg dip
-        self.assert_ (allclose(event_set.trace_start_y, -event_set.depth))
+        self.assert_ (allclose(event_set.rupture_centroid_y, event_set.depth))
 
         #event_set.trace_start_lat [-30.09]
         #event_set.trace_start_lon [ 149.93]
@@ -726,8 +726,8 @@ class Test_Event_Set(unittest.TestCase):
             self.assert_(event.rupture_centroid_lon == set.rupture_centroid_lon[i])
             self.assert_(event.rupture_y == set.rupture_y[i])
             self.assert_(event.rupture_x == set.rupture_x[i])
-            self.assert_(event.trace_start_y == set.trace_start_y[i])
-            self.assert_(event.trace_start_x == set.trace_start_x[i])
+            self.assert_(event.rupture_centroid_y == set.rupture_centroid_y[i])
+            self.assert_(event.rupture_centroid_x == set.rupture_centroid_x[i])
             self.assert_(event.source_zone_id == set.source_zone_id[i])
             self.assert_(event.trace_end_lat == set.trace_end_lat[i])
             self.assert_(event.trace_end_lon == set.trace_end_lon[i])
