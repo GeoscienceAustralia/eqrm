@@ -753,8 +753,8 @@ def save_event_set(eqrm_flags, event_set, event_activity, source_model,
     rupture_centroid_lat = event_set.rupture_centroid_lat
     rupture_centroid_lon = event_set.rupture_centroid_lon
     depth = event_set.depth
-    rupture_x = event_set.rupture_x
-    rupture_y = event_set.rupture_y
+    rupture_x = event_set.rupture_centroid_x
+    rupture_y = event_set.rupture_centroid_y
     length = event_set.length
     width = event_set.width
     event_num = event_set.event_num
@@ -841,8 +841,8 @@ def obsolete_save_event_set(eqrm_flags,event_set,r_new,compress=False):
     rupture_centroid_lat = event_set.rupture_centroid_lat
     rupture_centroid_lon = event_set.rupture_centroid_lon
     depth = event_set.depth
-    rupture_x = event_set.rupture_x
-    rupture_y = event_set.rupture_y
+    rupture_x = event_set.rupture_centroid_x
+    rupture_y = event_set.rupture_centroid_y
     length = event_set.length
     width = event_set.width
     # Pseudo_Event_Set will have a index attribute
