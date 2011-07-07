@@ -64,10 +64,8 @@ def create_event_set(event_num):
 #         print "events.trace_end_lon", events.trace_end_lon
 #         print "events.rupture_centroid_lat", events.rupture_centroid_lat
 #         print "events.rupture_centroid_lon", events.rupture_centroid_lon
-#         print "events.rupture_centroid_x", events.rupture_x
-#         print "events.rupture_centroid_y", events.rupture_y
-#         print "events.trace_start_x", events.trace_start_x
-#         print " events.trace_start_y", events.trace_start_y
+#         print "events.rupture_centroid_x", events.rupture_centroid_x
+#         print "events.rupture_centroid_y", events.rupture_centroid_y
 
         os.remove(file_name)
 
