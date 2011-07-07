@@ -109,7 +109,6 @@ def test_generate_synthetic_events_fault():
         prob_number_of_events_in_faults =[100]
         (event_set_fault, source_mod_fault) = generate_synthetic_events_fault(fault_xml_file,
                                                   event_control_file,
-                                                  prob_min_mag_cutoff,
                                                   prob_number_of_events_in_faults)
 
         return event_set_fault                                           
@@ -124,7 +123,7 @@ if __name__ == "__main__":
     depth=event_set_fault.depth
     r_lat=event_set_fault.rupture_centroid_lat
     r_lon=event_set_fault.rupture_centroid_lon
-    r_x=event_set_fault.rupture_x
+    r_x=event_set_fault.rupture_centroid_x
     s_lon=event_set_fault.trace_start_lon
     e_lon=event_set_fault.trace_end_lon
     s_lat=event_set_fault.trace_start_lat
