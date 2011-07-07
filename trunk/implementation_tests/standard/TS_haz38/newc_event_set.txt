@@ -1,2 +1,2 @@
-trace_start_lat,trace_start_lon,trace_end_lat,trace_end_lon,azimuth,dip,event_activity,Mw,rupture_centroid_lat,rupture_centroid_lon,depth,rupture_x,rupture_y,length,width,event_num,name
+trace_start_lat,trace_start_lon,trace_end_lat,trace_end_lon,azimuth,dip,event_activity,Mw,rupture_centroid_lat,rupture_centroid_lon,depth,rupture_centroid_x,rupture_centroid_y,length,width,event_num,name
 -33.4271796985,151.62954295,-32.5739178259,151.259449908,340,35,1.0,7.2,-32.95,151.61,11.5,50.4520416145,16.4237020775,100.904083229,15.0,0,scenario

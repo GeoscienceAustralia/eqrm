@@ -724,8 +724,6 @@ class Test_Output_manager(unittest.TestCase):
         self.assert_ (allclose(out['event_activity'],
                                asarray(event_activity)))
         set_dic = set.introspect_attribute_values()
-        set_dic['rupture_x']=set_dic['rupture_centroid_x']
-        set_dic['rupture_y']=set_dic['rupture_centroid_y']
         for key in out:
             if set_dic.has_key(key):
                 #print "key", key

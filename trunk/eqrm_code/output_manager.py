@@ -733,7 +733,7 @@ def save_event_set(eqrm_flags, event_set, event_activity, source_model,
                      'trace_end_lat,trace_end_lon,azimuth,dip,'
                      'event_activity,Mw,rupture_centroid_lat,'
                      'rupture_centroid_lon,depth,'
-                     'rupture_x,rupture_y,length,width,event_num,name\n')
+                     'rupture_centroid_x,rupture_centroid_y,length,width,event_num,name\n')
 
     # This is for speed, at the expense of memory
     # It is avoiding lots of expensive psudo-event lookups.
@@ -753,8 +753,8 @@ def save_event_set(eqrm_flags, event_set, event_activity, source_model,
     rupture_centroid_lat = event_set.rupture_centroid_lat
     rupture_centroid_lon = event_set.rupture_centroid_lon
     depth = event_set.depth
-    rupture_x = event_set.rupture_centroid_x
-    rupture_y = event_set.rupture_centroid_y
+    rupture_centroid_x = event_set.rupture_centroid_x
+    rupture_centroid_y = event_set.rupture_centroid_y
     length = event_set.length
     width = event_set.width
     event_num = event_set.event_num
@@ -772,8 +772,8 @@ def save_event_set(eqrm_flags, event_set, event_activity, source_model,
         s.append(str(rupture_centroid_lat[i]))
         s.append(str(rupture_centroid_lon[i]))
         s.append(str(depth[i]))
-        s.append(str(rupture_x[i]))
-        s.append(str(rupture_y[i]))
+        s.append(str(rupture_centroid_x[i]))
+        s.append(str(rupture_centroid_y[i]))
         s.append(str(length[i]))
         s.append(str(width[i]))
         s.append(str(event_num[i]))
@@ -819,8 +819,8 @@ def obsolete_save_event_set(eqrm_flags,event_set,r_new,compress=False):
     event_file.write('%column 11: rupture_centroid_lat\n') 
     event_file.write('%column 12: rupture_centroid_lon\n') 
     event_file.write('%column 13: depth\n') 
-    event_file.write('%column 14: rupture_x\n') 
-    event_file.write('%column 15: rupture_y\n') 
+    event_file.write('%column 14: rupture_centroid_x\n') 
+    event_file.write('%column 15: rupture_centroid_y\n') 
     event_file.write('%column 16: length\n') 
     event_file.write('%column 17: width\n') 
     event_file.write('%column 18: Event index\n')
@@ -841,8 +841,8 @@ def obsolete_save_event_set(eqrm_flags,event_set,r_new,compress=False):
     rupture_centroid_lat = event_set.rupture_centroid_lat
     rupture_centroid_lon = event_set.rupture_centroid_lon
     depth = event_set.depth
-    rupture_x = event_set.rupture_centroid_x
-    rupture_y = event_set.rupture_centroid_y
+    rupture_centroid_x = event_set.rupture_centroid_x
+    rupture_centroid_y = event_set.rupture_centroid_y
     length = event_set.length
     width = event_set.width
     # Pseudo_Event_Set will have a index attribute
@@ -876,8 +876,8 @@ def obsolete_save_event_set(eqrm_flags,event_set,r_new,compress=False):
         s.append(str(rupture_centroid_lat[i]))
         s.append(str(rupture_centroid_lon[i]))
         s.append(str(depth[i]))
-        s.append(str(rupture_x[i]))
-        s.append(str(rupture_y[i]))
+        s.append(str(rupture_centroid_x[i]))
+        s.append(str(rupture_centroid_y[i]))
         s.append(str(length[i]))
         s.append(str(width[i]))
         # Pseudo_Event_Set will have a index attribute
@@ -921,8 +921,8 @@ def load_event_set(saved_dir, site_tag):
         'rupture_centroid_lat':float,
         'rupture_centroid_lon':float,
         'depth':float,
-        'rupture_x':float,
-        'rupture_y':float,
+        'rupture_centroid_x':float,
+        'rupture_centroid_y':float,
         'length':float,
         'width':float,
         'event_num':int,
