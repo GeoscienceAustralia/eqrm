@@ -11,8 +11,8 @@
 %column 11: rupture_centroid_lat
 %column 12: rupture_centroid_lon
 %column 13: depth
-%column 14: rupture_x
-%column 15: rupture_y
+%column 14: rupture_centroid_x
+%column 15: rupture_centroid_y
 %column 16: length
 %column 17: width
 %column 18: Event index
