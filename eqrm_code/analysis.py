@@ -651,6 +651,11 @@ def main(parameter_handle,
     #print "time_taken_site_loop", time_taken_site_loop
 
     # SAVE HAZARD
+    if parallel.rank == 0:
+        write_title = True
+    else:
+        write_title =False
+    
     if eqrm_flags.save_hazard_map is True and parallel.lo != parallel.hi:
         files = save_hazard(soil_amp=False, eqrm_flags=eqrm_flags,
                             hazard=bedrock_hazard,
@@ -670,12 +675,12 @@ def main(parameter_handle,
 
     # Save Ground Motion
     if eqrm_flags.save_motion is True and parallel.lo != parallel.hi:
-        file = save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
+        a_file = save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
                           sites=all_sites,
                           compress=eqrm_flags.compress_output,
                           parallel_tag=parallel.file_tag,
                           write_title=(parallel.rank == False))
-        row_files_that_parallel_splits.append(file)
+        row_files_that_parallel_splits.append(a_file)
 
         files = save_motion(soil_amp=False, eqrm_flags=eqrm_flags
                             ,motion=bedrock_SA_all,
@@ -699,13 +704,13 @@ def main(parameter_handle,
             eqrm_flags.run_type == 'risk' and
             parallel.lo != parallel.hi):
         # No sites were investigated.
-        file = save_damage(eqrm_flags.output_dir, eqrm_flags.site_tag,
+        a_file = save_damage(eqrm_flags.output_dir, eqrm_flags.site_tag,
                            'structural', total_structure_damage,
                            all_sites.attributes['BID'],
                            compress=eqrm_flags.compress_output,
                            parallel_tag=parallel.file_tag,
                            write_title=(parallel.rank == False))
-        row_files_that_parallel_splits.append(file)
+        row_files_that_parallel_splits.append(a_file)
 
     if ((eqrm_flags.save_motion is True or
                  eqrm_flags.save_total_financial_loss is True or
@@ -723,11 +728,11 @@ def main(parameter_handle,
                  eqrm_flags.save_building_loss is True or
                  eqrm_flags.save_contents_loss is True) and
             parallel.lo != parallel.hi):
-        file = save_structures(eqrm_flags, all_sites,
+        a_file = save_structures(eqrm_flags, all_sites,
                                compress=eqrm_flags.compress_output,
                                parallel_tag=parallel.file_tag,
                                write_title=(parallel.rank == False))
-        row_files_that_parallel_splits.append(file)
+        row_files_that_parallel_splits.append(a_file)
 
     if (eqrm_flags.save_total_financial_loss is True and
             parallel.lo != parallel.hi):
@@ -745,20 +750,20 @@ def main(parameter_handle,
         new_total_building_loss_qw = new_total_building_loss_qw.reshape(
             (num_sites, -1))
         
-        file = save_ecloss('_total_building',eqrm_flags,
+        a_file = save_ecloss('_total_building',eqrm_flags,
                            new_total_building_loss_qw, all_sites,
                            compress=eqrm_flags.compress_output,
                            parallel_tag=parallel.file_tag)
-        column_files_that_parallel_splits.append(file)
+        column_files_that_parallel_splits.append(a_file)
 
-        file = save_val(eqrm_flags,
+        a_file = save_val(eqrm_flags,
                         sum(
             all_sites.cost_breakdown(
             ci=eqrm_flags.loss_regional_cost_index_multiplier)),
                         '_bval',
                         compress=eqrm_flags.compress_output,
                         parallel_tag=parallel.file_tag)
-        row_files_that_parallel_splits.append(file)
+        row_files_that_parallel_splits.append(a_file)
 
     if eqrm_flags.save_building_loss is True and parallel.lo != parallel.hi:
         
@@ -770,18 +775,18 @@ def main(parameter_handle,
         # overload the event
         new_building_loss_qw = new_building_loss_qw.reshape(
             (num_sites, -1))
-        file = save_ecloss('_building', eqrm_flags, new_building_loss_qw,
+        a_file = save_ecloss('_building', eqrm_flags, new_building_loss_qw,
                            all_sites, compress=eqrm_flags.compress_output,
                            parallel_tag=parallel.file_tag)
-        column_files_that_parallel_splits.append(file)
+        column_files_that_parallel_splits.append(a_file)
 
-#         file = save_val(eqrm_flags,sum( \
+#         a_file = save_val(eqrm_flags,sum( \
 #             all_sites.cost_breakdown(
 # ci=eqrm_flags.loss_regional_cost_index_multiplier)[:-1]),
 #                         '_bval',
 #                         compress=eqrm_flags.compress_output,
 #                         parallel_tag=parallel.file_tag)
-#         row_files_that_parallel_splits.append(file)
+#         row_files_that_parallel_splits.append(a_file)
 
     if eqrm_flags.save_contents_loss is True and parallel.lo != parallel.hi:
         new_contents_loss_qw = collapse_source_gmms(
@@ -793,10 +798,10 @@ def main(parameter_handle,
         new_contents_loss_qw = new_contents_loss_qw.reshape(
             (num_sites, -1))
         
-        file = save_ecloss('_contents', eqrm_flags,new_contents_loss_qw,
+        a_file = save_ecloss('_contents', eqrm_flags,new_contents_loss_qw,
                            all_sites, compress=eqrm_flags.compress_output,
                            parallel_tag=parallel.file_tag)
-        column_files_that_parallel_splits.append(file)
+        column_files_that_parallel_splits.append(a_file)
         
     if eqrm_flags.bridges_functional_percentages is not None and \
            have_bridge_data and parallel.lo != parallel.hi:  
@@ -809,18 +814,18 @@ def main(parameter_handle,
     if (eqrm_flags.save_fatalities is True and
             parallel.lo != parallel.hi):
         # note: will not handle multiple GMPES
-        file = save_fatalities('_fatalities',eqrm_flags,
+        a_file = save_fatalities('_fatalities',eqrm_flags,
                            total_fatalities,
                            sites=all_sites,
                            compress=eqrm_flags.compress_output,
                            parallel_tag=parallel.file_tag)
-        column_files_that_parallel_splits.append(file)
+        column_files_that_parallel_splits.append(a_file)
         
         files = save_distances(eqrm_flags, sites=all_sites,
                                event_set=event_set,
                                compress=eqrm_flags.compress_output,
                                parallel_tag=parallel.file_tag)
-        column_files_that_parallel_splits.append(file)
+        column_files_that_parallel_splits.append(files)
 
     if parallel.rank == 0:		# No site component
         # So just get one process to write these files.
