@@ -133,24 +133,26 @@ def main(parameter_handle,
     parallel = Parallel(eqrm_flags.is_parallel)
 
     # Make the output dir, if it is not present
-    add_last_directory(eqrm_flags.output_dir)
-
+    if parallel.rank == 0:
+        add_last_directory(eqrm_flags.output_dir)
+        
     # copy input parameter file to output directory.
-    if isinstance(parameter_handle, str) and parameter_handle[-3:] == '.py':
-        shutil.copyfile(parameter_handle,
-                        eqrm_flags.output_dir+'eqrm_flags.py')
-    else:
-        para_instance = copy.deepcopy(eqrm_flags)
-        eqrm_flags_to_control_file(
-            os.path.join(eqrm_flags.output_dir, 'eqrm_flags.py'),
-            para_instance)
+        if isinstance(parameter_handle, str) and parameter_handle[-3:] == '.py':
+            shutil.copyfile(parameter_handle,
+                            eqrm_flags.output_dir+'eqrm_flags.py')
+        else:
+            para_instance = copy.deepcopy(eqrm_flags)
+            eqrm_flags_to_control_file(
+                os.path.join(eqrm_flags.output_dir, 'eqrm_flags.py'),
+                para_instance)
+    parallel.barrier()
 
     # Set up the logging
     # Use defaults.
     #log.console_logging_level = log.INFO
     #log.file_logging_level = log.DEBUG
     log_filename = os.path.join(eqrm_flags.output_dir,
-                                'log' + parallel.file_tag + '.txt')
+                                'log' + parallel.log_file_tag + '.txt')
     log.log_filename = log_filename
     log.remove_log_file()
     log.set_log_file(log_filename)
