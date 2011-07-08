@@ -24,9 +24,8 @@ class WeaveIOError(exceptions.Exception):
                % get_weave_dir())
         raise IOError(msg)
 
-CSM_DAMPING_USE_SMOOTHING = True # TRUE 0
-CSM_DAMPING_DO_NOT_USE_SMOOTHING = False # FALSE 1
-
+# Users used to be able to set this...
+CSM_DAMPING_USE_SMOOTHING = True 
 
 def trapazoid_damp(capacity_parameters,kappa,acceleration,displacement,
                    unused_csm_hysteretic_damping):
