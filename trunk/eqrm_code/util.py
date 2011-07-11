@@ -257,7 +257,9 @@ def convert_path_string_to_join(path):
     
     seps = ['/','\\']
     out = multi_split(path, seps)
-    out = [x for x in out if x != '']
+    # Taking out, since it is turning
+    # '/nas/' to 'nas'
+    #out = [x for x in out if x != '']
     out = "', '".join(out)
     out = "join('" + out + "')"
     return out
@@ -280,6 +282,25 @@ def multi_split(split_this, seps):
             results += seq.split(seperator)
     return results
 
+def get_hostname():
+    """Return (<host>, <domain>) for machine.
+
+    For example, on the GA cyclone main node, return ('cyclone', 'agso.gov.au').
+    """
+
+    fd = os.popen('hostname')
+    hostname = fd.read()
+    fd.close()
+
+    try:
+        result = hostname.strip().split('.', 1)
+        if len(result) < 2:
+            result.append('')
+    except:
+        result = (hostname, '')
+
+    return result
+    
 ################################################################################
 
 if __name__ == "__main__":

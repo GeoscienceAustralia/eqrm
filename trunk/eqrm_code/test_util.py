@@ -115,15 +115,22 @@ class Test_Util(unittest.TestCase):
         
         s = r'.\s\i/'
         out = convert_path_string_to_join(s)
-        self.failUnlessEqual(out, "join('.', 's', 'i')")
+        self.failUnlessEqual(out, "join('.', 's', 'i', '')")
 
         s = r'.\i\s'
         out = convert_path_string_to_join(s)
         self.failUnlessEqual(out, "join('.', 'i', 's')")
 
+        s = r'\nas/'
+        out = convert_path_string_to_join(s)
+        self.failUnlessEqual(out, "join('', 'nas', '')")
+
     def test_multi_split(self):
         out = multi_split('1a2b3a4b',['a','b'])
         self.failUnlessEqual(out, ['1','2','3','4',''])
+        out = multi_split('/nas',['/'])
+        self.failUnlessEqual(out, ['','nas'])
+        
         
 ################################################################################
 
