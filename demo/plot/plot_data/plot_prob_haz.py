@@ -1,19 +1,19 @@
 """
   EQRM parameter file
-  All input files are first searched for in the input_dir, then in the
-  resources/data directory, which is part of EQRM.
+All input files are first searched for in the input_dir,then in the
+resources/data directory, which is part of EQRM.
 
- All distances are in kilometers.
- Acceleration values are in g.
- Angles, latitude and longitude are in decimal degrees.
+All distances are in kilometers.
+Acceleration values are in g.
+Angles, latitude and longitude are in decimal degrees.
 
- If a field is not used, set the value to None.
+If a field is not used, set the value to None.
 
 
 """
 
-from eqrm_code.parse_in_parameters import eqrm_data_home, get_time_user
 from os.path import join
+from eqrm_code.parse_in_parameters import eqrm_data_home, get_time_user
 
 
 # Operation Mode
@@ -67,7 +67,7 @@ save_motion = False
 save_prob_structural_damage = None
 
 # If this file is executed the simulation will start.
-# Delete all variables that are not EQRM parameters variables. 
+# Delete all variables that are not EQRM attributes variables. 
 if __name__ == '__main__':
     from eqrm_code.analysis import main
     main(locals())
