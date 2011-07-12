@@ -260,6 +260,9 @@ def convert_path_string_to_join(path):
     # Taking out, since it is turning
     # '/nas/' to 'nas'
     #out = [x for x in out if x != '']
+    if out[0] == '' and len(out) > 1:
+        out.pop(0)
+        out[0] = os.sep + out[0]
     out = "', '".join(out)
     out = "join('" + out + "')"
     return out

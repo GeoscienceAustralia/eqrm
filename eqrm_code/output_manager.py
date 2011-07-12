@@ -72,10 +72,6 @@ def save_hazard(soil_amp,eqrm_flags,
         parallel_tag = '' 
     for i in range(len(eqrm_flags.return_periods)):
         rp=str(eqrm_flags.return_periods[i])
-        if rp[-2:-1] == '.':
-            # get rid of the . if it is the second last character.
-            # Why?
-            rp = rp[:-2] + rp[-1]
         base_name = eqrm_flags.output_dir + get_hazard_file_name(
             eqrm_flags.site_tag, hazard_name, rp, EXTENSION)
         base_names.append(base_name)

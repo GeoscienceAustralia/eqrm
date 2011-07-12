@@ -123,7 +123,8 @@ class Test_Util(unittest.TestCase):
 
         s = r'\nas/'
         out = convert_path_string_to_join(s)
-        self.failUnlessEqual(out, "join('', 'nas', '')")
+        actual = "join('" + os.sep + 'nas' + "', '')" 
+        self.failUnlessEqual(out, actual)
 
     def test_multi_split(self):
         out = multi_split('1a2b3a4b',['a','b'])
