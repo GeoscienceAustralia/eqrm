@@ -136,11 +136,8 @@ class Test_Output_manager(unittest.TestCase):
         # check the site files
         for i in range(len(eqrm_flags.return_periods)):
             rp=str(eqrm_flags.return_periods[i])
-            if rp[-2:-1] == '.':
-                rp = rp[:-2] + rp[-1]
-            file_name = eqrm_flags.output_dir+eqrm_flags.site_tag+ '_'+ \
-                        hazard_name+'_rp' + \
-                        rp.replace('.','pt').replace(' ','') + EXTENSION
+            haz = get_hazard_file_name(eqrm_flags.site_tag, hazard_name, rp)
+            file_name = eqrm_flags.output_dir + haz
             f=open(file_name,'r')
 
             text = f.read().splitlines()
@@ -283,11 +280,8 @@ class Test_Output_manager(unittest.TestCase):
         # delete site files
         for i in range(len(eqrm_flags.return_periods)):
             rp=str(eqrm_flags.return_periods[i])
-            if rp[-2:-1] == '.':
-                rp = rp[:-2] + rp[-1]
-            file_name = eqrm_flags.output_dir+eqrm_flags.site_tag+ '_'+ \
-                        hazard_name+'_rp' + \
-                        rp.replace('.','pt').replace(' ','') + EXTENSION
+            haz = get_hazard_file_name(eqrm_flags.site_tag, hazard_name, rp)
+            file_name = eqrm_flags.output_dir + haz
             os.remove(file_name)
         # remove the locations file that is also produced.
         os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')

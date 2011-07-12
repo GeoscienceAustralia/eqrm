@@ -497,7 +497,7 @@ def create_parameter_data(handle, **kwargs):
     eqrm_flags.update(OLD_STYLE_PARAS_HARD_WIRED)
 
     # Remove or fix depreciated attributes
-    _depreciated_attributes(eqrm_flags)
+    depreciated_attributes(eqrm_flags)
     
     _add_default_values(eqrm_flags)
    
@@ -539,7 +539,7 @@ def update_control_file(file_name_path, new_file_name_path=None):
     attributes = _from_file_get_params(file_name_path)
     
     # Remove depreciated attributes
-    _depreciated_attributes(attributes)
+    depreciated_attributes(attributes)
     eqrm_flags_to_control_file(new_file_name_path, attributes)
 
     
@@ -624,7 +624,7 @@ DEPRECIATED_PARAS = {'atten_use_variability':
                      'prob_min_mag_cutoff':True
                      }
 
-def _depreciated_attributes(eqrm_flags):
+def depreciated_attributes(eqrm_flags):
     """
     Remove/fix/Give a warning about depreciated attributes.
     
