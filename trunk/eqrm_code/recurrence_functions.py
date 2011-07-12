@@ -45,8 +45,8 @@ def calc_event_activity(event_set, source_model):
                
         poly_ind = source.get_event_set_indexes()
         #print "poly_ind", poly_ind
-        mag_ind = where((actual_min_mag_generation < event_set.Mw[poly_ind])&
-                        (event_set.Mw[poly_ind] < recurrence_max_mag))[0]
+        mag_ind = where((actual_min_mag_generation <= event_set.Mw[poly_ind])&
+                        (event_set.Mw[poly_ind] <= recurrence_max_mag))[0]
         num_events=len(mag_ind)
         #print "mag_ind",mag_ind 
         if len(mag_ind)>0:
