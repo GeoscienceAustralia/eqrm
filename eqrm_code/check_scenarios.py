@@ -241,12 +241,24 @@ def float_line_diff(lineA, lineB,
 
     # Convert the strings to floats
     temp_line = []
-    lineA = [float(i) for i in lineA_list]
-    lineB = [float(i) for i in lineB_list]
     
-    arrayA = asarray(lineA)
-    arrayB = asarray(lineB)
-    is_same = allclose(arrayA, arrayB, rtol=relative_tolerance)
+    try:
+        lineA = [float(i) for i in lineA_list]
+        lineB = [float(i) for i in lineB_list]
+        arrayA = asarray(lineA)
+        arrayB = asarray(lineB)
+        is_same = allclose(arrayA, arrayB, rtol=relative_tolerance)
+    except:
+        if len(lineA_list)==len(lineB_list):
+            is_same =True
+            for i in xrange(len(lineA_list)):
+                if lineA_list[i] <> lineB_list[i]:
+                    a = float(lineA_list[i])
+                    b = float(lineB_list[i])
+                    if abs(a-b)>relative_tolerance:
+                        is_same = False
+        else:
+            is_same = False
     return is_same
     
 def print_diff_results(diff_results):
