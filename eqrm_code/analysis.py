@@ -284,8 +284,22 @@ def main(parameter_handle,
         
         # At this stage all the event generation has occured
         # So the Source classes should be 'downsized' to Event_Zones
-        
-        
+    
+    
+    #save event_set is now called earlier so that some arrays can be set to None
+    if parallel.rank == 0:        # No site component
+        # So just get one process to write these files.
+        save_event_set(eqrm_flags, event_set,
+                       event_activity,
+                       source_model,
+                       compress=eqrm_flags.compress_output)
+        #delete these data structures to reduce memory
+        event_set.area = None
+        event_set.trace_end_lat = None
+        event_set.trace_end_lon = None
+        event_set.source_zone_id = None
+        event_set.event_id = None
+               
     #  event_activity.event_activity[drop down to one dimension],
     event_activity.ground_motion_model_logic_split(
         source_model,
@@ -831,15 +845,6 @@ def main(parameter_handle,
                                compress=eqrm_flags.compress_output,
                                parallel_tag=parallel.file_tag)
         column_files_that_parallel_splits.append(files)
-
-    if parallel.rank == 0:		# No site component
-        # So just get one process to write these files.
-        save_event_set(eqrm_flags, event_set,
-                       event_activity,
-                       source_model,
-                       compress=eqrm_flags.compress_output)
-        
-    # delete big data structures here
 
     # parallel code.  Needed if # of processes is > # of structures
     calc_num_blocks = parallel.calc_num_blocks()

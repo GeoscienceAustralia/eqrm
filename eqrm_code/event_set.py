@@ -59,7 +59,8 @@ class Event_Set(object):
                  trace_start_lat, trace_start_lon,
                  trace_end_lat, trace_end_lon,
                  rupture_centroid_x, rupture_centroid_y,
-                 rupture_centroid_lat, rupture_centroid_lon):
+                 rupture_centroid_lat, rupture_centroid_lon,
+                 event_id=None):
         """
     A set of seismic events. Can be created  either directly or from an
     XML file which generates the events from eqrm_code.generation polygons.
@@ -125,8 +126,10 @@ class Event_Set(object):
         self.rupture_centroid_y = rupture_centroid_y
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
-        self.event_num = r_[0:len(self.depth)] # gives every event an id
-        
+        if event_id is None:
+           self.event_id = r_[0:len(self.depth)] # gives every event an id
+        else:
+            self.event_id = event_id
         self.check_arguments() 
 
 
@@ -515,7 +518,7 @@ class Event_Set(object):
                      'Mw': self.Mw, 'length': self.length,
                      'rupture_centroid_lat': self.rupture_centroid_lat,
                      'rupture_centroid_lon': self.rupture_centroid_lon,
-                     'event_num': self.event_num}
+                     'event_id': self.event_id}
 
         n = 1     #initialise number of arguments to 1
         for key in arguments.keys():
@@ -572,28 +575,15 @@ class Event_Set(object):
         else:
             fault_width = self.fault_width
 
-
-        # create and return a slice of the Event_Set data values
-        return Event_Set(self.azimuth[key],
-                         self.dip[key],
-                         self.ML[key],
-                         self.Mw[key],
-                         self.depth[key],
-                         self.depth_to_top[key],
-                         self.fault_type[key],
-                         self.width[key],
-                         self.length[key],
-                         self.area[key],
-                         fault_width[key],
-                         self.source_zone_id[key],
-                         self.trace_start_lat[key],
-                         self.trace_start_lon[key],
-                         self.trace_end_lat[key],
-                         self.trace_end_lon[key],
-                         self.rupture_centroid_x[key],
-                         self.rupture_centroid_y[key],
-                         self.rupture_centroid_lat[key],
-                         self.rupture_centroid_lon[key])
+        #some variables/array are set to None after the Event_set has
+        #been saved, so this method now checks for None values.
+        args = {}
+        for att in self.introspect_attributes():
+            if getattr(self, att) is None:
+                args[att] = None
+            else:
+                args[att] = getattr(self, att)[key]
+        return Event_Set(**args)
    
     def __len__(self):
         return len(self.rupture_centroid_lat)
@@ -662,25 +652,25 @@ class Event_Set(object):
         
 
 def _calc_attenuation_logic_split(GM_models, model_weights, 
-                                  event_activity, event_num):
+                                  event_activity, event_id):
     """event_activity has to be an array"""
 
     model_weights = absolute(array(model_weights))
 
-    new_event_num = []
+    new_event_id = []
     new_event_activity = []
     attenuation_ids = []
     attenuation_weights = []
-
+    
     for attenuation_id, GM_model in enumerate(GM_models):
-        new_event_num.extend(event_num)
-        attenuation_ids.extend(attenuation_id+0*event_num)
+        new_event_id.extend(event_id)
+        attenuation_ids.extend(attenuation_id+0*event_id)
 
         new_event_activity.extend(event_activity*model_weights[attenuation_id])
-        attenuation_weights.extend( model_weights[attenuation_id]+0*event_num)
+        attenuation_weights.extend( model_weights[attenuation_id]+0*event_id)
 
     #FIXME Why aren't these arrays?
-    return (new_event_activity, new_event_num,
+    return (new_event_activity, new_event_id,
             attenuation_ids, attenuation_weights)
     
     

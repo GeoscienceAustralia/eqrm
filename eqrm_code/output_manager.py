@@ -753,7 +753,7 @@ def save_event_set(eqrm_flags, event_set, event_activity, source_model,
     rupture_centroid_y = event_set.rupture_centroid_y
     length = event_set.length
     width = event_set.width
-    event_num = event_set.event_num
+    event_id = event_set.event_id
     
     for i in range(len(event_set)):
         s = []     
@@ -772,7 +772,7 @@ def save_event_set(eqrm_flags, event_set, event_activity, source_model,
         s.append(str(rupture_centroid_y[i]))
         s.append(str(length[i]))
         s.append(str(width[i]))
-        s.append(str(event_num[i]))
+        s.append(str(event_id[i]))
         s.append(str(sources_of_event_set[i].name))
 
         # finally, append the fault name
@@ -926,6 +926,8 @@ def load_event_set(saved_dir, site_tag):
         }
     attribute_dic, title_index_dic = csv2dict(file, convert=convert,
                                               delimiter=',')
+    attribute_dic['event_id'] = attribute_dic['event_num']
+    del(attribute_dic['event_num'])
     return attribute_dic
      
 
