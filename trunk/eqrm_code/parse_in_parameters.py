@@ -744,7 +744,11 @@ def _from_file_get_params(path_file):
     global unique_load_source_int
     name = 'name_' + str(unique_load_source_int)
     unique_load_source_int += 1
-    para_imp = imp.load_source(name, path_file)
+    try:
+        para_imp = imp.load_source(name, path_file)
+    except IOError, exc:
+        print "Problem with file " + path_file
+        raise
     attributes = introspect_attribute_values(para_imp)
     
     return attributes
