@@ -7,8 +7,9 @@ from eqrm_code import analysis
 from eqrm_code import parse_in_parameters
 
 
-plot_demo_run_names = ['plot_ProbRisk.py', 'plot_ProbHaz.py', 'plot_ScenGM.py',
-                 'plot_ScenRisk.py']
+plot_demo_run_names = [
+    'plot_probhaz2.py', 'plot_probhaz.py', 'plot_prob_risk.py',
+                 'plot_scen_gm.py', 'plot_scen_risk.py']
                  
 def demo_run(verbose=True, plot_dir=eqrm_filesystem.demo_plot_path,
              run_names=plot_demo_run_names):
@@ -17,7 +18,7 @@ def demo_run(verbose=True, plot_dir=eqrm_filesystem.demo_plot_path,
 
     plot_dir = os.path.join(plot_dir) # Why do this?
     current_dir = os.path.abspath(os.getcwd())
-    print "current", current
+    print "current_dir", current_dir
     os.chdir(plot_dir)
     if verbose:
         print 'Parameter file names = ',run_names
