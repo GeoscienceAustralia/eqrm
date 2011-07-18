@@ -976,7 +976,7 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
     # now find user sites and period in the loaded data, create plot dataset
     plot_data = []
     legend_titles = []
-    for (i, s) in enumerate(sites):
+    for (j, s) in enumerate(sites):
         try:
             (slat, slon, period) = s
             colour = None
@@ -985,11 +985,13 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
 
         # find site index matching user site
         site_index = None
+        i=0
         for (lat, lon) in zip(site_lats, site_lons):
             #if abs(lat - slat) <= delta and abs(lon - slon) <= delta:
             if lat == slat and lon == slon:
                 site_index = i
                 break
+            i+=1
         if site_index is None:
             msg = ("Site (%.3f,%.3f) not found in site data"
                    % (float(slat), float(slon)))
