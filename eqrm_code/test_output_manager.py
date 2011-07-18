@@ -1417,12 +1417,19 @@ class Test_Output_manager(unittest.TestCase):
                    f.close()
            os.remove(file_name)
         os.rmdir(eqrm_flags.output_dir)
-                            
+         
+    def not_implemented_test_pt_string(self):     
+        numbers = [1, 1.0, 1.2, 1.02, -1, -200.7, 244243.2423432432]
+        strings = ['1', '1pt0']
+        for num in numbers:
+            self.assertEqual(pt_string_as_float(float_as_pt_string(num)),
+                               num)
+        
 ################################################################################
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Output_manager, 'test')
-    #suite=unittest.makeSuite(Test_Output_manager,'test_load_collapsed_motion_sitess')
+    #suite=unittest.makeSuite(Test_Output_manager,'test_pt_string')
     #suite=unittest.makeSuite(Test_Output_manager,'test_save_event_set_new')
     runner = unittest.TextTestRunner() #verbosity=2) #verbosity=2
     runner.run(suite)

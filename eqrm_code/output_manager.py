@@ -151,17 +151,44 @@ def load_hazards(saved_dir, site_tag, soil_amp):
     return SA, periods, return_p 
 
 def get_hazard_file_name(site_tag, geo, return_period,
-                         extension=EXTENSION):
+                         extension=EXTENSION, remove_pt0=False):
     """Create the hazard file name.
     """
+    
+    try:
+        # To avoid 1pt0 not equal to 1 file name errors
+        return_period = float(return_period)
+    except ValueError:
+        pass
+        
     return_period = str(return_period)
+    
+    if remove_pt0 is True and return_period[-2:] == '.0':
+        return_period = return_period[:-2]
+        
     if return_period[0] is not '[':
         return_period = '[' + return_period + ']'
     base_name = site_tag + '_' + geo +'_rp' + \
                 return_period.replace('.','pt').replace(' ','') + extension
     return base_name
     
+def not_implemented_float_as_pt_string(num):
+    """
+    Trying to remove the pain of having a . in the file name,
+    when return periods are used in the file name.
+    """
+    num_string = float(num)
+    num_string.replace('.','pt').replace(' ','')
+    return num_string
+    
+    
+def not_implemented_pt_string_as_float(pt_string):
+    """
+    """
+    return float(pt_string.replace('pt','.'))
+    
 
+    
 def load_SA(file_full_name):
     """
     Given a file in the standard hazard SA format, load it.
@@ -209,8 +236,15 @@ def load_lat_long_haz_SA(output_dir, site_tag, soil_amp, period, return_period):
     else:
         geo = 'bedrock_SA'
     
-    file_name = get_hazard_file_name(site_tag, geo, return_period, EXTENSION)
-    SA_list, periods_f = load_hazard(os.path.join(output_dir, file_name))
+    file_name = get_hazard_file_name(site_tag, geo, return_period,
+     EXTENSION)
+    try:
+        SA_list, periods_f = load_hazard(os.path.join(output_dir, file_name))
+    except IOError:
+        file_name = get_hazard_file_name(site_tag, geo, return_period,
+                                         EXTENSION, remove_pt0=True)
+        SA_list, periods_f = load_hazard(os.path.join(output_dir, file_name))
+    
     SA_array = array(SA_list)
     #if period not in periods_f:
     #   print "Bad period" # Throw acception here
