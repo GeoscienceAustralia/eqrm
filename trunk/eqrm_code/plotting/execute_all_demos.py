@@ -31,6 +31,7 @@ def execute_demos():
 #-------------------------------------------------------------
         
 if __name__ == "__main__":
-    create_demo_data()
-    execute_demos()
+    print "This is broken.  Try \eqrm_core\demo\plot\execute_all_demos.py"
+    #create_demo_data()
+    #execute_demos()
     
