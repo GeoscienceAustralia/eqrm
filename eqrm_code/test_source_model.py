@@ -54,15 +54,15 @@ class Test_Source_model(unittest.TestCase):
        depth_top_seismogenic = "7"
        depth_bottom_seismogenic = "30">
       <boundary>
-	  151.1500 -32.4000  
-	  152.1700 -32.7500
-	  151.4300 -33.4500  
-	  151.1500 -32.4000
+	  -32.4000  151.1500 
+	  -32.7500  152.1700 
+	  -33.4500  151.4300   
+	  -32.4000  151.1500 
       </boundary>
       <excludes>
-	  151.1500 -32.4000    
-	  152.1700 -32.7500   
-	  151.4300 -33.4500 
+	  -32.4000  151.1500     
+	  -32.7500  152.1700   
+	  -33.4500  151.4300  
       </excludes>
     </geometry>
     
@@ -88,14 +88,14 @@ class Test_Source_model(unittest.TestCase):
         handle.close()
         source_model = source_model_from_xml(file_name)
         os.remove(file_name)
-        boundary = [(151.1500, -32.4000), 
-                    (152.1700, -32.7500),
-                    (151.4300, -33.4500),
-                    (151.1500, -32.4000)]
+        boundary = [(-32.4000, 151.1500), 
+                    (-32.7500, 152.1700),
+                    (-33.4500, 151.4300),
+                    (-32.4000, 151.1500)]
         exclude = None # This is not tested
-                       #[(151.1500, -32.4000),
-                       #(152.1700, -32.7500),
-                       #(151.4300, -33.4500)]
+                       #[(-32.4000, 151.1500),
+                       #(-32.7500, 152.1700),
+                       #(-33.4500, 151.4300)]
         min_magnitude = 3.3
         max_magnitude = 5.4
         b = 1
