@@ -302,6 +302,24 @@ class Test_Polygon(unittest.TestCase):
 	assert allclose( res, [1,2,3,5,4,0] )        
      	assert count == 3
 	
+    def test_new_populate_polygon(self):
+
+        polygon = [[0,0], [1,0], [1,1], [0,1]]
+        points = new_populate_polygon(polygon, 5)
+
+        assert len(points) == 5
+        for point in points:
+            assert is_inside_polygon(point, polygon)
+
+
+    #Very convoluted polygon
+        polygon = [[0,0], [10,10], [15,5], [20, 10], [25,0], [30,10], [40,-10]]
+
+        points = populate_polygon(polygon, 5)
+
+        assert len(points) == 5
+        for point in points:
+            assert is_inside_polygon(point, polygon)
 
     def test_populate_polygon(self):
 
