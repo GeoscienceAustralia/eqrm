@@ -3,7 +3,14 @@
 
 """
 
-from scipy import zeros, ones, array, concatenate, reshape, dot
+from scipy import radians, degrees, arcsin, zeros, ones, array, concatenate, dot, reshape, pi, sin
+
+from projections import azimuthal_orthographic_ll_to_xy as ll2xy
+ 
+
+# constant used to convert degrees to radians: rad = deg * DegreesToRadians
+DegreesToRadians = pi / 180.0
+
 
 from math import sqrt
 from numerical_tools import ensure_numeric
@@ -517,6 +524,84 @@ def read_polygon(filename,split=','):
 
     return polygon
 
+def new_populate_polygon(polygon, number_of_points, seed = None, exclude = None, 
+                         randoms = None):
+    """Populate given polygon with uniformly distributed points.
+       Takes into account the curvature of the earth.
+
+    Input:
+       polygon - list of vertices of polygon
+       number_of_points - (optional) number of points
+       seed - seed for random number generator (default=None)
+       exclude - list of polygons (inside main polygon) from where points should 
+                 be excluded
+       randoms - array of numbers between 0 and 1 to be used as the random numbers
+                for calculating the latitude of the points.  Obviously is this 
+                case the numbers are not random.  This should just be used for 
+                writing tests.
+    
+    Output:
+       points - list of points inside polygon
+
+    Examples:
+       populate_polygon( [[0,0], [-40,0], [-40,1], [0,1]], 6, 
+                         randoms = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0))
+       will return six not so randomly selected points inside the unit square
+    """
+ 
+    from random import uniform, random, randrange, seed as seed_function
+    if seed is not None:
+        seed_function(seed)
+    if randoms is None:
+        randoms = [random() for i in xrange(number_of_points)]
+        
+    #print polygon
+    points = []
+
+    #Find outer extent of polygon
+    max_x = min_x = polygon[0][1]
+    max_y = min_y = polygon[0][0]
+    for point in polygon[1:]:
+        x = point[1]
+        if x > max_x: max_x = x
+        if x < min_x: min_x = x
+        y = point[0]
+        if y > max_y: max_y = y
+        if y < min_y: min_y = y
+
+ #   max_x_rad = radians(max_x)
+    northlimit_rad = radians(max_y)
+#    min_x_rad = radians(min_x)
+    southlimit_rad = radians(min_y)
+    
+    i=0
+    while len(points) < number_of_points:
+        rand_num =randoms[i]
+        y_rad = arcsin(rand_num * abs((sin(northlimit_rad)- sin(southlimit_rad))) 
+                       + sin(southlimit_rad)) 
+        y= degrees(y_rad)
+        x = uniform(min_x, max_x)
+        #y = uniform(min_y, max_y)
+
+        append = False
+        if is_inside_polygon([y,x], polygon):
+
+            append = True
+
+            #Check exclusions
+            if exclude is not None:
+                for ex_poly in exclude:
+                    if is_inside_polygon([y,x], ex_poly):
+                        append = False
+
+        if append is True:
+            points.append([y,x])
+        i+=1
+        if i >= number_of_points:
+            randoms = [random() for i in xrange(number_of_points)]
+            i=0
+        
+    return points
 def populate_polygon(polygon, number_of_points, seed = None, exclude = None):
     """Populate given polygon with uniformly distributed points.
 
