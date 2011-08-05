@@ -1,5 +1,0 @@
-% Return period = [200]
-% First row are rsa periods - subsequent rows are sites
-0.0 0.30303 1.0
-0.1336356983 0.2396387546 0.05153847722
-0.146747307 0.2207187615 0.04444042219
