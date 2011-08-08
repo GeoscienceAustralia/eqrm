@@ -1235,7 +1235,8 @@ class Test_Output_manager(unittest.TestCase):
                    sites)
         
         base_names = save_motion(soil_amp, eqrm_flags, motion)
-        tmp = load_collapsed_motion_sites(eqrm_flags.output_dir,  eqrm_flags.site_tag,
+        tmp = load_collapsed_motion_sites(eqrm_flags.output_dir, 
+                                          eqrm_flags.site_tag,
                           soil_amp)
         SA, periods, lat, lon = tmp
         self.assert_(allclose(lat, lat_actual))
