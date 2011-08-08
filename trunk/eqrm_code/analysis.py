@@ -389,9 +389,9 @@ def main(parameter_handle,
     # parallelising over the site loop.
     parallel.calc_lo_hi(num_sites)
     all_sites = all_sites[parallel.lo:parallel.hi]
-    array_size = parallel.hi - parallel.lo   # block_size
+    num_site_block = parallel.hi - parallel.lo   # block_size
     msg = ('blocking over sites if running in parallel. block_size=' +
-           str(array_size))
+           str(num_site_block))
     log.debug(msg)
 
     msg = 'Number of atten_periods=' + str(len(eqrm_flags.atten_periods))
@@ -407,7 +407,7 @@ def main(parameter_handle,
     # are filled while looping over sites.  Wether they are needed or
     # not often depends on what is being saved.
     if eqrm_flags.save_hazard_map is True:
-        bedrock_hazard = zeros((array_size, len(eqrm_flags.atten_periods),
+        bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
                                 len(eqrm_flags.return_periods)),
                                dtype=float)
         
@@ -416,7 +416,7 @@ def main(parameter_handle,
         
     if eqrm_flags.save_hazard_map is True and \
            eqrm_flags.use_amplification is True:
-        soil_hazard = zeros((array_size, len(eqrm_flags.atten_periods),
+        soil_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
                              len(eqrm_flags.return_periods)),
                             dtype=float)
     else:
@@ -426,7 +426,7 @@ def main(parameter_handle,
     num_gmm_dimensions = event_activity.get_gmm_dimensions()
     if eqrm_flags.save_motion is True:
         bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions,
-                                array_size, num_events,
+                                num_site_block, num_events,
                                 len(eqrm_flags.atten_periods)),
                                dtype=float)        
     else:
@@ -435,7 +435,7 @@ def main(parameter_handle,
     if eqrm_flags.save_motion is True and \
            eqrm_flags.use_amplification is True:
         soil_SA_all = zeros((num_spawning, num_gmm_dimensions,
-                             array_size, num_events,
+                             num_site_block, num_events,
                              len(eqrm_flags.atten_periods)),
                             dtype=float)
     else:
@@ -444,19 +444,19 @@ def main(parameter_handle,
     log.resource_usage()
 
     if eqrm_flags.save_fatalities is True:
-        total_fatalities = zeros((array_size, num_psudo_events),
+        total_fatalities = zeros((num_site_block, num_psudo_events),
                                     dtype=float)
 
     if eqrm_flags.save_total_financial_loss is True:
-        total_building_loss_qw = zeros((array_size, num_spawning,
+        total_building_loss_qw = zeros((num_site_block, num_spawning,
                                         num_gmm_max, num_events),
                                     dtype=float)
     if eqrm_flags.save_building_loss is True:
-        building_loss_qw = zeros((array_size, num_spawning,
+        building_loss_qw = zeros((num_site_block, num_spawning,
                                         num_gmm_max, num_events),
                               dtype=float)
     if eqrm_flags.save_contents_loss is True:
-        contents_loss_qw = zeros((array_size, num_spawning,
+        contents_loss_qw = zeros((num_site_block, num_spawning,
                                         num_gmm_max, num_events),
                               dtype=float)
     if (eqrm_flags.save_prob_structural_damage is True and
@@ -466,7 +466,7 @@ def main(parameter_handle,
         # damage_states
         # (the damage_states are slight, moderate, extensive and complete.
         # subtract all of these from 1 to get the prob of no damage.)
-        total_structure_damage = zeros((array_size, 4), dtype=float)
+        total_structure_damage = zeros((num_site_block, 4), dtype=float)
 
     # create result array to save 'days to complete' data
     # need to store 'fp' days + state field
@@ -474,7 +474,7 @@ def main(parameter_handle,
     if eqrm_flags.bridges_functional_percentages is not None and \
            have_bridge_data:
         saved_days_to_complete = zeros((
-            array_size, num_psudo_events,
+            num_site_block, num_psudo_events,
             len(eqrm_flags.bridges_functional_percentages)))
 
     log.debug('Memory: Created all data collection arrays.')
@@ -500,9 +500,9 @@ def main(parameter_handle,
             raise RuntimeError(msg)   
          
     
-    for i in range(array_size):
+    for i in range(num_site_block):
         msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + \
-            str(array_size)
+            str(num_site_block)
         log.info(msg)
         
         log.debug('Memory: site ' + str(i+1))
@@ -767,7 +767,7 @@ def main(parameter_handle,
         new_total_building_loss_qw = new_total_building_loss_qw[...,0,:,0]
         # overload the event
         new_total_building_loss_qw = new_total_building_loss_qw.reshape(
-            (num_sites, -1))
+            (num_site_block, -1))
         
         a_file = save_ecloss('_total_building',eqrm_flags,
                            new_total_building_loss_qw, all_sites,
@@ -793,7 +793,7 @@ def main(parameter_handle,
         new_building_loss_qw = new_building_loss_qw[...,0,:,0]
         # overload the event
         new_building_loss_qw = new_building_loss_qw.reshape(
-            (num_sites, -1))
+            (num_site_block, -1))
         a_file = save_ecloss('_building', eqrm_flags, new_building_loss_qw,
                            all_sites, compress=eqrm_flags.compress_output,
                            parallel_tag=parallel.file_tag)
@@ -815,7 +815,7 @@ def main(parameter_handle,
         new_contents_loss_qw = new_contents_loss_qw[...,0,:,0]
         # overload the event
         new_contents_loss_qw = new_contents_loss_qw.reshape(
-            (num_sites, -1))
+            (num_site_block, -1))
         
         a_file = save_ecloss('_contents', eqrm_flags,new_contents_loss_qw,
                            all_sites, compress=eqrm_flags.compress_output,
