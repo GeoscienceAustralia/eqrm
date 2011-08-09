@@ -3,13 +3,15 @@
 
 """
 
-from scipy import radians, degrees, arcsin, zeros, ones, array, concatenate, dot, reshape, pi, sin
+from scipy import radians, degrees, arcsin, zeros, ones, array, concatenate, \
+    dot, reshape, pi, sin
+from random import uniform, random, randrange, seed as seed_function
 
 from projections import azimuthal_orthographic_ll_to_xy as ll2xy
  
 
 # constant used to convert degrees to radians: rad = deg * DegreesToRadians
-DegreesToRadians = pi / 180.0
+#DegreesToRadians = pi / 180.0
 
 
 from math import sqrt
@@ -84,7 +86,8 @@ def inside_polygon(points, polygon, closed=True, verbose=False):
     except NameError, e:
         raise NameError, e
     except:
-        msg = 'Polygon %s could not be converted to Numeric array' %(str(polygon))
+        msg = 'Polygon %s could not be converted to Numeric array' %(str(
+                polygon))
 	raise msg
 
     if len(points.shape) == 1:
@@ -166,7 +169,8 @@ def in_and_outside_polygon(points, polygon, closed = True, verbose = False):
 
        See separate_points_by_polygon for documentation
 
-       Returns an array of points inside and an array of points outside the polygon
+       Returns an array of points inside and an array of points outside the 
+       polygon
     """
 
     if verbose: print 'Checking input to outside_polygon'
@@ -438,7 +442,8 @@ def plot_polygons(polygons, figname, verbose=False):
     - plot of polygons
     """ 
 
-    from pylab import ion, hold, plot, axis, figure, legend, savefig, xlabel, ylabel, title, close
+    from pylab import ion, hold, plot, axis, figure, legend, savefig, xlabel, \
+        ylabel, title, close
 
     assert type(polygons) == list,\
                'input must be a list of polygons'
@@ -524,21 +529,22 @@ def read_polygon(filename,split=','):
 
     return polygon
 
-def new_populate_polygon(polygon, number_of_points, seed = None, exclude = None, 
-                         randoms = None):
-    """Populate given polygon with uniformly distributed points.
+def populate_geo_coord_polygon(polygon, number_of_points, seed = None, 
+                               exclude = None, randoms = None):
+    """Populate a polygon with uniformly distributed points.
        Takes into account the curvature of the earth.
 
     Input:
-       polygon - list of vertices of polygon
+       polygon - list of vertices of polygon, vertices in (lat, long)
        number_of_points - (optional) number of points
        seed - seed for random number generator (default=None)
-       exclude - list of polygons (inside main polygon) from where points should 
-                 be excluded
-       randoms - array of numbers between 0 and 1 to be used as the random numbers
-                for calculating the latitude of the points.  Obviously is this 
-                case the numbers are not random.  This should just be used for 
-                writing tests.
+       exclude - list of polygons (inside main polygon) from where points 
+       should be excluded
+       
+       randoms - array of numbers between 0 and 1 to be used as the
+                 random numbers for calculating the latitude of the
+                 points.  Obviously is this case the numbers are not
+                 random.  This should just be used for writing tests.
     
     Output:
        points - list of points inside polygon
@@ -548,10 +554,10 @@ def new_populate_polygon(polygon, number_of_points, seed = None, exclude = None,
                          randoms = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0))
        will return six not so randomly selected points inside the unit square
     """
- 
-    from random import uniform, random, randrange, seed as seed_function
+     
     if seed is not None:
         seed_function(seed)
+        
     if randoms is None:
         randoms = [random() for i in xrange(number_of_points)]
         
@@ -577,15 +583,14 @@ def new_populate_polygon(polygon, number_of_points, seed = None, exclude = None,
     i=0
     while len(points) < number_of_points:
         rand_num =randoms[i]
-        y_rad = arcsin(rand_num * abs((sin(northlimit_rad)- sin(southlimit_rad))) 
-                       + sin(southlimit_rad)) 
+        y_rad = arcsin(rand_num * abs((sin(northlimit_rad)- 
+        sin(southlimit_rad)))  + sin(southlimit_rad)) 
         y= degrees(y_rad)
         x = uniform(min_x, max_x)
         #y = uniform(min_y, max_y)
 
         append = False
         if is_inside_polygon([y,x], polygon):
-
             append = True
 
             #Check exclusions
@@ -593,23 +598,25 @@ def new_populate_polygon(polygon, number_of_points, seed = None, exclude = None,
                 for ex_poly in exclude:
                     if is_inside_polygon([y,x], ex_poly):
                         append = False
-
         if append is True:
             points.append([y,x])
         i+=1
         if i >= number_of_points:
             randoms = [random() for i in xrange(number_of_points)]
-            i=0
-        
+            i=0        
     return points
+    
+    
 def populate_polygon(polygon, number_of_points, seed = None, exclude = None):
-    """Populate given polygon with uniformly distributed points.
+    """Populate given polygon with uniformly distributed points, on a 2D 
+       surface.
 
     Input:
        polygon - list of vertices of polygon
        number_of_points - (optional) number of points
        seed - seed for random number generator (default=None)
-       exclude - list of polygons (inside main polygon) from where points should be excluded
+       exclude - list of polygons (inside main polygon) from where points 
+       should be excluded
 
     Output:
        points - list of points inside polygon
@@ -619,7 +626,6 @@ def populate_polygon(polygon, number_of_points, seed = None, exclude = None):
        will return five randomly selected points inside the unit square
     """
 
-    from random import uniform, seed as seed_function
     if seed is not None:
         seed_function(seed)
 
@@ -703,7 +709,6 @@ def populate_polygon_geo(polygon, number_of_points,
     while len(points) < number_of_points:
         x = uniform(min_x, max_x)
         y = uniform(min_y, max_y)
-
     
         append = False
         if self.geos_polygon.contains([x,y]):
