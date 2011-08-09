@@ -16,7 +16,7 @@ from scipy import where, asarray
 import exceptions
 
 from eqrm_code.distributions import distribution_functions
-from eqrm_code.polygon import populate_polygon
+from eqrm_code.polygon import populate_polygon, populate_geo_coord_polygon
 from eqrm_code.polygon_class import polygon_object
 from eqrm_code.xml_interface import Xml_Interface
 from eqrm_code.conversions import azimuth_of_trace
@@ -97,7 +97,8 @@ class Generation_Polygon(polygon_object):
     def populate(self,number_of_points,seed=None):
         polygon = self._linestring[:-1]
         exclude = [exclude[:-1] for exclude in self._exclude]
-        points=populate_polygon(polygon,number_of_points,seed,exclude)
+        points = populate_geo_coord_polygon(polygon, number_of_points,seed, 
+                                            exclude)
 
         for point in points:
             point = tuple(point)
