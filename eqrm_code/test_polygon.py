@@ -302,12 +302,12 @@ class Test_Polygon(unittest.TestCase):
 	assert allclose( res, [1,2,3,5,4,0] )        
      	assert count == 3
 	
-    def test_new_populate_polygon(self):
+    def test_populate_geo_coord_polygon(self):
         # Checks that the Y distance between points gets larger as the latitude 
         # gets larger.
         randoms=[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
         polygon = [[0,0], [50,0], [50,0.5], [0,0.5]]
-        points = new_populate_polygon(polygon, 9, None, None,randoms)
+        points = populate_geo_coord_polygon(polygon, 9, None, None,randoms)
         prevDiff =0.0
         for i in xrange(len(points)-1):
             if i <> 0:
@@ -320,7 +320,7 @@ class Test_Polygon(unittest.TestCase):
         # Checks that the distance between points changes in proportion to the
         # the change in width of the polygon due to the curvature of the earth.
         randoms = [0.09, 0.1, 0.89, 0.9]
-        points = new_populate_polygon(polygon, 4, None, None,randoms)
+        points = populate_geo_coord_polygon(polygon, 4, None, None,randoms)
         
         midA_lat = abs(points[1][0]-points[0][0]) + points[0][0]
         length_X_A= calc_ll_dist(midA_lat, 0.0, midA_lat, 0.5)
@@ -338,17 +338,17 @@ class Test_Polygon(unittest.TestCase):
     #Very convoluted polygon
         polygon = [[0,0], [10,10], [15,5], [20, 10], [25,0], [30,10], [40,-10]]
 
-        points = new_populate_polygon(polygon, 5)
+        points = populate_geo_coord_polygon(polygon, 5)
 
         assert len(points) == 5
         for point in points:
             assert is_inside_polygon(point, polygon)
-    def test_new_populate_polygon_with_exclude(self):
+    def test_populate_geo_coord_polygon_with_exclude(self):
         
 
         polygon = [[0,0], [1,0], [1,1], [0,1]]
         ex_poly = [[0,0], [0.5,0], [0.5, 0.5], [0,0.5]] #SW quarter
-        points = new_populate_polygon(polygon, 5, exclude = [ex_poly])
+        points = populate_geo_coord_polygon(polygon, 5, exclude = [ex_poly])
 
         assert len(points) == 5
         for point in points:
@@ -359,43 +359,45 @@ class Test_Polygon(unittest.TestCase):
         #overlap
         polygon = [[0,0], [1,0], [1,1], [0,1]]
         ex_poly = [[-1,-1], [0.5,0], [0.5, 0.5], [-1,0.5]]
-        points = new_populate_polygon(polygon, 5, exclude = [ex_poly])
+        points = populate_geo_coord_polygon(polygon, 5, exclude = [ex_poly])
 
         assert len(points) == 5
         for point in points:
             assert is_inside_polygon(point, polygon)
-            assert not is_inside_polygon(point, ex_poly)                        
+            assert not is_inside_polygon(point, ex_poly)
         
         #Multiple
         polygon = [[0,0], [1,0], [1,1], [0,1]]
         ex_poly1 = [[0,0], [0.5,0], [0.5, 0.5], [0,0.5]] #SW quarter
         ex_poly2 = [[0.5,0.5], [0.5,1], [1, 1], [1,0.5]] #NE quarter        
         
-        points = new_populate_polygon(polygon, 20, exclude = [ex_poly1, ex_poly2])
+        points = populate_geo_coord_polygon(polygon, 20, 
+        exclude = [ex_poly1, ex_poly2])
 
         assert len(points) == 20
         for point in points:
             assert is_inside_polygon(point, polygon)
             assert not is_inside_polygon(point, ex_poly1)
-            assert not is_inside_polygon(point, ex_poly2)                                
+            assert not is_inside_polygon(point, ex_poly2)
         
 
     #Very convoluted polygon
-        polygon = [[0,0], [10,10], [15,5], [20, 10], [25,0], [30,10], [40,-10]]
+        polygon = [[0,0], [10,10], [15,5], [20, 10], [25,0], [30,10], 
+                   [40,-10]]
         ex_poly = [[-1,-1], [5,0], [5, 5], [-1,5]]
-        points = new_populate_polygon(polygon, 20, exclude = [ex_poly])
+        points = populate_geo_coord_polygon(polygon, 20, exclude = [ex_poly])
         
         assert len(points) == 20
         for point in points:
             assert is_inside_polygon(point, polygon)
-            assert not is_inside_polygon(point, ex_poly), '%s' %str(point)                        
+            assert not is_inside_polygon(point, ex_poly), '%s' %str(point)
 
 
-    def non_deterministic_test_new_populate_polygon(self):
+    def non_deterministic_test_populate_geo_coord_polygon(self):
 #Check that proportion of points in an area is roughly what it should be
 #given the latitude of the area
         polygon = [[0,0], [-50,0], [-50,10], [0,10]]
-        points = new_populate_polygon(polygon, 100000)
+        points = populate_geo_coord_polygon(polygon, 100000)
         polygonA = [[0,0], [-2,0], [-2,10], [0,10]]
         polygonB = [[-48,0], [-50,0], [-50,10], [-48,10]]
         countA = 0.0
