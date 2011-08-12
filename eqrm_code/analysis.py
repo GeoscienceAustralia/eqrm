@@ -1189,7 +1189,9 @@ def load_data(eqrm_flags):
                                              eqrm_flags.default_input_dir,
                                              eqrm_flags.input_dir)
         except IOError:
-            site_file = None
+            #site_file = None
+            msg = "No site file was loaded.  Check file name; " + site_file
+            raise RuntimeError(msg) 
 
         if site_file:
             # if indeed there is a BUILDING file
@@ -1211,7 +1213,9 @@ def load_data(eqrm_flags):
                 sites.building_parameters['damping_Be'] = 0.05 # + \
 #                                      0*sites.building_parameters['damping_Be']
         else:
-            sites = None
+            #sites = None
+            msg = "No site file was loaded.  Check file name; " + site_file
+            raise RuntimeError(msg) 
 
         # now look for BRIDGE data
         bridge_file = ('bridgedb_' + eqrm_flags.site_tag +
