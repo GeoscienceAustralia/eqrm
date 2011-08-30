@@ -1814,7 +1814,8 @@ class TestBridgeDamage(unittest.TestCase):
                                0.236549375430427, 0.60646402809954],
                               [0.1212962, 0.1565718, 0.27978019, 0.273137],
                               [0.047551, 0.02388763, 0.01246965, 0.00170067],
-                              [0.02230382, 0.00941589, 0.00397589, 0.00039163]]])
+                              [0.02230382, 0.00941589, 0.00397589, 0.00039163]
+                              ]])
 
         msg = ('\nexpected=\n%s\nstructure_state=\n%s'
                 % (str(expected), str(structure_state)))
@@ -1824,9 +1825,10 @@ class TestBridgeDamage(unittest.TestCase):
         # we expect the other return values (non_structural_state &
         # acceleration_sensitive_state) to be same shape as structure_state
         # and filled with zeroes
-        other_expected = np.zeros(structure_state.shape)
+        other_expected = np.zeros(non_structural_state.shape)
         msg = ('\nother_expected=\n%s\nnon_structural_state=\n%s'
                 % (str(other_expected), str(non_structural_state)))
+
         self.failUnless(np.allclose(other_expected,
                                     non_structural_state, rtol=1.0e-6),
                         msg)
