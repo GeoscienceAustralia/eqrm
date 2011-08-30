@@ -27,7 +27,7 @@ def do_tests_checks_demos_audits(eqrm_root_dir,
         e.g.'python2.4'
       
     return:
-      False if any of these actions fail, otherwise True,
+      False if any of these actions fail, otherwise True.
     """
     #chdir(eqrm_root_dir)
     # FIXME If any more tests are added loop this!
