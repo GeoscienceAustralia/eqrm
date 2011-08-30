@@ -14,12 +14,11 @@ def do_tests_checks_demos_audits(eqrm_root_dir,
                                  test_all=True,
                                  check_scenarios=True,
                                  mini_check_scenarios=True,
-                                 check_risk=False,
                                  demo_batchrun=True,
                                  verbose=False,
                                  python_command='python'):
     """
-    Automatically do all of the tests, checks demos and audits EQRM has.
+    Automatically do all of the quick tests, checks demos and audits EQRM has.
 
     precondition: The current directory is eqrm_root_dir.
     args:
