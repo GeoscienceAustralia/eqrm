@@ -245,9 +245,9 @@ class Bridge_damage_model(object):
 
         # we assume non-structural and acceleration-sensitive states are
         # 'undamaged'.  create '0' arrays with same shape as 'structure_state'.
-        non_structural_state = np.zeros_like(structure_state)
-        acceleration_sensitive_state = np.zeros_like(structure_state)
-
+        non_structural_state = np.zeros(structure_state.shape)
+        acceleration_sensitive_state = np.zeros(structure_state.shape)
+       
         return (structure_state, non_structural_state,
                 acceleration_sensitive_state)
 
