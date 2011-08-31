@@ -92,7 +92,8 @@ standard_directories_to_ignore = ['.svn']
 standard_directories_to_ignore += ['output', 'current', 'mini_current',
                                    'mini_standard', 'standard',
                                    'risk_seperated',
-                                   'hazard_seperated']
+                                   'hazard_seperated', 'long_current',
+                                   'long_standard']
 
 def eqrm_audit_wrapper(directory,
                        extensions_to_ignore=None,

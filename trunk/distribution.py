@@ -72,7 +72,7 @@ def create_distribution_zip(vername, distro_dirs=None,
 
     # When using this, make sure the expo_dir is not deleted in 2 places.
     
-    if True: 
+    if False: # This needs a windows svn command line prompt 
         s = 'svn --force export http://65.61.168.30/svn/eqrm_core/trunk '\
             + expo_dir
     
@@ -83,6 +83,7 @@ def create_distribution_zip(vername, distro_dirs=None,
         fid = popen(s)
     
         version_info = fid.read()
+        print "version_info", version_info
         for line in version_info.split('\n'):
             # print "line", line
             if line.startswith('Exported'):
@@ -101,10 +102,8 @@ def create_distribution_zip(vername, distro_dirs=None,
         expo_dir = join("C:","WINNT","Profiles","gray duncan",
                         "Local Settings","Temp",
                         "EQRM_distribution_expo_dir-uphuz")
-        expo_dir = join("c:\\","winnt","Profiles","graydu~1",
-                        "locals~1","temp",
-                        "EQRM_distribution_expo_dir-uphuz")
-        version = '999'
+        expo_dir = join("c:\\","dump","eqrm_core_trunk")
+        version = '858'
         
         
     # create another temp dir to move things into
@@ -147,9 +146,15 @@ def create_distribution_zip(vername, distro_dirs=None,
     print s
     system(s)
     remove('copyright.tex')
-    remove('copyright.log')
-    remove('copyright.aux')
     remove('copyright.dvi')
+    try:    
+        remove('copyright.aux')
+    except:
+        pass
+    try:    
+        remove('copyright.log')
+    except:
+        pass
     try:    
         remove('copyright.tex.bak')
     except:
@@ -240,7 +245,6 @@ def create_distribution_zip(vername, distro_dirs=None,
         test_all=True,
         check_scenarios=True,
         mini_check_scenarios=False,
-        check_risk=False,
         demo_batchrun=True,
         verbose=True)
     if results_passed is False:

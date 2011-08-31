@@ -111,5 +111,8 @@ if __name__ == "__main__":
 				     '','iot','?',
 				     'Duncan Gray')
     add_licences_recursively('.',
+			     '.csv','','?',
+			     '?')
+    add_licences_recursively('.',
 			     '.xml','','?',
-			     'Duncan Gray')
+			     '?')
