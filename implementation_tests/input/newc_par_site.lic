@@ -8,17 +8,7 @@
       <filename>newc_par_site.csv</filename>
       <checksum>-1818302060</checksum>
       <publishable>Yes</publishable>
-      <accountable>Duncan Gray</accountable>
-      <source>?</source>
-      <IP_owner>?</IP_owner>
-      <IP_info>?</IP_info>
-    </datafile>
-    <datafile>
-      <filename>newc_par_site.xls</filename>
-      <checksum>1478114786</checksum>      
-      <!--<checksum>-1129214669</checksum> -->
-      <publishable>Yes</publishable>
-      <accountable>Duncan Gray</accountable>
+      <accountable>?</accountable>
       <source>?</source>
       <IP_owner>?</IP_owner>
       <IP_info>?</IP_info>
