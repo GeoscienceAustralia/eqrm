@@ -86,7 +86,10 @@ def do_tests_checks_demos_audits(eqrm_root_dir,
     return True
     
 if __name__ == '__main__':
-    do_tests_checks_demos_audits(determine_eqrm_path()
-                                 ,check_scenarios=False
-                                 ,ip_audit=False
-                                 ,python_command='python')
+    do_tests_checks_demos_audits(determine_eqrm_path(),
+                                 check_scenarios=False,
+                                 ip_audit=True,
+                                 test_all=False,
+                                 mini_check_scenarios=False,
+                                 demo_batchrun=False,
+                                 python_command='python')
