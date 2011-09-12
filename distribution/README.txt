@@ -12,6 +12,7 @@ sourceforge
 log in user dgray_ga
 Password:[uni password] 
 
+
 develop >project admin > feature settings > file manager
 click on the gear next to the eqrm dir, select
 upload here (uploaded the new distribution)

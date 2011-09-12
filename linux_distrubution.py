@@ -248,8 +248,8 @@ def create_distribution_zip(vername, distro_dirs=None,
         demo_batchrun=True,
         verbose=True)
     if results_passed is False:
-        os.remove(zip_file) # delete the zip file.  It is a fail
-        clean_up(current_dir, temp_dir, expo_dir)
+        #os.remove(zip_file) # delete the zip file.  It is a fail
+        #clean_up(current_dir, temp_dir, expo_dir)
         return False
     
     chdir(temp_dir)
