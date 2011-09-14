@@ -142,7 +142,8 @@ Install;
 * python-dev
 * python package numpy (http://numpy.scipy.org/)
 * python package scipy , (http://www.scipy.org/)
-* python package libgeos_c (for shapely)
+* python package libgeos_c (for shapely - is automatically installed
+     for some versions of Shapely and thus not needed.)
 * python package python-setuptolls (for installing shapely using easy_install)
 * python package shapely  (see notes below) (http://pypi.python.org/pypi/Shapely/)
 * python-numeric
@@ -165,6 +166,8 @@ in the *\eqrm_core\ directory;
     due to the inline compiler (weave) failing.  To fix I get g++ to
     work with g++_4.2, instead of g++_4.3.  Weave will also fail if
     python-dev is not installed.
+    
+    14/09/11 - For Ubuntu 11.04 64 bit g++-4.5 is installed, and weave works.
 
 To install the components required for any plotting you may require, install:
 * python-matplotlib
