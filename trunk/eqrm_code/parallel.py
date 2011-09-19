@@ -141,13 +141,15 @@ class Parallel(object):
 
 # this will run if eqrm_analysis.py is called from DOS prompt or double clicked
 if __name__ == '__main__':
-    
-    sites_len = 10
-    sites = range(sites_len)
-    
-    parra = Parallel(is_parallel=False)
-    lo,hi = parra.calc_lo_hi(sites_len)
-    print "lo", lo
-    print "hi", hi
-    print "My work", sites[lo:hi]
-    parra.finalize()
+    parra = Parallel()
+    if False:
+        sites_len = 10
+        sites = range(sites_len)
+        
+        parra = Parallel(is_parallel=False)
+        lo,hi = parra.calc_lo_hi(sites_len)
+        print "lo", lo
+        print "hi", hi
+        print "My work", sites[lo:hi]
+        parra.finalize()
+    print 'parra.rank', parra.rank
