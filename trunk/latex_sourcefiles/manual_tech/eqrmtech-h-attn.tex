@@ -41,7 +41,7 @@ where $Y$ is the median of the ground-motion parameter of interest,
 $x$ is the vector of seismological parameters, $\theta$ is the
 vector of the GMPE’s regression coefficients, and $\varepsilon$ is
 a random error term with a mean of zero and a standard deviation of
-$\sigma_{\ln Y}$ . In this regard, for a given set of seismological
+$\sigma_{\ln Y}$. In this regard, for a given set of seismological
 parameters, a GMPE describes the probability density function (PDF)
 of the ground-motion parameter as a lognormal distribution with
 median and standard deviation equal to $Y$, and  $\sigma_{\ln Y}$,
@@ -55,9 +55,9 @@ ground-motion parameters are Peak Ground Velocity (PGV), Peak Ground
 Acceleration (PGA), and $5\%$ damped Pseudo Spectral Acceleration
 (PSA or SA) of horizontal components. There are a number of ways to
 define the response variable based on two horizontal components as
-typically recorded in the field; Considering the perpendicular
-horizontal components to be independent, geometric mean or average
-of horizontal components, to name a few (for example see
+typically recorded in the field. For example the perpendicular
+horizontal components could be considered to be independent,
+geometric mean or average of horizontal components (see
 Table~\ref{GMPEs}). Although using the geometric mean has the
 advantage that the standard deviation for the ground-motion models
 is smaller than for other measures \citep{eqrm_Beyer06}, this
@@ -86,6 +86,8 @@ radiated by an earthquake \citep{eqrm_Hanks79}:
 \begin{equation}\label{eq:MW}
 M_W=\frac{2}{3}\log {M_0}-10.7.
 \end{equation}
+where $M_0$ is in dyne-cm.
+
 The main advantages of $M_W$ scale are:
 \begin{itemize}
 \item it is not saturated for large events
@@ -229,14 +231,14 @@ $Z_{2.5}$).
 \centering
 \renewcommand{\arraystretch}{1.3}
 \caption{Main characteristics of the implemented GMPEs}
-\label{GMPEs} \centering {\small
+\label{GMPEs} \centering {\footnotesize
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 \hline  Model &  Magnitude &  Magnitude &  Distance & Distance &
  Site
-&  Horizontal Component & Period &  Complexity  \\
+&  Horizontal Component & Period &  Complexity$^{*}$  \\
  Name &  Type &  Range
-&  Type &  Range &  Condition
-&  Type &  Range &\\
+&  Type &  Range (km) &  Condition
+&  Type &  Range (sec) &\\
 \hline \multicolumn{9}{|c|}{Shallow crustal events in active
 tectonic regions}\\
 \hline \citet{eqrm_Sadigh97a} & $M_W$ & 4-7.4 & $R_{rup}$ &
@@ -278,7 +280,7 @@ $R_{rup}$& 10-500& $V_{S30}$ Class & Random & 0-3 & 9\\
 \hline \citet{eqrm_Zhao06} & $M_W$ & 5.0-8.3 & $R_{rup}$ &
 30-300& $V_{S30} Class$ & Geometric mean & 0-5 & 16\\
 \hline
-
+\multicolumn{9}{l}{$^{*}$Complexity: number of model's coefficients including variance terms}\\
 \end{tabular}}
 \end{table}
 \end{landscape}
@@ -383,21 +385,19 @@ $\sigma_{log(S_a)}$ for brevity.
 
 
 The required input parameters by implemented GMPEs in EQRM, to model
-source, path and site effects are listed in Table ~\ref{inputs}. The
-abbreviations used in this Table are defined in Table ~\ref{def}. As
+source, path and site effects are listed in Table~\ref{inputs}. The
+abbreviations used in this Table are defined in Table~\ref{def}. As
 it can be seen GMPEs use different definitions for explanatory and
 response variables.
 
-Regarding response parameter,i.e. ground-motion parameter of
-interest, currently EQRM estimates $5 \%$ $S_a$ using GMPEs listed
-in Table \ref{GMPEs}. It should be noted that the EQRM estimates
-would be for the horizontal component type used by each GMPE. As can
-be seen in Table \ref{GMPEs} different horizontal component types
-are used by implemented GMPEs to define the response variable. Such
+EQRM estimates $5 \%$ $S_a$ for the horizontal component type used
+by each GMPE in Table \ref{GMPEs}. As can be seen in Table
+\ref{GMPEs} different horizontal component types are used by
+implemented GMPEs to define the response variable. Such
 incompatibilities become an issue as using multiple GMPEs is
 required (see ~\sref{sec:attn-multi-attnmodels}). A common target
 response parameter can be obtained using empirical correlations (see
-\citep{eqrm_Beyer06}). It is recommended that such empirical
+\citep{eqrm_Beyer06}). It is planned that such empirical
 relationships be implemented in EQRM in the future.
 
 For each GMPE, EQRM should provide inputs respecting the original
@@ -415,12 +415,12 @@ M_L =
 Equation~\ref{ml-mw} is developed for stable continental regions and
 is based on earlier work published by the same author
 \citep{eqrm_Johnstone96a}. It is important to note that
-uncertainties in the explanatory variables are map to the response
-variable \citep{eqrm_Bommer05}. In other words, in equation
-~\ref{eq:general} if an explanatory parameter, $x$, has been
-assigned using a correlation conversion with associated measure of
-aleatory variability, $\sigma_x$, then this should be map into the
-aleatory variability of the GMPEs, $\sigma_y$, by using the
+uncertainties in the seismological parameters are mapped to the
+response variables \citep{eqrm_Bommer05}. In other words, in
+equation ~\ref{eq:general} if a seismological parameter, $x$, has
+been assigned using a correlation conversion with associated measure
+of aleatory variability, $\sigma_x$, then this should be map into
+the aleatory variability of the GMPEs, $\sigma_y$, by using the
 expression:
 \begin{equation}
 \sigma_{Total} = \sqrt{\sigma_y^2+(\dfrac{\partial log(Y)}{\partial
@@ -436,14 +436,14 @@ increased standard deviation values due to conversion of
 source-to-site distance measures. However, in EQRM distance measures
 conversions are not necessary, since virtual fault-planes are
 generated through simulation process. This enables EQRM to not only
-directly calculate the proper Finite-source distance measure for
+directly calculate the proper finite-source distance measure for
 each GMPE, but also to estimate all the source geometry related
-parameters, i. e. $h$, $W$, $\delta$, $R_x$, and $Z_{TOR}$. It
-should be noted that \citet{eqrm_Gaull90a}, and \citet{eqrm_Liang08}
-models use point-source distance measures: $R_{hypo}$ and $R_{epi}$.
-There are two obvious techniques that could be used to approximate
-$\Repi$ and $\Rhyp$. The first technique approximates $\Repi$ and
-$\Rhyp$ using $\Rjb$ and $\Rrup$ respectively. This technique is
+parameters, i.e. $h$, $W$, $\delta$, $R_x$, and $Z_{TOR}$. It should
+be noted that \citet{eqrm_Gaull90a}, and \citet{eqrm_Liang08} models
+use point-source distance measures: $R_{hypo}$ and $R_{epi}$. There
+are two obvious techniques that could be used to approximate $\Repi$
+and $\Rhyp$. The first technique approximates $\Repi$ and $\Rhyp$
+using $\Rjb$ and $\Rrup$ respectively. This technique is
 conservative since \mbox{$\Repi \geq \Rjb$} and \mbox{$\Rhyp \geq
 \Rrup$}. The second technique involves approximating $\Rhyp$ by
 using the distance to the rupture centroid and $\Repi$ with the
@@ -454,19 +454,19 @@ technique.
 The only remaining parameters to be determined are site parameters.
 The user supplies the vlues for $V_{S30}$ parameter. In the absence
 of shear-wave velocity measurements in the target region, several
-techniques exist to estimate $V_{S30}$; use of geological maps,
-geomorphological maps, topographic slope maps, to name a few. The
-Z1.0 and Z2.5 parameters are used by some of the NGA GMPEs to model
-the basin effects. Currently these parameters are not included in
-the control file, and are estimated as follows: Z1.0 is estimated
-from Vs30 following the correlation relation suggested by
-\citet{eqrm_Chiou08}:
+techniques exist to estimate $V_{S30}$; e.g. it can be estimated
+using geological maps, geomorphological maps, topographic slope
+maps, to name a few. The Z$_{1.0}$ and Z$_{2.5}$ parameters are used
+by some of the NGA GMPEs to model the basin effects. Currently these
+parameters are not included in the control file, and are estimated
+as follows: Z$_{1.0}$ is estimated from Vs30 following the
+correlation relation suggested by \citet{eqrm_Chiou08}:
 \begin{equation}
 ln(Z_{1.0}) = 28.5-0.4775ln(V_{S30}^8+38.7^8)
 \end{equation}
 
-Z2.5 is approximated from Z1.0 following the correlation relation
-suggested by \citet{eqrm_Campbell07}:
+Z$_{2.5}$ is approximated from Z$_{1.0}$ following the correlation
+relation suggested by \citet{eqrm_Campbell07}:
 \begin{equation}
 ln(Z_{2.5}) = 0.519+3.595Z_{1.0}
 \end{equation}
@@ -565,6 +565,8 @@ $Z_{1.0}$&&&\textbullet&&&\textbullet& &&&&&&&&
 &&\\
 $Z_{2.5}$&&&&&\textbullet&& &&&&&&&&
 &&\\
+$PGA_{rock}$&&&\textbullet&\textbullet&\textbullet&\textbullet&
+&&&&&&&&
 \end{tabular}}
 \end{table}
 \end{landscape}
@@ -574,9 +576,10 @@ $Z_{2.5}$&&&&&\textbullet&& &&&&&&&&
 \caption{Definition of Input parameters} \label{def} \centering
 \begin{tabular}{|c|c|}
 \hline Parameter& Description\\
-\hline $M_W$ & {\small Moment magnitude}\\
 
 \hline $M_L$ & {\small Local magnitude}\\
+
+\hline $M_W$ & {\small Moment magnitude}\\
 
 \hline $h$ & {\small Focal depth (km); In EQRM: rupture centroid depth}\\
 
@@ -586,8 +589,8 @@ $Z_{2.5}$&&&&&\textbullet&& &&&&&&&&
 
 \hline $\delta$ & {\small Fault dip (degree)}\\
 
-\hline $SOF$ & {\small Style Of Faulting (function of rake angle,
-$\lambda$
+\hline $SOFFlag$ & {\small Style Of Faulting (function of rake
+angle, $\lambda$
 (degree))}\\
 
 \hline $R_{epi}$ & {\small Distance from the epicenter (km)}\\
@@ -693,21 +696,21 @@ observed ground-motions with respect to explanatory variables that
 cannot be reduced with increasing knowledge about the earthquake
 process. It is worth to mention that the aleatory variability can
 not be reduced with respect to a particular model, however in
-practice it is desirable to reduce the aleatory variability
-\citep{eqrm_Atik10}. The aleatory variability is represented by the
-standard deviation of the PDF for the GMPEs. Epistemic uncertainty
-is the uncertainty raised from our lack of knowledge about
-earthquake process. With increased data and knowledge, ideally, the
-epistemic uncertainty can be reduced to zero. The epistemic
-uncertainty is represented by means of logic-tree. In logic-tree
-approach, several GMPEs would be considered, and each equation is
-assigned a weighting factor that is interpreted as the relative
-likelihood of that equation being correct. It should be noted that
-selection of proper ground motion models has stronger influence on
-the final results than assigning weights to each model
-\citep{eqrm_Scherbaum05}. The incorporation of aleatory variability
-and epistemic uncertainty in EQRM are discussed in
-~\sref{attn:uncertainty} and ~\sref{sec:attn-multi-attnmodels}
+practice it is desirable to reduce the aleatory variability as much
+as possible \citep{eqrm_Atik10}. The aleatory variability is
+represented by the standard deviation of the PDF for the GMPEs.
+Epistemic uncertainty is the uncertainty raised from our lack of
+knowledge about earthquake process. With increased data and
+knowledge, ideally, the epistemic uncertainty can be reduced to
+zero. The epistemic uncertainty is represented by means of
+logic-tree. In logic-tree approach, several GMPEs would be
+considered, and each equation is assigned a weighting factor that is
+interpreted as the relative likelihood of that equation being
+correct. It should be noted that selection of proper ground motion
+models has stronger influence on the final results than assigning
+weights to each model \citep{eqrm_Scherbaum05}. The incorporation of
+aleatory variability and epistemic uncertainty in EQRM are discussed
+in~\sref{attn:uncertainty} and~\sref{sec:attn-multi-attnmodels}
 respectively.
 
 
@@ -947,7 +950,7 @@ ground motion for each event. These are carried through the various
 stages of an EQRM simulation such as amplification, building damage
 and loss calculation (see following chapters). At the end of the
 simulation these values can then be collapsed back to a single `best
-estimate' or kept in a un-collapsed form and used to determine the
+estimate' or kept in an un-collapsed form and used to determine the
 hazard and/or risk curve (see \cref{ch:risk}). These two options are
 illustrated in \fref{fig:attn-treecollapse} for both a hazrd and
 risk simulation. Note that when collapsing the samples the extreme
