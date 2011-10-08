@@ -224,7 +224,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         event_activity_matrix = calc_event_activity(event_set, source_model)
         lamba = A_min * grscale(b, recurrence_max_mag, 
                                 generation_min_mag, recurrence_min_mag)
-        self.assertEqual(lamba, sum(event_activity_matrix))
+        self.assert_(allclose(lamba, sum(event_activity_matrix)))
         
 
     def test_calc_event_activity_generation_min_mag(self):
