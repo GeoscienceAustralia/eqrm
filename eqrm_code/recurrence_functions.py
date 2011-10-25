@@ -118,48 +118,8 @@ def m2grpdfb(b, m, m0, mmax):
     pdf=pdf_tmp/sum(pdf_tmp)
     return pdf
         
-
-def make_bins(min_mag,max_magnitude,num_bins,
-              recurrence_model_dist = 'bounded_gutenberg_richter'):
-    if (recurrence_model_dist == 'characteristic'):
-        m2=0.5
-        m_c=max_magnitude-m2
-        
-        delta_mag = (m_c-min_mag)/(num_bins)
-        bins = r_[min_mag+delta_mag/2:m_c-delta_mag/2:(num_bins)*1j]
-        
-        characteristic_bin = array([m_c+(m2/2)])
-        bins = append(bins,characteristic_bin)
-    else:
-        delta_mag = (max_magnitude-min_mag)/num_bins
-        bins = r_[min_mag+delta_mag/2:max_magnitude-delta_mag/2:num_bins*1j]
-    #approximate the number of earthquakes in discrete (0.1 unit) bins
-    return bins
-def assign_event_bins(magnitudes, min_mag, max_magnitude, num_bins,
-              recurrence_model_dist = 'bounded_gutenberg_richter'):
-    if (recurrence_model_dist=='characteristic'):
-        m2=0.5
-        m_c= max_magnitude-m2
-        k = where(magnitudes < m_c)
-        # bin the event magnitudes
-        delta_mag = (m_c-min_mag)/num_bins
-        event_bins=zeros(len(magnitudes),dtype=int64)
-        #event_bins[k] =(magnitudes[k] -min_mag)/delta_mag
-        event_bins[k] = array([int(i) for i in
-                                (magnitudes[k]
-                                 -min_mag)/delta_mag])
-        k =where(magnitudes>=m_c)
-        event_bins[k]=num_bins
-    else:
-        # bin the event magnitudes
-        delta_mag = (max_magnitude-min_mag)/num_bins
- 
-        event_bins = array([int(i) for i in
-                                (magnitudes
-                                 -min_mag)/delta_mag])
- 
-    return event_bins
-
+    
+    
 def grscale(b,max_magnitude,new_min,min_magnitude):
     """
     Return Lambda for mag, max_magnitude, and min_magnitude

@@ -22,7 +22,8 @@ class Dummy_event_set:
 class Dummy:
     def __init__(self):
         pass
-               
+
+                  
 class Test_Recurrence_functions(unittest.TestCase):
     
     def setUp(self):
@@ -50,15 +51,6 @@ class Test_Recurrence_functions(unittest.TestCase):
         fmcalc = m2grpdfb(b,m,m0,mmax)
         self.assert_(allclose(pdf,fmcalc))
     
-    def test_make_bins(self):
-        min_magnitude = 0
-        max_magnitude = 6
-        num_bins = 3
-        bins = make_bins(min_magnitude, max_magnitude, num_bins,
-                         'bounded_gutenberg_richter')
-        
-        #print "bins", bins
-        self.assert_(allclose(array([1.,3.,5.]),bins))
         
     def test_grscale(self):
         m = 3.
@@ -98,18 +90,6 @@ class Test_Recurrence_functions(unittest.TestCase):
                                             slip_rate_mm, area_kms)
         self.assert_(allclose(A_min,0.225843709057))
         
-    def test_make_bins2(self):
-        max_magnitude = 7.0
-        min_magnitude = 4.0
-        num_of_mag_sample_bins = 4
-        magnitudes = array([5,5.25,5.5,5.75,6,6.25,6.5,6.75,7])
-        mag_bin_centroids = make_bins(min_magnitude, max_magnitude,
-                                      num_of_mag_sample_bins,
-                                      'characteristic')
-        event_bins = assign_event_bins(magnitudes, min_magnitude, 
-                                      max_magnitude, num_of_mag_sample_bins,
-              recurrence_model_dist = 'characteristic')
-#        print 'event_bins ',event_bins
         
     def test_calc_A_min_from_slip_rate_Characteristic(self):
         max_magnitude = 7.0
@@ -125,6 +105,28 @@ class Test_Recurrence_functions(unittest.TestCase):
         self.assert_(allclose(A_min,0.0253104984335))
 
     def test_calc_activities_Characteristic(self):
+    
+    
+    ##  As far as I can tell you can regard this function as generating
+    ##  events for testing.
+        def make_bins(min_mag,max_magnitude,num_bins,
+              recurrence_model_dist = 'bounded_gutenberg_richter'):
+            if (recurrence_model_dist == 'characteristic'):
+                m2=0.5
+                m_c=max_magnitude-m2
+                
+                delta_mag = (m_c-min_mag)/(num_bins)
+                bins = r_[min_mag+delta_mag/2:m_c-delta_mag/2:(num_bins)*1j]
+                
+                characteristic_bin = array([m_c+(m2/2)])
+                bins = append(bins,characteristic_bin)
+            else:
+                delta_mag = (max_magnitude-min_mag)/num_bins
+                bins = r_[min_mag+delta_mag/2:max_magnitude-delta_mag/2:num_bins*1j]
+            #approximate the number of earthquakes in discrete (0.1 unit) bins
+            return bins
+    
+    
         max_magnitude = 7.0
         min_magnitude = 4.0
         slip_rate_mm = 2.0
