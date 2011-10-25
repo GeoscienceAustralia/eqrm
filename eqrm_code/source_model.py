@@ -331,6 +331,7 @@ class Source_Zone(Source, polygon_object):
                         recurrence_model_distribution=
                         recurrence_model_distribution)
                  
+                 
     def determine_event_set_indexes(self, event_set):
         contains_point=[self.contains_point((lat,lon), use_cach=False) 
                         for lat,lon in zip(
