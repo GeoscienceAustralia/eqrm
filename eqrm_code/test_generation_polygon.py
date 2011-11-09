@@ -398,7 +398,6 @@ class Test_Generation_polygon(unittest.TestCase):
         # A_min not supplied above, should be there (converted from slip_rate)
         self.failUnless(not fault.A_min is None)
         self.failUnlessEqual(fault.generation_min_mag, 4.0)
-        self.failUnlessEqual(fault.number_of_mag_sample_bins, 15)
         self.failUnlessEqual(fault.number_of_events, 1500)
         expected = {'distribution': 'uniform', 'minimum': 4.0, 'maximum': 7.0}
         self.failUnlessEqual(fault.magnitude_dist, expected)

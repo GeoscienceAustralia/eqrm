@@ -45,11 +45,8 @@ def calc_event_activity(event_set, source_model):
                
         poly_ind = source.get_event_set_indexes()
         #print "poly_ind", poly_ind
-        mag_ind = where((actual_min_mag_generation <= event_set.Mw[poly_ind])&
-                        (event_set.Mw[poly_ind] <= recurrence_max_mag))[0]
-        num_events=len(mag_ind)
-        #print "mag_ind",mag_ind 
-        if len(mag_ind)>0:
+
+        if len(poly_ind)>0:
             zone_b = source.b
             grfctr = grscale(zone_b,
                              recurrence_max_mag, 
@@ -57,17 +54,16 @@ def calc_event_activity(event_set, source_model):
                              source.min_magnitude)
             A_mlow = source.A_min * grfctr
             
-            event_ind= poly_ind[mag_ind]
 
             if source.recurrence_model_distribution == \
                     'bounded_gutenberg_richter':
                 grpdf = m2grpdfb(zone_b,
-                                 event_set.Mw[event_ind],
+                                 event_set.Mw[poly_ind],
                                  actual_min_mag_generation,
                                  recurrence_max_mag)           
             elif source.recurrence_model_distribution == 'characteristic':
                 grpdf = calc_activities_Characteristic(
-                    event_set.Mw[event_ind], 
+                    event_set.Mw[poly_ind], 
                     zone_b, 
                     actual_min_mag_generation,
                     recurrence_max_mag)
@@ -75,7 +71,7 @@ def calc_event_activity(event_set, source_model):
                 raise IOError(source.recurrence_model_distribution,
                               " is not a valid recurrence model distribution.")
     
-            event_activity_matrix[event_ind] = A_mlow*grpdf
+            event_activity_matrix[poly_ind] = A_mlow*grpdf
             
     eqrmlog.debug('Memory: Out of the event_activity loop')
     eqrmlog.resource_usage()

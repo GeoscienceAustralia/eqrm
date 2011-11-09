@@ -440,7 +440,6 @@ class Event_Set(object):
             azimuth[start:end] = polygon_azimuth
             dip[start:end] = polygon_dip
             magnitude[start:end] = polygon_magnitude
-            #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
             fault_width[start:end] = (depth_bottom_seismogenic[start:end] \
                            - depth_top_seismogenic[start:end])/ \
@@ -964,7 +963,6 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
         rupture_centroid_x[start:end] = r_x_centroid
         rupture_centroid_y[start:end] = r_y_centroid
         #magnitude[start:end] = polygon_magnitude
-            #number_of_mag_sample_bins[start:end] = mag_sample_bins
             #print "magnitude.dtype.name", magnitude.dtype.name
         eqrmlog.debug('Memory: event set lists have been combined')
         eqrmlog.resource_usage()

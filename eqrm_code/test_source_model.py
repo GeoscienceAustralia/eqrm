@@ -100,7 +100,6 @@ class Test_Source_model(unittest.TestCase):
         max_magnitude = 5.4
         b = 1
         A_min = 0.568
-        number_of_mag_sample_bins = 15
         event_type = 'fish'
         name = 'bake'
         generation_min_mag = 1.0
@@ -108,7 +107,6 @@ class Test_Source_model(unittest.TestCase):
                           min_magnitude,max_magnitude,
                           generation_min_mag,
                           A_min,b,
-                          number_of_mag_sample_bins,
                           event_type,
                           name)
         #print "source_zone_polygon.polygon_object", szp._linestring
@@ -126,7 +124,6 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless(result.name == name,'Failed!')
         self.failUnless(szp.name == name,'Failed!')
         self.failUnless(source_model._magnitude_type == 'Mw','Failed!')
-        self.failUnless(result.number_of_mag_sample_bins== 15,'Failed!')
 
     
     def test_Source_Zone(self):
@@ -136,7 +133,6 @@ class Test_Source_model(unittest.TestCase):
         max_magnitude = 8
         b = 1
         A_min = 0.5
-        number_of_mag_sample_bins = 15
         event_type = 'fish'
         name = 'Source_Zone'
         generation_min_mag = 1.0
@@ -144,7 +140,7 @@ class Test_Source_model(unittest.TestCase):
                           min_magnitude, max_magnitude,
                           generation_min_mag,
                           A_min, b,
-                          number_of_mag_sample_bins, event_type,
+                          event_type,
                           name)
         self.failUnless(boundary==szp._linestring,
             'Failed!')
@@ -158,8 +154,6 @@ class Test_Source_model(unittest.TestCase):
             'Failed!')
         self.failUnless(A_min==szp.A_min,
             'Failed!')
-        self.failUnless(szp.number_of_mag_sample_bins== \
-                        number_of_mag_sample_bins,'Failed!')
 
    
     def test_Source(self):
@@ -486,7 +480,6 @@ class Test_Source_model(unittest.TestCase):
         recurrence_max_mag = 8.0
         A_min = 10
         b = 1.4
-        number_of_mag_sample_bins = 4
         distribution = 'distribution'
         
         fsg_list = []
@@ -501,7 +494,6 @@ class Test_Source_model(unittest.TestCase):
             dummy.recurrence_min_mag  = recurrence_min_mag + i
             dummy.A_min = A_min + i
             dummy.b = b + i
-            dummy.number_of_mag_sample_bins = number_of_mag_sample_bins + i
             dummy.event_type = event_type
             dummy.name = 'name' + str(i)
             dummy.distribution = 'distribution' + str(i)
@@ -519,8 +511,6 @@ class Test_Source_model(unittest.TestCase):
                                actual_generation_min_mag + i)
             self.failUnless(model.A_min == A_min + i)
             self.failUnless(model.b == b + i)
-            self.failUnless(model.number_of_mag_sample_bins == \
-                                number_of_mag_sample_bins + i)
             self.failUnless(model.name == 'name' + str(i))
             self.failUnless(model.recurrence_model_distribution == \
                                 'distribution' +  str(i))
@@ -534,7 +524,7 @@ class Test_Source_model(unittest.TestCase):
     def test_get_EventZone_instance(self):
         name = 'eggs'
         indexes = [5, 4]
-        souce = Source(1, 2, 3, 4, 5, 6, 7, name=name)
+        souce = Source(1, 2, 3, 4, 5, 7, name=name)
         souce.set_event_set_indexes(indexes)
         event_zone = souce.get_event_zone_instance()
         
