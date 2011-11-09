@@ -21,6 +21,7 @@ from eqrm_code.polygon_class import polygon_object
 from eqrm_code.xml_interface import Xml_Interface
 from eqrm_code.conversions import azimuth_of_trace
 from eqrm_code.recurrence_functions import calc_A_min_from_slip_rate
+from source_model import get_recurrence_elements
 
 class FileError(exceptions.Exception): pass
 
@@ -563,21 +564,20 @@ def polygons_from_xml_horspool(doc):
         dip = {'distribution':'uniform',
                'minimum':dip - delta_dip,
                'maximum': dip + delta_dip}
-        recurrence = xml_polygon['recurrence_model'][0]
-        event_gen_atts = recurrence['event_generation'][0].attributes
+
+        recurrence_models,  event_gen = get_recurrence_elements(xml_polygon)
+        event_gen_atts = event_gen.attributes
         number_of_events = int(event_gen_atts['number_of_events'])
-        recurrence_atts = recurrence.attributes
-        
-        minmag = max(float(recurrence_atts['recurrence_min_mag']),
-                     float(event_gen_atts['generation_min_mag']))
-        maxmag = float(recurrence_atts['recurrence_max_mag'])
+        minmag = min(float(rm.attributes['recurrence_min_mag']) for rm in recurrence_models)
+        maxmag = max(float(rm.attributes['recurrence_max_mag']) for rm in recurrence_models)
         magnitude = {'distribution':'uniform',
-                     'minimum':minmag,
+                     'minimum': max(minmag,
+                                    float(event_gen_atts['generation_min_mag'])),
                      'maximum': maxmag}
         # magnitude = None This fails, so this is used.             
         azimuth = {'distribution':'uniform',
                    'minimum':azi - dazi,
-                   'maximum':azi + dazi}       
+                   'maximum':azi + dazi}
         exclude = []
         for exclusion_zone in xml_polygon['excludes']:
             exclude.append(exclusion_zone.array)

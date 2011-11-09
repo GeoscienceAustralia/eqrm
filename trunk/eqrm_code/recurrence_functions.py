@@ -35,40 +35,41 @@ def calc_event_activity(event_set, source_model):
     eqrmlog.debug('Memory: event_activity_matrix weight_matrix created')
     eqrmlog.resource_usage()
 
-    for source in source_model: # loop over source zones 
-        #print "source.prob_min_mag_cutoff", source.prob_min_mag_cutoff
-        #print "source.min_magnitude", source.min_magnitude
-        #print "source.act_min_mag_gen", source.actual_min_mag_generation
+    for source in source_model: # loop over source zones
+
+        # FIXME STUB (DJH Nov 2011)
+        # Scaffolding while migrating to multiple recurrence models.
+        # Just use model[0] whiel under construction
+        STUB_rm0 = source.recurrence_models[0]
+        
         actual_min_mag_generation = source.actual_min_mag_generation
-        #print "actual_min_mag_generation", actual_min_mag_generation
-        recurrence_max_mag = source.max_magnitude
-               
+        recurrence_max_mag = STUB_rm0.max_magnitude
         poly_ind = source.get_event_set_indexes()
-        #print "poly_ind", poly_ind
+
 
         if len(poly_ind)>0:
-            zone_b = source.b
+            zone_b = STUB_rm0.b
             grfctr = grscale(zone_b,
                              recurrence_max_mag, 
                              actual_min_mag_generation, 
-                             source.min_magnitude)
-            A_mlow = source.A_min * grfctr
+                             STUB_rm0.min_magnitude)
+            A_mlow = STUB_rm0.A_min * grfctr
             
 
-            if source.recurrence_model_distribution == \
+            if STUB_rm0.recurrence_model_distribution == \
                     'bounded_gutenberg_richter':
                 grpdf = m2grpdfb(zone_b,
                                  event_set.Mw[poly_ind],
                                  actual_min_mag_generation,
                                  recurrence_max_mag)           
-            elif source.recurrence_model_distribution == 'characteristic':
+            elif STUB_rm0.recurrence_model_distribution == 'characteristic':
                 grpdf = calc_activities_Characteristic(
                     event_set.Mw[poly_ind], 
                     zone_b, 
                     actual_min_mag_generation,
                     recurrence_max_mag)
             else:
-                raise IOError(source.recurrence_model_distribution,
+                raise IOError(STUB_rm0.recurrence_model_distribution,
                               " is not a valid recurrence model distribution.")
     
             event_activity_matrix[poly_ind] = A_mlow*grpdf

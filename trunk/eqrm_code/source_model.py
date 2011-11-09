@@ -165,10 +165,8 @@ class Source_Model(object):
         # calculating an event activity and associating an event with
         # a ground motion model.  So split this class into two classes sometime
         if False:
-            source = Source(min_magnitude=None,
-                            max_magnitude=None,
+            source = Source((RecurrenceModel(None, None, None, None),),
                             generation_min_mag=None,
-                            A_min=None, b=None,
                             name='scenario',
                             event_type=None)
         else:
@@ -258,8 +256,21 @@ class EventZone(object):
                  ground_motion_calculator=self.ground_motion_calculator)
         
 
+class RecurrenceModel(object):
+    def __init__(self,
+                 recurrence_min_mag, recurrence_max_mag,
+                 A_min, b,
+                 distribution=None, weight=1.0):
+        # Note __init__() arg names must match <recurrence_model>
+        # attribute names so that RecurrenceModel(**attr_dict) works
+        self.min_magnitude = float(recurrence_min_mag)
+        self.max_magnitude = float(recurrence_max_mag)
+        self.recurrence_model_distribution = distribution or 'bounded_gutenberg_richter'
+        self.A_min = float(A_min)
+        self.b = float(b)
+        self.weight = float(weight)
 
-                    
+    
 class Source(EventZone):
     """A class that combines fault source generator data with that from the 
     event type control file.
@@ -268,29 +279,31 @@ class Source(EventZone):
     event type control data is added later.
     """
 
-    def __init__(self, min_magnitude, max_magnitude, generation_min_mag,
-                 A_min, b, event_type, name,
-                 recurrence_model_distribution='bounded_gutenberg_richter'):
+    def __init__(self,
+                 recurrence_model_seq,
+                 generation_min_mag,
+                 event_type,
+                 name):
         """
+        recurrence_model_seq: sequenec of RecurrenceModel()
         generation_min_mag - The minimum event generation specified
-          by the user
-        min_magnitude - The recurrence_min_mag
-        max_magnitude - The recurrence_max_mag
-        A_min,b are floats
-        
+        by the user
+
         #FIXME DSG-EQRM This class needs comments.
 
         And where are it's methods? recurrence_functions might have 1.
         """
 
-        self.min_magnitude = min_magnitude
-        self.max_magnitude = max_magnitude
-        self.actual_min_mag_generation = max(generation_min_mag, min_magnitude)
-        self.A_min = A_min
-        self.b = b
+        self.recurrence_models = recurrence_model_seq
+
+        # DJH FIXME handle weight - optional attr. If >1 RM, need weights on all, check total ~= 1
+        # DJH FIXME store multiple RMs in model
+        # FIXME write tests
+            
+        self.actual_min_mag_generation = max(generation_min_mag,
+                                             min(m.min_magnitude for m in self.recurrence_models))
         self.event_type = event_type
         self.name = name
-        self.recurrence_model_distribution = recurrence_model_distribution
         super(Source, self).__init__(name)
 
 
@@ -299,34 +312,29 @@ class Source_Zone(Source, polygon_object):
     Source_Zone adds boundary ploygon and exclude polygon to source,
     to describe the area of a Source.
     """
-    def __init__(self,boundary,exclude,
-                 min_magnitude,max_magnitude,
+    def __init__(self,
+                 boundary,
+                 exclude,
+                 recurrence_model_seq,
                  generation_min_mag,
-                 A_min,b,
                  event_type,
-                 name,
-                 recurrence_model_distribution='bounded_gutenberg_richter'):
+                 name):
         """
         boundary is a list of points that forms a polygon
         exclude is a list of polygons (so a list of a list of points)
-        min_magnitude,max_magnitude,
-        A_min,b are floats
+
+        recurrence_model_seq: sequence of RecurrenceModel()
         
         #FIXME DSG-EQRM This class needs comments.
 
         And where are it's methods? recurrence_functions might have 1.
         """
-        polygon_object.__init__(self,boundary,exclude)
+        polygon_object.__init__(self, boundary, exclude)
         Source.__init__(self,
-                        min_magnitude=min_magnitude,
-                        max_magnitude=max_magnitude,
+                        recurrence_model_seq,
                         generation_min_mag=generation_min_mag,
-                        A_min=A_min,
-                        b=b,
                         event_type=event_type,
-                        name = name,
-                        recurrence_model_distribution=
-                        recurrence_model_distribution)
+                        name = name)
                  
                  
     def determine_event_set_indexes(self, event_set):
@@ -479,11 +487,16 @@ def create_fault_sources(event_control_file, fsg_list, magnitude_type):
         # create a Source object with some FSG attributes
         min_magnitude = fsg.magnitude_dist['minimum']
         max_magnitude = fsg.magnitude_dist['maximum']
-        source = Source(fsg.recurrence_min_mag, fsg.recurrence_max_mag,
-                        fsg.generation_min_mag, fsg.A_min, fsg.b,
-                        fsg.event_type,
-                        fsg.name,
-                        recurrence_model_distribution=fsg.distribution)
+        source = Source(
+            (RecurrenceModel(
+                    fsg.recurrence_min_mag,
+                    fsg.recurrence_max_mag,
+                    fsg.A_min,
+                    fsg.b,
+                    fsg.distribution),),
+            fsg.generation_min_mag,
+            fsg.event_type,
+            fsg.name)
 
         # add new source to result list
         source_list.append(source)
@@ -492,6 +505,31 @@ def create_fault_sources(event_control_file, fsg_list, magnitude_type):
     source_model.add_event_type_atts_to_sources(event_control_file)
         
     return source_model
+
+
+def get_recurrence_elements(xml_polygon):
+    """
+    xml_polygon: a DOM <zone> node
+
+    Returns: sequence: DOM <'recurrence_model> nodes, DOM
+    <event_generation> node
+    """
+    # Handles both the legacy XML schema, which allows one recurrence
+    # model per zone, and the newer schema, which allows for multiple
+    # recurrence models per zone. A document using the newer schema is
+    # detected by looking for <event_generation> as an immediate child
+    # of <zone>. The older style has <event_generation> as a child of a
+    # single instance of <recurrence_model>
+
+    event_gen_elements = xml_polygon['event_generation']
+    recurrence_models =  xml_polygon['recurrence_model']
+    # Both old and new styles can only have one <event_generation>
+    # per zone, and must have at least one recurrence model
+    assert len(event_gen_elements) == 1 and recurrence_models
+    event_gen = event_gen_elements[0]
+    assert (event_gen.xml_node.parentNode is xml_polygon.xml_node or
+            len(recurrence_models)==1) # old style
+    return recurrence_models, event_gen 
 
 
 def source_model_from_xml(filename):
@@ -509,18 +547,11 @@ def source_model_from_xml(filename):
             polygon_name = str(i)
         geometry = xml_polygon['geometry'][0]
         boundary = geometry['boundary'][0].array
-        recurrence = xml_polygon['recurrence_model'][0].attributes
-        recurrence_model_distribution = recurrence['distribution']
-        min_magnitude = float(recurrence['recurrence_min_mag'])
-        max_magnitude = float(recurrence['recurrence_max_mag'])
-        A_min=float(recurrence['A_min'])
-        b=float(recurrence['b'])
-        
+        recurrence_models,  event_gen = get_recurrence_elements(xml_polygon)
         area = float(xml_polygon.attributes['area'])
         event_type = xml_polygon.attributes['event_type']
 
-        event_gen = xml_polygon['recurrence_model'][0]['event_generation']
-        generation_min_mag = float(event_gen[0].attributes[
+        generation_min_mag = float(event_gen.attributes[
             'generation_min_mag'])
         
         exclude=[]
@@ -531,13 +562,11 @@ def source_model_from_xml(filename):
         source_zone_polygon = Source_Zone(
             boundary,
             exclude,
-            min_magnitude,
-            max_magnitude,
+            [RecurrenceModel(**rm.attributes)
+             for rm in recurrence_models],
             generation_min_mag,
-            A_min,b,
             event_type,
-            polygon_name,
-            recurrence_model_distribution=recurrence_model_distribution)
+            polygon_name)
         source_zone_polygons.append(source_zone_polygon)
         
     doc.unlink()
