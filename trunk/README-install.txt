@@ -1,5 +1,5 @@
 
-Introduction
+INTRODUCTION
 	
 The EQRM builds on existing open source packages and it uses multiple
 languages (C and Python) to obtain an optimal trade-off between
