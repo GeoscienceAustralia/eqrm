@@ -125,7 +125,6 @@ class Fault_Source_Generator(object):
                      'A_min': float,
                      'b': float,
                      'generation_min_mag': float,
-                     'number_of_mag_sample_bins': int,
                      'number_of_events': int,
                     }
 
@@ -160,7 +159,6 @@ class Fault_Source_Generator(object):
             .slip_rate
             .A_min
             .generation_min_mag
-            .number_of_mag_sample_bins
             .number_of_events
             .magnitude_dist
         """
@@ -219,7 +217,6 @@ class Fault_Source_Generator(object):
         #     'A_min': <value>,                            # optional
         #     'b': <value>,
         #     'event_generation': {'generation_min_mag': <value>,]
-        #                          'number_of_mag_sample_bins': <value>,
         #                          'number_of_events': <value>}}
         #     }
         #
@@ -259,8 +256,6 @@ class Fault_Source_Generator(object):
         
         self.generation_min_mag = self.n2t(eg_dict, 'generation_min_mag')
         
-        self.number_of_mag_sample_bins = self.n2t(eg_dict,
-                                                  'number_of_mag_sample_bins')
         self.number_of_events = self.n2t(eg_dict, 'number_of_events')
 
         # calculate magnitude distribution
@@ -570,8 +565,6 @@ def polygons_from_xml_horspool(doc):
                'maximum': dip + delta_dip}
         recurrence = xml_polygon['recurrence_model'][0]
         event_gen_atts = recurrence['event_generation'][0].attributes
-        number_of_mag_sample_bins = int(event_gen_atts[
-            'number_of_mag_sample_bins'])
         number_of_events = int(event_gen_atts['number_of_events'])
         recurrence_atts = recurrence.attributes
         

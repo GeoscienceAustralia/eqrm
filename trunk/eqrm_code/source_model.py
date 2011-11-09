@@ -168,7 +168,7 @@ class Source_Model(object):
             source = Source(min_magnitude=None,
                             max_magnitude=None,
                             generation_min_mag=None,
-                            A_min=None, b=None, number_of_mag_sample_bins=None,
+                            A_min=None, b=None,
                             name='scenario',
                             event_type=None)
         else:
@@ -269,7 +269,7 @@ class Source(EventZone):
     """
 
     def __init__(self, min_magnitude, max_magnitude, generation_min_mag,
-                 A_min, b, number_of_mag_sample_bins, event_type, name,
+                 A_min, b, event_type, name,
                  recurrence_model_distribution='bounded_gutenberg_richter'):
         """
         generation_min_mag - The minimum event generation specified
@@ -288,7 +288,6 @@ class Source(EventZone):
         self.actual_min_mag_generation = max(generation_min_mag, min_magnitude)
         self.A_min = A_min
         self.b = b
-        self.number_of_mag_sample_bins = number_of_mag_sample_bins
         self.event_type = event_type
         self.name = name
         self.recurrence_model_distribution = recurrence_model_distribution
@@ -304,7 +303,6 @@ class Source_Zone(Source, polygon_object):
                  min_magnitude,max_magnitude,
                  generation_min_mag,
                  A_min,b,
-                 number_of_mag_sample_bins,
                  event_type,
                  name,
                  recurrence_model_distribution='bounded_gutenberg_richter'):
@@ -325,7 +323,6 @@ class Source_Zone(Source, polygon_object):
                         generation_min_mag=generation_min_mag,
                         A_min=A_min,
                         b=b,
-                        number_of_mag_sample_bins=number_of_mag_sample_bins,
                         event_type=event_type,
                         name = name,
                         recurrence_model_distribution=
@@ -484,7 +481,7 @@ def create_fault_sources(event_control_file, fsg_list, magnitude_type):
         max_magnitude = fsg.magnitude_dist['maximum']
         source = Source(fsg.recurrence_min_mag, fsg.recurrence_max_mag,
                         fsg.generation_min_mag, fsg.A_min, fsg.b,
-                        fsg.number_of_mag_sample_bins, fsg.event_type,
+                        fsg.event_type,
                         fsg.name,
                         recurrence_model_distribution=fsg.distribution)
 
@@ -523,8 +520,6 @@ def source_model_from_xml(filename):
         event_type = xml_polygon.attributes['event_type']
 
         event_gen = xml_polygon['recurrence_model'][0]['event_generation']
-        number_of_mag_sample_bins = int(event_gen[0].attributes[
-            'number_of_mag_sample_bins'])
         generation_min_mag = float(event_gen[0].attributes[
             'generation_min_mag'])
         
@@ -540,7 +535,6 @@ def source_model_from_xml(filename):
             max_magnitude,
             generation_min_mag,
             A_min,b,
-            number_of_mag_sample_bins,
             event_type,
             polygon_name,
             recurrence_model_distribution=recurrence_model_distribution)

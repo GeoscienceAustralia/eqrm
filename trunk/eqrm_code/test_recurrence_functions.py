@@ -198,7 +198,6 @@ class Test_Recurrence_functions(unittest.TestCase):
         recurrence_max_mag = 8.0
         A_min = 10
         b = 1.4
-        number_of_mag_sample_bins = 4
         distribution = 'distribution'
         
         dummy = Dummy()
@@ -210,7 +209,6 @@ class Test_Recurrence_functions(unittest.TestCase):
         dummy.recurrence_min_mag  = recurrence_min_mag  
         dummy.A_min = A_min
         dummy.b = b
-        dummy.number_of_mag_sample_bins = number_of_mag_sample_bins
         dummy.event_type = "background"
         dummy.name = 'name'
         dummy.distribution = 'bounded_gutenberg_richter'
@@ -259,7 +257,6 @@ class Test_Recurrence_functions(unittest.TestCase):
         recurrence_max_mag = 8.0
         A_min = 10
         b = 1.4
-        number_of_mag_sample_bins = 4
         distribution = 'distribution'
         
         dummy = Dummy()
@@ -271,7 +268,6 @@ class Test_Recurrence_functions(unittest.TestCase):
         dummy.recurrence_min_mag  = recurrence_min_mag  
         dummy.A_min = A_min
         dummy.b = b
-        dummy.number_of_mag_sample_bins = number_of_mag_sample_bins
         dummy.event_type = "background"
         dummy.name = 'name'
         dummy.distribution = 'bounded_gutenberg_richter'
@@ -327,7 +323,6 @@ class Test_Recurrence_functions(unittest.TestCase):
         recurrence_max_mag = 8.0
         A_min = 10
         b = 1.4
-        number_of_mag_sample_bins = 4
         distribution = 'distribution'
         
         dummy = Dummy()
@@ -339,7 +334,6 @@ class Test_Recurrence_functions(unittest.TestCase):
         dummy.recurrence_min_mag  = recurrence_min_mag  
         dummy.A_min = A_min
         dummy.b = b
-        dummy.number_of_mag_sample_bins = number_of_mag_sample_bins
         dummy.event_type = "background"
         dummy.name = 'name'
         dummy.distribution = 'bounded_gutenberg_richter'
