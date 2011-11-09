@@ -700,7 +700,7 @@ def check_sum_1_normalise(weights, msg=None):
     exactly sums to one.
 
     Args:
-      weights: A list or array that sould sum to 1.
+      weights: A numpy.ndarray that should sum to 1.
       msg: An error message if the array is not close to summing to 1.
 
     Returns:
