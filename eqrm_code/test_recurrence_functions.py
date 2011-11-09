@@ -8,8 +8,7 @@ from scipy import exp, log, array, sum, allclose, r_
 
 
 from eqrm_code.event_set import Event_Set
-from eqrm_code.source_model import Source_Model, Source_Zone, Source, \
-    create_fault_sources
+from eqrm_code.source_model import create_fault_sources
 from eqrm_code.recurrence_functions import *
 
 class Dummy_event_set:

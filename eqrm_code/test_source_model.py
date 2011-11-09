@@ -8,14 +8,13 @@ import types
 from scipy import array, allclose
 
 from source_model import *
-from source_model import Source_Zone
+from source_model import Source_Zone, RecurrenceModel
 from eqrm_code.event_set import Event_Set
 from eqrm_code.util import reset_seed, determine_eqrm_path
 
 
 
 #***************************************************************
-
 
 class Dummy:
     def __init__(self):
@@ -103,23 +102,26 @@ class Test_Source_model(unittest.TestCase):
         event_type = 'fish'
         name = 'bake'
         generation_min_mag = 1.0
+
         szp = Source_Zone(boundary,exclude,
-                          min_magnitude,max_magnitude,
+                          (RecurrenceModel(min_magnitude,
+                                           max_magnitude,
+                                           A_min,
+                                           b),),
                           generation_min_mag,
-                          A_min,b,
                           event_type,
                           name)
         #print "source_zone_polygon.polygon_object", szp._linestring
         result = source_model._sources[0]
         self.failUnless(result._linestring==szp._linestring,
             'Failed!')
-        self.failUnless(result.min_magnitude==szp.min_magnitude,
+        self.failUnless(result.recurrence_models[0].min_magnitude==szp.recurrence_models[0].min_magnitude,
             'Failed!')
-        self.failUnless(result.max_magnitude==szp.max_magnitude,
+        self.failUnless(result.recurrence_models[0].max_magnitude==szp.recurrence_models[0].max_magnitude,
             'Failed!')
-        self.failUnless(result.b==szp.b,
+        self.failUnless(result.recurrence_models[0].b==szp.recurrence_models[0].b,
             'Failed!')
-        self.failUnless(result.A_min==szp.A_min,
+        self.failUnless(result.recurrence_models[0].A_min==szp.recurrence_models[0].A_min,
             'Failed!')
         self.failUnless(result.name == name,'Failed!')
         self.failUnless(szp.name == name,'Failed!')
@@ -137,22 +139,24 @@ class Test_Source_model(unittest.TestCase):
         name = 'Source_Zone'
         generation_min_mag = 1.0
         szp = Source_Zone(boundary, exclude,
-                          min_magnitude, max_magnitude,
+                          (RecurrenceModel(min_magnitude,
+                                           max_magnitude,
+                                           A_min,
+                                           b),),
                           generation_min_mag,
-                          A_min, b,
                           event_type,
                           name)
         self.failUnless(boundary==szp._linestring,
             'Failed!')
         self.failUnless(exclude==szp._exclude,
             'Failed!')
-        self.failUnless(min_magnitude==szp.min_magnitude,
+        self.failUnless(min_magnitude==szp.recurrence_models[0].min_magnitude,
             'Failed!')
-        self.failUnless(max_magnitude==szp.max_magnitude,
+        self.failUnless(max_magnitude==szp.recurrence_models[0].max_magnitude,
             'Failed!')
-        self.failUnless(b==szp.b,
+        self.failUnless(b==szp.recurrence_models[0].b,
             'Failed!')
-        self.failUnless(A_min==szp.A_min,
+        self.failUnless(A_min==szp.recurrence_models[0].A_min,
             'Failed!')
 
    
@@ -506,13 +510,13 @@ class Test_Source_model(unittest.TestCase):
                                            magnitude_type)
         for i, model in enumerate(source_model):
             #self.failUnless(mod.min_magnitude  == )
-            self.failUnless(model.max_magnitude == recurrence_max_mag + i)
+            self.failUnless(model.recurrence_models[0].max_magnitude == recurrence_max_mag + i)
             self.failUnless(model.actual_min_mag_generation == \
                                actual_generation_min_mag + i)
-            self.failUnless(model.A_min == A_min + i)
-            self.failUnless(model.b == b + i)
+            self.failUnless(model.recurrence_models[0].A_min == A_min + i)
+            self.failUnless(model.recurrence_models[0].b == b + i)
             self.failUnless(model.name == 'name' + str(i))
-            self.failUnless(model.recurrence_model_distribution == \
+            self.failUnless(model.recurrence_models[0].recurrence_model_distribution == \
                                 'distribution' +  str(i))
             self.failUnless(model.scaling['scaling_rule'] == model.event_type)
             
@@ -524,7 +528,8 @@ class Test_Source_model(unittest.TestCase):
     def test_get_EventZone_instance(self):
         name = 'eggs'
         indexes = [5, 4]
-        souce = Source(1, 2, 3, 4, 5, 7, name=name)
+        souce = Source((RecurrenceModel(1, 2, 4, 5),),
+                       3, 7, name=name)
         souce.set_event_set_indexes(indexes)
         event_zone = souce.get_event_zone_instance()
         
