@@ -39,7 +39,7 @@ def calc_event_activity(event_set, source_model):
 
         # FIXME STUB (DJH Nov 2011)
         # Scaffolding while migrating to multiple recurrence models.
-        # Just use model[0] whiel under construction
+        # Just use model[0] while under construction
         STUB_rm0 = source.recurrence_models[0]
         
         actual_min_mag_generation = source.actual_min_mag_generation

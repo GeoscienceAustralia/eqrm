@@ -21,7 +21,7 @@ from eqrm_code.ground_motion_calculator import \
 from eqrm_code import parse_in_parameters
 
 
-    
+
 class Source_Model(object):
     """
     This is now a wrapper for a loop over self.sources.
@@ -268,7 +268,11 @@ class RecurrenceModel(object):
         self.recurrence_model_distribution = distribution or 'bounded_gutenberg_richter'
         self.A_min = float(A_min)
         self.b = float(b)
-        self.weight = float(weight)
+        # Weights must be normalised so all RMs in a Source() sum to
+        # ~1.0. Use a separate attr for the normalised weight to make
+        # sure we can't run with the un-normalised weight.
+        self.raw_weight = float(weight)
+        self.weight = None
 
     
 class Source(EventZone):
@@ -293,13 +297,17 @@ class Source(EventZone):
 
         And where are it's methods? recurrence_functions might have 1.
         """
+        # DJH FIXME TODO write tests:
+        # - new xml schema
+        # - test summing of rm weights
 
         self.recurrence_models = recurrence_model_seq
-
-        # DJH FIXME handle weight - optional attr. If >1 RM, need weights on all, check total ~= 1
-        # DJH FIXME store multiple RMs in model
-        # FIXME write tests
-            
+        weights_corrected = parse_in_parameters.check_sum_1_normalise(
+                asarray([rm.raw_weight for rm in self.recurrence_models]),
+                "All recurrence model weights in a zone must sum to 1.0")
+        for rm, wc in zip(self.recurrence_models, weights_corrected):
+            rm.weight = wc
+        
         self.actual_min_mag_generation = max(generation_min_mag,
                                              min(m.min_magnitude for m in self.recurrence_models))
         self.event_type = event_type
