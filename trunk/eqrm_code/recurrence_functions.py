@@ -30,54 +30,60 @@ def calc_event_activity(event_set, source_model):
     EQRM can currently only handle one source model.
     A source model has many source polygons.
     """
-    
-    event_activity_matrix=zeros((len(event_set)),float)
+    # Allocate a row per recurrence model. Note that this approach
+    # wastes a fair bit of space if not all the source zones have the
+    # same number of recurrence models
+    event_activity_matrix = zeros(
+        (max(len(s.recurrence_models) for s in source_model),
+         len(event_set)),
+        float)
     eqrmlog.debug('Memory: event_activity_matrix weight_matrix created')
     eqrmlog.resource_usage()
 
     for source in source_model: # loop over source zones
-
-        # FIXME STUB (DJH Nov 2011)
-        # Scaffolding while migrating to multiple recurrence models.
-        # Just use model[0] while under construction
-        STUB_rm0 = source.recurrence_models[0]
-        
         actual_min_mag_generation = source.actual_min_mag_generation
-        recurrence_max_mag = STUB_rm0.max_magnitude
         poly_ind = source.get_event_set_indexes()
 
+        for i, rm in enumerate(source.recurrence_models):
+            filtered_poly_ind = poly_ind[
+                ((rm.min_magnitude <= event_set.Mw[poly_ind]) &
+                 (event_set.Mw[poly_ind] <= rm.max_magnitude))]
 
-        if len(poly_ind)>0:
-            zone_b = STUB_rm0.b
-            grfctr = grscale(zone_b,
-                             recurrence_max_mag, 
-                             actual_min_mag_generation, 
-                             STUB_rm0.min_magnitude)
-            A_mlow = STUB_rm0.A_min * grfctr
-            
+            if len(filtered_poly_ind)>0:
+                recurrence_max_mag = rm.max_magnitude
+                zone_b = rm.b
+                grfctr = grscale(zone_b,
+                                 recurrence_max_mag, 
+                                 actual_min_mag_generation, 
+                                 rm.min_magnitude)
+                A_mlow = rm.A_min * grfctr
 
-            if STUB_rm0.recurrence_model_distribution == \
-                    'bounded_gutenberg_richter':
-                grpdf = m2grpdfb(zone_b,
-                                 event_set.Mw[poly_ind],
-                                 actual_min_mag_generation,
-                                 recurrence_max_mag)           
-            elif STUB_rm0.recurrence_model_distribution == 'characteristic':
-                grpdf = calc_activities_Characteristic(
-                    event_set.Mw[poly_ind], 
-                    zone_b, 
-                    actual_min_mag_generation,
-                    recurrence_max_mag)
-            else:
-                raise IOError(STUB_rm0.recurrence_model_distribution,
-                              " is not a valid recurrence model distribution.")
-    
-            event_activity_matrix[poly_ind] = A_mlow*grpdf
+
+                if rm.recurrence_model_distribution == \
+                        'bounded_gutenberg_richter':
+                    grpdf = m2grpdfb(zone_b,
+                                     event_set.Mw[filtered_poly_ind],
+                                     actual_min_mag_generation,
+                                     recurrence_max_mag)           
+                elif rm.recurrence_model_distribution == 'characteristic':
+                    grpdf = calc_activities_Characteristic(
+                        event_set.Mw[filtered_poly_ind], 
+                        zone_b, 
+                        actual_min_mag_generation,
+                        recurrence_max_mag)
+                else:
+                    raise IOError(rm.recurrence_model_distribution,
+                                  " is not a valid recurrence model distribution.")
+
+                event_activity_matrix[i, filtered_poly_ind] = A_mlow*grpdf * rm.weight
             
     eqrmlog.debug('Memory: Out of the event_activity loop')
     eqrmlog.resource_usage()
 
-    return event_activity_matrix 
+    # FIXME SCAFFOLDING (DJH). Migrating to multiple recurrence
+    # models. Just return the activities for 1st RM for the time being
+    # to retain API compatibility.
+    return event_activity_matrix[0]
     
 
 def m2grpdfb(b, m, m0, mmax):
