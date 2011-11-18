@@ -16,14 +16,14 @@ class Test_Generation_polygon(unittest.TestCase):
     def tearDown(self):
         pass
 
-     
-    def test_polygons_from_xml_horspool(self):
-        
-        handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
-        os.close(handle)
-        handle = open(file_name,'w')
-        
-        sample = """<source_model_zone magnitude_type="Mw">
+    eg="""<event_generation 
+      generation_min_mag = "3.3"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "1000" />"""
+
+    # A format string with slots for <source_model_zone> attrs and
+    # <event_generation> elements
+    sample = """<source_model_zone %(smz_attrs)s >
   <zone 
   area = "5054.035" 
   name = "bad zone"
@@ -48,17 +48,14 @@ class Test_Generation_polygon(unittest.TestCase):
 	  -33.4500 151.4300  
       </excludes>
     </geometry>
-    
+    %(eg)s
     <recurrence_model
       distribution = "bounded_gutenberg_richter"
       recurrence_min_mag = "3.4" 
       recurrence_max_mag = "5.4" 
       A_min= "0.568" 
       b = "1">
-      <event_generation 
-      generation_min_mag = "3.3"
-	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "1000" />
+      %(eg_legacy)s
     </recurrence_model>
     
     <ground_motion_models 
@@ -67,6 +64,26 @@ class Test_Generation_polygon(unittest.TestCase):
   </zone>
 </source_model_zone>
 """
+
+    def test_polygons_from_xml_horspool(self):
+        """
+        Test with current and legacy xml schema. Legacy schema has
+        <event_generation> inside <recurrence_model>
+        """
+        self._polygons_from_xml_horspool(eg = self.eg)
+        self._polygons_from_xml_horspool(eg_legacy = self.eg)
+        
+    
+    def _polygons_from_xml_horspool(self, eg = '', eg_legacy = ''):
+        
+        handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = self.sample % dict(smz_attrs = 'magnitude_type="Mw"',
+                                    eg = eg,
+                                    eg_legacy = eg_legacy)
+        
         handle.write(sample)
         handle.close()
 
@@ -143,57 +160,15 @@ class Test_Generation_polygon(unittest.TestCase):
             
         os.remove(file_name)
 
-        
     def test_polygons_from_xml_horspool_FileError_on_Ml(self):
-        
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
+
+        sample = self.sample % dict(smz_attrs = 'magnitude_type="Ml"',
+                                    eg = self.eg,
+                                    eg_legacy = '')
         
-        sample = """<source_model_zone magnitude_type="Ml">
-  <zone 
-  area = "5054.035" 
-  name = "bad zone"
-  event_type = "crustal fault">
-    
-    <geometry 
-       azimuth= "45" 
-       delta_azimuth= "5" 
-       dip= "35"
-       delta_dip = "5"
-       depth_top_seismogenic = "7"
-       depth_bottom_seismogenic = "15.60364655">
-      <boundary>
-	  -32.4000 151.1500   
-	  -32.7500 152.1700 
-	  -33.4500 151.4300   
-	  -32.4000 151.1500 
-      </boundary>
-      <excludes>
-	  -32.4000 151.1500     
-	  -32.7500 152.1700    
-	  -33.4500 151.4300  
-      </excludes>
-    </geometry>
-    
-    <recurrence_model
-      distribution = "bounded_gutenberg_richter"
-      recurrence_min_mag = "3.4" 
-      recurrence_max_mag = "5.4" 
-      A_min= "0.568" 
-      b = "1">
-      <event_generation 
-      generation_min_mag = "3.3"
-	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "1000" />
-    </recurrence_model>
-    
-    <ground_motion_models 
-       fault_type = "normal" 
-       ground_motion_selection = "crustal fault" />   
-  </zone>
-</source_model_zone>
-"""
         handle.write(sample)
         handle.close()
 
@@ -212,51 +187,10 @@ class Test_Generation_polygon(unittest.TestCase):
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
+
+        sample = self.sample % dict(smz_attrs = '',  eg = self.eg,
+                                    eg_legacy = '')
         
-        sample = """<source_model_zone>
-  <zone 
-  area = "5054.035" 
-  name = "bad zone"
-  event_type = "crustal fault">
-    
-    <geometry 
-       azimuth= "45" 
-       delta_azimuth= "5" 
-       dip= "35"
-       delta_dip = "5"
-       depth_top_seismogenic = "7"
-       depth_bottom_seismogenic = "15.60364655">
-      <boundary>
-	  -32.4000 151.1500   
-	  -32.7500 152.1700 
-	  -33.4500 151.4300   
-	  -32.4000 151.1500 
-      </boundary>
-      <excludes>
-	  -32.4000 151.1500     
-	  -32.7500 152.1700    
-	  -33.4500 151.4300  
-      </excludes>
-    </geometry>
-    
-    <recurrence_model
-      distribution = "bounded_gutenberg_richter"
-      recurrence_min_mag = "3.4" 
-      recurrence_max_mag = "5.4" 
-      A_min= "0.568" 
-      b = "1">
-      <event_generation 
-      generation_min_mag = "3.3"
-	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "1000" />
-    </recurrence_model>
-    
-    <ground_motion_models 
-       fault_type = "normal" 
-       ground_motion_selection = "crustal fault" />   
-  </zone>
-</source_model_zone>
-"""
         handle.write(sample)
         handle.close()
 

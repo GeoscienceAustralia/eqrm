@@ -1018,8 +1018,9 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
 
 # dimensions
 SPAWN_D = 0
-GMMODEL = 1
-EVENTS = 2
+GMMODEL_D = 1
+RECMODEL_D = 2
+EVENTS_D = 3
 class Event_Activity(object):
     """
     Class to manipulate the event activity value.
@@ -1044,8 +1045,7 @@ class Event_Activity(object):
         """
         num_events is number of events
         """
-        self.event_activity = zeros((1,1,num_events),
-                                    dtype=EVENT_FLOAT)
+        self.event_activity = None
         self.num_events = num_events
          
 
@@ -1055,7 +1055,7 @@ class Event_Activity(object):
        
         """
         event_indexes = arange(self.num_events)
-        self.set_event_activity(ones((self.num_events)), event_indexes)
+        self.set_event_activity(ones(((1, self.num_events))), event_indexes)
 
         
     def set_event_activity(self, event_activities, event_indexes=None):
@@ -1064,19 +1064,28 @@ class Event_Activity(object):
         Assumes that spawning has not occured yet, or splitting due to 
         ground motion models.
         
-        Parameters
-        event_indexes - the indexes of the events relating to the
-          event activities
+        event_activities: result from calc_event_activity()
+        event_indexes: the indexes of the events relating to the event
+        activities
           
         """
 
         # Make sure spawning has not already occured.
-        assert self.event_activity.shape[SPAWN_D] == 1
-        
+        assert self.event_activity is None
+        self.event_activity = zeros((1, # initial spawns
+                                     1, # initial ground motion models
+                                     event_activities.shape[0], # rec. models
+                                     self.num_events),
+                                    dtype=EVENT_FLOAT)
+  
         if event_indexes == None:
             event_indexes = arange(self.num_events)
-        assert len(event_indexes) == len(event_activities)
-        self.event_activity[0,0, event_indexes] = event_activities
+        assert len(event_indexes) == event_activities.shape[1]
+
+        # Note: Arcane rules apply to array indexing using a mix of
+        # tuples, integers and slices. See
+        # http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html#integer
+        self.event_activity[0, 0, :, event_indexes] = event_activities.T
 
     def spawn(self, weights):
         """
@@ -1107,31 +1116,41 @@ class Event_Activity(object):
             pass
         else:
             assert self.event_activity.shape[SPAWN_D] == 1
-            assert self.event_activity.shape[GMMODEL] == 1
+            assert self.event_activity.shape[GMMODEL_D] == 1
 
             max_num_models = source_model.get_max_num_atten_models()
-            new_event_activity = zeros((1, max_num_models,
+            new_event_activity = zeros((1,
+                                        max_num_models,
+                                        self.event_activity.shape[RECMODEL_D],
                                         self.num_events),
                                        dtype=EVENT_FLOAT)
             # this is so activities are not lost for events
             # which sources do not cover.
-            new_event_activity[0,0,:] = self.event_activity[0,0,:]
+            new_event_activity[0, 0, :, :] = self.event_activity[0, 0, :, :]
             
             for szp in source_model:
                 assert sum(szp.atten_model_weights) == 1
-               
+
                 sub_activity = \
-                    self.event_activity[0,0,szp.get_event_set_indexes()]
+                    self.event_activity[0, 0, :, szp.get_event_set_indexes()]
+                # sub_activity[event_index, rec_model_index]
+                
                 # going from e.g. [0.2, 0.8] to [0.2, 0.8, 0.0]
                 maxed_weights = zeros((max_num_models))
                 maxed_weights[0:len(szp.atten_model_weights)] = \
                                                  szp.atten_model_weights
-                activities = sub_activity * reshape(maxed_weights, (-1,1))
-                overwrite = new_event_activity[0,:,szp.get_event_set_indexes()]
-                new_event_activity[0,:,szp.get_event_set_indexes()] = \
-                    activities.T
-            assert allclose(scipy.sum(new_event_activity, axis=GMMODEL),
-                            self.event_activity)
+
+                activities = (sub_activity *
+                              reshape(maxed_weights, (-1, 1, 1))).swapaxes(0,1)
+                # activities[event_index, GM_model_index, rec_model_index]
+                new_event_activity[0, :, :, szp.get_event_set_indexes()] = \
+                    activities
+
+            assert allclose(
+                scipy.sum(new_event_activity, axis = GMMODEL_D),
+                # self.event_activity.shape[GMMODEL_D] == 1 so we can compare directly
+                self.event_activity)
+
             self.event_activity = new_event_activity
 
 
@@ -1146,15 +1165,19 @@ class Event_Activity(object):
         sources if atten is not collapsed.
         WARNING, if attenuation is collapsed this will be 1.
         """
-        return self.event_activity.shape[GMMODEL]
+        return self.event_activity.shape[GMMODEL_D]
 
     def get_ea_event_dimsion_only(self):
         """
         Get the event activity collapsing the ground motion model
         and spawning dimensions.
         """
-        return scipy.sum(scipy.sum(self.event_activity, axis=SPAWN_D),
-                         axis=(GMMODEL-1))  
+        return scipy.sum(
+            scipy.sum(
+                scipy.sum(
+                    self.event_activity, axis = SPAWN_D),
+                axis = GMMODEL_D - 1),
+            axis = RECMODEL_D - 2)
         
 ####################################################################
 # this will run if this is called from DOS prompt or double clicked

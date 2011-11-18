@@ -683,7 +683,7 @@ class Test_Output_manager(unittest.TestCase):
             depth_top_seismogenic=depth_top_seismogenic)
         set.source_zone_id = asarray([0,1]) # FIXME
         set.att_model_index = asarray([0,1]) # FIXME
-        event_activity = [0.2, 0.4]
+        event_activity = array([[0.2, 0.4]])
         
         setups = [('1', [1]), ('0',[0])]
         setups_dic = dict(setups)
