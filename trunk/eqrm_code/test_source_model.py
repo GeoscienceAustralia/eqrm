@@ -13,35 +13,9 @@ from eqrm_code.event_set import Event_Set
 from eqrm_code.util import reset_seed, determine_eqrm_path
 
 
-
-#***************************************************************
-
-class Dummy:
-    def __init__(self):
-        pass      
-        
-    def set_event_set_indexes(self,indexes):
-        self.event_set_indexes = indexes
-        
-    def get_event_set_indexes(self):
-        return self.event_set_indexes
-    
-    
-class Test_Source_model(unittest.TestCase):
-    
-    def setUp(self):
-        pass
-        
-    def tearDown(self):
-        pass
-    
-    def test_source_model_from_xml(self):
-        
-        handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
-        os.close(handle)
-        handle = open(file_name,'w')
-        
-        sample = """<source_model_zone magnitude_type="Mw">
+    # A format string with slots for the legacy and current
+    # <event_generation> element
+_sample = """<source_model_zone magnitude_type="Mw">
   <zone 
   area = "5054.035"  event_type = "TS_haz03" name="bake">
     
@@ -64,68 +38,146 @@ class Test_Source_model(unittest.TestCase):
 	  -33.4500  151.4300  
       </excludes>
     </geometry>
-    
-    <recurrence_model
-      distribution = "bounded_gutenberg_richter"
-      recurrence_min_mag = "3.3" 
-      recurrence_max_mag = "5.4" 
-      A_min= "0.568" 
-      b = "1">
-      <event_generation 
-      generation_min_mag = "3.3"
-	  number_of_mag_sample_bins = "15" 
-	  number_of_events = "1000" />
-    </recurrence_model>
-    
+    %(eg)s
+    %(rm)s
     <ground_motion_models 
        fault_type = "normal" 
        ground_motion_selection = "crustal fault" />   
   </zone>
 </source_model_zone>
 """
-        handle.write(sample)
-        handle.close()
-        source_model = source_model_from_xml(file_name)
-        os.remove(file_name)
+
+_eg = """<event_generation 
+      generation_min_mag = "%g"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "1000" />"""
+
+_rm = """<recurrence_model
+      recurrence_min_mag = "%g" 
+      recurrence_max_mag = "%g" 
+      A_min= "%g" 
+      b = "%g"
+      distribution = "%s"
+      %s>
+      %s
+    </recurrence_model>"""    
+
+BGR_D = "bounded_gutenberg_richter"
+
+
+def _rm_element(min_mag, max_mag, A_min, b, dist,
+                weight = None, g_min_mag = None):
+    return  _rm % (min_mag, max_mag, A_min, b, dist,
+                   '' if weight is None else ('weight = "%g"' % weight),
+                   '' if g_min_mag is None else (_eg % g_min_mag))
+                   
+def legacy_source_model_zone_xml(generation_min_mag, rm_args):
+    "Old-style XML. One recurrence_model with child event_generation"
+    return _sample % dict(eg = '',
+                          rm = _rm_element(g_min_mag = generation_min_mag, *rm_args))
+
+def source_model_zone_xml(generation_min_mag, *n_rm_args):
+    "<source_model_zone> XML with provision for multiple <recurrence_model>s"
+    return _sample % dict(eg = _eg % generation_min_mag,
+                          rm = '\n'.join((_rm_element(*a) for a in n_rm_args)))
+
+
+
+#***************************************************************
+
+class Dummy:
+    def __init__(self):
+        pass      
+        
+    def set_event_set_indexes(self,indexes):
+        self.event_set_indexes = indexes
+        
+    def get_event_set_indexes(self):
+        return self.event_set_indexes
+    
+    
+class Test_Source_model(unittest.TestCase):
+    
+    def setUp(self):
+        pass
+        
+    def tearDown(self):
+        pass
+
+
+    def test_source_model_from_xml(self):
+        """
+        Check current and legacy xml formats work.
+        """
+        min_magnitude = 3.3
+        max_magnitude = 5.4
+        A_min = 0.568
+        b = 1
+        # Test parsing of old-style single recurrrence model
+        self._source_model_from_xml(legacy_source_model_zone_xml,
+                                    (min_magnitude, max_magnitude, A_min, b, BGR_D))
+        # Test parsing of single recurrrence model
+        self._source_model_from_xml(source_model_zone_xml,
+                                    (min_magnitude, max_magnitude, A_min, b, BGR_D))
+        # Test parsing of multiple recurrrence models
+        self._source_model_from_xml(source_model_zone_xml,
+                                    (min_magnitude, max_magnitude, A_min, b, BGR_D, 0.5),
+                                    (min_magnitude*2, max_magnitude*2, A_min*2, b*2, BGR_D, 0.5))
+        # RM weights must sum to ~1.0
+        self.assertRaises(ValueError,
+                          self._source_model_from_xml,
+                          source_model_zone_xml,
+                          (min_magnitude, max_magnitude, A_min, b, BGR_D, 1.0),
+                          (min_magnitude*2, max_magnitude*2, A_min*2, b*2, BGR_D, 0.5))
+
+
+        
+    def _source_model_from_xml(self, sample_func, *args):
+        event_type = 'fish'
+        name = 'bake'
+        generation_min_mag = 1.0
+
+        sample = sample_func(generation_min_mag, *args)
+
         boundary = [(-32.4000, 151.1500), 
                     (-32.7500, 152.1700),
                     (-33.4500, 151.4300),
                     (-32.4000, 151.1500)]
         exclude = None # This is not tested
-                       #[(-32.4000, 151.1500),
-                       #(-32.7500, 152.1700),
-                       #(-33.4500, 151.4300)]
-        min_magnitude = 3.3
-        max_magnitude = 5.4
-        b = 1
-        A_min = 0.568
-        event_type = 'fish'
-        name = 'bake'
-        generation_min_mag = 1.0
+                           #[(-32.4000, 151.1500),
+                           #(-32.7500, 152.1700),
+                           #(-33.4500, 151.4300)]
 
-        szp = Source_Zone(boundary,exclude,
-                          (RecurrenceModel(min_magnitude,
-                                           max_magnitude,
-                                           A_min,
-                                           b),),
+        szp = Source_Zone(boundary, exclude,
+                          [RecurrenceModel(*a) for a in args],
                           generation_min_mag,
                           event_type,
                           name)
-        #print "source_zone_polygon.polygon_object", szp._linestring
+        handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        handle.write(sample)
+        handle.close()
+        source_model = source_model_from_xml(file_name)
+        os.remove(file_name)
+
         result = source_model._sources[0]
         self.failUnless(result._linestring==szp._linestring,
-            'Failed!')
-        self.failUnless(result.recurrence_models[0].min_magnitude==szp.recurrence_models[0].min_magnitude,
-            'Failed!')
-        self.failUnless(result.recurrence_models[0].max_magnitude==szp.recurrence_models[0].max_magnitude,
-            'Failed!')
-        self.failUnless(result.recurrence_models[0].b==szp.recurrence_models[0].b,
-            'Failed!')
-        self.failUnless(result.recurrence_models[0].A_min==szp.recurrence_models[0].A_min,
-            'Failed!')
+                        'Failed!')
         self.failUnless(result.name == name,'Failed!')
         self.failUnless(szp.name == name,'Failed!')
         self.failUnless(source_model._magnitude_type == 'Mw','Failed!')
+        
+        for i, sf_arg in enumerate(args):
+            self.failUnless(result.recurrence_models[i].min_magnitude==szp.recurrence_models[i].min_magnitude,
+                'Failed!')
+            self.failUnless(result.recurrence_models[i].max_magnitude==szp.recurrence_models[i].max_magnitude,
+                'Failed!')
+            self.failUnless(result.recurrence_models[i].b==szp.recurrence_models[i].b,
+                'Failed!')
+            self.failUnless(result.recurrence_models[i].A_min==szp.recurrence_models[i].A_min,
+                'Failed!')
 
     
     def test_Source_Zone(self):

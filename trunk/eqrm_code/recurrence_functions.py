@@ -29,6 +29,9 @@ def calc_event_activity(event_set, source_model):
     when analysis uses this function, the weight used is a constant of [1.0]
     EQRM can currently only handle one source model.
     A source model has many source polygons.
+
+    Returns: 2D ndarray of event activities indexed by
+    [recurrence_model_index, event_index]
     """
     # Allocate a row per recurrence model. Note that this approach
     # wastes a fair bit of space if not all the source zones have the
@@ -80,10 +83,7 @@ def calc_event_activity(event_set, source_model):
     eqrmlog.debug('Memory: Out of the event_activity loop')
     eqrmlog.resource_usage()
 
-    # FIXME SCAFFOLDING (DJH). Migrating to multiple recurrence
-    # models. Just return the activities for 1st RM for the time being
-    # to retain API compatibility.
-    return event_activity_matrix[0]
+    return event_activity_matrix
     
 
 def m2grpdfb(b, m, m0, mmax):

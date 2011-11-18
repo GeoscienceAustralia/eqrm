@@ -1014,6 +1014,7 @@ def calc_and_save_SA(eqrm_flags,
             eqrm_flags.atten_threshold_distance,
             eqrm_flags.use_amplification, sub_event_set,
             bedrock_SA, soil_SA)
+
         # collapse  multiple attenuation models 
         # collapsed_bedrock_SA shape (spawn, gmm, sites, events, periods)
         # gmm is 1 if its collapsed
@@ -1080,6 +1081,7 @@ def calc_and_save_SA(eqrm_flags,
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
             # into the events dimension.
+                
             bedrock_SA_events = coll_rock_SA_all_events[:,:,:,:,j].reshape(
                 1,-1)
             bedrock_hazard[site_index,j,:] = \

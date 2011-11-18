@@ -297,10 +297,6 @@ class Source(EventZone):
 
         And where are it's methods? recurrence_functions might have 1.
         """
-        # DJH FIXME TODO write tests:
-        # - new xml schema
-        # - test summing of rm weights
-
         self.recurrence_models = recurrence_model_seq
         weights_corrected = parse_in_parameters.check_sum_1_normalise(
                 asarray([rm.raw_weight for rm in self.recurrence_models]),

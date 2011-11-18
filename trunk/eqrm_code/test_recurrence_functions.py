@@ -8,7 +8,7 @@ from scipy import exp, log, array, sum, allclose, r_
 
 
 from eqrm_code.event_set import Event_Set
-from eqrm_code.source_model import create_fault_sources
+from eqrm_code.source_model import create_fault_sources, Source_Model, Source_Zone, RecurrenceModel
 from eqrm_code.recurrence_functions import *
 
 class Dummy_event_set:
@@ -225,7 +225,25 @@ class Test_Recurrence_functions(unittest.TestCase):
                                 generation_min_mag, recurrence_min_mag)
         self.assert_(allclose(lamba, sum(event_activity_matrix)))
         
+        # Check multiple recurrence models get weighted correctly
+        w1 = 0.2
+        w2 = 0.8
+        boundary = [(0, 0.0), (100., 0.0), (100., 100.0), (0., 100.0) ]
+        sm = Source_Model((Source_Zone(boundary, (),
+                                       [RecurrenceModel(recurrence_min_mag, recurrence_max_mag,
+                                                        A_min, b, None, w) for w in (w1, w2)],
+                                       generation_min_mag,
+                                       "background",
+                                       'dummy_polygon_name'),),
+                          magnitude_type)
+        sm[0].set_event_set_indexes(range(len(event_set)))
+        event_activity_matrix = calc_event_activity(event_set, sm)
+        self.assert_(allclose(
+                event_activity_matrix[0]/event_activity_matrix[1],
+                w1/w2))
 
+
+        
     def test_calc_event_activity_generation_min_mag(self):
     
         # Create an event set
