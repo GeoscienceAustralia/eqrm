@@ -422,7 +422,7 @@ def save_motion(soil_amp, eqrm_flags, motion, compress=False,
     parameters:
     soil_amp: False -> 'bedrock_SA', True -> 'soil_SA'
     motion: Array of spectral acceleration, units g
-        dimensions (spawn, gmm, sites, events, periods)
+        dimensions (spawn, gmm, rec_model, sites, events, periods)
 
     """
 
@@ -443,30 +443,32 @@ def save_motion(soil_amp, eqrm_flags, motion, compress=False,
     base_names = []
     for i_spawn in range(motion.shape[0]): # spawn
         for i_gmm in range(motion.shape[1]): # ground motion model
-            for i in range(motion.shape[3]): # events
-                # for all events
-                base_name =  eqrm_flags.output_dir + eqrm_flags.site_tag + \
-                            '_' + \
-                            motion_name + '_motion_' + str(i) + '_spawn_' + \
-                            str(i_spawn) + '_gmm_' + \
-                            str(i_gmm)+ '.txt'
-                
-                name = base_name + parallel_tag
-                base_names.append(base_name)
-                f=open(name,'w')
-                if write_title:
-                    f.write('% Event = '+str(i)+'\n')
-                    f.write('% Spawn = '+str(i_spawn)+'\n')
-                    f.write('% ground motion model = '+str(i_gmm)+'\n')
-                    f.write('% First row are rsa periods, then rows are sites'
-                            '\n')
-                    f.write(
-                        ' '.join([str(p) for p in eqrm_flags.atten_periods]) \
-                            + '\n')
-                for j in range(motion.shape[2]):
-                    mi=motion[i_spawn,i_gmm,j,i,:] # sites,event,periods 
-                    f.write(' '.join(['%.10g'%(m) for m in mi])+ '\n')
-                f.close()
+            for i_rm in xrange(motion.shape[2]): # recurrence model
+                for i in range(motion.shape[4]): # events
+                    # for all events
+                    base_name =  eqrm_flags.output_dir + eqrm_flags.site_tag + \
+                                '_' + \
+                                motion_name + '_motion_' + str(i) + '_spawn_' + \
+                                str(i_spawn) + '_gmm_' + \
+                                str(i_gmm) + '_rm_' + str(i_rm) + '.txt'
+
+                    name = base_name + parallel_tag
+                    base_names.append(base_name)
+                    f=open(name,'w')
+                    if write_title:
+                        f.write('% Event = '+str(i)+'\n')
+                        f.write('% Spawn = '+str(i_spawn)+'\n')
+                        f.write('% ground motion model = '+str(i_gmm)+'\n')
+                        f.write('%% Recurrence model = %d\n' % i_rm)
+                        f.write('% First row are rsa periods, then rows are sites'
+                                '\n')
+                        f.write(
+                            ' '.join([str(p) for p in eqrm_flags.atten_periods]) \
+                                + '\n')
+                    for j in range(motion.shape[3]): # sites
+                        mi=motion[i_spawn, i_gmm, i_rm, j, i, :]
+                        f.write(' '.join(['%.10g'%(m) for m in mi])+ '\n')
+                    f.close()
     return base_names
 
 def load_motion(saved_dir, site_tag, soil_amp):
@@ -476,11 +478,11 @@ def load_motion(saved_dir, site_tag, soil_amp):
     Load motion is used to load scenario SA data.
     
     The file name structure is;
-      [site_tag]_[soil_SA|bedrock_SA]_motion_[event #]_spawn_[spawn #]_gmm_[gmm #].txt
+      [site_tag]_[soil_SA|bedrock_SA]_motion_[event #]_spawn_[spawn #]_gmm_[gmm #]_rm_[rm#].txt
 
     Returns:
       SA: Array of spectral acceleration
-        dimensions (spawn, gmm, sites, events, periods)
+        dimensions (spawn, gmm, rm, sites, events, periods)
       periods: A list of periods of the SA values
     """
 
@@ -499,26 +501,30 @@ def load_motion(saved_dir, site_tag, soil_amp):
     max_event_ind = 0
     max_spawn_ind = 0
     max_gmm_ind = 0
+    max_rm_index = 0
     for file in files:
         tmp = load_motion_file(os.path.join(saved_dir, file))
-        SA, periods, event_index, spawn_index, gmm_index = tmp
+        SA, periods, event_index, spawn_index, gmm_index, rm_index = tmp
         # SA dimensions (sites, periods)
         # assume that the periods do not change
         assert len(periods) == SA.shape[1]
-        SA_dic[(spawn_index, gmm_index, event_index)] = SA
+        SA_dic[(spawn_index, gmm_index, rm_index, event_index)] = SA
         if spawn_index > max_spawn_ind:
             max_spawn_ind = spawn_index
         if gmm_index > max_gmm_ind:
             max_gmm_ind = gmm_index
         if event_index > max_event_ind:
             max_event_ind = event_index
-    SA = zeros((max_spawn_ind+1, max_gmm_ind+1, SA.shape[0], max_event_ind+1,
+        max_rm_index = max(max_rm_index, rm_index)
+    SA = zeros((max_spawn_ind+1, max_gmm_ind+1, max_rm_index+1,
+                SA.shape[0], max_event_ind+1,
                 SA.shape[1]))
     for spawn_i in range(max_spawn_ind+1):
         for gmm_i in range(max_gmm_ind+1):
-            for event_i in range(max_event_ind+1):
-                SA[spawn_i, gmm_i, :, event_i, :] = \
-                            SA_dic[(spawn_i, gmm_i, event_i)]
+            for rm_i in xrange(max_rm_index+1):
+                for event_i in range(max_event_ind+1):
+                    SA[spawn_i, gmm_i, rm_i, :, event_i, :] = \
+                        SA_dic[(spawn_i, gmm_i, rm_i, event_i)]
     return SA, periods
                 
 
@@ -529,16 +535,18 @@ def load_collapsed_motion_sites(saved_dir, site_tag, soil_amp):
     
     Returns:
       SA: Array of spectral acceleration
-        dimensions (sites, events*gmm*spawn, periods)
+        dimensions (sites, events*gmm*rm*spawn, periods)
       periods: A list of periods of the SA values
       lat: a vector of latitude values, site long
       lon: a vector of longitude values, site long
     """
     lat, lon = load_sites(saved_dir, site_tag)
     SA, periods = load_motion(saved_dir, site_tag, soil_amp)
-    #  SA dimensions (spawn, gmm, sites, events, periods)
-    newshape = (SA.shape[2], SA.shape[0]*SA.shape[1]*SA.shape[3], SA.shape[4])
-    SA = rollaxis(SA, 2)
+    #  SA dimensions (spawn, gmm, rm, sites, events, periods)
+    newshape = (SA.shape[3],
+                SA.shape[0]*SA.shape[1]*SA.shape[2]*SA.shape[4],
+                SA.shape[5])
+    SA = rollaxis(SA, 3)
     SA = SA.reshape(newshape)
     
     site_n_from_lat = lat.shape[0]
@@ -547,7 +555,19 @@ def load_collapsed_motion_sites(saved_dir, site_tag, soil_amp):
     
     return SA, periods, lat, lon
 
-        
+
+def collapsed_motion_index(motion_shape, spawn_i,  gmm_i,  rm_i,  event_i):
+    """
+    Computes a events*gmm*rm*spawn index for the SA array returned by
+    load_collapsed_motion_sites():
+    motion_shape: the shape attribute of the relevant 6d array
+    spawn_i,  gmm_i,  rm_i,  event_i: Indexes into that array
+    """
+    return  event_i + \
+        motion_shape[4] * rm_i + \
+        motion_shape[4] * motion_shape[2] * gmm_i + \
+        motion_shape[4] * motion_shape[2] * motion_shape[1] * spawn_i
+
 def load_motion_sites(output_dir, site_tag, soil_amp, period):
     """
     Given a hazard output from EQRM, return the long, lat and SA for a
@@ -593,9 +613,11 @@ def load_motion_file(file_full_name):
     text.pop(0) # event
     spawn_index = int(text[0].split('=')[1])
     text.pop(0) # spawn
-    gmm_index = int(text[0].split('=')[1]) 
+    gmm_index = int(text[0].split('=')[1])
     text.pop(0)
+    rm_index = int(text[0].split('=')[1])
     text.pop(0)
+    text.pop(0)    
     periods = array([float(ix) for ix in text[0].split(' ')])
     
     text.pop(0) # period_line 
@@ -604,7 +626,7 @@ def load_motion_file(file_full_name):
         # Each line is a site
         SA_list.append([float(ix) for ix in line.split(' ')])
     SA = array(SA_list)
-    return SA, periods, event_index, spawn_index, gmm_index
+    return SA, periods, event_index, spawn_index, gmm_index, rm_index
 
     
 

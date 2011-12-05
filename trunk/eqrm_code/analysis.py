@@ -41,7 +41,7 @@ from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
          save_bridge_days_to_complete
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
-from ground_motion_distribution import Distribution_Log_Normal
+from ground_motion_distribution import Distribution_Log_Normal, GroundMotionDistributionLogNormal
 from eqrm_code.structures import Structures, build_par_file
 from eqrm_code.exceedance_curves import hzd_do_value, \
      collapse_att_model, collapse_source_gmms
@@ -248,11 +248,11 @@ def main(parameter_handle,
         if (fid_event_types is not None) and (fid_sourcefaults is not None):
             # fid_event_types.name since the zone code leaves
             # the handle at the end of the file. (I think)
-            results = generate_synthetic_events_fault(
+            event_set_fault, source_model_fault = generate_synthetic_events_fault(
                 fid_sourcefaults, 
                 fid_event_types.name,
                 eqrm_flags.prob_number_of_events_in_faults)
-            (event_set_fault, source_model_fault) = results
+            
         else:
             event_set_fault = None
             source_model_fault = None
@@ -341,10 +341,13 @@ def main(parameter_handle,
    
     num_psudo_events = num_gmm_max * num_events * \
                        num_spawning
-    
-    ground_motion_distribution = Distribution_Log_Normal(
+    num_rm = event_activity.recurrence_model_count()
+
+    ground_motion_distribution = GroundMotionDistributionLogNormal(
         eqrm_flags.atten_variability_method,
-        eqrm_flags.atten_spawn_bins)
+        eqrm_flags.atten_spawn_bins,
+        num_rm)
+
     event_activity.spawn(ground_motion_distribution.spawn_weights)
 
     msg = ('Pseudo event set created. Number of pseudo_events=' +
@@ -356,17 +359,13 @@ def main(parameter_handle,
     # Initialise the ground motion object
     # Tasks here include
     #  - interpolation of coefficients to periods of interest
-    ground_motion_calc = Multiple_ground_motion_calculator(
-        source_model[0].atten_models,
-        periods=eqrm_flags.atten_periods,
-        model_weights=source_model[0].atten_model_weights)
-
 
     # load in soil amplifications factors
     # searches input_dir then defaultdir
     if eqrm_flags.use_amplification is True:
         amp_distribution = Distribution_Log_Normal(
-            eqrm_flags.amp_variability_method)
+            eqrm_flags.amp_variability_method,
+            None)
     
         amp_factor_file = eqrm_flags.site_tag + '_par_ampfactors.xml'
         amp_factor_file = get_local_or_default(amp_factor_file,
@@ -374,8 +373,7 @@ def main(parameter_handle,
                                                eqrm_flags.input_dir)
         soil_amplification_model = \
             Regolith_amplification_model.from_xml(
-            amp_factor_file.name,
-            distribution_instance= None)
+            amp_factor_file.name)
     else:
         soil_amplification_model = None
         amp_distribution = None
@@ -425,7 +423,7 @@ def main(parameter_handle,
     log.resource_usage()
     num_gmm_dimensions = event_activity.get_gmm_dimensions()
     if eqrm_flags.save_motion is True:
-        bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions,
+        bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                                 num_site_block, num_events,
                                 len(eqrm_flags.atten_periods)),
                                dtype=float)        
@@ -434,7 +432,7 @@ def main(parameter_handle,
         
     if eqrm_flags.save_motion is True and \
            eqrm_flags.use_amplification is True:
-        soil_SA_all = zeros((num_spawning, num_gmm_dimensions,
+        soil_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                              num_site_block, num_events,
                              len(eqrm_flags.atten_periods)),
                             dtype=float)
@@ -536,7 +534,6 @@ def main(parameter_handle,
             soil_SA_all,
             bedrock_hazard,
             soil_hazard,
-            ground_motion_calc,
             soil_amplification_model,
             i,
             rel_i,
@@ -892,9 +889,6 @@ def main(parameter_handle,
 # these are subfunctions
 ################################################################################
 
-# TODO remove the distribution that's put into ground_motion_calc
-# pass in event_activity
-
 def calc_and_save_SA(eqrm_flags,
                      sites,
                      event_set,
@@ -902,7 +896,6 @@ def calc_and_save_SA(eqrm_flags,
                      soil_SA_all,
                      bedrock_hazard,
                      soil_hazard,
-                     ground_motion_calc,
                      soil_amplification_model,
                      site_index,
                      rel_site_index,
@@ -918,6 +911,7 @@ def calc_and_save_SA(eqrm_flags,
     
     """
     num_spawn = event_activity.get_num_spawn()
+    num_rm = event_activity.recurrence_model_count()
 
     # WARNING - this only works if the event activity is not collapsed.
     num_gmm_after_collapsing = event_activity.get_gmm_dimensions()
@@ -932,20 +926,20 @@ def calc_and_save_SA(eqrm_flags,
     # Build some arrays to save into.
     # NUM_SITES IS 1
     coll_rock_SA_all_events = zeros(
-        (num_spawn, num_gmm_after_collapsing,
+        (num_spawn, num_gmm_after_collapsing, num_rm,
          num_sites, num_events, num_periods),
         dtype=float)
     rock_SA_overloaded = zeros((num_sites,
-                                num_events * num_gmm_max * num_spawn,
+                                num_events * num_gmm_max * num_spawn * num_rm,
                                 num_periods),
                                dtype=float)
     if eqrm_flags.use_amplification is True:
         coll_soil_SA_all_events = zeros(
-            (num_spawn, num_gmm_after_collapsing, num_sites, num_events,
+            (num_spawn, num_gmm_after_collapsing, num_rm, num_sites, num_events,
              len(eqrm_flags.atten_periods)),
             dtype=float)
         soil_SA_overloaded = zeros((num_sites,
-                                    num_events * num_gmm_max * num_spawn,
+                                    num_events * num_gmm_max * num_spawn * num_rm,
                                     num_periods),
                                    dtype=float)
     else:
@@ -959,20 +953,19 @@ def calc_and_save_SA(eqrm_flags,
         atten_model_weights = source.atten_model_weights
         ground_motion_calc = source.ground_motion_calculator
         
-        results = ground_motion_calc.distribution(
+        log_mean_extend_GM, log_sigma_extend_GM  = ground_motion_calc.distribution(
             event_set=sub_event_set,
             sites=sites,
             Vs30=BEDROCKVs30)
-        _ , log_mean_extend_GM, log_sigma_extend_GM = results
+        
         # *_extend_GM has shape of (GM_model, sites, events, periods)
         # the value of GM_model can change for each source.
         
         # evaluate the RSA
         # that is desired (i.e. chosen in parameter_handle)
-        (_, bedrock_SA, _) = \
-                        ground_motion_distribution.sample_for_eqrm(
+        bedrock_SA = ground_motion_distribution.ground_motion_sample(
             log_mean_extend_GM, log_sigma_extend_GM)
-        # bedrock_SA shape (spawn, GM_model, sites, events, periods)
+        # bedrock_SA shape (spawn, GM_model, rec_model, sites, events, periods)
         
         #print 'ENDING Calculating attenuation'
 
@@ -989,7 +982,6 @@ def calc_and_save_SA(eqrm_flags,
                                   sub_event_set,
                                   sites,
                                   ground_motion_distribution)
-                
             # Amplification factor cutoffs
             # Applies a minimum and maxium acceptable amplification factor
             # re-scale SAsoil if Ampfactor falls ouside acceptable
@@ -1016,7 +1008,6 @@ def calc_and_save_SA(eqrm_flags,
             bedrock_SA, soil_SA)
 
         # collapse  multiple attenuation models 
-        # collapsed_bedrock_SA shape (spawn, gmm, sites, events, periods)
         # gmm is 1 if its collapsed
         if (eqrm_flags.save_motion is True or
             eqrm_flags.save_hazard_map is True):
@@ -1033,63 +1024,70 @@ def calc_and_save_SA(eqrm_flags,
                 
         # saving RSA - only generally done for Ground Motion Simulation
         # (not for probabilistic hazard or if doing risk/secnario loss)
+        # collapsed_bedrock_SA and  collapsed_soil_SA indexed by
+        # [spawn, gmm, rm, site, event, period]
         if eqrm_flags.save_motion is True:
             # Put into arrays
-            assert collapsed_bedrock_SA.shape[2] == 1 # only one site
+            assert collapsed_bedrock_SA.shape[3] == 1 # only one site
             gmm_n = collapsed_bedrock_SA.shape[1]
-            coll_bedrock_SA = collapsed_bedrock_SA[:,:,0,:,:]
-            bedrock_SA_all[:,:gmm_n,rel_site_index,event_inds,:] = \
+            coll_bedrock_SA = collapsed_bedrock_SA[:, :, :, 0, :, :]
+            bedrock_SA_all[:, :gmm_n, :, rel_site_index, event_inds, :] = \
                                                                 coll_bedrock_SA
             if soil_SA is not None:
-                coll_soil_SA = collapsed_soil_SA[:,:,0,:,:]
-                soil_SA_all[:,:gmm_n,rel_site_index,event_inds,:] = \
+                coll_soil_SA = collapsed_soil_SA[:, :, :, 0, :, :]
+                soil_SA_all[:, :gmm_n, :, rel_site_index, event_inds, :] = \
                                                                  coll_soil_SA
         if eqrm_flags.save_hazard_map is True:
             # Build collapsed_bedrock_SA for all events
             # before getting out of the loop
             # collapsed_bedrock_SA shape (spawn, gmm, sites, events, periods)
-            coll_rock_SA_all_events[:,:,:,event_inds,:] = collapsed_bedrock_SA
+            coll_rock_SA_all_events[:, :, :, :, event_inds, :] = collapsed_bedrock_SA
             if soil_SA is not None:
                 # Build collapsed_soil_SA for all events
-                coll_soil_SA_all_events[:,:,:,event_inds,:] = \
+                coll_soil_SA_all_events[:, :, :, :, event_inds, :] = \
                                                           collapsed_soil_SA
         # Set up the arrays to pass to risk
         # This is built up as sources are iterated over.
         # assume one site
         for i_spawn in arange(bedrock_SA.shape[0]): # loop over spawn
             for i_gmm in arange(bedrock_SA.shape[1]): # loop over gmm
-                i_overloaded = i_spawn * num_gmm_max * num_events + \
-                                i_gmm * num_events + event_inds
-                # rock_SA_overloaded dim (sites, events * gmm * spawn, period)
-                rock_SA_overloaded[0, i_overloaded, :] = \
-                                      bedrock_SA[i_spawn,i_gmm,0,:,:]
-                if soil_SA is not None:
-                    soil_SA_overloaded[0, i_overloaded, :] = \
-                                          soil_SA[i_spawn,i_gmm,0,:,:]
+                for i_rm in xrange(bedrock_SA.shape[2]):
+                    # FIXME Reinventing multidimensional array
+                    # indexing here. Just use a ndarray() and return
+                    # whataver.reshape(num_sites, -1, num_periods)
+                    i_overloaded = (i_spawn * num_rm * num_gmm_max * num_events +
+                                    i_rm    * num_gmm_max * num_events +
+                                    i_gmm   * num_events +
+                                    event_inds)
+                    # rock_SA_overloaded dim (sites, events * gmm * rm * spawn, period)
+                    rock_SA_overloaded[0, i_overloaded, :] = \
+                        bedrock_SA[i_spawn, i_gmm, i_rm, 0, :, :]
+                    if soil_SA is not None:
+                        soil_SA_overloaded[0, i_overloaded, :] = \
+                            soil_SA[i_spawn, i_gmm, i_rm, 0, :, :]
         # can not do this, the current SA only has a subset of all events.
         # 0 to drop site out
         #rock_SA_overloaded_auto = (bedrock_SA[:,:,0,:,:]).reshape(
         #    (num_sites, num_spawn*num_gmm_max*num_events, num_periods))
 
     #End source loop
-    
     # Compute hazard if desired
     if eqrm_flags.save_hazard_map is True:
         event_act_d_events = event_activity.event_activity.reshape(-1)
-        assert coll_rock_SA_all_events.shape[2] == 1 # only one site
+        assert coll_rock_SA_all_events.shape[3] == 1 # only one site
         for j in range(len(eqrm_flags.atten_periods)):
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
             # into the events dimension.
                 
-            bedrock_SA_events = coll_rock_SA_all_events[:,:,:,:,j].reshape(
+            bedrock_SA_events = coll_rock_SA_all_events[:,:,:,:,:,j].reshape(
                 1,-1)
             bedrock_hazard[site_index,j,:] = \
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,
                                       1.0/array(eqrm_flags.return_periods))
             if soil_SA is not None:
-                soil_SA_events = coll_soil_SA_all_events[:,:,:,:,j].reshape(
+                soil_SA_events = coll_soil_SA_all_events[:,:,:,:,:,j].reshape(
                     (-1))
                 soil_hazard[site_index,j,:] = \
                          hzd_do_value(soil_SA_events,
@@ -1124,9 +1122,9 @@ def apply_threshold_distance(sites,
     # error here?  the problem is usually bedrock_SA, not Haznull.
     if True:
         #print "bedrock_SA", bedrock_SA
-        bedrock_SA[:,:,:, Haznull,:] = 0
+        bedrock_SA[..., Haznull,:] = 0
         if use_amplification is True:
-            soil_SA[:,:,:, Haznull,:] = 0
+            soil_SA[..., Haznull,:] = 0
         
         
     return bedrock_SA, soil_SA
@@ -1148,18 +1146,14 @@ def cutoff_pga(ground_motion, max_pga):
     if max_pga is None:
         return ground_motion
     
-    # Doing ground_motion[:,:,0:1] gets the first values of
+    # Doing ground_motion[...,0:1] gets the first values of
     # the last dimension,
     # but does not drop a dimension in the return value.
-    # ground_motion[:,:,0] would drop a dimension.
+    # ground_motion[...,0] would drop a dimension.
     assert isfinite(ground_motion).all()
-    if ground_motion.ndim == 4:
-        too_high = ground_motion[:,:,:,0:1] > max_pga
-        scaling_factor = where(too_high, max_pga/ground_motion[:,:,:,0:1], 1.0)
-    elif ground_motion.ndim == 5:
-        too_high = ground_motion[:,:,:,:,0:1] > max_pga
-        scaling_factor = where(
-            too_high, max_pga/ground_motion[:,:,:,:,0:1], 1.0)
+
+    too_high = ground_motion[..., 0:1] > max_pga
+    scaling_factor = where(too_high, max_pga/ground_motion[..., 0:1], 1.0)
     ground_motion *= scaling_factor
     assert isfinite(ground_motion).all()
     return ground_motion

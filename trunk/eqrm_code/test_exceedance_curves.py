@@ -9,6 +9,70 @@ from eqrm_code.exceedance_curves import *
 from eqrm_code.exceedance_curves import _collapse_att_model_dimension
 
 
+def _collapse_att_model_results(data, weights, num_of_att_models):
+    """
+    Collapse the data so it does not have an attenuation model dimension.
+    To collapse it, multiply the data by the weights and sum.
+
+    The data will not actually have an explicit attenuation model dimension.
+    The second dimension is event*attenuation model.  The data is grouped
+    results per event for the first att' model, then the second att' model ect.
+    
+    Data has 3 dimensions; (site, events*attenuation models, periods)
+    Site is 1.
+    
+    What the data is changes. Sometimes its SA, sometimes it's cost.
+    
+    """
+    first_axis = data.shape[0]
+    last_axis = data.shape[2]
+    
+    weights.shape = (1, -1, 1)
+    weighted_data = data*weights 
+    weighted_data.shape = (first_axis, num_of_att_models, -1, last_axis) 
+    sum = scipy.sum(weighted_data, 1)
+    
+    return sum
+        
+
+
+def do_collapse_logic_tree(data, event_num, weights,
+                           eqrm_flags, use_C=True):
+
+    """
+    Collapse data, such as when several events are used to repressent
+    one event.
+    
+    Data is the array to be collapsed (eg ground_motion or loss)
+
+    """
+    if len(data.shape) >= 4:
+        # Assume the extra dimension is the ground motion model
+        if eqrm_flags.atten_collapse_Sa_of_atten_models is True:
+            new_data = _collapse_att_model_dimension(data,
+                                                     weights)
+        else:       
+            new_data = data 
+            
+    else:
+        
+        # if there is only one attenuation model.
+        no_attn_collapse = (
+            (len(weights) == 1) or
+            eqrm_flags.atten_collapse_Sa_of_atten_models is False)
+        
+        if no_attn_collapse:        
+            new_data = data 
+        else:
+            weights = asarray(weights)
+            num_of_att_models = int(len(event_num)/(max(event_num) + 1))
+            new_data = _collapse_att_model_results(data,
+                                                   weights,
+                                                   num_of_att_models)
+            
+    return new_data, None, None
+
+
 
 class Dummy:
     def __init__(self):
@@ -473,12 +537,13 @@ class Test_Exceedance(unittest.TestCase):
 
     def test_collapse_att_model_dimension(self):
         gmm = 3
+        rec_model = 1
         site = 1
         events = 2
         periods = 4
-        size = gmm * site * events * periods
+        size = gmm *  rec_model * site * events * periods
         data = arange(0, size, 1)
-        data = reshape(data, (gmm, site, events, periods))
+        data = reshape(data, (gmm, rec_model, site, events, periods))
         weights = [0.2, 0.3, 0.5]
         sum = _collapse_att_model_dimension(data, weights)
 
@@ -488,16 +553,17 @@ class Test_Exceedance(unittest.TestCase):
         sum_act = scipy.sum(actual, 0)
 
         self.assert_ (allclose(sum, sum_act))
-        self.assert_ (sum[0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
+        self.assert_ (sum[0, 0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
         
     def test_collapse_att_model_dimension2(self):
         gmm = 3
         site = 1
+        rec_model = 1
         events = 2
         periods = 4
         size = gmm * site * events * periods
         data = arange(0, size, 1)
-        data = reshape(data, (gmm, site, events, periods))
+        data = reshape(data, (gmm, rec_model, site, events, periods))
         weights = [0.2, 0.3]
         sum = _collapse_att_model_dimension(data, weights)
 
@@ -507,16 +573,17 @@ class Test_Exceedance(unittest.TestCase):
         sum_act = scipy.sum(actual, 0)
 
         self.assert_ (allclose(sum, sum_act))
-        self.assert_ (sum[0, 1, 3] == 7*0.2 + 15*0.3)
+        self.assert_ (sum[0, 0, 1, 3] == 7*0.2 + 15*0.3) # FIXME FP precision
   
     def test_collapse_att_model_dimension3(self):
         gmm = 2
         site = 1
+        rec_model = 1
         events = 2
         periods = 1
-        size = gmm * site * events * periods
+        size = gmm * rec_model * site * events * periods
         data = array([[1., 0], [0, 1.]])
-        data = reshape(data, (gmm, site, events, periods))
+        data = reshape(data, (gmm, rec_model, site, events, periods))
         weights = [2., 0]
         sum = _collapse_att_model_dimension(data, weights)
 
@@ -540,7 +607,7 @@ class Test_Exceedance(unittest.TestCase):
         periods = 4
         size = spawn * gmm * site * events * periods
         data = arange(0, size, 1)
-        data = reshape(data, (spawn, gmm, site, events, periods))
+        data = reshape(data, (spawn, gmm, 1, site, events, periods))
         weights = [0.2, 0.3, 0.5]
         sum = collapse_att_model(data, weights, True)
 
@@ -551,7 +618,7 @@ class Test_Exceedance(unittest.TestCase):
         sum_act = sum_act.reshape((1,1, site, events, periods))
 
         self.assert_ (allclose(sum, sum_act))
-        self.assert_ (sum[0,0,0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
+        self.assert_ (sum[0,0,0,0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
         
             
     def test_collapse_att_model2(self):
@@ -561,11 +628,11 @@ class Test_Exceedance(unittest.TestCase):
         events = 1
         periods = 1
         data = array([[100, 10, 1.],[200, 20, 2]])
-        data = reshape(data, (spawn, gmm, site, events, periods))
+        data = reshape(data, (spawn, gmm, 1, site, events, periods))
         weights = [1., 2., 3.]
         sum = collapse_att_model(data, weights, True)
         actual = array([[123.],[246.]])
-        actual = reshape(actual, (spawn, 1, site, events, periods))
+        actual = reshape(actual, (spawn, 1, 1, site, events, periods))
         self.assert_ (allclose(sum, actual))
              
             
@@ -576,7 +643,7 @@ class Test_Exceedance(unittest.TestCase):
         events = 5
         periods = 1
         data = array([[1., 1, 0, 1, 0], [2., 2, 2, 1, 0], [0, 3, 0, 0, 1]])
-        data = reshape(data, (spawn, gmm, site, events, periods))
+        data = reshape(data, (spawn, gmm, 1, site, events, periods))
 
         dummy_list = []
         indexes = [[0, 2, 3],[1, 4]]
@@ -589,7 +656,7 @@ class Test_Exceedance(unittest.TestCase):
             
         sum = collapse_source_gmms(data, dummy_list, True)
         actual = array([5., 6, 4, 3, 1])
-        actual = reshape(actual, (spawn, 1, site, events, periods))
+        actual = reshape(actual, (spawn, 1, 1, site, events, periods))
         self.assert_ (sum.shape == actual.shape)
         self.assert_ (allclose(sum, actual))
                     

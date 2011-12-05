@@ -15,67 +15,7 @@ import scipy
 from scipy import allclose, isfinite, array, newaxis, zeros, ndarray, \
      asarray, where, concatenate, allclose, reshape, ones
 
-def do_collapse_logic_tree(data, event_num, weights,
-                           eqrm_flags, use_C=True):
-    """
-    Collapse data, such as when several events are used to repressent
-    one event.
-    
-    Data is the array to be collapsed (eg ground_motion or loss)
-
-    """
-    if len(data.shape) >= 4:
-        # Assume the extra dimension is the ground motion model
-        if eqrm_flags.atten_collapse_Sa_of_atten_models is True:
-            new_data = _collapse_att_model_dimension(data,
-                                                     weights)
-        else:       
-            new_data = data 
-            
-    else:
-        
-        # if there is only one attenuation model.
-        no_attn_collapse = (
-            (len(weights) == 1) or
-            eqrm_flags.atten_collapse_Sa_of_atten_models is False)
-        
-        if no_attn_collapse:        
-            new_data = data 
-        else:
-            weights = asarray(weights)
-            num_of_att_models = int(len(event_num)/(max(event_num) + 1))
-            new_data = _collapse_att_model_results(data,
-                                                   weights,
-                                                   num_of_att_models)
-            
-    return new_data, None, None
-
-def _collapse_att_model_results(data, weights, num_of_att_models):
-    """
-    Collapse the data so it does not have an attenuation model dimension.
-    To collapse it, multiply the data by the weights and sum.
-
-    The data will not actually have an explicit attenuation model dimension.
-    The second dimension is event*attenuation model.  The data is grouped
-    results per event for the first att' model, then the second att' model ect.
-    
-    Data has 3 dimensions; (site, events*attenuation models, periods)
-    Site is 1.
-    
-    What the data is changes. Sometimes its SA, sometimes it's cost.
-    
-    """
-    first_axis = data.shape[0]
-    last_axis = data.shape[2]
-    
-    weights.shape = (1, -1, 1)
-    weighted_data = data*weights 
-    weighted_data.shape = (first_axis, num_of_att_models, -1, last_axis) 
-    sum = scipy.sum(weighted_data, 1)
-    
-    return sum
-        
-def _collapse_att_model_dimension(data, weights):
+def _collapse_att_model_dimension(data, weights, gmm_index_from_end=-4):
     """
     Collapse the data so it does not have an attenuation model dimension.
     To collapse it, multiply the data by the weights and sum.
@@ -84,9 +24,9 @@ def _collapse_att_model_dimension(data, weights):
     all of the data.  
 
     Parameters:
-      data: With dimensions 4 or more;
-      The 4th last dimension is ground motion model.
-      e.g. (spawn, max ground motion model, site, events, periods) OR
+      data: With dimensions 5 or more;
+      The 5th last dimension is ground motion model.
+      e.g. (spawn, max ground motion model, rec_model, site, events, periods) OR
       (max ground motion model, site, events, periods)
         Site is 1. What the data is changes. Sometimes its SA, sometimes
         it's cost.
@@ -98,15 +38,13 @@ def _collapse_att_model_dimension(data, weights):
     Returns
     sum : same dimensions as weight without the gmm dimension.
     """
-    gmm_index_from_end=-4
-    new_weight_shape = ones((data.ndim))
-    gmm_index_from_start = data.ndim + gmm_index_from_end
-    new_weight_shape[gmm_index_from_end] = -1
+    assert data.ndim > 4
     # The lenght of weight can be less than the max gmm dimension in data.
-    weight_length = len(weights)
-    weighted_data = data[...,0:weight_length,:,:,:] * reshape(weights, new_weight_shape) 
-    sum = scipy.sum(weighted_data, gmm_index_from_start)
-    return sum    
+    weighted_data = (data[..., 0:len(weights), :, :, :, :] *
+                     asarray(weights)[:, newaxis, newaxis, newaxis, newaxis])
+    # numpy.sum() allows -ve axis. See
+    # http://docs.scipy.org/doc/numpy/reference/generated/numpy.sum.html#numpy.sum
+    return scipy.sum(weighted_data, -5)
 
     
 def collapse_att_model(data, weights, do_collapse):
@@ -119,28 +57,20 @@ def collapse_att_model(data, weights, do_collapse):
     This assumes the same ground motion model weights are applied to
     all of the data.
 
-
     Parameters:
-      data:  5 dimensions; 
-      (spawn, ground motion model, site, events, periods)
+      data:  6 dimensions; 
+      (spawn, ground motion model, rec_model, site, events, periods)
         Site is 1. What the data is changes. Sometimes its SA, sometimes
         it's cost.
       weights: The weight to apply to each ground motion model 'layer'
                1D, dimension (gmm)
-      
+
+    Returns: array with same rank and dimensions as data except GMM
+    axis will be 1 if do_collapse
     """
     if do_collapse:
-        gmm_index_from_end=-4
-        new_data_shape = data.shape
-        
-        # the new data shape will be just like data,
-        # but the length of the gmm dimension will be 1.
-        new_data_shape = list(data.shape)
-        new_data_shape[gmm_index_from_end] = 1
-
-        data = _collapse_att_model_dimension(data, weights)
-        # Put the gmm dimension back
-        data = data.reshape(new_data_shape)    
+        # Collapse and put the gmm dimension back
+        return _collapse_att_model_dimension(data, weights)[..., newaxis, :, :, :, :]
     return data
 
 def collapse_source_gmms(data, source_model, do_collapse):
@@ -149,7 +79,7 @@ def collapse_source_gmms(data, source_model, do_collapse):
     collapse this dimension, applying the weights in source_model.
 
     THE SECOND LAST AXIS IS ASSUMED TO BE EVENT
-    THE FOUTH LAST AXIS IS ASSUMED TO BE GMM
+    THE 5th LAST AXIS IS ASSUMED TO BE GMM
     
     parameters:
       data - an array of values (e.g. cost).  One of the dimensions is gmm. An example of
@@ -163,21 +93,21 @@ def collapse_source_gmms(data, source_model, do_collapse):
     """
     if not do_collapse:
         return data
-    
+    assert data.ndim == 6
     for source in source_model:
         event_ind = source.get_event_set_indexes()
         col_data = collapse_att_model(data[...,event_ind, :],
                                       source.atten_model_weights, do_collapse)
-        data[...,0:1,:,event_ind, :] = col_data
+        data[...,0:1,:,:,event_ind, :] = col_data
 
         # Erase the data that has been weighted.
         weight_length = len(source.atten_model_weights)
-        data[...,1:weight_length,:,event_ind, :] = 0.0
+        data[...,1:weight_length,:,:,event_ind, :] = 0.0
 
     # Check here that all values have been collapsed.
-    assert scipy.sum(data[...,1:,:,:,:]) == 0.0
+    assert scipy.sum(data[...,1:,:,:,:,:]) == 0.0
     
-    return data[...,0:1,:,:,:]
+    return data[...,0:1,:,:,:,:]
 
 def hzd_do_value(sa, r_nu, rtrn_rte): #,hack=[0]):
     """

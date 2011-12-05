@@ -1087,6 +1087,13 @@ class Event_Activity(object):
         # http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html#integer
         self.event_activity[0, 0, :, event_indexes] = event_activities.T
 
+
+    def recurrence_model_count(self):
+        "Only call this after .set_event_activity()"
+        assert self.event_activity is not None
+        return self.event_activity.shape[2]
+        
+        
     def spawn(self, weights):
         """
         Spawn the event activity.
@@ -1129,7 +1136,7 @@ class Event_Activity(object):
             new_event_activity[0, 0, :, :] = self.event_activity[0, 0, :, :]
             
             for szp in source_model:
-                assert sum(szp.atten_model_weights) == 1
+                assert sum(szp.atten_model_weights) == 1 # FIXME FP precision!
 
                 sub_activity = \
                     self.event_activity[0, 0, :, szp.get_event_set_indexes()]

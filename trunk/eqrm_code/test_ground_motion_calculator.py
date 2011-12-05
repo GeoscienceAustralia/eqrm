@@ -131,7 +131,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         gm = Multiple_ground_motion_calculator(model_names, periods,
                                                model_weights)
         
-        _, _,log_mean, log_sigma = gm._distribution_function(distances,
+        log_mean, log_sigma = gm._distribution_function(distances,
                                                              magnitudes,
                                                              depth=depths)
         
@@ -160,7 +160,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         gm = Multiple_ground_motion_calculator(model_names, periods,
                                                model_weights)
         
-        _, _,log_mean, log_sigma = gm._distribution_function(distances,
+        log_mean, log_sigma = gm._distribution_function(distances,
                                                              magnitudes,
                                                              depth=depths)
         
@@ -189,7 +189,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
                                                model_weights)
 
         # ignoring event_activity, event_id
-        _, _,log_mean,log_sigma = gm._distribution_function(distances,
+        log_mean,log_sigma = gm._distribution_function(distances,
                                                             magnitudes,
                                                             depth=depths)
         
@@ -229,11 +229,10 @@ class Test_ground_motion_calculator(unittest.TestCase):
         dist_ob = ADistObj(distance)
         magnitudes = {'Mw': array([3.0, 2.0, 1.5]),
                       'ML': array([3.0, 2.0, 1.5])}
-        results = gm._distribution_function(
+        log_mean_array, log_sigma_array = gm._distribution_function(
             dist_object=dist_ob,
             mag_dict=magnitudes)
         
-        _, _, log_mean_array, log_sigma_array = results
         # When combining multiple GM's on the event axis
         self.assert_(log_mean_array.shape == (
             2, num_sites, num_events, num_periods))

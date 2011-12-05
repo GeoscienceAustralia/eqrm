@@ -15,6 +15,10 @@ from eqrm_code.util import dict2csv, determine_eqrm_path
 import eqrm_code.eqrm_filesystem as efs
 
 
+def make_motion(dims):
+    def digital(sp, gmm, rm, site, ev, pd):
+        return sp*1000 + gmm*100 + rm*10 + site + ev*0.1 + pd*0.01
+    return fromfunction(digital, dims)    
 
 class Dummy:
     def __init__(self):
@@ -610,17 +614,18 @@ class Test_Output_manager(unittest.TestCase):
         eqrm_flags.atten_periods = [0.3, 0.5, 0.9]
         soil_amp = True
         motion_name = "soil_SA"
-        motion = array([[[[[4,5]],[[2,7,]]]]])# spawn,gmm,sites,event.periods
+        motion = array([[[[[[4,5]],[[2,7,]]]]]])# spawn,gmm,rm,sites,event.periods
         save_motion(soil_amp, eqrm_flags, motion)
         # Check the file output
-        for i in range(motion.shape[3]):
+        for i in range(motion.shape[4]):
             file_name = eqrm_flags.output_dir+eqrm_flags.site_tag+ '_' \
                    + motion_name + '_motion_' + \
-                   str(i) + '_spawn_0_gmm_0.txt'
+                   str(i) + '_spawn_0_gmm_0_rm_0.txt'
             file_h=open(file_name,'r')
 
             text = file_h.read().splitlines()
             # ditch the comment lines
+            text.pop(0)
             text.pop(0)
             text.pop(0)
             text.pop(0)
@@ -632,7 +637,7 @@ class Test_Output_manager(unittest.TestCase):
 
             for line_i,line in enumerate(text):
                 num_f = array([float(ix) for ix in line.split(' ')])
-                self.assert_ (allclose( num_f, motion[0,0,line_i,0,:]))
+                self.assert_ (allclose( num_f, motion[0,0,0,line_i,0,:]))
             file_h.close()
             os.remove(file_name)
         os.rmdir(eqrm_flags.output_dir)
@@ -1155,12 +1160,10 @@ class Test_Output_manager(unittest.TestCase):
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
         eqrm_flags.site_tag = "site_tag"
-        eqrm_flags.atten_periods = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+        eqrm_flags.atten_periods = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
         
-        def digital(sp, gmm, site, ev, pd):
-            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
-        # (spawn, gmm, sites, events, periods)
-        motion = fromfunction(digital, (2,3,4,5,6))
+        # (spawn, gmm, rm, sites, events, periods)
+        motion = make_motion((2,3,4,5,6,7))
         base_names = save_motion(soil_amp, eqrm_flags, motion)
         SA, periods = load_motion(eqrm_flags.output_dir,  eqrm_flags.site_tag,
                                   soil_amp)
@@ -1182,10 +1185,8 @@ class Test_Output_manager(unittest.TestCase):
         eqrm_flags.site_tag = "site_tag"
         eqrm_flags.atten_periods = [0.1, 0.2, 0.3, 0.4]
         
-        def digital(sp, gmm, site, ev, pd):
-            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
-        # (spawn, gmm, sites, events, periods)
-        motion = fromfunction(digital, (1,1,2,3,4))
+
+        motion = make_motion((1,1,1,2,3,4))
 
         lat_actual = array([-32., -31.])
         lon_actual = array([120., 121.])
@@ -1223,10 +1224,8 @@ class Test_Output_manager(unittest.TestCase):
         eqrm_flags.site_tag = "site_tag"
         eqrm_flags.atten_periods = [0.1]
         
-        def digital(sp, gmm, site, ev, pd):
-            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
         # (spawn, gmm, sites, events, periods)
-        motion = fromfunction(digital, (1,2,4,3,1))
+        motion = make_motion((1,2,1,4,3,1))
 
         lat_actual = array([-32., -31., -32., -31.])
         lon_actual = array([120., 121., 3., 4.])
@@ -1243,14 +1242,14 @@ class Test_Output_manager(unittest.TestCase):
         self.assert_(allclose(lon, lon_actual))
         #self.assert_(allclose(SA, motion[0,0,...]))
         # (sites, events*gmm*spawn, periods)
-        
         for spawn_i in range(motion.shape[0]):
             for gmm_i in range(motion.shape[1]):
-                for event_i in range(motion.shape[3]):
-                    overload_i = event_i + motion.shape[3]*gmm_i + \
-                                  motion.shape[3]* motion.shape[1]*spawn_i
-                    self.assert_(allclose(motion[spawn_i, gmm_i, :, event_i, :],
-                                          SA[:, overload_i, :]))
+                for rm_i in range(motion.shape[2]):
+                    for event_i in range(motion.shape[5]):
+                        overload_i =  collapsed_motion_index(motion.shape,
+                                                             spawn_i,  gmm_i,  rm_i,  event_i)
+                        self.assert_(allclose(motion[spawn_i, gmm_i, rm_i, :, event_i, :],
+                                              SA[:, overload_i, :]))
         self.assert_(allclose(array(eqrm_flags.atten_periods),
                               periods))
 
@@ -1270,17 +1269,14 @@ class Test_Output_manager(unittest.TestCase):
         eqrm_flags.site_tag = "site_tag"
         eqrm_flags.atten_periods = [0.1, 0.2]
         
-        def digital(sp, gmm, site, ev, pd):
-            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
         # (spawn, gmm, sites, events, periods)
-        motion = fromfunction(digital, (1,2,4,3,2))
+        motion = make_motion((1,2,2,4,3,2))
 
         lat_actual = array([-32., -31., -32., -31.])
         lon_actual = array([120., 121., 3., 4.])
         sites = Sites(lat_actual,lon_actual)
         base_name = save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
                    sites)
-        
         base_names = save_motion(soil_amp, eqrm_flags, motion)
         tmp = load_motion_sites(eqrm_flags.output_dir,  eqrm_flags.site_tag,
                           soil_amp=True, period=0.2)
@@ -1288,15 +1284,16 @@ class Test_Output_manager(unittest.TestCase):
         self.assert_(allclose(lat, lat_actual))
         self.assert_(allclose(lon, lon_actual))
         #self.assert_(allclose(SA, motion[0,0,...]))
-        # (sites, events*gmm*spawn, periods)
-        
+        # (sites, events*rm*gmm*spawn, periods)
+
         for spawn_i in range(motion.shape[0]):
             for gmm_i in range(motion.shape[1]):
-                for event_i in range(motion.shape[3]):
-                    overload_i = event_i + motion.shape[3]*gmm_i + \
-                                  motion.shape[3]* motion.shape[1]*spawn_i
-                    self.assert_(allclose(motion[spawn_i, gmm_i, :, event_i, 1],
-                                          SA[:, overload_i]))
+                for rm_i in range(motion.shape[2]):
+                    for event_i in range(motion.shape[4]):
+                        overload_i =  collapsed_motion_index(motion.shape,
+                                                             spawn_i,  gmm_i,  rm_i,  event_i)
+                        self.assert_(allclose(motion[spawn_i, gmm_i, rm_i, :, event_i, 1],
+                                              SA[:, overload_i]))
 
         
         os.remove(base_name)
@@ -1312,16 +1309,13 @@ class Test_Output_manager(unittest.TestCase):
             'output_managertest_load_motion_file') + os.sep
         eqrm_flags.site_tag = "site_tag"
         eqrm_flags.atten_periods = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
-        
-        def digital(sp, gmm, site, ev, pd):
-            return sp*100 + gmm*10 + site + ev*0.1 + pd*0.01
-        # (spawn, gmm, sites, events, periods)
-        motion = fromfunction(digital, (1,1,5,2,6))
-        SA_answer = motion[0, 0, :,1,:]
+
+        motion = make_motion((1,1,1,5,2,6))
+        SA_answer = motion[0, 0, 0, :,1,:]
         base_names = save_motion(soil_amp, eqrm_flags, motion)
 
         ans = load_motion_file(base_names[1]) # 1, so event_index == 1
-        SA, periods, event_index, spawn_index, gmm_index = ans
+        SA, periods, event_index, spawn_index, gmm_index, rm_index = ans
         
         self.assert_(allclose(array(eqrm_flags.atten_periods),
                               periods))
@@ -1329,6 +1323,7 @@ class Test_Output_manager(unittest.TestCase):
         self.assert_(event_index == 1)
         self.assert_(spawn_index == 0)
         self.assert_(gmm_index == 0)
+        self.assert_(rm_index == 0)
         
         for name in base_names:
             os.remove(name)
