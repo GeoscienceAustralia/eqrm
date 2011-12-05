@@ -271,7 +271,7 @@ class Multiple_ground_motion_calculator(object):
         if Vs30 is None:
             Vs30 = sites.attributes.get('Vs30', None)
 
-        results = self._distribution_function(
+        log_mean_extend_GM, log_sigma_extend_GM = self._distribution_function(
             distances, magnitudes,
             depth=event_set.depth,
             depth_to_top=event_set.depth_to_top,
@@ -282,9 +282,8 @@ class Multiple_ground_motion_calculator(object):
             event_id=event_id,
             periods=self.periods,
             GM_models=GM_models)
-        _, _, log_mean_extend_GM, log_sigma_extend_GM = results
-        return None, \
-               log_mean_extend_GM, log_sigma_extend_GM
+
+        return log_mean_extend_GM, log_sigma_extend_GM
 
     
     def _distribution_function(self, dist_object, mag_dict, periods=None,
@@ -327,5 +326,5 @@ class Multiple_ground_motion_calculator(object):
                     (log_sigma_extend_GM, log_sigma[newaxis, :]),
                     axis=new_axis)
         
-        return None, None, log_mean_extend_GM, log_sigma_extend_GM
+        return log_mean_extend_GM, log_sigma_extend_GM
 

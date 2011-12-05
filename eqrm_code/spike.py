@@ -56,7 +56,6 @@ def three(a, b=1, **kwargs):
     print "3 c", str(c)
     
 if __name__ == '__main__':
-    from eqrm_code.exceedance_curves import do_collapse_logic_tree
     from scipy import allclose, array, sum, resize, zeros
     import util
     from os import getcwd, chdir

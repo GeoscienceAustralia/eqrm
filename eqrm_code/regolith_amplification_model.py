@@ -26,7 +26,7 @@ class Regolith_amplification_model(object):
     # should subclass - GM(subclass), RA(subclass)
     
     def __init__(self, pga_bins, moment_magnitude_bins, periods,
-                 log_amplifications, log_stds, distribution_instance=None):
+                 log_amplifications, log_stds):
 
         pga_bins=asarray(pga_bins)
         moment_magnitude_bins=asarray(moment_magnitude_bins)
@@ -41,7 +41,6 @@ class Regolith_amplification_model(object):
         self.periods = periods
         self.log_amplifications = log_amplifications
         self.log_stds = log_stds
-        self.distribution_instance = distribution_instance
 
         # check that periods is increasing
         try: assert (self.periods.argsort()==r_[0:len(self.periods)]).all()
@@ -66,10 +65,12 @@ class Regolith_amplification_model(object):
         (bedrock) motion, site classes of events, event magnitudes,
         and event periods.
 
-        log_ground_motion = [sites]*[events]*[periods]*[ground_motion_samples]
-        array
+        ground_motion: ndarray [site, event, period]
+
+        returns:  (log_mean, log_sigma). ndarrays with same shape as ground_motion
+
         
-        Implimentation:
+        Implementation:
         bin all the pga and magnitudes
         loop over the models site classes:
             get the amplification this site_class
@@ -163,13 +164,7 @@ class Regolith_amplification_model(object):
                                 log_sigma[i,j,k]=log_stds[m,n,k]
                                 
         log_mean=log(ground_motion)+log_amplification
-
-        if self.distribution_instance is not None:
-            self.distribution_instance.set_log_mean_log_sigma_etc(
-                log_mean,log_sigma,
-                event_activity=event_activity,
-                event_id=event_id)
-        return self.distribution_instance, log_mean, log_sigma
+        return  log_mean, log_sigma
     
 
     def _bin_indices(self, values, bin_points):
@@ -189,7 +184,7 @@ class Regolith_amplification_model(object):
 
  
     @classmethod  
-    def from_xml(cls, filename, distribution_instance=None):
+    def from_xml(cls, filename):
         """
         """
         
@@ -197,8 +192,7 @@ class Regolith_amplification_model(object):
         pga_bins,moment_magnitude_bins,periods,log_amplifications,log_stds=paras
         
         model = cls(pga_bins,moment_magnitude_bins,periods,
-                    log_amplifications,log_stds,
-                    distribution_instance=distribution_instance)
+                    log_amplifications,log_stds)
         return model
 
     
@@ -293,78 +287,44 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
 
     Parameters:
       bedrock_SA - spectral acceleration, in g. dimensions
-        (spawn, GM_model, sites, events, periods)
+        [spawn, GM_model, rec_model, site, event, period]
       site_classes dimensions (site) = 1
       Mw - dimensions (events)
       atten_periods dimension (periods)
       amp_distribution - an instance of Distribution_Log_Normal.
       ground_motion_calc  - an instance of Multiple_ground_motion_calculator
-        No used yet.
       event_set - needed if a gmm has to be called
       sites - needed if a gmm has to be called
-    """
 
+    Returns: array with the same shape as bedrock_SA
+    """
     spawn_axis = 0
     GM_model_axis = 1
+    rec_model_axis = 2
     assert  bedrock_SA.shape[GM_model_axis] == len(
         ground_motion_calc.GM_models)
-    soil_SA = zeros(bedrock_SA.shape)
-    #    print "bedrock_SA.shape", bedrock_SA.shape
 
-    if True:
-        for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
-            for i_gmm in arange(bedrock_SA.shape[GM_model_axis]):
-                _, log_mean, log_sigma = \
-                   soil_amplification_model.distribution(
-                    bedrock_SA[i_spawn, i_gmm,:],
-                    site_classes,
-                    Mw,
-                    atten_periods)
-                
-                #print "log_mean", log_mean
-                #print "log_sigma", log_sigma
-                #print "i_spawn", i_spawn
-                #print "i_gmm", i_gmm
-                (_, sub_soil_SA, _) = \
-                    amp_distribution.sample_for_eqrm(log_mean, log_sigma)
-#                 print "************ old school ************"
-#                 print "sub_soil_SA", sub_soil_SA
-#                 print "sub_soil_SA.shape", sub_soil_SA.shape
-                soil_SA[i_spawn,i_gmm,:,:,:] = sub_soil_SA
-    if True:
-        soil_SA_new = zeros(bedrock_SA.shape)
-        for i_gmm, gmm in enumerate(ground_motion_calc.GM_models):
-            if gmm.GM_spec.uses_Vs30 is True:
-                _, log_mean, log_sigma = ground_motion_calc.distribution(
-                    sites, event_set,
-                    GM_models=[gmm])
-                (_, sub_soil_SA, _) = \
-                    ground_motion_distribution.sample_for_eqrm(
-                    log_mean, log_sigma)
-#                 print "************ Vs30 is True ************"
-#                 print "log_mean.shape", log_mean.shape
-#                 print "sub_soil_SA.shape", sub_soil_SA.shape
-#                 print "i_gmm", i_gmm
-#                 print "soil_SA_new.shape", soil_SA_new.shape
-#                 print "soil_SA_new[:,i_gmm,:,:,:]", soil_SA_new[:,i_gmm,:,:,:]
-#                 print "soil_SA_new[:,i_gmm,:,:,:].shape", soil_SA_new[:,i_gmm,:,:,:].shape
-                soil_SA_new[:,i_gmm,:,:,:] = sub_soil_SA[:,0,:,:,:]
-            else:
-                for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
-                    _, log_mean, log_sigma = \
-                       soil_amplification_model.distribution(
-                        bedrock_SA[i_spawn, i_gmm,:],
+    soil_SA_new = zeros(bedrock_SA.shape)
+    for i_gmm, gmm in enumerate(ground_motion_calc.GM_models):
+        if gmm.GM_spec.uses_Vs30 is True:
+            log_mean, log_sigma = ground_motion_calc.distribution(
+                sites, event_set,
+                GM_models=[gmm])
+            sub_soil_SA = ground_motion_distribution.ground_motion_sample(
+                log_mean, log_sigma)
+            assert sub_soil_SA.ndim == 6
+            soil_SA_new[:,i_gmm,:,:,:,:] = sub_soil_SA[:,0,:,:,:,:]
+        else:
+            for i_spawn in arange(bedrock_SA.shape[spawn_axis]):
+                for i_rm in arange(bedrock_SA.shape[rec_model_axis]):
+                    log_mean, log_sigma = soil_amplification_model.distribution(
+                        bedrock_SA[i_spawn, i_gmm, i_rm, :],
                         site_classes,
                         Mw,
                         atten_periods)
-                    (_, sub_soil_SA, _) = \
-                        amp_distribution.sample_for_eqrm(log_mean, log_sigma)
-#                     print "log_mean", log_mean
-#                     print "log_sigma", log_sigma
-#                     print "i_spawn", i_spawn
-#                     print "i_gmm", i_gmm
-#                     print "sub_soil_SA", sub_soil_SA
-                    soil_SA_new[i_spawn,i_gmm,:,:,:] = sub_soil_SA
-#     print "soil_SA_new", soil_SA_new
-#     print "soil_SA", soil_SA
+
+                    sub_soil_SA = amp_distribution.sample_for_eqrm(log_mean, log_sigma)
+
+                    assert sub_soil_SA.ndim == 3 # site, event, period
+                    soil_SA_new[i_spawn, i_gmm, i_rm, :,:,:] = sub_soil_SA
     return soil_SA_new

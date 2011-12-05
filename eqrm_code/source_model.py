@@ -189,8 +189,7 @@ class EventZone(object):
                  fault_type=None,
                  atten_models=None,
                  atten_model_weights=None,
-                 scaling=None,
-                 ground_motion_calculator=None):
+                 scaling=None):
         """
         """
 
@@ -252,8 +251,7 @@ class EventZone(object):
                  fault_type=self.fault_type,
                  atten_models=self.atten_models,
                  atten_model_weights=self.atten_model_weights,
-                 scaling=self.scaling,
-                 ground_motion_calculator=self.ground_motion_calculator)
+                 scaling=self.scaling)
         
 
 class RecurrenceModel(object):
