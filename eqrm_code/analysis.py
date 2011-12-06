@@ -447,15 +447,15 @@ def main(parameter_handle,
 
     if eqrm_flags.save_total_financial_loss is True:
         total_building_loss_qw = zeros((num_site_block, num_spawning,
-                                        num_gmm_max, num_events),
+                                        num_gmm_max, num_rm, num_events),
                                     dtype=float)
     if eqrm_flags.save_building_loss is True:
         building_loss_qw = zeros((num_site_block, num_spawning,
-                                        num_gmm_max, num_events),
+                                        num_gmm_max, num_rm, num_events),
                               dtype=float)
     if eqrm_flags.save_contents_loss is True:
         contents_loss_qw = zeros((num_site_block, num_spawning,
-                                        num_gmm_max, num_events),
+                                        num_gmm_max, num_rm, num_events),
                               dtype=float)
     if (eqrm_flags.save_prob_structural_damage is True and
         num_psudo_events == 1 and eqrm_flags.run_type == "risk"):
@@ -542,7 +542,7 @@ def main(parameter_handle,
             event_activity,
             source_model)
 
-		# calculate fatality
+        # calculate fatality
         if eqrm_flags.run_type == "fatality":
             #print 'STARTING fatality calculations'
             # Decide which SA to use
@@ -588,7 +588,7 @@ def main(parameter_handle,
             
             # This means calc_total_loss does not know about the
             # dimensions of multiple gmms and spawning.
-            overloaded_MW = tile(event_set.Mw, num_gmm_max * num_spawning)
+            overloaded_MW = tile(event_set.Mw, num_gmm_max * num_spawning * num_rm)
             
             (total_loss, damage,
                days_to_complete) = calc_total_loss(sites, SA, eqrm_flags,
@@ -608,7 +608,7 @@ def main(parameter_handle,
             # the event dimension is overloaded with event * max_gmm * spawning
             # Can unload the event dimension.
             #  dimensions of (site, spawn, max ground motion model, events)
-            newshape = (1,num_spawning, num_gmm_max, num_events)
+            newshape = (1,num_spawning, num_gmm_max, num_rm, num_events)
             structure_loss_qw = structure_loss.reshape(newshape)
             nsd_loss_qw = nsd_loss.reshape(newshape)
             accel_loss_qw = accel_loss.reshape(newshape)
@@ -782,7 +782,6 @@ def main(parameter_handle,
         row_files_that_parallel_splits.append(a_file)
 
     if eqrm_flags.save_building_loss is True and parallel.lo != parallel.hi:
-        
         new_building_loss_qw = collapse_source_gmms(
             building_loss_qw[...,newaxis,:,newaxis],
             source_model, eqrm_flags.atten_collapse_Sa_of_atten_models)
@@ -922,7 +921,7 @@ def calc_and_save_SA(eqrm_flags,
     assert num_sites == 1
     num_events = len(event_set)
     num_periods = len(eqrm_flags.atten_periods)
-    
+
     # Build some arrays to save into.
     # NUM_SITES IS 1
     coll_rock_SA_all_events = zeros(

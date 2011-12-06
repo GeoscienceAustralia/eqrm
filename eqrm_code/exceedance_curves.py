@@ -15,7 +15,7 @@ import scipy
 from scipy import allclose, isfinite, array, newaxis, zeros, ndarray, \
      asarray, where, concatenate, allclose, reshape, ones
 
-def _collapse_att_model_dimension(data, weights, gmm_index_from_end=-4):
+def _collapse_att_model_dimension(data, weights):
     """
     Collapse the data so it does not have an attenuation model dimension.
     To collapse it, multiply the data by the weights and sum.
@@ -27,7 +27,7 @@ def _collapse_att_model_dimension(data, weights, gmm_index_from_end=-4):
       data: With dimensions 5 or more;
       The 5th last dimension is ground motion model.
       e.g. (spawn, max ground motion model, rec_model, site, events, periods) OR
-      (max ground motion model, site, events, periods)
+      (max ground motion model, rec_model, site, events, periods)
         Site is 1. What the data is changes. Sometimes its SA, sometimes
         it's cost.
       weights: The weight to apply to each ground motion model 'layer'
@@ -93,7 +93,7 @@ def collapse_source_gmms(data, source_model, do_collapse):
     """
     if not do_collapse:
         return data
-    assert data.ndim == 6
+    assert data.ndim > 5
     for source in source_model:
         event_ind = source.get_event_set_indexes()
         col_data = collapse_att_model(data[...,event_ind, :],
