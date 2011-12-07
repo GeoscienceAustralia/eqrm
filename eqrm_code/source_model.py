@@ -255,10 +255,23 @@ class EventZone(object):
         
 
 class RecurrenceModel(object):
+    """
+    Describes the coefficients for a recurrence model.
+    """
     def __init__(self,
                  recurrence_min_mag, recurrence_max_mag,
                  A_min, b,
                  distribution=None, weight=1.0):
+        """
+        recurrence_min_mag: float. minimum magnitude coefficient
+        recurrence_max_mag: float. maximum magnitude coefficient
+        A_min: float. model coefficient
+        b: float. model coefficient
+        distribution: string. name of distribution to use. Default is
+                      'bounded_gutenberg_richter'
+        weight: float, 0..1.0. Controls the amount that this
+                 model contributes to its associated source.
+        """
         # Note __init__() arg names must match <recurrence_model>
         # attribute names so that RecurrenceModel(**attr_dict) works
         self.min_magnitude = float(recurrence_min_mag)
@@ -287,7 +300,7 @@ class Source(EventZone):
                  event_type,
                  name):
         """
-        recurrence_model_seq: sequenec of RecurrenceModel()
+        recurrence_model_seq: sequence of RecurrenceModel()
         generation_min_mag - The minimum event generation specified
         by the user
 
