@@ -1029,17 +1029,17 @@ class Event_Activity(object):
     The event activity is also split based on the attenuation models.
     The weights in the list of sources are used to handle this.
 
-
-      event_activity: probability that this event will occur is this
+    Attributes:
+    event_activity: probability that this event will occur is this
         year.  Takes into account;
         - The actual probability that a
         real event of the given magnitude will occur in a given year.
         - The number of synthetic events used.
         - spawning  (as a seperate dimension)
         - multiple ground motion models (as a seperate dimension)
-        
+        - multiple recurrence models (as a separate dimension)
     The dimensions of the event_activity are;
-      (num_spawns, num_gm_models, num_events)
+      (num_spawns, num_gm_models, num_recurrence_models, num_events)
     """
     def __init__(self, num_events):
         """
@@ -1060,14 +1060,12 @@ class Event_Activity(object):
         
     def set_event_activity(self, event_activities, event_indexes=None):
         """
-
         Assumes that spawning has not occured yet, or splitting due to 
         ground motion models.
         
         event_activities: result from calc_event_activity()
         event_indexes: the indexes of the events relating to the event
         activities
-          
         """
 
         # Make sure spawning has not already occured.
@@ -1089,7 +1087,10 @@ class Event_Activity(object):
 
 
     def recurrence_model_count(self):
-        "Only call this after .set_event_activity()"
+        """
+        Returns the number of recurrence models.
+        Only call this after .set_event_activity()
+        """
         assert self.event_activity is not None
         return self.event_activity.shape[2]
         
@@ -1100,7 +1101,6 @@ class Event_Activity(object):
         Do this after attenuation weighing.
         
         weights is a 1D array that sums to one.
-        
         """
         # currently set up to only spawn once
         assert self.event_activity.shape[SPAWN_D] == 1
@@ -1136,8 +1136,7 @@ class Event_Activity(object):
             new_event_activity[0, 0, :, :] = self.event_activity[0, 0, :, :]
             
             for szp in source_model:
-                assert sum(szp.atten_model_weights) == 1 # FIXME FP precision!
-
+                assert abs(sum(szp.atten_model_weights) - 1.0) < 0.01
                 sub_activity = \
                     self.event_activity[0, 0, :, szp.get_event_set_indexes()]
                 # sub_activity[event_index, rec_model_index]
@@ -1176,9 +1175,10 @@ class Event_Activity(object):
 
     def get_ea_event_dimsion_only(self):
         """
-        Get the event activity collapsing the ground motion model
+        Get the event activity collapsing the ground motion model, recurrence model
         and spawning dimensions.
         """
+        # FIXME could probably just use sum(self.event_activity.reshape(-1, self.event_activity.shape[-1]), axis=0)
         return scipy.sum(
             scipy.sum(
                 scipy.sum(

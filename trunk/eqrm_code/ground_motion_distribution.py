@@ -14,13 +14,13 @@
 """
 
 from scipy import exp, log, where, isfinite, reshape, array, r_, rollaxis, \
-    seterr, newaxis
+    seterr, newaxis, repeat
 from scipy.stats import norm
 
 SPAWN = 1 
 
-# By setting gm_rvs here, it be reset to something deterministic in
-# the test suites in order to produce repeatable results. Note that
+# By assigning gm_rvs here, it can be reset to something deterministic
+# in the test suites in order to produce repeatable results. Note that
 # this must happen before instantiating Distribution_Log_Normal() (or
 # subclasses) in the test suite.
 gm_rvs = norm.rvs  # function from scipy.stats
@@ -29,13 +29,12 @@ class Distribution_Log_Normal(object):
     """
     Log normal distribution.
 
-    Note, since this uses random numbers, just instanciating an instance
-    of this class will cause check_scenario to fail.
+    FIXME Since this uses random numbers, just instanciating an instance
+    of this class will cause check_scenario to fail. See gm_rvs above.
 
     """
     sample_shape = (Ellipsis,) # Essentially a no-op in this base
-                               # class. No need to add extra
-                               # dimensions in ._monte_carlo()
+                               # class. See ._monte_carlo()
     
     def __init__(self, var_method, atten_spawn_bins = None):
         self.var_method = var_method        
@@ -87,11 +86,8 @@ class Distribution_Log_Normal(object):
 
     def _monte_carlo(self, log_mean, log_sigma):
         """
-        variate_site should only be used for testing
-
-        Add an extra dimension to cater for multiple recurrrence
-        models. Relies on broadcasting on the reshaped log_sigma,
-        log_mean in our caller to make the elementwise arithmetic work
+        Perform random sampling about log_mean with log_sigma.
+        self.sample_shape controls the shape of the result.
         """
         assert log_sigma.shape == log_mean.shape
         variate_site = self._vs(log_sigma)
@@ -151,16 +147,18 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
         """
         assert log_mean.ndim == 4
         s = (self._spawn(log_mean, log_sigma) if self.var_method == SPAWN
-             else self.sample_for_eqrm(log_mean, log_sigma))
+             else self.sample_for_eqrm(log_mean, log_sigma)[newaxis, ...])
 
-        if self.var_method == 2: # monte_carlo just needs a spawn dim
-            return s[newaxis, ...]
-        elif self.var_method == SPAWN: # Need to insert a recurrence model dim
-            return s[:, :, newaxis, :, :, :]
-        else:
-            # Everything else needs both
-            return s[newaxis, :, newaxis, ...]
-        
+        if self.var_method == 2: # monte_carlo has added and populated
+                                 # the recurrence model dimension
+            return s
+
+        # Add the recurrence model dimension and "manually" broadcast
+        # it so that our caller doesn't have to treat this as a
+        # special case.
+        return repeat(s[:, :, newaxis, :, :, :],
+                      self.n_recurrence_models,
+                      2)
     
 def normalised_pdf(sigma_delta, atten_spawn_bins):
     """
