@@ -87,7 +87,8 @@ class Distribution_Log_Normal(object):
     def _monte_carlo(self, log_mean, log_sigma):
         """
         Perform random sampling about log_mean with log_sigma.
-        self.sample_shape controls the shape of the result.
+        self.sample_shape and self._vs() controls the shape of the
+        result.
         """
         assert log_sigma.shape == log_mean.shape
         variate_site = self._vs(log_sigma)
@@ -141,7 +142,8 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
         """
         Like .sample_for_eqrm() but adds spawn and recurrence_model dimensions.
 
-        log_mean, log_sigma: arrays with shape [gmm, site, event, period]
+        log_mean, log_sigma: spectral acceleration parameters. ndarrays
+        with shape [gmm, site, event, period]
 
         Returns: ndarray[spawn, GMmodel, rec_model, site, event, period]
         """

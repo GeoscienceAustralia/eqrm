@@ -86,6 +86,7 @@ def source_model_zone_xml(generation_min_mag, *n_rm_args):
 #***************************************************************
 
 class Dummy:
+    # FIXME DRY. There are at least 3 of these Dummy() classes in the test suite.
     def __init__(self):
         pass      
         
