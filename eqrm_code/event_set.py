@@ -1178,13 +1178,8 @@ class Event_Activity(object):
         Get the event activity collapsing the ground motion model, recurrence model
         and spawning dimensions.
         """
-        # FIXME could probably just use sum(self.event_activity.reshape(-1, self.event_activity.shape[-1]), axis=0)
-        return scipy.sum(
-            scipy.sum(
-                scipy.sum(
-                    self.event_activity, axis = SPAWN_D),
-                axis = GMMODEL_D - 1),
-            axis = RECMODEL_D - 2)
+        return self.event_activity.reshape(-1, self.event_activity.shape[-1]).sum(axis=0)
+
         
 ####################################################################
 # this will run if this is called from DOS prompt or double clicked

@@ -986,25 +986,24 @@ def calc_and_save_SA(eqrm_flags,
             # re-scale SAsoil if Ampfactor falls ouside acceptable
             # ampfactor bounds
             if eqrm_flags.amp_variability_method is not None:
-                soil_SA = amp_rescale(
-                    eqrm_flags.amp_min_factor,
-                    eqrm_flags.amp_max_factor,
-                    soil_SA,
-                    bedrock_SA)
+                amp_rescale(soil_SA,
+                            eqrm_flags.amp_min_factor,
+                            eqrm_flags.amp_max_factor,
+                            bedrock_SA)
             # PGA cutoff
             assert isfinite(soil_SA).all()
-            soil_SA = cutoff_pga(soil_SA,
-                                    eqrm_flags.atten_pga_scaling_cutoff)
+            cutoff_pga(soil_SA,
+                       eqrm_flags.atten_pga_scaling_cutoff)
         else: 	# No soil amplification
             soil_SA = None
-        bedrock_SA = cutoff_pga(bedrock_SA,
-                                   eqrm_flags.atten_pga_scaling_cutoff)
+        cutoff_pga(bedrock_SA,
+                   eqrm_flags.atten_pga_scaling_cutoff)
         
-        bedrock_SA, soil_SA = apply_threshold_distance(
-            sites,
-            eqrm_flags.atten_threshold_distance,
-            eqrm_flags.use_amplification, sub_event_set,
-            bedrock_SA, soil_SA)
+        apply_threshold_distance(bedrock_SA, soil_SA,
+                                 sites,
+                                 eqrm_flags.atten_threshold_distance,
+                                 eqrm_flags.use_amplification, sub_event_set)
+
 
         # collapse  multiple attenuation models 
         # gmm is 1 if its collapsed
@@ -1072,15 +1071,32 @@ def calc_and_save_SA(eqrm_flags,
     #End source loop
     # Compute hazard if desired
     if eqrm_flags.save_hazard_map is True:
+        # WARNING FIXME. This assumes that
+        # event_activity.event_activity is [spawns, gmm, rec_models,
+        # events]. See FIXME below
         event_act_d_events = event_activity.event_activity.reshape(-1)
         assert coll_rock_SA_all_events.shape[3] == 1 # only one site
         for j in range(len(eqrm_flags.atten_periods)):
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
             # into the events dimension.
-                
+
             bedrock_SA_events = coll_rock_SA_all_events[:,:,:,:,:,j].reshape(
                 1,-1)
+            # FIXME. This is fragile. This relies on the events in
+            # event_act_d_events corresponding to bedrock_SA_events,
+            # which depends on them both being flattened by reshape()
+            # in the same way, which amongst other things, relies on
+            # event_activity.event_activity.sahpe[1] ==
+            # num_gmm_after_collapsing and num_sites==1. The layout of
+            # event_activity.event_activity is not apparent here, and
+            # the code needs to be redesigned so that it is
+            # irrelevant. There really needs to be an event object that
+            # carries around all of the data relevant to an event
+            # (activity, accelerations etc.) and then have an array of
+            # those objects. Better yet, rewrite it in C/FORTRAN, just
+            # keep the site stuff in memory and generate one event at
+            # a time instead of having to keep them all in memory.
             bedrock_hazard[site_index,j,:] = \
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,
@@ -1096,22 +1112,21 @@ def calc_and_save_SA(eqrm_flags,
     return soil_SA_overloaded, rock_SA_overloaded
 
 
-def apply_threshold_distance(sites,
+def apply_threshold_distance(bedrock_SA,
+                             soil_SA,
+                             sites,
                              atten_threshold_distance,
                              use_amplification,
-                             event_set,
-                             bedrock_SA,
-                             soil_SA):
-    
-        # re-compute the source-site distances
-        # (NEEDED because this is not returned from bedrock_SA_pdf)
-        # Identify sites which are greater than
-        # eqrm_flags.atten_threshold_distance from an event
-        # (NO GM computed for these sites)
-        # This is not necessarily recomputing, since the
-        # distance method used previously may not be Joyner_Boore.
-        # But does this need to be Joyner_Boore?
-        # FIXME do this earlier, and reduce the distribution calcs to do.
+                             event_set):
+    # re-compute the source-site distances
+    # (NEEDED because this is not returned from bedrock_SA_pdf)
+    # Identify sites which are greater than
+    # eqrm_flags.atten_threshold_distance from an event
+    # (NO GM computed for these sites)
+    # This is not necessarily recomputing, since the
+    # distance method used previously may not be Joyner_Boore.
+    # But does this need to be Joyner_Boore?
+    # FIXME do this earlier, and reduce the distribution calcs to do.
     distances = sites.distances_from_event_set(event_set). \
                 distance('Joyner_Boore')
     #atten_threshold_distance = 0.1
@@ -1119,16 +1134,13 @@ def apply_threshold_distance(sites,
     #print "Haznull", Haznull
     # Assuming one site=
     # error here?  the problem is usually bedrock_SA, not Haznull.
-    if True:
-        #print "bedrock_SA", bedrock_SA
-        bedrock_SA[..., Haznull,:] = 0
-        if use_amplification is True:
-            soil_SA[..., Haznull,:] = 0
-        
-        
-    return bedrock_SA, soil_SA
+    bedrock_SA[..., Haznull,:] = 0
+    if use_amplification is True:
+        soil_SA[..., Haznull,:] = 0
 
-def amp_rescale(amp_min_factor, amp_max_factor, soil_SA, bedrock_SA):
+
+def amp_rescale(soil_SA,
+                amp_min_factor, amp_max_factor, bedrock_SA):
     if amp_min_factor is not None:
         too_low = (soil_SA/bedrock_SA) < amp_min_factor
         soil_SA[where(too_low)] = (amp_min_factor *
@@ -1137,13 +1149,12 @@ def amp_rescale(amp_min_factor, amp_max_factor, soil_SA, bedrock_SA):
         too_high = (soil_SA/bedrock_SA) > amp_max_factor
         soil_SA[where(too_high)] = (amp_max_factor*
                                     bedrock_SA[where(too_high)])
-    return soil_SA
 
 
 # handles the pga_cutoff
 def cutoff_pga(ground_motion, max_pga):
     if max_pga is None:
-        return ground_motion
+        return
     
     # Doing ground_motion[...,0:1] gets the first values of
     # the last dimension,
@@ -1155,7 +1166,6 @@ def cutoff_pga(ground_motion, max_pga):
     scaling_factor = where(too_high, max_pga/ground_motion[..., 0:1], 1.0)
     ground_motion *= scaling_factor
     assert isfinite(ground_motion).all()
-    return ground_motion
 
 
 def load_data(eqrm_flags):

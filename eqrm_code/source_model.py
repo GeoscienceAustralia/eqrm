@@ -216,6 +216,11 @@ class EventZone(object):
         event_indexes  list of integers that are indexes into an event set.
         """
 
+        # FIXME It would probably be a better idea to keep the
+        # relevant event_set itself as a property of self, rather than
+        # maintaining a long array of (usually sequential) indexes
+        # that could potentially get out of sync with what's actually
+        # in the single event_set array.
         self.event_set_indexes = asarray(event_indexes)
 
     def get_event_set_indexes(self):
