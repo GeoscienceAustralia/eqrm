@@ -535,7 +535,7 @@ class Event_Set(object):
     
     def introspect_attributes(self):
         """Return a list of all the event set attributes"""
-
+        # FIXME could probbaly just use self.__dict__.keys(), or better yet self.__dict__.items() and change caller
         return [att for att in dir(self) if not callable(getattr(self, att))
                                          and not att[-2:] == '__']
     
@@ -557,7 +557,10 @@ class Event_Set(object):
         Returns a new Event_Set object containing the sliced data.
         Additional attributes aren't carried over. eg event_id.
         """
-
+        # FIXME? This would probbaly not be needed if there was an
+        # Event() object and Event_Set() was a sequence of
+        # those. Probably not 'numpy friendly" though.
+        
         # 'key' has to be an array.
         if isinstance(key, int):
             key = [key]
@@ -570,19 +573,21 @@ class Event_Set(object):
 
         # special handling for some data
         if self.fault_width.shape == tuple():
+            # Zero-rank or scalar. Broadcast to same shape as self.width
             fault_width = self.fault_width + 0*self.width
         else:
             fault_width = self.fault_width
 
         #some variables/array are set to None after the Event_set has
         #been saved, so this method now checks for None values.
+        # FIXME could probably just use args = self.__dict__.items()
         args = {}
         for att in self.introspect_attributes():
             if getattr(self, att) is None:
                 args[att] = None
             else:
                 args[att] = getattr(self, att)[key]
-        return Event_Set(**args)
+        return Event_Set(**args) # FIXME relies on arg/attr name correspondence
    
     def __len__(self):
         return len(self.rupture_centroid_lat)
@@ -610,7 +615,7 @@ class Event_Set(object):
         
     def __call__(self, *multi_multi_polygons_list):
         """
-        WARNING: not tested/ used.  probably broken.
+        WARNING: not tested/ used.  probably broken. FIXME ... and just plain weird. Why would anybody expect self() to drop into wx.MainLoop() and never return?
         
         Calling event set will draw it once for every argument.
         
@@ -643,6 +648,7 @@ class Event_Set(object):
         
         for i in xrange(len(multi_multi_polygons_list)):
             multi_multi_polygons = multi_multi_polygons_list[i]
+            # FIXME This can't currently work - no MainWindow
             frame = MainWindow(None, i, 'Stand alone module',
                                self.rupture_start, self.rupture_end,
                                multi_multi_polygons=multi_multi_polygons,
@@ -1026,8 +1032,10 @@ class Event_Activity(object):
     Class to manipulate the event activity value.
     Handles the logic of splitting based on spawning.
     
-    The event activity is also split based on the attenuation models.
-    The weights in the list of sources are used to handle this.
+    The event activity is also split based on the attenuation models
+    and recurrence models.  The weights in the list of sources are
+    used to handle splitting between attenuation models, and
+    recurrence model activity is split using the associated weights.
 
     Attributes:
     event_activity: probability that this event will occur is this
@@ -1139,7 +1147,9 @@ class Event_Activity(object):
                 assert abs(sum(szp.atten_model_weights) - 1.0) < 0.01
                 sub_activity = \
                     self.event_activity[0, 0, :, szp.get_event_set_indexes()]
-                # sub_activity[event_index, rec_model_index]
+                # sub_activity[event_index, rec_model_index] here due
+                # to indexing event dim by sequence. See numpy
+                # advanced indexing.
                 
                 # going from e.g. [0.2, 0.8] to [0.2, 0.8, 0.0]
                 maxed_weights = zeros((max_num_models))

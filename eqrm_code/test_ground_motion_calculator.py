@@ -5,7 +5,7 @@ from scipy import array, exp, log, allclose, newaxis, asarray, zeros, \
      ones, int64
 
 from eqrm_code.ground_motion_specification import *
-from eqrm_code.ground_motion_interface import gound_motion_init
+from eqrm_code.ground_motion_interface import ground_motion_init
 from eqrm_code.ground_motion_misc import \
      Australian_standard_model_interpolation 
 from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \

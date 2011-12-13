@@ -1,5 +1,5 @@
 """
- Title: gound_motion_specification.py
+ Title: ground_motion_specification.py
  
   Author:  Peter Row, peter.row@ga.gov.au
            Duncan Gray, duncan.gray@ga.gov.au
@@ -15,7 +15,7 @@
 
 from scipy import allclose, asarray
 
-from eqrm_code.ground_motion_interface import gound_motion_init
+from eqrm_code.ground_motion_interface import ground_motion_init
 
 class Ground_motion_specification(object):
     """
@@ -37,7 +37,7 @@ class Ground_motion_specification(object):
     
     def __init__(self, ground_motion_model_name):
         try:
-            gm_args = gound_motion_init[ground_motion_model_name]
+            gm_args = ground_motion_init[ground_motion_model_name]
         except KeyError:
             raise KeyError, \
                   'Invalid ground motion model name: %s' \
