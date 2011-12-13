@@ -63,6 +63,10 @@ from eqrm_code import util
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import parse_in_parameters
 
+# Use predictable random variates
+from eqrm_code import ground_motion_distribution, test_rvs
+ground_motion_distribution.gm_rvs = test_rvs.reproducible_norm_rvs
+
 log.console_logging_level = log.WARNING
 log.default_to_console = False
 

@@ -13,23 +13,13 @@ from eqrm_code.event_set import Event_Set, Event_Activity
 from test_structures import get_sites_from_dic
 from eqrm_code.util import dict2csv, determine_eqrm_path
 import eqrm_code.eqrm_filesystem as efs
-
+from test_event_set import DummyEventSet
 
 def make_motion(dims):
     def digital(sp, gmm, rm, site, ev, pd):
         return sp*1000 + gmm*100 + rm*10 + site + ev*0.1 + pd*0.01
     return fromfunction(digital, dims)    
 
-class Dummy:
-    def __init__(self):
-        pass      
-        
-    def set_event_set_indexes(self,indexes):
-        self.event_set_indexes = indexes
-        
-    def get_event_set_indexes(self):
-        return self.event_set_indexes
-    
 
 def get_bridges_from_dic(attributes=None):
     """Get a Bridges object from a dictionary.
@@ -111,7 +101,7 @@ class Test_Output_manager(unittest.TestCase):
         pass
 
     def test_save_hazard(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = True
         hazard_name = 'soil_SA'
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -168,7 +158,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(eqrm_flags.output_dir)
 
     def test_load_SA(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = False
         hazard_name = 'bedrock_SA'
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -209,7 +199,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(eqrm_flags.output_dir)
 
     def test_load_hazards_1(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = True
         hazard_name = 'soil_SA'
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -251,7 +241,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(eqrm_flags.output_dir)
 
     def test_load_hazardsII(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = False
         hazard_name = 'bedrock_SA'
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -292,7 +282,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(eqrm_flags.output_dir)
 
     def test_load_hazardsIII(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = True
         hazard_name = 'soil_SA'
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -334,7 +324,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(eqrm_flags.output_dir)
 
     def test_load_hazards_no_files(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = False
         hazard_name = 'bedrock_SA'
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -415,7 +405,7 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_save_distances(self):
 
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_distances') + os.sep
         eqrm_flags.site_tag = "site_tag"
@@ -486,7 +476,7 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_save_distancesII(self):
 
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_distances') + os.sep
         eqrm_flags.site_tag = "site_tag"
@@ -557,7 +547,7 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_load_distances(self):
 
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_distances') + os.sep
         eqrm_flags.site_tag = "site_tag"
@@ -607,7 +597,7 @@ class Test_Output_manager(unittest.TestCase):
         # which is not present in the actual data, I suspect.
 
         # The demos use save motion, the imp' tests don't though
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_motion') + os.sep
         eqrm_flags.site_tag = "site_tag"
@@ -694,7 +684,7 @@ class Test_Output_manager(unittest.TestCase):
         setups_dic = dict(setups)
         sources = []
         for setup in setups:
-            d = Dummy()
+            d = DummyEventSet()
             d.name = setup[0]
             d.event_set_indexes = setup[1]
             sources.append(d)
@@ -703,7 +693,7 @@ class Test_Output_manager(unittest.TestCase):
         ea = Event_Activity(len(Mw))
         ea.set_event_activity(event_activity)
         
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_event_set') + os.sep
         eqrm_flags.site_tag = "site_tag"
@@ -811,7 +801,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(base_file_name)
 
     def test_save_structures(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp('test_save_structures') + os.sep
         eqrm_flags.site_tag = "site_tag"
         #eqrm_flags.atten_periods = [0.3, 0.5, 0.9]
@@ -872,12 +862,12 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_save_ecloss(self):
         ecloss_name = '_total_building'
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp('test_save_ecloss') + os.sep
         eqrm_flags.site_tag = "site_tag"
 
         ecloss = array([[1, 2, 3, 4], [10, 20, 30, 40]])
-        structures = Dummy()
+        structures = DummyEventSet()
         structures.attributes = {'BID': array([10, 20])}
         parallel_tag = 'yeah'
         name = save_ecloss(ecloss_name, eqrm_flags, ecloss, structures, compress=False,
@@ -902,12 +892,12 @@ class Test_Output_manager(unittest.TestCase):
 
     def test_save_eclossII(self):
         ecloss_name = '_total_building'
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp('test_save_ecloss') + os.sep
         eqrm_flags.site_tag = "site_tag"
 
         ecloss = array([[1, 2, 3, 4], [10, 20, 30, 40]])
-        structures = Dummy()
+        structures = DummyEventSet()
         structures.attributes = {'BID': array([10, 20])}
         name = save_ecloss(ecloss_name, eqrm_flags, ecloss, structures,
                            compress=False)
@@ -926,12 +916,12 @@ class Test_Output_manager(unittest.TestCase):
     def test_save_eclossIII(self):
         # testing a one row file
         ecloss_name = '_total_building'
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp('test_save_ecloss') + os.sep
         eqrm_flags.site_tag = "site_tag"
 
         ecloss = array([[1, 2, 3, 4]])
-        structures = Dummy()
+        structures = DummyEventSet()
         structures.attributes = {'BID': array([10])}
         name = save_ecloss(ecloss_name, eqrm_flags, ecloss, structures,
                            compress=False)
@@ -948,7 +938,7 @@ class Test_Output_manager(unittest.TestCase):
 
 
     def test_load_lat_long_haz_SA(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = True
         hazard_name = 'soil_SA'
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -990,7 +980,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(eqrm_flags.output_dir)
 
     def Xtest_load_val(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_manager_test_test_load_val') + os.sep
         eqrm_flags.site_tag = 'site_tag'
@@ -1005,7 +995,7 @@ class Test_Output_manager(unittest.TestCase):
 
 
     def test_load_structures(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
             prefix='test_output_man_test_load_structures') + os.sep
         eqrm_flags.site_tag = "site_tag"
@@ -1047,7 +1037,7 @@ class Test_Output_manager(unittest.TestCase):
 
 
     def test_load_ecloss_and_sites(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_manager_test_load_ecloss_and_sites') + os.sep
         eqrm_flags.site_tag = "site_tag"
@@ -1077,7 +1067,7 @@ class Test_Output_manager(unittest.TestCase):
                                     write_title=True)
         # dimensions(site, event)
         ecloss = array([[1, 2, 3, 4], [10, 20, 30, 40], [100,200, 300, 400]])
-        structures = Dummy()
+        structures = DummyEventSet()
         structures.attributes = {'BID': array([1, 2, 3])}
         ecloss_name =  '_total_building'
         ecloss_file = save_ecloss(ecloss_name, eqrm_flags, ecloss, structures,
@@ -1111,7 +1101,7 @@ class Test_Output_manager(unittest.TestCase):
 
 
     def test_save_bridges(self):
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp('test_save_bridges') + os.sep
         eqrm_flags.site_tag = "site_tag"
 
@@ -1155,7 +1145,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(eqrm_flags.output_dir)
 
     def test_load_motion(self):       
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = False
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
@@ -1178,7 +1168,7 @@ class Test_Output_manager(unittest.TestCase):
 
 
     def test_load_collapsed_motion_sitess(self):      
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = True
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
@@ -1217,7 +1207,7 @@ class Test_Output_manager(unittest.TestCase):
 
 
     def test_load_collapsed_motion_sitesII(self):      
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = True
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
@@ -1262,7 +1252,7 @@ class Test_Output_manager(unittest.TestCase):
 
 
     def test_load_motion_sites(self):      
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = True
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
@@ -1303,7 +1293,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(eqrm_flags.output_dir)
         
     def test_load_motion_file(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         soil_amp = False
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_load_motion_file') + os.sep
@@ -1373,7 +1363,7 @@ class Test_Output_manager(unittest.TestCase):
                              
  
     def test_save_bridge_days_to_complete(self):
-        eqrm_flags=Dummy()
+        eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_manager_test_save_bridge_days_to_complete') + os.sep
         eqrm_flags.site_tag = "site_tag"

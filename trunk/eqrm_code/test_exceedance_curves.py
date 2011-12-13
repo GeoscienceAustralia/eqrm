@@ -8,6 +8,7 @@ from scipy import allclose, array, arange, reshape
 from eqrm_code.exceedance_curves import *
 from eqrm_code.exceedance_curves import _collapse_att_model_dimension
 
+from test_event_set import DummyEventSet
 
 def _collapse_att_model_results(data, weights, num_of_att_models):
     """
@@ -73,18 +74,6 @@ def do_collapse_logic_tree(data, event_num, weights,
     return new_data, None, None
 
 
-
-class Dummy:
-    def __init__(self):
-        pass      
-        
-    def set_event_set_indexes(self,indexes):
-        self.event_set_indexes = indexes
-        
-    def get_event_set_indexes(self):
-        return self.event_set_indexes
-    
-    
 class Test_Exceedance(unittest.TestCase):
     def test_exceedance_curve(self):
         # WARNING - MORE A BLACK BOX TEST - BASED ON THE FUNCTIONS OUTPUT,
@@ -96,7 +85,7 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 0, 0]
         event_activity = [ -0.33333333, -0.33333333,
                                                -0.33333333]
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
         eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
@@ -155,7 +144,7 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1]
         event_activity = array([ 0.33333333, 0.33333333, 0.33333333,
                                  0.33333333, 0.33333333, 0.33333333])
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
         eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
@@ -224,7 +213,7 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1]
         event_activity = [ 0.33333333, 0.33333333, 0.33333333,
                            0.33333333, 0.33333333, 0.33333333]
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.atten_models = ['Gaull_1990_WA', 'Toro_1997_midcontinent',
                                    'Atkinson_Boore_97']
         eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
@@ -268,7 +257,7 @@ class Test_Exceedance(unittest.TestCase):
         # The length is used, not the values
         event_activity = [ 0.33333333, 0.33333333, 0.33333333,
                            0.33333333, 0.33333333, 0.33333333]
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         
         eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
@@ -303,7 +292,7 @@ class Test_Exceedance(unittest.TestCase):
         # The length is used, not the values
         event_activity = [ 0.33333333, 0.33333333, 0.33333333,
                            0.33333333, 0.33333333, 0.33333333]
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
         eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
@@ -336,7 +325,7 @@ class Test_Exceedance(unittest.TestCase):
         event_activity = [10., 10., 1, 1., .1, .1]
 
         
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         
         eqrm_flags.atten_models = ['Gaull_1990_WA', 'Toro_1997_midcontinent',
                                    'Atkinson_Boore_97']
@@ -370,7 +359,7 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1] # The event id
         event_activity = [-999, -999, -9993, -99,-99,-99]
 
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.atten_model_weights = [1., 0., 0.1]
         eqrm_flags.atten_collapse_Sa_of_atten_models = False
         
@@ -405,7 +394,7 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1] # The event id
         event_activity = [0.33333, 0.33333, 0.33333, 0.33333, 0.33333, 0.33333]
 
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
         eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
@@ -469,7 +458,7 @@ class Test_Exceedance(unittest.TestCase):
         index = [0, 1, 0, 1, 0, 1]
         event_activity = [ 0.33333333, 0.33333333, 0.33333333,
                            0.33333333, 0.33333333, 0.33333333]
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.atten_models = ['Toro_1997_midcontinent',
                                    'Atkinson_Boore_97','Sadigh_97']
         eqrm_flags.atten_model_weights = [0.33333333, 0.33333333,
@@ -649,7 +638,7 @@ class Test_Exceedance(unittest.TestCase):
         indexes = [[0, 2, 3],[1, 4]]
         weights = [[1,2],[1,1,1]]
         for index, weight in map(None, indexes, weights):
-            d = Dummy()
+            d = DummyEventSet()
             d.atten_model_weights = weight
             d.event_set_indexes = index
             dummy_list.append(d)

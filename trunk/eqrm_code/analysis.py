@@ -364,8 +364,7 @@ def main(parameter_handle,
     # searches input_dir then defaultdir
     if eqrm_flags.use_amplification is True:
         amp_distribution = Distribution_Log_Normal(
-            eqrm_flags.amp_variability_method,
-            None)
+            eqrm_flags.amp_variability_method)
     
         amp_factor_file = eqrm_flags.site_tag + '_par_ampfactors.xml'
         amp_factor_file = get_local_or_default(amp_factor_file,

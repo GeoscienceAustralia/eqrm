@@ -1,5 +1,5 @@
 """
- Title: gound_motion_initerface.py
+ Title: ground_motion_interface.py
  
   Author:  Peter Row, peter.row@ga.gov.au
            Duncan Gray, duncan.gray@ga.gov.au

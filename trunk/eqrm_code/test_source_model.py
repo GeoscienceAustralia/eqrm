@@ -11,6 +11,7 @@ from source_model import *
 from source_model import Source_Zone, RecurrenceModel
 from eqrm_code.event_set import Event_Set
 from eqrm_code.util import reset_seed, determine_eqrm_path
+from test_event_set import DummyEventSet
 
 
     # A format string with slots for the legacy and current
@@ -84,17 +85,6 @@ def source_model_zone_xml(generation_min_mag, *n_rm_args):
 
 
 #***************************************************************
-
-class Dummy:
-    # FIXME DRY. There are at least 3 of these Dummy() classes in the test suite.
-    def __init__(self):
-        pass      
-        
-    def set_event_set_indexes(self,indexes):
-        self.event_set_indexes = indexes
-        
-    def get_event_set_indexes(self):
-        return self.event_set_indexes
     
     
 class Test_Source_model(unittest.TestCase):
@@ -465,7 +455,7 @@ class Test_Source_model(unittest.TestCase):
         event_type = ['ham', 'eggs', 'ham', 'eggs', 'eggs']
         dummy_list = []
         for name in event_type:
-            d = Dummy()
+            d = DummyEventSet()
             d.event_type = name
             dummy_list.append(d)
             source_mod = Source_Model(dummy_list, 'Mw')
@@ -542,7 +532,7 @@ class Test_Source_model(unittest.TestCase):
         fsg_list = []
         for i,event_type in enumerate(['background', 'intraslab',
          'intraslab']):
-            dummy = Dummy()
+            dummy = DummyEventSet()
             dummy.magnitude_dist = {}
             dummy.magnitude_dist['minimum'] = actual_generation_min_mag + i
             dummy.magnitude_dist['maximum'] = recurrence_max_mag + i        

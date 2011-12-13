@@ -20,7 +20,7 @@ Description:
 
     The data required to calculate the ground motion (coefficients, constants,
     etc) is placed into a list which is stored in a dictionary
-    'gound_motion_init' (sic) with the model name as key.
+    'ground_motion_init' (sic) with the model name as key.
 
     Each dictionary list contains (in the following order):
         distribution function
@@ -130,9 +130,12 @@ from eqrm_code import ground_motion_misc
 LOG10E = math.log10(math.e)
 BEDROCKVs30 = array([760.]) # m/s
 
-# A dictionary of all the info specified bellow.
-# This is used by ground_motion_specification.
-gound_motion_init = {}
+# A dictionary of all the info specified bellow.  This is used by
+# ground_motion_specification.  Each entry is a list, which gets
+# passed as *args to
+# ground_motion_specification._set_interface_values()
+
+ground_motion_init = {}
 
 #***************  START OF ALLEN MODEL  ****************************
 
@@ -228,7 +231,7 @@ Allen_args=[
 
     Allen_uses_Vs30]
 
-gound_motion_init['Allen'] = Allen_args
+ground_motion_init['Allen'] = Allen_args # FIXME values should be a class instance or dict instead of a list so that args can be accessed by name
 
 #***************  END OF ALLEN MODEL  ****************************
 
@@ -332,7 +335,7 @@ Gaull_1990_WA_args=[
 
     Gaull_1990_WA_uses_Vs30]
 
-gound_motion_init['Gaull_1990_WA'] = Gaull_1990_WA_args
+ground_motion_init['Gaull_1990_WA'] = Gaull_1990_WA_args
 
 #***************  End of Gaull 1990 WA MODEL  ****************************
 
@@ -629,7 +632,7 @@ Toro_1997_midcontinent_args=[
 
     Toro_1997_midcontinent_uses_Vs30]
 
-gound_motion_init['Toro_1997_midcontinent'] = Toro_1997_midcontinent_args
+ground_motion_init['Toro_1997_midcontinent'] = Toro_1997_midcontinent_args
 
 #***************  End of Toro_1997_midcontinent MODEL  ******************
 
@@ -813,7 +816,7 @@ AllenSEA06_args=[
 
     AllenSEA06_uses_Vs30]
 
-gound_motion_init['AllenSEA06'] = AllenSEA06_args
+ground_motion_init['AllenSEA06'] = AllenSEA06_args
 
 #***************  End of AllenSEA06 MODEL  ******************
 
@@ -954,7 +957,7 @@ Atkinson_Boore_97_args=[
     ]
 
 
-gound_motion_init['Atkinson_Boore_97'] = Atkinson_Boore_97_args
+ground_motion_init['Atkinson_Boore_97'] = Atkinson_Boore_97_args
 
 
 #***************  End of Atkinson_Boore_97 MODEL  ******************
@@ -1312,7 +1315,7 @@ Sadigh_97_args=[
 
     Sadigh_97_uses_Vs30]
 
-gound_motion_init['Sadigh_97'] = Sadigh_97_args
+ground_motion_init['Sadigh_97'] = Sadigh_97_args
 
 
 #***************  End of Sadigh_97 MODEL  ************
@@ -1435,7 +1438,7 @@ Youngs_97_interface_args=[
 
     Youngs_97_uses_Vs30]
 
-gound_motion_init['Youngs_97_interface'] = Youngs_97_interface_args
+ground_motion_init['Youngs_97_interface'] = Youngs_97_interface_args
 
 #***************  End of Youngs_97 interface MODEL  ***********
 
@@ -1462,7 +1465,7 @@ Youngs_97_intraslab_args=[
 
     Youngs_97_uses_Vs30]
 
-gound_motion_init['Youngs_97_intraslab'] = Youngs_97_intraslab_args
+ground_motion_init['Youngs_97_intraslab'] = Youngs_97_intraslab_args
 
 #***************  End of Youngs_97 intraslab MODEL  ***********
 
@@ -1544,7 +1547,7 @@ Combo_Sadigh_Youngs_M8_args=[
 
     Combo_Sadigh_Youngs_M8_uses_Vs30]
 
-gound_motion_init['Combo_Sadigh_Youngs_M8'] = Combo_Sadigh_Youngs_M8_args
+ground_motion_init['Combo_Sadigh_Youngs_M8'] = Combo_Sadigh_Youngs_M8_args
 
 #***************  End of Combo_Sadigh_Youngs_M8 MODEL  ************
 
@@ -1643,7 +1646,7 @@ Youngs_97_args=[
     Youngs_97_sigma_coefficient_period,
     Youngs_97_sigma_coefficient_interpolation]
 
-gound_motion_init['Youngs_97'] = Youngs_97_args
+ground_motion_init['Youngs_97'] = Youngs_97_args
 
 #***************  End of Youngs_97 MODEL  ************
 
@@ -1720,7 +1723,7 @@ Combo_Sadigh_Youngs_M8_args=[
     linear_interpolation,
     Youngs_97_uses_Vs30]
 
-gound_motion_init['Combo_Sadigh_Youngs_M8'] = Combo_Sadigh_Youngs_M8_args
+ground_motion_init['Combo_Sadigh_Youngs_M8'] = Combo_Sadigh_Youngs_M8_args
 
 #***************  End of Combo_Sadigh_Youngs_M8 MODEL  ************
 """
@@ -2007,7 +2010,7 @@ Boore_08_args=[
 
     Boore_08_uses_Vs30]
 
-gound_motion_init['Boore_08'] = Boore_08_args
+ground_motion_init['Boore_08'] = Boore_08_args
 
 #***************  End of Boore_08 MODEL  ************
 
@@ -2135,7 +2138,7 @@ Somerville09_Yilgarn_args=[
 
     Somerville09_Yilgarn_uses_Vs30]
 
-gound_motion_init['Somerville09_Yilgarn'] = Somerville09_Yilgarn_args
+ground_motion_init['Somerville09_Yilgarn'] = Somerville09_Yilgarn_args
 #***************  End of Somerville_Yilgarn MODEL   ************
 #***************  Start of Somerville_Non_Cratonic MODEL   ************
 # dimension = (period, coeffiecient)
@@ -2199,7 +2202,7 @@ Somerville09_Non_Cratonic_args=[
 
     Somerville09_Non_Cratonic_uses_Vs30]
 
-gound_motion_init['Somerville09_Non_Cratonic'] = Somerville09_Non_Cratonic_args
+ground_motion_init['Somerville09_Non_Cratonic'] = Somerville09_Non_Cratonic_args
 #***************  End of Somerville_Non_Cratonic MODEL   ************
 
 #########################  Start of Liang_2008 model  ##########################
@@ -2318,7 +2321,7 @@ Liang_2008_args = [Liang_2008_distribution,
                    Liang_2008_interpolation,
                    Liang_2008_uses_Vs30]
 
-gound_motion_init['Liang_2008'] = Liang_2008_args
+ground_motion_init['Liang_2008'] = Liang_2008_args
 
 ##########################  End of Liang_2008 model  ###########################
 
@@ -2756,7 +2759,7 @@ Atkinson06_sigma_coefficient_period = [0.0, 1.0]
 
 Atkinson06_hard_bedrock_uses_Vs30 = False
 
-gound_motion_init['Atkinson06_hard_bedrock'] = \
+ground_motion_init['Atkinson06_hard_bedrock'] = \
                         [Atkinson06_hard_bedrock_distribution,
                          Atkinson06_magnitude_type,
                          Atkinson06_distance_type,
@@ -2770,7 +2773,7 @@ gound_motion_init['Atkinson06_hard_bedrock'] = \
 
 Atkinson06_soil_uses_Vs30 = True
 
-gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
+ground_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
                                         Atkinson06_magnitude_type,
                                         Atkinson06_distance_type,
                                         Atkinson06_coefficient68,
@@ -2783,7 +2786,7 @@ gound_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
 
 Atkinson06_bc_boundary_bedrock_uses_Vs30 = False
 
-gound_motion_init['Atkinson06_bc_boundary_bedrock'] = \
+ground_motion_init['Atkinson06_bc_boundary_bedrock'] = \
                         [Atkinson06_bc_boundary_bedrock,
                          Atkinson06_magnitude_type,
                          Atkinson06_distance_type,
@@ -3050,7 +3053,7 @@ Chiou08_interpolation = linear_interpolation
 
 Chiou08_uses_Vs30 = True
 
-gound_motion_init['Chiou08'] = [Chiou08_distribution,
+ground_motion_init['Chiou08'] = [Chiou08_distribution,
                                 Chiou08_magnitude_type,
                                 Chiou08_distance_type,
                                 Chiou08_coefficient,
@@ -3212,7 +3215,7 @@ Campbell03_interpolation = linear_interpolation
 
 Campbell03_uses_Vs30 = False
 
-gound_motion_init['Campbell03'] = [Campbell03_distribution,
+ground_motion_init['Campbell03'] = [Campbell03_distribution,
                                    Campbell03_magnitude_type,
                                    Campbell03_distance_type,
                                    Campbell03_coefficient,
@@ -3609,7 +3612,7 @@ Campbell08_distance_type = 'Rupture'
 Campbell08_interpolation = linear_interpolation
 Campbell08_uses_Vs30 = True
 
-gound_motion_init['Campbell08'] = [Campbell08_distribution,
+ground_motion_init['Campbell08'] = [Campbell08_distribution,
                                    Campbell08_magnitude_type,
                                    Campbell08_distance_type,
                                    Campbell08_coefficient,
@@ -3664,7 +3667,7 @@ mean_10_sigma_1_args=[
 
     mean_model_uses_Vs30]
 
-gound_motion_init['mean_10_sigma_1'] = mean_10_sigma_1_args
+ground_motion_init['mean_10_sigma_1'] = mean_10_sigma_1_args
 
 #***************  End of mean_10_sigma_1 ****************************
 
@@ -3695,7 +3698,7 @@ mean_20_sigma_2_args=[
 
     mean_model_uses_Vs30]
 
-gound_motion_init['mean_20_sigma_2'] = mean_20_sigma_2_args
+ground_motion_init['mean_20_sigma_2'] = mean_20_sigma_2_args
 
 #***************  End of mean_20_sigma_2 ****************************
 
@@ -3728,7 +3731,7 @@ mean_1_sigma_0pt5_args=[
 
     mean_model_uses_Vs30]
 
-gound_motion_init['mean_1_sigma_0pt5'] = mean_1_sigma_0pt5_args
+ground_motion_init['mean_1_sigma_0pt5'] = mean_1_sigma_0pt5_args
 
 #***************  End of mean_1_sigma_0pt5 ****************************
 #***************  START OF return_Vs30  ****************************
@@ -3763,7 +3766,7 @@ return_Vs30_args=[
 
     return_Vs30_uses_Vs30]
 
-gound_motion_init['return_Vs30'] = return_Vs30_args
+ground_motion_init['return_Vs30'] = return_Vs30_args
 
 #***************  End of return_Vs30 ****************************
 #***************  START OF mean_2_sigma_1  ****************************
@@ -3793,7 +3796,7 @@ mean_2_sigma_1_args=[
 
     mean_model_uses_Vs30]
 
-gound_motion_init['mean_2_sigma_1'] = mean_2_sigma_1_args
+ground_motion_init['mean_2_sigma_1'] = mean_2_sigma_1_args
 
 #***************  End of Gaull 1990 WA MODEL  ****************************
 
@@ -4563,7 +4566,7 @@ Abrahamson08_args = [Abrahamson08_distribution,
 
                      Abrahamson08_uses_Vs30]
 
-gound_motion_init['Abrahamson08'] = Abrahamson08_args
+ground_motion_init['Abrahamson08'] = Abrahamson08_args
 
 del AS08_coeff
 
@@ -4651,7 +4654,7 @@ Akkar_2010_crustal_interpolation = linear_interpolation
 
 Akkar_2010_crustal_uses_Vs30 = True
 
-gound_motion_init['Akkar_2010_crustal'] = [Akkar_2010_crustal_distribution,
+ground_motion_init['Akkar_2010_crustal'] = [Akkar_2010_crustal_distribution,
                                 Akkar_2010_crustal_magnitude_type,
                                 Akkar_2010_crustal_distance_type,
                                 
@@ -4795,7 +4798,7 @@ gound_motion_init['Akkar_2010_crustal'] = [Akkar_2010_crustal_distribution,
 ##
 ##Atkinson_2003_interface_uses_Vs30 = True
 ##
-##gound_motion_init['Atkinson_2003_interface'] = [Atkinson_2003_interface_distribution,
+##ground_motion_init['Atkinson_2003_interface'] = [Atkinson_2003_interface_distribution,
 ##                              Atkinson_2003_interface_magnitude_type,
 ##                              Atkinson_2003_interface_distance_type,
 ##
@@ -4939,7 +4942,7 @@ Atkinson_2003_intraslab_interpolation = linear_interpolation
 
 Atkinson_2003_intraslab_uses_Vs30 = True
 
-gound_motion_init['Atkinson_2003_intraslab'] = [Atkinson_2003_intraslab_distribution,
+ground_motion_init['Atkinson_2003_intraslab'] = [Atkinson_2003_intraslab_distribution,
                               Atkinson_2003_intraslab_magnitude_type,
                               Atkinson_2003_intraslab_distance_type,
 
@@ -5066,7 +5069,7 @@ gound_motion_init['Atkinson_2003_intraslab'] = [Atkinson_2003_intraslab_distribu
 ##
 ##Zhao_2006_intraslab_uses_Vs30 = True
 ##
-##gound_motion_init['Zhao_2006_intraslab'] = [Zhao_2006_intraslab_distribution,
+##ground_motion_init['Zhao_2006_intraslab'] = [Zhao_2006_intraslab_distribution,
 ##                              Zhao_2006_intraslab_magnitude_type,
 ##                              Zhao_2006_intraslab_distance_type,
 ##
@@ -5192,7 +5195,7 @@ Zhao_2006_interface_interpolation = linear_interpolation
 
 Zhao_2006_interface_uses_Vs30 = True
 
-gound_motion_init['Zhao_2006_interface'] = [Zhao_2006_interface_distribution,
+ground_motion_init['Zhao_2006_interface'] = [Zhao_2006_interface_distribution,
                               Zhao_2006_interface_magnitude_type,
                               Zhao_2006_interface_distance_type,
 
@@ -5338,7 +5341,7 @@ Atkinson_2003_interface_interpolation = linear_interpolation
 
 Atkinson_2003_interface_uses_Vs30 = True
 
-gound_motion_init['Atkinson_2003_interface'] = [Atkinson_2003_interface_distribution,
+ground_motion_init['Atkinson_2003_interface'] = [Atkinson_2003_interface_distribution,
                               Atkinson_2003_interface_magnitude_type,
                               Atkinson_2003_interface_distance_type,
 
@@ -5466,7 +5469,7 @@ Zhao_2006_intraslab_interpolation = linear_interpolation
 
 Zhao_2006_intraslab_uses_Vs30 = True
 
-gound_motion_init['Zhao_2006_intraslab'] = [Zhao_2006_intraslab_distribution,
+ground_motion_init['Zhao_2006_intraslab'] = [Zhao_2006_intraslab_distribution,
                               Zhao_2006_intraslab_magnitude_type,
                               Zhao_2006_intraslab_distance_type,
 

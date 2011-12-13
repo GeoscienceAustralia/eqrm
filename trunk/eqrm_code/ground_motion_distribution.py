@@ -27,35 +27,26 @@ gm_rvs = norm.rvs  # function from scipy.stats
 
 class Distribution_Log_Normal(object):
     """
-    Log normal distribution.
-
-    FIXME Since this uses random numbers, just instanciating an instance
-    of this class will cause check_scenario to fail. See gm_rvs above.
+    Provides a way to pick log-normally distributed samples from a set
+    of normal distributions characterised by mean and
+    standard-deviation parameters.
 
     """
     sample_shape = (Ellipsis,) # Essentially a no-op in this base
                                # class. See ._monte_carlo()
     
-    def __init__(self, var_method, atten_spawn_bins = None):
+    def __init__(self, var_method):
         self.var_method = var_method        
         self.rvs = gm_rvs
-        self.pdf = norm.pdf # function from scipy.stats
-        if var_method == None:
-            atten_spawn_bins = 1
-        self.atten_spawn_bins = atten_spawn_bins
-        sigma_delta = 2.5
-        weights, centroids = normalised_pdf(sigma_delta, atten_spawn_bins)
-        self.spawn_weights = weights
-        # Get the dimensions ready for applying to log_sigma's
-        self.spawn_centroids = centroids #.reshape(1,-1)
             
     def sample_for_eqrm(self, log_mean, log_sigma):
         """
-        log_mean,
-        log_sigma: ndarray. Must have identical shapes
+        log_mean, log_sigma: ndarray. Must have identical shapes. See
+        GroundMotionDistributionLogNormal.ground_motion_sample() for
+        details.
 
-        Returns: ndarray in the same shape as log_mean
-        
+        Returns: ndarray in the same shape as log_mean. Estimated
+        pectral accelerations at a site due to an event.
         """
         assert log_sigma.shape == log_mean.shape
         
@@ -109,8 +100,15 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
                  var_method,
                  atten_spawn_bins,
                  n_recurrence_models):
-        super(GroundMotionDistributionLogNormal, self).__init__(var_method, atten_spawn_bins)
-        self.n_recurrence_models = n_recurrence_models        
+        super(GroundMotionDistributionLogNormal, self).__init__(var_method)
+        self.n_recurrence_models = n_recurrence_models
+        if var_method == None:
+            atten_spawn_bins = 1
+        sigma_delta = 2.5
+        weights, centroids = normalised_pdf(sigma_delta, atten_spawn_bins)
+        self.spawn_weights = weights
+        # Get the dimensions ready for applying to log_sigma's
+        self.spawn_centroids = centroids #.reshape(1,-1)        
 
     sample_shape = (slice(None), newaxis, Ellipsis) # Makes ._monte_carlo() insert a
     # recurence model axis after  gmm. Will get broadcasted in ._monte_carlo()
@@ -142,10 +140,16 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
         """
         Like .sample_for_eqrm() but adds spawn and recurrence_model dimensions.
 
-        log_mean, log_sigma: spectral acceleration parameters. ndarrays
-        with shape [gmm, site, event, period]
+        log_mean, log_sigma: ndarray[gmm, site, event, period]. These
+        represent the mean and standard deviation of the predicted
+        spectral accelerations (indexed by period) at a site due to an
+        event, as calculated by the attenuation model indexed by
+        gmm. See the ground_motion_interface module for more
+        information.
 
-        Returns: ndarray[spawn, GMmodel, rec_model, site, event, period]
+        Returns: ndarray[spawn, GMmodel, rec_model, site, event,
+        period] spectral accelerations, measured in G.
+        
         """
         assert log_mean.ndim == 4
         s = (self._spawn(log_mean, log_sigma) if self.var_method == SPAWN

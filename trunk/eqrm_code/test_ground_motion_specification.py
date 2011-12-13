@@ -4,7 +4,7 @@ from scipy import array, exp, log, allclose, newaxis, asarray, zeros
 import math
 
 from eqrm_code.ground_motion_specification import *
-from eqrm_code.ground_motion_interface import gound_motion_init
+from eqrm_code.ground_motion_interface import ground_motion_init
 from eqrm_code.ground_motion_misc import \
      Australian_standard_model_interpolation
 from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
@@ -1370,7 +1370,7 @@ class Test_ground_motion_specification(unittest.TestCase):
         # Comparing against the variables in attenuation_models.py
         # A circular sort of test, since attenuation_models is being used
         #  as a data holder
-        imported = gound_motion_init[model_name]
+        imported = ground_motion_init[model_name]
         self.failUnless(model.magnitude_type==imported[1],
                         'Model attributes incorrect.')
         self.failUnless(model.distance_type==imported[2],

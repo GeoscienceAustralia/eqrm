@@ -17,7 +17,7 @@ import conversions
 from eqrm_code.event_set import * #Event_Set, Pseudo_Event_Set
 
 
-class Dummy:
+class DummyEventSet:
     def __init__(self):
         pass      
         
@@ -145,7 +145,7 @@ class Test_Event_Set(unittest.TestCase):
         os.remove(file_name)
 
     def test_scenario_event(self):
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.scenario_latitude = -32.95
         eqrm_flags.scenario_longitude = 151.61
         eqrm_flags.scenario_azimuth = 340
@@ -202,7 +202,7 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(event_set.length, answer))
   
     def test_scenario_event_II(self):
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.scenario_latitude = [-30., -32.]
         eqrm_flags.scenario_longitude = [150., -151.]
         eqrm_flags.scenario_azimuth = [340, 330]
@@ -261,7 +261,7 @@ class Test_Event_Set(unittest.TestCase):
 
     def test_scenario_event_III(self):
         
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.scenario_latitude = -32.95
         eqrm_flags.scenario_longitude = 151.61
         eqrm_flags.scenario_azimuth = 340
@@ -330,7 +330,7 @@ class Test_Event_Set(unittest.TestCase):
         
     def test_scenario_event_4(self):
         
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.scenario_latitude = [-30.]
         eqrm_flags.scenario_longitude = [150.]
         eqrm_flags.scenario_azimuth = [0]
@@ -420,7 +420,7 @@ class Test_Event_Set(unittest.TestCase):
         
         
     def test_scenario_event_max_width(self):
-        eqrm_flags = Dummy()
+        eqrm_flags = DummyEventSet()
         eqrm_flags.scenario_latitude = -32.95
         eqrm_flags.scenario_longitude = 151.61
         eqrm_flags.scenario_azimuth = 340
@@ -517,7 +517,7 @@ class Test_Event_Set(unittest.TestCase):
         handle.write(sample)
         handle.close()
         # 1 zone therefore 1 source
-        source = Dummy()
+        source = DummyEventSet()
         source.scaling = {'scaling_rule':'modified_Wells_and_Coppersmith_94'}
         source_model = [source]
 
@@ -667,7 +667,7 @@ class Test_Event_Set(unittest.TestCase):
         handle.close()
 
         
-        source = Dummy()
+        source = DummyEventSet()
         source.scaling = {'scaling_rule':'modified_Wells_and_Coppersmith_94'}
         source_model = [source, source]
 
@@ -796,8 +796,8 @@ class Test_Event_Set(unittest.TestCase):
         
         ea.set_event_activity(activity, indexes)
         atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
-        a = Dummy()
-        b = Dummy()
+        a = DummyEventSet()
+        b = DummyEventSet()
         source_model = [a, b]
         #event_set_indexes = [array([0,1,3]), array([2,4])]
         event_set_indexes = [[0,1,3], [2,4]]
@@ -826,8 +826,8 @@ class Test_Event_Set(unittest.TestCase):
         
         ea.set_event_activity(activity, indexes)
         atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
-        a = Dummy()
-        b = Dummy()
+        a = DummyEventSet()
+        b = DummyEventSet()
         source_model = [a, b]
         #event_set_indexes = [array([0,1,3]), array([2,4])]
         event_set_indexes = [[0,1,3], [2,4]]
@@ -1018,8 +1018,8 @@ class Test_Event_Set(unittest.TestCase):
         events_fault = Event_Set(*para_list)
 
         atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
-        a = Dummy()
-        b = Dummy()
+        a = DummyEventSet()
+        b = DummyEventSet()
         source_model = [a, b]
         event_set_indexes = [array([0]), array([1])]
         for sp, esi, amw in map(None, source_model, event_set_indexes,
@@ -1029,8 +1029,8 @@ class Test_Event_Set(unittest.TestCase):
         source_zone = Source_Model(source_model)
         
         atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]
-        a = Dummy()
-        b = Dummy()
+        a = DummyEventSet()
+        b = DummyEventSet()
         source_model = [a, b]
         event_set_indexes = [array([0,1]), array([2,3])]
         for sp, esi, amw in map(None, source_model, event_set_indexes,

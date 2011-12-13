@@ -19,11 +19,11 @@ class Test_ground_motion_interface(unittest.TestCase):
         model_name = 'Allen'
         model = Ground_motion_specification(model_name)
         result = model.calc_coefficient(new_period)
-        Allen_coefficient_period = gound_motion_init['Allen'][4]
+        Allen_coefficient_period = ground_motion_init['Allen'][4]
         calc_period = (Allen_coefficient_period[7] \
                        + Allen_coefficient_period[8])/2.
         self.failUnless(calc_period == new_period[0], 'Failed')
-        Allen_coefficient = gound_motion_init['Allen'][3]
+        Allen_coefficient = ground_motion_init['Allen'][3]
         #print "Allen_coefficient", Allen_coefficient
         calc_coefficient = (Allen_coefficient[0][7] \
                        + Allen_coefficient[0][8])/2.
@@ -32,11 +32,11 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.failUnless(calc_coefficient == result[0][0], 'Failed')
         
         result = model.calc_sigma_coefficient(new_period)
-        Allen_sigma_coefficient_period = gound_motion_init['Allen'][7]
+        Allen_sigma_coefficient_period = ground_motion_init['Allen'][7]
         calc_period = (Allen_sigma_coefficient_period[7] \
                        + Allen_sigma_coefficient_period[8])/2.
         self.failUnless(calc_period == new_period[0], 'Failed')
-        Allen_sigma_coefficient = gound_motion_init['Allen'][6]
+        Allen_sigma_coefficient = ground_motion_init['Allen'][6]
         #print "Allen_sigma_coefficient", Allen_sigma_coefficient
         calc_sigma_coefficient = (Allen_sigma_coefficient[0][7] \
                        + Allen_sigma_coefficient[0][8])/2.
