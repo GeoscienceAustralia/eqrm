@@ -5590,6 +5590,7 @@ def Abrahamson_Silva_1997_distribution(dist_object,
                                        **kwargs):
     """
     Abrahamson and Silva (1997, Seismological Research Letters, vol 68, num 1, pp 94-127)
+    Adapted from OpenSHA Java implementation.
     """
     assert len(periods) == coefficient.shape[3]
     assert len(periods) == sigma_coefficient.shape[3]
@@ -5618,6 +5619,10 @@ def Abrahamson_Silva_1997_distribution(dist_object,
     
     f3 = where(mag <= 5.8, a5, a6) #  [sites, events, peiods]
     f3 = where(logical_and(mag > 5.8,  mag < c1),
+               # Note: the 1997 paper has this as just (a5 + (a6 - a5)
+               # * / (c1 - 5.8)), but the OpenSHA java version has the
+               # (mag-5.8) term which looks right as this makes the
+               # function continuous.
                a5 + (a6 - a5) * (mag - 5.8) / (c1 - 5.8),
                f3)
 
