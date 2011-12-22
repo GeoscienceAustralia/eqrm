@@ -26,10 +26,6 @@ class B1(object):
         self.mg = kwargs['mg']
         print "B done"
         
-class Dummy:
-    def __init__(self):
-        pass
-
 def sunny(a, b, c=3):
     assert a == 1
     assert b == 2

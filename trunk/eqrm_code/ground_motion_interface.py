@@ -135,6 +135,17 @@ BEDROCKVs30 = array([760.]) # m/s
 # passed as *args to
 # ground_motion_specification._set_interface_values()
 
+
+# FIXME Refactor this module and incorporate the functionality of
+# ground_motion_specification.  ground_motion_init[] elements should
+# be classes (with class methods) or instances instead of a list so we
+# can just say whataver =
+# ground_motion_init[model_name].method(event_and_site_args) . The
+# classes should inherit from a base class that has methods for
+# interpolating the coefficients (currently done in
+# ground_motion_specification) and then the coefficients can be class
+# attributes.
+
 ground_motion_init = {}
 
 #***************  START OF ALLEN MODEL  ****************************
@@ -231,7 +242,7 @@ Allen_args=[
 
     Allen_uses_Vs30]
 
-ground_motion_init['Allen'] = Allen_args # FIXME values should be a class instance or dict instead of a list so that args can be accessed by name
+ground_motion_init['Allen'] = Allen_args
 
 #***************  END OF ALLEN MODEL  ****************************
 
@@ -2818,6 +2829,9 @@ Ch_faulting_flags = {'reverse':     (1, 0),
                      'strike_slip': (0, 0)}
 
 # generate 'Ch_fault_type' from the dictionary above 
+
+# FIXME --vvv-- DRY and just plain silly. See
+# Abrahamson_Silva_1997_distribution() for a reliable and simpler way
 tmp = []
 for (k, v) in Ch_faulting_flags.iteritems():
     index = ground_motion_misc.FaultTypeDictionary[k]
@@ -5483,3 +5497,172 @@ ground_motion_init['Zhao_2006_intraslab'] = [Zhao_2006_intraslab_distribution,
                           
                               Zhao_2006_intraslab_uses_Vs30]
     
+
+
+#########
+
+Abrahamson_Silva_1997_coefficient_period = [5, 4, 3, 2, 1.5, 1, 0.85, 0.75, 0.6, 0.5, 0.46, 0.4, 0.36,
+                                            0.3, 0.24, 0.2, 0.17, 0.15, 0.12, 0.1,
+                                            0.09, 0.075, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01]
+
+Abrahamson_Silva_1997_coefficient = asarray([
+        # c4, a1, a2, a3, a4, a5, a6, a9, a10, a11, a12, a13, c1, c5, n
+        [3.5, -1.46, 0.512, -0.725, -0.144, 0.4, -0.2, 0, 0.664, 0.04, -0.215, 0.17, 6.4, 0.03, 2], 
+        [3.5, -1.13, 0.512, -0.725, -0.144, 0.4, -0.2, 0.039, 0.64, 0.04, -0.1956, 0.17, 6.4, 0.03, 2], 
+        [3.5, -0.69, 0.512, -0.725, -0.144, 0.4, -0.156, 0.089, 0.63, 0.04, -0.1726, 0.17, 6.4, 0.03, 2], 
+        [3.5, -0.15, 0.512, -0.725, -0.144, 0.4, -0.094, 0.16, 0.61, 0.04, -0.14, 0.17, 6.4, 0.03, 2], 
+        [3.55, 0.26, 0.512, -0.7721, -0.144, 0.438, -0.049, 0.21, 0.6, 0.04, -0.12, 0.17, 6.4, 0.03, 2], 
+        [3.7, 0.828, 0.512, -0.8383, -0.144, 0.49, 0.013, 0.281, 0.423, 0, -0.102, 0.17, 6.4, 0.03, 2], 
+        [3.81, 1.02, 0.512, -0.8648, -0.144, 0.512, 0.038, 0.309, 0.37, -0.028, -0.0927, 0.17, 6.4, 0.03, 2], 
+        [3.9, 1.16, 0.512, -0.8852, -0.144, 0.528, 0.057, 0.331, 0.32, -0.05, -0.0862, 0.17, 6.4, 0.03, 2], 
+        [4.12, 1.428, 0.512, -0.9218, -0.144, 0.557, 0.091, 0.37, 0.194, -0.089, -0.074, 0.17, 6.4, 0.03, 2], 
+        [4.3, 1.615, 0.512, -0.9515, -0.144, 0.581, 0.119, 0.37, 0.085, -0.121, -0.0635, 0.17, 6.4, 0.03, 2], 
+        [4.38, 1.717, 0.512, -0.9652, -0.144, 0.592, 0.132, 0.37, 0.02, -0.136, -0.0594, 0.17, 6.4, 0.03, 2], 
+        [4.52, 1.86, 0.512, -0.988, -0.144, 0.61, 0.154, 0.37, -0.065, -0.16, -0.0518, 0.17, 6.4, 0.03, 2], 
+        [4.62, 1.955, 0.512, -1.0052, -0.144, 0.61, 0.17, 0.37, -0.123, -0.173, -0.046, 0.17, 6.4, 0.03, 2], 
+        [4.8, 2.114, 0.512, -1.035, -0.144, 0.61, 0.198, 0.37, -0.219, -0.195, -0.036, 0.17, 6.4, 0.03, 2], 
+        [4.97, 2.293, 0.512, -1.079, -0.144, 0.61, 0.232, 0.37, -0.35, -0.223, -0.0238, 0.17, 6.4, 0.03, 2], 
+        [5.1, 2.406, 0.512, -1.115, -0.144, 0.61, 0.26, 0.37, -0.445, -0.245, -0.0138, 0.17, 6.4, 0.03, 2], 
+        [5.19, 2.43, 0.512, -1.135, -0.144, 0.61, 0.26, 0.37, -0.522, -0.265, -0.004, 0.17, 6.4, 0.03, 2], 
+        [5.27, 2.407, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.577, -0.28, 0.005, 0.17, 6.4, 0.03, 2], 
+        [5.39, 2.272, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.591, -0.28, 0.018, 0.17, 6.4, 0.03, 2], 
+        [5.5, 2.16, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.598, -0.28, 0.028, 0.17, 6.4, 0.03, 2], 
+        [5.54, 2.1, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.609, -0.28, 0.03, 0.17, 6.4, 0.03, 2], 
+        [5.58, 2.037, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.628, -0.28, 0.03, 0.17, 6.4, 0.03, 2], 
+        [5.6, 1.94, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.665, -0.28, 0.03, 0.17, 6.4, 0.03, 2], 
+        [5.6, 1.87, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.62, -0.267, 0.028, 0.17, 6.4, 0.03, 2], 
+        [5.6, 1.78, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.555, -0.251, 0.0245, 0.17, 6.4, 0.03, 2], 
+        [5.6, 1.69, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.47, -0.23, 0.0143, 0.17, 6.4, 0.03, 2], 
+        [5.6, 1.64, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.417, -0.23, 0, 0.17, 6.4, 0.03, 2], 
+        [5.6, 1.64, 0.512, -1.145, -0.144, 0.61, 0.26, 0.37, -0.417, -0.23, 0, 0.17, 6.4, 0.03, 2]
+        ]).T
+
+Abrahamson_Silva_1997_sigma_coefficient = asarray([
+        # b5, b6
+        [0.89, 0.087], 
+        [0.88, 0.092], 
+        [0.87, 0.097], 
+        [0.85, 0.105], 
+        [0.84, 0.11], 
+        [0.83, 0.118], 
+        [0.82, 0.121], 
+        [0.81, 0.123], 
+        [0.81, 0.127], 
+        [0.8, 0.13], 
+        [0.8, 0.132], 
+        [0.79, 0.135], 
+        [0.79, 0.135], 
+        [0.78, 0.135], 
+        [0.77, 0.135], 
+        [0.77, 0.135], 
+        [0.76, 0.135], 
+        [0.75, 0.135], 
+        [0.75, 0.135], 
+        [0.74, 0.135], 
+        [0.74, 0.135], 
+        [0.73, 0.135], 
+        [0.72, 0.135], 
+        [0.71, 0.135], 
+        [0.71, 0.135], 
+        [0.7, 0.135], 
+        [0.7, 0.135], 
+        [0.7, 0.135]]).T
+
+
+
+Abrahamson_Silva_1997_uses_Vs30=True
+Abrahamson_Silva_1997_magnitude_type = 'Mw'
+Abrahamson_Silva_1997_distance_type = 'Rupture'
+
+
+def Abrahamson_Silva_1997_distribution(dist_object,
+                                       mag,
+                                       coefficient,
+                                       sigma_coefficient,
+                                       depth_to_top,
+                                       fault_type, Vs30,
+                                       dip, width,
+                                       periods,
+                                       depth=None,
+                                       distance=None,
+                                       Z25=None,
+                                       Fhw=0, # FIXME Fhw is only ever passed in from test suite
+                                       **kwargs):
+    """
+    Abrahamson and Silva (1997, Seismological Research Letters, vol 68, num 1, pp 94-127)
+    """
+    assert len(periods) == coefficient.shape[3]
+    assert len(periods) == sigma_coefficient.shape[3]
+    
+    # According to Trevor Allen, Vs30 > 360 indicates rock or shallow soil
+    deep_soil = where(Vs30[:, newaxis, newaxis] > 360, 0, 1)
+    
+    c4, a1, a2, a3, a4, a5, a6, a9, a10, a11, a12, a13, c1, c5, n = coefficient
+    b5, b6 = sigma_coefficient
+    # c4 .. n, b5, b6 shape is [1, 1, periods]
+
+    F_map = zeros(max(ground_motion_misc.FaultTypeDictionary.values()) + 1)
+    F_map[[ground_motion_misc.FaultTypeDictionary[t] for t in
+           ('reverse', 'normal', 'strike_slip')]] = (1.0, 0.0, 0.5)
+    F = F_map[fault_type] # [sites, events, 1]
+
+    # FIXME This use of where() everywhere is unfortunate, but might
+    # be the only way of doing all this conditional arithmetic in
+    # numpy. numpy.piecewise() is the closest thing to true conditional
+    # evaluation of functions in numpy, but it doesn't pass the
+    # element index info to the functions it calls - all they ever see
+    # is a 1D array regardless of the shape of the input - so isn't
+    # generally usable here. The "where()" approach leads to a lot of
+    # arithmetic that is simply thrown away. Once again, numpy is the
+    # wrong tool for this job.
+    
+    f3 = where(mag <= 5.8, a5, a6) #  [sites, events, peiods]
+    f3 = where(logical_and(mag > 5.8,  mag < c1),
+               a5 + (a6 - a5) * (mag - 5.8) / (c1 - 5.8),
+               f3)
+
+    fHWM = (mag - 5.5).clip(0.0, 1.0)
+    Rrup = dist_object.Rupture[:,:,newaxis] # [sites, events, 1] 
+    fHWRrup = zeros(Rrup.shape[0:2] + (len(periods),)) # [sites, events, periods]
+    fHWRrup = where(logical_and(Rrup > 4,  Rrup <= 8),
+                    a9 * (Rrup - 4.0) / 4.0,
+                    fHWRrup)
+    fHWRrup = where(logical_and(Rrup > 8, Rrup <= 18),
+                    a9,
+                    fHWRrup)
+    fHWRrup = where(logical_and(Rrup  > 18,  Rrup <= 25),
+                    a9 * (1 - (Rrup - 18) / 7),
+                    fHWRrup)
+    
+    f4 =  fHWM * fHWRrup
+
+    R = sqrt(Rrup **2 + c4**2)
+    f1 = (a1 + where(mag <=c1, a2, a4) * (mag - c1) + a12 * (8.5 - mag)**n +
+          log(R) * (a3 + a13 * (mag - c1)))    
+    rockMeanPGA = f1 + F * f3 + Fhw * f4
+    f5 = a10 + a11 * log(exp(rockMeanPGA) + c5)
+    log_mean = rockMeanPGA + deep_soil * f5
+    
+    sd = b5 - b6 * (mag - 5.0) # [site, event, period]
+    sd = where(mag <  5.0, b5, sd)
+    sd = where(mag >= 7.0,  b5 - 2 * b6, sd)
+
+    return log_mean, sd
+
+
+Abrahamson_Silva_1997_args = [Abrahamson_Silva_1997_distribution,
+                              Abrahamson_Silva_1997_magnitude_type,
+                              Abrahamson_Silva_1997_distance_type,
+                              
+                              Abrahamson_Silva_1997_coefficient,
+                              Abrahamson_Silva_1997_coefficient_period,
+                              linear_interpolation,
+
+                              Abrahamson_Silva_1997_sigma_coefficient,
+                              Abrahamson_Silva_1997_coefficient_period,
+                              linear_interpolation,
+                              
+                              Abrahamson_Silva_1997_uses_Vs30]
+
+
+ground_motion_init['Abrahamson_Silva_1997'] = Abrahamson_Silva_1997_args
