@@ -6,11 +6,6 @@ import shutil
 
 from eqrm_code.util import *
 
-
-class Dummy:
-    def __init__(self):
-        pass
-
 class Test_Util(unittest.TestCase):
     def setUp(self):
         pass

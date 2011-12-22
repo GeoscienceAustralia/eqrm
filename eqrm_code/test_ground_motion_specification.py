@@ -20,7 +20,7 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Abrahamson08', 'Campbell03', 'Chiou08', 'Campbell08',
                           'Akkar_2010_crustal', 'Zhao_2006_interface',
                           'Atkinson_2003_intraslab', 'Atkinson_2003_interface',
-                          'Zhao_2006_intraslab')
+                          'Zhao_2006_intraslab', 'Abrahamson_Silva_1997')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -1236,6 +1236,58 @@ tmp[:,1,:] = [0.6200, 0.6414]
 
 test_data['Atkinson_2003_intraslab_test_sigma'] = tmp
 del tmp
+#---------
+test_data['Abrahamson_Silva_1997_test_magnitude']  = test_data['Abrahamson08_test_magnitude'] 
+test_data['Abrahamson_Silva_1997_test_dip']  = test_data['Abrahamson08_test_dip'] 
+test_data['Abrahamson_Silva_1997_test_width']  = test_data['Abrahamson08_test_width'] 
+test_data['Abrahamson_Silva_1997_test_depth_to_top']  = test_data['Abrahamson08_test_depth_to_top'] 
+test_data['Abrahamson_Silva_1997_test_fault_type']  = test_data['Abrahamson08_test_fault_type'] 
+test_data['Abrahamson_Silva_1997_test_period']  = test_data['Abrahamson08_test_period'] 
+test_data['Abrahamson_Silva_1997_test_Vs30']  = test_data['Abrahamson08_test_Vs30'] 
+test_data['Abrahamson_Silva_1997_test_distance']  = test_data['Abrahamson08_test_distance'] 
+test_data['Abrahamson_Silva_1997_test_mean']  = [
+ [[  2.10186127e-01,  4.33934068e-01,  5.72372135e-02,  6.32623876e-03],
+  [  6.57728743e-01,  1.53262356e+00,  4.37270970e-01,  9.35135830e-02],
+  [  2.85143755e-01,  5.88685806e-01,  7.31274839e-02,  7.72688548e-03],
+  [  7.49040161e-01,  1.74539521e+00,  4.40122489e-01,  8.64967376e-02],
+  [  1.54933107e-01,  3.19862944e-01,  4.47998268e-02,  5.17948623e-03],
+  [  5.77548604e-01,  1.34578975e+00,  4.34437926e-01,  1.01099653e-01],
+  [  2.85143755e-01,  5.88685806e-01,  7.31274839e-02,  7.72688548e-03],
+  [  7.49040161e-01,  1.74539521e+00,  4.40122489e-01,  8.64967376e-02]],
+
+ [[  5.14527643e-02,  1.03240496e-01,  1.59912008e-02,  1.98812196e-03],
+  [  2.27566954e-01,  5.23072386e-01,  1.82766337e-01,  4.42239964e-02],
+  [  6.98021065e-02,  1.40058638e-01,  2.04306989e-02,  2.42829764e-03],
+  [  2.59159707e-01,  5.95689680e-01,  1.83958188e-01,  4.09056234e-02],
+  [  3.79270352e-02,  7.61009829e-02,  1.25163854e-02,  1.62773659e-03],
+  [  1.99825503e-01,  4.59307473e-01,  1.81582209e-01,  4.78115645e-02],
+  [  6.98021065e-02,  1.40058638e-01,  2.04306989e-02,  2.42829764e-03],
+  [  2.59159707e-01,  5.95689680e-01,  1.83958188e-01,  4.09056234e-02]],
+
+ [[  8.27661887e-03,  1.69613378e-02,  4.39371181e-03,  6.98752384e-04],
+  [  5.28817586e-02,  1.10433924e-01,  8.63203019e-02,  2.71875990e-02],
+  [  1.10833261e-02,  2.24639912e-02,  5.61349985e-03,  8.53564233e-04],
+  [  5.91335877e-02,  1.22641347e-01,  8.68832113e-02,  2.51205683e-02],
+  [  6.16263663e-03,  1.27468722e-02,  3.43897817e-03,  5.72031655e-04],
+  [  4.72466549e-02,  9.93706999e-02,  8.57610395e-02,  2.94263494e-02],
+  [  1.10833261e-02,  2.24639912e-02,  5.61349985e-03,  8.53564233e-04],
+  [  5.91335877e-02,  1.22641347e-01,  8.68832113e-02,  2.51205683e-02]]]
+
+
+
+test_data['Abrahamson_Silva_1997_test_sigma']  = [[
+  [ 0.7,   0.77,  0.83,  0.87 ],
+  [ 0.43,  0.5,   0.594,  0.676],
+  [ 0.7,   0.77,  0.83,  0.87 ],
+  [ 0.43,  0.5,   0.594,  0.676],
+  [ 0.7,   0.77,  0.83,  0.87 ],
+  [ 0.43,  0.5,   0.594,  0.676],
+  [ 0.7,   0.77,  0.83,  0.87 ],
+  [ 0.43,  0.5,   0.594,  0.676]]]
+
+
+#------
+
 
 ################################################################################
 class Distance_stub(object):

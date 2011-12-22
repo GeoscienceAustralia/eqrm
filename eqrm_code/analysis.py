@@ -57,10 +57,6 @@ from eqrm_code.RSA2MMI import rsa2mmi_array
 from eqrm_code.fatalities import forecast_fatality
 
 
-class Dummy:
-    def __init__(self):
-        pass
-    
 # data columns expected in a BRIDGE data file
 BridgeDataColumns = {'BID': int,
                      'LONGITUDE': float,
@@ -403,6 +399,7 @@ def main(parameter_handle,
     # initialise some matrices.  These matrices have a site dimension and
     # are filled while looping over sites.  Wether they are needed or
     # not often depends on what is being saved.
+
     if eqrm_flags.save_hazard_map is True:
         bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
                                 len(eqrm_flags.return_periods)),
@@ -421,6 +418,16 @@ def main(parameter_handle,
     log.debug('Memory: hazard_map array created')
     log.resource_usage()
     num_gmm_dimensions = event_activity.get_gmm_dimensions()
+
+    # FIXME These *_SA_all arrays probably account for a lot of the
+    # memory usage. As far as I can tell, the only reason they need a
+    # site dimension at all is because they accumulate the SAs so that
+    # they can be saved later by save_motion(). If the program simply
+    # wrote the per-site results as it went (completely feasible -
+    # default ulimit for max open files on Linux is 1024), probably
+    # nothing in this entire program would need to be indexed by both
+    # events and sites.
+    
     if eqrm_flags.save_motion is True:
         bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                                 num_site_block, num_events,
@@ -1086,16 +1093,16 @@ def calc_and_save_SA(eqrm_flags,
             # event_act_d_events corresponding to bedrock_SA_events,
             # which depends on them both being flattened by reshape()
             # in the same way, which amongst other things, relies on
-            # event_activity.event_activity.sahpe[1] ==
+            # event_activity.event_activity.shape[1] ==
             # num_gmm_after_collapsing and num_sites==1. The layout of
             # event_activity.event_activity is not apparent here, and
             # the code needs to be redesigned so that it is
-            # irrelevant. There really needs to be an event object that
-            # carries around all of the data relevant to an event
-            # (activity, accelerations etc.) and then have an array of
-            # those objects. Better yet, rewrite it in C/FORTRAN, just
-            # keep the site stuff in memory and generate one event at
-            # a time instead of having to keep them all in memory.
+            # irrelevant. There really needs to be an event object
+            # that carries around all of the data relevant to an event
+            # (lat, lon, activity, magnitude etc.) and then have an
+            # array of those objects per source object. Just keep the
+            # event stuff in memory and process one site at a time.
+
             bedrock_hazard[site_index,j,:] = \
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,

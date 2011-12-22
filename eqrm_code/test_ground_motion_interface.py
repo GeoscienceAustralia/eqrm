@@ -2594,6 +2594,52 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 ################################################################################
 
+
+    def test_Abrahamson_Silva_1997(self):
+
+
+        class DistObj(object):
+            def __init__(self, distance):
+                self.Rupture = distance
+                self.Horizontal = distance
+
+
+        # Test various scenarios for period=0.2
+
+        periods = numpy.array([5])
+        coeffs = numpy.asarray([3.5, -1.46, 0.512, -0.725, -0.144, 0.4,
+                                -0.2, 0, 0.664, 0.04, -0.215, 0.17, 6.4,
+                                0.03, 2]).reshape(-1, 1, 1, 1)
+        sigma_coeffs = numpy.array([0.89, 0.087]).reshape(-1, 1, 1, 1)
+
+        
+        Rrup = 100.0
+        dist_object = DistObj(numpy.array(numpy.array([[Rrup, Rrup]])))
+        Mw = numpy.array([[[7.0], [5.0]]])
+        depth = numpy.array([[[0.0], [0.0]]])
+        dip = numpy.array([[[90.0], [90.0]]])
+        fault_type = numpy.array([[[2], [2]]], dtype=int)	# strike_slip
+        Vs30 = numpy.array([760.0])
+        width = numpy.array([[[10.0], [10.0]]])
+        
+        model_name = 'Abrahamson_Silva_1997'
+        model = Ground_motion_specification(model_name)
+        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+                                                   mag=Mw, periods=periods,
+                                                   depth_to_top=depth,
+                                                   width=width,
+                                                   fault_type=fault_type,
+                                                   dip=dip, Vs30=Vs30,
+                                                   coefficient=coeffs,
+                                                   sigma_coefficient=
+                                                   sigma_coeffs)
+        self.failUnless(allclose(log_mean,
+                                 asarray([[[-4.99955238], [-9.04591837]]]),
+                                 rtol=1.0e-4, atol=1.0e-4))
+        self.failUnless(allclose(log_sigma,
+                                 asarray([[[ 0.716], [ 0.89 ]]]),
+                                 rtol=1.0e-4, atol=1.0e-4))
+                                 
 if __name__ == "__main__":
     """The idea here is that if you want to run just the test_xyz() test, do:
         python test_ground_motion_interface.py test_xyz

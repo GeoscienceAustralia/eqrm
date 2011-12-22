@@ -45,12 +45,6 @@ from eqrm_code import scaling
 EVENT_FLOAT = float64 #float32
 EVENT_INT = int64 #int32
 
-
-class Dummy:
-    def __init__(self):
-        pass
-
-    
 class Event_Set(object):
     def __init__(self, azimuth, dip, ML, Mw,
                  depth, depth_to_top, fault_type,
@@ -656,29 +650,6 @@ class Event_Set(object):
         app.MainLoop()
         
 
-def _calc_attenuation_logic_split(GM_models, model_weights, 
-                                  event_activity, event_id):
-    """event_activity has to be an array"""
-
-    model_weights = absolute(array(model_weights))
-
-    new_event_id = []
-    new_event_activity = []
-    attenuation_ids = []
-    attenuation_weights = []
-    
-    for attenuation_id, GM_model in enumerate(GM_models):
-        new_event_id.extend(event_id)
-        attenuation_ids.extend(attenuation_id+0*event_id)
-
-        new_event_activity.extend(event_activity*model_weights[attenuation_id])
-        attenuation_weights.extend( model_weights[attenuation_id]+0*event_id)
-
-    #FIXME Why aren't these arrays?
-    return (new_event_activity, new_event_id,
-            attenuation_ids, attenuation_weights)
-    
-    
 def merge_events_and_sources(event_set_zone, event_set_fault,
                               source_model_zone, source_model_fault):
     """
@@ -687,6 +658,11 @@ def merge_events_and_sources(event_set_zone, event_set_fault,
     Fault info is concatenated to the end of zone info.
     
     """
+    # FIXME Keeping the event set separate from the source model is a
+    # bad idea. If each source model had a reference to its own
+    # events, none of this event_set_index bookkeeping would be
+    # necessary.
+    
     # add's event_set_fault to the end of event_set_zone
     source_model_zone_event_set_length = len(event_set_zone)
     event_set_merged = event_set_zone + event_set_fault
@@ -1126,10 +1102,16 @@ class Event_Activity(object):
 
         Source_model is a collection of Source's.
         """
+        # FIXME Hang on - is this valid? Here we're using the
+        # attenuation model weights to weight the event activities
+        # (i.e. probabilities), yet in
+        # exceedance_curve.collapse_att_model() (called from
+        # analysis.calc_and_save_SA), the same weights are used to
+        # collapse spectral accelerations. Who says weighting factors
+        # that apply to probabilities necessarily apply to
+        # accelerations?
         
-        if apply_weights is False:
-            pass
-        else:
+        if apply_weights:
             assert self.event_activity.shape[SPAWN_D] == 1
             assert self.event_activity.shape[GMMODEL_D] == 1
 

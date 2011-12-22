@@ -221,6 +221,29 @@ class EventZone(object):
         # maintaining a long array of (usually sequential) indexes
         # that could potentially get out of sync with what's actually
         # in the single event_set array.
+
+        # FIXME I suspect that this could be replaced by (start, end)
+        # or slice() instead of a sequence of consecutive ints. The
+        # only place where self.set_event_set_indexes() might be
+        # called with some non-sequential ints is from
+        # szp.determine_event_set_indexes(), which is only called from
+        # source_model.calculate_recurrence(), and only when
+        # szp.get_event_set_indexes() is None. I suspect the only time
+        # that will ever happen is due to
+        # event_set.generate_synthetic_events_fault() skipping a fault
+        # due to "if num == 0: continue", in which case, that probably
+        # equates to an empty slice. Would need to change
+        # merge_events_and_sources(), and also uses of
+        # get_event_set_indexes(), as numpy advanced "partial" indexing won't be
+        # triggered (see
+        # http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html#integer
+        # )
+        #
+        # So, using an array of consecutive integer indexes is massive
+        # overkill and means (a) unnecessarily storing a whole bunch
+        # of ints and (b) not being able to share event_set data with
+        # a view, as happens when slicing.
+        
         self.event_set_indexes = asarray(event_indexes)
 
     def get_event_set_indexes(self):
@@ -363,7 +386,6 @@ class Source_Zone(Source, polygon_object):
             event_set.rupture_centroid_lat,
             event_set.rupture_centroid_lon)]
         poly_ind=where(contains_point)[0]
-        
         self.set_event_set_indexes(poly_ind)
         
 

@@ -3,6 +3,9 @@
 """A program to take the output from the FORTRAN program and make
 unittest code for Abrahamson08."""
 
+# FIXME Why not just write a test suite method incorporating a loop?
+# Why write python that writes python?
+
 import sys
 import re
 import numpy
@@ -80,7 +83,7 @@ def read_file(filename, num_headers, field_dict):
 
 def write_code(cases):
     """For each case, write unittest code."""
-
+    
     # set main code indent
     indent = ' ' * 8
 
