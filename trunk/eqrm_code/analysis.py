@@ -424,9 +424,7 @@ def main(parameter_handle,
     # site dimension at all is because they accumulate the SAs so that
     # they can be saved later by save_motion(). If the program simply
     # wrote the per-site results as it went (completely feasible -
-    # default ulimit for max open files on Linux is 1024), probably
-    # nothing in this entire program would need to be indexed by both
-    # events and sites.
+    # default ulimit for max open files on Linux is 1024).
     
     if eqrm_flags.save_motion is True:
         bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
@@ -1097,11 +1095,7 @@ def calc_and_save_SA(eqrm_flags,
             # num_gmm_after_collapsing and num_sites==1. The layout of
             # event_activity.event_activity is not apparent here, and
             # the code needs to be redesigned so that it is
-            # irrelevant. There really needs to be an event object
-            # that carries around all of the data relevant to an event
-            # (lat, lon, activity, magnitude etc.) and then have an
-            # array of those objects per source object. Just keep the
-            # event stuff in memory and process one site at a time.
+            # irrelevant. 
 
             bedrock_hazard[site_index,j,:] = \
                          hzd_do_value(bedrock_SA_events,

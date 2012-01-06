@@ -551,9 +551,6 @@ class Event_Set(object):
         Returns a new Event_Set object containing the sliced data.
         Additional attributes aren't carried over. eg event_id.
         """
-        # FIXME? This would probbaly not be needed if there was an
-        # Event() object and Event_Set() was a sequence of
-        # those. Probably not 'numpy friendly" though.
         
         # 'key' has to be an array.
         if isinstance(key, int):
@@ -607,49 +604,6 @@ class Event_Set(object):
     def get_Mw(self):
         pass
         
-    def __call__(self, *multi_multi_polygons_list):
-        """
-        WARNING: not tested/ used.  probably broken. FIXME ... and just plain weird. Why would anybody expect self() to drop into wx.MainLoop() and never return?
-        
-        Calling event set will draw it once for every argument.
-        
-        The *arguments (any number) should be sequences of multi-polygons.
-
-        I say multi-multi-polygons to highlight the fact that each argument is
-        a sequence of multi-polygons, and each multi-polygon is a sequence of
-        simple polygons (and simple exclusions).
-        """
-
-        self.draw(*multi_multi_polygons_list)
-
-    def draw(self,*multi_multi_polygons_list):
-        """Draw it once for every argument.
-        
-        The *arguments (any number) should be sequences of multi-polygons.
-
-        I say multi-multi-polygons to highlight the fact that each argument is
-        a sequence of multi-polygons, and each multi-polygon is a sequence of
-        simple polygons (and simple exclusions).
-        """
-        
-        import wx
-
-        app = wx.PySimpleApp()
-        try:
-            recurrence = self.recurrence
-        except:
-            recurrence = None
-        
-        for i in xrange(len(multi_multi_polygons_list)):
-            multi_multi_polygons = multi_multi_polygons_list[i]
-            # FIXME This can't currently work - no MainWindow
-            frame = MainWindow(None, i, 'Stand alone module',
-                               self.rupture_start, self.rupture_end,
-                               multi_multi_polygons=multi_multi_polygons,
-                               recurrence=recurrence)
-        app.MainLoop()
-        
-
 def merge_events_and_sources(event_set_zone, event_set_fault,
                               source_model_zone, source_model_fault):
     """
@@ -1102,14 +1056,6 @@ class Event_Activity(object):
 
         Source_model is a collection of Source's.
         """
-        # FIXME Hang on - is this valid? Here we're using the
-        # attenuation model weights to weight the event activities
-        # (i.e. probabilities), yet in
-        # exceedance_curve.collapse_att_model() (called from
-        # analysis.calc_and_save_SA), the same weights are used to
-        # collapse spectral accelerations. Who says weighting factors
-        # that apply to probabilities necessarily apply to
-        # accelerations?
         
         if apply_weights:
             assert self.event_activity.shape[SPAWN_D] == 1
