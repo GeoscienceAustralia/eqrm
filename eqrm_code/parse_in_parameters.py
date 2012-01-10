@@ -848,7 +848,7 @@ class DictKeyAsAttributes(dict):
 
 
 class ParameterData(object):
-    """OBSOLETE
+    """
     Class to build the attribute_data 'onto'.
     The user will add attributes to this class.
     """
