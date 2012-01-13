@@ -530,10 +530,25 @@ def main(parameter_handle,
         #  2.  this has not been tested recently
         #  3.  it absolutely will not work
         
+        # First proof of concept by trimming the event set
+        # TODO:
+        # 1. Do we need to replace attributes of source_model?
+        # 2. ?
+        # 3. Write unit test for trim functions when done 
+        # Currently this passes unit tests and check scenarios. This is because
+        # there are no scenarios that generate an event_set over the
+        # attenuation threshold distance. We need to make sure this is covered.
+        (event_set_subset, 
+         source_model_subset) = trim_event_set_threshold_distance(sites,
+                                      event_set,
+                                      source_model,
+                                      eqrm_flags.atten_threshold_distance)
+        
         soil_SA, bedrock_SA = calc_and_save_SA(
             eqrm_flags,
             sites,
-            event_set,
+            #event_set,
+            event_set_subset,
             bedrock_SA_all,
             soil_SA_all,
             bedrock_hazard,
@@ -544,7 +559,8 @@ def main(parameter_handle,
             ground_motion_distribution,
             amp_distribution,
             event_activity,
-            source_model)
+            #source_model)
+            source_model_subset)
 
         # calculate fatality
         if eqrm_flags.run_type == "fatality":
@@ -1138,7 +1154,30 @@ def apply_threshold_distance(bedrock_SA,
     if use_amplification is True:
         soil_SA[..., Haznull,:] = 0
 
-
+def trim_event_set_threshold_distance(sites,
+                                      event_set,
+                                      source_model,
+                                      atten_threshold_distance):
+    # A rethink of apply_threshold distance
+    # Calculate the distances of the event_set from the sites array and
+    # return an event_set where distance <= atten_threshold_distance
+    distances = sites.distances_from_event_set(event_set). \
+                distance('Joyner_Boore')
+                
+    # distances is an ndarray where [sites, events]. We only want the events 
+    # dimension for this function as we're trimming events
+    (sites_to_keep, events_to_keep) = where(distances <= atten_threshold_distance)
+    
+    # Event_Set.__getitem__ covers this slice
+    event_set_subset = event_set[events_to_keep]
+    
+    # We don't want to modify source_model so deepcopy it first
+    source_model_subset = copy.deepcopy(source_model)
+    # TODO: do we need to replace attributes of source_model?
+    
+    # We don't want to modify event_set so lets return a trimmed copy
+    return (event_set_subset, source_model_subset)
+    
 def amp_rescale(soil_SA,
                 amp_min_factor, amp_max_factor, bedrock_SA):
     if amp_min_factor is not None:
@@ -1257,7 +1296,7 @@ def load_data(eqrm_flags):
     elif eqrm_flags.run_type == "hazard":
         #raise RuntimeError('run_type "hazard" not yet modified for Bridges')
 
-        # we are running hazard or ground motion scenarion (i.e. no damage)
+        # we are running hazard or ground motion scenario (i.e. no damage)
         if eqrm_flags.grid_flag == 1:
             # grid is from a GIS output
             name = eqrm_flags.site_tag + '_par_site.csv'
