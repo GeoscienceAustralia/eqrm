@@ -1,0 +1,49 @@
+<event_type_controlfile>
+  <event_group
+     event_type = "background">
+    <GMPE 
+       fault_type = "normal">
+      <branch model = "Toro_1997_midcontinent" 	weight = "0.3"/> 
+      <branch model = "Atkinson_Boore_97" weight = "0.4"/> 
+      <branch model = "Sadigh_97" weight = "0.3"/> 
+    </GMPE>
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
+    scaling_fault_type = "unspecified" />
+  </event_group>
+  
+  <event_group
+     event_type = "crustal fault">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "Campbell08" weight = "1"/> 
+    </GMPE>
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse" />
+  </event_group>
+	
+  
+  <event_group
+     event_type = "interface">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "Zhao06_crustalinterface" weight = "0.5"/> 
+      <branch model = "Atkinson03_interface" weight = "0.5"/> 
+    </GMPE>
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
+    scaling_fault_type = "reverse" />
+  </event_group>
+  
+  <event_group
+     event_type = "intraslab">
+    <GMPE 
+       fault_type = "reverse">
+      <branch model = "Zhao06_slab" weight = "0.5"/> 
+      <branch model = "Atkinson03_inslab" weight = "0.5"/> 
+    </GMPE>
+    <scaling scaling_rule = "Wells_and_Coppersmith_94" 
+    scaling_fault_type = "unspecified" />
+  </event_group>	
+  
+</event_type_controlfile>
+			
+	

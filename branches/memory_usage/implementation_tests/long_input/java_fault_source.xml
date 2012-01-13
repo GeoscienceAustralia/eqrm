@@ -1,0 +1,250 @@
+<source_model_fault magnitude_type="Mw">
+  <fault 
+  name = "opak_river"
+  event_type = "crustal_fault">
+  
+    <geometry 
+        dip= "90" 
+        out_of_dip_theta = "0"
+        delta_theta = "0" 
+        depth_top_seismogenic = "3"
+        depth_bottom_seismogenic = "18"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-8.0" lon="110.3" />
+            <end lat="-7.78" lon="110.49" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "characteristic"
+       recurrence_min_mag = "5.0" 
+       recurrence_max_mag = "6.8" 
+       slip_rate = "2.4" 
+       b = "1">
+      <event_generation 
+        generation_min_mag = "4.5"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "10000" />
+    </recurrence_model>
+           
+  </fault>
+  
+  <fault 
+  name = "lembang"
+  event_type = "crustal_fault">
+  
+    <geometry 
+        dip= "90" 
+        out_of_dip_theta = "0"
+        delta_theta = "0" 
+        depth_top_seismogenic = "3"
+        depth_bottom_seismogenic = "18"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-6.89" lon="107.81" />
+            <end lat="-6.83" lon="107.51" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "characteristic"
+       recurrence_min_mag = "5.0" 
+       recurrence_max_mag = "6.6" 
+       slip_rate = "1.5" 
+       b = "1">
+      <event_generation 
+        generation_min_mag = "4.5"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "10000" />
+    </recurrence_model>
+           
+  </fault>
+
+  <fault 
+  name = "cimandiri"
+  event_type = "crustal_fault">
+  
+    <geometry 
+        dip= "90" 
+        out_of_dip_theta = "0"
+        delta_theta = "0" 
+        depth_top_seismogenic = "3"
+        depth_bottom_seismogenic = "18"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-6.96" lon="107.13" />
+            <end lat="-7.02" lon="106.56" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "characteristic"
+       recurrence_min_mag = "5.0" 
+       recurrence_max_mag = "7.2" 
+       slip_rate = "4.0" 
+       b = "1">
+      <event_generation 
+        generation_min_mag = "4.5"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "10000" />
+    </recurrence_model>
+   
+  </fault>
+  <fault 
+  name = "lasem"
+  event_type = "crustal_fault">
+  
+    <geometry 
+        dip= "90" 
+        out_of_dip_theta = "0"
+        delta_theta = "0" 
+        depth_top_seismogenic = "3"
+        depth_bottom_seismogenic = "18"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-7.14" lon="110.59" />
+            <end lat="-6.66" lon="111.59" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "characteristic"
+       recurrence_min_mag = "5.0" 
+       recurrence_max_mag = "6.5" 
+       slip_rate = "1.0" 
+       b = "1">
+      <event_generation 
+        generation_min_mag = "4.5"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "10000" />
+    </recurrence_model>
+           
+  </fault>  
+
+  <fault 
+  name = "sunda"
+  event_type = "crustal_fault">
+  
+    <geometry 
+        dip= "90" 
+        out_of_dip_theta = "0"
+        delta_theta = "0" 
+        depth_top_seismogenic = "3"
+        depth_bottom_seismogenic = "20"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-7.12" lon="105.34" />
+            <end lat="-6.12" lon="104.88" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "characteristic"
+       recurrence_min_mag = "5.0" 
+       recurrence_max_mag = "7.6" 
+       slip_rate = "5.0" 
+       b = "1">
+      <event_generation 
+        generation_min_mag = "4.5"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "10000" />
+    </recurrence_model>  
+  </fault> 
+  
+  <fault 
+  name = "java_megathrust"
+  event_type = "subduction_interface">
+  
+    <geometry 
+        dip= "15" 
+        out_of_dip_theta = "0"
+        delta_theta = "0" 
+        depth_top_seismogenic = "3"
+        depth_bottom_seismogenic = "20"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-11.13" lon="114.13" />
+            <end lat="-8.30" lon="104.64" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "bounded_gutenberg_richter"
+       recurrence_min_mag = "5.0" 
+       recurrence_max_mag = "8.1" 
+       A_min = "6.14" 
+       b = "1.1">
+      <event_generation 
+        generation_min_mag = "5.0"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "30000" />
+    </recurrence_model>
+           
+    </fault>
+  
+ <fault 
+  name = "java instraslab deep"
+  event_type = "intraslab">
+  
+    <geometry 
+        dip= "58" 
+        out_of_dip_theta = "90"
+        delta_theta = "90" 
+        depth_top_seismogenic = "140"
+        depth_bottom_seismogenic = "340"
+        slab_width = "20">
+        <trace> 	
+            <start lat="-9.35599" lon="112.691361" />
+            <end lat="-7.622251" lon="106.080779" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "bounded_gutenberg_richter"
+       recurrence_min_mag = "4.8" 
+       recurrence_max_mag = "8.0" 
+       A_min = "2.57" 
+       b = "1.2">
+      <event_generation 
+        generation_min_mag = "5.0"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "50000" />
+    </recurrence_model>
+           
+  </fault>
+  
+  <fault 
+  name = "java instraslab shallow"
+  event_type = "intraslab">
+  
+    <geometry 
+        dip= "35" 
+        out_of_dip_theta = "90"
+        delta_theta = "90" 
+        depth_top_seismogenic = "35"
+        depth_bottom_seismogenic = "140"
+        slab_width = "20">
+        <trace> 	
+            <start lat="-10.338979" lon="112.433555" />
+            <end lat="-8.60524" lon="105.822974" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "bounded_gutenberg_richter"
+       recurrence_min_mag = "4.8" 
+       recurrence_max_mag = "8.0" 
+       A_min = "2.66" 
+       b = "1.2">
+      <event_generation 
+        generation_min_mag = "5.0"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "25000" />
+    </recurrence_model>
+           
+  </fault>
+  
+
+
+</source_model_fault>

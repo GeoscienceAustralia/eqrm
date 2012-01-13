@@ -1,0 +1,229 @@
+\chapter{Appendicies}
+
+\section{A selection of GMPE formulae}
+\label{app:GMPE_eqns}
+
+This appendix discusses individual GMPE's described in the previous
+version of the EQRM manual.  This does not represent all of the GMPE's
+available for use within EQRM, but rather a subset of the available
+models. More will come in the future.
+
+
+\subsection{Toro ground motion formula}
+
+The \citet{dr_Toro97a} ground motion relation used in the EQRM code
+is based on the Joyner-Boore distance $\Rjb$ and moment-magnitude.
+Note that this reference largely describes the variability and not
+how the coefficients were derived. \citet{dr_EPRI93a} describes
+how the coefficients were derived.
+
+The \citet{dr_Toro97a} ground motion model divides North America
+into two regions (Gulf and Mid-Continent) and can  be used with
+two different measures of magnitude (local and moment). Currently
+the EQRM can only use the Mid-Continent -- moment magnitude
+version of the ground motion model. This version of the ground motion
+model is used because the earthquake mechanism in Mid-Continent
+USA is believed by some to be similar to that in Australia (i.e. both are
+intraplate settings).
+
+The ground motion formula is
+\begin{equation}
+\begin{split}
+\mu_{log(S_a)}(T_o,r_m,\Rjb) &= C_1 + C_2(r_m-6) + C_3(r_m-6)^2 - C_4\ln(R_M) \\
+       &\quad  - (C_5-C_4)\max\left[\ln\left(\frac{R_M}{100}\right),0\right] -C_6R_M,
+\end{split}
+\end{equation}
+where
+\begin{equation}
+ R_M = \sqrt{ \Rjb^2 + C_7^2 }.
+\end{equation}
+
+The coefficients used in the code, $C_1,\ldots,C_7$, are functions
+of $T_o$ and are tabulated in \citet[Table 2]{dr_Toro97a}.
+
+The `uncertainty parameter' ($\sigma_{log(S_a)}$) can be
+decomposed as follows:
+\begin{equation}
+ \sigma_{log(S_a)}(T_o,r_m,\Rjb) =
+ \sqrt{\sigma_a(T_o,r_m,\Rjb)+\sigma_e(r_m)}.
+\end{equation}
+
+The aleatory or random uncertainty $\sigma_a$ can be separated
+into a source dependant component $\sigma_{a,r_m}$ (see
+\citet[Table 3]{dr_Toro97a}) and a path dependant
+component $\sigma_{a,\Rjb}$ (see \citet[Table 4]{dr_Toro97a}) as follows:
+\begin{equation}
+\label{eq:attn-toro-aleat} \sigma_a =
+\sqrt{\sigma_{a,r_m}^2(T_o,r_m) + \sigma_{a,\Rjb}^2(T_o,\Rjb)}.
+\end{equation}
+The EQRM uses the aleatory uncertainty as defined by
+\eref{eq:attn-toro-aleat}.
+
+The epistemic or knowledge uncertainty $\sigma_e$ is dependant
+upon source only, that is \mbox{$\sigma_e =\sigma_{e,r_m}$} (see
+\citet[Page 48]{dr_Toro97a} or
+\typefunc{attn}{\_preptoro}{\_epistemic}). Note that
+$\sigma_{a,r_m}$ is a function of $T_o$ and $r_m$;
+$\sigma_{a,\Rjb}$ is a function of $T_o$ and $\Rjb$; and
+$\sigma_{e,r_m}$ is a function of $r_m$ only.
+
+\subsection{Gaull ground motion formula}
+\label{attn:atten-formula-Gaull}
+
+
+The \citet{dr_Gaull90a} ground motion relation, as used in the EQRM
+code, is based on hypocentral distance $\Rhyp$ and local magnitude
+$r_{m_l}$.The Gaull ground motion model can be used to compute (i)
+the mean of the logarithm of PGA $\mu_{log(PGA)}$ or (ii) the mean
+of the logarithm of the Modified Mercalli Intensity
+$\mu_{log(\Imm)}$. The formula is based on empirical intensity
+data in the Australian region and the PGA extension created using
+Papua New Guinea data. For the purpose of this ground motion model
+the Australian region is divided into four sub-regions, Western
+Australia, Southeastern Australia, Northeastern Australia and
+Indonesia. The ground motion formulae is:
+\begin{equation}
+lnY = \ln a-c\ln \Rhyp + br_{m_l}
+\end{equation}
+where $a$, $b$ and $c$ are constants, $r_{m_l}$ is the local
+magnitude of the rupture and $lnY$ represents $\mu_{log(PGA)}$ or
+$\mu_{log(MMI)}$ depending on the value of the constants. The
+constants are tabulated in \citet[Table 4]{dr_Gaull90a}.
+
+Note that in the case of the \citet{dr_Gaull90a} ground motion model
+(PGA version) there is no need to prepare the ground motion
+coefficients because the ground motion model is only defined for
+$T_o=0 sec$ (PGA). To compute $S_a(T_o,r_m,R)$ (more specifically,
+$\mu_{log(S_a)}$), we can extend the $PGA$ estimate using the
+Australian Standard Response Spectral Acceleration
+\citep{dr_Standards93a}. 
+
+\citet[Table 4]{dr_Gaull90a} tabulate the `uncertainty
+parameter(s)' ($\sigma_{log(Y)}$) and indicate that they do not
+depend on $r_{m_l}$ or $\Rhyp$. Furthermore, when extending the
+PGA estimate to a complete $S_a$ it is assumed that
+$\sigma_{log(S_a)}$ is not a function of $T_o$ and that
+\begin{equation}
+\sigma_{log(S_a)}(T_o) = \sigma_{log(PGA)}.
+\end{equation}
+Personal discussions with Brian Gaull (2002 and 2003) have
+revealed that the following values of $\sigma_{log(Y)}$; 0.7 (for
+PGA) and 0.925 (for $\Imm$) should be used in preference to the
+published values of 0.28 and 0.37 respectively.
+
+
+\subsection{Atkinson and Boore ground motion formula}
+
+The \cite{dr_Atkinson97a} ground motion relation, as used in the
+EQRM code, is based on hypocentral distance $\Rhyp$ and moment
+magnitude $r_m$. The formula is
+\begin{equation}
+\mu_{log(S_a)}(T_o,r_m,\Rhyp) = C_1 + C_2(r_m-6) + C_3(r_m-6)^2
+-ln(\Rhyp)-C_4\Rhyp.
+\end{equation}
+The coefficients used in the code, $C_1,\ldots,C_7$, are functions
+of $T_o$ and are tabulated in \citet[Table 1]{dr_Atkinson97a}.
+
+The uncertainty is dependant on $T_o$ only.. It represents aleatory uncertainty,
+$\sigma_a$ and no attempt is made to separate it into into source
+and path components.
+
+
+\subsection{Sadigh ground motion formula}
+
+The \cite{dr_Sadigh97a} ground motion relation, as used in the EQRM
+code, is based on rupture distance $\Rrup$ and moment-magnitude
+$r_m$. Using the convention defined by \citet{dr_Campbell03a} (in
+accompanying appendix), the ground motion formula is
+\begin{equation}
+\begin{split}
+\mu_{log(S_a)}(T_o,r_m,\Rrup) & = C_1F +C_2 + C_3r_m
++C_4(8.5-r_m)^2 + \\ c_5ln(r_{rup}+C_7\exp{c_8r_m}) +
+C_6ln(r_{rup}+2),
+\end{split}
+\end{equation}
+where the parameter $F$ is hard wired in the EQRM to 1 (hence
+assuming reverse faulting). The coefficients used in the code,
+$C_1,\ldots,C_7$, are functions of $T_o$ and $ r_m$. They are
+tabulated in \citet[Table 2]{dr_Sadigh97a}.
+
+\cite{dr_Sadigh97a} define a magnitude $r_m$ and period $T_o$
+dependant `standard error' $\sigma(r_m,T_o)$ (see \citealt[Table
+3]{dr_Sadigh97a}) which can be generalised as follows
+\begin{equation}
+\sigma(r_m,T_o) = \left \{ \begin{array}{ll}
+C_{10}-C_{11}r_m & \textrm{for $0<r_m<7.21$} \\
+c_{12} & \textrm{for $r_m \geq 7.21$} \\
+\end{array} \right.
+\end{equation}
+where the coefficients $C_{10}$, $C_{11}$ and $C_{12}$ are
+functions of $T_o$, and are defined in \cite[Table
+A-14]{dr_Campbell03a}. For the purpose of
+consistency, $\sigma(r_m,T_o)$ is assumed to be the aleatory
+uncertainty $\sigma_a$.
+
+
+\subsection{Somerville ground motion formula}
+The \citet{dr_Somerville01a} ground motion relation, as used in the
+EQRM code, is based on Joyner--Boore distance $R_{jb}$ and moment
+magnitude $r_m$. The \citet{dr_Somerville01a} ground motion model
+can be used for rift or nonrift zones and for vertical or
+horizontal shaking (i.e. four seperate versions). The default
+setting in the EQRM is nonrift.
+
+
+
+The ground motion formula is
+\begin{equation}
+\begin{split}
+\mu_{log(S_a)}(T_o,r_m,\Rjb) &= C_1 + C_2(r_m-6.4) + C_3ln(R_M) + C_4(r_m-6.4))\ln(R_M) \\
+       &\quad  + C_5 \Rjb+ C_7(8.5-r_m)^2,
+\end{split}
+\end{equation}
+for $\Rjb<50$, and
+\begin{equation}
+\begin{split}
+\mu_{log(S_a)}(T_o,r_m,\Rjb) &= C_1 + C_2(r_m-6.4) + C_3ln(R_M) + C_4(r_m-6.4))\ln(R_M) \\
+       &\quad  + C_5 \Rjb + C_6(ln(R_M)-ln\sqrt{2536}) +    C_7(8.5-r_m)^2,
+\end{split}
+\end{equation}
+for $\Rjb \geq 50$, where
+\begin{equation}
+ R_M = \sqrt{ \Rjb + 6^2 }.
+\end{equation}
+
+The coefficients used in the code, $C_1,\ldots,C_7$, are functions
+of $T_o$ and are tabulated in \citet[Table 9]{dr_Somerville01a}.
+
+\cite{dr_Somerville01a} describe five types of uncertainty as
+follows:
+
+\begin{supertabular}{ll}
+$\sigma_{\mu}$ & uncertainty in the median ground motion = 0.2. \\
+$\sigma_{\sigma}$ & uncertainty in the scatter about median ground motion = 0.15. \\
+$\sigma_{modeling}(T_o)$ & representing the discrepancy between
+actual
+physical processes \\
+  & and the simplified representation of the model.\\
+$\sigma_a(T_o)$ & arising from parameters varied in the study of \\
+ & \cite{dr_Somerville01a}. \\
+$\sigma_b(T_o)$ & arising from earlier studies by the same
+authors.\\
+\end{supertabular}
+
+The terms $\sigma_{\mu}$ and $\sigma_{\sigma}$ are clearly
+epistemic uncertainty. \cite{dr_Somerville01a} then define
+$\sigma_{modeling}(T_o)$, $\sigma_a(T_o)$ and $\sigma_b(T_o)$ as
+contributions to the scatter and as such the aleatory uncertainty
+is taken to be:
+\begin{equation}
+\sigma_{a,log(S_a)}(T_o) = \sqrt{
+\sigma_{modeling}^2(T_o)+\sigma_a^2(T_o)+\sigma_b^2(T_o) }.
+\end{equation}
+
+\
+\eject
+
+
+
+
