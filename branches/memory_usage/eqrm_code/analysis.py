@@ -22,7 +22,7 @@ import copy
 import datetime
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
-     arange, reshape, exp, tile
+     arange, reshape, exp, tile, intersect1d
 
 from eqrm_code.parse_in_parameters import  \
     AttributeSyntaxError, create_parameter_data, eqrm_flags_to_control_file
@@ -530,16 +530,9 @@ def main(parameter_handle,
         #  2.  this has not been tested recently
         #  3.  it absolutely will not work
         
-        # First proof of concept by trimming the event set
-        # TODO:
-        # 1. Do we need to replace attributes of source_model?
-        # 2. ?
-        # 3. Write unit test for trim functions when done 
-        # Currently this passes unit tests and check scenarios. This is because
-        # there are no scenarios that generate an event_set over the
-        # attenuation threshold distance. We need to make sure this is covered.
-        (event_set_subset, 
-         source_model_subset) = trim_event_set_threshold_distance(sites,
+        # A source model subset - each event reference in the source model
+        # meets the attenuation threshold criteria
+        source_model_subset = trim_event_set_threshold_distance(sites,
                                       event_set,
                                       source_model,
                                       eqrm_flags.atten_threshold_distance)
@@ -547,8 +540,7 @@ def main(parameter_handle,
         soil_SA, bedrock_SA = calc_and_save_SA(
             eqrm_flags,
             sites,
-            #event_set,
-            event_set_subset,
+            event_set,
             bedrock_SA_all,
             soil_SA_all,
             bedrock_hazard,
@@ -559,7 +551,6 @@ def main(parameter_handle,
             ground_motion_distribution,
             amp_distribution,
             event_activity,
-            #source_model)
             source_model_subset)
 
         # calculate fatality
@@ -1018,11 +1009,6 @@ def calc_and_save_SA(eqrm_flags,
             soil_SA = None
         cutoff_pga(bedrock_SA,
                    eqrm_flags.atten_pga_scaling_cutoff)
-        
-        apply_threshold_distance(bedrock_SA, soil_SA,
-                                 sites,
-                                 eqrm_flags.atten_threshold_distance,
-                                 eqrm_flags.use_amplification, sub_event_set)
 
 
         # collapse  multiple attenuation models 
@@ -1117,7 +1103,9 @@ def calc_and_save_SA(eqrm_flags,
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,
                                       1.0/array(eqrm_flags.return_periods))
-            if soil_SA is not None:
+            # FIXME. soil_SA is never defined in this scope. Is the intention
+            # to check soil_SA_overloaded?
+            if soil_SA_overloaded is not None:
                 soil_SA_events = coll_soil_SA_all_events[:,:,:,:,:,j].reshape(
                     (-1))
                 soil_hazard[site_index,j,:] = \
@@ -1146,6 +1134,8 @@ def apply_threshold_distance(bedrock_SA,
     distances = sites.distances_from_event_set(event_set). \
                 distance('Joyner_Boore')
     #atten_threshold_distance = 0.1
+    # distances is an ndarray where [sites, events]. Note that Haznull refers
+    # to the sites dimension and the events dimension is ignored in the filter
     Haznull, _ = where(distances > atten_threshold_distance)
     #print "Haznull", Haznull
     # Assuming one site=
@@ -1158,25 +1148,41 @@ def trim_event_set_threshold_distance(sites,
                                       event_set,
                                       source_model,
                                       atten_threshold_distance):
+    """
+    trim_event_set_threshold_distance
+    Calculate the distances of the event_set from the sites array. For those
+    events less than or equal to the attentuation threshold, return a subset 
+    source model so that calc_and_save_SA only works on those events.
+    
+    calc_and_save_SA calculates an SA figure by getting a subset of event
+    indices:
+    
+    for source in source_model:
+        event_inds = source.get_event_set_indexes()
+        if len(event_inds) == 0:
+            continue
+        sub_event_set = event_set[event_inds]
+    """
     # A rethink of apply_threshold distance
     # Calculate the distances of the event_set from the sites array and
     # return an event_set where distance <= atten_threshold_distance
-    distances = sites.distances_from_event_set(event_set). \
-                distance('Joyner_Boore')
+    distances = sites.distances_from_event_set(event_set).distance('Joyner_Boore')
                 
     # distances is an ndarray where [sites, events]. We only want the events 
     # dimension for this function as we're trimming events
     (sites_to_keep, events_to_keep) = where(distances <= atten_threshold_distance)
-    
-    # Event_Set.__getitem__ covers this slice
-    event_set_subset = event_set[events_to_keep]
-    
-    # We don't want to modify source_model so deepcopy it first
+
     source_model_subset = copy.deepcopy(source_model)
-    # TODO: do we need to replace attributes of source_model?
+    # Re-sync the event indices in the source model. As we don't want to add
+    # events that may already be excluded by generate_synthetic_events_fault(),
+    # do the following
+    # 1. Grab the event set already calculated
+    # 2. The intersection of this and events_to_keep is what we want
+    for source in source_model_subset:
+        source_indices = source.get_event_set_indexes()
+        source.set_event_set_indexes(intersect1d(source_indices,events_to_keep))
     
-    # We don't want to modify event_set so lets return a trimmed copy
-    return (event_set_subset, source_model_subset)
+    return source_model_subset
     
 def amp_rescale(soil_SA,
                 amp_min_factor, amp_max_factor, bedrock_SA):
