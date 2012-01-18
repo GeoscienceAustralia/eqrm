@@ -55,7 +55,7 @@ import eqrm_code.util as util
 import eqrm_filesystem as eq_fs
 from eqrm_code.RSA2MMI import rsa2mmi_array
 from eqrm_code.fatalities import forecast_fatality
-from eqrm_code.filters import apply_threshold_distance
+from eqrm_code.filters import source_model_threshold_distance_subset
 
 
 # data columns expected in a BRIDGE data file
@@ -533,7 +533,7 @@ def main(parameter_handle,
         
         # A source model subset - each event reference in the source model
         # meets the attenuation threshold criteria
-        source_model_subset = trim_event_set_threshold_distance(sites,
+        source_model_subset = source_model_threshold_distance_subset(sites,
                                       event_set,
                                       source_model,
                                       eqrm_flags.atten_threshold_distance)
@@ -1115,47 +1115,6 @@ def calc_and_save_SA(eqrm_flags,
                                       1.0/array(eqrm_flags.return_periods))
                 
     return soil_SA_overloaded, rock_SA_overloaded
-
-
-def trim_event_set_threshold_distance(sites,
-                                      event_set,
-                                      source_model,
-                                      atten_threshold_distance):
-    """
-    trim_event_set_threshold_distance
-    Calculate the distances of the event_set from the sites array. For those
-    events less than or equal to the attentuation threshold, return a subset 
-    source model so that calc_and_save_SA only works on those events.
-    
-    calc_and_save_SA calculates an SA figure by getting a subset of event
-    indices:
-    
-    for source in source_model:
-        event_inds = source.get_event_set_indexes()
-        if len(event_inds) == 0:
-            continue
-        sub_event_set = event_set[event_inds]
-    """
-    # A rethink of apply_threshold distance
-    # Calculate the distances of the event_set from the sites array and
-    # return an event_set where distance <= atten_threshold_distance
-    distances = sites.distances_from_event_set(event_set).distance('Joyner_Boore')
-                
-    # distances is an ndarray where [sites, events]. We only want the events 
-    # dimension for this function as we're trimming events
-    (sites_to_keep, events_to_keep) = where(distances <= atten_threshold_distance)
-
-    source_model_subset = copy.deepcopy(source_model)
-    # Re-sync the event indices in the source model. As we don't want to add
-    # events that may already be excluded by generate_synthetic_events_fault(),
-    # do the following
-    # 1. Grab the event set already calculated
-    # 2. The intersection of this and events_to_keep is what we want
-    for source in source_model_subset:
-        source_indices = source.get_event_set_indexes()
-        source.set_event_set_indexes(intersect1d(source_indices,events_to_keep))
-    
-    return source_model_subset
     
 def amp_rescale(soil_SA,
                 amp_min_factor, amp_max_factor, bedrock_SA):
