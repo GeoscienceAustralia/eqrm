@@ -2,7 +2,7 @@
 """
 Created on 12/01/2012
 
-@author: u78240
+@author: Ben Cooper, ben.cooper@ga.gov.au
 """
 
 import os
@@ -62,7 +62,8 @@ class Test_Perf(unittest.TestCase):
         
         # Assert that the result is the same as self.log_list
         self.assertEqual(result, self.log_list)
-    
+
+#-------------------------------------------------------------    
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Perf,'test')
     runner = unittest.TextTestRunner() #verbosity=2)
