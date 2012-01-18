@@ -101,6 +101,21 @@ class Sites(object):
             attributes[k] = self.attributes[k][key]
 
         return Sites(self.latitude[key], self.longitude[key], **attributes)
+    
+    def __repr__(self):
+        return ('Sites:\n'
+                'number of sites:%r\n'
+                '            lat:%r\n'
+                '           long:%r\n'
+                '     attributes:%r\n'
+                % (len(self), self.latitude, self.longitude, self.attributes))
+        
+    def __str__(self):
+        return ('Sites:\n'
+                'number of sites:%s\n'
+                '            lat:%s\n'
+                '           long:%s\n'
+                % (len(self), self.latitude, self.longitude))
 
     def set_Vs30(self, site_class2Vs30):
         """Given a mapping from site_class to Vs30, calculate the Vs30 values
