@@ -55,6 +55,7 @@ import eqrm_code.util as util
 import eqrm_filesystem as eq_fs
 from eqrm_code.RSA2MMI import rsa2mmi_array
 from eqrm_code.fatalities import forecast_fatality
+from eqrm_code.filters import apply_threshold_distance
 
 
 # data columns expected in a BRIDGE data file
@@ -1110,33 +1111,6 @@ def calc_and_save_SA(eqrm_flags,
                                       1.0/array(eqrm_flags.return_periods))
                 
     return soil_SA_overloaded, rock_SA_overloaded
-
-
-def apply_threshold_distance(bedrock_SA,
-                             soil_SA,
-                             sites,
-                             atten_threshold_distance,
-                             use_amplification,
-                             event_set):
-    # re-compute the source-site distances
-    # (NEEDED because this is not returned from bedrock_SA_pdf)
-    # Identify sites which are greater than
-    # eqrm_flags.atten_threshold_distance from an event
-    # (NO GM computed for these sites)
-    # This is not necessarily recomputing, since the
-    # distance method used previously may not be Joyner_Boore.
-    # But does this need to be Joyner_Boore?
-    # FIXME do this earlier, and reduce the distribution calcs to do.
-    distances = sites.distances_from_event_set(event_set). \
-                distance('Joyner_Boore')
-    #atten_threshold_distance = 0.1
-    Haznull, _ = where(distances > atten_threshold_distance)
-    #print "Haznull", Haznull
-    # Assuming one site=
-    # error here?  the problem is usually bedrock_SA, not Haznull.
-    bedrock_SA[..., Haznull,:] = 0
-    if use_amplification is True:
-        soil_SA[..., Haznull,:] = 0
 
 
 def amp_rescale(soil_SA,
