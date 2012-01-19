@@ -1,5 +1,5 @@
 """
-Title: demo_batchmem.py
+Title: performance.py
 
   Author:  Ben Cooper, ben.cooper@ga.gov.au
 
