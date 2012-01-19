@@ -14,7 +14,7 @@ import os
 import sys
 import time, datetime
 from functools import wraps
-from eqrm_code.get_version import get_version
+from eqrm_code.get_version import get_svn_revision_sandpit_linux
 from eqrm_code.ANUGA_utilities import log
 
 default_csv_file = 'perf.csv'
@@ -68,7 +68,7 @@ def stats(func):
         if os.path.exists(log.log_filename):
         
             # Subversion revision
-            version, date, modified = get_version()
+            revision, commit, url = get_svn_revision_sandpit_linux()
             #print "STATS %s(%s) SVN version=%s date=%s modified=%s" % (func.__name__, str(*args), version, date, modified)
             
             # Log analysis
@@ -83,11 +83,12 @@ def stats(func):
             # Headers
             header_list = None
             if not os.path.exists(os.path.join(output_dir, default_csv_file)):
-                header_list = ['version', 'start', 'end', 'running time']
+                header_list = ['revision', 'url', 'start', 'end', 'running time']
                 header_list.extend([k for (k,v) in memory_usage_locations])
             
             # Data
-            data_list = [version,
+            data_list = [commit,
+                         url,
                          datetime.datetime.fromtimestamp(t0).isoformat(' '),
                          datetime.datetime.fromtimestamp(t1).isoformat(' '),
                          str(tdiff)]
