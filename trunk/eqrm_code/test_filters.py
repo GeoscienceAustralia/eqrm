@@ -15,13 +15,17 @@ from eqrm_code.filters import *
 
 from eqrm_code.event_set import Event_Set
 from eqrm_code.sites import Sites
+from eqrm_code.source_model import Source_Model
 from eqrm_code.test_event_set import DummyEventSet
-
-try:
-    from eqrm_code.ANUGA_utilities import log
-    log_imported = True
-except ImportError:
-    log_imported = False
+    
+def create_source_model():
+    """
+    Create dummy source model.
+    This needs to match the event_set created by create_event_set()
+    """
+    # create_event_set returns an event_set of size 2
+    source_model = Source_Model.create_scenario_source_model(2)
+    return source_model
     
 def create_event_set():
     """
@@ -99,6 +103,9 @@ class Test_Filters(unittest.TestCase):
         self.event_set = create_event_set()
         #print "event_set", self.event_set
         #print "len(event_set)=", len(self.event_set)
+        
+        # Set up test source_model object
+        self.source_model = create_source_model()
         
         # Set up dummy SA values - can be anything as long as we understand
         # what's being tested
@@ -211,6 +218,81 @@ class Test_Filters(unittest.TestCase):
         # This should produce all ones
         assert allclose(bedrock_SA, self.SA_ones)
         assert allclose(soil_SA, self.SA_ones)
+        
+    def test_source_model_threshold_distance_subset_all(self):
+        """
+        Test source_model_threshold_distance_subset function for 
+        atten_threshold_distance scenario where the source_model_subset returned
+        contains no events
+        """
+        # Set a low threshold distance
+        #                event 0       event 1
+        # distances [[   337.69538742  27105.63126916]]
+        atten_threshold_distance = 300
+        
+        # Expected result - evcnt_set_indexes an empty array
+        source_model_expected = create_source_model()
+        for source in source_model_expected:
+            source.set_event_set_indexes([])
+        
+        source_model_subset = source_model_threshold_distance_subset(self.sites,
+                                                        self.event_set,
+                                                        self.source_model,
+                                                        atten_threshold_distance)
+        
+        for i, source in enumerate(source_model_subset):
+            self.failUnless(allclose(source.event_set_indexes,
+                                     source_model_expected[i].event_set_indexes))
+    
+    def test_source_model_threshold_distance_subset_partial(self):
+        """
+        Test source_model_threshold_distance_subset function for 
+        atten_threshold_distance scenario where the source_model_subset returned
+        contains a reduced set of events
+        """
+        # Set a normal threshold distance
+        #                event 0       event 1
+        # distances [[   337.69538742  27105.63126916]]
+        atten_threshold_distance = 400
+        
+        # Expected result - event_set_indexes a subset according to distances in 
+        # the above comment
+        source_model_expected = create_source_model()
+        for source in source_model_expected:
+            event_inds = [0]
+            source.set_event_set_indexes(event_inds)
+        
+        source_model_subset = source_model_threshold_distance_subset(self.sites,
+                                                        self.event_set,
+                                                        self.source_model,
+                                                        atten_threshold_distance)
+        
+        for i, source in enumerate(source_model_subset):
+            self.failUnless(allclose(source.event_set_indexes,
+                                     source_model_expected[i].event_set_indexes))
+    
+    def test_source_model_threshold_distance_subset_none(self):
+        """
+        Test source_model_threshold_distance_subset function for 
+        atten_threshold_distance scenario where the source_model_subset returned
+        contains the original set of events
+        """
+        # Set a high threshold distance
+        #                event 0       event 1
+        # distances [[   337.69538742  27105.63126916]]
+        atten_threshold_distance = 30000
+        
+        # Expected result - an unchanged source model
+        source_model_expected = create_source_model()
+        
+        source_model_subset = source_model_threshold_distance_subset(self.sites,
+                                                        self.event_set,
+                                                        self.source_model,
+                                                        atten_threshold_distance)
+        
+        for i, source in enumerate(source_model_subset):
+            self.failUnless(allclose(source.event_set_indexes,
+                                     source_model_expected[i].event_set_indexes))
 
 #-------------------------------------------------------------    
 if __name__ == "__main__":
