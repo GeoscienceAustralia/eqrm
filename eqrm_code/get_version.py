@@ -10,10 +10,13 @@ SubWCRev.exe . ver.txt ver.py
 
 """
 import os
+import re
 import sys
 import commands
 from os.path import join
 import tempfile
+
+from eqrm_code.eqrm_filesystem import eqrm_path
 
 template = 'version.txt'
 version = 'version.py'
@@ -28,7 +31,6 @@ asc  = """$WCREV$
 '$WCMODS?Modified:Not modified$'
 '$WCDATE$'
 """
-
 
 def get_version():
     """
@@ -64,8 +66,35 @@ def get_version_sandpit_linux():
     date = None
     modified = None
     return version, date, modified
+
+def get_svn_revision_sandpit_linux(path=None):
+    """
+    Returns the SVN revision and other data - does not comform to the get_version()
+    return format so leaving separate for now.
+    Based on method used in django 
+    (https://code.djangoproject.com/browser/django/trunk/django/utils/version.py)
+    """
+    rev = None
+    url = None
     
+    if path is None:
+        path = eqrm_path
     
+    # Determine whether the path has svn info, then read from the info xml 
+    entries_path = '%s/.svn/entries' % path
+    try:
+        entries = open(entries_path, 'r').read()
+        info_xml = os.popen('svn info --xml %s' % path)
+    except IOError:
+        pass
+    else:
+        from xml.dom import minidom
+        dom = minidom.parse(info_xml)
+        rev = dom.getElementsByTagName('entry')[0].getAttribute('revision')
+        url = dom.getElementsByTagName('url')[0].firstChild.toxml()
+        commit = dom.getElementsByTagName('commit')[0].getAttribute('revision')
+        
+    return rev, commit, url
 
 def get_version_sandpit_windows():
     """

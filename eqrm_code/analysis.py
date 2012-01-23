@@ -22,7 +22,7 @@ import copy
 import datetime
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
-     arange, reshape, exp, tile
+     arange, reshape, exp, tile, intersect1d
 
 from eqrm_code.parse_in_parameters import  \
     AttributeSyntaxError, create_parameter_data, eqrm_flags_to_control_file
@@ -55,7 +55,7 @@ import eqrm_code.util as util
 import eqrm_filesystem as eq_fs
 from eqrm_code.RSA2MMI import rsa2mmi_array
 from eqrm_code.fatalities import forecast_fatality
-from eqrm_code.filters import apply_threshold_distance
+from eqrm_code.filters import source_model_threshold_distance_subset
 
 
 # data columns expected in a BRIDGE data file
@@ -531,6 +531,13 @@ def main(parameter_handle,
         #  2.  this has not been tested recently
         #  3.  it absolutely will not work
         
+        # A source model subset - each event reference in the source model
+        # meets the attenuation threshold criteria
+        source_model_subset = source_model_threshold_distance_subset(sites,
+                                      event_set,
+                                      source_model,
+                                      eqrm_flags.atten_threshold_distance)
+        
         soil_SA, bedrock_SA = calc_and_save_SA(
             eqrm_flags,
             sites,
@@ -545,7 +552,7 @@ def main(parameter_handle,
             ground_motion_distribution,
             amp_distribution,
             event_activity,
-            source_model)
+            source_model_subset)
 
         # calculate fatality
         if eqrm_flags.run_type == "fatality":
@@ -1003,11 +1010,6 @@ def calc_and_save_SA(eqrm_flags,
             soil_SA = None
         cutoff_pga(bedrock_SA,
                    eqrm_flags.atten_pga_scaling_cutoff)
-        
-        apply_threshold_distance(bedrock_SA, soil_SA,
-                                 sites,
-                                 eqrm_flags.atten_threshold_distance,
-                                 eqrm_flags.use_amplification, sub_event_set)
 
 
         # collapse  multiple attenuation models 
@@ -1102,7 +1104,9 @@ def calc_and_save_SA(eqrm_flags,
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,
                                       1.0/array(eqrm_flags.return_periods))
-            if soil_SA is not None:
+            # FIXME. soil_SA is never defined in this scope. Is the intention
+            # to check soil_SA_overloaded?
+            if soil_SA_overloaded is not None:
                 soil_SA_events = coll_soil_SA_all_events[:,:,:,:,:,j].reshape(
                     (-1))
                 soil_hazard[site_index,j,:] = \
@@ -1111,8 +1115,7 @@ def calc_and_save_SA(eqrm_flags,
                                       1.0/array(eqrm_flags.return_periods))
                 
     return soil_SA_overloaded, rock_SA_overloaded
-
-
+    
 def amp_rescale(soil_SA,
                 amp_min_factor, amp_max_factor, bedrock_SA):
     if amp_min_factor is not None:
@@ -1231,7 +1234,7 @@ def load_data(eqrm_flags):
     elif eqrm_flags.run_type == "hazard":
         #raise RuntimeError('run_type "hazard" not yet modified for Bridges')
 
-        # we are running hazard or ground motion scenarion (i.e. no damage)
+        # we are running hazard or ground motion scenario (i.e. no damage)
         if eqrm_flags.grid_flag == 1:
             # grid is from a GIS output
             name = eqrm_flags.site_tag + '_par_site.csv'
