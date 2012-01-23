@@ -1,0 +1,21 @@
+# Example machines file, used by mpirun when running EQRM in parallel	
+compute-0-0 cpu=1
+compute-0-1 cpu=1
+compute-0-2 cpu=1
+compute-0-3 cpu=1
+compute-0-4 cpu=1
+compute-0-5 cpu=1
+compute-0-6 cpu=1
+compute-0-7 cpu=1
+compute-0-8 cpu=1
+compute-0-9 cpu=1
+compute-0-10 cpu=1
+compute-0-11 cpu=4
+compute-0-12 cpu=4
+compute-0-13 cpu=4
+compute-0-14 cpu=4
+compute-0-15 cpu=4
+compute-0-16 cpu=4
+compute-0-17 cpu=4
+compute-0-18 cpu=4
+compute-0-19 cpu=4

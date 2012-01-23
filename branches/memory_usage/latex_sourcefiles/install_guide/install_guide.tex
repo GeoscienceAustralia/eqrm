@@ -1,0 +1,343 @@
+% Use pdflatex to compile.
+\documentclass[a4paper, 12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{supertabular}
+\usepackage{hyperref}
+
+\input ../manual_tech/eqrmtech-macros  % load in a bunch of purpose built macros
+
+
+% A couple of changes to the formatting
+\setlength{\parindent}{0in}  % remove paragraph indenting
+\setlength{\parskip}{1em} % put a blank line between paragraphs
+%\value{10}
+% \setcounter{counter}{value}
+
+
+
+
+\makeatletter
+\def\maketitle{%
+\null
+\thispagestyle{empty}%
+\hrule height 0.5pt \vskip 2.5cm
+\begin{center}
+\normalfont
+{\Large \textbf\@title\par}%
+\vskip 2.5cm \normalsize \textbf{EQRM Development Team} \vskip 2.5cm
+{\normalsize \textbf \@author\par}%
+\vskip 4.53cm
+{\normalsize \textbf \@date\par}%
+\vskip 3.5cm \hrule height 0.5pt
+\end{center}%
+\null \clearpage }
+
+\makeatother
+\title{EQRM Install Guide}
+\author{Geoscience Australia}
+
+
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+The EQRM builds on existing open source packages and it uses
+multiple languages (C and Python) to obtain an optimal trade-off
+between useability and speed. For these two reasons the installation
+process contains multiple steps.
+
+Currently EQRM can be installed on the Windows and Linux operating
+system. Installation on the Mac OS has not been tested.
+
+For any help, please post to:
+\begin{itemize}
+\item eqrm-user@lists.sourceforge.net; or
+\item \url{https://sourceforge.net/mail/?group_id=198293}.
+\end{itemize}
+Also, to keep up to date with EQRM developments, join the developer
+or user lists.
+
+We would also like to hear from you if you are not able to install
+the software.
+
+EQRM is currently dependant on;
+\begin{itemize}
+\item python;
+\item numpy;
+\item scipy;
+\item Shapely; and
+\item gcc (MinGW on Windows)
+\item Matplotlib (Plotting utilities only)
+\item GMT (Plotting utilities only)
+\end{itemize}
+
+The above requirements are for the 'core' of EQRM. The plotting
+functions require one or more of the following: matplotlib GMT
+
+\begin{supertabular}{|p{1\textwidth}|}
+\hline  \\
+ Note: when \texttt{*/eqrm\_core/eqrm\_code} is mentioned
+below you need to replace the * with the actual place you have
+installed EQRM on your computer.  \\
+\\ \hline
+\end{supertabular}
+
+\section{Getting a copy of the EQRM}
+
+The most stable release of the EQRM can be downloaded from \\
+\url{http://sourceforge.net/projects/eqrm/}.
+
+If you are interested in the bleeding edge version then please
+contact the developers at eqrm-user@lists.sourceforge.net
+
+\section{Instalation}
+
+This section deals with the installation of the open source packages
+and the setup of paths to get the EQRM running. More packages are
+required for the plotting tools (\sref{sec:-plotting-tools}) and to
+analyse the test coverage (\sref{sec:test-coverage}).
+
+\begin{supertabular}{|p{1\textwidth}|}
+\hline  \\
+The EQRM can be sensitive to the versions chosen. We recomend that you select the versions indicated below.  \\
+\\ \hline
+\end{supertabular}
+
+
+\subsection{WINDOWS INSTALL INSTRUCTIONS:}
+
+%%%%% NOTE %%%%%
+% Reference to Python(xy) removed because it is difficult to find the
+% required version.....
+
+%There are two options for installing the EQRM and the required open
+%source packages in Windows. Option 1 (\sref{sec:windows-option1})
+%involves installing each package individually. Option 2
+%(\sref{sec:windows-option2}) uses Python(x,y) which conveniently
+%packages many of the required packages.
+
+%\subsubsection{Option 1 - Installing all open source packages individually}
+\label{sec:windows-option1}
+
+\begin{enumerate}
+
+\item Install python 2.5 from \\
+\url{http://www.python.org/download/}. \\
+Note that the EQRM is not compatable with Python 3$+$ \\
+
+\item Install numpy from \\
+  \url{http://numpy.scipy.org/} \\
+  Use version 1.3.0 or later \\
+
+\item Install scipy from \\
+ \url{http://scipy.org}
+ Use version 0.7.1 or later \\
+
+\item Install the full package of MinGW.
+When installing using \\
+\texttt{mingw-5.X.X.exe}, you are
+asked to choose components.  \\
+\underline{Tick the g++ compiler} and do not untick any components. \\
+ \url{http://www.mingw.org/}
+
+\item Install Shapely 1.X.X (python GIS kit) from \\
+\url{http://pypi.python.org/pypi/Shapely/.}
+
+\item Add \texttt{C:/MinGW/bin} (so you can compile c extensions
+to python) and \texttt{C:/Python25} (so you can call Python from a
+DOS prompt) to your \underline{``path"} and \texttt{*/eqrm\_core} to
+your \underline{``pythonpath"}:
+\begin{enumerate}
+
+\item right click My Computer - go to properties - Advanced - Environment Variables
+
+\item If a variable called \underline{``path"} already exists in User
+Variables: \\
+select path then ``press Edit..." \\
+otherwise press "New..." \\
+
+\item Variable Name = PATH, \\
+add \texttt{"C:/MinGW/bin;C:/Python25;}" to  Variable Value \\
+(use ";" to separate values).
+
+\item Variable Name = PYTHONPATH, \\
+add \texttt{"*/eqrm\_core;}" to Variable Value \\
+(use ";" to separate values).
+\end{enumerate}
+
+\item At the DOS prompt: \\
+\texttt{cd */eqrm\_core} \\
+\texttt{python test\_all.py} \\
+\texttt{python check\_scenarios.py} \\
+If you get a Could not locate executable g++ error, it means MinGW
+is not working.  Check steps 9 and 10.
+\end{enumerate}
+%
+%-----------------------------------------------------------------------------
+%
+%
+%\subsubsection{Option 2 - Installing python(x,y)}:
+%\label{sec:windows-option2}
+
+%\begin{enumerate}
+%\item Install python(x,y) \\
+%\url{http://www.pythonxy.com/}
+%\item Repeat steps 5 to 7 from \sref{sec:windows-option1}
+%\end{enumerate}
+
+
+\subsection{GENERAL LINUX INSTALL INSTRUCTIONS}
+
+There are a variety of Linux distributions.  The best instructions
+for installing each of the necessary packages is found at the
+website of each package, so only general instructions are given
+here.
+
+Install;
+\begin{enumerate}
+\item python 2.5 \\
+\url{http://www.python.org/download/} \\
+Note that the EQRM is not compatable with Python 3$+$ \\
+\item python-dev
+\item python package numpy \\
+\url{http://numpy.scipy.org/}
+\item python package scipy \\
+\url{http://www.scipy.org/}
+\item \texttt{python package libgeos\_c} (for shapely)
+\item python package \texttt{python-setuptolls} \\
+(for installing shapely using \texttt{easy\_install})
+\item python package \texttt{shapely}  (see notes below) \\
+\url{http://pypi.python.org/pypi/Shapely/}
+\item \texttt{gcc} also needs to be installed. Using versions higher than 4.2
+have caused problems with weave.
+\end{enumerate}
+
+Unzip the EQRM install file (e.g.
+\texttt{eqrm\_versionX.X.svn\_X.zip}) to where ever you want it.
+
+Set the environment variable PYTHONPATH to \texttt{*/eqrm\_core}
+(where the EQRM software was installed.)
+
+Run the following in the \texttt{*/eqrm\_core} directory:
+\begin{enumerate}
+\item \texttt{python test\_all.py} \\
+to test that individual parts of the code work
+\item \texttt{python check\_scenarios.py} \\
+to run some scenarios and check the output
+\end{enumerate}
+
+6 March 2009 - Installed EQRM on a debian system and
+\texttt{test\_all} failed due to the inline compiler (weave)
+failing.  To fix I get g++ to work with g$++$v4.2, instead of
+g$++$v4.3.  Weave will also fail if python-dev is not installed.
+
+
+\textbf{Notes for installing Shapely on a Linux system:} \\
+
+Please note that shapely is not produced by us so the install
+process may vary over time.
+\begin{enumerate}
+
+\item download and install \texttt{ez\_setup.py} - need to be root \\
+\scriptsize
+\url{http://peak.telecommunity.com/DevCenter/EasyInstall#installing-easy-install}
+\normalsize
+
+\item download and install the GIS library (i.e.
+\texttt{libgeos\_c}) \\
+To install on debian \\
+\texttt{apt-get install libgeos-c1}\\
+ \\
+To install on Suse (need to be root) \\
+download geos (e.g. \texttt{geos-3.0.0.tar.bz2}) \\
+from \url{http://trac.osgeo.org/geos/} \\
+ \\
+\texttt{tar xvfj geos-3.0.0.tar.bz2} \\
+\texttt{cd geos-3.0.0} \\
+\texttt{./configure} \\
+\texttt{./make} \\
+\texttt{./make install} \\
+\texttt{ldconfig}
+
+\item install shapely \\
+\url{http://pypi.python.org/pypi/Shapely} \\
+\texttt{sudo easy\_install Shapely}
+
+\end{enumerate}
+
+\section{Setting up for Plotting Tools} \label{sec:-plotting-tools}
+
+
+To install the components required for any plotting you may require
+matplotlib (xy plotting, histograms etc.) and GMT (maps). Follow
+these steps:
+
+\begin{enumerate}
+\item Install matplotlib from \\
+\url{http://sourceforge.net/projects/matplotlib/]} \\
+You must choose the file to install that matches your operating
+system 'type' and python version. For example, the matplotlib
+install file \texttt{matplotlib-0.98.5.2.win32-py2.5.exe} is meant
+for a Win32 system running python 2.5.
+
+\item If you require any visualisation with a map in it, install GMT
+from \\
+\url{http://gmt.soest.hawaii.edu/gmt/gmt_windows.html} \\
+You will need the basic GMT distribution and the High and Full
+resolution GSHHS coastlines installs.  Get these from \\
+\url{http://gmt.soest.hawaii.edu/} \\
+by clicking on the 'DOWNLOAD' link and then clicking on the 'INSTALL
+FORM' link.  You choose many options on the form - if you do not
+understand a choice it is usually safe to leave the default choice,
+with the exception of the NetCDF question. Unless you are sure you
+already have NetCDF 3.6.x installed, always ask for NetCDF to be
+installed.  You should also select the high-resolution and
+full-resolution coastline data installs. \\
+\\
+Note that you can install GMT anywhere you wish, though you may
+choose to use the suggested directories (such as /usr/local, for
+example). If you choose a 'system' location you will need to log in
+as administrator.
+
+\end{enumerate}
+
+
+\section{Setting up for Test Coverage} \label{sec:test-coverage}
+
+For developers running using the SVN repository:
+\begin{enumerate}
+\item If you want to run the coverage scrips(\texttt{coverage\_of\_tests.py}) the
+python coverage module needs to be installed.  To do this go to; \\
+\url{http://www.nedbatchelder.com/code/modules/coverage.html} and
+follow the install instructions. Note, if the file is downloaded as
+\\ \texttt{coverage-2.77.tar.tar}, change it to
+\texttt{coverage-2.77.tar.gz}
+\end{enumerate}
+
+%
+\section{General Notes}
+
+Scipy is dependent on numpy, so numpy must be installed before
+scipy, and the two versions must be compatible.
+
+To find out the version of numpy, execute the following at the Python prompt \\
+\texttt{import numpy} \\
+\texttt{numpy.version.version}
+
+To find out the version of scipy, execute the following at the Python prompt \\
+\texttt{import scipy} \\
+\texttt{scipy.version.version}
+
+You may be able to install \texttt{libgeos\_c} by \\
+\texttt{yum install libgeos-devel}, or \\
+\texttt{yum install geos-devel}
+
+
+
+
+\end{document}
