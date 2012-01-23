@@ -11,6 +11,7 @@ https://bitbucket.org/gjcross/talks/history/PyCon_AU_2011/Decorators/Examples/ti
 
 import csv
 import os
+import socket
 import sys
 import time, datetime
 from functools import wraps
@@ -71,6 +72,9 @@ def stats(func):
             revision, commit, url = get_svn_revision_sandpit_linux()
             #print "STATS %s(%s) SVN version=%s date=%s modified=%s" % (func.__name__, str(*args), version, date, modified)
             
+            # hostname from socket library
+            hostname = socket.gethostname()
+            
             # Log analysis
             memory_usage_locations = log_analysis()
             #print "STATS %s(%s) Output=%s" % (func.__name__, str(*args), memory_usage_locations)
@@ -83,12 +87,13 @@ def stats(func):
             # Headers
             header_list = None
             if not os.path.exists(os.path.join(output_dir, default_csv_file)):
-                header_list = ['revision', 'url', 'start', 'end', 'running time']
+                header_list = ['revision', 'url', 'hostname', 'start', 'end', 'running time']
                 header_list.extend([k for (k,v) in memory_usage_locations])
             
             # Data
             data_list = [commit,
                          url,
+                         hostname,
                          datetime.datetime.fromtimestamp(t0).isoformat(' '),
                          datetime.datetime.fromtimestamp(t1).isoformat(' '),
                          str(tdiff)]
