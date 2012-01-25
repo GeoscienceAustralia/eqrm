@@ -16,12 +16,15 @@
 import copy
 import xml.dom.minidom
 import math
+import os, glob
 import scipy
+import tempfile
+import sys
 
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
      int64, reshape, arange, append, radians, where, minimum, seterr
-from numpy import random
+from numpy import random, save, load
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
@@ -44,6 +47,24 @@ from eqrm_code import scaling
 # therefore let's not use it.
 EVENT_FLOAT = float64 #float32
 EVENT_INT = int64 #int32
+
+# SAVE_METHOD
+# Specifies whether a file based storage method is to be used for attributes. 
+# Currently supported values:
+#
+# 'npy'      - numpy native binary format (1 file per attribute per Event_Set)
+# 'pytables' - PyTables hdf5 file (1 file per Event_Set)
+# None       - in memory
+#
+SAVE_METHOD = None
+try:
+    import tables
+    SAVE_METHOD = 'pytables'
+except ImportError:
+    # If pytables is unavailable, fall back to npy
+    log.info('Event_Set - pytables not available, using numpy binary format for dataset storage')
+    SAVE_METHOD = 'npy'
+
 
 class Event_Set(object):
     def __init__(self, azimuth, dip, ML, Mw,
@@ -100,6 +121,9 @@ class Event_Set(object):
 
 
         """
+        if SAVE_METHOD is not None:
+            self._filename = tempfile.mktemp(prefix='event_set_', suffix='.%s' % SAVE_METHOD)
+        
         self.azimuth = azimuth
         self.dip = dip
         self.ML = ML
@@ -124,8 +148,148 @@ class Event_Set(object):
            self.event_id = r_[0:len(self.depth)] # gives every event an id
         else:
             self.event_id = event_id
-        self.check_arguments() 
+        self.check_arguments()
 
+    def __del__(self):
+        """__del__ : Make sure file data is cleaned up
+        """
+        if SAVE_METHOD is not None:
+            (root, ext) = os.path.splitext(self._filename)
+            for filename in glob.glob('%s*%s' % (root, ext)) :
+                os.remove( filename ) 
+        
+    def _get_pytables_array(self, name):
+        """Return the PyTables node with a given name. This should simply be 
+        a numpy array
+        """
+        f = tables.openFile(self._filename)
+        
+        try:
+            object = f.getNode(f.root, name)
+            array = object.read()
+        except:
+            array = None
+            
+        f.close()
+        return array
+
+    def _set_pytables_array(self, name, array):
+        """Create a PyTables array from the numpy array with a given name, 
+        removing an existing node with the same name if necessary
+        """ 
+        f = tables.openFile(self._filename, 'a')
+        # Remove existing node if required
+        try:
+            f.removeNode(f.root, name, True)
+        except:
+            pass
+        # Create one
+        if array is not None:
+            f.createArray(f.root, name, array)
+            
+        f.close()
+    
+    def _get_numpy_binary_array(self, name):
+        """Return the array stored in the named .npy file
+        """
+        (root, ext) = os.path.splitext(self._filename)
+        filename = '%s%s%s' % (root, name, ext)
+        
+        if os.path.exists(filename):
+            return load(filename)
+        else:
+            return None
+    
+    def _set_numpy_binary_array(self, name, array):
+        """Store the array in the .npy file using name as part of the filename
+        """
+        if array is not None:
+            (root, ext) = os.path.splitext(self._filename)
+            filename = '%s%s%s' % (root, name, ext)
+            save(filename, array)
+        
+    def _get_file_array(self, name):
+        if SAVE_METHOD == 'pytables':
+            return self._get_pytables_array(name)
+        elif SAVE_METHOD == 'npy':
+            return self._get_numpy_binary_array(name)
+        else:
+            return self.__dict__.get(name)
+    
+    def _set_file_array(self, name, array):
+        if SAVE_METHOD == 'pytables':
+            self._set_pytables_array(name, array)
+        elif SAVE_METHOD == 'npy':
+            self._set_numpy_binary_array(name, array)
+        else:
+            self.__dict__[name] = array
+    
+    # PROPERTIES #
+    # Define getters and setters for each attribute to exercise the 
+    # file-based data structure
+    azimuth = property(lambda self: self._get_file_array('azimuth'), 
+                       lambda self, value: self._set_file_array('azimuth', value))
+    
+    dip = property(lambda self: self._get_file_array('dip'), 
+                   lambda self, value: self._set_file_array('dip', value))
+    
+    ML = property(lambda self: self._get_file_array('ML'), 
+                  lambda self, value: self._set_file_array('ML', value))
+    
+    Mw = property(lambda self: self._get_file_array('Mw'), 
+                  lambda self, value: self._set_file_array('Mw', value))
+    
+    depth = property(lambda self: self._get_file_array('depth'), 
+                     lambda self, value: self._set_file_array('depth', value))
+    
+    depth_to_top = property(lambda self: self._get_file_array('depth_to_top'), 
+                            lambda self, value: self._set_file_array('depth_to_top', value))
+    
+    fault_type = property(lambda self: self._get_file_array('fault_type'), 
+                          lambda self, value: self._set_file_array('fault_type', value))
+    
+    width = property(lambda self: self._get_file_array('width'), 
+                     lambda self, value: self._set_file_array('width', value))
+    
+    length = property(lambda self: self._get_file_array('length'), 
+                      lambda self, value: self._set_file_array('length', value))
+    
+    area = property(lambda self: self._get_file_array('area'), 
+                    lambda self, value: self._set_file_array('area', value))
+    
+    fault_width = property(lambda self: self._get_file_array('fault_width'), 
+                           lambda self, value: self._set_file_array('fault_width', value))
+    
+    source_zone_id = property(lambda self: self._get_file_array('source_zone_id'), 
+                              lambda self, value: self._set_file_array('source_zone_id', value))
+    
+    trace_start_lat = property(lambda self: self._get_file_array('trace_start_lat'), 
+                               lambda self, value: self._set_file_array('trace_start_lat', value))
+    
+    trace_start_lon = property(lambda self: self._get_file_array('trace_start_lon'), 
+                               lambda self, value: self._set_file_array('trace_start_lon', value))
+    
+    trace_end_lat = property(lambda self: self._get_file_array('trace_end_lat'), 
+                             lambda self, value: self._set_file_array('trace_end_lat', value))
+    
+    trace_end_lon = property(lambda self: self._get_file_array('trace_end_lon'), 
+                             lambda self, value: self._set_file_array('trace_end_lon', value))
+    
+    rupture_centroid_x = property(lambda self: self._get_file_array('rupture_centroid_x'), 
+                                  lambda self, value: self._set_file_array('rupture_centroid_x', value))
+    
+    rupture_centroid_y = property(lambda self: self._get_file_array('rupture_centroid_y'), 
+                                  lambda self, value: self._set_file_array('rupture_centroid_y', value))
+    
+    rupture_centroid_lat = property(lambda self: self._get_file_array('rupture_centroid_lat'), 
+                                    lambda self, value: self._set_file_array('rupture_centroid_lat', value))
+    
+    rupture_centroid_lon = property(lambda self: self._get_file_array('rupture_centroid_lon'), 
+                                    lambda self, value: self._set_file_array('rupture_centroid_lon', value))
+    
+    event_id = property(lambda self: self._get_file_array('event_id'), 
+                        lambda self, value: self._set_file_array('event_id', value))
+    # END PROPERTIES #
 
     @classmethod
     def create(cls, rupture_centroid_lat, rupture_centroid_lon, azimuth,
@@ -531,14 +695,16 @@ class Event_Set(object):
         """Return a list of all the event set attributes"""
         # FIXME could probbaly just use self.__dict__.keys(), or better yet self.__dict__.items() and change caller
         return [att for att in dir(self) if not callable(getattr(self, att))
-                                         and not att[-2:] == '__']
+                                         and not att[-2:] == '__'
+                                         and not att[0] == '_']
     
     def introspect_attribute_values(self):
         """Puts all the attribute values of event set into a dictionary"""
 
         attributes = [att for att in dir(self)
                       if not callable(getattr(self, att))
-                      and not att[-2:] == '__']
+                      and not att[-2:] == '__'
+                      and not att[0] == '_']
         att_values = {}
         for att in attributes:
             att_values[att] = getattr(self, att)
@@ -569,8 +735,9 @@ class Event_Set(object):
         else:
             fault_width = self.fault_width
 
-        #some variables/array are set to None after the Event_set has
-        #been saved, so this method now checks for None values.
+        # some variables/array are set to None after the Event_set has
+        # been saved, so this method now checks for None values.
+        # We also don't want _arguments to be passed along
         # FIXME could probably just use args = self.__dict__.items()
         args = {}
         for att in self.introspect_attributes():
