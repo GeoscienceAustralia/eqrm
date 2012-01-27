@@ -6,15 +6,15 @@ import unittest
 from scipy import seterr
 
 import eqrm_code.test_event_set as test_event_set
-import eqrm_code.event_set as event_set
+from eqrm_code import file_store
 
 
 class Test_Event_Set_Pytables(test_event_set.Test_Event_Set):
     
     def setUp(self):
         # Set up event_set module globals for this test
-        event_set.SAVE_METHOD = 'pytables'
-        event_set.tables = tables
+        file_store.SAVE_METHOD = 'pytables'
+        file_store.tables = tables
 
 if __name__ == "__main__":
     seterr(all='warn')

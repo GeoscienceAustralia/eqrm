@@ -40,6 +40,7 @@ from eqrm_code.ANUGA_utilities import log as eqrmlog
 from eqrm_code import source_model #import create_fault_sources
 from eqrm_code import ground_motion_misc
 from eqrm_code import scaling
+from eqrm_code import file_store
 
 # This specifies the dtypes used in  event set.
 # This was investigated to save memory
@@ -48,25 +49,7 @@ from eqrm_code import scaling
 EVENT_FLOAT = float64 #float32
 EVENT_INT = int64 #int32
 
-# SAVE_METHOD
-# Specifies whether a file based storage method is to be used for attributes. 
-# Currently supported values:
-#
-# 'npy'      - numpy native binary format (1 file per attribute per Event_Set)
-# 'pytables' - PyTables hdf5 file (1 file per Event_Set)
-# None       - in memory
-#
-SAVE_METHOD = None
-try:
-    import tables
-    SAVE_METHOD = 'pytables'
-except ImportError:
-    # If pytables is unavailable, fall back to npy
-    log.info('Event_Set - pytables not available, using numpy binary format for dataset storage')
-    SAVE_METHOD = 'npy'
-
-
-class Event_Set(object):
+class Event_Set(file_store.File_Store):
     def __init__(self, azimuth, dip, ML, Mw,
                  depth, depth_to_top, fault_type,
                  width, length, area, fault_width,
@@ -121,8 +104,7 @@ class Event_Set(object):
 
 
         """
-        if SAVE_METHOD is not None:
-            self._filename = tempfile.mktemp(prefix='event_set_', suffix='.%s' % SAVE_METHOD)
+        super(Event_Set, self).__init__('event_set')
         
         self.azimuth = azimuth
         self.dip = dip
@@ -151,78 +133,7 @@ class Event_Set(object):
         self.check_arguments()
 
     def __del__(self):
-        """__del__ : Make sure file data is cleaned up
-        """
-        if SAVE_METHOD is not None:
-            (root, ext) = os.path.splitext(self._filename)
-            for filename in glob.glob('%s*%s' % (root, ext)) :
-                os.remove( filename ) 
-        
-    def _get_pytables_array(self, name):
-        """Return the PyTables node with a given name. This should simply be 
-        a numpy array
-        """
-        f = tables.openFile(self._filename)
-        
-        try:
-            object = f.getNode(f.root, name)
-            array = object.read()
-        except:
-            array = None
-            
-        f.close()
-        return array
-
-    def _set_pytables_array(self, name, array):
-        """Create a PyTables array from the numpy array with a given name, 
-        removing an existing node with the same name if necessary
-        """ 
-        f = tables.openFile(self._filename, 'a')
-        # Remove existing node if required
-        try:
-            f.removeNode(f.root, name, True)
-        except:
-            pass
-        # Create one
-        if array is not None:
-            f.createArray(f.root, name, array)
-            
-        f.close()
-    
-    def _get_numpy_binary_array(self, name):
-        """Return the array stored in the named .npy file
-        """
-        (root, ext) = os.path.splitext(self._filename)
-        filename = '%s%s%s' % (root, name, ext)
-        
-        if os.path.exists(filename):
-            return load(filename)
-        else:
-            return None
-    
-    def _set_numpy_binary_array(self, name, array):
-        """Store the array in the .npy file using name as part of the filename
-        """
-        if array is not None:
-            (root, ext) = os.path.splitext(self._filename)
-            filename = '%s%s%s' % (root, name, ext)
-            save(filename, array)
-        
-    def _get_file_array(self, name):
-        if SAVE_METHOD == 'pytables':
-            return self._get_pytables_array(name)
-        elif SAVE_METHOD == 'npy':
-            return self._get_numpy_binary_array(name)
-        else:
-            return self.__dict__.get(name)
-    
-    def _set_file_array(self, name, array):
-        if SAVE_METHOD == 'pytables':
-            self._set_pytables_array(name, array)
-        elif SAVE_METHOD == 'npy':
-            self._set_numpy_binary_array(name, array)
-        else:
-            self.__dict__[name] = array
+        super(Event_Set, self).__del__()
     
     # PROPERTIES #
     # Define getters and setters for each attribute to exercise the 
@@ -540,6 +451,7 @@ class Event_Set(object):
         
         #initialise new attributes
         num_events = sum(prob_number_of_events_in_zones)
+        
         rupture_centroid_lat = zeros((num_events), dtype=EVENT_FLOAT)
         rupture_centroid_lon = zeros((num_events), dtype=EVENT_FLOAT)
         depth_top_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
@@ -566,39 +478,35 @@ class Event_Set(object):
             if num == 0:
                 continue
 
-            #populate the polygons
-            polygon_depth_top_seismogenic = gp.populate_depth_top_seismogenic(
+            #populate the polygons and attach the current polygons generated attributes
+            depth_top_seismogenic[start:end] = gp.populate_depth_top_seismogenic(
                 num)
             eqrmlog.debug('Memory: populate_depth_top_seismogenic created')
             eqrmlog.resource_usage()
-            polygon_azimuth = gp.populate_azimuth(num)
+            azimuth[start:end] = gp.populate_azimuth(num)
             eqrmlog.debug('Memory: populate_azimuth created')
             eqrmlog.resource_usage()
-            polygon_dip = gp.populate_dip(num)
+            dip[start:end] = gp.populate_dip(num)
             eqrmlog.debug('Memory: populate_dip created')
             eqrmlog.resource_usage()
-            polygon_magnitude = gp.populate_magnitude(num)
+            magnitude[start:end] = gp.populate_magnitude(num)
             eqrmlog.debug('Memory: populate_magnitude created')
             eqrmlog.resource_usage()
-            polygon_depth_bottom = gp.populate_depth_bottom_seismogenic(num)
+            depth_bottom_seismogenic[start:end] = gp.populate_depth_bottom_seismogenic(num)
+            eqrmlog.debug('Memory: populate_depth_bottom_seismogenic created')
+            eqrmlog.resource_usage()
 
             #FIXME DSG-EQRM the events will not to randomly placed,
             # Due to  lat, lon being spherical coords and popolate
             # working in x,y (flat 2D).
-            (lat, lon) = array(gp.populate(num)).swapaxes(0, 1) 
+            (rupture_centroid_lat[start:end], 
+             rupture_centroid_lon[start:end]) = array(gp.populate(num)).swapaxes(0, 1) 
+             
+            del gp
+            
             eqrmlog.debug('Memory: lat,lon created')
             eqrmlog.resource_usage()
             
-            #attach the current polygons generated attributes
-            rupture_centroid_lat[start:end] = lat
-            rupture_centroid_lon[start:end] = lon
-            
-            depth_top_seismogenic[start:end] = polygon_depth_top_seismogenic
-            depth_bottom_seismogenic[start:end] = polygon_depth_bottom
-            azimuth[start:end] = polygon_azimuth
-            dip[start:end] = polygon_dip
-            magnitude[start:end] = polygon_magnitude
-            #print "magnitude.dtype.name", magnitude.dtype.name
             fault_width[start:end] = (depth_bottom_seismogenic[start:end] \
                            - depth_top_seismogenic[start:end])/ \
                            sin(dip[start:end]*pi/180.)
@@ -623,6 +531,7 @@ class Event_Set(object):
             
             
             start = end
+            
         new_ML=None
         new_Mw=None
         if magnitude_type == 'ML':
@@ -638,8 +547,7 @@ class Event_Set(object):
                                  ML=new_ML,
                                  Mw=new_Mw,
                                  depth_top_seismogenic=depth_top_seismogenic,
-                                 depth_bottom_seismogenic=
-                                 depth_bottom_seismogenic,
+                                 depth_bottom_seismogenic=depth_bottom_seismogenic,
                                  fault_width=fault_width,
                                  area=area,
                                  width=width)
