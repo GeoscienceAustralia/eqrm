@@ -56,6 +56,7 @@ import eqrm_filesystem as eq_fs
 from eqrm_code.RSA2MMI import rsa2mmi_array
 from eqrm_code.fatalities import forecast_fatality
 from eqrm_code.filters import source_model_threshold_distance_subset
+from eqrm_code.analysis_data import Analysis_Data
 
 
 # data columns expected in a BRIDGE data file
@@ -160,7 +161,7 @@ def main(parameter_handle,
     log.debug('SVN modified: ' + str(modified))
     log.debug('Memory: Initial')
     log.resource_usage()
-
+    
     if eqrm_flags.is_scenario is True:
         # generate a scenario event set
         event_set = Event_Set.create_scenario_events(
@@ -400,22 +401,24 @@ def main(parameter_handle,
     # initialise some matrices.  These matrices have a site dimension and
     # are filled while looping over sites.  Wether they are needed or
     # not often depends on what is being saved.
+    
+    data = Analysis_Data()
 
     if eqrm_flags.save_hazard_map is True:
-        bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
+        data.bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
                                 len(eqrm_flags.return_periods)),
                                dtype=float)
         
     else:
-        bedrock_hazard = None
+        data.bedrock_hazard = None
         
     if eqrm_flags.save_hazard_map is True and \
            eqrm_flags.use_amplification is True:
-        soil_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
+        data.soil_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
                              len(eqrm_flags.return_periods)),
                             dtype=float)
     else:
-        soil_hazard = None     
+        data.soil_hazard = None     
     log.debug('Memory: hazard_map array created')
     log.resource_usage()
     num_gmm_dimensions = event_activity.get_gmm_dimensions()
@@ -428,21 +431,21 @@ def main(parameter_handle,
     # default ulimit for max open files on Linux is 1024).
     
     if eqrm_flags.save_motion is True:
-        bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
+        data.bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                                 num_site_block, num_events,
                                 len(eqrm_flags.atten_periods)),
                                dtype=float)        
     else:
-        bedrock_SA_all = None
+        data.bedrock_SA_all = None
         
     if eqrm_flags.save_motion is True and \
            eqrm_flags.use_amplification is True:
-        soil_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
+        data.soil_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                              num_site_block, num_events,
                              len(eqrm_flags.atten_periods)),
                             dtype=float)
     else:
-        soil_SA_all = None        
+        data.soil_SA_all = None        
     log.debug('Memory: save_motion array created')
     log.resource_usage()
 
@@ -542,10 +545,10 @@ def main(parameter_handle,
             eqrm_flags,
             sites,
             event_set,
-            bedrock_SA_all,
-            soil_SA_all,
-            bedrock_hazard,
-            soil_hazard,
+            data.bedrock_SA_all,
+            data.soil_SA_all,
+            data.bedrock_hazard,
+            data.soil_hazard,
             soil_amplification_model,
             i,
             rel_i,
@@ -686,16 +689,16 @@ def main(parameter_handle,
     
     if eqrm_flags.save_hazard_map is True and parallel.lo != parallel.hi:
         files = save_hazard(soil_amp=False, eqrm_flags=eqrm_flags,
-                            hazard=bedrock_hazard,
+                            hazard=data.bedrock_hazard,
                             sites=all_sites,
                             compress=eqrm_flags.compress_output,
                             parallel_tag=parallel.file_tag,
                             write_title=(parallel.rank == False))
         row_files_that_parallel_splits.extend(files)
 
-        if soil_hazard is not None:
+        if data.soil_hazard is not None:
             files = save_hazard(soil_amp=True, eqrm_flags=eqrm_flags,
-                                hazard=soil_hazard,
+                                hazard=data.soil_hazard,
                                 compress=eqrm_flags.compress_output,
                                 parallel_tag=parallel.file_tag,
                                 write_title=(parallel.rank == False))
@@ -711,15 +714,15 @@ def main(parameter_handle,
         row_files_that_parallel_splits.append(a_file)
 
         files = save_motion(soil_amp=False, eqrm_flags=eqrm_flags
-                            ,motion=bedrock_SA_all,
+                            ,motion=data.bedrock_SA_all,
                             compress=eqrm_flags.compress_output,
                             parallel_tag=parallel.file_tag,
                             write_title=(parallel.rank == False))
         row_files_that_parallel_splits.extend(files)
 
-        if soil_SA_all is not None:
+        if data.soil_SA_all is not None:
             files = save_motion(soil_amp=True, eqrm_flags=eqrm_flags,
-                                motion=soil_SA_all,
+                                motion=data.soil_SA_all,
                                compress=eqrm_flags.compress_output,
                                parallel_tag=parallel.file_tag,
                                write_title=(parallel.rank == False))
@@ -1098,8 +1101,7 @@ def calc_and_save_SA(eqrm_flags,
             # num_gmm_after_collapsing and num_sites==1. The layout of
             # event_activity.event_activity is not apparent here, and
             # the code needs to be redesigned so that it is
-            # irrelevant. 
-
+            # irrelevant.
             bedrock_hazard[site_index,j,:] = \
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,

@@ -6,7 +6,8 @@ A base class that implements file store methods for NumPy arrays
 
 import os, glob
 import tempfile
-from numpy import save, load
+from numpy import save
+from numpy.lib.format import open_memmap
 
 from eqrm_code.ANUGA_utilities import log
 
@@ -76,10 +77,11 @@ class File_Store(object):
         filename = '%s%s%s' % (root, name, ext)
         
         if os.path.exists(filename):
-            return load(filename)
+            array = open_memmap(filename)
+            return array
         else:
             return None
-    
+        
     def _set_numpy_binary_array(self, name, array):
         """Store the array in the .npy file using name as part of the filename
         """
@@ -103,3 +105,4 @@ class File_Store(object):
             self._set_numpy_binary_array(name, array)
         else:
             self.__dict__[name] = array
+

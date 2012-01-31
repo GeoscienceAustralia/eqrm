@@ -41,6 +41,7 @@ from eqrm_code import source_model #import create_fault_sources
 from eqrm_code import ground_motion_misc
 from eqrm_code import scaling
 from eqrm_code import file_store
+from eqrm_code.event_set_data import Event_Set_Data
 
 # This specifies the dtypes used in  event set.
 # This was investigated to save memory
@@ -452,16 +453,18 @@ class Event_Set(file_store.File_Store):
         #initialise new attributes
         num_events = sum(prob_number_of_events_in_zones)
         
-        rupture_centroid_lat = zeros((num_events), dtype=EVENT_FLOAT)
-        rupture_centroid_lon = zeros((num_events), dtype=EVENT_FLOAT)
-        depth_top_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
-        depth_bottom_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
-        azimuth = zeros((num_events), dtype=EVENT_FLOAT)
-        dip = zeros((num_events), dtype=EVENT_FLOAT)
-        area = zeros((num_events), dtype=EVENT_FLOAT)
-        width = zeros((num_events), dtype=EVENT_FLOAT)
-        fault_width = zeros((num_events), dtype=EVENT_FLOAT)
-        magnitude = zeros((num_events), dtype=EVENT_FLOAT)
+        data = Event_Set_Data()
+        
+        data.rupture_centroid_lat = zeros((num_events), dtype=EVENT_FLOAT)
+        data.rupture_centroid_lon = zeros((num_events), dtype=EVENT_FLOAT)
+        data.depth_top_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
+        data.depth_bottom_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
+        data.azimuth = zeros((num_events), dtype=EVENT_FLOAT)
+        data.dip = zeros((num_events), dtype=EVENT_FLOAT)
+        data.area = zeros((num_events), dtype=EVENT_FLOAT)
+        data.width = zeros((num_events), dtype=EVENT_FLOAT)
+        data.fault_width = zeros((num_events), dtype=EVENT_FLOAT)
+        data.magnitude = zeros((num_events), dtype=EVENT_FLOAT)
         
         
         source_zone_id = zeros((num_events), dtype=EVENT_INT)
@@ -479,48 +482,44 @@ class Event_Set(file_store.File_Store):
                 continue
 
             #populate the polygons and attach the current polygons generated attributes
-            depth_top_seismogenic[start:end] = gp.populate_depth_top_seismogenic(
+            data.depth_top_seismogenic[start:end] = gp.populate_depth_top_seismogenic(
                 num)
             eqrmlog.debug('Memory: populate_depth_top_seismogenic created')
             eqrmlog.resource_usage()
-            azimuth[start:end] = gp.populate_azimuth(num)
+            data.azimuth[start:end] = gp.populate_azimuth(num)
             eqrmlog.debug('Memory: populate_azimuth created')
             eqrmlog.resource_usage()
-            dip[start:end] = gp.populate_dip(num)
+            data.dip[start:end] = gp.populate_dip(num)
             eqrmlog.debug('Memory: populate_dip created')
             eqrmlog.resource_usage()
-            magnitude[start:end] = gp.populate_magnitude(num)
+            data.magnitude[start:end] = gp.populate_magnitude(num)
             eqrmlog.debug('Memory: populate_magnitude created')
             eqrmlog.resource_usage()
-            depth_bottom_seismogenic[start:end] = gp.populate_depth_bottom_seismogenic(num)
-            eqrmlog.debug('Memory: populate_depth_bottom_seismogenic created')
-            eqrmlog.resource_usage()
+            data.depth_bottom_seismogenic[start:end] = gp.populate_depth_bottom_seismogenic(num)
 
             #FIXME DSG-EQRM the events will not to randomly placed,
             # Due to  lat, lon being spherical coords and popolate
             # working in x,y (flat 2D).
-            (rupture_centroid_lat[start:end], 
-             rupture_centroid_lon[start:end]) = array(gp.populate(num)).swapaxes(0, 1) 
-             
-            del gp
+            (data.rupture_centroid_lat[start:end], 
+             data.rupture_centroid_lon[start:end]) = array(gp.populate(num)).swapaxes(0, 1)
             
             eqrmlog.debug('Memory: lat,lon created')
             eqrmlog.resource_usage()
             
-            fault_width[start:end] = (depth_bottom_seismogenic[start:end] \
-                           - depth_top_seismogenic[start:end])/ \
-                           sin(dip[start:end]*pi/180.)
-            area[start:end] = scaling.scaling_calc_rup_area(
-                magnitude[start:end], source.scaling)
+            data.fault_width[start:end] = (data.depth_bottom_seismogenic[start:end] \
+                           - data.depth_top_seismogenic[start:end])/ \
+                           sin(data.dip[start:end]*pi/180.)
+            data.area[start:end] = scaling.scaling_calc_rup_area(
+                data.magnitude[start:end], source.scaling)
             #print "source.scaling", source.scaling
             #print "magnitude[start:end]", magnitude[start:end]
             #print "dip[start:end]", dip[start:end]
             #print "rup_area=area[start:end", area[start:end]
             #print "max_rup_width=fault_width[s:e]", fault_width[start:end]
             
-            width[start:end] = scaling.scaling_calc_rup_width(
-                magnitude[start:end], source.scaling, dip[start:end],
-                rup_area=area[start:end], max_rup_width=fault_width[start:end])
+            data.width[start:end] = scaling.scaling_calc_rup_width(
+                data.magnitude[start:end], source.scaling, data.dip[start:end],
+                rup_area=data.area[start:end], max_rup_width=data.fault_width[start:end])
             eqrmlog.debug('Memory: event set lists have been combined')
             eqrmlog.resource_usage()
 
@@ -535,22 +534,22 @@ class Event_Set(file_store.File_Store):
         new_ML=None
         new_Mw=None
         if magnitude_type == 'ML':
-            new_ML=magnitude
+            new_ML=data.magnitude
         elif magnitude_type == 'Mw':
-            new_Mw=magnitude
+            new_Mw=data.magnitude
         else:
             raise Exception('Magnitudes not set')
-        event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
-                                 rupture_centroid_lon=rupture_centroid_lon,
-                                 azimuth=azimuth,
-                                 dip=dip,
+        event = Event_Set.create(rupture_centroid_lat=data.rupture_centroid_lat,
+                                 rupture_centroid_lon=data.rupture_centroid_lon,
+                                 azimuth=data.azimuth,
+                                 dip=data.dip,
                                  ML=new_ML,
                                  Mw=new_Mw,
-                                 depth_top_seismogenic=depth_top_seismogenic,
-                                 depth_bottom_seismogenic=depth_bottom_seismogenic,
-                                 fault_width=fault_width,
-                                 area=area,
-                                 width=width)
+                                 depth_top_seismogenic=data.depth_top_seismogenic,
+                                 depth_bottom_seismogenic=data.depth_bottom_seismogenic,
+                                 fault_width=data.fault_width,
+                                 area=data.area,
+                                 width=data.width)
         event.source_zone_id = asarray(source_zone_id)
         eqrmlog.debug('Memory: finished generating events')
         eqrmlog.resource_usage()
