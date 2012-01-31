@@ -1,0 +1,87 @@
+2011-01-18 16:07:54,367 Level 29                  analysis:150 |Logfile is './implementation_tests/current/TS_haz37/log.txt' with logging level of DEBUG, console logging level is WARNING
+2011-01-18 16:07:54,367 DEBUG                     analysis:151 |host name: tornado.agso.gov.au
+2011-01-18 16:07:54,586 DEBUG                     analysis:153 |SVN version: 601
+2011-01-18 16:07:54,587 DEBUG                     analysis:154 |SVN date: None
+2011-01-18 16:07:54,587 DEBUG                     analysis:155 |SVN modified: None
+2011-01-18 16:07:54,587 DEBUG                     analysis:156 |Memory: Initial
+2011-01-18 16:07:54,588 DEBUG                     analysis:157 |Resource usage: memory=455.4MB resident=43.9MB stacksize=0.3MB
+2011-01-18 16:07:54,612 DEBUG                     analysis:216 |Memory: source_model_zone created
+2011-01-18 16:07:54,612 DEBUG                     analysis:217 |Resource usage: memory=455.7MB resident=44.1MB stacksize=0.3MB
+2011-01-18 16:07:54,613 INFO                     event_set:394 |generating events
+2011-01-18 16:07:54,623 DEBUG                    event_set:448 |Memory: populate_depth_top_seismogenic created
+2011-01-18 16:07:54,624 DEBUG                    event_set:449 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,625 DEBUG                    event_set:451 |Memory: populate_azimuth created
+2011-01-18 16:07:54,625 DEBUG                    event_set:452 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,626 DEBUG                    event_set:455 |Memory: populate_dip created
+2011-01-18 16:07:54,626 DEBUG                    event_set:456 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,626 DEBUG                    event_set:458 |Memory: populate_magnitude created
+2011-01-18 16:07:54,627 DEBUG                    event_set:459 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,628 DEBUG                    event_set:466 |Memory: lat,lon created
+2011-01-18 16:07:54,628 DEBUG                    event_set:467 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,629 DEBUG                    event_set:493 |Memory: event set lists have been combined
+2011-01-18 16:07:54,630 DEBUG                    event_set:494 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,630 DEBUG                    event_set:448 |Memory: populate_depth_top_seismogenic created
+2011-01-18 16:07:54,631 DEBUG                    event_set:449 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,631 DEBUG                    event_set:451 |Memory: populate_azimuth created
+2011-01-18 16:07:54,632 DEBUG                    event_set:452 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,632 DEBUG                    event_set:455 |Memory: populate_dip created
+2011-01-18 16:07:54,633 DEBUG                    event_set:456 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,633 DEBUG                    event_set:458 |Memory: populate_magnitude created
+2011-01-18 16:07:54,634 DEBUG                    event_set:459 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,634 DEBUG                    event_set:466 |Memory: lat,lon created
+2011-01-18 16:07:54,635 DEBUG                    event_set:467 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,636 DEBUG                    event_set:493 |Memory: event set lists have been combined
+2011-01-18 16:07:54,636 DEBUG                    event_set:494 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,637 DEBUG                    event_set:448 |Memory: populate_depth_top_seismogenic created
+2011-01-18 16:07:54,637 DEBUG                    event_set:449 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,638 DEBUG                    event_set:451 |Memory: populate_azimuth created
+2011-01-18 16:07:54,638 DEBUG                    event_set:452 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,639 DEBUG                    event_set:455 |Memory: populate_dip created
+2011-01-18 16:07:54,639 DEBUG                    event_set:456 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,639 DEBUG                    event_set:458 |Memory: populate_magnitude created
+2011-01-18 16:07:54,640 DEBUG                    event_set:459 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,641 DEBUG                    event_set:466 |Memory: lat,lon created
+2011-01-18 16:07:54,641 DEBUG                    event_set:467 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,642 DEBUG                    event_set:493 |Memory: event set lists have been combined
+2011-01-18 16:07:54,643 DEBUG                    event_set:494 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,644 DEBUG                    event_set:524 |Memory: finished generating events
+2011-01-18 16:07:54,644 DEBUG                    event_set:525 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,645 DEBUG                     analysis:227 |Memory: event_set_zone created
+2011-01-18 16:07:54,645 DEBUG                     analysis:228 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,646 DEBUG                     analysis:241 |No fault source XML file found
+2011-01-18 16:07:54,646 DEBUG         recurrence_functions:35  |Memory: event_activity_matrix weight_matrix created
+2011-01-18 16:07:54,647 DEBUG         recurrence_functions:36  |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,649 DEBUG         recurrence_functions:103 |Memory: Out of the event_activity loop
+2011-01-18 16:07:54,650 DEBUG         recurrence_functions:104 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,650 DEBUG                     analysis:280 |Memory: event activity has been calculated
+2011-01-18 16:07:54,651 DEBUG                     analysis:281 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:54,651 INFO                      analysis:289 |Event set created. Number of events=4
+2011-01-18 16:07:54,651 DEBUG                     analysis:290 |Memory: Event Set created
+2011-01-18 16:07:54,652 DEBUG                     analysis:291 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:55,020 INFO                      analysis:304 |Sites set created. Number of sites=5
+2011-01-18 16:07:55,021 DEBUG                     analysis:305 |Memory: Sites created
+2011-01-18 16:07:55,021 DEBUG                     analysis:306 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:55,022 DEBUG                     analysis:315 |Pseudo event set created. Number of pseudo_events=88
+2011-01-18 16:07:55,022 DEBUG                     analysis:316 |Memory: Pseudo Event Set created
+2011-01-18 16:07:55,023 DEBUG                     analysis:317 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:55,366 DEBUG                     analysis:365 |blocking over sites if running in parallel. block_size=5
+2011-01-18 16:07:55,367 DEBUG                     analysis:368 |Number of atten_periods=3
+2011-01-18 16:07:55,367 DEBUG                     analysis:374 |Number of SA_surfaces=2
+2011-01-18 16:07:55,367 DEBUG                     analysis:394 |Memory: hazard_map array created
+2011-01-18 16:07:55,368 DEBUG                     analysis:395 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:55,368 DEBUG                     analysis:413 |Memory: save_motion array created
+2011-01-18 16:07:55,369 DEBUG                     analysis:414 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:55,369 DEBUG                     analysis:447 |Memory: Created all data collection arrays.
+2011-01-18 16:07:55,370 DEBUG                     analysis:448 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:55,370 INFO                      analysis:464 |P0: do site 1 of 5
+2011-01-18 16:07:55,663 INFO                      analysis:464 |P0: do site 2 of 5
+2011-01-18 16:07:55,955 INFO                      analysis:464 |P0: do site 3 of 5
+2011-01-18 16:07:56,247 INFO                      analysis:464 |P0: do site 4 of 5
+2011-01-18 16:07:56,538 INFO                      analysis:464 |P0: do site 5 of 5
+2011-01-18 16:07:56,830 DEBUG                     analysis:577 |Memory: Ended looping over sites
+2011-01-18 16:07:56,830 DEBUG                     analysis:578 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
+2011-01-18 16:07:56,831 INFO                      analysis:588 |time_pre_site_loop_fraction 0.353982300885
+2011-01-18 16:07:56,831 INFO                      analysis:591 |loop_time (excluding file saving) 0:00:02.260000 hr:min:sec
+2011-01-18 16:07:56,860 INFO                      analysis:785 |On node 0, tornado.agso.gov.au time_taken_overall 0:00:02.280000 hr:min:sec
+2011-01-18 16:07:56,860 DEBUG                     analysis:788 |Memory: End
+2011-01-18 16:07:56,861 DEBUG                     analysis:789 |Resource usage: memory=455.8MB resident=44.3MB stacksize=0.3MB
