@@ -36,11 +36,6 @@ log.debug('Starting up the log file, so warnings are suppressed.')
 
 EXCLUDE_FILES = []
 
-# exclude the PyTables test if the module if not available
-try:
-    import tables
-except ImportError:
-    EXCLUDE_FILES.append('test_event_set_pytables.py')
 #exclude_files = ['test_check_scenarios.py',
  #                'test_eqrm_audit_wrapper.py'] #['test_exceedance_curves.py']
 # Removing test_sparse.py and test_cg_solve.py since they want to compile.
