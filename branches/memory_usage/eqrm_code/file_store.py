@@ -22,7 +22,9 @@ class File_Store(object):
     
     def __init__(self, name):
         if SAVE_METHOD is not None:
-            self._filename = tempfile.mktemp(prefix='%s_' % name, suffix='.%s' % SAVE_METHOD)
+            handle, filename = tempfile.mkstemp(prefix='%s_' % name, suffix='.%s' % SAVE_METHOD)
+            os.close(handle)
+            self._filename = filename
 
     def __del__(self):
         """__del__ : Make sure file data is cleaned up
