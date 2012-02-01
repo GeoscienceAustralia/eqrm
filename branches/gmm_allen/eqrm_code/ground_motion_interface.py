@@ -5829,6 +5829,8 @@ Allen_2012_model_deep = array([
          -1.81848588e-01,  -1.12546353e+00,  -2.65764167e-01,
           1.34464527e+00]])
 
+# TA:
+# model = model(1:end-2,:);
 Allen_2012_coefficient_deep = Allen_2012_model_deep[0:-2].T
 
 Allen_2012_model_shallow = array([
@@ -5983,6 +5985,8 @@ Allen_2012_model_shallow = array([
           2.67368620e-01,  -1.36450596e+00,  -1.99400732e-01,
          -2.50974847e-01]])
 
+# TA:
+# model = model(1:end-2,:);
 Allen_2012_coefficient_shallow = Allen_2012_model_shallow[0:-2].T
 
 # TA:
@@ -6014,16 +6018,31 @@ def Allen_2012_distribution(**kwargs):
     Rrup = dist_object.Rupture
     
     coefficient = coefficient(depth)
+    
+    # TA:
+    # c0 = model(:,2);
+    # c1 = model(:,3);
+    # c2 = model(:,4);
+    # c3 = model(:,5);
+    # c4 = model(:,6);
+    # c5 = model(:,7);
+    # c6 = model(:,8);
+    # c7 = model(:,9);
+    # c8 = model(:,10);
+    # c9 = model(:,11);
+    # c10 = model(:,12);
+    # c11 = model(:,13);
     n, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 = coefficient
     
     # TA:
     # minr1 = zeros(size(model(:,1)));
     # maxr2 = zeros(size(model(:,1)));
     # maxr3 = zeros(size(model(:,1)));
+    # r01 = 80;
+    # r02 = 150;
     minr1 = zeros(n.shape)
     maxr2 = zeros(n.shape)
     maxr3 = zeros(n.shape)
-    
     r01 = 80
     r02 = 150
     
@@ -6061,7 +6080,7 @@ def Allen_2012_distribution(**kwargs):
     # A12 = [AT A12];
     AT = 1 / n
     A12 = concatenate((AT,A12),1)
-    
+
     log_mean = log10(A12)
     
     # TODO: What is the shape of log_sigma?
