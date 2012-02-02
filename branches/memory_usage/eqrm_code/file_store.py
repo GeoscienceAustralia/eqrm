@@ -6,6 +6,8 @@ A base class that implements file store methods for NumPy arrays
 
 import os, glob
 import tempfile
+
+from ANUGA_utilities import log
 from numpy import save
 from numpy.lib.format import open_memmap
 
@@ -92,6 +94,7 @@ class File_Store(object):
             handle, filename = tempfile.mkstemp(prefix='%s_' % name, suffix='.%s' % SAVE_METHOD)
             os.close(handle)
             self._filename = filename
+            log.debug("%s.__init__ filename=%s" % (type(self).__name__, filename))
 
     def __del__(self):
         """__del__ : Make sure file data is cleaned up
