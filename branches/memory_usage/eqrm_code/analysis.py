@@ -408,7 +408,6 @@ def main(parameter_handle,
         data.bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
                                 len(eqrm_flags.return_periods)),
                                dtype=float)
-        
     else:
         data.bedrock_hazard = None
         
@@ -423,13 +422,6 @@ def main(parameter_handle,
     log.resource_usage()
     num_gmm_dimensions = event_activity.get_gmm_dimensions()
 
-    # FIXME These *_SA_all arrays probably account for a lot of the
-    # memory usage. As far as I can tell, the only reason they need a
-    # site dimension at all is because they accumulate the SAs so that
-    # they can be saved later by save_motion(). If the program simply
-    # wrote the per-site results as it went (completely feasible -
-    # default ulimit for max open files on Linux is 1024).
-    
     if eqrm_flags.save_motion is True:
         data.bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                                 num_site_block, num_events,
@@ -506,7 +498,7 @@ def main(parameter_handle,
             raise RuntimeError(msg)   
          
     
-    for i in range(num_site_block):
+    for i in xrange(num_site_block):
         msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + \
             str(num_site_block)
         log.info(msg)
@@ -1086,7 +1078,7 @@ def calc_and_save_SA(eqrm_flags,
         # events]. See FIXME below
         event_act_d_events = event_activity.event_activity.reshape(-1)
         assert coll_rock_SA_all_events.shape[3] == 1 # only one site
-        for j in range(len(eqrm_flags.atten_periods)):
+        for j in xrange(len(eqrm_flags.atten_periods)):
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
             # into the events dimension.

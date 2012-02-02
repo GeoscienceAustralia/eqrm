@@ -41,7 +41,7 @@ from eqrm_code import source_model #import create_fault_sources
 from eqrm_code import ground_motion_misc
 from eqrm_code import scaling
 from eqrm_code import file_store
-from eqrm_code.event_set_data import Event_Set_Data
+from eqrm_code.event_set_data import Event_Set_Data, Event_Activity_Data
 
 # This specifies the dtypes used in  event set.
 # This was investigated to save memory
@@ -480,21 +480,25 @@ class Event_Set(file_store.File_Store):
             
             if num == 0:
                 continue
-
+            
             #populate the polygons and attach the current polygons generated attributes
             data.depth_top_seismogenic[start:end] = gp.populate_depth_top_seismogenic(
                 num)
             eqrmlog.debug('Memory: populate_depth_top_seismogenic created')
             eqrmlog.resource_usage()
+            
             data.azimuth[start:end] = gp.populate_azimuth(num)
             eqrmlog.debug('Memory: populate_azimuth created')
             eqrmlog.resource_usage()
+            
             data.dip[start:end] = gp.populate_dip(num)
             eqrmlog.debug('Memory: populate_dip created')
             eqrmlog.resource_usage()
+            
             data.magnitude[start:end] = gp.populate_magnitude(num)
             eqrmlog.debug('Memory: populate_magnitude created')
             eqrmlog.resource_usage()
+            
             data.depth_bottom_seismogenic[start:end] = gp.populate_depth_bottom_seismogenic(num)
 
             #FIXME DSG-EQRM the events will not to randomly placed,
@@ -504,7 +508,7 @@ class Event_Set(file_store.File_Store):
              data.rupture_centroid_lon[start:end]) = array(gp.populate(num)).swapaxes(0, 1)
             
             eqrmlog.debug('Memory: lat,lon created')
-            eqrmlog.resource_usage()
+            eqrmlog.resource_usage()      
             
             data.fault_width[start:end] = (data.depth_bottom_seismogenic[start:end] \
                            - data.depth_top_seismogenic[start:end])/ \
@@ -1031,7 +1035,7 @@ SPAWN_D = 0
 GMMODEL_D = 1
 RECMODEL_D = 2
 EVENTS_D = 3
-class Event_Activity(object):
+class Event_Activity(file_store.File_Store):
     """
     Class to manipulate the event activity value.
     Handles the logic of splitting based on spawning.
@@ -1057,9 +1061,20 @@ class Event_Activity(object):
         """
         num_events is number of events
         """
+        super(Event_Activity, self).__init__('event_activity')
+        
         self.event_activity = None
         self.num_events = num_events
+        
+    def __del__(self):
+        super(Event_Activity, self).__del__()
          
+    # PROPERTIES #
+    # Define getters and setters for each attribute to exercise the 
+    # file-based data structure
+    event_activity = property(lambda self: self._get_file_array('event_activity'), 
+                       lambda self, value: self._set_file_array('event_activity', value))
+    # END PROPERTIES #
 
     def set_scenario_event_activity(self):
         """
@@ -1136,14 +1151,19 @@ class Event_Activity(object):
             assert self.event_activity.shape[GMMODEL_D] == 1
 
             max_num_models = source_model.get_max_num_atten_models()
-            new_event_activity = zeros((1,
+            
+            # This temporarily becomes quite large on large simulations.
+            # Placing in a File_Store array
+            data = Event_Activity_Data()
+            
+            data.new_event_activity = zeros((1,
                                         max_num_models,
                                         self.event_activity.shape[RECMODEL_D],
                                         self.num_events),
                                        dtype=EVENT_FLOAT)
             # this is so activities are not lost for events
             # which sources do not cover.
-            new_event_activity[0, 0, :, :] = self.event_activity[0, 0, :, :]
+            data.new_event_activity[0, 0, :, :] = self.event_activity[0, 0, :, :]
             
             for szp in source_model:
                 assert abs(sum(szp.atten_model_weights) - 1.0) < 0.01
@@ -1161,15 +1181,15 @@ class Event_Activity(object):
                 activities = (sub_activity *
                               reshape(maxed_weights, (-1, 1, 1))).swapaxes(0,1)
                 # activities[event_index, GM_model_index, rec_model_index]
-                new_event_activity[0, :, :, szp.get_event_set_indexes()] = \
+                data.new_event_activity[0, :, :, szp.get_event_set_indexes()] = \
                     activities
 
             assert allclose(
-                scipy.sum(new_event_activity, axis = GMMODEL_D),
+                scipy.sum(data.new_event_activity, axis = GMMODEL_D),
                 # self.event_activity.shape[GMMODEL_D] == 1 so we can compare directly
                 self.event_activity)
 
-            self.event_activity = new_event_activity
+            self.event_activity = data.new_event_activity
 
 
     def get_num_spawn(self):

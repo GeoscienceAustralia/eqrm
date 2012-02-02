@@ -35,14 +35,13 @@ class File_Store(object):
                 os.remove( filename ) 
     
     def _get_numpy_binary_array(self, name):
-        """Return the array stored in the named .npy file
+        """Return the an memmap object as represented by the .npy file
         """
         (root, ext) = os.path.splitext(self._filename)
         filename = '%s%s%s' % (root, name, ext)
         
         if os.path.exists(filename):
-            array = open_memmap(filename)
-            return array
+            return open_memmap(filename)
         else:
             return None
         

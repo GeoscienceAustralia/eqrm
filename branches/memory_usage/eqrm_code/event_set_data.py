@@ -49,4 +49,15 @@ class Event_Set_Data(file_store.File_Store):
     
     magnitude = property(lambda self: self._get_file_array('magnitude'),
                          lambda self, value: self._set_file_array('magnitude', value))
-    
+
+
+class Event_Activity_Data(file_store.File_Store):
+
+    def __init__(self):
+        super(Event_Activity_Data, self).__init__('event_activity_data')
+
+    def __del__(self):
+        super(Event_Activity_Data, self).__del__()
+        
+    new_event_activity = property(lambda self: self._get_file_array('new_event_activity'), 
+                                  lambda self, value: self._set_file_array('new_event_activity', value))
