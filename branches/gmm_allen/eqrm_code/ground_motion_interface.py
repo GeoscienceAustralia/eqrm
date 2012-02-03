@@ -5831,7 +5831,8 @@ Allen_2012_model_deep = array([
 
 # TA:
 # model = model(1:end-2,:);
-Allen_2012_coefficient_deep = Allen_2012_model_deep[0:-2].T
+Allen_2012_coefficient_deep = Allen_2012_model_deep[0:-2].T[1:]
+Allen_2012_coefficient_period_deep = Allen_2012_model_deep[0:-2].T[0]
 
 Allen_2012_model_shallow = array([
        [  1.00000000e-01,  -4.09851974e-01,   8.79898957e-01,
@@ -5987,7 +5988,15 @@ Allen_2012_model_shallow = array([
 
 # TA:
 # model = model(1:end-2,:);
-Allen_2012_coefficient_shallow = Allen_2012_model_shallow[0:-2].T
+Allen_2012_coefficient_shallow = Allen_2012_model_shallow[0:-2].T[1:]
+Allen_2012_coefficient_period_shallow = Allen_2012_model_shallow[0:-2].T[0]
+
+# Set the coefficient values to something initially
+# Allen_2012_depth_interpolation is called by Allen_2012_distribution to recalculate
+Allen_2012_coefficient = Allen_2012_coefficient_deep
+Allen_2012_coefficient_period = Allen_2012_coefficient_period_deep
+
+Allen_2012_interpolation = linear_interpolation
 
 # TA:
 # if depth >= 10
@@ -5995,17 +6004,32 @@ Allen_2012_coefficient_shallow = Allen_2012_model_shallow[0:-2].T
 # else
 #     load 'AUS11_shallow.mat
 # end
-Allen_2012_coefficient = lambda depth: Allen_2012_coefficient_deep if depth >= 10 else Allen_2012_coefficient_shallow
+def Allen_2012_depth_interpolation(depth, periods):
+    if depth >= 10:
+        Allen_2012_coefficient = Allen_2012_coefficient_deep
+        Allen_2012_coefficient_period = Allen_2012_coefficient_period_deep
+    else:
+        Allen_2012_coefficient = Allen_2012_coefficient_shallow
+        Allen_2012_coefficient_period = Allen_2012_coefficient_period_shallow
+    
+    return Allen_2012_interpolation(periods,
+                                    Allen_2012_coefficient,
+                                    Allen_2012_coefficient_period)
 
-# TODO:
-# Allen_2012_coefficient to fit in with ground_motion_interface
-# Allen_2012_coefficient_period
-# Allen_2012_sigma_coefficient
-# Allen_2012_coefficient_period
+# Sigma set to zeros
+Allen_2012_sigma_coefficient = zeros(Allen_2012_coefficient.shape)
+Allen_2012_sigma_coefficient_period = zeros(Allen_2012_coefficient_period.shape)
 
-Allen_2012_uses_Vs30=True
+
+Allen_2012_uses_Vs30 = True
 Allen_2012_magnitude_type = 'Mw'
 Allen_2012_distance_type = 'Rupture'
+
+# FIXME: http://www.scipy.org/NumPy_for_Matlab_Users
+# distinguishes between a .* b (a * b) and a * b (dot(a,b))
+# whereas the code in all distribution functions does not.
+# 
+# Is an element-wise multiply and a matrix multiply different, no?
 
 def Allen_2012_distribution(**kwargs):
     """
@@ -6014,10 +6038,20 @@ def Allen_2012_distribution(**kwargs):
     """
     dist_object = kwargs['dist_object']
     Mw = kwargs['mag']
-    depth = kwargs['depth']
-    Rrup = dist_object.Rupture
     
-    coefficient = coefficient(depth)
+    depth = kwargs['depth']
+    periods = kwargs['periods']
+    
+    # TODO: What to do with sigma_coefficient?
+    sigma_coefficient = kwargs['sigma_coefficient']
+    
+    # Re-calculate coefficient based on depth and periods
+    coefficient = Allen_2012_depth_interpolation(depth, periods)[:,newaxis,newaxis,:]
+    
+    assert len(periods) == coefficient.shape[3]
+    assert len(periods) == sigma_coefficient.shape[3]
+    
+    Rrup = dist_object.Rupture[:,:,newaxis]
     
     # TA:
     # c0 = model(:,2);
@@ -6032,17 +6066,22 @@ def Allen_2012_distribution(**kwargs):
     # c9 = model(:,11);
     # c10 = model(:,12);
     # c11 = model(:,13);
-    n, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 = coefficient
+    c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 = coefficient
     
     # TA:
     # minr1 = zeros(size(model(:,1)));
     # maxr2 = zeros(size(model(:,1)));
     # maxr3 = zeros(size(model(:,1)));
+    #
+    # Note that we're using c0 and not model(:1), which represents periods in 
+    # Trevor Allen's model (same shape)
+    minr1 = zeros(c0.shape)
+    maxr2 = zeros(c0.shape)
+    maxr3 = zeros(c0.shape)
+    
+    # TA:
     # r01 = 80;
     # r02 = 150;
-    minr1 = zeros(n.shape)
-    maxr2 = zeros(n.shape)
-    maxr3 = zeros(n.shape)
     r01 = 80
     r02 = 150
     
@@ -6055,12 +6094,12 @@ def Allen_2012_distribution(**kwargs):
     #    maxr3(j) = min([log10(rhypRange/r2) 0]);
     # end
     # minr1 = 10.^minr1
-    for j in range(len(n)):
-        r1 = r01 + dot((Mw - 4), c8[j])
-        r2 = r02 + dot((Mw - 4), c11[j])
-        minr1[j] = minimum(log10(Rrup), log10(r1))
-        maxr2[j] = maximum(log10(Rrup/r1), 0)
-        maxr3[j] = maximum(log10(Rrup/r2), 0)
+    for j in xrange(len(periods)):
+        r1 = r01 + (Mw-4)*c8[:,:,j]
+        r2 = r02 + (Mw-4)*c11[:,:,j]
+        minr1[:,:,j] = minimum(log10(Rrup), log10(r1))
+        maxr2[:,:,j] = maximum(log10(Rrup/r1), 0)
+        maxr3[:,:,j] = maximum(log10(Rrup/r2), 0)
     minr1 = 10**minr1
     
     # TA:
@@ -6069,42 +6108,39 @@ def Allen_2012_distribution(**kwargs):
     #       + (ones(size(minr1)).*(1+c5*(M-4))).^2)) ...
     #       + maxr2.*(c6 + c7*(M-4)) ...
     #       + maxr3.*(c9 + c10*(M-4)));
-    A12 = 10**(c0 + dot(c1,(Mw - 4)) + dot(c2,(Mw - 4))**2
-               + (c3 + dot(c4,(Mw - 4))) * log10(sqrt(minr1**2
-               + (ones(minr1.shape)) * (1 + dot(c5, (Mw - 4)))**2
-               + maxr2 * (c6 + dot(c7, (Mw - 4)))
-               + maxr3 * (c9 + dot(c10, (Mw - 4))))))
+    A12 = 10**(c0 + c1*(Mw-4) + c2*(Mw-4)**2 \
+               + (c3 + c4*(Mw-4))*log10(sqrt(minr1**2 \
+               + (ones(minr1.shape)*(1 + c5*(Mw-4)))**2)) \
+               + maxr2 * (c6 + c7*(Mw-4)) \
+               + maxr3 * (c9 + c10*(Mw-4)))
     
     # TA:
     # AT = 1 ./ model(:,1);
     # A12 = [AT A12];
-    AT = 1 / n
-    A12 = concatenate((AT,A12),1)
+    # TODO: Is this logic relevant?
 
     log_mean = log10(A12)
     
-    # TODO: What is the shape of log_sigma?
-    log_sigma = None 
+    # TODO: What should log_sigma be?
+    log_sigma = zeros(log_mean.shape)
     
     return log_mean, log_sigma
     
-    
-Allen_2012_interpolation = linear_interpolation
 
-#Allen_2012_args = [Allen_2012_distribution,
-#                   Allen_2012_magnitude_type,
-#                   Allen_2012_distance_type,
+Allen_2012_args = [Allen_2012_distribution,
+                   Allen_2012_magnitude_type,
+                   Allen_2012_distance_type,
                    
-#                   Allen_2012_coefficient,
-#                   Allen_2012_coefficient_period,
-#                   Allen_2012_interpolation,
+                   Allen_2012_coefficient,
+                   Allen_2012_coefficient_period,
+                   Allen_2012_interpolation,
                    
-#                   Allen_2012_sigma_coefficient,
-#                   Allen_2012_coefficient_period,
-#                   Allen_2012_interpolation,
+                   Allen_2012_sigma_coefficient,
+                   Allen_2012_sigma_coefficient_period,
+                   Allen_2012_interpolation,
                    
-#                   Allen_2012_uses_Vs30]
+                   Allen_2012_uses_Vs30]
 
-#ground_motion_init['Allen_2012'] = Allen_2012_args
+ground_motion_init['Allen_2012'] = Allen_2012_args
 
 #***************  END OF ALLEN 2012 MODEL  *************************
