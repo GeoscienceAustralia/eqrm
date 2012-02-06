@@ -5831,8 +5831,8 @@ Allen_2012_model_deep = array([
 
 # TA:
 # model = model(1:end-2,:);
-Allen_2012_coefficient_deep = Allen_2012_model_deep[0:-2].T[1:]
-Allen_2012_coefficient_period_deep = Allen_2012_model_deep[0:-2].T[0]
+Allen_2012_coeff_deep = Allen_2012_model_deep[0:-2].T[1:]
+Allen_2012_coeff_period_deep = Allen_2012_model_deep[0:-2].T[0]
 
 Allen_2012_model_shallow = array([
        [  1.00000000e-01,  -4.09851974e-01,   8.79898957e-01,
@@ -5988,33 +5988,15 @@ Allen_2012_model_shallow = array([
 
 # TA:
 # model = model(1:end-2,:);
-Allen_2012_coefficient_shallow = Allen_2012_model_shallow[0:-2].T[1:]
-Allen_2012_coefficient_period_shallow = Allen_2012_model_shallow[0:-2].T[0]
+Allen_2012_coeff_shallow = Allen_2012_model_shallow[0:-2].T[1:]
+Allen_2012_coeff_period_shallow = Allen_2012_model_shallow[0:-2].T[0]
 
-# Set the coefficient values to something initially
-# Allen_2012_depth_interpolation is called by Allen_2012_distribution to recalculate
-Allen_2012_coefficient = Allen_2012_coefficient_deep
-Allen_2012_coefficient_period = Allen_2012_coefficient_period_deep
+# Concatenate the deep and shallow coefficients.
+# Allen_2012_distribution decides which indices to use based on the depth passed in
+Allen_2012_coefficient = concatenate((Allen_2012_coeff_deep, Allen_2012_coeff_shallow))
 
-Allen_2012_interpolation = linear_interpolation
-
-# TA:
-# if depth >= 10
-#     load 'AUS11_deep.mat'
-# else
-#     load 'AUS11_shallow.mat
-# end
-def Allen_2012_depth_interpolation(depth, periods):
-    if depth >= 10:
-        Allen_2012_coefficient = Allen_2012_coefficient_deep
-        Allen_2012_coefficient_period = Allen_2012_coefficient_period_deep
-    else:
-        Allen_2012_coefficient = Allen_2012_coefficient_shallow
-        Allen_2012_coefficient_period = Allen_2012_coefficient_period_shallow
-    
-    return Allen_2012_interpolation(periods,
-                                    Allen_2012_coefficient,
-                                    Allen_2012_coefficient_period)
+# The period dimension is the same for both deep and shallow models
+Allen_2012_coefficient_period = Allen_2012_coeff_period_deep
 
 # Sigma set to zeros
 Allen_2012_sigma_coefficient = zeros(Allen_2012_coefficient.shape)
@@ -6025,6 +6007,9 @@ Allen_2012_uses_Vs30 = True
 Allen_2012_magnitude_type = 'Mw'
 Allen_2012_distance_type = 'Rupture'
 
+Allen_2012_interpolation = linear_interpolation
+
+
 # FIXME: http://www.scipy.org/NumPy_for_Matlab_Users
 # distinguishes between a .* b (a * b) and a * b (dot(a,b))
 # whereas the code in all distribution functions does not.
@@ -6034,7 +6019,7 @@ Allen_2012_distance_type = 'Rupture'
 def Allen_2012_distribution(**kwargs):
     """
     Allen 2012 distribution
-    Adapted from Matlab implementation
+    Adapted from Trevor Allen's Matlab implementation
     """
     dist_object = kwargs['dist_object']
     Mw = kwargs['mag']
@@ -6042,14 +6027,8 @@ def Allen_2012_distribution(**kwargs):
     depth = kwargs['depth']
     periods = kwargs['periods']
     
-    # TODO: What to do with sigma_coefficient?
+    coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    
-    # Re-calculate coefficient based on depth and periods
-    coefficient = Allen_2012_depth_interpolation(depth, periods)[:,newaxis,newaxis,:]
-    
-    assert len(periods) == coefficient.shape[3]
-    assert len(periods) == sigma_coefficient.shape[3]
     
     Rrup = dist_object.Rupture[:,:,newaxis]
     
@@ -6066,7 +6045,20 @@ def Allen_2012_distribution(**kwargs):
     # c9 = model(:,11);
     # c10 = model(:,12);
     # c11 = model(:,13);
-    c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 = coefficient
+    
+    # Deep indices
+    cd = coefficient[:12]
+    
+    # Shallow indices
+    cs = coefficient[12:]
+    
+    # TA:
+    # if depth >= 10
+    #     load 'AUS11_deep.mat'
+    # else
+    #     load 'AUS11_shallow.mat
+    # end
+    c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 = cd if (asarray(depth) >= 10).all() else cs    
     
     # TA:
     # minr1 = zeros(size(model(:,1)));
