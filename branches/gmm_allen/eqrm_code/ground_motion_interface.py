@@ -5989,6 +5989,7 @@ Allen_2012_model_shallow = array([
 # TA:
 # model = model(1:end-2,:);
 Allen_2012_coeff_shallow = Allen_2012_model_shallow[0:-2].T[1:]
+
 Allen_2012_coeff_period_shallow = Allen_2012_model_shallow[0:-2].T[0]
 
 # Concatenate the deep and shallow coefficients.
@@ -6002,11 +6003,10 @@ Allen_2012_coefficient_period = Allen_2012_coeff_period_deep
 Allen_2012_sigma_coefficient = zeros(Allen_2012_coefficient.shape)
 Allen_2012_sigma_coefficient_period = zeros(Allen_2012_coefficient_period.shape)
 
-
+# Other parameters
 Allen_2012_uses_Vs30 = True
 Allen_2012_magnitude_type = 'Mw'
 Allen_2012_distance_type = 'Rupture'
-
 Allen_2012_interpolation = linear_interpolation
 
 
@@ -6023,28 +6023,33 @@ def Allen_2012_distribution(**kwargs):
     """
     dist_object = kwargs['dist_object']
     Mw = kwargs['mag']
-    
     depth = kwargs['depth']
     periods = kwargs['periods']
-    
     coefficient = kwargs['coefficient']
-    sigma_coefficient = kwargs['sigma_coefficient']
     
+    # Rrup from distance object
+    Rrup = dist_object.Rupture
+
+    num_sites = Mw.shape[0]
+    num_events = Mw.shape[1]
+    num_periods = coefficient.shape[3]
+
+    # Check we have the right shapes
+    msg = 'Expected %s.shape=%s, got %s'
+
+    assert Mw.shape == (1, num_events, 1), (msg
+               % ('Mw', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Mw.shape)))
+
+    # ignore first dimension of distances
+    assert Rrup.shape[1:] == (num_events,), (msg
+               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
+
+    assert coefficient.shape == (24, 1, 1, num_periods), (msg
+               % ('coefficient', '(24,1,1,%d)' % num_periods,
+                  str(coefficient.shape)))
+
     Rrup = dist_object.Rupture[:,:,newaxis]
-    
-    # TA:
-    # c0 = model(:,2);
-    # c1 = model(:,3);
-    # c2 = model(:,4);
-    # c3 = model(:,5);
-    # c4 = model(:,6);
-    # c5 = model(:,7);
-    # c6 = model(:,8);
-    # c7 = model(:,9);
-    # c8 = model(:,10);
-    # c9 = model(:,11);
-    # c10 = model(:,12);
-    # c11 = model(:,13);
     
     # Deep indices
     cd = coefficient[:12]
@@ -6052,59 +6057,68 @@ def Allen_2012_distribution(**kwargs):
     # Shallow indices
     cs = coefficient[12:]
     
-    # TA:
-    # if depth >= 10
-    #     load 'AUS11_deep.mat'
-    # else
-    #     load 'AUS11_shallow.mat
-    # end
-    c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 = cd if (asarray(depth) >= 10).all() else cs    
+    # Loop over the events dimension and calculate GM per event
+    A12 = zeros((num_sites, num_events, num_periods))
     
-    # TA:
-    # minr1 = zeros(size(model(:,1)));
-    # maxr2 = zeros(size(model(:,1)));
-    # maxr3 = zeros(size(model(:,1)));
-    #
-    # Note that we're using c0 and not model(:1), which represents periods in 
-    # Trevor Allen's model (same shape)
-    minr1 = zeros(c0.shape)
-    maxr2 = zeros(c0.shape)
-    maxr3 = zeros(c0.shape)
-    
-    # TA:
-    # r01 = 80;
-    # r02 = 150;
-    r01 = 80
-    r02 = 150
-    
-    # TA:
-    # for j = 1:length(minr1)
-    #    r1 = r01 + (M-4)*c8(j);
-    #    r2 = r02 + (M-4)*c11(j);
-    #    minr1(j) = min([log10(rhypRange) log10(r1)]);
-    #    maxr2(j) = min([log10(rhypRange/r1) 0]);
-    #    maxr3(j) = min([log10(rhypRange/r2) 0]);
-    # end
-    # minr1 = 10.^minr1
-    for j in xrange(len(periods)):
-        r1 = r01 + (Mw-4)*c8[:,:,j]
-        r2 = r02 + (Mw-4)*c11[:,:,j]
-        minr1[:,:,j] = minimum(log10(Rrup), log10(r1))
-        maxr2[:,:,j] = maximum(log10(Rrup/r1), 0)
-        maxr3[:,:,j] = maximum(log10(Rrup/r2), 0)
-    minr1 = 10**minr1
-    
-    # TA:
-    # A12 = 10.^(c0 + c1 * (M-4) + c2*(M-4).^2 ...
-    #       + (c3 + c4*(M-4)).*log10(sqrt(minr1.^2 ...
-    #       + (ones(size(minr1)).*(1+c5*(M-4))).^2)) ...
-    #       + maxr2.*(c6 + c7*(M-4)) ...
-    #       + maxr3.*(c9 + c10*(M-4)));
-    A12 = 10**(c0 + c1*(Mw-4) + c2*(Mw-4)**2 \
-               + (c3 + c4*(Mw-4))*log10(sqrt(minr1**2 \
-               + (ones(minr1.shape)*(1 + c5*(Mw-4)))**2)) \
-               + maxr2 * (c6 + c7*(Mw-4)) \
-               + maxr3 * (c9 + c10*(Mw-4)))
+    for e in xrange(num_events):
+        # Get the parameters for this event
+        d = depth[:,e,:]
+        r = Rrup[:,e,:]
+        m = Mw[:,e,:]
+        
+        # TA:
+        # if depth >= 10
+        #     load 'AUS11_deep.mat'
+        # else
+        #     load 'AUS11_shallow.mat
+        # end
+        c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 = cd if d >= 10 else cs
+        
+        # TA:
+        # minr1 = zeros(size(model(:,1)));
+        # maxr2 = zeros(size(model(:,1)));
+        # maxr3 = zeros(size(model(:,1)));
+        #
+        # Note that we're using c0 and not model(:1), which represents periods in 
+        # Trevor Allen's model (same shape)
+        minr1 = zeros(c0.shape)
+        maxr2 = zeros(c0.shape)
+        maxr3 = zeros(c0.shape)
+        
+        # TA:
+        # r01 = 80;
+        # r02 = 150;
+        r01 = 80
+        r02 = 150
+        
+        # TA:
+        # for j = 1:length(minr1)
+        #    r1 = r01 + (M-4)*c8(j);
+        #    r2 = r02 + (M-4)*c11(j);
+        #    minr1(j) = min([log10(rhypRange) log10(r1)]);
+        #    maxr2(j) = min([log10(rhypRange/r1) 0]);
+        #    maxr3(j) = min([log10(rhypRange/r2) 0]);
+        # end
+        # minr1 = 10.^minr1
+        for j in xrange(len(periods)):
+            r1 = r01 + (m-4)*c8[:,:,j]
+            r2 = r02 + (m-4)*c11[:,:,j]
+            minr1[:,:,j] = minimum(log10(r), log10(r1))
+            maxr2[:,:,j] = maximum(log10(r/r1), 0)
+            maxr3[:,:,j] = maximum(log10(r/r2), 0)
+        minr1 = 10**minr1
+        
+        # TA:
+        # A12 = 10.^(c0 + c1 * (M-4) + c2*(M-4).^2 ...
+        #       + (c3 + c4*(M-4)).*log10(sqrt(minr1.^2 ...
+        #       + (ones(size(minr1)).*(1+c5*(M-4))).^2)) ...
+        #       + maxr2.*(c6 + c7*(M-4)) ...
+        #       + maxr3.*(c9 + c10*(M-4)));
+        A12[:,e,:] = 10**(c0 + c1*(m-4) + c2*(m-4)**2 \
+                     + (c3 + c4*(m-4))*log10(sqrt(minr1**2 \
+                     + (ones(minr1.shape)*(1 + c5*(m-4)))**2)) \
+                     + maxr2 * (c6 + c7*(m-4)) \
+                     + maxr3 * (c9 + c10*(m-4)))
     
     # TA:
     # AT = 1 ./ model(:,1);
