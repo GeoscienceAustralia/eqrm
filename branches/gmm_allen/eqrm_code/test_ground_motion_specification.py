@@ -20,7 +20,8 @@ classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
                           'Abrahamson08', 'Campbell03', 'Chiou08', 'Campbell08',
                           'Akkar_2010_crustal', 'Zhao_2006_interface',
                           'Atkinson_2003_intraslab', 'Atkinson_2003_interface',
-                          'Zhao_2006_intraslab', 'Abrahamson_Silva_1997')
+                          'Zhao_2006_intraslab', 'Abrahamson_Silva_1997',
+                          'Allen_2012')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -1288,6 +1289,44 @@ test_data['Abrahamson_Silva_1997_test_sigma']  = [[
 
 #------
 
+#***************  ALLEN 2012 MODEL  ***********************
+
+# SA values provided by TA for
+# Mw of 3.5, 4.0, 6.0
+# Rrup distance of 10, 100
+# Depth of 5, 10
+#
+# This equates to:
+# num_sites = 1
+# num_events = 18
+#
+
+# depth
+test_data['Allen_2012_test_depth'] =        [5.0,  5.0,  5.0,  5.0,   5.0,   5.0,
+                                             10.0, 10.0, 10.0, 10.0,  10.0,  10.0,
+                                             15.0, 15.0, 15.0, 15.0,  15.0,  15.0]
+
+# Mw
+test_data['Allen_2012_test_magnitude'] =    [3.5,  4.0,  6.0,  3.5,   4.0,   6.0,
+                                             3.5,  4.0,  6.0,  3.5,   4.0,   6.0,
+                                             3.5,  4.0,  6.0,  3.5,   4.0,   6.0]
+
+# Rrup
+tmp = zeros((1, 18))
+tmp[0,:] =                                  [10.0, 10.0, 10.0, 100.0, 100.0, 100.0,
+                                             10.0, 10.0, 10.0, 100.0, 100.0, 100.0,
+                                             10.0, 10.0, 10.0, 100.0, 100.0, 100.0]
+test_data['Allen_2012_test_distance'] = tmp
+del tmp
+
+# period
+test_data['Allen_2012_test_period'] = [0.1, 0.30303, 1.0]
+
+# TODO: Plug real values in here
+test_data['Allen_2012_test_mean'] = zeros((3, 18))
+
+
+#***************  END ALLEN 2012 MODEL  ***********************
 
 ################################################################################
 class Distance_stub(object):

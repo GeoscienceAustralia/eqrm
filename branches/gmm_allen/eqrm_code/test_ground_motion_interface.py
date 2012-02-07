@@ -2064,7 +2064,118 @@ class Test_ground_motion_interface(unittest.TestCase):
                % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
                                          rtol=1.0e-4, atol=1.0e-4),
-                                 msg)      
+                                 msg)
+              
+    def perform_test_Allen_2012(self,
+                                depth, 
+                                log_mean_expected, 
+                                log_sigma_expected):
+        """Test the Allen 2012 model."""
+
+        class DistObj(object):
+            def __init__(self, distance):
+                self.Rupture = distance
+                self.Horizontal = distance
+
+        Mw = numpy.array([[[5.0]]])
+        periods = numpy.array([0.0, 0.30303, 1.0])
+        coefficient = numpy.array([[[[-0.52399484,  0.28245458,  1.32370131]]],
+                                   [[[ 0.92314208,  1.1293744,   1.35628554]]],
+                                   [[[-0.02891889, -0.08017727, -0.16673118]]],
+                                   [[[-1.61441909, -1.52787315, -1.42356139]]],
+                                   [[[ 0.15830725,  0.12800644,  0.06457542]]],
+                                   [[[ 0.49864719,  0.53548988,  0.68615477]]],
+                                   [[[-0.46472481, -0.43477361, -0.40349246]]],
+                                   [[[ 0.24469685,  0.17518533,  0.16402114]]],
+                                   [[[ 1.66227384, -0.09592922, -0.69159662]]],
+                                   [[[-1.31301538, -1.23115497, -1.21129386]]],
+                                   [[[-0.1903296,  -0.16500132, -0.22438971]]],
+                                   [[[-1.01126128, -0.31446059,  2.24553155]]],
+                                   [[[-0.40985197,  0.3213329,   1.49651989]]],
+                                   [[[ 0.87989896,  1.1503695,   1.24502143]]],
+                                   [[[-0.04327807, -0.10881265, -0.17988298]]],
+                                   [[[-1.71886156, -1.57999043, -1.54432795]]],
+                                   [[[ 0.19843089,  0.14276332,  0.11450603]]],
+                                   [[[ 0.47902576,  0.57215055,  0.64594586]]],
+                                   [[[-0.23372661, -0.28341236, -0.23966958]]],
+                                   [[[ 0.18211638,  0.15795797,  0.16168768]]],
+                                   [[[ 2.10329839,  1.17853097,  1.65580905]]],
+                                   [[[-1.66418163, -1.51284055, -1.47264227]]],
+                                   [[[-0.08835182, -0.12445249, -0.14740927]]],
+                                   [[[-0.84402461,  0.38229927, -1.10409676]]]])
+        sigma_coefficient = numpy.zeros(coefficient.shape)
+        Rrup =  numpy.array([[10.0]])
+        dist_object = DistObj(Rrup)
+        
+        model_name = 'Allen_2012'
+        model = Ground_motion_specification(model_name)
+        
+        # Shallow test
+        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+                                                   mag=Mw,
+                                                   periods=periods,
+                                                   depth=depth,
+                                                   coefficient=coefficient,
+                                                   sigma_coefficient=sigma_coefficient)
+        
+        msg = ('depth=%s, T=%s, Mw=%s, Rrup=%s: log_mean=%s, expected=%s'
+               % (depth, periods, Mw, Rrup, str(log_mean), str(log_mean_expected)))
+        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+
+        msg = ('depth=%s, T=%s, Mw=%s, Rrup=%s: log_sigma=%s, expected=%s'
+               % (depth, periods, Mw, Rrup, str(log_sigma), str(log_sigma_expected)))
+        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
+                                         rtol=1.0e-4, atol=1.0e-4),
+                                 msg)
+    
+    # TODO: Plug real values in here
+    def test_Allen_2012(self):
+        """Test the Allen 2012 model (depth == 10)"""
+
+        # Threshold == depth == 10
+        depth = numpy.array([[[10.0]]])
+        
+        # expected values from TA
+        log_mean_expected = numpy.array([[[0.0]]])
+        log_sigma_expected = numpy.array([[[0.0]]])
+        
+        # Deep test
+        self.perform_test_Allen_2012(depth,
+                                     log_mean_expected,
+                                     log_sigma_expected)
+    
+    # TODO: Plug real values in here
+    def test_Allen_2012_deep(self):
+        """Test the Allen 2012 model - deep (depth > 10)"""
+
+        # Deep == depth >= 10
+        depth = numpy.array([[[15.0]]])
+        
+        # expected values from TA
+        log_mean_expected = numpy.array([[[0.0]]])
+        log_sigma_expected = numpy.array([[[0.0]]])
+        
+        # Deep test
+        self.perform_test_Allen_2012(depth,
+                                     log_mean_expected,
+                                     log_sigma_expected)
+        
+    
+    # TODO: Plug real values in here
+    def test_Allen_2012_shallow(self):
+        """Test the Allen 2012 model - shallow (depth < 10)"""
+
+        depth = numpy.array([[[5.0]]])
+        
+        # expected values from TA
+        log_mean_expected = numpy.array([[[0.0]]])
+        log_sigma_expected = numpy.array([[[0.0]]])
+        
+        self.perform_test_Allen_2012(depth,
+                                     log_mean_expected,
+                                     log_sigma_expected)
         
     def speed_test(self):
         """Tests relative speeds of the weave and pure-python versions of:
