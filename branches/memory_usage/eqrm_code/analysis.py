@@ -27,17 +27,17 @@ from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
 from eqrm_code.parse_in_parameters import  \
     AttributeSyntaxError, create_parameter_data, eqrm_flags_to_control_file
 from eqrm_code.event_set import Event_Set, Event_Activity, \
-     generate_synthetic_events_fault, merge_events_and_sources
+     generate_synthetic_events_fault, merge_events_and_sources, \
+     load_event_set
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
 from eqrm_code.ground_motion_interface import BEDROCKVs30
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
      Regolith_amplification_model, load_site_class2Vs30
-from eqrm_code.source_model import source_model_from_xml, Source_Model
 from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
-         save_event_set, save_hazard, save_structures, save_val, \
+         save_hazard, save_structures, save_val, \
          save_ecloss, join_parallel_files, join_parallel_files_column, \
-         save_damage, get_source_file_handle, save_fatalities, \
+         save_damage, save_fatalities, \
          save_bridge_days_to_complete
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
@@ -162,161 +162,8 @@ def main(parameter_handle,
     log.debug('Memory: Initial')
     log.resource_usage()
     
-    if eqrm_flags.is_scenario is True:
-        # generate a scenario event set
-        event_set = Event_Set.create_scenario_events(
-            rupture_centroid_lat=[eqrm_flags.scenario_latitude],
-            rupture_centroid_lon=[eqrm_flags.scenario_longitude],
-            azimuth=[eqrm_flags.scenario_azimuth],
-            dip=[eqrm_flags.scenario_dip],
-            Mw=[eqrm_flags.scenario_magnitude],
-            depth=[eqrm_flags.scenario_depth],
-            fault_width=eqrm_flags.max_width,
-            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
-        # Other rupture parameters are calculated by event_set object.
-        # trace start is calculated from centroid and azimuth.
-        # Rupture area, length, and width are calculated from Mw
-        # using Wells and Coppersmith 94 (modified so rupture
-        # width is less than fault_width).
-        event_activity = Event_Activity(len(event_set))
-        event_activity.set_scenario_event_activity()
-        event_set.scenario_setup()
-        source_model = Source_Model.create_scenario_source_model(
-            len(event_set))
-        source_model.set_attenuation(eqrm_flags.atten_models,
-                                          eqrm_flags.atten_model_weights)
-    else:
-        # (i.e. is_scenario is False) generate a probablistic event set
-        # (using eqrm_flags.source_filename)
-        # Once the event control file is 'fully operational'
-        # remove the try.
-        try:
-            fid_event_types = get_source_file_handle(eqrm_flags,
-                                                 source_file_type='event_type')
-        except IOError, e:
-            fid_event_types = None
-            log.debug('No event typlecontrol XML file found')
-            log.debug(e)
-        try:
-            fid_sourcepolys = get_source_file_handle(eqrm_flags, 
-                                                     source_file_type='zone')
-        except IOError, e:
-            fid_sourcepolys = None
-            log.debug('No zone source XML file found')
-            log.debug(e)
-      
-        # tell event set which source models to calculate activity with
-        if fid_sourcepolys is not None:
-            source_model_zone = source_model_from_xml(
-                fid_sourcepolys.name)
-       
-            if fid_event_types is not None:
-                source_model_zone.add_event_type_atts_to_sources(
-                    fid_event_types)
-
-            if eqrm_flags.atten_models is not None and \
-                eqrm_flags.atten_model_weights is not None:
-                source_model_zone.set_attenuation(eqrm_flags.atten_models,
-                                           eqrm_flags.atten_model_weights)
-            log.debug('Memory: source_model_zone created')
-            log.resource_usage()
-
-            event_set_zone = Event_Set.generate_synthetic_events(
-                fid_genpolys=fid_sourcepolys,
-                source_model=source_model_zone,
-                prob_number_of_events_in_zones=\
-                eqrm_flags.prob_number_of_events_in_zones)
-
-            log.debug('Memory: event_set_zone created')
-            log.resource_usage()
-        else:
-            event_set_zone = None
-            source_model_zone = None
-        
-        
-        #generate event set and source_models for the fault sources
-        
-        try:
-            fid_sourcefaults  = get_source_file_handle(
-                eqrm_flags, source_file_type='fault')
-        except IOError, e:
-            fid_sourcefaults = None
-            log.debug('No fault source XML file found')
-            log.debug(e)
-        if (fid_event_types is not None) and (fid_sourcefaults is not None):
-            # fid_event_types.name since the zone code leaves
-            # the handle at the end of the file. (I think)
-            event_set_fault, source_model_fault = generate_synthetic_events_fault(
-                fid_sourcefaults, 
-                fid_event_types.name,
-                eqrm_flags.prob_number_of_events_in_faults)
-            
-        else:
-            event_set_fault = None
-            source_model_fault = None
-         
-        # add the two event sets and source models together
-        if event_set_fault is None: # assume no fault sources
-            if event_set_zone is None:              
-                msg = 'No fault source or zone source xml files'
-                raise RuntimeError(msg)
-            event_set = event_set_zone
-            source_model = source_model_zone
-        elif event_set_zone is None: # assume no zone sources
-            event_set = event_set_fault
-            source_model = source_model_fault
-        else:
-            # merge
-            event_set, source_model = merge_events_and_sources(
-                event_set_zone, event_set_fault,
-                source_model_zone, source_model_fault)
-                
-        
-        # event activity is calculated
-        event_activity = Event_Activity(len(event_set))
-        source_model.calculate_recurrence(
-            event_set,
-            event_activity)
-        log.debug('Memory: event activity has been calculated')
-        log.resource_usage()
-        
-        # At this stage all the event generation has occured
-        # So the Source classes should be 'downsized' to Event_Zones
-    
-    
-    #save event_set is now called earlier so that some arrays can be set to None
-    if parallel.rank == 0:        # No site component
-        # So just get one process to write these files.
-        save_event_set(eqrm_flags, event_set,
-                       event_activity,
-                       source_model,
-                       compress=eqrm_flags.compress_output)
-        #delete these data structures to reduce memory
-        event_set.area = None
-        event_set.trace_end_lat = None
-        event_set.trace_end_lon = None
-        event_set.source_zone_id = None
-        event_set.event_id = None
-               
-    #  event_activity.event_activity[drop down to one dimension],
-    event_activity.ground_motion_model_logic_split(
-        source_model,
-        not eqrm_flags.atten_collapse_Sa_of_atten_models)
-    
-    log.debug('Memory: Event activities split due to gmms.')
-    log.resource_usage()
-    
-    msg = 'Event set created. Number of events=' + str(len(event_set.depth))
-    log.info(msg)
-    log.debug('Memory: Event Set created')
-    log.resource_usage()
-    
-    # Want to be able to save and load event sets here
-    # Need to save event_zone/Source as well.
-    # And eqrm_flags.
-
-    # Add the ground motion models to the source
-    source_model.set_ground_motion_calcs(eqrm_flags.atten_periods)
+    # load event set data
+    (event_set, event_activity, source_model) = load_event_set(eqrm_flags, parallel)
     
     # load all data into a 'sites' object
     # if we have bridge data, 'have_bridge_data' will be True

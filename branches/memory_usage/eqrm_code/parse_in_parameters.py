@@ -406,7 +406,16 @@ CONV_NEW = [{'order': 10.0,
              {'old_para': 'save_fatalities',
              'order': 100.07,
              'new_para': 'save_fatalities',
-             'default': False}
+             'default': False},
+             {'order': 100.08,
+              'new_para': 'data_dir',
+              'default': None},
+              {'order': 100.09,
+              'new_para': 'save_event_set_data',
+              'default': False},
+              {'order': 100.10,
+              'new_para': 'load_event_set_data',
+              'default': False},
             ]
 
 # Old style attributes that have not been removed yet.

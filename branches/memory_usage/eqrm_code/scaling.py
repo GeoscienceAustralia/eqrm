@@ -26,6 +26,7 @@
 from eqrm_code import scaling_functions
 import string
 import copy
+from numpy import asarray
 
 NAME_BEGINNING = {'WEL':'Wells_and_Coppersmith_94',
                   'MOD':'modified_Wells_and_Coppersmith_94'}
@@ -46,7 +47,7 @@ def scaling_calc_rup_area(Mw, scaling_dic):
         scaling_dic['scaling_rule'] = NAME_BEGINNING[key]
     func_name = scaling_dic['scaling_rule'] + '_rup_area'
     
-    scaling_dic['Mw'] = Mw
+    scaling_dic['Mw'] = asarray(Mw)
     func_pointer = getattr(scaling_functions, func_name)
     rup_area = apply(func_pointer, [], scaling_dic)
     return rup_area
