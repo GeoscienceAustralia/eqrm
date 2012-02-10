@@ -38,6 +38,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.site_indexes = [2255,11511]
         set.input_dir = join('.','in')
         set.output_dir = join('.','out')
+        set.data_dir = join('.', 'data')
         set.return_periods = [22,11]
         
         # Scenario input 
@@ -265,6 +266,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.is_scenario = True    # If False, probabilistic input used
         set.input_dir = '.'
         set.output_dir = '.'
+        set.data_dir = '.'
 
         return set
 

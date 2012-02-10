@@ -19,6 +19,9 @@ from numpy.lib.format import open_memmap
 #
 SAVE_METHOD = 'npy'
 
+class FileStoreException(Exception):
+    pass
+
 class File_Store(object):
     """
     File_Store
@@ -139,7 +142,7 @@ class File_Store(object):
             # Make save dir if necessary
             save_dir = os.path.join(dir, self._name)
             if not os.path.exists(save_dir):
-                os.mkdir(save_dir)
+                os.makedirs(save_dir)
             
             # Place each array file in the save dir
             for name, filename in self._array_files.items():
@@ -154,7 +157,7 @@ class File_Store(object):
         
         load_dir = os.path.join(dir, self._name)
         if not os.path.exists(load_dir):
-            return
+            raise FileStoreException("Directory %s does not exist" % load_dir)
         
         # Load each name.npy file into the file structure using
         # _set_numpy_binary_array(name, load(name.npy))
@@ -162,6 +165,6 @@ class File_Store(object):
             for file in files:
                 name, ext = os.path.splitext(file)
                 if ext == '.npy':
-                    self._set_numpy_binary_array(name, load(os.path.join(root,file)))
+                    self._set_file_array(name, load(os.path.join(root,file)))
         
 

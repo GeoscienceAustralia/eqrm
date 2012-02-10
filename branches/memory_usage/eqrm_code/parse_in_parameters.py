@@ -409,13 +409,13 @@ CONV_NEW = [{'order': 10.0,
              'default': False},
              {'order': 100.08,
               'new_para': 'data_dir',
-              'default': None},
+              'default': None}, # _add_default_values sets this to eqrm_data_home/data
               {'order': 100.09,
-              'new_para': 'save_event_set_data',
-              'default': False},
-              {'order': 100.10,
-              'new_para': 'load_event_set_data',
-              'default': False},
+               'values': {0: 'generate', # Generate on first node, process on other nodes
+                          1: 'save',     # Generate, save and stop
+                          2: 'load'},    # Load from saved data
+              'new_para': 'event_set_data_mode',
+              'default': 'generate'},
             ]
 
 # Old style attributes that have not been removed yet.
@@ -582,6 +582,10 @@ def _add_default_values(eqrm_flags):
                 raise AttributeSyntaxError(
                 "Attribute Error: Attribute "  + param['new_para']
                 + " must be defined.")
+    
+    # Default the data_dir to eqrm_data_home/data if not set
+    if eqrm_flags.data_dir is None:
+        eqrm_flags['data_dir'] = os.path.join(eqrm_data_home(), 'data')
 
 # In the dictionary DEPRECIATED_PARAS
 # the key is the depreciated attribute.
@@ -787,6 +791,10 @@ def _verify_eqrm_flags(eqrm_flags):
     if eqrm_flags.amp_variability_method == 1:
         raise AttributeSyntaxError(
             'Cannot spawn on amplification.')
+    
+    if eqrm_flags.event_set_data_mode == 'load' and not os.path.exists(eqrm_flags.data_dir):
+        raise AttributeSyntaxError(
+            'data_dir %s must exist if event_set_data_mode is load.' % eqrm_flags.data_dir)
 
   
 def find_set_data_py_files(path):

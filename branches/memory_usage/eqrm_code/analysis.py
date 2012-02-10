@@ -28,7 +28,7 @@ from eqrm_code.parse_in_parameters import  \
     AttributeSyntaxError, create_parameter_data, eqrm_flags_to_control_file
 from eqrm_code.event_set import Event_Set, Event_Activity, \
      generate_synthetic_events_fault, merge_events_and_sources, \
-     load_event_set
+     create_event_set
 from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
 from eqrm_code.ground_motion_interface import BEDROCKVs30
@@ -163,7 +163,7 @@ def main(parameter_handle,
     log.resource_usage()
     
     # load event set data
-    (event_set, event_activity, source_model) = load_event_set(eqrm_flags, parallel)
+    (event_set, event_activity, source_model) = create_event_set(eqrm_flags, parallel)
     
     # load all data into a 'sites' object
     # if we have bridge data, 'have_bridge_data' will be True
@@ -176,7 +176,7 @@ def main(parameter_handle,
     del sites
     num_sites = len(all_sites)
 
-    log.info('Sites set created. Number of sites=' + str(num_sites))
+    log.info('P%s: Sites set created. Number of sites=%s' % (parallel.rank, str(num_sites)))
     log.debug('Memory: Sites created')
     log.resource_usage()
     
@@ -375,6 +375,8 @@ def main(parameter_handle,
         
         # A source model subset - each event reference in the source model
         # meets the attenuation threshold criteria
+        # TODO: Can we move this outside the site loop and save to file/
+        # load from file?
         source_model_subset = source_model_threshold_distance_subset(sites,
                                       event_set,
                                       source_model,

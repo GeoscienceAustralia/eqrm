@@ -62,12 +62,10 @@ amp_max_factor = 10000
 save_hazard_map = True
 
 
-# .npy data file directory
+# Data
 data_dir = join(input_dir, 'TS_haz43', 'data')
-# Save event set data to .npy files
-save_event_set_data = False
-# Load event set data from .npy files
-load_event_set_data = True
+event_set_data_mode = "load"
+
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 
