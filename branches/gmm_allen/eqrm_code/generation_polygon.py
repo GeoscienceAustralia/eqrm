@@ -95,15 +95,17 @@ class Generation_Polygon(polygon_object):
         #Similar to unpacking tuples (ie range(*(1,5,2)) is same as [1,3,5])
         #see python tutorial s4.7.4
 
-    def populate(self,number_of_points,seed=None):
+    def populate(self,number_of_points,seed=None,use_cache=False):
         polygon = self._linestring[:-1]
         exclude = [exclude[:-1] for exclude in self._exclude]
-        points = populate_geo_coord_polygon(polygon, number_of_points,seed, 
-                                            exclude)
+        
+        points = populate_geo_coord_polygon(polygon, number_of_points, seed, exclude)
 
-        for point in points:
-            point = tuple(point)
-            self._precomputed_points[point]=True
+        if use_cache:
+            for point in points:
+                point = tuple(point)
+                self._precomputed_points[point]=True
+                
         return points
 
 

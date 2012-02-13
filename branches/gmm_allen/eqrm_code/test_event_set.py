@@ -15,7 +15,7 @@ from source_model import source_model_from_xml, Source_Model
 import conversions
 
 from eqrm_code.event_set import * #Event_Set, Pseudo_Event_Set
-
+from eqrm_code import file_store
 
 class DummyEventSet:
     def __init__(self):
@@ -93,6 +93,9 @@ def csv_to_array(csv_file):
     return csv_array
 
 class Test_Event_Set(unittest.TestCase):
+    
+    def setUp(self):
+        file_store.SAVE_METHOD = None
 
     def test_event_set_conformance(self):
         event_csv_name = "../test_resources/unit_test_event.csv"

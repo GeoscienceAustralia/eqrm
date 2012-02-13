@@ -21,7 +21,7 @@ def constant(mean=None, n=1):
     """Generate a list with a constant distribution"""
     mean = float(mean)
     answer=[]
-    for i in range(n):
+    for i in xrange(n):
         answer.append(mean)
     return answer
 
@@ -33,7 +33,7 @@ def uniform(minimum=None, maximum=None, n=1):
     if minimum == maximum:
         return n*[minimum]
     answer = []
-    for i in range(n):
+    for i in xrange(n):
         answer.append(random.uniform(a=minimum, b=maximum))
     return answer
 

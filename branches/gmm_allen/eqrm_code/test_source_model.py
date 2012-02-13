@@ -2,7 +2,7 @@ import os
 import sys
 import unittest
 from os.path import join
-import tempfile
+import tempfile, shutil
 import types
 
 from scipy import array, allclose
@@ -90,11 +90,12 @@ def source_model_zone_xml(generation_min_mag, *n_rm_args):
 class Test_Source_model(unittest.TestCase):
     
     def setUp(self):
-        pass
-        
+        # Create a temporary directory for the data files
+        self.data_dir = tempfile.mkdtemp()
+    
     def tearDown(self):
-        pass
-
+        # Remove the temporary data directory
+        shutil.rmtree(self.data_dir)
 
     def test_source_model_from_xml(self):
         """
@@ -494,8 +495,8 @@ class Test_Source_model(unittest.TestCase):
             self.failUnless(i in setups_dic[key])
             setups_dic[key].remove(i)
             
-            
-    def test_create_fault_sources(self):
+    
+    def _create_fault_sources(self):
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
         handle = open(file_name,'w')
@@ -551,6 +552,22 @@ class Test_Source_model(unittest.TestCase):
         source_model = create_fault_sources(file_name, 
                                            fsg_list, 
                                            magnitude_type)
+        
+        os.remove(file_name)
+        
+        return source_model
+    
+    def test_create_fault_sources(self):
+
+        generation_min_mag = 7.9
+        recurrence_min_mag = 4
+        actual_generation_min_mag = max(generation_min_mag, recurrence_min_mag)
+        recurrence_max_mag = 8.0
+        A_min = 10
+        b = 1.4
+
+        source_model = self._create_fault_sources()
+        
         for i, model in enumerate(source_model):
             #self.failUnless(mod.min_magnitude  == )
             self.failUnless(model.recurrence_models[0].max_magnitude == recurrence_max_mag + i)
@@ -564,8 +581,6 @@ class Test_Source_model(unittest.TestCase):
             self.failUnless(model.scaling['scaling_rule'] == model.event_type)
             
         self.failUnless(source_model[0].scaling['scaling_rule'] == 'background')
-            
-        os.remove(file_name)
         
         
     def test_get_EventZone_instance(self):
@@ -581,7 +596,7 @@ class Test_Source_model(unittest.TestCase):
             event_zone.min_magnitude
         except AttributeError:
             pass
-        except e:
+        except Exception, e:
             self.fail('Unexpected exception thrown:', e)
         else:
             self.fail('ExpectedException not thrown')
@@ -589,6 +604,38 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless(allclose(event_zone.get_event_set_indexes(),
                                      array(indexes)))
 
+    
+    def test_load_save(self):
+        
+        # Create dummy Source Model
+        source_model1 = self._create_fault_sources()
+        
+        # Save it to the temporary dir
+        source_model1.save(self.data_dir)
+        
+        # Load the second source model from file
+        source_model2 = Source_Model.load(self.data_dir)
+        
+        
+        for i, model1 in enumerate(source_model1):
+            model2 = source_model2[i]
+            
+            #self.failUnless(mod.min_magnitude  == )
+            self.failUnless(model1.recurrence_models[0].max_magnitude == 
+                            model2.recurrence_models[0].max_magnitude)
+            self.failUnless(model1.actual_min_mag_generation == 
+                            model2.actual_min_mag_generation)
+            self.failUnless(model1.recurrence_models[0].A_min == 
+                            model2.recurrence_models[0].A_min)
+            self.failUnless(model1.recurrence_models[0].b == 
+                            model2.recurrence_models[0].b)
+            self.failUnless(model1.name == 
+                            model2.name)
+            self.failUnless(model1.recurrence_models[0].recurrence_model_distribution == 
+                            model2.recurrence_models[0].recurrence_model_distribution)
+            self.failUnless(model1.scaling['scaling_rule'] == 
+                            model2.scaling['scaling_rule'])
+            
         
         
 ################################################################################
