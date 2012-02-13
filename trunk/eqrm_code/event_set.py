@@ -16,12 +16,15 @@
 import copy
 import xml.dom.minidom
 import math
+import os, glob
 import scipy
+import tempfile
+import sys
 
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
      int64, reshape, arange, append, radians, where, minimum, seterr
-from numpy import random
+from numpy import random, save, load
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
@@ -37,6 +40,8 @@ from eqrm_code.ANUGA_utilities import log as eqrmlog
 from eqrm_code import source_model #import create_fault_sources
 from eqrm_code import ground_motion_misc
 from eqrm_code import scaling
+from eqrm_code import file_store
+from eqrm_code.event_set_data import Event_Set_Data, Event_Activity_Data
 
 # This specifies the dtypes used in  event set.
 # This was investigated to save memory
@@ -45,7 +50,7 @@ from eqrm_code import scaling
 EVENT_FLOAT = float64 #float32
 EVENT_INT = int64 #int32
 
-class Event_Set(object):
+class Event_Set(file_store.File_Store):
     def __init__(self, azimuth, dip, ML, Mw,
                  depth, depth_to_top, fault_type,
                  width, length, area, fault_width,
@@ -100,6 +105,8 @@ class Event_Set(object):
 
 
         """
+        super(Event_Set, self).__init__('event_set')
+        
         self.azimuth = azimuth
         self.dip = dip
         self.ML = ML
@@ -120,12 +127,110 @@ class Event_Set(object):
         self.rupture_centroid_y = rupture_centroid_y
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
-        if event_id is None:
+        if event_id is None and depth is not None:
            self.event_id = r_[0:len(self.depth)] # gives every event an id
         else:
             self.event_id = event_id
-        self.check_arguments() 
+        self.check_arguments()
 
+    def __del__(self):
+        super(Event_Set, self).__del__()
+    
+    # PROPERTIES #
+    # Define getters and setters for each attribute to exercise the 
+    # file-based data structure
+    azimuth = property(lambda self: self._get_file_array('azimuth'), 
+                       lambda self, value: self._set_file_array('azimuth', value))
+    
+    dip = property(lambda self: self._get_file_array('dip'), 
+                   lambda self, value: self._set_file_array('dip', value))
+    
+    ML = property(lambda self: self._get_file_array('ML'), 
+                  lambda self, value: self._set_file_array('ML', value))
+    
+    Mw = property(lambda self: self._get_file_array('Mw'), 
+                  lambda self, value: self._set_file_array('Mw', value))
+    
+    depth = property(lambda self: self._get_file_array('depth'), 
+                     lambda self, value: self._set_file_array('depth', value))
+    
+    depth_to_top = property(lambda self: self._get_file_array('depth_to_top'), 
+                            lambda self, value: self._set_file_array('depth_to_top', value))
+    
+    fault_type = property(lambda self: self._get_file_array('fault_type'), 
+                          lambda self, value: self._set_file_array('fault_type', value))
+    
+    width = property(lambda self: self._get_file_array('width'), 
+                     lambda self, value: self._set_file_array('width', value))
+    
+    length = property(lambda self: self._get_file_array('length'), 
+                      lambda self, value: self._set_file_array('length', value))
+    
+    area = property(lambda self: self._get_file_array('area'), 
+                    lambda self, value: self._set_file_array('area', value))
+    
+    fault_width = property(lambda self: self._get_file_array('fault_width'), 
+                           lambda self, value: self._set_file_array('fault_width', value))
+    
+    source_zone_id = property(lambda self: self._get_file_array('source_zone_id'), 
+                              lambda self, value: self._set_file_array('source_zone_id', value))
+    
+    trace_start_lat = property(lambda self: self._get_file_array('trace_start_lat'), 
+                               lambda self, value: self._set_file_array('trace_start_lat', value))
+    
+    trace_start_lon = property(lambda self: self._get_file_array('trace_start_lon'), 
+                               lambda self, value: self._set_file_array('trace_start_lon', value))
+    
+    trace_end_lat = property(lambda self: self._get_file_array('trace_end_lat'), 
+                             lambda self, value: self._set_file_array('trace_end_lat', value))
+    
+    trace_end_lon = property(lambda self: self._get_file_array('trace_end_lon'), 
+                             lambda self, value: self._set_file_array('trace_end_lon', value))
+    
+    rupture_centroid_x = property(lambda self: self._get_file_array('rupture_centroid_x'), 
+                                  lambda self, value: self._set_file_array('rupture_centroid_x', value))
+    
+    rupture_centroid_y = property(lambda self: self._get_file_array('rupture_centroid_y'), 
+                                  lambda self, value: self._set_file_array('rupture_centroid_y', value))
+    
+    rupture_centroid_lat = property(lambda self: self._get_file_array('rupture_centroid_lat'), 
+                                    lambda self, value: self._set_file_array('rupture_centroid_lat', value))
+    
+    rupture_centroid_lon = property(lambda self: self._get_file_array('rupture_centroid_lon'), 
+                                    lambda self, value: self._set_file_array('rupture_centroid_lon', value))
+    
+    event_id = property(lambda self: self._get_file_array('event_id'), 
+                        lambda self, value: self._set_file_array('event_id', value))
+    # END PROPERTIES #
+
+    @classmethod
+    def load(cls, dir=None):
+        """
+        Return an Event_Set object from the .npy files stored in the specified
+        directory
+        """
+        event_set = cls(azimuth=None,
+                        dip=None,
+                        ML=None,
+                        Mw=None,
+                        depth=None,
+                        depth_to_top=None,
+                        fault_type=None,
+                        width=None,
+                        length=None,
+                        area=None,
+                        fault_width=None,
+                        source_zone_id=None,
+                        trace_start_lat=None,
+                        trace_start_lon=None,
+                        trace_end_lat=None,
+                        trace_end_lon=None,
+                        rupture_centroid_x=None,
+                        rupture_centroid_y=None,
+                        rupture_centroid_lat=None,
+                        rupture_centroid_lon=None)
+        event_set._load(dir)
+        return event_set
 
     @classmethod
     def create(cls, rupture_centroid_lat, rupture_centroid_lon, azimuth,
@@ -360,8 +465,6 @@ class Event_Set(object):
         Boundary is in lat,long pairs. First node is repeated.
         """      
 
-        log.info('generating events')
-        
         (generation_polygons,
              magnitude_type) = polygons_from_xml(fid_genpolys)
         num_polygons = len(generation_polygons)
@@ -376,16 +479,19 @@ class Event_Set(object):
         
         #initialise new attributes
         num_events = sum(prob_number_of_events_in_zones)
-        rupture_centroid_lat = zeros((num_events), dtype=EVENT_FLOAT)
-        rupture_centroid_lon = zeros((num_events), dtype=EVENT_FLOAT)
-        depth_top_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
-        depth_bottom_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
-        azimuth = zeros((num_events), dtype=EVENT_FLOAT)
-        dip = zeros((num_events), dtype=EVENT_FLOAT)
-        area = zeros((num_events), dtype=EVENT_FLOAT)
-        width = zeros((num_events), dtype=EVENT_FLOAT)
-        fault_width = zeros((num_events), dtype=EVENT_FLOAT)
-        magnitude = zeros((num_events), dtype=EVENT_FLOAT)
+        
+        data = Event_Set_Data()
+        
+        data.rupture_centroid_lat = zeros((num_events), dtype=EVENT_FLOAT)
+        data.rupture_centroid_lon = zeros((num_events), dtype=EVENT_FLOAT)
+        data.depth_top_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
+        data.depth_bottom_seismogenic = zeros((num_events), dtype=EVENT_FLOAT)
+        data.azimuth = zeros((num_events), dtype=EVENT_FLOAT)
+        data.dip = zeros((num_events), dtype=EVENT_FLOAT)
+        data.area = zeros((num_events), dtype=EVENT_FLOAT)
+        data.width = zeros((num_events), dtype=EVENT_FLOAT)
+        data.fault_width = zeros((num_events), dtype=EVENT_FLOAT)
+        data.magnitude = zeros((num_events), dtype=EVENT_FLOAT)
         
         
         source_zone_id = zeros((num_events), dtype=EVENT_INT)
@@ -401,54 +507,50 @@ class Event_Set(object):
             
             if num == 0:
                 continue
-
-            #populate the polygons
-            polygon_depth_top_seismogenic = gp.populate_depth_top_seismogenic(
+            
+            #populate the polygons and attach the current polygons generated attributes
+            data.depth_top_seismogenic[start:end] = gp.populate_depth_top_seismogenic(
                 num)
             eqrmlog.debug('Memory: populate_depth_top_seismogenic created')
             eqrmlog.resource_usage()
-            polygon_azimuth = gp.populate_azimuth(num)
+            
+            data.azimuth[start:end] = gp.populate_azimuth(num)
             eqrmlog.debug('Memory: populate_azimuth created')
             eqrmlog.resource_usage()
-            polygon_dip = gp.populate_dip(num)
+            
+            data.dip[start:end] = gp.populate_dip(num)
             eqrmlog.debug('Memory: populate_dip created')
             eqrmlog.resource_usage()
-            polygon_magnitude = gp.populate_magnitude(num)
+            
+            data.magnitude[start:end] = gp.populate_magnitude(num)
             eqrmlog.debug('Memory: populate_magnitude created')
             eqrmlog.resource_usage()
-            polygon_depth_bottom = gp.populate_depth_bottom_seismogenic(num)
+            
+            data.depth_bottom_seismogenic[start:end] = gp.populate_depth_bottom_seismogenic(num)
 
             #FIXME DSG-EQRM the events will not to randomly placed,
             # Due to  lat, lon being spherical coords and popolate
             # working in x,y (flat 2D).
-            (lat, lon) = array(gp.populate(num)).swapaxes(0, 1) 
+            (data.rupture_centroid_lat[start:end], 
+             data.rupture_centroid_lon[start:end]) = array(gp.populate(num)).swapaxes(0, 1)
+            
             eqrmlog.debug('Memory: lat,lon created')
-            eqrmlog.resource_usage()
+            eqrmlog.resource_usage()      
             
-            #attach the current polygons generated attributes
-            rupture_centroid_lat[start:end] = lat
-            rupture_centroid_lon[start:end] = lon
-            
-            depth_top_seismogenic[start:end] = polygon_depth_top_seismogenic
-            depth_bottom_seismogenic[start:end] = polygon_depth_bottom
-            azimuth[start:end] = polygon_azimuth
-            dip[start:end] = polygon_dip
-            magnitude[start:end] = polygon_magnitude
-            #print "magnitude.dtype.name", magnitude.dtype.name
-            fault_width[start:end] = (depth_bottom_seismogenic[start:end] \
-                           - depth_top_seismogenic[start:end])/ \
-                           sin(dip[start:end]*pi/180.)
-            area[start:end] = scaling.scaling_calc_rup_area(
-                magnitude[start:end], source.scaling)
+            data.fault_width[start:end] = (data.depth_bottom_seismogenic[start:end] \
+                           - data.depth_top_seismogenic[start:end])/ \
+                           sin(data.dip[start:end]*pi/180.)
+            data.area[start:end] = scaling.scaling_calc_rup_area(
+                data.magnitude[start:end], source.scaling)
             #print "source.scaling", source.scaling
             #print "magnitude[start:end]", magnitude[start:end]
             #print "dip[start:end]", dip[start:end]
             #print "rup_area=area[start:end", area[start:end]
             #print "max_rup_width=fault_width[s:e]", fault_width[start:end]
             
-            width[start:end] = scaling.scaling_calc_rup_width(
-                magnitude[start:end], source.scaling, dip[start:end],
-                rup_area=area[start:end], max_rup_width=fault_width[start:end])
+            data.width[start:end] = scaling.scaling_calc_rup_width(
+                data.magnitude[start:end], source.scaling, data.dip[start:end],
+                rup_area=data.area[start:end], max_rup_width=data.fault_width[start:end])
             eqrmlog.debug('Memory: event set lists have been combined')
             eqrmlog.resource_usage()
 
@@ -459,31 +561,37 @@ class Event_Set(object):
             
             
             start = end
+            
         new_ML=None
         new_Mw=None
         if magnitude_type == 'ML':
-            new_ML=magnitude
+            new_ML=data.magnitude
         elif magnitude_type == 'Mw':
-            new_Mw=magnitude
+            new_Mw=data.magnitude
         else:
             raise Exception('Magnitudes not set')
-        event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
-                                 rupture_centroid_lon=rupture_centroid_lon,
-                                 azimuth=azimuth,
-                                 dip=dip,
+        event = Event_Set.create(rupture_centroid_lat=data.rupture_centroid_lat,
+                                 rupture_centroid_lon=data.rupture_centroid_lon,
+                                 azimuth=data.azimuth,
+                                 dip=data.dip,
                                  ML=new_ML,
                                  Mw=new_Mw,
-                                 depth_top_seismogenic=depth_top_seismogenic,
-                                 depth_bottom_seismogenic=
-                                 depth_bottom_seismogenic,
-                                 fault_width=fault_width,
-                                 area=area,
-                                 width=width)
+                                 depth_top_seismogenic=data.depth_top_seismogenic,
+                                 depth_bottom_seismogenic=data.depth_bottom_seismogenic,
+                                 fault_width=data.fault_width,
+                                 area=data.area,
+                                 width=data.width)
         event.source_zone_id = asarray(source_zone_id)
         eqrmlog.debug('Memory: finished generating events')
         eqrmlog.resource_usage()
 
         return event
+
+    def save(self, dir=None):
+        """
+        Save the ndarray objects to the specified directory
+        """
+        self._save(dir)
 
     
     def scenario_setup(self):
@@ -531,14 +639,16 @@ class Event_Set(object):
         """Return a list of all the event set attributes"""
         # FIXME could probbaly just use self.__dict__.keys(), or better yet self.__dict__.items() and change caller
         return [att for att in dir(self) if not callable(getattr(self, att))
-                                         and not att[-2:] == '__']
+                                         and not att[-2:] == '__'
+                                         and not att[0] == '_']
     
     def introspect_attribute_values(self):
         """Puts all the attribute values of event set into a dictionary"""
 
         attributes = [att for att in dir(self)
                       if not callable(getattr(self, att))
-                      and not att[-2:] == '__']
+                      and not att[-2:] == '__'
+                      and not att[0] == '_']
         att_values = {}
         for att in attributes:
             att_values[att] = getattr(self, att)
@@ -569,8 +679,9 @@ class Event_Set(object):
         else:
             fault_width = self.fault_width
 
-        #some variables/array are set to None after the Event_set has
-        #been saved, so this method now checks for None values.
+        # some variables/array are set to None after the Event_set has
+        # been saved, so this method now checks for None values.
+        # We also don't want _arguments to be passed along
         # FIXME could probably just use args = self.__dict__.items()
         args = {}
         for att in self.introspect_attributes():
@@ -957,7 +1068,7 @@ SPAWN_D = 0
 GMMODEL_D = 1
 RECMODEL_D = 2
 EVENTS_D = 3
-class Event_Activity(object):
+class Event_Activity(file_store.File_Store):
     """
     Class to manipulate the event activity value.
     Handles the logic of splitting based on spawning.
@@ -983,9 +1094,36 @@ class Event_Activity(object):
         """
         num_events is number of events
         """
+        super(Event_Activity, self).__init__('event_activity')
+        
         self.event_activity = None
         self.num_events = num_events
+        
+    def __del__(self):
+        super(Event_Activity, self).__del__()
          
+    # PROPERTIES #
+    # Define getters and setters for each attribute to exercise the 
+    # file-based data structure
+    event_activity = property(lambda self: self._get_file_array('event_activity'), 
+                       lambda self, value: self._set_file_array('event_activity', value))
+    # END PROPERTIES #
+    
+    @classmethod
+    def load(cls, num_events, dir=None):
+        """
+        Return an Event_Activity object from the .npy files stored in the specified
+        directory
+        """
+        event_activity = cls(num_events)
+        event_activity._load(dir)
+        return event_activity
+
+    def save(self, dir=None):
+        """
+        Save the ndarray objects to the specified directory
+        """
+        self._save(dir)
 
     def set_scenario_event_activity(self):
         """
@@ -1062,14 +1200,19 @@ class Event_Activity(object):
             assert self.event_activity.shape[GMMODEL_D] == 1
 
             max_num_models = source_model.get_max_num_atten_models()
-            new_event_activity = zeros((1,
+            
+            # This temporarily becomes quite large on large simulations.
+            # Placing in a File_Store array
+            data = Event_Activity_Data()
+            
+            data.new_event_activity = zeros((1,
                                         max_num_models,
                                         self.event_activity.shape[RECMODEL_D],
                                         self.num_events),
                                        dtype=EVENT_FLOAT)
             # this is so activities are not lost for events
             # which sources do not cover.
-            new_event_activity[0, 0, :, :] = self.event_activity[0, 0, :, :]
+            data.new_event_activity[0, 0, :, :] = self.event_activity[0, 0, :, :]
             
             for szp in source_model:
                 assert abs(sum(szp.atten_model_weights) - 1.0) < 0.01
@@ -1087,15 +1230,15 @@ class Event_Activity(object):
                 activities = (sub_activity *
                               reshape(maxed_weights, (-1, 1, 1))).swapaxes(0,1)
                 # activities[event_index, GM_model_index, rec_model_index]
-                new_event_activity[0, :, :, szp.get_event_set_indexes()] = \
+                data.new_event_activity[0, :, :, szp.get_event_set_indexes()] = \
                     activities
 
             assert allclose(
-                scipy.sum(new_event_activity, axis = GMMODEL_D),
+                scipy.sum(data.new_event_activity, axis = GMMODEL_D),
                 # self.event_activity.shape[GMMODEL_D] == 1 so we can compare directly
                 self.event_activity)
 
-            self.event_activity = new_event_activity
+            self.event_activity = data.new_event_activity
 
 
     def get_num_spawn(self):
@@ -1118,6 +1261,242 @@ class Event_Activity(object):
         """
         return self.event_activity.reshape(-1, self.event_activity.shape[-1]).sum(axis=0)
 
+####################################################################
+from eqrm_code.source_model import source_model_from_xml, Source_Model
+from eqrm_code.output_manager import save_event_set, get_source_file_handle
+
+def generate_event_set(eqrm_flags):
+    """
+    TODO: doco!
+    """
+    
+    if eqrm_flags.is_scenario is True:
+        # generate a scenario event set
+        event_set = Event_Set.create_scenario_events(
+            rupture_centroid_lat=[eqrm_flags.scenario_latitude],
+            rupture_centroid_lon=[eqrm_flags.scenario_longitude],
+            azimuth=[eqrm_flags.scenario_azimuth],
+            dip=[eqrm_flags.scenario_dip],
+            Mw=[eqrm_flags.scenario_magnitude],
+            depth=[eqrm_flags.scenario_depth],
+            fault_width=eqrm_flags.max_width,
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
+        # Other rupture parameters are calculated by event_set object.
+        # trace start is calculated from centroid and azimuth.
+        # Rupture area, length, and width are calculated from Mw
+        # using Wells and Coppersmith 94 (modified so rupture
+        # width is less than fault_width).
+        event_activity = Event_Activity(len(event_set))
+        event_activity.set_scenario_event_activity()
+        event_set.scenario_setup()
+        source_model = Source_Model.create_scenario_source_model(
+            len(event_set))
+        source_model.set_attenuation(eqrm_flags.atten_models,
+                                          eqrm_flags.atten_model_weights)
+    else:
+        # (i.e. is_scenario is False) generate a probablistic event set
+        # (using eqrm_flags.source_filename)
+        # Once the event control file is 'fully operational'
+        # remove the try.
+        try:
+            fid_event_types = get_source_file_handle(eqrm_flags,
+                                                 source_file_type='event_type')
+        except IOError, e:
+            fid_event_types = None
+            log.debug('No event typlecontrol XML file found')
+            log.debug(e)
+        try:
+            fid_sourcepolys = get_source_file_handle(eqrm_flags, 
+                                                     source_file_type='zone')
+        except IOError, e:
+            fid_sourcepolys = None
+            log.debug('No zone source XML file found')
+            log.debug(e)
+      
+        # tell event set which source models to calculate activity with
+        if fid_sourcepolys is not None:
+            source_model_zone = source_model_from_xml(
+                fid_sourcepolys.name)
+       
+            if fid_event_types is not None:
+                source_model_zone.add_event_type_atts_to_sources(
+                    fid_event_types)
+
+            if eqrm_flags.atten_models is not None and \
+                eqrm_flags.atten_model_weights is not None:
+                source_model_zone.set_attenuation(eqrm_flags.atten_models,
+                                           eqrm_flags.atten_model_weights)
+            log.debug('Memory: source_model_zone created')
+            log.resource_usage()
+
+            event_set_zone = Event_Set.generate_synthetic_events(
+                fid_genpolys=fid_sourcepolys,
+                source_model=source_model_zone,
+                prob_number_of_events_in_zones=\
+                eqrm_flags.prob_number_of_events_in_zones)
+
+            log.debug('Memory: event_set_zone created')
+            log.resource_usage()
+        else:
+            event_set_zone = None
+            source_model_zone = None
+        
+        
+        #generate event set and source_models for the fault sources
+        
+        try:
+            fid_sourcefaults  = get_source_file_handle(
+                eqrm_flags, source_file_type='fault')
+        except IOError, e:
+            fid_sourcefaults = None
+            log.debug('No fault source XML file found')
+            log.debug(e)
+        if (fid_event_types is not None) and (fid_sourcefaults is not None):
+            # fid_event_types.name since the zone code leaves
+            # the handle at the end of the file. (I think)
+            event_set_fault, source_model_fault = generate_synthetic_events_fault(
+                fid_sourcefaults, 
+                fid_event_types.name,
+                eqrm_flags.prob_number_of_events_in_faults)
+            
+        else:
+            event_set_fault = None
+            source_model_fault = None
+         
+        # add the two event sets and source models together
+        if event_set_fault is None: # assume no fault sources
+            if event_set_zone is None:              
+                msg = 'No fault source or zone source xml files'
+                raise RuntimeError(msg)
+            event_set = event_set_zone
+            source_model = source_model_zone
+        elif event_set_zone is None: # assume no zone sources
+            event_set = event_set_fault
+            source_model = source_model_fault
+        else:
+            # merge
+            event_set, source_model = merge_events_and_sources(
+                event_set_zone, event_set_fault,
+                source_model_zone, source_model_fault)
+                
+        
+        # event activity is calculated
+        event_activity = Event_Activity(len(event_set))
+        source_model.calculate_recurrence(
+            event_set,
+            event_activity)
+        log.debug('Memory: event activity has been calculated')
+        log.resource_usage()
+        
+        # At this stage all the event generation has occured
+        # So the Source classes should be 'downsized' to Event_Zones
+    
+    #  event_activity.event_activity[drop down to one dimension],
+    event_activity.ground_motion_model_logic_split(
+        source_model,
+        not eqrm_flags.atten_collapse_Sa_of_atten_models)
+        
+    log.debug('Memory: Event activities split due to gmms.')
+    log.resource_usage()
+    
+    # Add the ground motion models to the source
+    source_model.set_ground_motion_calcs(eqrm_flags.atten_periods)
+    
+    # Save event set to standard output file
+    save_event_set(eqrm_flags, event_set,
+                   event_activity,
+                   source_model,
+                   compress=eqrm_flags.compress_output)
+    event_set.area = None
+    event_set.trace_end_lat = None
+    event_set.trace_end_lon = None
+    event_set.source_zone_id = None
+    event_set.event_id = None
+    
+    # Save event_set, event_activity and source_model to data files
+    event_set.save(eqrm_flags.data_dir)
+    event_activity.save(eqrm_flags.data_dir)
+    source_model.save(eqrm_flags.data_dir)
+
+def load_event_set(eqrm_flags):
+    """
+    TODO: doco!
+    """
+    
+    event_set = Event_Set.load(eqrm_flags.data_dir)
+    event_activity = Event_Activity.load(len(event_set), eqrm_flags.data_dir)
+    source_model = Source_Model.load(eqrm_flags.data_dir)
+    
+    return (event_set, event_activity, source_model)
+
+def create_event_set(eqrm_flags, parallel):
+    """
+    TODO: doco!
+    """
+    
+    # eqrm_flags.event_set_data_mode
+    # 3 modes:
+    # 'generate' - first node generates, saves to file
+    #            - other nodes wait until first node is done
+    #            - once first node is done, all continue to work
+    # 'save'     - first node generates, save to file and exits
+    #            - other nodes ignored
+    # 'load'     - all nodes load data from file and continue to work
+    #
+    
+    mode = eqrm_flags.event_set_handler
+    
+    if parallel.rank == 0:
+        log.info('event_set_handler = %s' % mode)
+    
+    # Wait for all nodes to be at this point to start
+    parallel.barrier()
+    
+    if mode == 'load':
+        
+        log.info('P%s: Loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
+        
+        (event_set,
+         event_activity,
+         source_model) = load_event_set(eqrm_flags)
+        
+    elif mode == 'generate':
+        
+        if parallel.rank == 0:
+            log.info('P%s: Generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
+            generate_event_set(eqrm_flags)
+            parallel.notifyworkers(msg=parallel.load_event_set)
+        else:
+            log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
+            parallel.waitfor(msg=parallel.load_event_set, source=0)
+        
+        log.info('P%s: Loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
+        
+        (event_set,
+         event_activity,
+         source_model) = load_event_set(eqrm_flags)
+         
+    elif mode == 'save':
+        
+        if parallel.rank == 0:
+            log.info('P%s: Generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
+            generate_event_set(eqrm_flags)
+        else:
+            log.info('P%s: Warning - saving the event set is not a parallel operation. Extra nodes are unnecessary.' % parallel.rank)
+        
+        # FIXME: Is there a better way of handling this exit?
+        log.info("P%s: Nothing else to do. Exiting." % parallel.rank)
+        sys.exit()
+        
+    else:
+        raise ValueError('Got bad value for eqrm_flags.event_set_data_mode: %s'
+                         % eqrm_flags.event_set_data_mode)
+    
+    log.info('P%s: Event set created. Number of events=%s' % (parallel.rank, len(event_set.depth)))
+    log.debug('Memory: Event Set created')
+    log.resource_usage()
+    
+    return (event_set, event_activity, source_model)
         
 ####################################################################
 # this will run if this is called from DOS prompt or double clicked

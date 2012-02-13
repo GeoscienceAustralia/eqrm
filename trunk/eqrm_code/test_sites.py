@@ -7,13 +7,14 @@ from scipy import array, allclose
 import numpy as np
 
 from eqrm_code.sites import Sites, truncate_sites_for_test
+from eqrm_code import file_store
 
 projection = azimuthal_orthographic
 
 
 class Test_Sites(unittest.TestCase):
     def setUp(self):
-        pass
+        file_store.SAVE_METHOD = None
 
     def tearDown(self):
         pass

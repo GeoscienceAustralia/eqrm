@@ -20,6 +20,8 @@ from eqrm_code.ground_motion_calculator import \
      Multiple_ground_motion_calculator
 from eqrm_code import parse_in_parameters
 
+import cPickle as pickle
+import os
 
 
 class Source_Model(object):
@@ -53,6 +55,40 @@ class Source_Model(object):
         s = s+'sources = '+str(self._sources)+n
         s = s+'magnitude_type = '+str(self._magnitude_type)+n
         return s
+
+    @classmethod
+    def load(cls, dir=None):
+        """
+        Return a Source_Model object by loading the pickled object from 
+        source_model/source_model.p in the specified directory.
+        """
+        if dir is None:
+            dir = os.path.curdir
+        
+        load_dir = os.path.join(dir, 'source_model')
+        if not os.path.exists(load_dir):
+            return None
+        
+        return pickle.load(open(os.path.join(load_dir, 'source_model.p'), "rb"))
+    
+    def save(self, dir=None):
+        """
+        Save the Source_Model object as source_model/source_model.p in the specified
+        directory by pickling self.
+        
+        FIXME: Is there anything in Source_Model and its super-classes that cannot
+        be pickled?
+        """
+        if dir is None:
+            dir = os.path.curdir
+            
+        # Make save dir if necessary
+        save_dir = os.path.join(dir, 'source_model')
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
+        
+        pickle.dump(self, open(os.path.join(save_dir, 'source_model.p'), "wb"))
+        
 
     def set_attenuation(self, atten_models, atten_model_weights):
         """
