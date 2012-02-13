@@ -64,7 +64,7 @@ save_hazard_map = True
 
 # Data
 data_dir = join(input_dir, 'TS_haz43', 'data')
-event_set_data_mode = "load"
+event_set_handler = "load"
 
 
 # If this file is executed the simulation will start.

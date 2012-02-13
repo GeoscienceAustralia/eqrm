@@ -1444,17 +1444,17 @@ def create_event_set(eqrm_flags, parallel):
     # 'load'     - all nodes load data from file and continue to work
     #
     
-    mode = eqrm_flags.event_set_data_mode
+    mode = eqrm_flags.event_set_handler
     
     if parallel.rank == 0:
-        log.info('event_set_data_mode = %s' % mode)
+        log.info('event_set_handler = %s' % mode)
     
     # Wait for all nodes to be at this point to start
     parallel.barrier()
     
     if mode == 'load':
         
-        log.info('P%s: loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
+        log.info('P%s: Loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
         
         (event_set,
          event_activity,
@@ -1463,14 +1463,14 @@ def create_event_set(eqrm_flags, parallel):
     elif mode == 'generate':
         
         if parallel.rank == 0:
-            log.info('P%s: generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
+            log.info('P%s: Generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
             generate_event_set(eqrm_flags)
             parallel.notifyworkers(msg=parallel.load_event_set)
         else:
-            log.info('P%s: waiting for P0 to generate event set' % parallel.rank)
+            log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
             parallel.waitfor(msg=parallel.load_event_set, source=0)
         
-        log.info('P%s: loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
+        log.info('P%s: Loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
         
         (event_set,
          event_activity,
@@ -1479,12 +1479,10 @@ def create_event_set(eqrm_flags, parallel):
     elif mode == 'save':
         
         if parallel.rank == 0:
-            log.info('P%s: generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
+            log.info('P%s: Generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
             generate_event_set(eqrm_flags)
-            parallel.notifyworkers(msg=parallel.load_event_set)
         else:
-            log.info('P%s: waiting for P0 to generate event set' % parallel.rank)
-            parallel.waitfor(msg=parallel.load_event_set, source=0)
+            log.info('P%s: Warning - saving the event set is not a parallel operation. Extra nodes are unnecessary.' % parallel.rank)
         
         # FIXME: Is there a better way of handling this exit?
         log.info("P%s: Nothing else to do. Exiting." % parallel.rank)

@@ -411,10 +411,7 @@ CONV_NEW = [{'order': 10.0,
               'new_para': 'data_dir',
               'default': None}, # _add_default_values sets this to eqrm_data_home/data
               {'order': 100.09,
-               'values': {0: 'generate', # Generate on first node, process on other nodes
-                          1: 'save',     # Generate, save and stop
-                          2: 'load'},    # Load from saved data
-              'new_para': 'event_set_data_mode',
+              'new_para': 'event_set_handler',
               'default': 'generate'},
             ]
 
@@ -792,9 +789,9 @@ def _verify_eqrm_flags(eqrm_flags):
         raise AttributeSyntaxError(
             'Cannot spawn on amplification.')
     
-    if eqrm_flags.event_set_data_mode == 'load' and not os.path.exists(eqrm_flags.data_dir):
+    if eqrm_flags.event_set_handler == 'load' and not os.path.exists(eqrm_flags.data_dir):
         raise AttributeSyntaxError(
-            'data_dir %s must exist if event_set_data_mode is load.' % eqrm_flags.data_dir)
+            'data_dir %s must exist if event_set_handler is load.' % eqrm_flags.data_dir)
 
   
 def find_set_data_py_files(path):
