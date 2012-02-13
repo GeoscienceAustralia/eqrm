@@ -1,5 +1,0 @@
-damage_extent,residential_drift_threshold,non_residential_drift_threshold,acceleration_threshold
-slight,0.00400000,0.00100000,0.20000000
-moderate,0.00800000,0.00800000,0.40000000
-extreme,0.02000000,0.01500000,0.80000000
-complete,0.03000000,0.02500000,1.60000000
