@@ -55,6 +55,9 @@ class Parallel(object):
                     self._not_parallel()
         else:
             self._not_parallel()
+            
+        # Some constants to identify messages
+        self.load_event_set = 0
 
             
     def calc_lo_hi(self, elements):
@@ -109,7 +112,43 @@ class Parallel(object):
         if self.is_parallel is True:
             import pypar
             pypar.barrier()
-      
+    
+    def send(self, *args, **kwargs):
+        """
+        Wrapper for pypar.send
+        """
+        if self.is_parallel is True:
+            import pypar
+            pypar.send(*args, **kwargs)
+            
+    def receive(self, *args, **kwargs):
+        """
+        Wrapper for pypar.receive
+        """
+        if self.is_parallel is True:
+            import pypar
+            return pypar.receive(*args, **kwargs)
+        else:
+            return None
+        
+    def waitfor(self, msg, source):
+        """
+        Block on wait for the provided message from the given source
+        """
+        go = False if self.is_parallel else True
+        while go is False:
+            incoming = self.receive(source=source)
+            if incoming == msg:
+                go = True
+            
+    def notifyworkers(self, msg):
+        """
+        Send all nodes that aren't rank==0 msg 
+        """
+        if self.is_parallel is True:
+            for node in range(self.size)[1:]:
+                self.send(msg, node)
+    
     def calc_num_blocks(self):
         """
         pre-req: calc_lo_hi has been calculated - and only calculated once!

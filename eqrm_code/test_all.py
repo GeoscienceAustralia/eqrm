@@ -35,6 +35,7 @@ log.debug('Starting up the log file, so warnings are suppressed.')
 #E.g. if they are known to fail and under development
 
 EXCLUDE_FILES = []
+
 #exclude_files = ['test_check_scenarios.py',
  #                'test_eqrm_audit_wrapper.py'] #['test_exceedance_curves.py']
 # Removing test_sparse.py and test_cg_solve.py since they want to compile.
