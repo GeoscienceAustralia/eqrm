@@ -487,7 +487,8 @@ DEFAULT = \texttt{False} \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{save\_motion}: \\
 DEFAULT = \texttt{False} \\
-\texttt{True} $\Rightarrow$ Save RSA motion (use for saving scenario ground motion results). \\
+\texttt{True} $\Rightarrow$ Save RSA motion (use for saving scenario ground
+motion results). \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{save\_prob\_strucutural\_damage}: \\
 DEFAULT = \texttt{False} \\
@@ -497,3 +498,28 @@ damage state.  Note this is only supported for a single event. \\
 \hline
 %---------------------------------------------------------
  \end{tabular}
+ 
+ \vspace{2em}
+\begin{tabular}{|p{\textwidth}|}
+%---------------------------------------------------------
+\hline
+\vspace{0.3em} \noindent \Large \textbf{Data Input:} \normalsize \\
+\hline \vspace{0.1em} \texttt{data\_dir}: \\
+DEFAULT = \texttt{\$EQRMDATADIR/data} \\
+Directory used to save to and load from event set data files.\\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{event\_data\_handler}: \\
+DEFAULT = \texttt{`generate'} \\
+Sets the mode that the event set generator uses to produce an event set to work
+on. \\
+ \hspace{0.5em} \texttt{`generate'} $\Rightarrow$ generate a new event set
+ sample \\
+ \hspace{0.5em} \texttt{`save'} $\Rightarrow$ generate a new event set sample,
+ save to \texttt{data\_dir}, and exit \\
+ \hspace{0.5em} \texttt{`load'} $\Rightarrow$ load event set from
+ \texttt{data\_dir} (previously generated using \texttt{`save'}) \\
+ 
+\hline
+%---------------------------------------------------------
+ \end{tabular}
+ 
