@@ -16,15 +16,15 @@
 import copy
 import xml.dom.minidom
 import math
-import os, glob
 import scipy
 import tempfile
 import sys
+import os, shutil
 
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
      int64, reshape, arange, append, radians, where, minimum, seterr
-from numpy import random, save, load
+from numpy import random
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
@@ -1265,10 +1265,15 @@ class Event_Activity(file_store.File_Store):
 from eqrm_code.source_model import source_model_from_xml, Source_Model
 from eqrm_code.output_manager import save_event_set, get_source_file_handle
 
-def generate_event_set(eqrm_flags):
+def generate_event_set(parallel, eqrm_flags):
     """
-    TODO: doco!
+    Generate the event set, event activity and source model objects based on
+    the parameters in eqrm_flags. Once completed call the save methods of these
+    objects to store to file.
     """
+    
+    save_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
+    log.info('P%s: Generating event set and saving to %s' % (parallel.rank, save_dir))
     
     if eqrm_flags.is_scenario is True:
         # generate a scenario event set
@@ -1414,78 +1419,93 @@ def generate_event_set(eqrm_flags):
     event_set.event_id = None
     
     # Save event_set, event_activity and source_model to data files
-    event_set.save(eqrm_flags.data_dir)
-    event_activity.save(eqrm_flags.data_dir)
-    source_model.save(eqrm_flags.data_dir)
+    event_set.save(save_dir)
+    event_activity.save(save_dir)
+    source_model.save(save_dir)
 
-def load_event_set(eqrm_flags):
+def load_event_set(parallel, eqrm_flags):
     """
-    TODO: doco!
+    Load the event set, event activity and source model objects from file as
+    specified in eqrm_flags
     """
     
-    event_set = Event_Set.load(eqrm_flags.data_dir)
-    event_activity = Event_Activity.load(len(event_set), eqrm_flags.data_dir)
-    source_model = Source_Model.load(eqrm_flags.data_dir)
+    load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
+    log.info('P%s: Loading event set from %s' % (parallel.rank, load_dir))
+    
+    event_set = Event_Set.load(load_dir)
+    event_activity = Event_Activity.load(len(event_set), load_dir)
+    source_model = Source_Model.load(load_dir)
     
     return (event_set, event_activity, source_model)
 
 def create_event_set(eqrm_flags, parallel):
     """
-    TODO: doco!
-    """
+    Implements the three modes as specified in eqrm_flags.event_set_handler
+    'generate' - first node generates event set and saves to file
+               - other nodes wait until first node is done
+               - once first node is done, all nodes load the event set and return 
+                 to the caller
+    'save'     - first node generates event set and saves to file
+               - any other nodes skipped
+               - all nodes exit after completion
+    'load'     - all nodes load the event set data from file and return to the 
+                 caller
+                 
+    Other eqrm_flags used
+    data_dir       - specifies the base directory for event set files
+    event_set_name - a name for the event set generated
     
-    # eqrm_flags.event_set_data_mode
-    # 3 modes:
-    # 'generate' - first node generates, saves to file
-    #            - other nodes wait until first node is done
-    #            - once first node is done, all continue to work
-    # 'save'     - first node generates, save to file and exits
-    #            - other nodes ignored
-    # 'load'     - all nodes load data from file and continue to work
-    #
+    These are used to construct the directory to save to and load from. i.e.
+    the files are referenced in data_dir/event_set_name
+    """
     
     mode = eqrm_flags.event_set_handler
     
     if parallel.rank == 0:
         log.info('event_set_handler = %s' % mode)
+        log.info('event_set_name = %s' % eqrm_flags.event_set_name)
     
     # Wait for all nodes to be at this point to start
     parallel.barrier()
     
     if mode == 'load':
         
-        log.info('P%s: Loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
-        
         (event_set,
          event_activity,
-         source_model) = load_event_set(eqrm_flags)
+         source_model) = load_event_set(parallel, eqrm_flags)
         
     elif mode == 'generate':
         
+        # If data_dir is not set default to a temporary directory (and delete when done)
+        delete_data_dir = False
+        if parallel.rank == 0 and eqrm_flags.data_dir is None:
+            eqrm_flags['data_dir'] = tempfile.mkdtemp()
+            log.info('P%s: data_dir not set. Created temporary directory %s' % (parallel.rank, eqrm_flags.data_dir))
+            delete_data_dir = True
+            
         if parallel.rank == 0:
-            log.info('P%s: Generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
-            generate_event_set(eqrm_flags)
+            generate_event_set(parallel, eqrm_flags)
             parallel.notifyworkers(msg=parallel.load_event_set)
         else:
             log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
             parallel.waitfor(msg=parallel.load_event_set, source=0)
         
-        log.info('P%s: Loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
-        
         (event_set,
          event_activity,
-         source_model) = load_event_set(eqrm_flags)
+         source_model) = load_event_set(parallel, eqrm_flags)
+         
+        if delete_data_dir:
+            log.info('P%s: Deleting temporary directory %s' % (parallel.rank, eqrm_flags.data_dir))
+            shutil.rmtree(eqrm_flags.data_dir)
          
     elif mode == 'save':
-        
+                
         if parallel.rank == 0:
-            log.info('P%s: Generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
-            generate_event_set(eqrm_flags)
+            generate_event_set(parallel, eqrm_flags)
         else:
             log.info('P%s: Warning - saving the event set is not a parallel operation. Extra nodes are unnecessary.' % parallel.rank)
         
-        # FIXME: Is there a better way of handling this exit?
-        log.info("P%s: Nothing else to do. Exiting." % parallel.rank)
+        log.info('P%s: Nothing else to do. Exiting.' % parallel.rank)
         sys.exit()
         
     else:

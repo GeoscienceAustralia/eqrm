@@ -63,9 +63,9 @@ save_hazard_map = True
 
 
 # Data
-data_dir = join(input_dir, 'TS_haz43', 'data')
-event_set_handler = "load"
-
+data_dir = join('.', 'implementation_tests', 'input')
+event_set_name = 'TS_haz43'
+event_set_handler = 'load'
 
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 

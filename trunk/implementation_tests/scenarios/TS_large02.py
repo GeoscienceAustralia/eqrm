@@ -68,8 +68,9 @@ save_contents_loss = False
 save_motion = False
 save_prob_structural_damage = None
 
-data_dir = join('.', 'implementation_tests', 'input', 'TS_large02', 'data')
-event_set_handler = "load"
+data_dir = join('.', 'implementation_tests', 'input')
+event_set_name = 'TS_large02'
+event_set_handler = 'load'
 
 # If this file is executed the simulation will start
 # Delete all variables that are not EQRM parameters variables. 
