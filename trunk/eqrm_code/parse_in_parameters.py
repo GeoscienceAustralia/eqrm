@@ -409,10 +409,19 @@ CONV_NEW = [{'order': 10.0,
              'default': False},
              {'order': 100.08,
               'new_para': 'data_dir',
-              'default': None}, # _add_default_values sets this to eqrm_data_home/data
-              {'order': 100.09,
+              'default': None}, # If none set to temporary directory
+             {'order': 100.09,
               'new_para': 'event_set_handler',
               'default': 'generate'},
+             {'order': 100.10,
+              'new_para': 'event_set_name',
+              'default': 'current_generated_events'},
+             {'order': 100.11,
+              'new_para': 'log_level',
+              'default': 'debug'},
+             {'order': 100.12,
+              'new_para': 'console_log_level',
+              'default': 'info'}
             ]
 
 # Old style attributes that have not been removed yet.
@@ -579,10 +588,6 @@ def _add_default_values(eqrm_flags):
                 raise AttributeSyntaxError(
                 "Attribute Error: Attribute "  + param['new_para']
                 + " must be defined.")
-    
-    # Default the data_dir to eqrm_data_home/data if not set
-    if eqrm_flags.data_dir is None:
-        eqrm_flags['data_dir'] = os.path.join(eqrm_data_home(), 'data')
 
 # In the dictionary DEPRECIATED_PARAS
 # the key is the depreciated attribute.
@@ -789,9 +794,20 @@ def _verify_eqrm_flags(eqrm_flags):
         raise AttributeSyntaxError(
             'Cannot spawn on amplification.')
     
-    if eqrm_flags.event_set_handler == 'load' and not os.path.exists(eqrm_flags.data_dir):
+    if eqrm_flags.event_set_handler != 'generate' and eqrm_flags.data_dir is None:
         raise AttributeSyntaxError(
-            'data_dir %s must exist if event_set_handler is load.' % eqrm_flags.data_dir)
+            'data_dir be set if event_set_handler is %s.' % eqrm_flags.event_set_handler)
+    
+    if eqrm_flags.event_set_handler != 'generate' and not os.path.exists(eqrm_flags.data_dir):
+        raise AttributeSyntaxError(
+            'data_dir %s must exist if event_set_handler is %s.' % (eqrm_flags.data_dir, 
+                                                                    eqrm_flags.event_set_handler))
+    
+    if eqrm_flags.event_set_handler == 'load':
+        load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
+        if not os.path.exists(load_dir):
+            raise AttributeSyntaxError(
+                'data_dir/event_set_name %s must exist if event_set_handler is load.' % load_dir)
 
   
 def find_set_data_py_files(path):
