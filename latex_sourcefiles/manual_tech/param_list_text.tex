@@ -504,22 +504,61 @@ damage state.  Note this is only supported for a single event. \\
 %---------------------------------------------------------
 \hline
 \vspace{0.3em} \noindent \Large \textbf{Data Input:} \normalsize \\
-\hline \vspace{0.1em} \texttt{data\_dir}: \\
-DEFAULT = \texttt{\$EQRMDATADIR/data} \\
-Directory used to save to and load from event set data files.\\
-%---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{event\_data\_handler}: \\
+\hline \vspace{0.1em} \texttt{event\_set\_handler}: \\
 DEFAULT = \texttt{`generate'} \\
 Sets the mode that the event set generator uses to produce an event set to work
 on. \\
- \hspace{0.5em} \texttt{`generate'} $\Rightarrow$ generate a new event set
- sample \\
- \hspace{0.5em} \texttt{`save'} $\Rightarrow$ generate a new event set sample,
- save to \texttt{data\_dir}, and exit \\
- \hspace{0.5em} \texttt{`load'} $\Rightarrow$ load event set from
- \texttt{data\_dir} (previously generated using \texttt{`save'}) \\
+ \hspace{0.5em} \texttt{`generate'} $\Rightarrow$ Generate a new event set
+ sample. \\
+ \hspace{0.5em} \texttt{`save'} $\Rightarrow$ Generate a new event set sample,
+ save and exit. \\
+ \hspace{0.5em} \texttt{`load'} $\Rightarrow$ Load an event set (generated using
+ \texttt{`save'}). \\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{event\_set\_name}: \\
+DEFAULT = \texttt{`current\_generated\_events'} \\
+Name used to identify the event set data. \\
+For \texttt{event\_set\_handler} options: \\
+ \hspace{0.5em} \texttt{`save'} $\Rightarrow$ Save event set to
+ \texttt{data\_dir}/\texttt{event\_set\_name}. \\
+ \hspace{0.5em} \texttt{`load'} $\Rightarrow$ Load event set from
+ \texttt{data\_dir}/\texttt{event\_set\_name}. \\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{data\_dir}: \\
+Directory used to save to and load from event set data files. \\
+For \texttt{event\_set\_handler} options: \\
+ \hspace{0.5em} \texttt{`generate'} $\Rightarrow$ If not set default to a
+ temporary directory, and delete when usage complete. \\
+ \hspace{0.5em} \texttt{`save'} $\Rightarrow$ Mandatory and must exist. \\
+ \hspace{0.5em} \texttt{`load'} $\Rightarrow$ Mandatory and must exist. \\
+%---------------------------------------------------------
  
 \hline
 %---------------------------------------------------------
  \end{tabular}
  
+ \vspace{2em}
+\begin{tabular}{|p{\textwidth}|}
+%---------------------------------------------------------
+\hline
+\vspace{0.3em} \noindent \Large \textbf{Log Input:} \normalsize \\
+\hline \vspace{0.1em} \texttt{log\_level}: \\
+DEFAULT = \texttt{`debug'} \\
+Level of verbosity in file log. \\
+Options (in decreasing verbosity): \\
+ \hspace{0.5em} \texttt{`debug'} \\
+ \hspace{0.5em} \texttt{`info'} \\
+ \hspace{0.5em} \texttt{`warning'} \\
+ \hspace{0.5em} \texttt{`error'} \\
+ \hspace{0.5em} \texttt{`critical'} \\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{console\_log\_level}: \\
+DEFAULT = \texttt{`info'} \\
+Level of verbosity in console output. \\
+Same options as for \texttt{log\_level}. Must be set to less than or equal
+verbosity to \texttt{log\_level}. \\
+%---------------------------------------------------------
+ 
+\hline
+%---------------------------------------------------------
+ \end{tabular} 
