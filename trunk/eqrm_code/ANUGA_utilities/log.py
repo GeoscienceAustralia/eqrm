@@ -98,6 +98,9 @@ file_logging_level = DefaultFileLogLevel
 # If a log message does not have a level, set it to the console level
 default_to_console = True
 
+# Log level override flag for set_log_level
+allow_level_override = True
+
 # The default name of the file to log to.
 log_filename = os.path.join('.', 'EQRM.log')
 
@@ -113,6 +116,7 @@ WARNING = logging.WARNING
 INFO = logging.INFO
 DEBUG = logging.DEBUG
 NOTSET = logging.NOTSET
+INCREMENT = 10 
 
 # set _new_python to True if python version 2.5 or later
 _new_python = (sys.version_info >= 0x02050000)      # 2.5.x.x
@@ -180,17 +184,72 @@ def set_log_file(new_log_filename, level=None):
     global log_filename
     
     log_filename = new_log_filename
+    
+    # Reinitialise the log
+    _reinitialise(level)
+
+def set_log_level(level, console_level=None):
+    """
+    Set up or change log level.
+    
+    level == string representation of log level. i.e.
+    
+    'critical' = logging.CRITICAL 
+    'error' = logging.ERROR 
+    'warning' = logging.WARNING 
+    'info' = logging.INFO 
+    'debug' = logging.DEBUG 
+    
+    file_logging_level = level
+    
+    If console_level is None, console_logging_level becomes the next quietest.
+    i.e.
+    console_logging_level = level + 10 (increment between above levels)
+    
+    e.g.
+    level = 'info', console_level = None
+    file_logging_level = logging.INFO
+    console_logging_level = logging.WARNING
+    
+    Note: If console_logging_level and file_logging_level have already been
+    set outside this module, this will not do anything. e.g. check_scenarios.py
+    """
+    global console_logging_level, file_logging_level
+    
+    if allow_level_override:
+        # File logging level
+        numeric_level = getattr(logging, level.upper(), None)
+        if not isinstance(numeric_level, int):
+            raise ValueError('Invalid log level: %s' % level)
+        file_logging_level = numeric_level
+        
+        # Console logging level
+        if console_level is None:
+            console_logging_level = numeric_level + INCREMENT
+        else:
+            numeric_console_level = getattr(logging, console_level.upper(), None)
+            if not isinstance(numeric_console_level, int):
+                raise ValueError('Invalid console log level: %s' % console_level)
+            console_logging_level = numeric_console_level
+        
+        # sanity check the logging levels, require console >= file
+        if file_logging_level > console_logging_level:
+            file_logging_level = console_logging_level
+        
+        # Reinitialise the log
+        _reinitialise(file_logging_level)
+
+def _reinitialise(level=None):
+    # Initialise (or reinitialise) the logs
     if _setup is False:
         _initialise(level=level)
     else:
         logger.removeHandler(log_file_hdlr)
-
-        # This helps the tests to pass
         logger.removeHandler(console) 
+        logger.setLevel(file_logging_level)
         _add_console_handler(logger)
         _add_file_handler(logger)
         _start_msg(level=level)
-
 
 def remove_file_handler():
     """

@@ -69,6 +69,7 @@ ground_motion_distribution.gm_rvs = test_rvs.reproducible_norm_rvs
 
 log.console_logging_level = log.WARNING
 log.default_to_console = False
+log.allow_level_override = False
 
 eqrm_path = util.determine_eqrm_path()
 
