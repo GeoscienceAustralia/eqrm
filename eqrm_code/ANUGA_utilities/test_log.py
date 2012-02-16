@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from cStringIO import StringIO
 import os
 import sys
 import unittest
@@ -11,193 +12,159 @@ import tempfile
 
 class Test_Log(unittest.TestCase):
     def setUp(self):
-        pass
+        # Store current log values
+        self.console_level_orig = log.console_logging_level
+        self.file_level_orig = log.file_logging_level
+        self.default_to_console_orig = log.default_to_console
+        self.log_filename_orig = log.log_filename
+        self.allow_level_override_orig = log.allow_level_override
+        
+        # Redirect stderr and stdout
+        self.console = StringIO()
+        sys.stdout = self.console
+        
+        # Temporary log file
+        (handle, self.logfile) = tempfile.mkstemp('.log', 'test_log_')
+        os.close(handle)
+        
+        # Initialise the new logger
+        log.default_to_console = True
+        log.allow_level_override = True
+        log.set_log_file(self.logfile, log.file_logging_level)
 
     def tearDown(self):
-        # The tests after this one should be quite.
-        # Not too quite though, or exceptions are discarded.
-        log.console_logging_level = log.ERROR
+        # Set everything back to the way it was
+        log.default_to_console = self.default_to_console_orig
+        log.allow_level_override = self.allow_level_override_orig
+        log.set_log_level(logging.getLevelName(self.file_level_orig), 
+                          logging.getLevelName(self.console_level_orig))
+        log.set_log_file(self.log_filename_orig)
         
-    # Problems with handles still present/ only closing at end of execution
-    # 
-#         logging.shutdown()
-#         if os.path.exists(LOGFILE_NAME):
-#             os.remove(LOGFILE_NAME)
-#         self.f_open.close()
-#         if os.path.exists(STDOUT_LOG_NAME):
-#             os.remove(STDOUT_LOG_NAME)
-
-    # see ticket #177
-    def FIXME_test_simple(self):
-
-        current_default_to_console = log.default_to_console
-        log.default_to_console = True
-
-        # don't change the file names, they are used in the log files
-        LOGFILE_NAME = 'test.log'
-        STDOUT_LOG_NAME = 'stdout.log'
-
-        print os.getcwd()
-
-        # get a temporary file
-        (handle, filename) = tempfile.mkstemp('.log','get_bridges_')
-        os.close(handle)
-        # Check that logging works in simple case.
+        # ..and stdout!
+        sys.stdout = sys.__stdout__
         
-        # just in case
-        if os.path.exists(LOGFILE_NAME):
-            os.remove(LOGFILE_NAME)
-        if os.path.exists(STDOUT_LOG_NAME):
-            os.remove(STDOUT_LOG_NAME)
-
-        # set log module logfile name
-        log.log_filename = LOGFILE_NAME
-
-        # set logging levels for this test
-        log.console_logging_level = logging.INFO
-        log.file_logging_level = logging.DEBUG
+        # Remove the temporary logfile
+        os.remove(self.logfile)
         
-        # vvvvv  WARNING - DO NOT REFORMAT THESE LINES!  vvvvv
-        log_expect = '''2010-03-23 11:17:18,453 CRITICAL |Logfile is 'test.log' with logging level of DEBUG, console logging level is INFO
-2010-03-23 11:17:18,469 DEBUG    |test at level DEBUG
-2010-03-23 11:17:18,469 INFO     |test at level INFO'''
-
-        stdout_expect = '''Logfile is 'test.log' with logging level of DEBUG, console logging level is INFO
-test at level INFO'''
-        # ^^^^^  WARNING - DO NOT REFORMAT THESE LINES!  ^^^^^
-
-        # capture stdout to a file
-        save_stdout = sys.stdout
-        save_stderr = sys.stderr
-        self.f_open = open(STDOUT_LOG_NAME, 'w')
-        sys.stdout = sys.stderr = self.f_open
-
-        #Initialise the logger
-        log.set_log_file(LOGFILE_NAME)
-                
-        # do some logging
+    def logMessages(self):
         log.debug('test at level DEBUG')
-        #log.resource_usage(logging.INFO)
         log.info('test at level INFO')
+        log.warning('test at level WARNING')
+        log.error('test at level ERROR')
+        log.critical('test at level CRITICAL')
+    
+    def log_level_test(self, 
+                       file_expected,
+                       console_expected,
+                       file_level,
+                       console_level):
         
-        # put stdout/stderr back to normal
-        sys.stderr = save_stderr
-        sys.stdout = save_stdout
-
-        if os.path.exists(LOGFILE_NAME):
-            print "I found a log file"
-        else:
-            print "NOOOOOOO  log file"
-
-        # check that captured stdout is as expected
-        fd = open(STDOUT_LOG_NAME, 'r')
-        lines = fd.readlines()
-        fd.close()
-        result = []
-        for line in lines:
-            l = line.strip('\n')
-            result.append(l)
-        expected = []
-        for line in stdout_expect.split('\n'):
-            expected.append(line)
-        self.failUnlessEqual(result, expected)
-
-        # check logfile is as expected
-        fd = open(LOGFILE_NAME, 'r')
-        lines = fd.readlines()
-        print "lines",lines
-        fd.close()
-
-        result = strip_log(lines)
-        expected = strip_log(log_expect.split('\n'))
+        log.set_log_level(file_level, console_level)
         
-        self.failUnlessEqual(result, expected)
+        self.logMessages()
         
-      
+        # Get file output
+        f = open(self.logfile, 'r')
+        lines = f.readlines()
+        f.close()
 
-        log.default_to_console = current_default_to_console
-
+        # The first line is the output message from
+        # log.set_log_file(self.logfile, log.file_logging_level)
+        # so we want the slice after this
+        file_result = strip_log(lines)[1:]
+        console_result = self.console.getvalue().strip().split('\n')[1:]
         
-    # see ticket #177
-    def FIXME_test_set_log_file(self):
-        # Since there are two tests,  set_log_file
-        # is actually tested, though not be running twince in here.
-        # The order the tests are done in does not matter
+        file_expected = strip_log(file_expected.split('\n'))
+        console_expected = console_expected.split('\n')
         
-        current_default_to_console = log.default_to_console
-        log.default_to_console = True
+        self.assertEqual(file_result, file_expected)
+        self.assertEqual(console_result, console_expected)
+    
+    def test_set_log_level(self):
+        """
+        Test standard operation of set_log_level
+        """
         
-        LOGFILE_NAME = 'atest.log'
-        STDOUT_LOG_NAME = 'cstdout.log'
+        file_expected = '''|Logfile is '%s' with logging level of INFO, console logging level is ERROR
+|test at level INFO
+|test at level WARNING
+|test at level ERROR
+|test at level CRITICAL''' % self.logfile
+
+        console_expected = '''test at level ERROR
+test at level CRITICAL'''
         
-        # just in case
-        if os.path.exists(LOGFILE_NAME):
-            os.remove(LOGFILE_NAME)
-        if os.path.exists(STDOUT_LOG_NAME):
-            os.remove(STDOUT_LOG_NAME)
-
-        # set log module logfile name
-        log.log_filename = LOGFILE_NAME
-
-        # set logging levels for this test
-        log.console_logging_level = logging.INFO
-        log.file_logging_level = logging.DEBUG
+        file_level = 'info'
+        console_level = 'error'
         
-        # vvvvv  WARNING - DO NOT REFORMAT THESE LINES!  vvvvv
-        log_expect = '''2010-03-23 11:17:18,453 CRITICAL |Logfile is 'atest.log' with logging level of DEBUG, console logging level is INFO
-2010-03-23 11:17:18,469 DEBUG    |test at level DEBUG
-2010-03-23 11:17:18,469 INFO     |test at level INFO'''
-
-        stdout_expect = '''Logfile is 'atest.log' with logging level of DEBUG, console logging level is INFO
-test at level INFO'''
-        # ^^^^^  WARNING - DO NOT REFORMAT THESE LINES!  ^^^^^
-
-        # capture stdout to a file
-        save_stdout = sys.stdout
-        save_stderr = sys.stderr
-        self.f_open = open(STDOUT_LOG_NAME, 'w')
-        sys.stdout = sys.stderr = self.f_open
-
-        #Initialise the logger
-        log.set_log_file(LOGFILE_NAME)
+        self.log_level_test(file_expected, 
+                            console_expected, 
+                            file_level, 
+                            console_level)
         
-        # do some logging
-        log.debug('test at level DEBUG')
-        #log.resource_usage(logging.INFO)
-        log.info('test at level INFO')
         
-        # put stdout/stderr back to normal
-        sys.stderr = save_stderr
-        sys.stdout = save_stdout
+    def test_set_log_level_no_console(self):
+        """
+        Test set_log_level where console level is set by default 
+        (file level + increment)
+        """
+        file_expected = '''|Logfile is '%s' with logging level of DEBUG, console logging level is INFO
+|test at level DEBUG
+|test at level INFO
+|test at level WARNING
+|test at level ERROR
+|test at level CRITICAL''' % self.logfile
+
+        console_expected = '''test at level INFO
+test at level WARNING
+test at level ERROR
+test at level CRITICAL'''
         
+        file_level = 'debug'
+        console_level = None
+        
+        self.log_level_test(file_expected, 
+                            console_expected, 
+                            file_level, 
+                            console_level)
+    
+    def test_set_log_level_conflict(self):
+        """
+        Test set_log_level where console level < file level
+        """
+        file_expected = '''|Logfile is '%s' with logging level of INFO, console logging level is INFO
+|test at level INFO
+|test at level WARNING
+|test at level ERROR
+|test at level CRITICAL''' % self.logfile
 
-        # check logfile is as expected
-        fd = open(LOGFILE_NAME, 'r')
-        lines = fd.readlines()
-        fd.close()
-
-        result = strip_log(lines)
-        expected = strip_log(log_expect.split('\n'))
-        print "result",result
-        print "expected", expected
-        self.failUnlessEqual(result, expected)
-
-        # check that captured stdout is as expected
-        fd = open(STDOUT_LOG_NAME, 'r')
-        lines = fd.readlines()
-        fd.close()
-        result = []
-        for line in lines:
-            l = line.strip('\n')
-            result.append(l)
-        expected = []
-        for line in stdout_expect.split('\n'):
-            expected.append(line)
-        self.failUnlessEqual(result, expected)
-
-        #log.close_log_file()
-
-        log.default_to_console = current_default_to_console
+        console_expected = '''test at level INFO
+test at level WARNING
+test at level ERROR
+test at level CRITICAL'''
+        
+        file_level = 'error'
+        console_level = 'info'
+        
+        self.log_level_test(file_expected, 
+                            console_expected, 
+                            file_level, 
+                            console_level)
+    
+    def test_set_log_level_no_effect(self):
+        """
+        Test set_log_level where it is expected to have no effect. i.e.
+        levels set programmatically elsewhere
+        """
+        log.allow_level_override = False
+        log.console_logging_level = log.WARNING
+        log.file_logging_level = log.INFO
+        
+        log.set_log_level(level='debug', console_level='critical')
+        
+        self.assertNotEqual(log.console_logging_level, log.CRITICAL)
+        self.assertNotEqual(log.file_logging_level, log.DEBUG)
+        
         
 def strip_log(lines):
     """

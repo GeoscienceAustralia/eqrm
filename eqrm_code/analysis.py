@@ -153,6 +153,7 @@ def main(parameter_handle,
                                 'log' + parallel.log_file_tag + '.txt')
     log.log_filename = log_filename
     log.remove_log_file()
+    log.set_log_level(eqrm_flags.log_level, eqrm_flags.console_log_level)
     log.set_log_file(log_filename)
     log.debug('host name: ' + str(parallel.node))
     version, date, modified = get_version()
