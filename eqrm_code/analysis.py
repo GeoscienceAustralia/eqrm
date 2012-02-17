@@ -697,7 +697,7 @@ def main(parameter_handle,
                                event_set=event_set,
                                compress=eqrm_flags.compress_output,
                                parallel_tag=parallel.file_tag)
-        column_files_that_parallel_splits.append(files)
+        column_files_that_parallel_splits.extend(files)
 
     # parallel code.  Needed if # of processes is > # of structures
     calc_num_blocks = parallel.calc_num_blocks()
