@@ -145,7 +145,7 @@ def log_analysis():
     if os.path.exists(log.log_filename):
         # 1. Determine logfile for the previous run
         # Note: analysis.main changes the value of log.log_filename per setdata file
-        print "Using log file %s" % log.log_filename
+        log.info('log_analysis - using log file %s' % log.log_filename)
         log_file = open(log.log_filename)
         
         # 2. Grab the Memory/Resource lines in a tuple
