@@ -1485,16 +1485,20 @@ def create_event_set(eqrm_flags, parallel):
             
         if parallel.rank == 0:
             generate_event_set(parallel, eqrm_flags)
-            parallel.notifyworkers(msg=parallel.load_event_set)
+            # Send the workers the location of the new data_dir
+            parallel.notifyworkers(msg=eqrm_flags['data_dir'])
         else:
             log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
-            parallel.waitfor(msg=parallel.load_event_set, source=0)
+            # Wait until the master has sent the location of the new data_dir
+            eqrm_flags['data_dir'] = parallel.receive(source=0)
         
         (event_set,
          event_activity,
          source_model) = load_event_set(parallel, eqrm_flags)
-         
-        if delete_data_dir:
+        
+        # We want to delete the temporary directory only once all the nodes are done loading
+        parallel.barrier()
+        if parallel.rank == 0 and delete_data_dir:
             log.info('P%s: Deleting temporary directory %s' % (parallel.rank, eqrm_flags.data_dir))
             shutil.rmtree(eqrm_flags.data_dir)
          
