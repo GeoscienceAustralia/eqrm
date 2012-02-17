@@ -516,7 +516,7 @@ on. \\
  \texttt{`save'}). \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{event\_set\_name}: \\
-DEFAULT = \texttt{`current\_generated\_events'} \\
+DEFAULT = \texttt{`current\_event\_set'} \\
 Name used to identify the event set data. \\
 For \texttt{event\_set\_handler} options: \\
  \hspace{0.5em} \texttt{`save'} $\Rightarrow$ Save event set to
@@ -528,7 +528,7 @@ For \texttt{event\_set\_handler} options: \\
 Directory used to save to and load from event set data files. \\
 For \texttt{event\_set\_handler} options: \\
  \hspace{0.5em} \texttt{`generate'} $\Rightarrow$ If not set default to a
- temporary directory, and delete when usage complete. \\
+ temporary directory, and delete when no longer required. \\
  \hspace{0.5em} \texttt{`save'} $\Rightarrow$ Mandatory and must exist. \\
  \hspace{0.5em} \texttt{`load'} $\Rightarrow$ Mandatory and must exist. \\
 %---------------------------------------------------------
@@ -542,7 +542,7 @@ For \texttt{event\_set\_handler} options: \\
 %---------------------------------------------------------
 \hline
 \vspace{0.3em} \noindent \Large \textbf{Log Input:} \normalsize \\
-\hline \vspace{0.1em} \texttt{log\_level}: \\
+\hline \vspace{0.1em} \texttt{file\_log\_level}: \\
 DEFAULT = \texttt{`debug'} \\
 Level of verbosity in file log. \\
 Options (in decreasing verbosity): \\

@@ -1480,7 +1480,8 @@ def create_event_set(eqrm_flags, parallel):
         delete_data_dir = False
         if parallel.rank == 0 and eqrm_flags.data_dir is None:
             eqrm_flags['data_dir'] = tempfile.mkdtemp()
-            log.info('P%s: data_dir not set. Created temporary directory %s' % (parallel.rank, eqrm_flags.data_dir))
+            log.info('P%s: data_dir not set. Created temporary directory %s' % (parallel.rank, 
+                                                                                eqrm_flags.data_dir))
             delete_data_dir = True
             
         if parallel.rank == 0:
@@ -1499,7 +1500,8 @@ def create_event_set(eqrm_flags, parallel):
         # We want to delete the temporary directory only once all the nodes are done loading
         parallel.barrier()
         if parallel.rank == 0 and delete_data_dir:
-            log.info('P%s: Deleting temporary directory %s' % (parallel.rank, eqrm_flags.data_dir))
+            log.info('P%s: Deleting temporary directory %s' % (parallel.rank, 
+                                                               eqrm_flags.data_dir))
             shutil.rmtree(eqrm_flags.data_dir)
          
     elif mode == 'save':
