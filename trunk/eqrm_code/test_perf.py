@@ -38,7 +38,7 @@ class Test_Perf(unittest.TestCase):
 """
         
         # Create temp log file
-        (self.handle, self.file_name) = tempfile.mkstemp('.csv', 'test_perf_')
+        (self.handle, self.file_name) = tempfile.mkstemp('.log', 'test_perf_')
         os.close(self.handle)
         
         f = open(self.file_name,"wb")
