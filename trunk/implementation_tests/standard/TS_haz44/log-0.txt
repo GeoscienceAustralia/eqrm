@@ -1,0 +1,55 @@
+2012-02-20 11:03:31,328 Level 29                  analysis:157 |Logfile is './implementation_tests/current/TS_haz44/log-0.txt' with logging level of DEBUG, console logging level is WARNING
+2012-02-20 11:03:31,329 DEBUG                     analysis:158 |host name: tornado.agso.gov.au
+2012-02-20 11:03:31,499 DEBUG                     analysis:160 |SVN version: 946M
+2012-02-20 11:03:31,500 DEBUG                     analysis:161 |SVN date: None
+2012-02-20 11:03:31,500 DEBUG                     analysis:162 |SVN modified: None
+2012-02-20 11:03:31,501 DEBUG                     analysis:163 |Memory: Initial
+2012-02-20 11:03:31,502 DEBUG                     analysis:164 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:31,502 INFO                     event_set:1495|event_set_handler = generate
+2012-02-20 11:03:31,503 INFO                     event_set:1496|event_set_name = current_event_set
+2012-02-20 11:03:31,503 INFO                     event_set:1514|P0: data_dir not set. Created temporary directory /tmp/tmpy4jGXB
+2012-02-20 11:03:31,504 INFO                     event_set:1304|P0: Generating event set and saving to /tmp/tmpy4jGXB/current_event_set
+2012-02-20 11:03:31,537 DEBUG                    event_set:1434|Memory: Event activities split due to gmms.
+2012-02-20 11:03:31,538 DEBUG                    event_set:1435|Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:31,608 INFO                     event_set:1463|P0: Loading event set from /tmp/tmpy4jGXB/current_event_set
+2012-02-20 11:03:31,643 INFO                     event_set:1534|P0: Deleting temporary directory /tmp/tmpy4jGXB
+2012-02-20 11:03:31,647 INFO                     event_set:1551|P0: Event set created. Number of events=15
+2012-02-20 11:03:31,647 DEBUG                    event_set:1552|Memory: Event Set created
+2012-02-20 11:03:31,648 DEBUG                    event_set:1553|Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,176 INFO                      analysis:180 |P0: Sites set created. Number of sites=4
+2012-02-20 11:03:32,176 DEBUG                     analysis:181 |Memory: Sites created
+2012-02-20 11:03:32,177 DEBUG                     analysis:182 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,186 DEBUG                     analysis:201 |Pseudo event set created. Number of pseudo_events=15
+2012-02-20 11:03:32,186 DEBUG                     analysis:202 |Memory: Pseudo Event Set created
+2012-02-20 11:03:32,187 DEBUG                     analysis:203 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,288 DEBUG                     analysis:238 |blocking over sites if running in parallel. block_size=4
+2012-02-20 11:03:32,288 DEBUG                     analysis:241 |Number of atten_periods=20
+2012-02-20 11:03:32,289 DEBUG                     analysis:247 |Number of SA_surfaces=2
+2012-02-20 11:03:32,289 DEBUG                     analysis:269 |Memory: hazard_map array created
+2012-02-20 11:03:32,290 DEBUG                     analysis:270 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,293 DEBUG                     analysis:289 |Memory: save_motion array created
+2012-02-20 11:03:32,294 DEBUG                     analysis:290 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,294 DEBUG                     analysis:326 |Memory: Created all data collection arrays.
+2012-02-20 11:03:32,295 DEBUG                     analysis:327 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,295 INFO                      analysis:352 |P0: do site 1 of 4
+2012-02-20 11:03:32,296 DEBUG                     analysis:354 |Memory: site 1
+2012-02-20 11:03:32,296 DEBUG                     analysis:355 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,376 INFO                      analysis:352 |P0: do site 2 of 4
+2012-02-20 11:03:32,376 DEBUG                     analysis:354 |Memory: site 2
+2012-02-20 11:03:32,377 DEBUG                     analysis:355 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,442 INFO                      analysis:352 |P0: do site 3 of 4
+2012-02-20 11:03:32,442 DEBUG                     analysis:354 |Memory: site 3
+2012-02-20 11:03:32,443 DEBUG                     analysis:355 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,508 INFO                      analysis:352 |P0: do site 4 of 4
+2012-02-20 11:03:32,508 DEBUG                     analysis:354 |Memory: site 4
+2012-02-20 11:03:32,509 DEBUG                     analysis:355 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,585 DEBUG                     analysis:504 |Memory: Ended looping over sites
+2012-02-20 11:03:32,586 DEBUG                     analysis:505 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB
+2012-02-20 11:03:32,586 INFO                      analysis:515 |time_pre_site_loop_fraction 0.659090909091
+2012-02-20 11:03:32,587 INFO                      analysis:518 |event_loop_time (excluding file saving) 0:00:00.880000 hr:min:sec
+2012-02-20 11:03:32,587 DEBUG                     analysis:521 |event_loop_time_seconds = 0.88 seconds.
+2012-02-20 11:03:32,757 INFO                      analysis:724 |On node 0, tornado.agso.gov.au clock (processor) time taken overall 0:00:00.940000 hr:min:sec.
+2012-02-20 11:03:32,758 INFO                      analysis:733 |On node 0, tornado.agso.gov.au wall time taken overall 0:00:01.434531 hr:min:sec.
+2012-02-20 11:03:32,758 INFO                      analysis:736 |wall_time_taken_overall_seconds = 1.43453097343
+2012-02-20 11:03:32,759 DEBUG                     analysis:740 |Memory: End
+2012-02-20 11:03:32,759 DEBUG                     analysis:741 |Resource usage: memory=457.7MB resident=46.7MB stacksize=0.3MB

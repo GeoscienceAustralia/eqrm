@@ -280,7 +280,11 @@ class Event_Set(file_store.File_Store):
         if depth_bottom_seismogenic is not None:
             depth_bottom_seismogenic = asarray(depth_bottom_seismogenic)   
         if fault_width is not None:
-            fault_width = asarray(fault_width)           
+            fault_width = asarray(fault_width)
+        if width is not None:
+            width = asarray(width)
+        if length is not None:
+            length = asarray(length)           
         rupture_centroid_lat = asarray(rupture_centroid_lat)
         rupture_centroid_lon = asarray(rupture_centroid_lon)
         azimuth = asarray(azimuth)
@@ -295,19 +299,27 @@ class Event_Set(file_store.File_Store):
             Mw = conversions.Johnston_89_Mw(ML)
         if ML is None:
             ML = conversions.Johnston_01_ML(Mw)
-            
-        if area is None:
-            area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
                 
         if fault_width is None and depth_bottom_seismogenic is not None \
                 and depth_top_seismogenic is not None:
             fault_width = (depth_bottom_seismogenic \
                            - depth_top_seismogenic)/ \
                            sin(dip*pi/180.)
+        
+        if area is None:
+            area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
+                           
         if width is None:
             width = conversions.\
                 modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
                                                         fault_width)
+        
+        if length is None:
+            length = area / width
+        
+        # Note: area used to determine length and width only
+        # It is no longer needed after this point in time.
+        
         if depth is None:
             depth = conversions.depth(depth_top_seismogenic,
                                       dip, Mw, fault_width)
@@ -320,10 +332,6 @@ class Event_Set(file_store.File_Store):
             fault_type = ones(
                 depth.shape, dtype=int) * \
                 ground_motion_misc.FaultTypeDictionary['reverse']
-
-        # Add function conversions
-        if length is None:
-            length = area/width
 
         # Calculate the distance of the origin from the centroid
         rad = pi/180.
@@ -368,13 +376,19 @@ class Event_Set(file_store.File_Store):
     
     
     @classmethod
-    def create_scenario_events(cls, rupture_centroid_lat,
-                               rupture_centroid_lon, azimuth,
-                               dip, Mw, depth, 
+    def create_scenario_events(cls, 
+                               rupture_centroid_lat,
+                               rupture_centroid_lon, 
+                               azimuth,
+                               dip, 
+                               Mw, 
+                               depth, 
                                scenario_number_of_events,
                                fault_width=None,
                                depth_top_seismogenic=None, 
-                               depth_bottom_seismogenic=None):
+                               depth_bottom_seismogenic=None,
+                               width=None,
+                               length=None):
         
         __len__ = '__len__'
         if scenario_number_of_events > 1:
@@ -400,6 +414,15 @@ class Event_Set(file_store.File_Store):
                 depth_top_seismogenic = concatenate(
                     [[depth_top_seismogenic] for i in
                      xrange(scenario_number_of_events)])
+                
+            # Note: as we need to test for NoneType width and length must be
+            # passed into here as scalars and not vectors
+            if width is not None:
+                width = concatenate([[width] for i in 
+                                     xrange(scenario_number_of_events)])
+            if length is not None:
+                length = concatenate([[length] for i in 
+                                      xrange(scenario_number_of_events)])
         else:
             rupture_centroid_lat = asarray(rupture_centroid_lat)
             rupture_centroid_lon = asarray(rupture_centroid_lon)
@@ -407,6 +430,13 @@ class Event_Set(file_store.File_Store):
             dip = asarray(dip)
             depth = asarray(depth)
             Mw = asarray(Mw)
+            
+            # Note: as we need to test for NoneType width and length must be
+            # passed into here as scalars and not vectors
+            if width is not None:
+                width = asarray([width])
+            if length is not None:
+                length = asarray([length])
                 
         event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
                                  rupture_centroid_lon=rupture_centroid_lon,
@@ -417,7 +447,9 @@ class Event_Set(file_store.File_Store):
                                  fault_width=fault_width,
                                  depth_top_seismogenic=depth_top_seismogenic,
                                  depth_bottom_seismogenic=
-                                 depth_bottom_seismogenic)
+                                 depth_bottom_seismogenic,
+                                 width=width,
+                                 length=length)
         return event
         
 
@@ -1285,7 +1317,9 @@ def generate_event_set(parallel, eqrm_flags):
             Mw=[eqrm_flags.scenario_magnitude],
             depth=[eqrm_flags.scenario_depth],
             fault_width=eqrm_flags.max_width,
-            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events,
+            length=eqrm_flags.scenario_length,
+            width=eqrm_flags.scenario_width)
         # Other rupture parameters are calculated by event_set object.
         # trace start is calculated from centroid and azimuth.
         # Rupture area, length, and width are calculated from Mw

@@ -196,6 +196,17 @@ Longitude of rupture centroid.    \\
 \hline \vspace{0.1em} \texttt{scenario\_dip}: \\
 Dip of rupture plane (degrees from horizontal).  \\
 %---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{scenario\_width}: \\
+DEFAULT = \texttt{None} \\
+Width of rupture centroid (km). \\
+If \texttt{None}, dip, magnitude, area and \texttt{max\_width} used to calculate 
+using a Wells and Coppersmith (1994) conversion. \\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{scenario\_length}: \\
+DEFAULT = \texttt{None} \\
+Length of rupture centroid (km). \\
+If \texttt{None}, calculated as area/width. \\
+%---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{scenario\_number\_of\_events}: \\
  The desired number of
 copies of the event to be generated. Typically, copies are taken
