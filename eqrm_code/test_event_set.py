@@ -477,7 +477,60 @@ class Test_Event_Set(unittest.TestCase):
         
         answer = area/width 
         self.assert_(allclose(event_set.length, answer))
-  
+    
+    def scenario_event_set(self):
+        eqrm_flags = DummyEventSet()
+        
+        eqrm_flags.scenario_latitude = -32.95
+        eqrm_flags.scenario_longitude = 151.61
+        eqrm_flags.scenario_azimuth = 340
+        eqrm_flags.dip = 35
+        eqrm_flags.scenario_magnitude = 8
+        eqrm_flags.scenario_depth = 11.5
+        eqrm_flags.scenario_number_of_events = 1
+        
+        return eqrm_flags
+    
+    def test_scenario_event_width(self):
+        eqrm_flags = self.scenario_event_set()
+        
+        eqrm_flags.max_width = 5 # should be ignored
+        eqrm_flags.width = 10
+        
+        event_set = Event_Set.create_scenario_events(
+            rupture_centroid_lat=[eqrm_flags.scenario_latitude],
+            rupture_centroid_lon=[eqrm_flags.scenario_longitude],
+            azimuth=[eqrm_flags.scenario_azimuth],
+            dip=[eqrm_flags.dip],
+            Mw=[eqrm_flags.scenario_magnitude],
+            fault_width=eqrm_flags.max_width,
+            depth=[eqrm_flags.scenario_depth],
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events,
+            width=eqrm_flags.width,)
+
+        width = array(eqrm_flags.width)
+        msg = ('expected=%s result=%s' % (str(width), str(event_set.width)))
+        self.assert_ (allclose(event_set.width, width), msg)
+        
+        
+    def test_scenario_event_length(self):
+        eqrm_flags = self.scenario_event_set()
+        
+        eqrm_flags.length = 15
+        
+        event_set = Event_Set.create_scenario_events(
+            rupture_centroid_lat=[eqrm_flags.scenario_latitude],
+            rupture_centroid_lon=[eqrm_flags.scenario_longitude],
+            azimuth=[eqrm_flags.scenario_azimuth],
+            dip=[eqrm_flags.dip],
+            Mw=[eqrm_flags.scenario_magnitude],
+            depth=[eqrm_flags.scenario_depth],
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events,
+            length=eqrm_flags.length)
+
+        length = array(eqrm_flags.length)
+        msg = ('expected=%s result=%s' % (str(length), str(event_set.length)))
+        self.assert_ (allclose(event_set.length, length), msg)
   
     def test_generate_synthetic_events(self):
         
