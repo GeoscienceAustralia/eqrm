@@ -31,6 +31,7 @@
 
 import sys
 import os
+import socket
 import imp
 from os.path import join
 from time import strftime, localtime
@@ -814,6 +815,11 @@ def _verify_eqrm_flags(eqrm_flags):
         if not os.path.exists(load_dir):
             raise AttributeSyntaxError(
                 'data_dir/event_set_name %s must exist if event_set_handler is load.' % load_dir)
+    
+    if not os.path.exists(eqrm_flags.output_dir):
+        raise AttributeSyntaxError(
+                'output_dir %s must exist and be accessible from host %s' % (eqrm_flags.output_dir,
+                                                                             socket.gethostname()))
 
   
 def find_set_data_py_files(path):

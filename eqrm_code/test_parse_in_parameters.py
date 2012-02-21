@@ -1,6 +1,7 @@
 import os
 import sys
 import tempfile
+import shutil
 import unittest
 
 from scipy import array, allclose, asarray
@@ -20,10 +21,14 @@ class Dummy:
 class Test_Parse_in_parameters(unittest.TestCase):
     
     def setUp(self):
-        pass
+        self.inputDir = tempfile.mkdtemp()
+        self.outputDir = tempfile.mkdtemp()
+        self.dataDir = tempfile.mkdtemp()
         
     def tearDown(self):
-        pass
+        shutil.rmtree(self.inputDir)
+        shutil.rmtree(self.outputDir)
+        shutil.rmtree(self.dataDir)
 
     def build_instance_to_eqrm_flags(self):
         set = Dummy()
@@ -36,9 +41,8 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.site_tag= 'newc'
         set.site_db_tag = 'fish'
         set.site_indexes = [2255,11511]
-        set.input_dir = join('.','in')
-        set.output_dir = join('.','out')
-        set.data_dir = join('.', 'data')
+        set.input_dir = self.inputDir
+        set.output_dir = self.outputDir
         set.return_periods = [22,11]
         
         # Scenario input 
@@ -107,7 +111,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.save_prob_structural_damage = True
         
         # Data
-        set.data_dir = join('.','data')
+        set.data_dir = self.dataDir
         set.event_set_handler = 'generate'
         set.event_set_name = 'test'
         
@@ -125,9 +129,9 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.site_db_tag == 'fish')
         self.failUnless(allclose(TPT.site_indexes, asarray([2255,11511])))
         self.failUnless(os.path.abspath(TPT.input_dir) ==
-                        os.path.abspath(join('.','in')))
+                        os.path.abspath(self.inputDir))
         self.failUnless(os.path.abspath(TPT.output_dir) ==
-                        os.path.abspath(join('.','out')))   
+                        os.path.abspath(self.outputDir))   
         self.failUnless(allclose(TPT.return_periods, asarray([22,11])))        
         self.failUnless(TPT.grid_flag == 1)
         
@@ -193,7 +197,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.atten_model_weights[1] == 0.7)
         
         self.failUnless(os.path.abspath(TPT.data_dir) == 
-                        os.path.abspath(join('.','data')))
+                        os.path.abspath(self.dataDir))
         self.failUnless(TPT.event_set_handler == 'generate')
         self.failUnless(TPT.event_set_name == 'test')
         

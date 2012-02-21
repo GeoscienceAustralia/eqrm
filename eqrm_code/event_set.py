@@ -1510,33 +1510,23 @@ def create_event_set(eqrm_flags, parallel):
         
     elif mode == 'generate':
         
-        # If data_dir is not set default to a temporary directory (and delete when done)
-        delete_data_dir = False
-        if parallel.rank == 0 and eqrm_flags.data_dir is None:
-            eqrm_flags['data_dir'] = tempfile.mkdtemp()
-            log.info('P%s: data_dir not set. Created temporary directory %s' % (parallel.rank, 
-                                                                                eqrm_flags.data_dir))
-            delete_data_dir = True
+        # If data_dir is not set default to output_dir
+        if eqrm_flags.data_dir is None:
+            eqrm_flags['data_dir'] = eqrm_flags.output_dir
+            log.info('P%s: data_dir not set. Defaulting to output_dir %s' % (parallel.rank, 
+                                                                             eqrm_flags.output_dir))
             
         if parallel.rank == 0:
             generate_event_set(parallel, eqrm_flags)
-            # Send the workers the location of the new data_dir
-            parallel.notifyworkers(msg=eqrm_flags['data_dir'])
+            # Let the workers know they can continue 
+            parallel.notifyworkers(msg=parallel.load_event_set)
         else:
             log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
-            # Wait until the master has sent the location of the new data_dir
-            eqrm_flags['data_dir'] = parallel.receive(source=0)
+            parallel.waitfor(msg=parallel.load_event_set, source=0)
         
         (event_set,
          event_activity,
          source_model) = load_event_set(parallel, eqrm_flags)
-        
-        # We want to delete the temporary directory only once all the nodes are done loading
-        parallel.barrier()
-        if parallel.rank == 0 and delete_data_dir:
-            log.info('P%s: Deleting temporary directory %s' % (parallel.rank, 
-                                                               eqrm_flags.data_dir))
-            shutil.rmtree(eqrm_flags.data_dir)
          
     elif mode == 'save':
                 
