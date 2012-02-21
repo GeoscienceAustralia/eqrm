@@ -24,11 +24,13 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.inputDir = tempfile.mkdtemp()
         self.outputDir = tempfile.mkdtemp()
         self.dataDir = tempfile.mkdtemp()
+        self.dataStoreDir = tempfile.mkdtemp()
         
     def tearDown(self):
         shutil.rmtree(self.inputDir)
         shutil.rmtree(self.outputDir)
         shutil.rmtree(self.dataDir)
+        shutil.rmtree(self.dataStoreDir)
 
     def build_instance_to_eqrm_flags(self):
         set = Dummy()
@@ -114,6 +116,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.data_dir = self.dataDir
         set.event_set_handler = 'generate'
         set.event_set_name = 'test'
+        set.data_array_storage = self.dataStoreDir
         
         # Log
         set.file_log_level = 'warning'
@@ -200,6 +203,8 @@ class Test_Parse_in_parameters(unittest.TestCase):
                         os.path.abspath(self.dataDir))
         self.failUnless(TPT.event_set_handler == 'generate')
         self.failUnless(TPT.event_set_name == 'test')
+        self.failUnless(os.path.abspath(TPT.data_array_storage) == 
+                        os.path.abspath(self.dataStoreDir))
         
         self.failUnless(TPT.file_log_level == 'warning')
         self.failUnless(TPT.console_log_level == 'critical')
@@ -383,7 +388,46 @@ class Test_Parse_in_parameters(unittest.TestCase):
                         
         os.remove(file_name)
         os.remove(file_name[:-3]+ '.pyc')
-
+    
+    def test_default_to_attr(self):
+        set = self.build_instance_to_eqrm_flags()
+        
+        # these should default to output_dir
+        del set.data_dir
+        del set.data_array_storage
+        
+        eqrm_flags = create_parameter_data(set)
+        
+        expected_dir = os.path.abspath(eqrm_flags.output_dir)
+        
+        data_dir = os.path.abspath(eqrm_flags.data_dir)
+        self.failUnlessEqual(data_dir, expected_dir)
+        
+        data_array_storage = os.path.abspath(eqrm_flags.data_array_storage)
+        self.failUnlessEqual(data_array_storage, expected_dir)
+    
+    def test_directory_exists_check(self):
+        set = self.build_instance_to_eqrm_flags()
+        
+        # These parameters are checked to see if they exist
+        orig_output_dir = set.output_dir
+        orig_data_array_storage = set.data_array_storage
+        
+        # Shouldn't exist (bad if does!)
+        not_exists = join('does','not','exist')
+        
+        set.output_dir = not_exists
+        self.failUnlessRaises(AttributeSyntaxError,
+                              create_parameter_data, (set,))
+        set.output_dir = orig_output_dir
+        
+        set.data_array_storage = not_exists
+        self.failUnlessRaises(AttributeSyntaxError,
+                              create_parameter_data, (set,))
+        set.data_array_storage = orig_data_array_storage
+        
+        # Run again to see if no exception is raised
+        create_parameter_data(set)
         
 #-------------------------------------------------------------
 if __name__ == "__main__":

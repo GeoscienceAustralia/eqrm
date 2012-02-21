@@ -250,7 +250,7 @@ def main(parameter_handle,
     # are filled while looping over sites.  Wether they are needed or
     # not often depends on what is being saved.
     
-    data = Analysis_Data()
+    data = Analysis_Data(dir=eqrm_flags.data_array_storage)
 
     if eqrm_flags.save_hazard_map is True:
         data.bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
@@ -1035,7 +1035,8 @@ def load_data(eqrm_flags):
                 eqrm_flags.buildings_usage_classification,
                 use_refined_btypes=True,
                 force_btype_flag=False,
-                loss_aus_contents=eqrm_flags.loss_aus_contents)
+                loss_aus_contents=eqrm_flags.loss_aus_contents,
+                data_dir=eqrm_flags.data_array_storage)
 
             #FIXME do this after subsampling the sites
             # Hard wires the Demand Curve damping to 5%
@@ -1107,7 +1108,11 @@ def load_data(eqrm_flags):
         # i.e. searches input_dir then defaultdir
         name = get_local_or_default(name, eqrm_flags.default_input_dir,
                                     eqrm_flags.input_dir)
-        sites = Sites.from_csv(name, SITE_CLASS=str, VS30=float, POPULATION=float)
+        sites = Sites.from_csv(name, 
+                               SITE_CLASS=str, 
+                               VS30=float, 
+                               POPULATION=float,
+                               data_dir=eqrm_flags.data_array_storage)
         # FIXME this is a bit of a hack.  re Vs30 and VS30.
         sites.attributes['Vs30'] = sites.attributes['VS30']
     else:
