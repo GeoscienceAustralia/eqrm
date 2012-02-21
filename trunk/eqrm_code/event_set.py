@@ -51,15 +51,29 @@ EVENT_FLOAT = float64 #float32
 EVENT_INT = int64 #int32
 
 class Event_Set(file_store.File_Store):
-    def __init__(self, azimuth, dip, ML, Mw,
-                 depth, depth_to_top, fault_type,
-                 width, length, area, fault_width,
+    def __init__(self, 
+                 azimuth, 
+                 dip, 
+                 ML, 
+                 Mw,
+                 depth, 
+                 depth_to_top, 
+                 fault_type,
+                 width, 
+                 length, 
+                 area, 
+                 fault_width,
                  source_zone_id,
-                 trace_start_lat, trace_start_lon,
-                 trace_end_lat, trace_end_lon,
-                 rupture_centroid_x, rupture_centroid_y,
-                 rupture_centroid_lat, rupture_centroid_lon,
-                 event_id=None):
+                 trace_start_lat, 
+                 trace_start_lon,
+                 trace_end_lat, 
+                 trace_end_lon,
+                 rupture_centroid_x, 
+                 rupture_centroid_y,
+                 rupture_centroid_lat, 
+                 rupture_centroid_lon,
+                 event_id=None,
+                 dir=None):
         """
     A set of seismic events. Can be created  either directly or from an
     XML file which generates the events from eqrm_code.generation polygons.
@@ -105,7 +119,7 @@ class Event_Set(file_store.File_Store):
 
 
         """
-        super(Event_Set, self).__init__('event_set')
+        super(Event_Set, self).__init__('event_set', dir)
         
         self.azimuth = azimuth
         self.dip = dip
@@ -204,7 +218,7 @@ class Event_Set(file_store.File_Store):
     # END PROPERTIES #
 
     @classmethod
-    def load(cls, dir=None):
+    def load(cls, load_dir, store_dir=None):
         """
         Return an Event_Set object from the .npy files stored in the specified
         directory
@@ -228,8 +242,9 @@ class Event_Set(file_store.File_Store):
                         rupture_centroid_x=None,
                         rupture_centroid_y=None,
                         rupture_centroid_lat=None,
-                        rupture_centroid_lon=None)
-        event_set._load(dir)
+                        rupture_centroid_lon=None,
+                        dir=store_dir)
+        event_set._load(load_dir)
         return event_set
 
     @classmethod
@@ -1122,11 +1137,11 @@ class Event_Activity(file_store.File_Store):
     The dimensions of the event_activity are;
       (num_spawns, num_gm_models, num_recurrence_models, num_events)
     """
-    def __init__(self, num_events):
+    def __init__(self, num_events, dir=None):
         """
         num_events is number of events
         """
-        super(Event_Activity, self).__init__('event_activity')
+        super(Event_Activity, self).__init__('event_activity', dir)
         
         self.event_activity = None
         self.num_events = num_events
@@ -1142,13 +1157,13 @@ class Event_Activity(file_store.File_Store):
     # END PROPERTIES #
     
     @classmethod
-    def load(cls, num_events, dir=None):
+    def load(cls, num_events, load_dir, store_dir=None):
         """
         Return an Event_Activity object from the .npy files stored in the specified
         directory
         """
-        event_activity = cls(num_events)
-        event_activity._load(dir)
+        event_activity = cls(num_events, store_dir)
+        event_activity._load(load_dir)
         return event_activity
 
     def save(self, dir=None):
@@ -1466,8 +1481,10 @@ def load_event_set(parallel, eqrm_flags):
     load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
     log.info('P%s: Loading event set from %s' % (parallel.rank, load_dir))
     
-    event_set = Event_Set.load(load_dir)
-    event_activity = Event_Activity.load(len(event_set), load_dir)
+    store_dir = eqrm_flags.data_array_storage
+    
+    event_set = Event_Set.load(load_dir, store_dir)
+    event_activity = Event_Activity.load(len(event_set), load_dir, store_dir)
     source_model = Source_Model.load(load_dir)
     
     return (event_set, event_activity, source_model)
@@ -1509,12 +1526,6 @@ def create_event_set(eqrm_flags, parallel):
          source_model) = load_event_set(parallel, eqrm_flags)
         
     elif mode == 'generate':
-        
-        # If data_dir is not set default to output_dir
-        if eqrm_flags.data_dir is None:
-            eqrm_flags['data_dir'] = eqrm_flags.output_dir
-            log.info('P%s: data_dir not set. Defaulting to output_dir %s' % (parallel.rank, 
-                                                                             eqrm_flags.output_dir))
             
         if parallel.rank == 0:
             generate_event_set(parallel, eqrm_flags)
@@ -1533,7 +1544,7 @@ def create_event_set(eqrm_flags, parallel):
         if parallel.rank == 0:
             generate_event_set(parallel, eqrm_flags)
         else:
-            log.info('P%s: Warning - saving the event set is not a parallel operation. Extra nodes are unnecessary.' % parallel.rank)
+            log.warning('P%s: Saving the event set is not parallel.' % parallel.rank)
         
         log.info('P%s: Nothing else to do. Exiting.' % parallel.rank)
         sys.exit()
@@ -1542,7 +1553,8 @@ def create_event_set(eqrm_flags, parallel):
         raise ValueError('Got bad value for eqrm_flags.event_set_data_mode: %s'
                          % eqrm_flags.event_set_data_mode)
     
-    log.info('P%s: Event set created. Number of events=%s' % (parallel.rank, len(event_set.depth)))
+    log.info('P%s: Event set created. Number of events=%s' % (parallel.rank, 
+                                                              len(event_set.depth)))
     log.debug('Memory: Event Set created')
     log.resource_usage()
     

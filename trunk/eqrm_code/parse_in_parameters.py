@@ -97,6 +97,9 @@ SECOND_LINE = '  EQRM parameter file'
 # order - The order in which an EQRM control file is automatically generated.
 #         Lower numbers printed first.
 # values - Obsolete. Used to convert from the old style to the new.
+# default - default value if not set
+# default_to_attr - default to another parameter in this list. The parameter 
+# must be defined in an item in a lower order in the list.
 
 CONV_NEW = [{'order': 10.0,
              'title': '\n# Operation Mode\n'},
@@ -414,19 +417,22 @@ CONV_NEW = [{'order': 10.0,
              'order': 100.07,
              'new_para': 'save_fatalities',
              'default': False},
-             {'order': 100.08,
+             {'order': 110.01,
               'new_para': 'data_dir',
-              'default': None}, # If none set to temporary directory
-             {'order': 100.09,
+              'default_to_attr': 'output_dir'}, # see _add_default_values
+             {'order': 110.02,
               'new_para': 'event_set_handler',
               'default': 'generate'},
-             {'order': 100.10,
+             {'order': 110.03,
               'new_para': 'event_set_name',
               'default': 'current_event_set'},
-             {'order': 100.11,
+             {'order': 110.04,
+              'new_para': 'data_array_storage',
+              'default_to_attr': 'output_dir'}, # see _add_default_values
+             {'order': 120.01,
               'new_para': 'file_log_level',
               'default': 'debug'},
-             {'order': 100.12,
+             {'order': 120.02,
               'new_para': 'console_log_level',
               'default': 'info'}
             ]
@@ -523,13 +529,13 @@ def create_parameter_data(handle, **kwargs):
     
     _add_default_values(eqrm_flags)
    
-    # Check attattribute names
+    # Check attribute names
     for key in eqrm_flags:
         if not CONV_DIC_NEW.has_key(key):
             msg = ("Attribute Error: Attribute " + key + " is unknown.")
             raise AttributeSyntaxError(msg)
             
-    # Do attribute value fixes    
+    # Do attribute value fixes
     _att_value_fixes(eqrm_flags)
 
     # Check if values are consistant
@@ -588,13 +594,19 @@ def _add_default_values(eqrm_flags):
     """        
     for param in CONV_NEW: 
         if param.has_key('new_para') and \
-               not eqrm_flags.has_key(param['new_para']):
+               not eqrm_flags.has_key(param['new_para']): 
             if param.has_key('default'):
                 eqrm_flags[param['new_para']] = param['default']
+            elif param.has_key('default_to_attr') and \
+                    eqrm_flags.has_key(param['default_to_attr']) and \
+                    eqrm_flags[param['default_to_attr']] is not None:
+                eqrm_flags[param['new_para']] = eqrm_flags[param['default_to_attr']]
             else:
                 raise AttributeSyntaxError(
                 "Attribute Error: Attribute "  + param['new_para']
                 + " must be defined.")
+            
+            
 
 # In the dictionary DEPRECIATED_PARAS
 # the key is the depreciated attribute.
@@ -820,6 +832,11 @@ def _verify_eqrm_flags(eqrm_flags):
         raise AttributeSyntaxError(
                 'output_dir %s must exist and be accessible from host %s' % (eqrm_flags.output_dir,
                                                                              socket.gethostname()))
+        
+    if not os.path.exists(eqrm_flags.data_array_storage):
+        raise AttributeSyntaxError(
+                'data_array_storage %s must exist and be accessible from host %s' % (eqrm_flags.data_array_storage,
+                                                                                     socket.gethostname()))
 
   
 def find_set_data_py_files(path):
