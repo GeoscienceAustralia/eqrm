@@ -553,7 +553,11 @@ def main(parameter_handle,
                           compress=eqrm_flags.compress_output,
                           parallel_tag=parallel.file_tag,
                           write_title=(parallel.rank == False))
-        row_files_that_parallel_splits.append(a_file)
+        # save_hazard also calls save_sites. Only append if not already exists.
+        # FIXME: This will overwrite what is written in save_hazard. 
+        #        Is this correct?
+        if a_file not in row_files_that_parallel_splits:
+            row_files_that_parallel_splits.append(a_file)
 
         files = save_motion(soil_amp=False, eqrm_flags=eqrm_flags
                             ,motion=data.bedrock_SA_all,
