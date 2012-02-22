@@ -39,14 +39,14 @@ from eqrm_code import file_store
 class Sites(file_store.File_Store):
     """An object to hold site data."""
 
-    def __init__(self, latitude, longitude, **attributes):
+    def __init__(self, latitude, longitude, dir=None, **attributes):
         """Create a Sites object to handle multiple site data.
 
         latitude    latitude of sites (vector)
         longitude   longitude of sites (vector)
         attributes  dictionary of site attributes (vectors of data)
         """
-        super(Sites, self).__init__('sites')
+        super(Sites, self).__init__('sites', dir)
 
         self.latitude = asarray(latitude)
         self.longitude = asarray(longitude)
@@ -70,7 +70,7 @@ class Sites(file_store.File_Store):
     # END PROPERTIES #
 
     @classmethod
-    def from_csv(cls, file, **attribute_conversions):
+    def from_csv(cls, file, data_dir=None, **attribute_conversions):
         """Construct Site instance from csv file.
 
         file                   open file handle for site data
@@ -99,7 +99,7 @@ class Sites(file_store.File_Store):
         attributes = copy.copy(sites_dict)
 
         # call class constructor
-        return cls(latitude, longitude, **attributes)
+        return cls(latitude, longitude, data_dir, **attributes)
 
     def __len__(self):
         """Make len() return number of sites."""

@@ -153,6 +153,7 @@ def main(parameter_handle,
                                 'log' + parallel.log_file_tag + '.txt')
     log.log_filename = log_filename
     log.remove_log_file()
+    log.set_log_level(eqrm_flags.file_log_level, eqrm_flags.console_log_level)
     log.set_log_file(log_filename)
     log.debug('host name: ' + str(parallel.node))
     version, date, modified = get_version()
@@ -249,7 +250,7 @@ def main(parameter_handle,
     # are filled while looping over sites.  Wether they are needed or
     # not often depends on what is being saved.
     
-    data = Analysis_Data()
+    data = Analysis_Data(dir=eqrm_flags.data_array_storage)
 
     if eqrm_flags.save_hazard_map is True:
         data.bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
@@ -552,7 +553,11 @@ def main(parameter_handle,
                           compress=eqrm_flags.compress_output,
                           parallel_tag=parallel.file_tag,
                           write_title=(parallel.rank == False))
-        row_files_that_parallel_splits.append(a_file)
+        # save_hazard also calls save_sites. Only append if not already exists.
+        # FIXME: This will overwrite what is written in save_hazard. 
+        #        Is this correct?
+        if a_file not in row_files_that_parallel_splits:
+            row_files_that_parallel_splits.append(a_file)
 
         files = save_motion(soil_amp=False, eqrm_flags=eqrm_flags
                             ,motion=data.bedrock_SA_all,
@@ -696,7 +701,7 @@ def main(parameter_handle,
                                event_set=event_set,
                                compress=eqrm_flags.compress_output,
                                parallel_tag=parallel.file_tag)
-        column_files_that_parallel_splits.append(files)
+        column_files_that_parallel_splits.extend(files)
 
     # parallel code.  Needed if # of processes is > # of structures
     calc_num_blocks = parallel.calc_num_blocks()
@@ -1030,7 +1035,8 @@ def load_data(eqrm_flags):
                 eqrm_flags.buildings_usage_classification,
                 use_refined_btypes=True,
                 force_btype_flag=False,
-                loss_aus_contents=eqrm_flags.loss_aus_contents)
+                loss_aus_contents=eqrm_flags.loss_aus_contents,
+                data_dir=eqrm_flags.data_array_storage)
 
             #FIXME do this after subsampling the sites
             # Hard wires the Demand Curve damping to 5%
@@ -1102,7 +1108,11 @@ def load_data(eqrm_flags):
         # i.e. searches input_dir then defaultdir
         name = get_local_or_default(name, eqrm_flags.default_input_dir,
                                     eqrm_flags.input_dir)
-        sites = Sites.from_csv(name, SITE_CLASS=str, VS30=float, POPULATION=float)
+        sites = Sites.from_csv(name, 
+                               SITE_CLASS=str, 
+                               VS30=float, 
+                               POPULATION=float,
+                               data_dir=eqrm_flags.data_array_storage)
         # FIXME this is a bit of a hack.  re Vs30 and VS30.
         sites.attributes['Vs30'] = sites.attributes['VS30']
     else:

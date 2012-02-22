@@ -7,8 +7,8 @@ from eqrm_code import file_store
 
 class Event_Set_Data(file_store.File_Store):
     
-    def __init__(self):
-        super(Event_Set_Data, self).__init__('event_set_data')
+    def __init__(self, dir=None):
+        super(Event_Set_Data, self).__init__('event_set_data', dir)
 
     def __del__(self):
         super(Event_Set_Data, self).__del__()
@@ -53,8 +53,8 @@ class Event_Set_Data(file_store.File_Store):
 
 class Event_Activity_Data(file_store.File_Store):
 
-    def __init__(self):
-        super(Event_Activity_Data, self).__init__('event_activity_data')
+    def __init__(self, dir=None):
+        super(Event_Activity_Data, self).__init__('event_activity_data', dir)
 
     def __del__(self):
         super(Event_Activity_Data, self).__del__()

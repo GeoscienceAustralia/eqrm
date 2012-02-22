@@ -45,7 +45,12 @@ attribute_conversions = {'LATITUDE': float,
 
 class Structures(Sites):
 
-    def __init__(self, latitude, longitude, building_parameters, **attributes):
+    def __init__(self, 
+                 latitude, 
+                 longitude, 
+                 building_parameters,
+                 data_dir=None,  
+                 **attributes):
         """Create an object holding all Structures data.
 
         Inherits from Sites which handles lat, lon and attributes.  Structures
@@ -57,16 +62,24 @@ class Structures(Sites):
         """
 
         # inherit setup from Sites, add building parameters
-        Sites.__init__(self, latitude, longitude, **attributes)
+        Sites.__init__(self, latitude, longitude, data_dir, **attributes)
         self.building_parameters = building_parameters
 
 
     @classmethod
-    def from_csv(cls, sites_filename, building_parameters_table,
-                 default_input_dir, input_dir=None, eqrm_dir=None,
+    def from_csv(cls, 
+                 sites_filename, 
+                 building_parameters_table,
+                 default_input_dir, 
+                 input_dir=None, 
+                 eqrm_dir=None,
                  buildings_usage_classification='HAZUS',
-                 use_refined_btypes=True, force_btype_flag=False,
-                 determ_btype=None, determ_buse=None, loss_aus_contents=0):
+                 use_refined_btypes=True, 
+                 force_btype_flag=False,
+                 determ_btype=None, 
+                 determ_buse=None, 
+                 loss_aus_contents=0,
+                 data_dir=None):
         """Read structures data from a file.
         Extract strucuture parameters from building_parameters_table.
 
@@ -164,7 +177,7 @@ class Structures(Sites):
                 rcp['nonstructural acceleration sensitive']
 
         # create structures:
-        return cls(latitude, longitude, building_parameters, **attributes)
+        return cls(latitude, longitude, building_parameters, data_dir, **attributes)
 
 
     def cost_breakdown(self, ci=None):

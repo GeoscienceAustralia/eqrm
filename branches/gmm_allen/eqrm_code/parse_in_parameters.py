@@ -31,6 +31,7 @@
 
 import sys
 import os
+import socket
 import imp
 from os.path import join
 from time import strftime, localtime
@@ -96,6 +97,9 @@ SECOND_LINE = '  EQRM parameter file'
 # order - The order in which an EQRM control file is automatically generated.
 #         Lower numbers printed first.
 # values - Obsolete. Used to convert from the old style to the new.
+# default - default value if not set
+# default_to_attr - default to another parameter in this list. The parameter 
+# must be defined in an item in a lower order in the list.
 
 CONV_NEW = [{'order': 10.0,
              'title': '\n# Operation Mode\n'},
@@ -190,6 +194,12 @@ CONV_NEW = [{'order': 10.0,
             {'old_para': 'determ_ntrg',
              'order': 30.08,
              'new_para': 'scenario_number_of_events',
+             'default': None},
+            {'order': 30.09,
+             'new_para': 'scenario_width',
+             'default': None},
+            {'order': 30.10,
+             'new_para': 'scenario_length',
              'default': None},
             {'order': 40.0,
              'title': '\n# Probabilistic input\n'},
@@ -407,12 +417,24 @@ CONV_NEW = [{'order': 10.0,
              'order': 100.07,
              'new_para': 'save_fatalities',
              'default': False},
-             {'order': 100.08,
+             {'order': 110.01,
               'new_para': 'data_dir',
-              'default': None}, # _add_default_values sets this to eqrm_data_home/data
-              {'order': 100.09,
+              'default_to_attr': 'output_dir'}, # see _add_default_values
+             {'order': 110.02,
               'new_para': 'event_set_handler',
               'default': 'generate'},
+             {'order': 110.03,
+              'new_para': 'event_set_name',
+              'default': 'current_event_set'},
+             {'order': 110.04,
+              'new_para': 'data_array_storage',
+              'default_to_attr': 'output_dir'}, # see _add_default_values
+             {'order': 120.01,
+              'new_para': 'file_log_level',
+              'default': 'debug'},
+             {'order': 120.02,
+              'new_para': 'console_log_level',
+              'default': 'info'}
             ]
 
 # Old style attributes that have not been removed yet.
@@ -507,13 +529,13 @@ def create_parameter_data(handle, **kwargs):
     
     _add_default_values(eqrm_flags)
    
-    # Check attattribute names
+    # Check attribute names
     for key in eqrm_flags:
         if not CONV_DIC_NEW.has_key(key):
             msg = ("Attribute Error: Attribute " + key + " is unknown.")
             raise AttributeSyntaxError(msg)
             
-    # Do attribute value fixes    
+    # Do attribute value fixes
     _att_value_fixes(eqrm_flags)
 
     # Check if values are consistant
@@ -572,17 +594,19 @@ def _add_default_values(eqrm_flags):
     """        
     for param in CONV_NEW: 
         if param.has_key('new_para') and \
-               not eqrm_flags.has_key(param['new_para']):
+               not eqrm_flags.has_key(param['new_para']): 
             if param.has_key('default'):
                 eqrm_flags[param['new_para']] = param['default']
+            elif param.has_key('default_to_attr') and \
+                    eqrm_flags.has_key(param['default_to_attr']) and \
+                    eqrm_flags[param['default_to_attr']] is not None:
+                eqrm_flags[param['new_para']] = eqrm_flags[param['default_to_attr']]
             else:
                 raise AttributeSyntaxError(
                 "Attribute Error: Attribute "  + param['new_para']
                 + " must be defined.")
-    
-    # Default the data_dir to eqrm_data_home/data if not set
-    if eqrm_flags.data_dir is None:
-        eqrm_flags['data_dir'] = os.path.join(eqrm_data_home(), 'data')
+            
+            
 
 # In the dictionary DEPRECIATED_PARAS
 # the key is the depreciated attribute.
@@ -697,8 +721,14 @@ def _att_value_fixes(eqrm_flags):
         eqrm_flags['output_dir'] = eqrm_flags.output_dir+'/'
     if not eqrm_flags.input_dir[-1] == '/':
         eqrm_flags['input_dir'] = eqrm_flags.input_dir+ '/'
+    if not eqrm_flags.data_dir[-1] == '/':
+        eqrm_flags['data_dir'] = eqrm_flags.data_dir+ '/'
+    if not eqrm_flags.data_array_storage[-1] == '/':
+        eqrm_flags['data_array_storage'] = eqrm_flags.data_array_storage+ '/'
     eqrm_flags['output_dir'] = _change_slashes(eqrm_flags.output_dir)
     eqrm_flags['input_dir'] = _change_slashes(eqrm_flags.input_dir)
+    eqrm_flags['data_dir'] = _change_slashes(eqrm_flags.data_dir)
+    eqrm_flags['data_array_storage'] = _change_slashes(eqrm_flags.data_array_storage)
     
     if eqrm_flags.atten_variability_method == None:
         eqrm_flags.atten_spawn_bins = None
@@ -789,9 +819,24 @@ def _verify_eqrm_flags(eqrm_flags):
         raise AttributeSyntaxError(
             'Cannot spawn on amplification.')
     
-    if eqrm_flags.event_set_handler == 'load' and not os.path.exists(eqrm_flags.data_dir):
+    if eqrm_flags.event_set_handler == 'load':
+        load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
+        if not os.path.exists(load_dir):
+            raise AttributeSyntaxError(
+                'data_dir/event_set_name %s must exist if event_set_handler is load.' % load_dir)
+    
+    # Only do these checks if different from output_dir 
+    # (output_dir gets created if not exists
+    if eqrm_flags.data_dir != eqrm_flags.output_dir and \
+            not os.path.exists(eqrm_flags.data_dir):
         raise AttributeSyntaxError(
-            'data_dir %s must exist if event_set_handler is load.' % eqrm_flags.data_dir)
+            'data_dir %s must exist and be accessible from %s' % (eqrm_flags.data_array_storage,
+                                                                                socket.gethostname()))
+    if eqrm_flags.data_array_storage != eqrm_flags.output_dir and \
+            not os.path.exists(eqrm_flags.data_array_storage):
+        raise AttributeSyntaxError(
+                'data_array_storage %s must exist and be accessible from %s' % (eqrm_flags.data_array_storage,
+                                                                                socket.gethostname()))
 
   
 def find_set_data_py_files(path):

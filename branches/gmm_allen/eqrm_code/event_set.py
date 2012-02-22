@@ -16,15 +16,15 @@
 import copy
 import xml.dom.minidom
 import math
-import os, glob
 import scipy
 import tempfile
 import sys
+import os, shutil
 
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
      int64, reshape, arange, append, radians, where, minimum, seterr
-from numpy import random, save, load
+from numpy import random
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import conversions
@@ -51,15 +51,29 @@ EVENT_FLOAT = float64 #float32
 EVENT_INT = int64 #int32
 
 class Event_Set(file_store.File_Store):
-    def __init__(self, azimuth, dip, ML, Mw,
-                 depth, depth_to_top, fault_type,
-                 width, length, area, fault_width,
+    def __init__(self, 
+                 azimuth, 
+                 dip, 
+                 ML, 
+                 Mw,
+                 depth, 
+                 depth_to_top, 
+                 fault_type,
+                 width, 
+                 length, 
+                 area, 
+                 fault_width,
                  source_zone_id,
-                 trace_start_lat, trace_start_lon,
-                 trace_end_lat, trace_end_lon,
-                 rupture_centroid_x, rupture_centroid_y,
-                 rupture_centroid_lat, rupture_centroid_lon,
-                 event_id=None):
+                 trace_start_lat, 
+                 trace_start_lon,
+                 trace_end_lat, 
+                 trace_end_lon,
+                 rupture_centroid_x, 
+                 rupture_centroid_y,
+                 rupture_centroid_lat, 
+                 rupture_centroid_lon,
+                 event_id=None,
+                 dir=None):
         """
     A set of seismic events. Can be created  either directly or from an
     XML file which generates the events from eqrm_code.generation polygons.
@@ -105,7 +119,7 @@ class Event_Set(file_store.File_Store):
 
 
         """
-        super(Event_Set, self).__init__('event_set')
+        super(Event_Set, self).__init__('event_set', dir)
         
         self.azimuth = azimuth
         self.dip = dip
@@ -204,7 +218,7 @@ class Event_Set(file_store.File_Store):
     # END PROPERTIES #
 
     @classmethod
-    def load(cls, dir=None):
+    def load(cls, load_dir, store_dir=None):
         """
         Return an Event_Set object from the .npy files stored in the specified
         directory
@@ -228,8 +242,9 @@ class Event_Set(file_store.File_Store):
                         rupture_centroid_x=None,
                         rupture_centroid_y=None,
                         rupture_centroid_lat=None,
-                        rupture_centroid_lon=None)
-        event_set._load(dir)
+                        rupture_centroid_lon=None,
+                        dir=store_dir)
+        event_set._load(load_dir)
         return event_set
 
     @classmethod
@@ -280,7 +295,11 @@ class Event_Set(file_store.File_Store):
         if depth_bottom_seismogenic is not None:
             depth_bottom_seismogenic = asarray(depth_bottom_seismogenic)   
         if fault_width is not None:
-            fault_width = asarray(fault_width)           
+            fault_width = asarray(fault_width)
+        if width is not None:
+            width = asarray(width)
+        if length is not None:
+            length = asarray(length)           
         rupture_centroid_lat = asarray(rupture_centroid_lat)
         rupture_centroid_lon = asarray(rupture_centroid_lon)
         azimuth = asarray(azimuth)
@@ -295,19 +314,27 @@ class Event_Set(file_store.File_Store):
             Mw = conversions.Johnston_89_Mw(ML)
         if ML is None:
             ML = conversions.Johnston_01_ML(Mw)
-            
-        if area is None:
-            area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
                 
         if fault_width is None and depth_bottom_seismogenic is not None \
                 and depth_top_seismogenic is not None:
             fault_width = (depth_bottom_seismogenic \
                            - depth_top_seismogenic)/ \
                            sin(dip*pi/180.)
+        
+        if area is None:
+            area = conversions.modified_Wells_and_Coppersmith_94_area(Mw)
+                           
         if width is None:
             width = conversions.\
                 modified_Wells_and_Coppersmith_94_width(dip, Mw, area,
                                                         fault_width)
+        
+        if length is None:
+            length = area / width
+        
+        # Note: area used to determine length and width only
+        # It is no longer needed after this point in time.
+        
         if depth is None:
             depth = conversions.depth(depth_top_seismogenic,
                                       dip, Mw, fault_width)
@@ -320,10 +347,6 @@ class Event_Set(file_store.File_Store):
             fault_type = ones(
                 depth.shape, dtype=int) * \
                 ground_motion_misc.FaultTypeDictionary['reverse']
-
-        # Add function conversions
-        if length is None:
-            length = area/width
 
         # Calculate the distance of the origin from the centroid
         rad = pi/180.
@@ -368,13 +391,19 @@ class Event_Set(file_store.File_Store):
     
     
     @classmethod
-    def create_scenario_events(cls, rupture_centroid_lat,
-                               rupture_centroid_lon, azimuth,
-                               dip, Mw, depth, 
+    def create_scenario_events(cls, 
+                               rupture_centroid_lat,
+                               rupture_centroid_lon, 
+                               azimuth,
+                               dip, 
+                               Mw, 
+                               depth, 
                                scenario_number_of_events,
                                fault_width=None,
                                depth_top_seismogenic=None, 
-                               depth_bottom_seismogenic=None):
+                               depth_bottom_seismogenic=None,
+                               width=None,
+                               length=None):
         
         __len__ = '__len__'
         if scenario_number_of_events > 1:
@@ -400,6 +429,15 @@ class Event_Set(file_store.File_Store):
                 depth_top_seismogenic = concatenate(
                     [[depth_top_seismogenic] for i in
                      xrange(scenario_number_of_events)])
+                
+            # Note: as we need to test for NoneType width and length must be
+            # passed into here as scalars and not vectors
+            if width is not None:
+                width = concatenate([[width] for i in 
+                                     xrange(scenario_number_of_events)])
+            if length is not None:
+                length = concatenate([[length] for i in 
+                                      xrange(scenario_number_of_events)])
         else:
             rupture_centroid_lat = asarray(rupture_centroid_lat)
             rupture_centroid_lon = asarray(rupture_centroid_lon)
@@ -407,6 +445,13 @@ class Event_Set(file_store.File_Store):
             dip = asarray(dip)
             depth = asarray(depth)
             Mw = asarray(Mw)
+            
+            # Note: as we need to test for NoneType width and length must be
+            # passed into here as scalars and not vectors
+            if width is not None:
+                width = asarray([width])
+            if length is not None:
+                length = asarray([length])
                 
         event = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
                                  rupture_centroid_lon=rupture_centroid_lon,
@@ -417,7 +462,9 @@ class Event_Set(file_store.File_Store):
                                  fault_width=fault_width,
                                  depth_top_seismogenic=depth_top_seismogenic,
                                  depth_bottom_seismogenic=
-                                 depth_bottom_seismogenic)
+                                 depth_bottom_seismogenic,
+                                 width=width,
+                                 length=length)
         return event
         
 
@@ -1090,11 +1137,11 @@ class Event_Activity(file_store.File_Store):
     The dimensions of the event_activity are;
       (num_spawns, num_gm_models, num_recurrence_models, num_events)
     """
-    def __init__(self, num_events):
+    def __init__(self, num_events, dir=None):
         """
         num_events is number of events
         """
-        super(Event_Activity, self).__init__('event_activity')
+        super(Event_Activity, self).__init__('event_activity', dir)
         
         self.event_activity = None
         self.num_events = num_events
@@ -1110,13 +1157,13 @@ class Event_Activity(file_store.File_Store):
     # END PROPERTIES #
     
     @classmethod
-    def load(cls, num_events, dir=None):
+    def load(cls, num_events, load_dir, store_dir=None):
         """
         Return an Event_Activity object from the .npy files stored in the specified
         directory
         """
-        event_activity = cls(num_events)
-        event_activity._load(dir)
+        event_activity = cls(num_events, store_dir)
+        event_activity._load(load_dir)
         return event_activity
 
     def save(self, dir=None):
@@ -1265,10 +1312,15 @@ class Event_Activity(file_store.File_Store):
 from eqrm_code.source_model import source_model_from_xml, Source_Model
 from eqrm_code.output_manager import save_event_set, get_source_file_handle
 
-def generate_event_set(eqrm_flags):
+def generate_event_set(parallel, eqrm_flags):
     """
-    TODO: doco!
+    Generate the event set, event activity and source model objects based on
+    the parameters in eqrm_flags. Once completed call the save methods of these
+    objects to store to file.
     """
+    
+    save_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
+    log.info('P%s: Generating event set and saving to %s' % (parallel.rank, save_dir))
     
     if eqrm_flags.is_scenario is True:
         # generate a scenario event set
@@ -1280,7 +1332,9 @@ def generate_event_set(eqrm_flags):
             Mw=[eqrm_flags.scenario_magnitude],
             depth=[eqrm_flags.scenario_depth],
             fault_width=eqrm_flags.max_width,
-            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events,
+            length=eqrm_flags.scenario_length,
+            width=eqrm_flags.scenario_width)
         # Other rupture parameters are calculated by event_set object.
         # trace start is calculated from centroid and azimuth.
         # Rupture area, length, and width are calculated from Mw
@@ -1414,85 +1468,93 @@ def generate_event_set(eqrm_flags):
     event_set.event_id = None
     
     # Save event_set, event_activity and source_model to data files
-    event_set.save(eqrm_flags.data_dir)
-    event_activity.save(eqrm_flags.data_dir)
-    source_model.save(eqrm_flags.data_dir)
+    event_set.save(save_dir)
+    event_activity.save(save_dir)
+    source_model.save(save_dir)
 
-def load_event_set(eqrm_flags):
+def load_event_set(parallel, eqrm_flags):
     """
-    TODO: doco!
+    Load the event set, event activity and source model objects from file as
+    specified in eqrm_flags
     """
     
-    event_set = Event_Set.load(eqrm_flags.data_dir)
-    event_activity = Event_Activity.load(len(event_set), eqrm_flags.data_dir)
-    source_model = Source_Model.load(eqrm_flags.data_dir)
+    load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
+    log.info('P%s: Loading event set from %s' % (parallel.rank, load_dir))
+    
+    store_dir = eqrm_flags.data_array_storage
+    
+    event_set = Event_Set.load(load_dir, store_dir)
+    event_activity = Event_Activity.load(len(event_set), load_dir, store_dir)
+    source_model = Source_Model.load(load_dir)
     
     return (event_set, event_activity, source_model)
 
 def create_event_set(eqrm_flags, parallel):
     """
-    TODO: doco!
-    """
+    Implements the three modes as specified in eqrm_flags.event_set_handler
+    'generate' - first node generates event set and saves to file
+               - other nodes wait until first node is done
+               - once first node is done, all nodes load the event set and return 
+                 to the caller
+    'save'     - first node generates event set and saves to file
+               - any other nodes skipped
+               - all nodes exit after completion
+    'load'     - all nodes load the event set data from file and return to the 
+                 caller
+                 
+    Other eqrm_flags used
+    data_dir       - specifies the base directory for event set files
+    event_set_name - a name for the event set generated
     
-    # eqrm_flags.event_set_data_mode
-    # 3 modes:
-    # 'generate' - first node generates, saves to file
-    #            - other nodes wait until first node is done
-    #            - once first node is done, all continue to work
-    # 'save'     - first node generates, save to file and exits
-    #            - other nodes ignored
-    # 'load'     - all nodes load data from file and continue to work
-    #
+    These are used to construct the directory to save to and load from. i.e.
+    the files are referenced in data_dir/event_set_name
+    """
     
     mode = eqrm_flags.event_set_handler
     
     if parallel.rank == 0:
         log.info('event_set_handler = %s' % mode)
+        log.info('event_set_name = %s' % eqrm_flags.event_set_name)
     
     # Wait for all nodes to be at this point to start
     parallel.barrier()
     
     if mode == 'load':
         
-        log.info('P%s: Loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
-        
         (event_set,
          event_activity,
-         source_model) = load_event_set(eqrm_flags)
+         source_model) = load_event_set(parallel, eqrm_flags)
         
     elif mode == 'generate':
-        
+            
         if parallel.rank == 0:
-            log.info('P%s: Generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
-            generate_event_set(eqrm_flags)
+            generate_event_set(parallel, eqrm_flags)
+            # Let the workers know they can continue 
             parallel.notifyworkers(msg=parallel.load_event_set)
         else:
             log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
             parallel.waitfor(msg=parallel.load_event_set, source=0)
         
-        log.info('P%s: Loading event set from %s' % (parallel.rank, eqrm_flags.data_dir))
-        
         (event_set,
          event_activity,
-         source_model) = load_event_set(eqrm_flags)
+         source_model) = load_event_set(parallel, eqrm_flags)
          
     elif mode == 'save':
-        
+                
         if parallel.rank == 0:
-            log.info('P%s: Generating event set and saving to %s' % (parallel.rank, eqrm_flags.data_dir))
-            generate_event_set(eqrm_flags)
+            generate_event_set(parallel, eqrm_flags)
         else:
-            log.info('P%s: Warning - saving the event set is not a parallel operation. Extra nodes are unnecessary.' % parallel.rank)
+            log.warning('P%s: Saving the event set is not parallel.' % parallel.rank)
         
-        # FIXME: Is there a better way of handling this exit?
-        log.info("P%s: Nothing else to do. Exiting." % parallel.rank)
+        log.info('P%s: Nothing else to do. Exiting.' % parallel.rank)
         sys.exit()
         
     else:
         raise ValueError('Got bad value for eqrm_flags.event_set_data_mode: %s'
                          % eqrm_flags.event_set_data_mode)
     
-    log.info('P%s: Event set created. Number of events=%s' % (parallel.rank, len(event_set.depth)))
+    log.info('P%s: Event set created. Number of events=%s' % (parallel.rank, 
+                                                              len(event_set.depth)))
     log.debug('Memory: Event Set created')
     log.resource_usage()
     

@@ -91,12 +91,14 @@ class File_Store(object):
     """
     
     
-    def __init__(self, name):
+    def __init__(self, name, dir):
+        """__init__: create a file store instance with name and dir"""
         self._name = name
         self._array_files = {}
+        self._dir = dir # if this is None tempfile will use /tmp
 
     def __del__(self):
-        """__del__ : Make sure any data files are cleaned up"""
+        """__del__: Make sure any data files are cleaned up"""
         for filename in self._array_files.values():
             os.remove(filename)
     
@@ -115,7 +117,9 @@ class File_Store(object):
             
             # Create and map a new file if needed
             if filename is None:
-                handle, filename = tempfile.mkstemp(prefix='%s.%s.' % (self._name, name), suffix='.npy')
+                handle, filename = tempfile.mkstemp(prefix='%s.%s.' % (self._name, name), 
+                                                    suffix='.npy',
+                                                    dir=self._dir)
                 os.close(handle)
                 self._array_files[name] = filename
                 
