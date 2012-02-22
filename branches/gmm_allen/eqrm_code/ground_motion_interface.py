@@ -6071,83 +6071,59 @@ def Allen_2012_distribution(**kwargs):
 
     Rrup = dist_object.Rupture[:,:,newaxis]
     
-    # Deep indices
+    # Deep coefficients
     cd = coefficient[:12]
     sd = sigma_coefficient[0]
     
-    # Shallow indices
+    # Shallow coefficients
     cs = coefficient[12:]
     ss = sigma_coefficient[1]
     
-    # Loop over the events dimension and calculate GM per event
-    A12 = zeros((num_sites, num_events, num_periods))
-    A12_sigma = zeros((num_sites, num_events, num_periods))
+    # TA:
+    # if depth >= 10
+    #     load 'AUS11_deep.mat'
+    # else
+    #     load 'AUS11_shallow.mat
+    # end    
+    c = where(depth >= 10, cd, cs)
+    s = where(depth >= 10, sd, ss)
     
-    # TODO: Refactor using vector operations for performance
-    for e in xrange(num_events):
-        # Get the parameters for this event
-        d = depth[:,e,:]
-        r = Rrup[:,e,:]
-        m = Mw[:,e,:]
-        
-        # TA:
-        # if depth >= 10
-        #     load 'AUS11_deep.mat'
-        # else
-        #     load 'AUS11_shallow.mat
-        # end
-        c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 = cd if d >= 10 else cs
-        c_sigma = sd if d >= 10 else ss
-        
-        # TA:
-        # minr1 = zeros(size(model(:,1)));
-        # maxr2 = zeros(size(model(:,1)));
-        # maxr3 = zeros(size(model(:,1)));
-        #
-        # Note that we're using c0 and not model(:1), which represents periods in 
-        # Trevor Allen's model (same shape)
-        minr1 = zeros(c0.shape)
-        maxr2 = zeros(c0.shape)
-        maxr3 = zeros(c0.shape)
-        
-        # TA:
-        # r01 = 80;
-        # r02 = 150;
-        r01 = 80
-        r02 = 150
-        
-        # TA:
-        # for j = 1:length(minr1)
-        #    r1 = r01 + (M-4)*c8(j);
-        #    r2 = r02 + (M-4)*c11(j);
-        #    minr1(j) = min([log10(rhypRange) log10(r1)]);
-        #    maxr2(j) = min([log10(rhypRange/r1) 0]);
-        #    maxr3(j) = min([log10(rhypRange/r2) 0]);
-        # end
-        # minr1 = 10.^minr1
-        for j in xrange(len(periods)):
-            r1 = r01 + (m-4)*c8[:,:,j]
-            r2 = r02 + (m-4)*c11[:,:,j]
-            minr1[:,:,j] = minimum(log10(r), log10(r1))
-            maxr2[:,:,j] = maximum(log10(r/r1), 0)
-            maxr3[:,:,j] = maximum(log10(r/r2), 0)
-        minr1 = 10**minr1
-        
-        # TA:
-        # A12 = 10.^(c0 + c1 * (M-4) + c2*(M-4).^2 ...
-        #       + (c3 + c4*(M-4)).*log10(sqrt(minr1.^2 ...
-        #       + (ones(size(minr1)).*(1+c5*(M-4))).^2)) ...
-        #       + maxr2.*(c6 + c7*(M-4)) ...
-        #       + maxr3.*(c9 + c10*(M-4)));
-        A12[:,e,:] = 10**(c0 + c1*(m-4) + c2*(m-4)**2 \
-                     + (c3 + c4*(m-4))*log10(sqrt(minr1**2 \
-                     + (ones(minr1.shape)*(1 + c5*(m-4)))**2)) \
-                     + maxr2 * (c6 + c7*(m-4)) \
-                     + maxr3 * (c9 + c10*(m-4)))
-        
-        # TODO: Confirm the value for sigma
-        A12_sigma[:,e,:] = c_sigma
-        
+    # Extract the coefficients    
+    c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 = c
+    
+    # TA:
+    # r01 = 80;
+    # r02 = 150;
+    r01 = 80
+    r02 = 150
+    
+    # TA:
+    # for j = 1:length(minr1)
+    #    r1 = r01 + (M-4)*c8(j);
+    #    r2 = r02 + (M-4)*c11(j);
+    #    minr1(j) = min([log10(rhypRange) log10(r1)]);
+    #    maxr2(j) = min([log10(rhypRange/r1) 0]);
+    #    maxr3(j) = min([log10(rhypRange/r2) 0]);
+    # end
+    # minr1 = 10.^minr1
+    r1 = r01 + (Mw-4)*c8
+    r2 = r02 + (Mw-4)*c11
+    minr1 = minimum(log10(Rrup), log10(r1))
+    maxr2 = maximum(log10(Rrup/r1), 0)
+    maxr3 = maximum(log10(Rrup/r2), 0)
+    minr1 = 10**minr1
+    
+    # TA:
+    # A12 = 10.^(c0 + c1 * (M-4) + c2*(M-4).^2 ...
+    #       + (c3 + c4*(M-4)).*log10(sqrt(minr1.^2 ...
+    #       + (ones(size(minr1)).*(1+c5*(M-4))).^2)) ...
+    #       + maxr2.*(c6 + c7*(M-4)) ...
+    #       + maxr3.*(c9 + c10*(M-4)));
+    A12 = 10**(c0 + c1*(Mw-4) + c2*(Mw-4)**2 \
+               + (c3 + c4*(Mw-4))*log10(sqrt(minr1**2 \
+               + (ones(minr1.shape)*(1 + c5*(Mw-4)))**2)) \
+               + maxr2 * (c6 + c7*(Mw-4)) \
+               + maxr3 * (c9 + c10*(Mw-4)))
         
     # TA:
     # AT = 1 ./ model(:,1);
@@ -6155,7 +6131,9 @@ def Allen_2012_distribution(**kwargs):
     # TODO: Is this logic relevant?
 
     log_mean = log10(A12)
-    log_sigma = log10(A12_sigma)
+    
+    # TODO: Confirm the value for sigma
+    log_sigma = tile(s,(1,num_events,1))
     
     return log_mean, log_sigma
     
