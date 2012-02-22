@@ -813,30 +813,24 @@ def _verify_eqrm_flags(eqrm_flags):
         raise AttributeSyntaxError(
             'Cannot spawn on amplification.')
     
-    if eqrm_flags.event_set_handler != 'generate' and eqrm_flags.data_dir is None:
-        raise AttributeSyntaxError(
-            'data_dir be set if event_set_handler is %s.' % eqrm_flags.event_set_handler)
-    
-    if eqrm_flags.event_set_handler != 'generate' and not os.path.exists(eqrm_flags.data_dir):
-        raise AttributeSyntaxError(
-            'data_dir %s must exist if event_set_handler is %s.' % (eqrm_flags.data_dir, 
-                                                                    eqrm_flags.event_set_handler))
-    
     if eqrm_flags.event_set_handler == 'load':
         load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
         if not os.path.exists(load_dir):
             raise AttributeSyntaxError(
                 'data_dir/event_set_name %s must exist if event_set_handler is load.' % load_dir)
     
-    if not os.path.exists(eqrm_flags.output_dir):
+    # Only do these checks if different from output_dir 
+    # (output_dir gets created if not exists
+    if eqrm_flags.data_dir != eqrm_flags.output_dir and \
+            not os.path.exists(eqrm_flags.data_dir):
         raise AttributeSyntaxError(
-                'output_dir %s must exist and be accessible from host %s' % (eqrm_flags.output_dir,
-                                                                             socket.gethostname()))
-        
-    if not os.path.exists(eqrm_flags.data_array_storage):
+            'data_dir %s must exist and be accessible from %s' % (eqrm_flags.data_array_storage,
+                                                                                socket.gethostname()))
+    if eqrm_flags.data_array_storage != eqrm_flags.output_dir and \
+            not os.path.exists(eqrm_flags.data_array_storage):
         raise AttributeSyntaxError(
-                'data_array_storage %s must exist and be accessible from host %s' % (eqrm_flags.data_array_storage,
-                                                                                     socket.gethostname()))
+                'data_array_storage %s must exist and be accessible from %s' % (eqrm_flags.data_array_storage,
+                                                                                socket.gethostname()))
 
   
 def find_set_data_py_files(path):
