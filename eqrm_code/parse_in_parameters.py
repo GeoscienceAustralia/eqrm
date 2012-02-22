@@ -721,8 +721,14 @@ def _att_value_fixes(eqrm_flags):
         eqrm_flags['output_dir'] = eqrm_flags.output_dir+'/'
     if not eqrm_flags.input_dir[-1] == '/':
         eqrm_flags['input_dir'] = eqrm_flags.input_dir+ '/'
+    if not eqrm_flags.data_dir[-1] == '/':
+        eqrm_flags['data_dir'] = eqrm_flags.data_dir+ '/'
+    if not eqrm_flags.data_array_storage[-1] == '/':
+        eqrm_flags['data_array_storage'] = eqrm_flags.data_array_storage+ '/'
     eqrm_flags['output_dir'] = _change_slashes(eqrm_flags.output_dir)
     eqrm_flags['input_dir'] = _change_slashes(eqrm_flags.input_dir)
+    eqrm_flags['data_dir'] = _change_slashes(eqrm_flags.data_dir)
+    eqrm_flags['data_array_storage'] = _change_slashes(eqrm_flags.data_array_storage)
     
     if eqrm_flags.atten_variability_method == None:
         eqrm_flags.atten_spawn_bins = None
