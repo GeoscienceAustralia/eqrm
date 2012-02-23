@@ -11,7 +11,8 @@ from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
      Multiple_ground_motion_calculator
 
 classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
-                          'Toro_1997_midcontinent', 'Sadigh_97',
+                          'Toro_1997_midcontinent', 'Sadigh_97', 
+                          'Sadigh_Original_97',
                           'Youngs_97_interface', 'Youngs_97_intraslab',
                           'Combo_Sadigh_Youngs_M8', 'Boore_08',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
@@ -153,6 +154,31 @@ test_data['Sadigh_97_test_mean'] = [
     ]
 
 test_data['Sadigh_97_test_magnitude'] = [6.0,6.0,7.0]
+
+# ***********************************************************
+
+# ***********************************************************
+
+# Sadigh '97 test data from 
+# Verification of Probabilistic Seismic Hazard Analysis Computer Programs,
+# Thomas, Wong and Abrahamson, 2010
+# Table 3.2
+
+# Mw
+test_data['Sadigh_Original_97_test_magnitude'] =    [6.5, 6.5, 6.5]
+
+# Rrup
+tmp = zeros((1,3))
+tmp[0,:] =                                          [0.0, 10.0, 50.0]
+test_data['Sadigh_Original_97_test_distance'] = tmp
+
+# period
+test_data['Sadigh_Original_97_test_period'] =       [0.0]
+
+# TODO: Is there a bigger set of test data?
+test_data['Sadigh_Original_97_test_mean'] =       [[[0.7717],
+                                                    [0.3123],
+                                                    [0.0497]]]
 
 # ***********************************************************
 
