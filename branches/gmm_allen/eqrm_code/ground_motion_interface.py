@@ -6119,18 +6119,18 @@ def Allen_2012_distribution(**kwargs):
     #       + (ones(size(minr1)).*(1+c5*(M-4))).^2)) ...
     #       + maxr2.*(c6 + c7*(M-4)) ...
     #       + maxr3.*(c9 + c10*(M-4)));
-    A12 = 10**(c0 + c1*(Mw-4) + c2*(Mw-4)**2 \
-               + (c3 + c4*(Mw-4))*log10(sqrt(minr1**2 \
-               + (ones(minr1.shape)*(1 + c5*(Mw-4)))**2)) \
-               + maxr2 * (c6 + c7*(Mw-4)) \
-               + maxr3 * (c9 + c10*(Mw-4)))
+    lnA12 = (c0 + c1*(Mw-4) + c2*(Mw-4)**2 \
+             + (c3 + c4*(Mw-4))*log10(sqrt(minr1**2 \
+             + (ones(minr1.shape)*(1 + c5*(Mw-4)))**2)) \
+             + maxr2 * (c6 + c7*(Mw-4)) \
+             + maxr3 * (c9 + c10*(Mw-4)))/LOG10E
         
     # TA:
     # AT = 1 ./ model(:,1);
     # A12 = [AT A12];
     # TODO: Is this logic relevant?
 
-    log_mean = log10(A12)
+    log_mean = lnA12
     
     # TODO: Confirm the value for sigma
     log_sigma = tile(s,(1,num_events,1))
