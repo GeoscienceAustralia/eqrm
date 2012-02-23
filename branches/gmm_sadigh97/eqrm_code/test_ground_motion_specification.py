@@ -159,26 +159,30 @@ test_data['Sadigh_97_test_magnitude'] = [6.0,6.0,7.0]
 
 # ***********************************************************
 
-# Sadigh '97 test data from 
-# Verification of Probabilistic Seismic Hazard Analysis Computer Programs,
-# Thomas, Wong and Abrahamson, 2010
-# Table 3.2
+# Sadigh '97 test data from the OpenSHA test result set
+# https://source.usc.edu/svn/opensha/trunk
+# \test\org\opensha\sha\imr\attenRelImpl\test\AttenRelResultSetFiles\SADIGH.txt
+# SetParameter("Fault Type") = "Other"
+# SetParameter("Sadigh Site Type") = "Rock"
+#
 
 # Mw
-test_data['Sadigh_Original_97_test_magnitude'] =    [6.5, 6.5, 6.5]
+test_data['Sadigh_Original_97_test_magnitude'] =    [6.0, 6.5, 7.0]
 
 # Rrup
 tmp = zeros((1,3))
-tmp[0,:] =                                          [0.0, 10.0, 50.0]
+tmp[0,:] =                                          [10.0, 10.0, 10.0]
 test_data['Sadigh_Original_97_test_distance'] = tmp
 
 # period
-test_data['Sadigh_Original_97_test_period'] =       [0.0]
+test_data['Sadigh_Original_97_test_period'] =       [0.0, 0.10, 1]
 
 # TODO: Is there a bigger set of test data?
-test_data['Sadigh_Original_97_test_mean'] =       [[[0.7717],
-                                                    [0.3123],
-                                                    [0.0497]]]
+test_data['Sadigh_Original_97_test_mean'] =       [[[0.223793, 0.450355, 0.117692],
+                                                    [0.312275, 0.610350, 0.212184],
+                                                    [0.372536, 0.709483, 0.313197]]]
+
+
 
 # ***********************************************************
 
