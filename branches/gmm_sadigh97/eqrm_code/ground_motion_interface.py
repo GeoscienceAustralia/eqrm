@@ -1335,6 +1335,11 @@ ground_motion_init['Sadigh_97'] = Sadigh_97_args
 
 # Note: zero period acceleration (ZPA) assumed to be 0. 
 
+# Coefficients as per 
+# Appendix C, t. C-8, p. C-15,
+# Evaluation of Earthquake Ground Motions,
+# Idriss et al.,
+# 2007
 # M <= 6.5
 Sadigh_Original_97_model_low = asarray([
     # Period,  C1,    C2, C3,     C4,    C5,      C6,     C7
@@ -1381,9 +1386,32 @@ Sadigh_Original_97_coefficient = concatenate((Sadigh_Original_97_coefficient_low
                                               Sadigh_Original_97_coefficient_high))
 Sadigh_Original_97_coefficient_period = Sadigh_Original_97_coefficient_period_low
 
-# TODO: Sigma coefficients?
-Sadigh_Original_97_sigma_coefficient = zeros(Sadigh_Original_97_coefficient.shape)
-Sadigh_Original_97_sigma_coefficient_period = Sadigh_Original_97_coefficient_period
+# Sigma coefficients as per 
+# Appendix C, t. C-7, p. C-14,
+# Evaluation of Earthquake Ground Motions,
+# Idriss et al.,
+# 2007
+# M < 7.21 -> sigma = coeff - 0.14M
+# M >= 7.12 -> sigma = coeff
+Sadigh_Original_97_sigma_model = asarray([
+    # Period, M < 7.21, M >= 7.21
+    [0,       1.39,     0.38],
+    [0.07,    1.40,     0.39],
+    [0.1,     1.41,     0.40],
+    [0.2,     1.43,     0.42],
+    [0.3,     1.45,     0.44],
+    [0.4,     1.48,     0.47],
+    [0.5,     1.50,     0.49],
+    [0.75,    1.52,     0.51],
+    [1,       1.53,     0.52],
+    [1.5,     1.53,     0.52],
+    [2,       1.53,     0.52],
+    [3,       1.53,     0.52],
+    [4,       1.53,     0.52]
+]).T
+Sadigh_Original_97_sigma_coefficient_period = Sadigh_Original_97_sigma_model[0]
+Sadigh_Original_97_sigma_coefficient = Sadigh_Original_97_sigma_model[1:]
+
 
 # TODO: Are these correct?
 Sadigh_Original_97_uses_Vs30 = False
@@ -1397,13 +1425,13 @@ def Sadigh_Original_97_distribution(**kwargs):
     Equation for ground motion as per 
     Appendix C, eq. [C-17], p. C-14,
     Evaluation of Earthquake Ground Motions,
-    Idriss, Archuleta,
+    Idriss et al.,
     2007
     """
     dist_object = kwargs['dist_object']
     Mw = kwargs['mag']
-    periods = kwargs['periods']
     coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
     
     # Rrup from distance object
     Rrup = dist_object.Rupture
@@ -1440,14 +1468,19 @@ def Sadigh_Original_97_distribution(**kwargs):
     
     c1, c2, c3, c4, c5, c6, c7 = c
     
-    S97 = c1 + \
-          c2*Mw + \
-          c3*((8.5-Mw)**2.5) + \
-          c4*log(Rrup + exp(c5 + c6*Mw)) + \
-          c7*log(Rrup + 2)
+    log_mean = c1 + \
+               c2*Mw + \
+               c3*((8.5-Mw)**2.5) + \
+               c4*log(Rrup + exp(c5 + c6*Mw)) + \
+               c7*log(Rrup + 2)
     
-    log_mean = S97
-    log_sigma = zeros((1, num_events, 1))
+    # Low mag sigma (M < 7.21)
+    s_low = sigma_coefficient[0] - 0.14*Mw
+    
+    # High mag sigma (M >= 7.21)
+    s_high = sigma_coefficient[1]
+    
+    log_sigma = where(Mw >= 7.21, s_high, s_low)
 
     return (log_mean, log_sigma)
 
