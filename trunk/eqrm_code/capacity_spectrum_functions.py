@@ -16,7 +16,8 @@ from scipy import where, exp, pi, newaxis, stats, weave, zeros, log, \
      asarray, array, seterr
 from interp import interp
 
-from eqrm_code import util 
+from eqrm_code import util
+from eqrm_code import weave_converters
 
 class WeaveIOError(exceptions.Exception):
     def __init__(self, errno=None, msg=None):
@@ -338,7 +339,7 @@ def calculate_capacity(surface_displacement,capacity_parameters):
                          ['num_sites','num_events','num_periods',
                           'surface_displacement','capacity',
                           'a','b','c','Du','Dy','Ay'],
-                         type_converters=weave.converters.blitz,
+                         type_converters=weave_converters.eqrm,
                          compiler='gcc')
         except IOError:
             raise WeaveIOError
@@ -360,7 +361,7 @@ def calculate_capacity(surface_displacement,capacity_parameters):
                          ['num_sites','num_events','num_periods',
                           'surface_displacement','capacity',
                           'a','b','c','Du','Dy','Ay'],
-                         type_converters=weave.converters.blitz,
+                         type_converters=weave_converters.eqrm,
                          compiler='gcc')
         except IOError:
             raise WeaveIOError
@@ -488,7 +489,7 @@ def calculate_updated_demand(periods,SA0,SD0,Ra,Rv,Rd,TAV,TVD,
                          ['num_sites','num_events','num_periods',
                           'Ra','Rv','Rd','R','periods',
                           'TAV','TVD'],
-                         type_converters=weave.converters.blitz,
+                         type_converters=weave_converters.eqrm,
                          compiler='gcc')
         except IOError:
             raise WeaveIOError
@@ -508,7 +509,7 @@ def calculate_updated_demand(periods,SA0,SD0,Ra,Rv,Rd,TAV,TVD,
                          ['num_sites','num_events','num_periods',
                           'Ra','Rv','Rd','R','periods',
                           'TAV','TVD'],
-                         type_converters=weave.converters.blitz,
+                         type_converters=weave_converters.eqrm,
                          compiler='gcc')
         except IOError:
             raise WeaveIOError
