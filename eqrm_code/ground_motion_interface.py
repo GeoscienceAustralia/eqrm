@@ -120,6 +120,7 @@ from eqrm_code.ground_motion_misc import linear_interpolation, \
 from eqrm_code import util 
 from eqrm_code import conversions
 from eqrm_code import ground_motion_misc
+from eqrm_code import weave_converters
 
 # Note, this is covering up, in Abrahamson08_distribution, Ztor being 0,
 # causing divide by 0 errors.  It may be covering up other things.
@@ -531,7 +532,7 @@ def Toro_1997_midcontinent_distribution(**kwargs):
                      ['num_sites', 'num_events', 'num_periods',
                       'coefficient', 'sigma_coefficient',
                       'mag', 'log_mean', 'distance', 'log_sigma'],
-                     type_converters=weave.converters.blitz,
+                     type_converters=weave_converters.eqrm,
                      compiler='gcc')   
     except IOError:
         raise util.WeaveIOError 
@@ -939,7 +940,7 @@ def Atkinson_Boore_97_distribution(**kwargs):
                      ['num_sites', 'num_events', 'num_periods',
                       'coefficient', 'sigma_coefficient',
                       'mag', 'log_mean', 'distance', 'log_sigma'],
-                     type_converters=weave.converters.blitz,
+                     type_converters=weave_converters.eqrm,
                      compiler='gcc')     
     except IOError:
         raise util.WeaveIOError 
@@ -1297,7 +1298,7 @@ def Sadigh_97_distribution(**kwargs):
                      ['num_sites', 'num_events', 'num_periods',
                       'coefficient', 'sigma_coefficient',
                       'mag', 'log_mean', 'distance', 'log_sigma'],
-                     type_converters=weave.converters.blitz,
+                     type_converters=weave_converters.eqrm,
                      compiler='gcc')   
     except IOError:
         raise util.WeaveIOError 
