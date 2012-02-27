@@ -18,6 +18,7 @@ from eqrm_code.xml_interface import Xml_Interface
 from eqrm_code.interp import interp
 from eqrm_code.csv_interface import csv2dict
 from eqrm_code import util
+from eqrm_code import weave_converters
 
 class Regolith_amplification_model(object):
     """
@@ -144,7 +145,7 @@ class Regolith_amplification_model(object):
                                   'num_sites','num_events',
                                   'num_periods',
                                   'in_zone'],
-                                 type_converters=weave.converters.blitz,
+                                 type_converters=weave_converters.eqrm,
                                  compiler='gcc')
                 except IOError:
                     raise util.WeaveIOError 
