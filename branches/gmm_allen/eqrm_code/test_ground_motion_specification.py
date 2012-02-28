@@ -1663,11 +1663,32 @@ test_data['Allen_2012_test_accelM35R100D5'] = array([
        [  3.14762354e-02,   3.93308612e-01],
        [  2.50000000e-02,   3.49050096e-01],
        [  1.01010101e-02,   2.27648385e-01]]).T
+       
+test_data['Allen_2012_test_sigma_shallow'] = array([
+       [ 0.35533697,  0.35624902,  0.35704694,  0.35764279,  0.35845709,
+         0.35903936,  0.35960383,  0.36082654,  0.36312035,  0.36584991,
+         0.36863937,  0.37079451,  0.37364418,  0.37600683,  0.3777093 ,
+         0.378327  ,  0.37920497,  0.38020318,  0.38116609,  0.38355871,
+         0.38571442,  0.39112994,  0.39686384,  0.40510136,  0.41515827,
+         0.42695297,  0.43836117,  0.41269879]])
+
+test_data['Allen_2012_test_sigma_deep'] = array([
+       [ 0.3349771 ,  0.33443175,  0.33432986,  0.33387799,  0.33420823,
+         0.33430223,  0.33533873,  0.33655017,  0.33789837,  0.33902168,
+         0.3406606 ,  0.34240618,  0.34414659,  0.34721318,  0.34809836,
+         0.34886661,  0.34981217,  0.35037704,  0.35281502,  0.35564235,
+         0.35967277,  0.36537822,  0.3730547 ,  0.38384394,  0.39650681,
+         0.41076258,  0.42518372,  0.39635169]])
 
 # DB:
 # In each array the first column has the period in seconds and the second has 
 # the corresponding response spectral period in cm/s^2.
-from scipy import log
+
+# Period
+test_data['Allen_2012_test_period'] = \
+    test_data['Allen_2012_test_accelM60R100D5'][0]
+
+# Mean
 tmp = zeros((12, 28)) 
 tmp[0,:] =  test_data['Allen_2012_test_accelM60R100D5'][1]
 tmp[1,:] =  test_data['Allen_2012_test_accelM40R100D5'][1]
@@ -1684,23 +1705,64 @@ tmp[11,:] = test_data['Allen_2012_test_accelM35R100D5'][1]
 test_data['Allen_2012_test_mean'] = tmp
 del tmp
 
-test_data['Allen_2012_test_period'] = \
-    test_data['Allen_2012_test_accelM60R100D5'][0]
+# Sigma
+tmp = zeros((12, 28))
+tmp[0,:] =  test_data['Allen_2012_test_sigma_shallow'] # accelM60R100D5
+tmp[1,:] =  test_data['Allen_2012_test_sigma_shallow'] # accelM40R100D5
+tmp[2,:] =  test_data['Allen_2012_test_sigma_deep']    # accelM35R100D10
+tmp[3,:] =  test_data['Allen_2012_test_sigma_deep']    # accelM35R10D10
+tmp[4,:] =  test_data['Allen_2012_test_sigma_deep']    # accelM40R10D10
+tmp[5,:] =  test_data['Allen_2012_test_sigma_shallow'] # accelM60R10D5
+tmp[6,:] =  test_data['Allen_2012_test_sigma_deep']    # accelM60R100D10
+tmp[7,:] =  test_data['Allen_2012_test_sigma_deep']    # accelM60R10D10
+tmp[8,:] =  test_data['Allen_2012_test_sigma_shallow'] # accelM40R10D5
+tmp[9,:] =  test_data['Allen_2012_test_sigma_deep']    # accelM40R100D10
+tmp[10,:] = test_data['Allen_2012_test_sigma_shallow'] # accelM35R10D5
+tmp[11,:] = test_data['Allen_2012_test_sigma_shallow'] # accelM35R100D5
+test_data['Allen_2012_test_sigma'] = tmp
+del tmp
     
 # Mw
-test_data['Allen_2012_test_magnitude'] = [6.0,   4.0,   3.5,   3.5,   4.0,   6.0,
-                                          6.0,   6.0,   4.0,   4.0,   3.5,   3.5]
+test_data['Allen_2012_test_magnitude'] = [6.0,   # accelM60R100D5
+                                          4.0,   # accelM40R100D5
+                                          3.5,   # accelM35R100D10
+                                          3.5,   # accelM35R10D10
+                                          4.0,   # accelM40R10D10
+                                          6.0,   # accelM60R10D5
+                                          6.0,   # accelM60R100D10
+                                          6.0,   # accelM60R10D10
+                                          4.0,   # accelM40R10D5
+                                          4.0,   # accelM40R100D10
+                                          3.5,   # accelM35R10D5
+                                          3.5]   # accelM35R100D5
 
 # Rrup
-tmp = zeros((1, 12))
-tmp[0,:] =                               [100.0, 100.0, 100.0, 10.0,  10.0,  10.0, 
-                                          100.0, 10.0,  10.0,  100.0, 10.0,  100.0]
-test_data['Allen_2012_test_distance'] = tmp
-del tmp
+test_data['Allen_2012_test_distance'] = [[100.0, # accelM60R100D5
+                                          100.0, # accelM40R100D5
+                                          100.0, # accelM35R100D10
+                                          10.0,  # accelM35R10D10
+                                          10.0,  # accelM40R10D10
+                                          10.0,  # accelM60R10D5
+                                          100.0, # accelM60R100D10
+                                          10.0,  # accelM60R10D10
+                                          10.0,  # accelM40R10D5
+                                          100.0, # accelM40R100D10
+                                          10.0,  # accelM35R10D5
+                                          100.0]]# accelM35R100D5
 
 # Depth
-test_data['Allen_2012_test_depth'] =     [5.0,   5.0,   10.0,  10.0,  10.0,  5.0,
-                                          10.0,  10.0,  5.0,   10.0,  5.0,   5.0]
+test_data['Allen_2012_test_depth'] =     [5.0,   # accelM60R100D5
+                                          5.0,   # accelM40R100D5
+                                          10.0,  # accelM35R100D10
+                                          10.0,  # accelM35R10D10
+                                          10.0,  # accelM40R10D10
+                                          5.0,   # accelM60R10D5
+                                          10.0,  # accelM60R100D10
+                                          10.0,  # accelM60R10D10
+                                          5.0,   # accelM40R10D5
+                                          10.0,  # accelM40R100D10
+                                          5.0,   # accelM35R10D5
+                                          5.0]   # accelM35R100D5
 
 #***************  END ALLEN 2012 MODEL  ***********************
 
