@@ -5841,7 +5841,9 @@ Allen_2012_sigma_deep = array([
 # TA:
 # model = model(1:end-2,:);
 Allen_2012_coeff_deep = Allen_2012_model_deep[0:-2].T[1:]
-Allen_2012_coeff_period_deep = Allen_2012_model_deep[0:-2].T[0]
+# TA:
+# T = 1 ./ model(:,1);
+Allen_2012_coeff_period_deep = 1 / Allen_2012_model_deep[0:-2].T[0]
 
 Allen_2012_model_shallow = array([
        [  1.00000000e-01,  -3.85387450e-01,   9.34207628e-01,
@@ -6006,8 +6008,9 @@ Allen_2012_sigma_shallow = array([
 # TA:
 # model = model(1:end-2,:);
 Allen_2012_coeff_shallow = Allen_2012_model_shallow[0:-2].T[1:]
-
-Allen_2012_coeff_period_shallow = Allen_2012_model_shallow[0:-2].T[0]
+# TA:
+# T = 1 ./ model(:,1);
+Allen_2012_coeff_period_shallow = 1 / Allen_2012_model_shallow[0:-2].T[0]
 
 # Concatenate the deep and shallow coefficients.
 # Allen_2012_distribution decides which indices to use based on the depth passed in
@@ -6044,7 +6047,6 @@ def Allen_2012_distribution(**kwargs):
     dist_object = kwargs['dist_object']
     Mw = kwargs['mag']
     depth = kwargs['depth']
-    periods = kwargs['periods']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     
