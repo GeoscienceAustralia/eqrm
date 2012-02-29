@@ -740,6 +740,10 @@ class Event_Set(file_store.File_Store):
                 args[att] = None
             else:
                 args[att] = getattr(self, att)[key]
+                
+        # Keep the file_store data directory intact
+        args['dir'] = self._dir
+        
         return Event_Set(**args) # FIXME relies on arg/attr name correspondence
    
     def __len__(self):

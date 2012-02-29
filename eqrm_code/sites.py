@@ -33,21 +33,18 @@ import scipy as np
 from eqrm_code.distances import Distances
 from eqrm_code.csv_interface import csv_to_arrays
 from eqrm_code.projections import azimuthal_orthographic as projection
-from eqrm_code import file_store
 
 
-class Sites(file_store.File_Store):
+class Sites(object):
     """An object to hold site data."""
 
-    def __init__(self, latitude, longitude, dir=None, **attributes):
+    def __init__(self, latitude, longitude, **attributes):
         """Create a Sites object to handle multiple site data.
 
         latitude    latitude of sites (vector)
         longitude   longitude of sites (vector)
         attributes  dictionary of site attributes (vectors of data)
         """
-        super(Sites, self).__init__('sites', dir)
-
         self.latitude = asarray(latitude)
         self.longitude = asarray(longitude)
         self.attributes = attributes
@@ -56,21 +53,8 @@ class Sites(file_store.File_Store):
         for key in self.attributes:
             assert(len(self.latitude) == len(self.attributes[key]))
 
-    def __del__(self):
-        super(Sites, self).__del__()
-
-    # PROPERTIES #
-    # Define getters and setters for each attribute to exercise the 
-    # file-based data structure
-    latitude = property(lambda self: self._get_file_array('latitude'), 
-                        lambda self, value: self._set_file_array('latitude', value))
-    
-    longitude = property(lambda self: self._get_file_array('longitude'), 
-                         lambda self, value: self._set_file_array('longitude', value))
-    # END PROPERTIES #
-
     @classmethod
-    def from_csv(cls, file, data_dir=None, **attribute_conversions):
+    def from_csv(cls, file, **attribute_conversions):
         """Construct Site instance from csv file.
 
         file                   open file handle for site data
@@ -99,7 +83,7 @@ class Sites(file_store.File_Store):
         attributes = copy.copy(sites_dict)
 
         # call class constructor
-        return cls(latitude, longitude, data_dir, **attributes)
+        return cls(latitude, longitude, **attributes)
 
     def __len__(self):
         """Make len() return number of sites."""
