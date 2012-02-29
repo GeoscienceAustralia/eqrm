@@ -49,7 +49,6 @@ class Structures(Sites):
                  latitude, 
                  longitude, 
                  building_parameters,
-                 data_dir=None,  
                  **attributes):
         """Create an object holding all Structures data.
 
@@ -62,7 +61,7 @@ class Structures(Sites):
         """
 
         # inherit setup from Sites, add building parameters
-        Sites.__init__(self, latitude, longitude, data_dir, **attributes)
+        Sites.__init__(self, latitude, longitude, **attributes)
         self.building_parameters = building_parameters
 
 
@@ -78,8 +77,7 @@ class Structures(Sites):
                  force_btype_flag=False,
                  determ_btype=None, 
                  determ_buse=None, 
-                 loss_aus_contents=0,
-                 data_dir=None):
+                 loss_aus_contents=0):
         """Read structures data from a file.
         Extract strucuture parameters from building_parameters_table.
 
@@ -177,7 +175,7 @@ class Structures(Sites):
                 rcp['nonstructural acceleration sensitive']
 
         # create structures:
-        return cls(latitude, longitude, building_parameters, data_dir, **attributes)
+        return cls(latitude, longitude, building_parameters, **attributes)
 
 
     def cost_breakdown(self, ci=None):

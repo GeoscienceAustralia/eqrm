@@ -1035,8 +1035,7 @@ def load_data(eqrm_flags):
                 eqrm_flags.buildings_usage_classification,
                 use_refined_btypes=True,
                 force_btype_flag=False,
-                loss_aus_contents=eqrm_flags.loss_aus_contents,
-                data_dir=eqrm_flags.data_array_storage)
+                loss_aus_contents=eqrm_flags.loss_aus_contents)
 
             #FIXME do this after subsampling the sites
             # Hard wires the Demand Curve damping to 5%
@@ -1111,8 +1110,7 @@ def load_data(eqrm_flags):
         sites = Sites.from_csv(name, 
                                SITE_CLASS=str, 
                                VS30=float, 
-                               POPULATION=float,
-                               data_dir=eqrm_flags.data_array_storage)
+                               POPULATION=float)
         # FIXME this is a bit of a hack.  re Vs30 and VS30.
         sites.attributes['Vs30'] = sites.attributes['VS30']
     else:
