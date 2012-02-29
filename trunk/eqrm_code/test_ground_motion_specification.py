@@ -11,7 +11,8 @@ from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
      Multiple_ground_motion_calculator
 
 classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
-                          'Toro_1997_midcontinent', 'Sadigh_97',
+                          'Toro_1997_midcontinent', 'Sadigh_97', 
+                          'Sadigh_Original_97',
                           'Youngs_97_interface', 'Youngs_97_intraslab',
                           'Combo_Sadigh_Youngs_M8', 'Boore_08',
                           'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
@@ -154,6 +155,40 @@ test_data['Sadigh_97_test_mean'] = [
     ]
 
 test_data['Sadigh_97_test_magnitude'] = [6.0,6.0,7.0]
+
+# ***********************************************************
+
+# ***********************************************************
+
+# Sadigh '97 test data from the OpenSHA test result set
+# https://source.usc.edu/svn/opensha/trunk
+# \test\org\opensha\sha\imr\attenRelImpl\test\AttenRelResultSetFiles\SADIGH.txt
+# SetParameter("Fault Type") = "Other"
+# SetParameter("Sadigh Site Type") = "Rock"
+#
+# test_sigma calculated by hand
+#
+
+# Mw
+test_data['Sadigh_Original_97_test_magnitude'] =    [6.0, 6.5, 7.0, 7.5]
+
+# Rrup
+tmp = zeros((1,4))
+tmp[0,:] =                                          [10.0, 10.0, 10.0, 10.0]
+test_data['Sadigh_Original_97_test_distance'] = tmp
+
+# period
+test_data['Sadigh_Original_97_test_period'] =       [0.0, 0.10, 1]
+
+test_data['Sadigh_Original_97_test_mean'] =       [[[0.223793, 0.450355, 0.117692],
+                                                    [0.312275, 0.610350, 0.212184],
+                                                    [0.372536, 0.709483, 0.313197],
+                                                    [0.447629, 0.805460, 0.423117]]]
+
+test_data['Sadigh_Original_97_test_sigma'] =      [[[0.55, 0.57, 0.69],
+                                                    [0.48, 0.50, 0.62],
+                                                    [0.41, 0.43, 0.55],
+                                                    [0.38, 0.40, 0.52]]]
 
 # ***********************************************************
 

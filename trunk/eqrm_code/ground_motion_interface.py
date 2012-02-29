@@ -1332,6 +1332,177 @@ ground_motion_init['Sadigh_97'] = Sadigh_97_args
 
 #***************  End of Sadigh_97 MODEL  ************
 
+#***************  Start of Sadigh_Original_97 MODEL  ************
+
+# Note: zero period acceleration (ZPA) assumed to be 0. 
+
+# Coefficients as per 
+# Appendix C, t. C-8, p. C-15,
+# Evaluation of Earthquake Ground Motions,
+# Idriss et al.,
+# 2007
+# M <= 6.5
+Sadigh_Original_97_model_low = asarray([
+    # Period,  C1,    C2, C3,     C4,    C5,      C6,     C7
+    [0,       -0.624, 1,  0.000, -2.100, 1.29649, 0.250,  0.000],
+    [0.03,    -0.624, 1,  0.000, -2.100, 1.29649, 0.250,  0.000],
+    [0.07,     0.110, 1,  0.006, -2.128, 1.29649, 0.250, -0.082],
+    [0.1,      0.275, 1,  0.006, -2.148, 1.29649, 0.250, -0.041],
+    [0.2,      0.153, 1, -0.004, -2.080, 1.29649, 0.250,  0.000],
+    [0.3,     -0.057, 1, -0.017, -2.028, 1.29649, 0.250,  0.000],
+    [0.4,     -0.298, 1, -0.028, -1.990, 1.29649, 0.250,  0.000],
+    [0.5,     -0.588, 1, -0.040, -1.945, 1.29649, 0.250,  0.000],
+    [0.75,    -1.208, 1, -0.050, -1.865, 1.29649, 0.250,  0.000],
+    [1,       -1.705, 1, -0.055, -1.800, 1.29649, 0.250,  0.000],
+    [1.5,     -2.407, 1, -0.065, -1.725, 1.29649, 0.250,  0.000],
+    [2,       -2.945, 1, -0.070, -1.670, 1.29649, 0.250,  0.000],
+    [3,       -3.700, 1, -0.080, -1.610, 1.29649, 0.250,  0.000],
+    [4,       -4.230, 1, -0.100, -1.570, 1.29649, 0.250,  0.000]
+]).T
+Sadigh_Original_97_coefficient_low = Sadigh_Original_97_model_low[1:]
+Sadigh_Original_97_coefficient_period_low = Sadigh_Original_97_model_low[0]
+
+# M > 6.5
+Sadigh_Original_97_model_high = asarray([
+    # Period,  C1,    C2,   C3,     C4,     C5,      C6,     C7
+    [0,       -1.237, 1.1,  0.000, -2.100, -0.48451, 0.524,  0.000],
+    [0.03,    -1.237, 1.1,  0.000, -2.100, -0.48451, 0.524,  0.000],
+    [0.07,    -0.540, 1.1,  0.006, -2.128, -0.48451, 0.524, -0.082],
+    [0.1,     -0.375, 1.1,  0.006, -2.148, -0.48451, 0.524, -0.041],
+    [0.2,     -0.497, 1.1, -0.004, -2.080, -0.48451, 0.524,  0.000],
+    [0.3,     -0.707, 1.1, -0.017, -2.028, -0.48451, 0.524,  0.000],
+    [0.4,     -0.948, 1.1, -0.028, -1.990, -0.48451, 0.524,  0.000],
+    [0.5,     -1.238, 1.1, -0.040, -1.945, -0.48451, 0.524,  0.000],
+    [0.75,    -1.858, 1.1, -0.050, -1.865, -0.48451, 0.524,  0.000],
+    [1,       -2.355, 1.1, -0.055, -1.800, -0.48451, 0.524,  0.000],
+    [1.5,     -3.057, 1.1, -0.065, -1.725, -0.48451, 0.524,  0.000],
+    [2,       -3.595, 1.1, -0.070, -1.670, -0.48451, 0.524,  0.000],
+    [3,       -4.350, 1.1, -0.080, -1.610, -0.48451, 0.524,  0.000],
+    [4,       -4.880, 1.1, -0.100, -1.570, -0.48451, 0.524,  0.000]
+]).T
+Sadigh_Original_97_coefficient_high = Sadigh_Original_97_model_high[1:]
+Sadigh_Original_97_coefficient_period_high= Sadigh_Original_97_model_high[0]
+
+Sadigh_Original_97_coefficient = concatenate((Sadigh_Original_97_coefficient_low,
+                                              Sadigh_Original_97_coefficient_high))
+Sadigh_Original_97_coefficient_period = Sadigh_Original_97_coefficient_period_low
+
+# Sigma coefficients as per 
+# Appendix C, t. C-7, p. C-14,
+# Evaluation of Earthquake Ground Motions,
+# Idriss et al.,
+# 2007
+# M < 7.21 -> sigma = coeff - 0.14M
+# M >= 7.12 -> sigma = coeff
+Sadigh_Original_97_sigma_model = asarray([
+    # Period, M < 7.21, M >= 7.21
+    [0,       1.39,     0.38],
+    [0.07,    1.40,     0.39],
+    [0.1,     1.41,     0.40],
+    [0.2,     1.43,     0.42],
+    [0.3,     1.45,     0.44],
+    [0.4,     1.48,     0.47],
+    [0.5,     1.50,     0.49],
+    [0.75,    1.52,     0.51],
+    [1,       1.53,     0.52],
+    [1.5,     1.53,     0.52],
+    [2,       1.53,     0.52],
+    [3,       1.53,     0.52],
+    [4,       1.53,     0.52]
+]).T
+Sadigh_Original_97_sigma_coefficient_period = Sadigh_Original_97_sigma_model[0]
+Sadigh_Original_97_sigma_coefficient = Sadigh_Original_97_sigma_model[1:]
+
+
+# TODO: Are these correct?
+Sadigh_Original_97_uses_Vs30 = False
+Sadigh_Original_97_magnitude_type='Mw'
+Sadigh_Original_97_distance_type='Rupture'
+Sadigh_Original_97_interpolation=linear_interpolation
+
+def Sadigh_Original_97_distribution(**kwargs):
+    """
+    Sadigh et al. (1997) distribution.
+    Equation for ground motion as per 
+    Appendix C, eq. [C-17], p. C-14,
+    Evaluation of Earthquake Ground Motions,
+    Idriss et al.,
+    2007
+    """
+    dist_object = kwargs['dist_object']
+    Mw = kwargs['mag']
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
+    
+    # Rrup from distance object
+    Rrup = dist_object.Rupture
+
+    num_sites = Mw.shape[0]
+    num_events = Mw.shape[1]
+    num_periods = coefficient.shape[3]
+
+    # Check we have the right shapes
+    msg = 'Expected %s.shape=%s, got %s'
+
+    assert Mw.shape == (1, num_events, 1), (msg
+               % ('Mw', '(%d,%d,%d)' % (num_sites, num_events, 1),
+                  str(Mw.shape)))
+
+    # ignore first dimension of distances
+    assert Rrup.shape[1:] == (num_events,), (msg
+               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
+
+    assert coefficient.shape == (14, 1, 1, num_periods), (msg
+               % ('coefficient', '(14,1,1,%d)' % num_periods,
+                  str(coefficient.shape)))
+
+    Rrup = dist_object.Rupture[:,:,newaxis]
+    
+    # Low mag coefficients (M <= 6.5)
+    c_low = coefficient[:7]
+    
+    # High mag coefficients (M > 6.5)
+    c_high = coefficient[7:]
+    
+    # Determine coefficients based on mag
+    c = where(Mw > 6.5, c_high, c_low)
+    
+    c1, c2, c3, c4, c5, c6, c7 = c
+    
+    log_mean = c1 + \
+               c2*Mw + \
+               c3*((8.5-Mw)**2.5) + \
+               c4*log(Rrup + exp(c5 + c6*Mw)) + \
+               c7*log(Rrup + 2)
+    
+    # Low mag sigma (M < 7.21)
+    s_low = sigma_coefficient[0] - 0.14*Mw
+    
+    # High mag sigma (M >= 7.21)
+    s_high = sigma_coefficient[1]
+    
+    log_sigma = where(Mw >= 7.21, s_high, s_low)
+
+    return (log_mean, log_sigma)
+
+Sadigh_Original_97_args=[
+    Sadigh_Original_97_distribution,
+    Sadigh_Original_97_magnitude_type,
+    Sadigh_Original_97_distance_type,
+    
+    Sadigh_Original_97_coefficient,
+    Sadigh_Original_97_coefficient_period,
+    Sadigh_Original_97_interpolation,
+    
+    Sadigh_Original_97_sigma_coefficient,
+    Sadigh_Original_97_sigma_coefficient_period,
+    Sadigh_Original_97_interpolation,
+
+    Sadigh_Original_97_uses_Vs30]
+
+ground_motion_init['Sadigh_Original_97'] = Sadigh_Original_97_args
+
+#***************  End of Sadigh_Original_97 MODEL  ************
 
 #***************  Start of Youngs_97 MODEL common block  ************
 
