@@ -2064,7 +2064,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                % (period, ML, R, str(log_sigma), str(log_sigma_expected)))
         self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
                                          rtol=1.0e-4, atol=1.0e-4),
-                                 msg)      
+                                 msg)
         
     def speed_test(self):
         """Tests relative speeds of the weave and pure-python versions of:
