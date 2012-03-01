@@ -5,6 +5,7 @@ A base class that implements file store methods for NumPy arrays
 """
 
 import os
+import sys
 import tempfile
 
 from numpy import save, load
@@ -18,6 +19,8 @@ from numpy.lib.format import open_memmap
 # None       - in memory
 #
 SAVE_METHOD = 'npy'
+if sys.platform == 'win32':
+    SAVE_METHOD = None
 
 class FileStoreException(Exception):
     pass
