@@ -21,10 +21,10 @@ class Dummy:
 class Test_Parse_in_parameters(unittest.TestCase):
     
     def setUp(self):
-        self.inputDir = tempfile.mkdtemp()
-        self.outputDir = tempfile.mkdtemp()
-        self.dataDir = tempfile.mkdtemp()
-        self.dataStoreDir = tempfile.mkdtemp()
+        self.inputDir = tempfile.mkdtemp(prefix="inputDir")
+        self.outputDir = tempfile.mkdtemp(prefix="outputDir")
+        self.dataDir = tempfile.mkdtemp(prefix="dataDir")
+        self.dataStoreDir = tempfile.mkdtemp(prefix="dataStoreDir")
         
     def tearDown(self):
         shutil.rmtree(self.inputDir)
@@ -131,10 +131,11 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.site_tag == 'newc')
         self.failUnless(TPT.site_db_tag == 'fish')
         self.failUnless(allclose(TPT.site_indexes, asarray([2255,11511])))
-        self.failUnless(os.path.abspath(TPT.input_dir) ==
-                        os.path.abspath(self.inputDir))
-        self.failUnless(os.path.abspath(TPT.output_dir) ==
-                        os.path.abspath(self.outputDir))   
+        
+        self.failUnless(os.stat(os.path.abspath(TPT.input_dir)) ==
+                        os.stat(os.path.abspath(self.inputDir)))
+        self.failUnless(os.stat(os.path.abspath(TPT.output_dir)) ==
+                        os.stat(os.path.abspath(self.outputDir)))   
         self.failUnless(allclose(TPT.return_periods, asarray([22,11])))        
         self.failUnless(TPT.grid_flag == 1)
         
@@ -199,12 +200,12 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.atten_model_weights[0] == 0.3)
         self.failUnless(TPT.atten_model_weights[1] == 0.7)
         
-        self.failUnless(os.path.abspath(TPT.data_dir) == 
-                        os.path.abspath(self.dataDir))
+        self.failUnless(os.stat(os.path.abspath(TPT.data_dir)) == 
+                        os.stat(os.path.abspath(self.dataDir)))
         self.failUnless(TPT.event_set_handler == 'generate')
         self.failUnless(TPT.event_set_name == 'test')
-        self.failUnless(os.path.abspath(TPT.data_array_storage) == 
-                        os.path.abspath(self.dataStoreDir))
+        self.failUnless(os.stat(os.path.abspath(TPT.data_array_storage)) == 
+                        os.stat(os.path.abspath(self.dataStoreDir)))
         
         self.failUnless(TPT.file_log_level == 'warning')
         self.failUnless(TPT.console_log_level == 'critical')

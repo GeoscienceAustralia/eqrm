@@ -830,13 +830,14 @@ def _verify_eqrm_flags(eqrm_flags):
     if eqrm_flags.data_dir != eqrm_flags.output_dir and \
             not os.path.exists(eqrm_flags.data_dir):
         raise AttributeSyntaxError(
-            'data_dir %s must exist and be accessible from %s' % (eqrm_flags.data_array_storage,
-                                                                                socket.gethostname()))
+            'data_dir %s must exist and be accessible from %s' % (eqrm_flags.data_dir,
+                                                                  socket.gethostname()))
+        
     if eqrm_flags.data_array_storage != eqrm_flags.output_dir and \
             not os.path.exists(eqrm_flags.data_array_storage):
         raise AttributeSyntaxError(
-                'data_array_storage %s must exist and be accessible from %s' % (eqrm_flags.data_array_storage,
-                                                                                socket.gethostname()))
+            'data_array_storage %s must exist and be accessible from %s' % (eqrm_flags.data_array_storage,
+                                                                            socket.gethostname()))
 
   
 def find_set_data_py_files(path):
@@ -934,7 +935,10 @@ def eqrm_flags_to_control_file(py_file_name, eqrm_flags):
         elif eqrm_flags.has_key(para_dic['new_para']):
             line = [para_dic['new_para']]
             val = eqrm_flags[para_dic['new_para']]
-            if line[0] == 'input_dir' or line[0] == 'output_dir':
+            if line[0] in ['input_dir',
+                           'output_dir',
+                           'data_dir',
+                           'data_array_storage']:
                 if not 'join' in val:
                     val = convert_path_string_to_join(val)
             line.append(val)
