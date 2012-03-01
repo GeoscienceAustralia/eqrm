@@ -10,19 +10,32 @@ from eqrm_code.ground_motion_misc import \
 from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
      Multiple_ground_motion_calculator
 
-classes_with_test_data = ('Allen','AllenSEA06','Gaull_1990_WA',
-                          'Toro_1997_midcontinent', 'Sadigh_97', 
-                          'Sadigh_Original_97',
-                          'Youngs_97_interface', 'Youngs_97_intraslab',
-                          'Combo_Sadigh_Youngs_M8', 'Boore_08',
-                          'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic',
-                          'Liang_2008', 'Atkinson06_hard_bedrock',
-                          'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock',
-                          'Abrahamson08', 'Campbell03', 'Chiou08', 'Campbell08',
-                          'Akkar_2010_crustal', 'Zhao_2006_interface',
-                          'Atkinson_2003_intraslab', 'Atkinson_2003_interface',
-                          'Zhao_2006_intraslab', 'Abrahamson_Silva_1997',
-                          'Allen_2012')
+classes_with_test_data = ('Abrahamson08', 
+                          'Abrahamson_Silva_1997', 
+                          'Akkar_2010_crustal', 
+                          'Allen', 
+                          'Allen_2012', 
+                          'Atkinson06_bc_boundary_bedrock', 
+                          'Atkinson06_hard_bedrock', 
+                          'Atkinson06_soil', 
+                          'Atkinson_2003_interface', 
+                          'Atkinson_2003_intraslab', 
+                          'Boore_08', 
+                          'Campbell03', 
+                          'Campbell08', 
+                          'Chiou08', 
+                          'Combo_Sadigh_Youngs_M8', 
+                          'Gaull_1990_WA', 
+                          'Liang_2008', 
+                          'Sadigh_97', 
+                          'Sadigh_Original_97', 
+                          'Somerville09_Non_Cratonic', 
+                          'Somerville09_Yilgarn', 
+                          'Toro_1997_midcontinent', 
+                          'Youngs_97_interface', 
+                          'Youngs_97_intraslab', 
+                          'Zhao_2006_interface', 
+                          'Zhao_2006_intraslab')
 
 # Atkinson_Boore_97 is out.  It has no test data.
 
@@ -401,45 +414,6 @@ test_data['Combo_Sadigh_Youngs_M8_trimmed_test_mean'] = [
 
 test_data['Combo_Sadigh_Youngs_M8_trimmed_test_magnitude'] = [6.5]
 test_data['Combo_Sadigh_Youngs_M8_trimmed_test_depth'] = [10.0]
-
-# ***********************************************************
-
-
-test_data['AllenSEA06_test_period'] = [
-    0.0000E+00,2.5000E-02,3.1500E-02,3.9600E-02,4.9900E-02,6.2900E-02,
-           7.9100E-02,9.9600E-02,1.2550E-01,1.5800E-01,1.9880E-01,2.5060E-01,
-           3.1550E-01,3.9680E-01,5.0000E-01,6.2890E-01,7.9370E-01,1.0000E+00,
-           1.2500E+00,1.5870E+00,2.0000E+00,2.5000E+00,3.1250E+00,4.0000E+00,
-           5.0000E+00,6.2500E+00,7.6920E+00,1.0000E+01]
-
-test_data['AllenSEA06_test_distance'] = [9,14,21.0]
-
-test_data['AllenSEA06_test_mean'] = array([
-    [1.9085E-01,2.8322E-01,3.3223E-01,3.8110E-01,
-     4.2045E-01,4.3670E-01,4.3483E-01,4.1459E-01,
-     3.7654E-01,3.3145E-01,2.8550E-01,2.3414E-01,
-     1.8471E-01,1.3908E-01,1.0155E-01,7.0559E-02,
-     4.6963E-02,3.0169E-02,1.9345E-02,1.2098E-02,
-     7.3549E-03,4.4177E-03,2.6241E-03,1.5683E-03,
-     9.2787E-04,5.6127E-04,3.4052E-04,2.0889E-04],
-    [9.6752E-02,1.3946E-01,1.6316E-01,1.8794E-01,
-     2.0926E-01,2.1961E-01,2.2178E-01,2.1435E-01,
-     1.9805E-01,1.7847E-01,1.5664E-01,1.3041E-01,
-     1.0413E-01,7.9163E-02,5.8426E-02,4.1004E-02,
-     2.7482E-02,1.7674E-02,1.1320E-02,7.0665E-03,
-     4.2918E-03,2.5689E-03,1.5203E-03,9.0654E-04,
-     5.3461E-04,3.2263E-04,1.9514E-04,1.1944E-04],
-    [5.0838E-02,7.0389E-02,8.1847E-02,9.4674E-02,
-     1.0654E-01,1.1362E-01,1.1680E-01,1.1483E-01,
-     1.0841E-01,1.0042E-01,9.0105E-02,7.6499E-02,
-     6.2215E-02,4.7997E-02,3.5791E-02,2.5390E-02,
-     1.7166E-02,1.1080E-02,7.0935E-03,4.4272E-03,
-     2.6890E-03,1.6056E-03,9.4663E-04,5.6245E-04,
-     3.3037E-04,1.9872E-04,1.1973E-04,7.3048E-05]])
-test_data['AllenSEA06_test_mean'] = \
-                                  test_data['AllenSEA06_test_mean'] \
-                                  [:,newaxis,:]
-test_data['AllenSEA06_test_magnitude'] = [5.4]
 
 
 # ***********************************************************

@@ -35,7 +35,7 @@ event_control_tag = "use"
 prob_number_of_events_in_zones = [1, 2, 1, 0, 0, 0]
 
 # Attenuation
-atten_models = ['Allen', 'AllenSEA06', 'Gaull_1990_WA', 'Toro_1997_midcontinent', 'Sadigh_97', 'Youngs_97_interface', 'Youngs_97_intraslab', 'Combo_Sadigh_Youngs_M8', 'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic', 'Chiou08', 'Campbell08', 'Liang_2008', 'Campbell03', 'Atkinson06_hard_bedrock', 'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock', 'Zhao_2006_intraslab', 'Atkinson_2003_interface', 'Akkar_2010_crustal', 'Zhao_2006_interface', 'Atkinson_2003_intraslab']
+atten_models = ['Allen', 'Allen_2012', 'Gaull_1990_WA', 'Toro_1997_midcontinent', 'Sadigh_97', 'Youngs_97_interface', 'Youngs_97_intraslab', 'Combo_Sadigh_Youngs_M8', 'Somerville09_Yilgarn', 'Somerville09_Non_Cratonic', 'Chiou08', 'Campbell08', 'Liang_2008', 'Campbell03', 'Atkinson06_hard_bedrock', 'Atkinson06_soil', 'Atkinson06_bc_boundary_bedrock', 'Zhao_2006_intraslab', 'Atkinson_2003_interface', 'Akkar_2010_crustal', 'Zhao_2006_interface', 'Atkinson_2003_intraslab']
 atten_model_weights = [0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456, 0.045454545454545456]
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = None
