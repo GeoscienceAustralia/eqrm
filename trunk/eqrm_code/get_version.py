@@ -15,6 +15,7 @@ import sys
 import commands
 from os.path import join
 import tempfile
+from xml.dom import minidom
 
 from eqrm_code.eqrm_filesystem import eqrm_path
 
@@ -51,19 +52,9 @@ def get_version():
     return version, date, modified
 
 def get_version_sandpit_linux():
-    """
-    #FIXME: This only gives the most recent version info in the current dir
-    """
-    output = commands.getoutput('svnversion')
-    print "*******" + str(output) + "**********"
-    splitoutput = output.split(":")
-    #print "splitoutput", splitoutput
-    #if splitoutput[0][-1:] == "M":
-    #    splitoutput[0] = splitoutput[0][:-1]
-    version = splitoutput[0]
+    version, date, _ = get_svn_revision_sandpit_linux()
+    print "*******" + str(version) + "**********"
     
-    
-    date = None
     modified = None
     return version, date, modified
 
@@ -74,7 +65,8 @@ def get_svn_revision_sandpit_linux(path=None):
     Based on method used in django 
     (https://code.djangoproject.com/browser/django/trunk/django/utils/version.py)
     """
-    rev = None
+    commit = "exported"
+    date = None
     url = None
     
     if path is None:
@@ -82,19 +74,14 @@ def get_svn_revision_sandpit_linux(path=None):
     
     # Determine whether the path has svn info, then read from the info xml 
     entries_path = '%s/.svn/entries' % path
-    try:
-        entries = open(entries_path, 'r').read()
+    if os.path.exists(entries_path):
         info_xml = os.popen('svn info --xml %s' % path)
-    except IOError:
-        pass
-    else:
-        from xml.dom import minidom
         dom = minidom.parse(info_xml)
-        rev = dom.getElementsByTagName('entry')[0].getAttribute('revision')
         url = dom.getElementsByTagName('url')[0].firstChild.toxml()
         commit = dom.getElementsByTagName('commit')[0].getAttribute('revision')
+        date = dom.getElementsByTagName('date')[0].firstChild.toxml()
         
-    return rev, commit, url
+    return commit, date, url
 
 def get_version_sandpit_windows():
     """

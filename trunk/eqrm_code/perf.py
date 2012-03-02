@@ -69,7 +69,7 @@ def stats(func):
         if os.path.exists(log.log_filename):
         
             # Subversion revision
-            revision, commit, url = get_svn_revision_sandpit_linux()
+            commit, _, url = get_svn_revision_sandpit_linux()
             #print "STATS %s(%s) SVN version=%s date=%s modified=%s" % (func.__name__, str(*args), version, date, modified)
             
             # hostname from socket library
