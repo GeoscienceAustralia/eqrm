@@ -145,6 +145,7 @@ class Event_Set(file_store.File_Store):
         else:
             self.event_id = event_id
         self.check_arguments()
+        
 
     def __del__(self):
         super(Event_Set, self).__del__()
@@ -247,11 +248,22 @@ class Event_Set(file_store.File_Store):
         return event_set
 
     @classmethod
-    def create(cls, rupture_centroid_lat, rupture_centroid_lon, azimuth,
-               dip=None, ML=None, Mw=None, depth=None, fault_width=None,
+    def create(cls, 
+               rupture_centroid_lat, 
+               rupture_centroid_lon, 
+               azimuth,
+               dip=None, 
+               ML=None, 
+               Mw=None, 
+               depth=None, 
+               fault_width=None,
                depth_top_seismogenic=None, # Need for generate synthetic events
                depth_bottom_seismogenic=None,
-               fault_type=None,area=None, width=None, length=None):
+               fault_type=None,
+               area=None, 
+               width=None, 
+               length=None,
+               dir=None):
         """generate a scenario event set or a synthetic event set.
         Args:
           rupture_centroid_lat: Latitude of rupture centriod
@@ -385,7 +397,8 @@ class Event_Set(file_store.File_Store):
                         rupture_centroid_x,
                         rupture_centroid_y,
                         rupture_centroid_lat,
-                        rupture_centroid_lon)
+                        rupture_centroid_lon,
+                        dir=dir)
         return event_set
     
     
@@ -402,7 +415,8 @@ class Event_Set(file_store.File_Store):
                                depth_top_seismogenic=None, 
                                depth_bottom_seismogenic=None,
                                width=None,
-                               length=None):
+                               length=None,
+                               store_dir=None):
         
         __len__ = '__len__'
         if scenario_number_of_events > 1:
@@ -463,14 +477,17 @@ class Event_Set(file_store.File_Store):
                                  depth_bottom_seismogenic=
                                  depth_bottom_seismogenic,
                                  width=width,
-                                 length=length)
+                                 length=length,
+                                 dir=store_dir)
         return event
         
 
     @classmethod
-    def generate_synthetic_events(cls, fid_genpolys,
+    def generate_synthetic_events(cls, 
+                                  fid_genpolys,
                                   source_model,
-                                  prob_number_of_events_in_zones=None):
+                                  prob_number_of_events_in_zones=None,
+                                  store_dir=None):
         """Randomly generate the event_set parameters.
 
         Note: The rupture centroid are within the polygons.  The trace
@@ -630,7 +647,8 @@ class Event_Set(file_store.File_Store):
                                  depth_bottom_seismogenic=depth_bottom_seismogenic,
                                  fault_width=fault_width,
                                  area=area,
-                                 width=width)
+                                 width=width,
+                                 dir=store_dir)
         event.source_zone_id = asarray(source_zone_id)
         eqrmlog.debug('Memory: finished generating events')
         eqrmlog.resource_usage()
@@ -815,8 +833,10 @@ def _add_sources(source_model_zone, source_model_fault,
     
     return mergedSourceMod
     
-def generate_synthetic_events_fault(fault_xml_file, event_control_file,
-                                    prob_number_of_events_in_faults=None):
+def generate_synthetic_events_fault(fault_xml_file, 
+                                    event_control_file,
+                                    prob_number_of_events_in_faults=None,
+                                    store_dir=None):
     """Create Source objects from XML files for faults and events.
 
     fault_xml_file                   path to the FSG XML file
@@ -1107,7 +1127,8 @@ def generate_synthetic_events_fault(fault_xml_file, event_control_file,
                         rupture_centroid_x,
                         rupture_centroid_y,
                         rupture_centroid_lat,
-                        rupture_centroid_lon)
+                        rupture_centroid_lon,
+                        dir=store_dir)
 
     event.source_zone_id = asarray(source_zone_id)
     
@@ -1338,7 +1359,8 @@ def generate_event_set(parallel, eqrm_flags):
             fault_width=eqrm_flags.max_width,
             scenario_number_of_events=eqrm_flags.scenario_number_of_events,
             length=eqrm_flags.scenario_length,
-            width=eqrm_flags.scenario_width)
+            width=eqrm_flags.scenario_width,
+            store_dir=eqrm_flags.data_array_storage)
         # Other rupture parameters are calculated by event_set object.
         # trace start is calculated from centroid and azimuth.
         # Rupture area, length, and width are calculated from Mw
@@ -1391,7 +1413,8 @@ def generate_event_set(parallel, eqrm_flags):
                 fid_genpolys=fid_sourcepolys,
                 source_model=source_model_zone,
                 prob_number_of_events_in_zones=\
-                eqrm_flags.prob_number_of_events_in_zones)
+                eqrm_flags.prob_number_of_events_in_zones,
+                store_dir=eqrm_flags.data_array_storage)
 
             log.debug('Memory: event_set_zone created')
             log.resource_usage()
@@ -1415,7 +1438,8 @@ def generate_event_set(parallel, eqrm_flags):
             event_set_fault, source_model_fault = generate_synthetic_events_fault(
                 fid_sourcefaults, 
                 fid_event_types.name,
-                eqrm_flags.prob_number_of_events_in_faults)
+                eqrm_flags.prob_number_of_events_in_faults,
+                store_dir=eqrm_flags.data_array_storage)
             
         else:
             event_set_fault = None
