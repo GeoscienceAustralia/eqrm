@@ -42,6 +42,8 @@ from projections import azimuthal_orthographic_ll_to_xy as ll2xy
 # constant used to convert degrees to radians: rad = deg * DegreesToRadians
 DegreesToRadians = pi / 180.0
 
+# DISTANCE_LIMIT = 0.000001
+DISTANCE_LIMIT = 1.0
 
 def Hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
                 widths, dips, depths, projection, trace_start_lat,
@@ -179,7 +181,8 @@ def Mendez_Rupture_xy(cos_dip, sin_dip, lengths, widths, depths, x0, y0, x, y):
     z_closest = where(ylo, (depths-widths*sin_dip/2), z_closest) 
     
     rupture_distance = sqrt((x_closest- x)**2+(y_closest-y)**2+(z_closest-z)**2)
-    return where(rupture_distance<1, 1, rupture_distance)
+    return where(rupture_distance < DISTANCE_LIMIT,
+                 DISTANCE_LIMIT, rupture_distance)
 
 def Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths):
     y_rup = y*cos_dip - depths*sin_dip
@@ -210,7 +213,8 @@ def Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths):
     y = y - w
     
     rupture_distance = sqrt(x*x + y*y + z*z)
-    return where(rupture_distance < 1, 1, rupture_distance)
+    return where(rupture_distance < DISTANCE_LIMIT,
+                 DISTANCE_LIMIT, rupture_distance)
 
 def Joyner_Boore(lat_sites, lon_sites, lat_events, lon_events, lengths,
                  azimuths, widths, dips, depths, projection, trace_start_lat,
@@ -259,7 +263,8 @@ def Joyner_Boore(lat_sites, lon_sites, lat_events, lon_events, lengths,
     y = y-w
     
     joyner_boore_distance = sqrt(x*x + y*y)
-    return where(joyner_boore_distance < 1, 1.0, joyner_boore_distance)
+    return where(joyner_boore_distance < DISTANCE_LIMIT,
+                 DISTANCE_LIMIT, joyner_boore_distance)
 
 def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
                azimuths, widths, dips, depths, projection, trace_start_lat,
@@ -299,7 +304,8 @@ def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
                     trace_start_lon, azimuths)
 
     # limit distance to 1.0km minimum
-    return where(abs(Rx) < 1.0, sign(Rx)*1.0, Rx)
+    return where(abs(Rx) < DISTANCE_LIMIT, 
+                 sign(Rx) * DISTANCE_LIMIT, Rx)
 
 ###################
 # END OF FUNCTIONS#

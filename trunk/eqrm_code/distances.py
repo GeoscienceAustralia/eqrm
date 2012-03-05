@@ -19,6 +19,9 @@ from scipy import array
 
 from distance_functions import distance_functions
 
+#def distance_limit(distance):
+ #   """ Given an array of distances, set a lower limit.
+  #  """
 
 class Distances(object):
     def __init__(self, site_latitude, site_longitude, rupture_centroids_lat,

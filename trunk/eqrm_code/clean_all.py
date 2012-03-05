@@ -12,7 +12,6 @@ Note: Recompile ANUGA after running this script
 """
 
 import os
-import tempfile
 
 from eqrm_code import util
 
