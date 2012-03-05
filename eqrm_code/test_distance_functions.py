@@ -170,14 +170,15 @@ class Test_Distance_functions(unittest.TestCase):
         projection = None
 
         # define expected Rx values
-        expected_Rx = asarray([[+km_per_degree],	# 1 deg E, 0 deg N of start
-                               [+km_per_degree],	# 1 deg E, 1 deg S of start
-                               [ 0.0],			# 0 deg E, 1 deg S of start
-                               [-km_per_degree],	# 1 deg W, 1 deg S of start
-                               [-km_per_degree],	# 1 deg W, 0 deg N of start
-                               [-km_per_degree],	# 1 deg W, 1 deg N of start
-                               [ 0.0],			# 0 deg E, 1 deg N of start
-                               [+km_per_degree]])	# 1 deg E, 1 deg N of start
+        expected_Rx = asarray(
+            [[+km_per_degree],	# 1 deg E, 0 deg N of start
+             [+km_per_degree],	# 1 deg E, 1 deg S of start
+             [ 0.0],			# 0 deg E, 1 deg S of start
+             [-km_per_degree],	# 1 deg W, 1 deg S of start
+             [-km_per_degree],	# 1 deg W, 0 deg N of start
+             [-km_per_degree],	# 1 deg W, 1 deg N of start
+             [ 0.0],			# 0 deg E, 1 deg N of start
+             [+km_per_degree]])	# 1 deg E, 1 deg N of start
                              
 
         Rx = Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
