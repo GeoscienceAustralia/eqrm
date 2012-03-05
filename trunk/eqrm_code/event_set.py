@@ -1366,7 +1366,8 @@ def generate_event_set(parallel, eqrm_flags):
         # Rupture area, length, and width are calculated from Mw
         # using Wells and Coppersmith 94 (modified so rupture
         # width is less than fault_width).
-        event_activity = Event_Activity(len(event_set))
+        event_activity = Event_Activity(num_events=len(event_set), 
+                                        dir=eqrm_flags.data_array_storage)
         event_activity.set_scenario_event_activity()
         event_set.scenario_setup()
         source_model = Source_Model.create_scenario_source_model(
@@ -1463,7 +1464,8 @@ def generate_event_set(parallel, eqrm_flags):
                 
         
         # event activity is calculated
-        event_activity = Event_Activity(len(event_set))
+        event_activity = Event_Activity(num_events=len(event_set), 
+                                        dir=eqrm_flags.data_array_storage)
         source_model.calculate_recurrence(
             event_set,
             event_activity)
