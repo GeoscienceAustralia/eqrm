@@ -13,6 +13,8 @@ from eqrm_code.polygon import *
 
 from eqrm_code.polygon import point_on_line
 
+from eqrm_code import perf
+
 def test_function(x, y):
     return x+y
 
@@ -39,7 +41,7 @@ class Test_Polygon(unittest.TestCase):
             else:
                 import polygon_ext
 
-
+    @perf.benchmark
     def test_point_on_line(self):
         
 	#Endpoints first
@@ -65,7 +67,7 @@ class Test_Polygon(unittest.TestCase):
 
 
 
-
+    @perf.benchmark
     def test_is_inside_polygon_main(self):
 
 
@@ -89,7 +91,7 @@ class Test_Polygon(unittest.TestCase):
 	assert not is_inside_polygon( (0.5, 0.), polygon, closed=False)
 	assert not is_inside_polygon( (1., 0.5), polygon, closed=False)
 
-
+    @perf.benchmark
     def test_inside_polygon_main(self):
 
         #Simplest case: Polygon is the unit square
@@ -162,7 +164,7 @@ class Test_Polygon(unittest.TestCase):
         assert not is_inside_polygon( (0.5, 0.5), polygon )
 
 
-
+    @perf.benchmark
     def test_duplicate_points_being_ok(self):
 
 
@@ -193,7 +195,7 @@ class Test_Polygon(unittest.TestCase):
 	assert len(res) == 0
 
         
-
+    @perf.benchmark
     def test_inside_polygon_vector_version(self):
 	#Now try the vector formulation returning indices
         polygon = [[0,0], [1,0], [0.5,-1], [2, -1], [2,1], [0,1]]
@@ -202,6 +204,7 @@ class Test_Polygon(unittest.TestCase):
 
 	assert allclose( res, [0,1,2] )
 
+    @perf.benchmark
     def test_outside_polygon(self):
         U = [[0,0], [1,0], [1,1], [0,1]] #Unit square    
 
@@ -229,6 +232,7 @@ class Test_Polygon(unittest.TestCase):
 
 	assert allclose( res, [0, 4, 5] )        
      
+    @perf.benchmark
     def test_outside_polygon2(self):
         U = [[0,0], [1,0], [1,1], [0,1]] #Unit square    
    
@@ -238,6 +242,7 @@ class Test_Polygon(unittest.TestCase):
         assert is_outside_polygon( [0.5, 1.0], U, closed = False )
         #evaluate to True as the point 0.5, 1.0 is outside the unit square
 
+    @perf.benchmark
     def test_all_outside_polygon(self):
         """Test case where all points are outside poly
         """
@@ -258,7 +263,7 @@ class Test_Polygon(unittest.TestCase):
         indices = inside_polygon(points, U, closed = True)
         assert allclose(indices, [])                
 
-
+    @perf.benchmark
     def test_all_inside_polygon(self):
         """Test case where all points are inside poly
         """
@@ -278,7 +283,7 @@ class Test_Polygon(unittest.TestCase):
         indices = inside_polygon(points, U, closed = True)
         assert allclose(indices, [0,1,2])
         
-
+    @perf.benchmark
     def test_separate_points_by_polygon(self):
         U = [[0,0], [1,0], [1,1], [0,1]] #Unit square    
 
@@ -302,6 +307,7 @@ class Test_Polygon(unittest.TestCase):
 	assert allclose( res, [1,2,3,5,4,0] )        
      	assert count == 3
 	
+    @perf.benchmark
     def test_populate_geo_coord_polygon(self):
         # Checks that the Y distance between points gets larger as the latitude 
         # gets larger.
@@ -343,6 +349,8 @@ class Test_Polygon(unittest.TestCase):
         assert len(points) == 5
         for point in points:
             assert is_inside_polygon(point, polygon)
+            
+    @perf.benchmark
     def test_populate_geo_coord_polygon_with_exclude(self):
         
 
@@ -414,6 +422,7 @@ class Test_Polygon(unittest.TestCase):
         
         assert abs(pointsRatio - areaRatio) < 0.2
 
+    @perf.benchmark
     def test_populate_polygon(self):
 
         polygon = [[0,0], [1,0], [1,1], [0,1]]
@@ -433,7 +442,7 @@ class Test_Polygon(unittest.TestCase):
         for point in points:
             assert is_inside_polygon(point, polygon)
 
-
+    @perf.benchmark
     def test_populate_polygon_with_exclude(self):
         
 
@@ -481,7 +490,7 @@ class Test_Polygon(unittest.TestCase):
             assert is_inside_polygon(point, polygon)
             assert not is_inside_polygon(point, ex_poly), '%s' %str(point)                        
 
-
+    @perf.benchmark
     def test_populate_polygon_with_exclude2(self):
         
 
@@ -522,6 +531,7 @@ class Test_Polygon(unittest.TestCase):
             assert is_inside_polygon(point, polygon)
             assert not is_inside_polygon(point, ex_poly), '%s' %str(point)                        
 
+    @perf.benchmark
     def test_point_in_polygon(self):
         polygon = [[0,0], [1,0], [1,1], [0,1]]
         point = point_in_polygon(polygon)
@@ -549,6 +559,7 @@ class Test_Polygon(unittest.TestCase):
         point = point_in_polygon(polygon)
         assert is_inside_polygon(point, polygon)
 
+    @perf.benchmark
     def test_in_and_outside_polygon_main(self):
 
 
@@ -622,6 +633,7 @@ class Test_Polygon(unittest.TestCase):
 	assert len(res) == 2
 	assert allclose(res, [0,1])
 
+    @perf.benchmark
     def test_polygon_area(self):
 
         #Simplest case: Polygon is the unit square
@@ -640,6 +652,7 @@ class Test_Polygon(unittest.TestCase):
         polygon = [[0,0], [1,1], [2,0], [1, -1]]
 	assert polygon_area(polygon) == 2.0
 
+    @perf.benchmark
     def test_poly_xy(self):
  
         #Simplest case: Polygon is the unit square

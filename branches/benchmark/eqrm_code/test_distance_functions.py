@@ -11,6 +11,8 @@ from eqrm_code.projections import (azimuthal_orthographic,
 from eqrm_code.sites import Sites
 from eqrm_code.distances import Distances
 
+from eqrm_code import perf
+
 #site=Sites(None,None)
 projection=azimuthal_orthographic
 
@@ -21,6 +23,8 @@ dips = 10.0
 depths=0.0
 
 class Test_Distance_functions(unittest.TestCase):
+    
+    @perf.benchmark
     def test_Epicentral(self):
         dist = Distances(None,None,None,None,None,None,None,None,None,None)
         
@@ -50,6 +54,7 @@ class Test_Distance_functions(unittest.TestCase):
         assert allclose(d,distance,rtol=0.001)
         assert allclose(d,d2)
 
+    @perf.benchmark
     def test_Epicentral2(self):
         dist = Distances(None,None,None,None,None,None,None,None,None,None)
         
@@ -74,7 +79,7 @@ class Test_Distance_functions(unittest.TestCase):
 
         assert allclose(d,distance,rtol=0.1)
 
-
+    @perf.benchmark
     def test_mendez_distances(self):
         dist = Distances(None,None,None,None,None,None,None,None,None,None)
         
@@ -102,6 +107,7 @@ class Test_Distance_functions(unittest.TestCase):
 
         assert allclose(distance1,distance2)
         
+    @perf.benchmark
     def test_Hypocentral(self):
         dist = Distances(None,None,None,None,None,None,None,None,None,None)
         
@@ -141,6 +147,7 @@ class Test_Distance_functions(unittest.TestCase):
         D = 1.852*60*180/pi*arccos(sin(L1)*sin(L2)+cos(L1)*cos(L2)*cos(DG))
         return D
 
+    @perf.benchmark
     def test_Horizontal(self):
         # calculate length of 1 degree of great circle
         R = 6367.0		# Earth radius (km)

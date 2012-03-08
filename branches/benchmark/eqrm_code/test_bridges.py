@@ -12,6 +12,8 @@ import pprint
 
 import bridges
 
+from eqrm_code import perf
+
 
 class Test_Bridges(unittest.TestCase):
 
@@ -88,6 +90,7 @@ class Test_Bridges(unittest.TestCase):
 
         os.remove(self.file_name)
 
+    @perf.benchmark
     def test_load(self):
         """Test initial load of Bridges object."""
 
@@ -127,6 +130,7 @@ class Test_Bridges(unittest.TestCase):
                    % (str(att), str(act)))
             self.failUnlessEqual(att, act, msg)
 
+    @perf.benchmark
     def test_get_item(self):
         """Test the __getitem__() method of Bridges object."""
 

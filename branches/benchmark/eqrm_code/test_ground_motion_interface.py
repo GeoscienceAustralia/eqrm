@@ -7,6 +7,8 @@ from eqrm_code.ground_motion_specification import Ground_motion_specification
 from eqrm_code.ground_motion_interface import *
 import numpy
 
+from eqrm_code import perf
+
 class Test_ground_motion_interface(unittest.TestCase):
     def setUp(self):
         pass
@@ -14,6 +16,7 @@ class Test_ground_motion_interface(unittest.TestCase):
     def tearDown(self):
         pass
   
+    @perf.benchmark
     def test_Allen_interpolation(self):
         new_period = [0.45]
         model_name = 'Allen'
@@ -44,7 +47,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         #print "result[0][0]", result[0][0]
         self.failUnless(calc_sigma_coefficient == result[0][0], 'Failed')
         
-        
+    @perf.benchmark
     def test_Gaull_1990_WA_distribution(self):
         model_name = 'Gaull_1990_WA'
         model = Ground_motion_specification(model_name)
@@ -70,8 +73,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         # log_mean=100-20+21=101
         self.failUnless(101.0==log_mean,
                         'Model incorrect.')
-        
 
+    @perf.benchmark
     def test_Youngs_97_distribution(self):
         model_name='Youngs_97_interface'
         model=Ground_motion_specification(model_name)
@@ -110,7 +113,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.failUnless(42.76599206==(round(log_mean,8)),
                         'Model incorrect.')
 
-
+    @perf.benchmark
     def test_Sadigh_97_distribution(self):
         model_name='Sadigh_97'
         model=Ground_motion_specification(model_name)
@@ -155,6 +158,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.failUnless(sigma_1==log_sigma, 'Model incorrect.')
         self.assert_(allclose(log_mean_calc, log_mean))
 
+    @perf.benchmark
     def test_Toro_1997_midcontinent_distribution(self):
         
         model_name = 'Toro_1997_midcontinent'
@@ -204,6 +208,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.assert_(allclose(actual, log_mean[0][0][0]))
         self.assert_(allclose(actual, log_mean_p[0][0][0]))
         
+    @perf.benchmark
     def test_Atkinson_Boore_97_distribution(self):
         
         model_name='Atkinson_Boore_97'
@@ -242,6 +247,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.assert_(allclose(actual, log_mean_p[0][0][0]))
         self.assert_(allclose(actual, log_mean[0][0][0]))
 
+    @perf.benchmark
     def test_Boore_08_distribution_subfunctions(self):
         
         model_name='Boore_08'
@@ -350,7 +356,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         fs = fs_Boore_08(blin, pga4nl, bnl_local, Vs30_local)     
         self.assert_(allclose(fs_actual, fs))
 
-        
+    @perf.benchmark
     def test_Boore_08_distribution(self):
         
         model_name='Boore_08'
@@ -412,7 +418,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.assert_(allclose(log_mean_actual, log_mean[0][0][0]))
         self.assert_(allclose(sigtu, log_sigma[0][0][0]))
    
-
+    @perf.benchmark
     def test_Boore_08_distribution2(self):
         pga4nl = array([[[0.01, 0.04, 0.11, 0.04],
                          [ 0.04, 0.01, 0.11, 0.01]]])
@@ -430,7 +436,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                          [ mid, low, 2*high, 2*low]]])
         self.assert_(allclose(fs_actual, fs))
                
-         
+    @perf.benchmark
     def test_Boore_08_distribution3(self):
         
         model_name='Boore_08'
@@ -510,6 +516,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.assert_(allclose(log_mean_actual, log_mean[0][0][2]))
         self.assert_(allclose(sigtu, log_sigma[0][0][0]))
 
+    @perf.benchmark
     def test_Boore_08_distribution_subfunctions2(self):
         
         model_name = 'Boore_08'
@@ -579,7 +586,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         fm = fm_Boore_08(e1, e2, e3, e4, e5, e6, e7, mag, mh, fault_type)
         self.assert_(allclose([4, 4+5*-2+6*4, 18], fm))
 
-
+    @perf.benchmark
     def test_Somerville09_Yilgarn_distribution(self):
         model_name='Somerville09_Yilgarn'
         model=Ground_motion_specification(model_name)
@@ -663,7 +670,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.assert_(allclose(log_mean_actual, log_mean[0][0][0]))
         self.assert_(allclose(sigtu, log_sigma[0][0][0]))
 
-
+    @perf.benchmark
     def test_Liang_2008(self):
         """Test the Liang_2008 model by calling Liang_2008() directly."""
 
@@ -829,7 +836,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                  atol=1.0e-4),
                         msg)
 
-
+    @perf.benchmark
     def test_Atkinson06_basic(self):
         """Test the Atkinson06_basic function."""
 
@@ -882,7 +889,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-3, atol=1.0e-3),
                                  msg)
 
-
+    @perf.benchmark
     def test_Atkinson06_hard_bedrock(self):
         """Test the Atkinson06_hard_bedrock function."""
 
@@ -977,6 +984,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-3, atol=1.0e-3),
                                  msg)
 
+    @perf.benchmark
     def test_Atkinson06_soil(self):
         """Test the Atkinson06_soil function."""
 
@@ -1035,6 +1043,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-3, atol=1.0e-3),
                                  msg)
 
+    @perf.benchmark
     def test_Atkinson06_bc_boundary_bedrock(self):
         """Test the Atkinson06_bc_boundary_bedrock function."""
 
@@ -1090,6 +1099,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-3, atol=1.0e-3),
                                  msg)
 
+    @perf.benchmark
     def test_Chiou08_basic(self):
         """Test the Chiou08 model by calling Chiou08_distribution() directly."""
 
@@ -1163,6 +1173,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                         msg)
 
+    @perf.benchmark
     def test_Chiou08(self):
         """Test the Chiou8 model."""
 
@@ -1232,6 +1243,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                  rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
+    @perf.benchmark
     def test_Campbell03(self):
         """Test the Campbell03 model."""
 
@@ -1280,6 +1292,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
+    @perf.benchmark
     def test_Campbell08_special(self):
         """Test the Campbell08 model - special.
 
@@ -1351,6 +1364,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=rtol, atol=atol),
                                  msg)
 
+    @perf.benchmark
     def test_Campbell08_SS1(self):
         """Test the Campbell08 model - strike_slip fault."""
 
@@ -1420,6 +1434,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=rtol, atol=atol),
                                  msg)
 
+    @perf.benchmark
     def test_Campbell08_SS1(self):
         """Test the Campbell08 model - strike_slip fault."""
 
@@ -1489,6 +1504,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=rtol, atol=atol),
                                  msg)
 
+    @perf.benchmark
     def test_Campbell08_SS2(self):
         """Test the Campbell08 model - strike_slip fault."""
 
@@ -1561,6 +1577,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=rtol, atol=atol),
                                  msg)
 
+    @perf.benchmark
     def test_Campbell08_RV1(self):
         """Test the Campbell08 model - Reverse fault."""
 
@@ -1632,6 +1649,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=rtol, atol=atol),
                                  msg)
 
+    @perf.benchmark
     def test_Campbell08_RV2(self):
         """Test the Campbell08 model - Reverse fault."""
 
@@ -1703,6 +1721,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=rtol, atol=atol),
                                  msg)
 
+    @perf.benchmark
     def test_Abrahamson08(self):
         """Test the Abrahamson08 model.
 
@@ -1780,7 +1799,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                  rtol=1.0e-4, atol=1.0e-4),
                         msg)
 
-
+    @perf.benchmark
     def test_mean_10_sigma_1(self):
         model_name = 'mean_10_sigma_1'
         model = Ground_motion_specification(model_name)
@@ -1798,7 +1817,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         self.failUnless(allclose(log_mean, act_log_mean))
         self.failUnless(allclose(log_sigma, act_log_sigma))
 
-        
+    @perf.benchmark
     def test_Zhao_2006_intraslab(self):
         """Test the Campbell03 model."""
 
@@ -1853,7 +1872,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
-
+    @perf.benchmark
     def test_Zhao_2006_interface(self):
         """Test the Campbell03 model."""
 
@@ -1908,7 +1927,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
-
+    @perf.benchmark
     def test_Atkinson_2003_interface(self):
         """Test the Campbell03 model."""
 
@@ -1962,6 +1981,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
 
+    @perf.benchmark
     def test_Atkinson_2003_intraslab(self):
         """Test the Campbell03 model."""
 
@@ -2015,6 +2035,7 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=1.0e-4, atol=1.0e-4),
                                  msg)
          
+    @perf.benchmark
     def test_Akkar_2010_crustal(self):
         """Test the Akkar2010 model."""
 
@@ -2594,7 +2615,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
 ################################################################################
 
-
+    @perf.benchmark
     def test_Abrahamson_Silva_1997(self):
 
 

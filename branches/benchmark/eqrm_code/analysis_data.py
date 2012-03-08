@@ -27,5 +27,10 @@ class Analysis_Data(file_store.File_Store):
                               lambda self, value: self._set_file_array('bedrock_SA_all', value))
     
     soil_SA_all = property(lambda self: self._get_file_array('soil_SA_all'),
-                              lambda self, value: self._set_file_array('soil_SA_all', value))
+                           lambda self, value: self._set_file_array('soil_SA_all', value))
     
+    #bedrock_SA = property(lambda self: self._get_file_array('bedrock_SA'),
+    #                      lambda self, value: self._set_file_array('bedrock_SA', value))
+    
+    #soil_SA = property(lambda self: self._get_file_array('soil_SA'),
+    #                   lambda self, value: self._set_file_array('soil_SA', value))

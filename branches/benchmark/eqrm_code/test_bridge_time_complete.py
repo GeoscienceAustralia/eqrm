@@ -7,6 +7,7 @@ import unittest
 import bridge_time_complete as btc
 import numpy as np
 
+from eqrm_code import perf
 
 class TestBridgeTimeComplete(unittest.TestCase):
 
@@ -14,6 +15,7 @@ class TestBridgeTimeComplete(unittest.TestCase):
     # test case to ensure bad state string is handled OK
     ######
 
+    @perf.benchmark
     def test_bad_state(self):
         """Check that a bad state string gives RuntimeError."""
 
@@ -26,6 +28,7 @@ class TestBridgeTimeComplete(unittest.TestCase):
     # test cases compared with published examples
     ######
 
+    @perf.benchmark
     def test_Ken_example(self):
         # cases from Ken's recent paper:
         #     Bridge Seismic Vulnerability Modelling
@@ -86,7 +89,7 @@ class TestBridgeTimeComplete(unittest.TestCase):
     # test more like the real world
     # really just ensuring multiple sites/events works
     ######
-
+    @perf.benchmark
     def test_real_world(self):
         fp = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
         states = np.array([[[1],[0],[3]],

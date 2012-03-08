@@ -10,6 +10,8 @@ from scipy.stats import norm
 
 from eqrm_code.fatalities import *
 
+from eqrm_code import perf
+
 class Test_fatalities(unittest.TestCase):
     
     def setUp(self):
@@ -18,6 +20,7 @@ class Test_fatalities(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_forecast_fatality(self):
         # This test is bad, since I'm writing it based on the code.
         

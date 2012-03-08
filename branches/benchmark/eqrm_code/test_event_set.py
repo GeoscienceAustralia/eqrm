@@ -15,7 +15,7 @@ from source_model import source_model_from_xml, Source_Model
 import conversions
 
 from eqrm_code.event_set import * #Event_Set, Pseudo_Event_Set
-from eqrm_code import file_store
+from eqrm_code import perf
 
 class DummyEventSet:
     def __init__(self):
@@ -97,6 +97,7 @@ class Test_Event_Set(unittest.TestCase):
     def setUp(self):
         file_store.SAVE_METHOD = None
 
+    @perf.benchmark
     def test_event_set_conformance(self):
         event_csv_name = "../test_resources/unit_test_event.csv"
         event_set1 = event_from_csv_long()
@@ -147,6 +148,7 @@ class Test_Event_Set(unittest.TestCase):
         handle.close()
         os.remove(file_name)
 
+    @perf.benchmark
     def test_scenario_event(self):
         eqrm_flags = DummyEventSet()
         eqrm_flags.scenario_latitude = -32.95
@@ -204,6 +206,7 @@ class Test_Event_Set(unittest.TestCase):
         answer = area/width 
         self.assert_(allclose(event_set.length, answer))
   
+    @perf.benchmark
     def test_scenario_event_II(self):
         eqrm_flags = DummyEventSet()
         eqrm_flags.scenario_latitude = [-30., -32.]
@@ -262,6 +265,7 @@ class Test_Event_Set(unittest.TestCase):
         answer = area/width 
         self.assert_(allclose(event_set.length, answer))
 
+    @perf.benchmark
     def test_scenario_event_III(self):
         
         eqrm_flags = DummyEventSet()
@@ -331,6 +335,7 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_ (len(event_set.length)== \
                       eqrm_flags.scenario_number_of_events)
         
+    @perf.benchmark
     def test_scenario_event_4(self):
         
         eqrm_flags = DummyEventSet()
@@ -421,7 +426,7 @@ class Test_Event_Set(unittest.TestCase):
                       eqrm_flags.scenario_magnitude [0])
         self.assert_ (len(event_set) == 1)
         
-        
+    @perf.benchmark
     def test_scenario_event_max_width(self):
         eqrm_flags = DummyEventSet()
         eqrm_flags.scenario_latitude = -32.95
@@ -491,6 +496,7 @@ class Test_Event_Set(unittest.TestCase):
         
         return eqrm_flags
     
+    @perf.benchmark
     def test_scenario_event_width(self):
         eqrm_flags = self.scenario_event_set()
         
@@ -512,7 +518,7 @@ class Test_Event_Set(unittest.TestCase):
         msg = ('expected=%s result=%s' % (str(width), str(event_set.width)))
         self.assert_ (allclose(event_set.width, width), msg)
         
-        
+    @perf.benchmark
     def test_scenario_event_length(self):
         eqrm_flags = self.scenario_event_set()
         
@@ -532,6 +538,7 @@ class Test_Event_Set(unittest.TestCase):
         msg = ('expected=%s result=%s' % (str(length), str(event_set.length)))
         self.assert_ (allclose(event_set.length, length), msg)
   
+    @perf.benchmark
     def test_generate_synthetic_events(self):
         
         
@@ -627,7 +634,7 @@ class Test_Event_Set(unittest.TestCase):
         os.remove(file_name)
         os.remove(et_file_name)
 
-
+    @perf.benchmark
     def test_generate_synthetic_events_horspool(self):
 
         handle, file_name = tempfile.mkstemp('_4.xml', __name__+'_')
@@ -745,6 +752,7 @@ class Test_Event_Set(unittest.TestCase):
         
         os.remove(file_name)
         
+    @perf.benchmark
     def test_event_set_subsetting(self):
         rupture_centroid_lat = [-33.351170370959323, -32.763381339789468]
         rupture_centroid_lon = [151.45946928787703, 151.77787395867014]
@@ -788,7 +796,7 @@ class Test_Event_Set(unittest.TestCase):
            
 
         
-        
+    @perf.benchmark
     def test_Event_Activity(self):
         num_events = 3
         ea = Event_Activity(num_events)
@@ -803,7 +811,7 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(ea.event_activity[0,0, 1, 2], 40))
 
         
-        
+    @perf.benchmark
     def test_Event_Activity_set_event_activity(self):
         num_events = 3
         ea = Event_Activity(num_events)
@@ -816,6 +824,7 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(ea.event_activity[0,0, 1, 1], 40))
         self.assert_(allclose(ea.event_activity[0,0, 1, 2], 50))
         
+    @perf.benchmark
     def test_Event_Activity_spawn(self):
         num_events = 3
         ea = Event_Activity(num_events)
@@ -842,7 +851,7 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(event[1], 2))
         self.assert_(allclose(event[7], 8))
 
-        
+    @perf.benchmark
     def test_Event_Activity_ground_motion_model_logic_split(self):      
         num_events = 6
         max_weights = 5
@@ -870,7 +879,7 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(ea.event_activity[0, 0, 1, 3], 24.))
         self.assert_(allclose(ea.event_activity[0, 0, 1, 4], 8.))
 
-
+    @perf.benchmark
     def test_apply_spawn(self):      
         num_events = 6
         max_weights = 5
@@ -921,6 +930,7 @@ class Test_Event_Set(unittest.TestCase):
         self.assert_(allclose(ea.get_ea_event_dimsion_only(),
                               activity.sum(axis=0)))
         
+    @perf.benchmark
     def test_generate_synthetic_events_fault(self):
         def dump_src(etc):
             """Helper function to dump info from SRC object."""
@@ -1064,7 +1074,7 @@ class Test_Event_Set(unittest.TestCase):
 #            print('%s:' % src.event_type)
 #            dump_src(src)
 
-
+    @perf.benchmark
     def test_merge_events_and_sources(self):
         para = array([0, 1., 2.])
         para_list = [para]*20

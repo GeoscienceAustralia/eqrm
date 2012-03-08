@@ -8,6 +8,7 @@ import scipy
 import eqrm_code.csv_interface as csvi
 import util
 
+from eqrm_code import perf
 
 """
 Test CVS interface.
@@ -30,6 +31,7 @@ class Test_Csv_Interface(unittest.TestCase):
                         '117,-33,Fibro',
                         '118,-34,Double Brick']
 
+    @perf.benchmark
     def test_quick_convert_csv_to_arrays(self):
         lon = csvi.quick_convert_csv_to_arrays(self.dummy_f, LONGITUDE=float)
         assert lon.keys()[0] == 'LONGITUDE'
@@ -46,6 +48,7 @@ class Test_Csv_Interface(unittest.TestCase):
         assert scipy.alltrue(self.LONGITUDE == all['LONGITUDE'])
         assert scipy.alltrue(self.WALLS == all['WALLS'])
 
+    @perf.benchmark
     def test_quick_convert_csv_to_arrays_lats_longs(self):
         lon = csvi.quick_convert_csv_to_arrays(self.dummy_f, LONGITUDE=float)
         assert lon.keys()[0] == 'LONGITUDE'
@@ -62,6 +65,7 @@ class Test_Csv_Interface(unittest.TestCase):
         assert scipy.alltrue(self.LONGITUDE == all['LONGITUDE'])
         assert scipy.alltrue(self.WALLS == all['WALLS'])
        
+    @perf.benchmark
     def unnfinished_test_quick_convert_csv_to_arrays_lats_longs_file(self):
         (handle, file_name) = tempfile.mkstemp('.csv', 'test_csv_interface_')
         os.close(handle)
@@ -95,6 +99,7 @@ class Test_Csv_Interface(unittest.TestCase):
 
         os.remove(file_name)
         
+    @perf.benchmark
     def test_csv_to_arrays(self):
         (handle, file_name) = tempfile.mkstemp('.csv', 'test_csv_interface_')
         os.close(handle)
@@ -120,6 +125,7 @@ class Test_Csv_Interface(unittest.TestCase):
 
         os.remove(file_name)
             
+    @perf.benchmark
     def test_csv_to_array(self):
         lat = csvi.csv_to_array(self.dummy_f, 'LATITUDE', float)        
         lon = csvi.csv_to_array(self.dummy_f, 'LONGITUDE', float)        
@@ -129,6 +135,8 @@ class Test_Csv_Interface(unittest.TestCase):
         assert scipy.alltrue(self.LONGITUDE == lon)
         assert scipy.alltrue(self.WALLS == wal)
 
+
+    @perf.benchmark
     def test_dict2csv(self):
         (handle, file_name) = tempfile.mkstemp('.csv', 'test_csv_interface_')
         os.close(handle)
@@ -154,6 +162,7 @@ class Test_Csv_Interface(unittest.TestCase):
         
         os.remove(file_name)
 
+    @perf.benchmark
     def test_dict2csv_bad(self):
         (handle, file_name) = tempfile.mkstemp('.csv', 'test_csv_interface_')
         os.close(handle)
@@ -175,6 +184,7 @@ class Test_Csv_Interface(unittest.TestCase):
             os.remove(file_name)
             self.failUnless(False, "Error not thrown")
 
+    @perf.benchmark
     def test_dict2csv_convert(self):
         (handle, file_name) = tempfile.mkstemp('.csv', 'test_csv_interface_')
         os.close(handle)
@@ -202,6 +212,7 @@ class Test_Csv_Interface(unittest.TestCase):
         
         os.remove(file_name)
 
+    @perf.benchmark
     def test_csv2rowdict(self):
         (handle, filename) = tempfile.mkstemp('.csv', 'test_csv_interface_')
         os.close(handle)

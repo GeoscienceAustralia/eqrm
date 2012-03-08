@@ -5,6 +5,7 @@ from scipy import asarray, allclose
 
 from eqrm_code.interp import interp
 
+from eqrm_code import perf
 
 class Test_Interp(unittest.TestCase):
     
@@ -14,6 +15,7 @@ class Test_Interp(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_interp(self):
         functx = asarray([1,2])
         functy = asarray([10,20])
@@ -22,6 +24,7 @@ class Test_Interp(unittest.TestCase):
         y_ans = x * 10.0
         self.assert_(allclose(y, y_ans, rtol=0.05))
      
+    @perf.benchmark
     def test_interp_no_extrapolate_high(self):
         functx = asarray([1,2])
         functy = asarray([10,20])
@@ -36,6 +39,7 @@ class Test_Interp(unittest.TestCase):
         y_ans = x * 10.0
         self.assert_(allclose(y, [5.,15.,20.], rtol=0.05))   
 
+    @perf.benchmark
     def test_interp_no_extrapolate_low(self):
         functx = asarray([1,2])
         functy = asarray([10,20])
@@ -50,6 +54,7 @@ class Test_Interp(unittest.TestCase):
         y_ans = x * 10.0
         self.assert_(allclose(y, [10.,15.,25.], rtol=0.05))
         
+    @perf.benchmark
     def test_interp_no_extrapolating(self):
         functx = asarray([1,2])
         functy = asarray([10,20])
@@ -66,7 +71,7 @@ class Test_Interp(unittest.TestCase):
         y_ans = x * 10.0
         self.assert_(allclose(y, [10.,15.,20.], rtol=0.05))
 
-        
+    @perf.benchmark
     def test_interp_no_extrapolate_low_decending(self):
         functx = asarray([2,1])
         functy = asarray([20,10])
@@ -81,6 +86,7 @@ class Test_Interp(unittest.TestCase):
         y_ans = x * 10.0
         self.assert_(allclose(y, [10.,15.,25.], rtol=0.05))
         
+    @perf.benchmark
     def test_interp_no_extrapolate_low_bad_ordering(self):
         functx = asarray([2, 1, 0.8])
         functy = asarray([20, 10, 8])
@@ -95,6 +101,7 @@ class Test_Interp(unittest.TestCase):
         y_ans = x * 10.0
         self.assert_(allclose(y, [8.,15.,25.], rtol=0.05))
 
+    @perf.benchmark
     def test_interp_no_extrapolate_high_local_max(self):
         functx = asarray([2, 1, 3])
         functy = asarray([30, 10, 20])

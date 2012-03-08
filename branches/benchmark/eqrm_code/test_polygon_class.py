@@ -13,6 +13,8 @@ from eqrm_code.polygon_class import get_independent_polygons_obsolete, \
 from eqrm_code.util import determine_eqrm_path
 #from geos_interface import Empty_polygon
 
+from eqrm_code import perf
+
 australia = [(-11.0, 142.0), (-25.0, 153.0), (-38.0, 149.0), \
              (-37.0, 140.0), (-31.0, 130.0), (-35.0, 117.0), \
              (-21.0, 113.0), (-11.0, 133.0), (-11.0, 142.0)]
@@ -55,10 +57,13 @@ invalid = [(lo,l),(lo,r),(hi,r),(hi,l),(lo,r)]
 
 
 class Test_Polygon_Class(unittest.TestCase):
+    
+    @perf.benchmark
     def test_polygon_object(self):
         poly = polygon_class.polygon_object(small_square)
         assert allclose(poly.area,small_square_area)
 
+    @perf.benchmark
     def test_polygon_object_with_excludes(self):
         poly = polygon_class.polygon_with_excludes(large_square,[small_square])
         assert allclose(poly.area,large_square_area-small_square_area)
@@ -71,24 +76,28 @@ class Test_Polygon_Class(unittest.TestCase):
         except ValueError:
             pass
 
+    @perf.benchmark
     def test_polygon_difference(self):
         poly1 = polygon_class.polygon_object(large_square)
         poly2 = polygon_class.polygon_object(small_square)
         poly = poly1.difference(poly2)
         assert allclose(poly.area,large_square_area-small_square_area)
 
+    @perf.benchmark
     def test_polygon_difference2(self):
         poly1 = polygon_class.polygon_object(small_square)
         poly2 = polygon_class.polygon_object(source_square)
         poly = poly1.difference(poly2)
         assert allclose(poly.area,small_square_area/2)
 
+    @perf.benchmark
     def test_polygon_difference3(self):
         poly1 = polygon_class.polygon_object(large_square)
         poly2 = polygon_class.polygon_object(source_square)
         poly = poly1.difference(poly2)
         assert allclose(poly.area,large_square_area*2/5)
 
+    @perf.benchmark
     def test_polygon_difference4(self):
         poly1 = polygon_class.polygon_object(large_square)
         poly2 = polygon_class.polygon_object(large_square)
@@ -96,26 +105,28 @@ class Test_Polygon_Class(unittest.TestCase):
         assert allclose(poly.area,0.)
         assert poly is polygon_class.empty_polygon
 
-        
+    @perf.benchmark
     def test_complex_polygon_difference(self):
         poly1 = polygon_class.polygon_object(small_square)
         poly2 = polygon_class.polygon_object(narrow_square)
         poly = poly1.difference(poly2)
         assert allclose(poly.area,small_square_area/2)
         
-        
+    @perf.benchmark
     def test_polygon_intersection(self):
         poly1 = polygon_class.polygon_object(small_square)
         poly2 = polygon_class.polygon_object(large_square)
         poly = poly1.intersection(poly2)
         assert poly1 is poly
 
+    @perf.benchmark
     def test_polygon_intersection2(self):
         poly1 = polygon_class.polygon_object(small_square)
         poly2 = polygon_class.polygon_object(source_square)
         poly = poly1.intersection(poly2)
         assert allclose(poly.area,small_square_area/2)
 
+    @perf.benchmark
     def test_polygon_system_test(self):
         poly1 = polygon_class.polygon_object(small_square)
         poly2 = polygon_class.polygon_object(large_square)
@@ -125,6 +136,7 @@ class Test_Polygon_Class(unittest.TestCase):
         poly = poly2.intersection(poly)
         assert allclose(poly.area,large_square_area*3/5-small_square_area/2)
 
+    @perf.benchmark
     def test_polygon_with_exclude(self):
         poly = polygon_class.polygon_object\
                (large_square,[small_square,narrow_square])
@@ -204,6 +216,7 @@ class Test_Polygon_Class(unittest.TestCase):
             super_poly = super_poly.union(poly)
         assert allclose(super_poly.area,area)
 
+    @perf.benchmark
     def test_contains_point(self):
         outline = [(-32.3999999999999990, 151.1500000000000100),
      (-32.7500000000000000, 152.1699999999999900),
@@ -216,6 +229,7 @@ class Test_Polygon_Class(unittest.TestCase):
         is_in = po.contains_point(point)
         assert not is_in    
      
+    @perf.benchmark
     def test_contains_point2(self):
         outline = [(-35.0, 149.5), (-32.399999999999999, 149.5),
                       (-32.399999999999999, 151.15000000000001),
@@ -236,7 +250,7 @@ class Test_Polygon_Class(unittest.TestCase):
         is_in = po.contains_point(point)
         assert is_in
           
-     
+    @perf.benchmark
     def test_contains_point3(self):
         outline = [[ -35.    , 149.5  ],
                    [ -32.925  ,149.5  ],

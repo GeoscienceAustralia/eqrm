@@ -7,6 +7,8 @@ import unittest
 #from csv_interface import Csv_interface
 from eqrm_code.building_params_from_csv import *
 
+from eqrm_code import perf
+
 class Test_Building_Params(unittest.TestCase):
     
     def setUp(self):
@@ -15,6 +17,7 @@ class Test_Building_Params(unittest.TestCase):
     def tearDown(self):
         pass
     
+    @perf.benchmark
     def test_building_parameters_values_FCB(self):
         pass
     
@@ -22,7 +25,7 @@ class Test_Building_Params(unittest.TestCase):
         #from scipy import allclose
         #assert allclose((structure_ratio+nsd_d_ratio+nsd_a_ratio),1.0)
 
-        
+    @perf.benchmark
     def test_building_params_from_csv_workshop_3(self):
         pass
         # Let's not test this stuff.
@@ -30,6 +33,7 @@ class Test_Building_Params(unittest.TestCase):
         # Have the tests at a higher level - test_structure.
         #
         
+    @perf.benchmark
     def investigate_building_params_from_csv_workshop_3(self):
         bp=building_params_from_csv('building_parameters_workshop_3')
         print "bp", bp

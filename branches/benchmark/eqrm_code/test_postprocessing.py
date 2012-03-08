@@ -8,6 +8,8 @@ from scipy import loadtxt, array
 from eqrm_code.util import dict2csv
 from eqrm_code.postprocessing import *
 
+from eqrm_code import perf
+
 class Test_postprocessing(unittest.TestCase):
     
     def setUp(self):
@@ -16,6 +18,7 @@ class Test_postprocessing(unittest.TestCase):
     def tearDown(self):
         pass
     
+    @perf.benchmark
     def test_calc_loss_deagg_suburb(self):
         
         handle, sitedb_file = tempfile.mkstemp('.csv','test_post_processing_')

@@ -11,6 +11,8 @@ from eqrm_code.event_set import Event_Set
 from eqrm_code.source_model import create_fault_sources, Source_Model, Source_Zone, RecurrenceModel
 from eqrm_code.recurrence_functions import *
 
+from eqrm_code import perf
+
 class Dummy_event_set:
     def __init__(self, Mw):
         self.Mw = Mw     
@@ -31,6 +33,7 @@ class Test_Recurrence_functions(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_m2grpdfb(self):
         
 
@@ -50,7 +53,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         fmcalc = m2grpdfb(b,m,m0,mmax)
         self.assert_(allclose(pdf,fmcalc))
     
-        
+    @perf.benchmark
     def test_grscale(self):
         m = 3.
         b = 1.
@@ -64,6 +67,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         test = (exp(-1*beta*(m-m0))-tmp)/(1-tmp)
         self.assertEqual(test, grscale(b,mmax,m,m0))     
 
+    @perf.benchmark
     def test_grscaleB(self):
         m = 7.9
         b = 0.43429448190325176 # this makes beta = 1 
@@ -76,7 +80,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         test = (exp(-1*beta*(m-mmin))-tmp)/(1-tmp)
         self.assertEqual(test, grscale(b,mmax,m,mmin))   
         
-
+    @perf.benchmark
     def test_calc_A_min_from_slip_rate_GR(self):
         max_magnitude = 7.0
         mMin = 4.0
@@ -89,7 +93,7 @@ class Test_Recurrence_functions(unittest.TestCase):
                                             slip_rate_mm, area_kms)
         self.assert_(allclose(A_min,0.225843709057))
         
-        
+    @perf.benchmark
     def test_calc_A_min_from_slip_rate_Characteristic(self):
         max_magnitude = 7.0
         mMin = 4.0
@@ -103,6 +107,7 @@ class Test_Recurrence_functions(unittest.TestCase):
                                                          area_kms)
         self.assert_(allclose(A_min,0.0253104984335))
 
+    @perf.benchmark
     def test_calc_activities_Characteristic(self):
     
     
@@ -164,7 +169,7 @@ class Test_Recurrence_functions(unittest.TestCase):
                                                      6.13542392e-05,
                                                      4.60091887e-04]))
 
-
+    @perf.benchmark
     def test_calc_event_activity(self):
     
         # Create an event set
@@ -243,7 +248,7 @@ class Test_Recurrence_functions(unittest.TestCase):
                 w1/w2))
 
 
-        
+    @perf.benchmark
     def test_calc_event_activity_generation_min_mag(self):
     
         # Create an event set
@@ -303,7 +308,8 @@ class Test_Recurrence_functions(unittest.TestCase):
         
         self.assert_(allclose(lamba, sum(event_activity_matrix)))
 
-        
+
+    @perf.benchmark
     def test_calc_event_activity_summing(self):
     
         # Create an event set

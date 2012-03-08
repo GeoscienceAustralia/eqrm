@@ -14,7 +14,11 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model
 from eqrm_code.structures import Structures
 from eqrm_code.util import determine_eqrm_path
 
+from eqrm_code import perf
+
 class Test_cadell(unittest.TestCase):    
+    
+    @perf.benchmark
     def test_cadel_ground_motion(self):   
         
         eqrm_dir = determine_eqrm_path()

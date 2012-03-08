@@ -10,6 +10,8 @@ from eqrm_code.exceedance_curves import _collapse_att_model_dimension
 
 from test_event_set import DummyEventSet
 
+from eqrm_code import perf
+
 def _collapse_att_model_results(data, weights, num_of_att_models):
     """
     Collapse the data so it does not have an attenuation model dimension.
@@ -75,6 +77,8 @@ def do_collapse_logic_tree(data, event_num, weights,
 
 
 class Test_Exceedance(unittest.TestCase):
+    
+    @perf.benchmark
     def test_exceedance_curve(self):
         # WARNING - MORE A BLACK BOX TEST - BASED ON THE FUNCTIONS OUTPUT,
         # RATHER THAN
@@ -172,6 +176,7 @@ class Test_Exceedance(unittest.TestCase):
             eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
         
+    @perf.benchmark
     def test_exceedance_curveIII(self):
         
         # WARNING - MORE A BLACK BOX TEST - BASED ON THE FUNCTIONS OUTPUT,
@@ -241,6 +246,7 @@ class Test_Exceedance(unittest.TestCase):
             eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
         
+    @perf.benchmark
     def test_exceedance_curve4(self):
         
         # WARNING - MORE A BLACK BOX TEST - BASED ON THE FUNCTIONS OUTPUT,
@@ -279,6 +285,7 @@ class Test_Exceedance(unittest.TestCase):
             eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
         
+    @perf.benchmark
     def test_exceedance_curve5(self):
         # Treating it as a black box and working out what it does
         soil_SA = array([[[ 1],
@@ -313,6 +320,7 @@ class Test_Exceedance(unittest.TestCase):
         #print "results", results
         self.assert_ (allclose(results, new_soil_SA))
         
+    @perf.benchmark
     def test_exceedance_curve6(self):
         # Treating it as a black box and working out what it does
         soil_SA = array([[[ 1],
@@ -346,6 +354,7 @@ class Test_Exceedance(unittest.TestCase):
             eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
         
+    @perf.benchmark
     def test_exceedance_curve7(self):
         # Treating it as a black box and working out what it does
         # Showing how if the atten_collapse_Sa_of_atten_models is False
@@ -382,7 +391,7 @@ class Test_Exceedance(unittest.TestCase):
         #print "results", results
         self.assert_ (allclose(results, soil_SA))
 
-     
+    @perf.benchmark
     def test_exceedance_curve8(self):
         # Treating it as a black box and working out what it does
         soil_SA = array([[[ 1.],
@@ -416,7 +425,7 @@ class Test_Exceedance(unittest.TestCase):
             eqrm_flags)
         self.assert_ (allclose(results, new_soil_SA))
 
-        
+    @perf.benchmark        
     def test_exceedance_curve_python_code(self):
         
         # WARNING - MORE A BLACK BOX TEST - BASED ON THE FUNCTIONS OUTPUT,
@@ -486,6 +495,7 @@ class Test_Exceedance(unittest.TestCase):
             eqrm_flags, use_C=False)
         self.assert_ (allclose(results, new_soil_SA))
 
+    @perf.benchmark
     def test_hzd_do_value(self):
         
         # WARNING - MORE A BLACK BOX TEST - BASED ON THE FUNCTIONS OUTPUT,
@@ -524,6 +534,7 @@ class Test_Exceedance(unittest.TestCase):
         
         self.assert_ (allclose(hzd, bedrock_hazard))
 
+    @perf.benchmark
     def test_collapse_att_model_dimension(self):
         gmm = 3
         rec_model = 1
@@ -544,6 +555,7 @@ class Test_Exceedance(unittest.TestCase):
         self.assert_ (allclose(sum, sum_act))
         self.assert_ (sum[0, 0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
         
+    @perf.benchmark
     def test_collapse_att_model_dimension2(self):
         gmm = 3
         site = 1
@@ -564,6 +576,7 @@ class Test_Exceedance(unittest.TestCase):
         self.assert_ (allclose(sum, sum_act))
         self.assert_ (sum[0, 0, 1, 3] == 7*0.2 + 15*0.3) # FIXME FP precision
   
+    @perf.benchmark
     def test_collapse_att_model_dimension3(self):
         gmm = 2
         site = 1
@@ -587,7 +600,7 @@ class Test_Exceedance(unittest.TestCase):
         actual = reshape(actual, (1, site, events, periods))
         self.assert_ (allclose(sum, actual))
         
-  
+    @perf.benchmark
     def test_collapse_att_model(self):
         spawn = 1
         gmm = 3
@@ -609,7 +622,7 @@ class Test_Exceedance(unittest.TestCase):
         self.assert_ (allclose(sum, sum_act))
         self.assert_ (sum[0,0,0,0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
         
-            
+    @perf.benchmark
     def test_collapse_att_model2(self):
         spawn = 2
         gmm = 3
@@ -624,7 +637,7 @@ class Test_Exceedance(unittest.TestCase):
         actual = reshape(actual, (spawn, 1, 1, site, events, periods))
         self.assert_ (allclose(sum, actual))
              
-            
+    @perf.benchmark
     def test_collapse_source_gmms(self):
         spawn = 1
         gmm = 3

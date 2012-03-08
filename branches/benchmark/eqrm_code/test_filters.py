@@ -18,6 +18,8 @@ from eqrm_code.sites import Sites
 from eqrm_code.source_model import Source_Model
 from eqrm_code.test_event_set import DummyEventSet
     
+from eqrm_code import perf
+    
 def create_source_model():
     """
     Create dummy source model.
@@ -135,6 +137,7 @@ class Test_Filters(unittest.TestCase):
         # Run some analysis tearDown?
         pass
     
+    @perf.benchmark
     def test_apply_threshold_distance_all(self):
         """
         Test apply_threshold_distance function for atten_threshold_distance 
@@ -160,6 +163,7 @@ class Test_Filters(unittest.TestCase):
         assert allclose(bedrock_SA, self.SA_zeros)
         assert allclose(soil_SA, self.SA_zeros)
     
+    @perf.benchmark
     def test_apply_threshold_distance_partial(self):
         """
         Test apply_threshold_distance function for atten_threshold_distance 
@@ -194,6 +198,7 @@ class Test_Filters(unittest.TestCase):
         assert allclose(bedrock_SA, bedrock_SA_expected)
         assert allclose(soil_SA, soil_SA_expected)
     
+    @perf.benchmark
     def test_apply_threshold_distance_none(self):
         """
         Test apply_threshold_distance function for atten_threshold_distance 
@@ -219,6 +224,7 @@ class Test_Filters(unittest.TestCase):
         assert allclose(bedrock_SA, self.SA_ones)
         assert allclose(soil_SA, self.SA_ones)
         
+    @perf.benchmark
     def test_source_model_threshold_distance_subset_all(self):
         """
         Test source_model_threshold_distance_subset function for 
@@ -244,6 +250,7 @@ class Test_Filters(unittest.TestCase):
             self.failUnless(allclose(source.event_set_indexes,
                                      source_model_expected[i].event_set_indexes))
     
+    @perf.benchmark
     def test_source_model_threshold_distance_subset_partial(self):
         """
         Test source_model_threshold_distance_subset function for 
@@ -271,6 +278,7 @@ class Test_Filters(unittest.TestCase):
             self.failUnless(allclose(source.event_set_indexes,
                                      source_model_expected[i].event_set_indexes))
     
+    @perf.benchmark
     def test_source_model_threshold_distance_subset_none(self):
         """
         Test source_model_threshold_distance_subset function for 

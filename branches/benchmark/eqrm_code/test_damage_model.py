@@ -31,6 +31,7 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
 from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING
 
+from eqrm_code import perf
 
 class Dummy:
     def __init__(self):
@@ -47,7 +48,7 @@ class Test_damage_model(unittest.TestCase):
         dparams = (0.001, 0.001, 0.001, 0.08)
         assert(False) # not implimented
 
-
+    @perf.benchmark
     def test_find_intersection(self):
         SA = array([0.289739794645192, 0.646693092888598, 0.553904993443363,
                     0.449529429311655, 0.379120948142093, 0.335578413347301,
@@ -90,7 +91,7 @@ class Test_damage_model(unittest.TestCase):
         SDcr_m = 42.1418578996947
         assert allclose(SDcr_m, SDcr)
 
-
+    @perf.benchmark
     def test_nonlin_damp_rand(self):
         SA = array([0.289739794645192, 0.646693092888598, 0.553904993443363,
                     0.449529429311655, 0.379120948142093, 0.335578413347301,
@@ -137,6 +138,7 @@ class Test_damage_model(unittest.TestCase):
                                     SAnew,                 ...
                                     SAcapNew  );'''
 
+    @perf.benchmark
     def test_update_demand_again(self):
         SA = array([0.342010, 0.763370, 0.653840, 0.530630, 0.44294,
                     0.38397, 0.34452, 0.321240, 0.302940, 0.276640,
@@ -177,7 +179,7 @@ class Test_damage_model(unittest.TestCase):
 
         assert allclose(SAnew, SA_new_m, rtol=5e-5)
 
-
+    @perf.benchmark
     def test_find_intersection_again(self):
         '''
     [SDcrNew, SAcrNew] = find_intersection( SDnew,                 ...
@@ -221,7 +223,7 @@ class Test_damage_model(unittest.TestCase):
         SDcr_m = 41.810644943005
         assert allclose(SDcr_m, SDcr)
 
-
+    @perf.benchmark
     def test_capacity_method(self):
         #in
         (Ay, Dy, Au, Du) =(0.13417, 2.9975, 0.26833, 41.964)
@@ -289,7 +291,7 @@ class Test_damage_model(unittest.TestCase):
         assert allclose(SAcr, point[0])
         assert allclose(SDcr, point[1])
 
-
+    @perf.benchmark
     def test_fragility(self):
         #in
         """
@@ -339,7 +341,7 @@ class Test_damage_model(unittest.TestCase):
         cost_matlab = 55.2885441482002
         assert allclose(cost_matlab, (f1*pdf*cost*Area*ci).sum())
 
-
+    @perf.benchmark
     def test_cumulative_state_probability(self):
         blocking_block_comments = True
         """Test that cumulative_state_probability works the same way
@@ -378,7 +380,7 @@ class Test_damage_model(unittest.TestCase):
         assert y[1] < y[2]
         assert y[-3] > y[-2]
 
-
+    @perf.benchmark
     def test_building_response(self):
         #Test that building response is the same as matlab
 
@@ -463,7 +465,7 @@ class Test_damage_model(unittest.TestCase):
         # point2=damage_model.get_building_displacement()
         # assert allclose(point, point2)
 
-
+    @perf.benchmark
     def test_calc_total_loss_OS_bug_search(self):
         blocking_block_comments = True
         """plugging in results from TS_risk57.par"""
@@ -572,9 +574,11 @@ class Test_damage_model(unittest.TestCase):
                               array([[9978.48421213, 1226.05473008, 0.]]))
         assert allclose(asarray(total_loss), asarray(total_loss_windows))
 
+    @perf.benchmark
     def test_save_structure_damage_states(self):
         pass
 
+    @perf.benchmark
     def test_reduce_cumulative_to_pdf(self):
         cumulative = array([1.0, 0.6, 0.3, 0.1])
         non_cummulative = cumulative[:]

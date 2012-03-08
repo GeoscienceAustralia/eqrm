@@ -57,7 +57,8 @@ class Parallel(object):
             self._not_parallel()
             
         # Some constants to identify messages
-        self.load_event_set = 0
+        self.event_set_generated = 0
+        self.load_event_set = 1
 
             
     def calc_lo_hi(self, elements):

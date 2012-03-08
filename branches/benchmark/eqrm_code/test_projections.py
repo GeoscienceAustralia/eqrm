@@ -7,6 +7,7 @@ from projections import azimuthal_orthographic_ll_to_xy as ll2xy
 
 from projections import azimuthal_orthographic_xy_to_ll as xy2ll
 
+from eqrm_code import perf
 
 class Test_Projections(unittest.TestCase):
     
@@ -16,6 +17,7 @@ class Test_Projections(unittest.TestCase):
     def tearDown(self):
         pass
      
+    @perf.benchmark
     def test_xy2ll(self):
         """Test functionality of azimuthal_orthographic_xy_to_ll() function"""
         #xy2ll(x,y,lat0,lon0,azimuth=0,R=6367.0)
@@ -24,6 +26,7 @@ class Test_Projections(unittest.TestCase):
         #print 'lat ', lat
         #print 'lon ', lon
         
+    @perf.benchmark
     def test_ll2xy(self):
         """Test functionality of azimuthal_orthographic_ll_to_xy() function"""
 

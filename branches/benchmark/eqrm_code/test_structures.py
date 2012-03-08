@@ -11,6 +11,7 @@ from eqrm_code.building_params_from_csv import building_params_from_csv
 from eqrm_code.structures import *
 from eqrm_code.util import dict2csv, determine_eqrm_path
 
+from eqrm_code import perf
 
 class Test_Structures(unittest.TestCase):
     
@@ -49,6 +50,7 @@ class Test_Structures(unittest.TestCase):
             )
         os.remove(file_name)
 
+    @perf.benchmark
     def test_building_parameters_values_hazus(self):
 
         # All these headings must be present
@@ -127,6 +129,7 @@ class Test_Structures(unittest.TestCase):
             attribute_dic["STRUCTURE_CLASSIFICATION"],
             sites.building_parameters["structure_classification"].tolist())
 
+    @perf.benchmark
     def test_building_parameters_values_FCB(self):
         attribute_dic={
             'BID':[1,2,3],
@@ -197,7 +200,7 @@ class Test_Structures(unittest.TestCase):
         # test drift_threshold and CONTENTS_COST_DENSITY after doing
         # tests for building_params_from_csv
 
-
+    @perf.benchmark
     def test_building_parameters_values_bridges(self):
         attribute_dic={
             'BID':[1],
@@ -234,7 +237,7 @@ class Test_Structures(unittest.TestCase):
         # fcb_usage [111 131 451 ..., 231 231 231]
 
 
-        
+    @perf.benchmark
     def test_build_replacement_ratios(self):
         #usage_values_per_struct = ['RES1',
         #                          'RES3', 'COM8', 'GOV1', 'GOV1', 'GOV1']

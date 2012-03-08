@@ -6,7 +6,7 @@ from eqrm_code.capacity_spectrum_functions import *
 from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
 
-
+from eqrm_code import perf
      
 def cap_curve_function(Dy,Ay,Du,Au, Sd):
     ky = (Ay/Dy) #slope of linear part of capacity curve
@@ -18,6 +18,8 @@ def cap_curve_function(Dy,Ay,Du,Au, Sd):
     
     
 class Test_capacity_spectrum_functions(unittest.TestCase):
+    
+    @perf.benchmark
     def test_undamped_response(self):
         """
         Test that the undamped response is the same as matlabs
@@ -47,6 +49,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         assert allclose(TVD_mat,TVD,rtol=5e-5)
         assert allclose(SD,SD_mat,rtol=5e-5)        
 
+    @perf.benchmark
     def test_capacity_parameters(self):
         """
         Test that capacity parameters and kappa are the same as matlabs
@@ -79,7 +82,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                         rtol=5e-5)
         assert allclose(kappa,kappam)   
        
-
+    @perf.benchmark
     def test_build_capacity(self):
         """
         Test that the capacity is the same as matlabs
@@ -104,7 +107,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
 
         assert allclose(capacity[0],capacity_m,rtol=5e-5)        
          
-
+    @perf.benchmark
     def test_build_capacityIII(self):
         """
         Warning this test is not based on what should be happening,
@@ -128,6 +131,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         #print "capacity", capacity
         assert allclose(capacity[0],capacity_m,rtol=5e-5)        
         
+    @perf.benchmark
     def test_update_demand(self):
         """
         Test that the  reduction factors and update damand functions
@@ -174,6 +178,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                  95.059,86.326]
         assert allclose(SDnew,SD_newm,rtol=5e-5)
 
+    @perf.benchmark
     def test_build_capacity_again(self):
         """
         Test that calculating the capacity works again.
@@ -207,7 +212,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                         0.268333333333333,0.268333333333333])
         assert allclose(capacity,SA_capm,rtol=5e-5)
 
-
+    @perf.benchmark
     def test_undamped_responseII(self):
         """
         Test that the undamped response is the same as matlabs
@@ -252,6 +257,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         assert allclose(TAV_mat,TAV)
         assert allclose(TVD_mat,TVD)
 
+    @perf.benchmark
     def test_capacity_parametersII(self):
         """
         Test that capacity parameters and kappa are the same as matlabs
@@ -296,7 +302,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                         (Dym,Aym,Dum,Aum,aam,bbm,ccm))
         assert allclose(kappa,kappam)
        
-
+    @perf.benchmark
     def test_build_capacityII(self):
         """
         Test that the capacity is the same as matlabs
@@ -356,7 +362,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         
         assert allclose(capacity[0,0],capacity_m)        
         
-        
+    @perf.benchmark            
     def test_update_demandII(self):
         """
         Test that the  reduction factors and update damand functions
@@ -455,6 +461,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
   16.31797473121083]
         assert allclose(SDnew,SD_newm)
 
+    @perf.benchmark
     def test_build_capacity_againII(self):
         """
         Test that calculating the capacity works again.
@@ -585,7 +592,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         assert allclose(1.99087165775938,SDcr[0,0])
         assert allclose(0.46802255489563,SAcr)
 
-        
+    @perf.benchmark
     def test_hyst_area_rand(self):
 
         Dy = DyV = 2.
@@ -620,7 +627,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
             # once it was in the range.
             self.assert_(allclose(area,  array([ 23.31698721])))
             
-          
+    @perf.benchmark
     def test_hyst_area_rand3(self):
 
         Dy = DyV = 2.

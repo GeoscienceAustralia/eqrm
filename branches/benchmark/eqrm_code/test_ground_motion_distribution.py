@@ -6,9 +6,11 @@ from ground_motion_distribution import *
 from scipy import array, log, exp, newaxis, concatenate, allclose, sqrt, \
      r_, alltrue, where, arange, resize, sum, ones, seterr
 
+from eqrm_code import perf
 
 class Test_Log_normal_distribution(unittest.TestCase):
    
+    @perf.benchmark
     def test_DLN_monte_carlo2(self):
         # dimensions (2,1,3,4) = 24 elements
         dim = (2,1,3,4)
@@ -30,6 +32,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         self.assert_(allclose(sample_values, actual))
         self.assert_(sample_values.shape == dim)
 
+    @perf.benchmark
     def test_DLN_monte_carlo3(self):
         dim = (1,2,3)
         count_up = arange(0,6,1)
@@ -44,7 +47,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         # Can not check result, it's random 
         self.assert_(sample_values.shape == dim)
 
-
+    @perf.benchmark
     def test_DLN_no_variability(self):
         # dimensions (2,1,3,4) = 24 elements
         dim = (2,1,3,4)
@@ -60,7 +63,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)
 
-        
+    @perf.benchmark
     def test_DLN_sigmas(self):
         # dimensions (2,1,3,4) = 24 elements
         dim = (2,1,3,4)
@@ -96,7 +99,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)       
 
-        
+    @perf.benchmark
     def test_normalised_pdf(self):
         sigma_delta = 3
         number_of_bins = 1
@@ -106,6 +109,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         self.assert_(centroids == 0)       
         self.assert_(len(centroids) == 1)       
         
+    @perf.benchmark
     def test_normalised_pdfII(self):
         sigma_delta = 2.5
         number_of_bins = 2
@@ -115,6 +119,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         self.assert_(allclose(centroids, [-2.5, 2.5]))       
         self.assert_(len(centroids) == 2)
         
+    @perf.benchmark
     def test_normalised_pdf3(self):
         sigma_delta = 2.5
         number_of_bins = 10
@@ -136,6 +141,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         self.assert_(allclose(weights, act_wts, 0.01))       
         self.assert_(len(weights) == 10)
 
+    @perf.benchmark
     def test_spawning(self):
         spawn_bins = 2
 
@@ -151,7 +157,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         act_SA = exp(concatenate((act_SA_0, act_SA_1)))
         self.assert_(allclose(act_SA, sample_values))   
         
-        
+    @perf.benchmark
     def test_spawningII(self):
         spawn_bins = 3
 

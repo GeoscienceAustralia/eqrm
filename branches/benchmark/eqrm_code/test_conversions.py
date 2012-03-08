@@ -6,6 +6,8 @@ from scipy import array, allclose, exp, log, power, asarray, minimum
 
 from eqrm_code.conversions import conversion_functions
 
+from eqrm_code import perf
+
 """
 Some of the values in event_set (such as fault length)
 are dependent on other values (such as Mw), unless they
@@ -16,6 +18,8 @@ as the original.
 """
 
 class Test_Conversions(unittest.TestCase):
+    
+    @perf.benchmark
     def test_width2(self):
         width_function=conversion_functions[
             'modified_Wells_and_Coppersmith_94_width']
@@ -28,6 +32,7 @@ class Test_Conversions(unittest.TestCase):
         assert allclose([ 15,1.75792361,4.21696503,\
                           6.05476637,12.97166415],width)
         
+    @perf.benchmark
     def test_length(self):
         Mw = 6.02
         dip = 45
@@ -44,7 +49,7 @@ class Test_Conversions(unittest.TestCase):
         length = area/width
         self.assert_ (allclose([length],[20]))
         
-
+    @perf.benchmark
     def test_calc_depth_to_top(self):
         """Test the calc_depth_to_top() function."""
 
@@ -89,7 +94,7 @@ class Test_Conversions(unittest.TestCase):
         msg = 'Expected %s same as %s' % (str(Ztor), str(expected))
         self.failUnless(allclose(Ztor, expected), msg)
         
-
+    @perf.benchmark
     def test_convert_Z10_to_Z25(self):
         """Test the convert_Z10_to_Z25() function."""
 
@@ -111,7 +116,7 @@ class Test_Conversions(unittest.TestCase):
                % (str(Z10), str(expected_Z25), str(Z25)))
         self.failUnless(allclose(Z25, expected_Z25), msg)
 
-        
+    @perf.benchmark
     def test_convert_Vs30_to_Z10(self):
         """Test the convert_Vs30_to_Z10() function."""
 
@@ -138,6 +143,7 @@ class Test_Conversions(unittest.TestCase):
                % (str(Vs30), str(expected_Z10), str(Z10)))
         self.failUnless(allclose(Z10, expected_Z10), msg)
 
+    @perf.benchmark
     def test_azimuth_of_trace(self):
         """Test the azimuth_of_trace() function."""
 
@@ -159,6 +165,7 @@ class Test_Conversions(unittest.TestCase):
                    % (start_lat, expected, result))
             self.failUnlessAlmostEqual(result, expected, 1, msg)
             
+    @perf.benchmark
     def test_Wells_and_Coppersmith_94(self):
         Wells_and_Copper_94= conversion_functions['Wells_and_Coppersmith_94']
         calc_max_width_in_slab=conversion_functions['calc_max_width_in_slab']
@@ -190,7 +197,7 @@ class Test_Conversions(unittest.TestCase):
         self.failUnlessAlmostEqual(length[2], 19.09457573, 1, msg)
         self.failUnlessAlmostEqual(width[2], 8., 1, msg)
         
-        
+    @perf.benchmark
     def test_calc_max_width_in_slab(self):
         
         calc_max_width_in_slab= conversion_functions['calc_max_width_in_slab']

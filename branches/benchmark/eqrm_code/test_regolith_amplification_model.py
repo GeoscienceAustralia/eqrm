@@ -9,9 +9,11 @@ from scipy import array, asarray, allclose, concatenate, newaxis, log, exp
 from eqrm_code.regolith_amplification_model import *
 from eqrm_code.util import dict2csv
 
+from eqrm_code import perf
 
 class Test_Regolith_Amplification_Model(unittest.TestCase):
         
+    @perf.benchmark
     def test_bin_indicies(self):
         #/(mean_log_amp*log_ground_motion)
 
@@ -30,6 +32,7 @@ class Test_Regolith_Amplification_Model(unittest.TestCase):
                 array((0,0,0,1,1,2,2)))
         # may fail on borders if anything changes
         
+    @perf.benchmark
     def test_amplification_model_parameters_from_xml(self):
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
@@ -184,6 +187,7 @@ CD
 
         os.remove(file_name)
 
+    @perf.benchmark
     def test_load_site_class2Vs30(self):
         a = 60.0
         b = 2.0
@@ -203,6 +207,7 @@ CD
         #print "results",results 
         self.failUnless(results == answer,  'Failed!')
         
+    @perf.benchmark
     def test_load_site_class2Vs30_2(self):
         a = 60.0
         b = 2.0
@@ -222,6 +227,7 @@ CD
         os.remove(file_name)
         self.failUnless(results == answer,  'Failed!')
 
+    @perf.benchmark
     def test_load_site_class2Vs30_bad(self):
         a = 60.0
         b = 2.0

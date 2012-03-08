@@ -8,8 +8,12 @@ from numpy import nanmax
 
 from eqrm_code.equivalent_linear_solver import find_intersection, \
      get_intersection_indices, findfirst
+     
+from eqrm_code import perf
 
 class Test_damage_solver(unittest.TestCase):
+    
+    @perf.benchmark
     def test_findfirst(self):
         
         condition=array((False,False,True))
@@ -31,6 +35,7 @@ class Test_damage_solver(unittest.TestCase):
         assert allclose(axis_1,findfirst(condition,axis=-1))        
         assert allclose(axis_0,findfirst(condition,axis=-2))
         
+    @perf.benchmark
     def test_get_intersection_indices(self):
         
         condition=array((False,False,True))
@@ -83,6 +88,7 @@ class Test_damage_solver(unittest.TestCase):
         assert allclose(get_intersection_indices(condition,axis=-1),answer1)
         assert allclose(get_intersection_indices(condition,axis=-2),answer0)
     
+    @perf.benchmark
     def test_find_intersection(self):
 
         # SA == SAcap at index 1.5, therefore SD=2.5
@@ -104,6 +110,7 @@ class Test_damage_solver(unittest.TestCase):
         SAcap=array([0,6,7.0])
         assert (find_intersection(SD,SA,SAcap)==1.5)
 
+    @perf.benchmark
     def test_find_intersectionII(self):
         # If there is 2 intersections, are they found? No
         SD=array([1,2,3.0])
@@ -111,7 +118,7 @@ class Test_damage_solver(unittest.TestCase):
         SAcap=array([0,6,4.0])
         assert (find_intersection(SD,SA,SAcap)==1.5)
         
-
+    @perf.benchmark
     def test_find_intersection_array(self):
         # SA == SAcap at index 1.5, therefore SD=2.5
         SD=array([[1,2,3.0],[1,2,3.0],[1,2,3.0]])
@@ -120,7 +127,7 @@ class Test_damage_solver(unittest.TestCase):
         answer = [2.5,3,1.5]
         assert allclose(find_intersection(SD,SA,SAcap),answer)
 
-        
+    @perf.benchmark
     def test_array_ab_diff(self):
         a = array([7.35287023,  3.98947559,  0.])
         b = array([ 7.38625883, 3.98947559, 0.])

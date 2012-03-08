@@ -10,6 +10,8 @@ import tempfile
 
 from xml.etree import ElementTree as ET #, getiterator
 
+from eqrm_code import perf
+
 def build_xml():
     test_string = """<Event magnitude_type='Mw'>
     <polygon>
@@ -47,6 +49,7 @@ def build_xml():
 
 class Test_ElementTree(unittest.TestCase):
 
+    @perf.benchmark
     def test_element_tree(self):
         from xml.etree import ElementTree
         #3$$$as ET #, getiterator

@@ -13,6 +13,7 @@ from eqrm_code.event_set import Event_Set
 from eqrm_code.util import reset_seed, determine_eqrm_path
 from test_event_set import DummyEventSet
 
+from eqrm_code import perf
 
     # A format string with slots for the legacy and current
     # <event_generation> element
@@ -97,6 +98,7 @@ class Test_Source_model(unittest.TestCase):
         # Remove the temporary data directory
         shutil.rmtree(self.data_dir)
 
+    @perf.benchmark
     def test_source_model_from_xml(self):
         """
         Check current and legacy xml formats work.
@@ -171,7 +173,7 @@ class Test_Source_model(unittest.TestCase):
             self.failUnless(result.recurrence_models[i].A_min==szp.recurrence_models[i].A_min,
                 'Failed!')
 
-    
+    @perf.benchmark
     def test_Source_Zone(self):
         boundary = [(0, 0.0), (100., 0.0), (100., 100.0), (0., 100.0) ]
         exclude = [[(10., 10.0),  (20., 10.0),(20., 20.0),(10., 20.0)]]
@@ -203,7 +205,7 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless(A_min==szp.recurrence_models[0].A_min,
             'Failed!')
 
-   
+    @perf.benchmark
     def test_Source(self):
         def dump_etc(etc):
             """Helper function to dump info from EG object."""
@@ -283,6 +285,7 @@ class Test_Source_model(unittest.TestCase):
 
         os.remove(file_name)
 
+    @perf.benchmark
     def test_Source2(self):
         """Test various expected exceptions for XML errors."""
 
@@ -426,6 +429,7 @@ class Test_Source_model(unittest.TestCase):
 
         os.remove(file_name)
 
+    @perf.benchmark
     def test_add_event_type_atts_to_sources(self):
         (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
@@ -472,13 +476,13 @@ class Test_Source_model(unittest.TestCase):
         max_num_atten_models = source_mod.get_max_num_atten_models()
         self.failUnlessEqual(max_num_atten_models, 2)
         
-        
+    @perf.benchmark
     def test_create_scenario_source_model(self):
         source_model = Source_Model.create_scenario_source_model(3)
         self.failUnless(allclose(source_model[0].event_set_indexes,
                                      array([0,1,2])))
 
-            
+    @perf.benchmark
     def test_sources_of_event_set(self):
         setups = [('5,3,2', [5,3,2]), ('6,4',[6, 4]), ('0,1',[0,1])]
         setups_dic = dict(setups)
@@ -557,6 +561,7 @@ class Test_Source_model(unittest.TestCase):
         
         return source_model
     
+    @perf.benchmark
     def test_create_fault_sources(self):
 
         generation_min_mag = 7.9
@@ -582,7 +587,7 @@ class Test_Source_model(unittest.TestCase):
             
         self.failUnless(source_model[0].scaling['scaling_rule'] == 'background')
         
-        
+    @perf.benchmark
     def test_get_EventZone_instance(self):
         name = 'eggs'
         indexes = [5, 4]
@@ -604,7 +609,7 @@ class Test_Source_model(unittest.TestCase):
         self.failUnless(allclose(event_zone.get_event_set_indexes(),
                                      array(indexes)))
 
-    
+    @perf.benchmark
     def test_load_save(self):
         
         # Create dummy Source Model
