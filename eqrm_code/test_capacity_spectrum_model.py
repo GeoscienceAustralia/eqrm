@@ -9,6 +9,7 @@ from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
 from eqrm_code.capacity_spectrum_functions import CSM_DAMPING_USE_SMOOTHING
 
+from eqrm_code import perf
 
 def reset_seed(use_determ_seed=False):
     """Set random seeds.
@@ -38,6 +39,7 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_OS_bug_search(self):
         """
         Used to trackdown ticket #98
@@ -109,6 +111,7 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
                         array([[ 7.35287023,  3.98947559,  0.]]))
         assert allclose(asarray(point),asarray(point_windows) )
 
+    @perf.benchmark
     def test_OS_bug_searchII(self):
         """
         Used to trackdown ticket #98

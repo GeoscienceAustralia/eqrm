@@ -7,18 +7,19 @@ from scipy import array, allclose
 import numpy as np
 
 from eqrm_code.sites import Sites, truncate_sites_for_test
-from eqrm_code import file_store
+from eqrm_code import perf
 
 projection = azimuthal_orthographic
 
 
 class Test_Sites(unittest.TestCase):
     def setUp(self):
-        file_store.SAVE_METHOD = None
-
+        pass
+    
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def testing(self):
         attributes = {'mo': array(['money', 'soup']),
                       'SITE_CLASS': array(['E', 'C'])}
@@ -46,6 +47,7 @@ class Test_Sites(unittest.TestCase):
         else:
             self.failUnless(False, "KeyError not raised")
 
+    @perf.benchmark
     def test_read_from_file(self):
         """Test reading Sites data from a file."""
 
@@ -123,6 +125,7 @@ class Test_Sites(unittest.TestCase):
         # get rid of test data file 
         os.remove(filename)
 
+    @perf.benchmark
     def testing_truncate_sites_for_test(self):
         attributes = {'mo': array(['money', 'soup']),
                       'SITE_CLASS': array(['E', 'C']),
@@ -142,6 +145,7 @@ class Test_Sites(unittest.TestCase):
                                             site_indexes)
         self.failUnlessEqual(site_indexes, new_sites.attributes['id'])
 
+    @perf.benchmark
     def test_join(self):
         """Test the 'join two Sites' method."""
 

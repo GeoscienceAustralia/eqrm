@@ -8,7 +8,11 @@ from eqrm_code.conversions import conversion_functions
 from eqrm_code.scaling import *
 from eqrm_code.scaling_functions import *
 
+from eqrm_code import perf
+
 class Test_scaling(unittest.TestCase):
+    
+    @perf.benchmark
     def test_modified_Wells_and_Coppersmith_94_rup_width(self):
 
         Mw = array([6.64 , 4.51 , 5.27 , 5.61 , 6.4])
@@ -26,6 +30,7 @@ class Test_scaling(unittest.TestCase):
         assert allclose(correct,
                         width)
                
+    @perf.benchmark
     def test_modified_Wells_and_Coppersmith_94_rup_width2(self):
         # 
         Mw = array([4.5, 6.5, 13., 13.])
@@ -42,6 +47,7 @@ class Test_scaling(unittest.TestCase):
         assert allclose(correct,
                         width)
                
+    @perf.benchmark
     def test_modified_Wells_and_Coppersmith_94_rup_area(self):
         # 
         Mw = array([4.02, 5.02, 6.02])
@@ -54,6 +60,7 @@ class Test_scaling(unittest.TestCase):
         assert allclose(correct,
                         width)
         
+    @perf.benchmark
     def test_Wells_and_Coppersmith_94_rup_area(self):
         # Mw = 1.87/0.82 gives a width of 0.1 
         # 0.1 = 10**-1 = 10**(-2.87+1.87) = 10**(-2.87+(0.82*1.87/0.82))
@@ -85,6 +92,7 @@ class Test_scaling(unittest.TestCase):
         correct = [ 0.1, ]
         assert allclose(correct, area)
         
+    @perf.benchmark
     def test_Wells_and_Coppersmith_94_rup_width(self):
         # Try and get an answer of 0.1
         # Mw = 0.14/0.35 gives a width of 0.1 
@@ -121,6 +129,7 @@ class Test_scaling(unittest.TestCase):
         correct = [ 0.1, ]
         assert allclose(correct, width)
         
+    @perf.benchmark
     def test_Leonard_SCR_area(self):
         
         Mw = array([5.5])
@@ -137,6 +146,7 @@ class Test_scaling(unittest.TestCase):
         correct = Leonard_Mw_to_Area(Mw)
         assert allclose(correct, area)
 
+    @perf.benchmark
     def test_Leonard_SCR_width(self):
         scaling_dic = {'scaling_rule':'Leonard_SCR'} 
         area = 1.0   
@@ -166,6 +176,7 @@ class Test_scaling(unittest.TestCase):
         width_actual = area/length
         assert allclose(width, max_rup_width)
         
+    @perf.benchmark
     def test_Leonard_SCR_constants(self):
     
         Mw = array([4., 8.]) 

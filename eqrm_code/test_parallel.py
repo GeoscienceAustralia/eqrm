@@ -5,6 +5,8 @@ import unittest
 
 from eqrm_code.parallel import *
 
+from eqrm_code import perf
+
 class Test_Parallel(unittest.TestCase):
     
     def setUp(self):
@@ -13,6 +15,7 @@ class Test_Parallel(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_parallel_off(self):
         
         sites_len = 10
@@ -26,6 +29,7 @@ class Test_Parallel(unittest.TestCase):
         self.assert_ (lo == 0) 
         self.assert_ (hi == sites_len) 
         
+    @perf.benchmark
     def test_parallel_on(self):
         # This test can be run with
         # mpirun -hostfile ~/.machines.cyclone -c 2 python parallel_spike.py
@@ -55,7 +59,8 @@ class Test_Parallel(unittest.TestCase):
             else:
                 self.assert_ (lo == 5) 
                 self.assert_ (hi == 10)
-           
+    
+    @perf.benchmark
     def test_parallel_on(self):
         # This test can be run with
         # mpirun -hostfile ~/.machines.cyclone -c 2 python parallel_spike.py

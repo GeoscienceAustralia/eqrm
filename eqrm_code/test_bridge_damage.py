@@ -17,7 +17,7 @@ import numpy as np
 import eqrm_code.damage_model as dm
 import eqrm_code.bridges as bridges
 
-
+from eqrm_code import perf
 
 class DataObj(object):
     """
@@ -54,6 +54,7 @@ class TestBridgeDamage(unittest.TestCase):
     # test case to ensure bad class string is handled OK
     ######
 
+    @perf.benchmark
     def test_bad_CLASS(self):
         """Check that a bad CLASS string gives RuntimeError."""
 
@@ -70,6 +71,7 @@ class TestBridgeDamage(unittest.TestCase):
     # test case to ensure bad model string is handled OK
     ######
 
+    @perf.benchmark
     def test_bad_model(self):
         CLASS = 'HWB17'
         sa_1_0 = np.array([0.125, 0.444])
@@ -84,6 +86,7 @@ class TestBridgeDamage(unittest.TestCase):
     # test cases compared with published examples
     ######
 
+    @perf.benchmark
     def test_Ken_paper(self):
         # case from Ken's recent paper
         CLASS = 'HWB17'
@@ -111,6 +114,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=2.0e-2), msg)
 
+    @perf.benchmark
     def test_FEMA(self):
         # case from FEMA paper, chapter 7
         # NOTE: this example seems to calculate modified spectral acceleration
@@ -127,6 +131,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-2), msg)
 
+    @perf.benchmark
     def test_Ken_0631A(self):
         # case 0631A from Ken's spreadsheet
         CLASS = 'HWB17'
@@ -140,6 +145,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=1.0e-4), msg)
 
+    @perf.benchmark
     def test_Ken_1046(self):
         # case 1046 from Ken's spreadsheet
         CLASS = 'HWB22'
@@ -153,6 +159,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=1.0e-3), msg)
 
+    @perf.benchmark
     def test_Ken_1469(self):
         # case 1469 from Ken's spreadsheet
         CLASS = 'HWB3'
@@ -166,6 +173,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=1.0e-3), msg)
 
+    @perf.benchmark
     def test_Ken_1466(self):
         # case 1466 from Ken's spreadsheet
         CLASS = 'HWB17'
@@ -179,6 +187,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=1.0e-3), msg)
 
+    @perf.benchmark
     def test_Ken_1153(self):
         # case 1153 from Ken's spreadsheet
         CLASS = 'HWB10'
@@ -192,6 +201,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=1.0e-3), msg)
 
+    @perf.benchmark
     def test_Ken_0361(self):
         # case 0361 from Ken's spreadsheet, assume EQ1 and Ishape==0
         CLASS = 'HWB28'
@@ -209,6 +219,7 @@ class TestBridgeDamage(unittest.TestCase):
     # test cases generated in bridge_test_spreadsheet.xls
     ######
 
+    @perf.benchmark
     def test_HWB1(self):
         CLASS = 'HWB1'
         sa_1_0 = np.array([[0.125]])
@@ -254,7 +265,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB2(self):
         CLASS = 'HWB2'
         sa_1_0 = np.array([[0.085]])
@@ -301,7 +312,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB3(self):
         CLASS = 'HWB3'
         sa_1_0 = np.array([[0.125]])
@@ -349,7 +360,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB4(self):
         CLASS = 'HWB4'
         sa_1_0 = np.array([[0.25]])
@@ -395,7 +406,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB5(self):
         CLASS = 'HWB5'
         sa_1_0 = np.array([[0.165]])
@@ -441,7 +452,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB6(self):
         CLASS = 'HWB6'
         sa_1_0 = np.array([[0.35]])
@@ -487,7 +498,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB7(self):
         CLASS = 'HWB7'
         sa_1_0 = np.array([[0.75]])
@@ -533,7 +544,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB8(self):
         CLASS = 'HWB8'
         sa_1_0 = np.array([[0.5]])
@@ -579,7 +590,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB9(self):
         CLASS = 'HWB9'
         sa_1_0 = np.array([[0.75]])
@@ -627,7 +638,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB10(self):
         CLASS = 'HWB10'
         sa_1_0 = np.array([[0.5]])
@@ -673,7 +684,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB11(self):
         CLASS = 'HWB11'
         sa_1_0 = np.array([[0.75]])
@@ -720,7 +731,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB12(self):
         CLASS = 'HWB12'
         sa_1_0 = np.array([[0.5]])
@@ -766,7 +777,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB13(self):
         CLASS = 'HWB13'
         sa_1_0 = np.array([[0.75]])
@@ -812,7 +823,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB14(self):
         CLASS = 'HWB14'
         sa_1_0 = np.array([[0.5]])
@@ -858,7 +869,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB15(self):
         CLASS = 'HWB15'
         sa_1_0 = np.array([[0.75]])
@@ -904,7 +915,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB16(self):
         CLASS = 'HWB16'
         sa_1_0 = np.array([[0.5]])
@@ -950,7 +961,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB17(self):
         CLASS = 'HWB17'
         sa_1_0 = np.array([[0.75]])
@@ -996,7 +1007,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB18(self):
         CLASS = 'HWB18'
         sa_1_0 = np.array([[0.5]])
@@ -1042,7 +1053,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB19(self):
         CLASS = 'HWB19'
         sa_1_0 = np.array([[0.75]])
@@ -1090,7 +1101,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB20(self):
         CLASS = 'HWB20'
         sa_1_0 = np.array([[0.5]])
@@ -1136,7 +1147,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB21(self):
         CLASS = 'HWB21'
         sa_1_0 = np.array([[0.75]])
@@ -1182,7 +1193,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB22(self):
         CLASS = 'HWB22'
         sa_1_0 = np.array([[0.5]])
@@ -1228,7 +1239,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB23(self):
         CLASS = 'HWB23'
         sa_1_0 = np.array([[0.75]])
@@ -1276,7 +1287,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB24(self):
         CLASS = 'HWB24'
         sa_1_0 = np.array([[0.5]])
@@ -1322,7 +1333,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB25(self):
         CLASS = 'HWB25'
         sa_1_0 = np.array([[0.75]])
@@ -1368,7 +1379,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB26(self):
         CLASS = 'HWB26'
         sa_1_0 = np.array([[0.5]])
@@ -1414,7 +1425,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB27(self):
         CLASS = 'HWB27'
         sa_1_0 = np.array([[0.75]])
@@ -1460,7 +1471,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_HWB28(self):
         CLASS = 'HWB28'
         sa_1_0 = np.array([[0.5]])
@@ -1506,7 +1517,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_array_sequential(self):
         """Initial part of 'array' test.
 
@@ -1558,6 +1569,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
+    @perf.benchmark
     def test_array_array(self):
         """Do test_array_sequential() above as one call to bridge_states().
 
@@ -1579,7 +1591,7 @@ class TestBridgeDamage(unittest.TestCase):
         msg = ('\nexpected=\n%s\nresult=\n%s' % (str(expected), str(result)))
         self.failUnless(np.allclose(expected, result, rtol=5.0e-3), msg)
 
-
+    @perf.benchmark
     def test_choose_random_state_3d(self):
         """Test the choose_random_state() function.
 
@@ -1648,7 +1660,7 @@ class TestBridgeDamage(unittest.TestCase):
                % (str(expected_states), str(result_states)))
         self.failUnless(np.alltrue(result_states == expected_states), msg)
 
-
+    @perf.benchmark
     def test_choose_random_state_5d(self):
         """Test the choose_random_state() function.
         Choose a random state from a state array.
@@ -1719,6 +1731,7 @@ class TestBridgeDamage(unittest.TestCase):
                % (str(expected_states), str(result_states)))
         self.failUnless(np.alltrue(result_states == expected_states), msg)
 
+    @perf.benchmark
     def test_interpret_damage_state(self):
         """Test the interpret_damage_state() function."""
 
@@ -1735,7 +1748,7 @@ class TestBridgeDamage(unittest.TestCase):
             msg = 'result_str=%s, expected_str=%s' % (result_str, expected_str)
             self.failUnless(result_str == expected_str, msg)
 
-
+    @perf.benchmark
     def test_calc_total_loss(self):
         """Test calling calc_total_loss() directly with bridge data.
 

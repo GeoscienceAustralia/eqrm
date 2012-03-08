@@ -12,6 +12,8 @@ from scipy import array, allclose
 
 from eqrm_code.check_scenarios import *
 
+from eqrm_code import perf
+
 class Test_check_scenarios(unittest.TestCase):
     
     def setUp(self):
@@ -20,6 +22,7 @@ class Test_check_scenarios(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_how_it_works(self):
         
         try:
@@ -61,6 +64,7 @@ class Test_check_scenarios(unittest.TestCase):
             pass
             #print "Test not running"
     
+    @perf.benchmark
     def test_check_dir_names(self):    
         dir_list = ['./implementation_tests/current/TS_haz38/', 
                     './implementation_tests/current/TS_haz39/', 
@@ -70,6 +74,7 @@ class Test_check_scenarios(unittest.TestCase):
         actual = ['TS_haz38', 'TS_haz39', 'TS_risk63']
         self.assertEqual(results, actual)
         
+    @perf.benchmark
     def test_check_dir_namesII(self):    
         dir_list = ['./implementation_tests/current/TS_haz38', 
                     './implementation_tests/current/TS_haz39', 

@@ -9,6 +9,8 @@ from xml.etree import ElementTree as ET #, getiterator
 from eqrm_code.xml_interface import Xml_Interface
 
 from eqrm_code.ANUGA_utilities import log
+
+from eqrm_code import perf
 #print "log.console_logging_level", log.console_logging_level
 #log.console_logging_level = log.ERROR
 
@@ -96,16 +98,20 @@ class Test_Xml_Interface(unittest.TestCase):
         self.xml.unlink()
         self.xml2.unlink()
 
+    @perf.benchmark
     def test_attributes(self):
         assert self.xml['Event'][0].attributes['magnitude_type']=='Mw'
         
+    @perf.benchmark
     def test_getting_polygons(self):
         assert  len(self.xml['polygon'])==2
 
+    @perf.benchmark
     def test_getting_excludes(self):
         assert len(self.xml['polygon'][0]['exclude'])==0
         assert len(self.xml['polygon'][1]['exclude'])==2
 
+    @perf.benchmark
     def test_getting_array(self):
         exclude_array = self.xml['polygon'][1]['exclude'][0].array
         expected_exclude_array=[[-32.0,121],[-34,122],[-32,121]]
@@ -115,6 +121,7 @@ class Test_Xml_Interface(unittest.TestCase):
         # Looking into something different
         root = build_xml()
 
+    @perf.benchmark
     def test_top_level_tag_name(self):
         """Test getting some info about the XML document.
 

@@ -6,6 +6,8 @@ import shutil
 
 from eqrm_code.util import *
 
+from eqrm_code import perf
+
 class Test_Util(unittest.TestCase):
     def setUp(self):
         pass
@@ -13,12 +15,14 @@ class Test_Util(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_determine_eqrm_path(self):
         # WARNING - just runs the model, does not check the results,
         # since the results are based on where EQRM is installed.
         determine_eqrm_path()
         # determine_eqrm_path is used in the test below though.
         
+    @perf.benchmark
     def test_get_local_or_default(self):
         eqrm_dir = determine_eqrm_path()
         input_dir =  os.path.join(eqrm_dir, 'eqrm_code')
@@ -30,6 +34,7 @@ class Test_Util(unittest.TestCase):
         # changes, or if the file is removed.
         self.failUnless(fid.read(9) == 'structure')
 
+    @perf.benchmark
     def test_WeaveIOError(self):
         try:
             raise WeaveIOError
@@ -38,6 +43,7 @@ class Test_Util(unittest.TestCase):
         else:
             self.fail("Error not thrown")
 
+    @perf.benchmark
     def test_add_directories(self):
         import tempfile
 
@@ -58,6 +64,7 @@ class Test_Util(unittest.TestCase):
         # clean up!
         shutil.rmtree(root_dir)
 
+    @perf.benchmark
     def test_add_directories_bad(self):
         
         import tempfile
@@ -75,6 +82,7 @@ class Test_Util(unittest.TestCase):
         #clean up!
         os.rmdir(root_dir)       
 
+    @perf.benchmark
     def test_find_bridge_sa(self):
         """Test the find_bridge_sa() function."""
 
@@ -102,6 +110,7 @@ class Test_Util(unittest.TestCase):
         # Too flaky for a test.
         retcode = run_call('get_python_version.py', 'python')
         
+    @perf.benchmark
     def test_string_convert(self):
         
         s = r'foo\bar'
@@ -121,6 +130,7 @@ class Test_Util(unittest.TestCase):
         actual = "join('" + os.sep + 'nas' + "', '')" 
         self.failUnlessEqual(out, actual)
 
+    @perf.benchmark
     def test_multi_split(self):
         out = multi_split('1a2b3a4b',['a','b'])
         self.failUnlessEqual(out, ['1','2','3','4',''])

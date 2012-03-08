@@ -53,6 +53,7 @@ class Test_Perf(unittest.TestCase):
     def tearDown(self):
         os.remove(self.file_name)
     
+    @benchmark
     def test_log_analysis(self):
         # Set log global to the temp file_name
         log.log_filename = self.file_name

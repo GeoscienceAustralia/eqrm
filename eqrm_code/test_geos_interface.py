@@ -6,6 +6,8 @@ from scipy import allclose
 
 from eqrm_code.geos_interface import *
 
+from eqrm_code import perf
+
 
 """
 Geos (a c++ port of JTS-topology-suit) (python bindings at hobu.net) is
@@ -62,6 +64,7 @@ class Test_Geos_Interface(unittest.TestCase):
     def tearDown(self):
         pass
     
+    @perf.benchmark
     def test_polygon_to_geos_polygon(self):
         geos_poly = polygon_to_geos_polygon(small_square)
         #assert geos_poly.isSimple()
@@ -87,11 +90,12 @@ class Test_Geos_Interface(unittest.TestCase):
         assert error_raised
         
                  
-
+    @perf.benchmark
     def test_polygon_to_geos_polygon_with_excludes(self):
         geos_poly = polygon_to_geos_polygon(small_square,[narrow_square])
         assert allclose(geos_poly.area,small_square_area/2)
 
+    @perf.benchmark
     def test_wkt_to_list_empty_polygon(self):
         geos_poly1 = polygon_to_geos_polygon(small_square)
         geos_poly2 = polygon_to_geos_polygon(large_square)
@@ -100,7 +104,7 @@ class Test_Geos_Interface(unittest.TestCase):
         # [] newer version of shapely 1.2.1
         assert list_multipolygon(geos_poly)==[[]] or list_multipolygon(geos_poly)==[]
         
-        
+    @perf.benchmark
     def test_wkt_to_multipolygon_list_simple_polygon(self):
         geos_poly = polygon_to_geos_polygon(small_square)
         
@@ -111,6 +115,7 @@ class Test_Geos_Interface(unittest.TestCase):
         geos_poly2 = obsolete_multipolygon_list_to_geos_polygon(poly_list)
         assert same_polygon(geos_poly,geos_poly2)
 
+    @perf.benchmark
     def test_wkt_to_multipolygon_list_complex_polygon(self):
         geos_poly = polygon_to_geos_polygon(large_square)
         geos_poly = geos_poly.difference(polygon_to_geos_polygon(small_square))
@@ -119,7 +124,7 @@ class Test_Geos_Interface(unittest.TestCase):
         geos_poly2 = obsolete_multipolygon_list_to_geos_polygon(poly_list) 
         assert same_polygon(geos_poly,geos_poly2)
 
-
+    @perf.benchmark
     def test_wkt_to_multipolygon_list_multipolygon(self):
         geos_poly = polygon_to_geos_polygon(narrow_square)
         geos_poly = geos_poly.difference(polygon_to_geos_polygon(small_square))
@@ -128,6 +133,7 @@ class Test_Geos_Interface(unittest.TestCase):
         geos_poly2 = obsolete_multipolygon_list_to_geos_polygon(poly_list)
         assert same_polygon(geos_poly,geos_poly2)
 
+    @perf.benchmark
     def test_obsolete_points_to_linestring(self):
         point_a=(0,0)
         point_b=(1,1)
@@ -213,7 +219,7 @@ class Test_Geos_Interface(unittest.TestCase):
         print triangle_list
         assert allclose(poly1.area,poly2.area)
         
-        
+    @perf.benchmark
     def test_obsolete_matlab_polygon_to_geos_quick(self):
         
         points=[[0,0],[0,3],[3,3],[3,0],[0,0]]

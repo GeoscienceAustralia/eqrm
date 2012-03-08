@@ -9,6 +9,7 @@ from scipy import array, allclose
 from eqrm_code.util import dict2csv
 from eqrm_code.misc import reduce_structure_db
 
+from eqrm_code import perf
 
 
 class Test_misc(unittest.TestCase):
@@ -18,6 +19,7 @@ class Test_misc(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_reduce_structure_db(self):
         handle, file_name_in = tempfile.mkstemp('.csv','test_throw_away_')
         os.close(handle)

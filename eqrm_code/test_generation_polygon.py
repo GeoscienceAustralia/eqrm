@@ -8,6 +8,8 @@ import types
 
 from eqrm_code.generation_polygon import *
 
+from eqrm_code import perf
+
 class Test_Generation_polygon(unittest.TestCase):
     
     def setUp(self):
@@ -65,6 +67,7 @@ class Test_Generation_polygon(unittest.TestCase):
 </source_model_zone>
 """
 
+    @perf.benchmark
     def test_polygons_from_xml_horspool(self):
         """
         Test with current and legacy xml schema. Legacy schema has
@@ -160,6 +163,7 @@ class Test_Generation_polygon(unittest.TestCase):
             
         os.remove(file_name)
 
+    @perf.benchmark
     def test_polygons_from_xml_horspool_FileError_on_Ml(self):
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
         os.close(handle)
@@ -182,6 +186,7 @@ class Test_Generation_polygon(unittest.TestCase):
             self.failUnless(False, "FileError not raised")
             
 
+    @perf.benchmark
     def test_polygons_from_xml_no_magnitude_type_ok(self):
         
         handle, file_name = tempfile.mkstemp('.xml', __name__+'_')
@@ -201,7 +206,7 @@ class Test_Generation_polygon(unittest.TestCase):
             
         os.remove(file_name)
                     
-        
+    @perf.benchmark
     def test_xml_fault_generators(self):
         def dump_fault(fault):
             """Helper function to dump info from FSG object."""
@@ -358,7 +363,7 @@ class Test_Generation_polygon(unittest.TestCase):
         
         self.failUnlessEqual(len(errorIndexes),0)
         
-        
+    @perf.benchmark
     def test_xml_fault_generators_magnitude_type(self):
         def dump_fault(fault):
             """Helper function to dump info from FSG object."""
@@ -452,7 +457,7 @@ class Test_Generation_polygon(unittest.TestCase):
             os.remove(file_name)
             self.failUnless(False, "FileError not raised")
             
-        
+    @perf.benchmark
     def test_xml_fault_generators_magnitude_type_left_out(self):
         def dump_fault(fault):
             """Helper function to dump info from FSG object."""

@@ -1864,6 +1864,7 @@ def ground_motion_interface_conformance(GM_class, model_name):
 
     return (exp(log_mean), test_mean, log_sigma, test_sigma)
 
+from eqrm_code import perf
 
 class Test_ground_motion_specification(unittest.TestCase):
     def setUp(self):
@@ -1890,17 +1891,19 @@ class Test_ground_motion_specification(unittest.TestCase):
                          "%s did not pass assert:\n%s" % (model_name, msg))
 
 
+    @perf.benchmark
     def test_all_ground_motion_interfaces(self):
         for name in classes_with_test_data:
             self.ground_motion_interface_conformance(Ground_motion_calculator,
                                                      name)
-
+    @perf.benchmark
     def test_all_multi_ground_motion_interfaces(self):
         for name in classes_with_test_data:
             self.ground_motion_interface_conformance(
                                        Multiple_ground_motion_calculator,
                                        name)
 
+    @perf.benchmark
     def test_Ground_motion_specification_init_(self):
         model_name = 'Gaull_1990_WA'
         model = Ground_motion_specification(model_name)

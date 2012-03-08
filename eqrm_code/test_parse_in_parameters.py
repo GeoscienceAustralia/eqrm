@@ -8,6 +8,8 @@ from scipy import array, allclose, asarray
 
 from parse_in_parameters import *
 
+from eqrm_code import perf
+
 try:
     from eqrm_code.ANUGA_utilities import log
     log_imported = True
@@ -210,13 +212,13 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.file_log_level == 'warning')
         self.failUnless(TPT.console_log_level == 'critical')
 
-
+    @perf.benchmark
     def test_instance_to_eqrm_flags(self):
         set = self.build_instance_to_eqrm_flags()
         TPT = create_parameter_data(set)
         self.check_eqrm_flags(TPT)
 
-
+    @perf.benchmark
     def test_instance_to_eqrm_flags_depreciated_atts(self):
         # Test depreciated_attributes
         set = self.build_instance_to_eqrm_flags()
@@ -226,7 +228,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.atten_variability_method == None)
         self.failUnless(TPT.amp_variability_method == None)
 
-
+    @perf.benchmark
     def test_eqrm_flags_to_control_file(self):
 
         if log_imported:
@@ -256,7 +258,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
             # turn logging back to previous levels
             log.console_logging_level = console_logging_level
         
-  
+    @perf.benchmark
     def test_DictKeyAsAttributes(self):
         dic = DictKeyAsAttributes()
         leg = 12
@@ -268,7 +270,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
             del dic.leg
         self.failUnlessRaises(AttributeError, del_again)
 
-        
+    @perf.benchmark
     def test_add_default_values_raise(self):
         set = Dummy()
         self.failUnlessRaises(AttributeSyntaxError,
@@ -302,13 +304,13 @@ class Test_Parse_in_parameters(unittest.TestCase):
 
         return set
 
-
+    @perf.benchmark
     def test_convert_py_2_THE(self):
         set = self.small_set_data()
         para_new = create_parameter_data(set)
         self.failUnless(para_new.atten_override_RSA_shape == None)
 
-
+    @perf.benchmark
     def test_fail_on_bad_att(self):
         
         set = Dummy()
@@ -334,7 +336,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
                               create_parameter_data, (set,))
         
 
-   
+    @perf.benchmark
     def test_find_set_data_py_files(self):
         
         temp_dir = tempfile.mkdtemp(suffix='test_parse_in_parameters')
@@ -371,7 +373,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         os.remove(txt_file)
         os.rmdir(temp_dir)
       
-   
+    @perf.benchmark
     def test_update_control_file(self):
         set = self.small_set_data()
         para_new = create_parameter_data(set)
@@ -390,6 +392,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         os.remove(file_name)
         os.remove(file_name[:-3]+ '.pyc')
     
+    @perf.benchmark
     def test_default_to_attr(self):
         set = self.build_instance_to_eqrm_flags()
         
@@ -407,6 +410,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         data_array_storage = os.path.abspath(eqrm_flags.data_array_storage)
         self.failUnlessEqual(data_array_storage, expected_dir)
     
+    @perf.benchmark
     def test_directory_exists_check(self):
         set = self.build_instance_to_eqrm_flags()
         

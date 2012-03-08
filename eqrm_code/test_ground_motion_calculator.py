@@ -14,6 +14,8 @@ from eqrm_code.ground_motion_calculator import Ground_motion_calculator, \
 
 from eqrm_code.test_ground_motion_specification import data2atts, \
      ground_motion_interface_conformance, Distance_stub
+     
+from eqrm_code import perf
 
 class Test_ground_motion_calculator(unittest.TestCase):
     def setUp(self):
@@ -28,6 +30,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         self.assert_(allclose(median, test_mean, rtol=0.05),
                      "%s did not pass assert" %model_name )
         
+    @perf.benchmark
     def test_toro_conformance(self):
         GM_model_name = 'Toro_1997_midcontinent'
         self.ground_motion_interface_conformance(Ground_motion_calculator,
@@ -37,7 +40,8 @@ class Test_ground_motion_calculator(unittest.TestCase):
         GM_model_name = 'Youngs_97'
         self.ground_motion_interface_conformance(Ground_motion_calculator,
                                                  GM_model_name)
-            
+
+    @perf.benchmark
     def test_log_mean(self):
         """
         This checks that for the given test_distance and test_magnitudes,
@@ -59,7 +63,8 @@ class Test_ground_motion_calculator(unittest.TestCase):
         
         self.assert_(allclose(exp(log_mean), test_mean, rtol=0.05),
                      "%s did not pass assert" %model_name )
-       
+
+    @perf.benchmark
     def test_log_sigma_BA08(self):
         model_name = 'Boore_08'
         
@@ -84,6 +89,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         self.assert_(allclose(log_sigma, test_log_sigma, rtol=0.05),
                      "%s did not pass assert" %model_name )
         
+    @perf.benchmark
     def test_log_sigma_Somerville09_Yilgarn(self):
         model_name = 'Somerville09_Yilgarn'
         
@@ -104,6 +110,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         self.assert_(allclose(log_sigma, test_log_sigma, rtol=0.0000005),
                      "%s did not pass assert" %model_name )
         
+    @perf.benchmark
     def test_Multiple_ground_motion_calculatorII(self):
         """
         This checks that for the given test_distance and test_magnitudes,
@@ -144,6 +151,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         #print "mean_out", mean_out.shape
         #print "mean_out", mean_out
         
+    @perf.benchmark
     def test_Multiple_ground_motion_calculatorI(self):
         """
         This checks that for the given test_distance and test_magnitudes,
@@ -174,6 +182,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         #print "mean_out", mean_out
         self.assert_(allclose(exp(log_mean), mean_out, rtol=0.05), "Fail")
     
+    @perf.benchmark
     def test_mult_gm(self):
         """
         This checks that for the given test_distance and test_magnitudes,
@@ -196,6 +205,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         self.assert_(allclose(exp(log_mean), test_mean, rtol=0.05),
                      "%s did not pass assert" % model_name)
 
+    @perf.benchmark
     def test_multiple_GM(self):
         # test that multiple ground motion model results
         # are returned with the right dimensions

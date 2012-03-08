@@ -8,6 +8,7 @@ from os import sep, path
 from scipy import array, allclose
 
 from eqrm_code.RSA2MMI import *
+from eqrm_code import perf
 
 class Test_RSA2MMI(unittest.TestCase):
     
@@ -17,6 +18,7 @@ class Test_RSA2MMI(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_RSA2MMI(self):
         # This test is bad, since I'm writing it based on the code.
         data = []   

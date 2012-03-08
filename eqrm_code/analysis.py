@@ -383,21 +383,20 @@ def main(parameter_handle,
                                       source_model,
                                       eqrm_flags.atten_threshold_distance)
         
-        soil_SA, bedrock_SA = calc_and_save_SA(
-            eqrm_flags,
-            sites,
-            event_set,
-            data.bedrock_SA_all,
-            data.soil_SA_all,
-            data.bedrock_hazard,
-            data.soil_hazard,
-            soil_amplification_model,
-            i,
-            rel_i,
-            ground_motion_distribution,
-            amp_distribution,
-            event_activity,
-            source_model_subset)
+        soil_SA, bedrock_SA = calc_and_save_SA(eqrm_flags,
+                                               sites,
+                                               event_set,
+                                               data.bedrock_SA_all,
+                                               data.soil_SA_all,
+                                               data.bedrock_hazard,
+                                               data.soil_hazard,
+                                               soil_amplification_model,
+                                               i,
+                                               rel_i,
+                                               ground_motion_distribution,
+                                               amp_distribution,
+                                               event_activity,
+                                               source_model_subset)
 
         # calculate fatality
         if eqrm_flags.run_type == "fatality":

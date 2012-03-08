@@ -15,6 +15,8 @@ from eqrm_code.aggregate_building_db_cd_code import aggregate_building_db, \
 from eqrm_code.structures import attribute_conversions, Structures
 from eqrm_code.util import dict2csv
 
+from eqrm_code import perf
+
 """
 """
 
@@ -58,7 +60,7 @@ class Agg_db_cd_code(unittest.TestCase):
         os.remove(file_name)
     
     
-    
+    @perf.benchmark
     def test_aggregate_building_db(self):
         attribute_dic={
             'BID':[1,2,3], # This is really ufi
@@ -104,6 +106,7 @@ class Agg_db_cd_code(unittest.TestCase):
                 self.assertEqual(site['FCB_USAGE'][i] , 491)
                 self.assertEqual(site['POSTCODE'][i] , 2291)
      
+    @perf.benchmark
     def test_aggregate_building_db2(self):
         # Note the survey_factor is used to weight the values
         # that are averaged.
@@ -151,7 +154,7 @@ class Agg_db_cd_code(unittest.TestCase):
                 self.assertEqual(site['FCB_USAGE'][i] , 491)
                 self.assertEqual(site['POSTCODE'][i] , 2291)
                    
-
+    @perf.benchmark
     def test_structure_aggregate_building_db_load(self):
         
         attribute_dic={

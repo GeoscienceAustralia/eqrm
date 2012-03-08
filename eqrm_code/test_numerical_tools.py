@@ -10,6 +10,8 @@ from math import sqrt, pi
 
 from eqrm_code.numerical_tools import *
 
+from eqrm_code import perf
+
 epsilon=0.00001
 
 
@@ -23,7 +25,7 @@ class Test_Numerical_Tools(unittest.TestCase):
     def tearDown(self):
         pass
 
-
+    @perf.benchmark
     def test_angle1(self):
         """Test angles between one vector and the x-axis
 	"""
@@ -36,7 +38,7 @@ class Test_Numerical_Tools(unittest.TestCase):
         assert allclose(angle([0.0, -1.0])/pi*180, 270.0)
         assert allclose(angle([1.0, -1.0])/pi*180, 315.0)		
 		
-							  
+    @perf.benchmark
     def test_angle2(self):
         """Test angles between two arbitrary vectors
 	"""    
@@ -64,9 +66,7 @@ class Test_Numerical_Tools(unittest.TestCase):
         vc = [ -0.5,  0.5]
         assert allclose(angle(vc, v_prev)/pi*180, 270.0)                
 
-
-		
-    
+    @perf.benchmark
     def test_err(self):
         x = [2,5] # diff at first position = 4, 4^2 = 16
         y = [6,7] # diff at secnd position = 2, 2^2 = 4
@@ -92,18 +92,12 @@ class Test_Numerical_Tools(unittest.TestCase):
         y = [6,7,5,10,103]
         err_3 = err(x,y,2,False)
         assert err_3 == sqrt(47)
-				
-		
-	
-		
 
-
+    @perf.benchmark
     def test_anglediff(self):
         assert allclose(anglediff([0.0, 1.], [1.0, 1.0])/pi*180, 45.0)
 
-
-
-	
+    @perf.benchmark
     def test_ensure_numeric(self):
         from numerical_tools import ensure_numeric
         from scipy import ndarray, array
@@ -151,6 +145,7 @@ class Test_Numerical_Tools(unittest.TestCase):
         assert (A == B).all()
         assert A is not B   #Not the same object
 
+    @perf.benchmark
     def test_histogram(self):
         """Test histogram with different bin boundaries
         """

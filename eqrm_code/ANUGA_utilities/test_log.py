@@ -33,6 +33,10 @@ class Test_Log(unittest.TestCase):
         log.set_log_file(self.logfile, log.file_logging_level)
 
     def tearDown(self):
+        # Remove the temporary logfile
+        log.remove_file_handler()
+        log.remove_log_file()
+        
         # Set everything back to the way it was
         log.default_to_console = self.default_to_console_orig
         log.allow_level_override = self.allow_level_override_orig
@@ -42,9 +46,6 @@ class Test_Log(unittest.TestCase):
         
         # ..and stdout!
         sys.stdout = sys.__stdout__
-        
-        # Remove the temporary logfile
-        os.remove(self.logfile)
         
     def logMessages(self):
         log.debug('test at level DEBUG')

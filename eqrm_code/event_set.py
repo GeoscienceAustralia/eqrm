@@ -1508,6 +1508,15 @@ def load_event_set(parallel, eqrm_flags):
     specified in eqrm_flags
     """
     
+    # The first node starts
+    # The others wait for notification
+    # Each node notifies the next one when done
+    
+    if parallel.rank != 0:
+        log.info('P%s: Waiting for P%s to load event set' % (parallel.rank,
+                                                             parallel.rank-1))
+        parallel.waitfor(msg=parallel.load_event_set, source=parallel.rank-1)
+        
     load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
     log.info('P%s: Loading event set from %s' % (parallel.rank, load_dir))
     
@@ -1516,6 +1525,9 @@ def load_event_set(parallel, eqrm_flags):
     event_set = Event_Set.load(load_dir, store_dir)
     event_activity = Event_Activity.load(len(event_set), load_dir, store_dir)
     source_model = Source_Model.load(load_dir)
+    
+    if parallel.rank < parallel.size-1:
+        parallel.send(parallel.load_event_set, parallel.rank+1)
     
     return (event_set, event_activity, source_model)
 
@@ -1560,10 +1572,10 @@ def create_event_set(eqrm_flags, parallel):
         if parallel.rank == 0:
             generate_event_set(parallel, eqrm_flags)
             # Let the workers know they can continue 
-            parallel.notifyworkers(msg=parallel.load_event_set)
+            parallel.notifyworkers(msg=parallel.event_set_generated)
         else:
             log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
-            parallel.waitfor(msg=parallel.load_event_set, source=0)
+            parallel.waitfor(msg=parallel.event_set_generated, source=0)
         
         (event_set,
          event_activity,

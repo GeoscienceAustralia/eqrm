@@ -9,6 +9,8 @@ import eqrm_code.test_event_set as test_event_set
 from eqrm_code import file_store
 from eqrm_code.event_set import Event_Set, Event_Activity
 
+from eqrm_code import perf
+
 class Test_Event_Set_Npy(test_event_set.Test_Event_Set):
     
     def setUp(self):
@@ -22,7 +24,7 @@ class Test_Event_Set_Npy(test_event_set.Test_Event_Set):
         # Remove the temporary data directory
         shutil.rmtree(self.data_dir)
         
-        
+    @perf.benchmark
     def test_event_set_load_save(self):
         # Create a dummy event set
         event_set1 = test_event_set.event_from_csv_long()
@@ -59,7 +61,7 @@ class Test_Event_Set_Npy(test_event_set.Test_Event_Set):
         assert allclose(event_set1.dip,
                         event_set2.dip)
 
-
+    @perf.benchmark
     def test_event_activity_load_save(self):
         # Event_Activity object based on Test_Event_Set.test_Event_Activity
         num_events = 3

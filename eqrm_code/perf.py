@@ -16,7 +16,7 @@ import sys
 import time, datetime
 from functools import wraps
 from eqrm_code.get_version import get_svn_revision_sandpit_linux
-from eqrm_code.ANUGA_utilities import log
+from eqrm_code.ANUGA_utilities import log 
 
 default_csv_file = 'perf.csv'
 
@@ -36,6 +36,20 @@ def timeit(func):
         result = func(*args, **kw)
         tdiff_msecs = 1000 * (default_timer() - t0)
         print "%s(%s) time = %0.2f msecs" % (func.__name__ , str(*args), tdiff_msecs)
+        return result
+    return wrapper
+
+def benchmark(func):
+    '''Wrap a call to the benchmarker library. If the module does not exist
+    simply return the result of the function call.'''
+    
+    @wraps(func)
+    def wrapper(*args, **kw):
+        try:
+            from bench import benchmarker
+            result = benchmarker.runcall(func, *args, **kw)
+        except ImportError:
+            result = func(*args, **kw)
         return result
     return wrapper
 

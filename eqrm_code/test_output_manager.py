@@ -15,6 +15,8 @@ from eqrm_code.util import dict2csv, determine_eqrm_path
 import eqrm_code.eqrm_filesystem as efs
 from test_event_set import DummyEventSet
 
+from eqrm_code import perf
+
 def make_motion(dims):
     def digital(sp, gmm, rm, site, ev, pd):
         return sp*1000 + gmm*100 + rm*10 + site + ev*0.1 + pd*0.01
@@ -100,6 +102,7 @@ class Test_Output_manager(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @perf.benchmark
     def test_save_hazard(self):
         eqrm_flags=DummyEventSet()
         soil_amp = True
@@ -157,6 +160,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
         os.rmdir(eqrm_flags.output_dir)
 
+    @perf.benchmark
     def test_load_SA(self):
         eqrm_flags=DummyEventSet()
         soil_amp = False
@@ -198,6 +202,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
         os.rmdir(eqrm_flags.output_dir)
 
+    @perf.benchmark
     def test_load_hazards_1(self):
         eqrm_flags=DummyEventSet()
         soil_amp = True
@@ -240,6 +245,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
         os.rmdir(eqrm_flags.output_dir)
 
+    @perf.benchmark
     def test_load_hazardsII(self):
         eqrm_flags=DummyEventSet()
         soil_amp = False
@@ -280,7 +286,8 @@ class Test_Output_manager(unittest.TestCase):
         # remove the locations file that is also produced.
         os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
         os.rmdir(eqrm_flags.output_dir)
-
+    
+    @perf.benchmark
     def test_load_hazardsIII(self):
         eqrm_flags=DummyEventSet()
         soil_amp = True
@@ -323,6 +330,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(eqrm_flags.output_dir+ eqrm_flags.site_tag + '_locations.txt')
         os.rmdir(eqrm_flags.output_dir)
 
+    @perf.benchmark
     def test_load_hazards_no_files(self):
         eqrm_flags=DummyEventSet()
         soil_amp = False
@@ -341,7 +349,7 @@ class Test_Output_manager(unittest.TestCase):
                         'empty directory did not cause an error')
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_save_sites(self):
         output_dir = tempfile.mkdtemp('output_managertest_save_sites') + os.sep
         site_tag = "site_tag"
@@ -367,7 +375,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(loc_file_name)
         os.rmdir(output_dir)
 
-
+    @perf.benchmark
     def test_load_sites(self):
         output_dir = tempfile.mkdtemp('output_managertest_save_sites') + os.sep
         site_tag = "site_tag"
@@ -385,6 +393,7 @@ class Test_Output_manager(unittest.TestCase):
         self.assertEqual(float(lat_actual[0]), float(lat[0]))
         self.assertEqual(float(lon_actual[0]), float(lon[0]))
 
+    @perf.benchmark
     def test_load_sitesII(self):
         output_dir = tempfile.mkdtemp('output_managertest_save_sites') + os.sep
         site_tag = "site_tag"
@@ -402,7 +411,7 @@ class Test_Output_manager(unittest.TestCase):
         self.assertEqual(float(lat_actual[0]), float(lat[0]))
         self.assertEqual(float(lon_actual[0]), float(lon[0]))
 
-
+    @perf.benchmark
     def test_save_distances(self):
 
         eqrm_flags=DummyEventSet()
@@ -474,6 +483,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(file_name)
         os.rmdir(eqrm_flags.output_dir)
 
+    @perf.benchmark
     def test_save_distancesII(self):
 
         eqrm_flags=DummyEventSet()
@@ -544,7 +554,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(file_name)
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_load_distances(self):
 
         eqrm_flags=DummyEventSet()
@@ -591,7 +601,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(os.path.join(eqrm_flags.output_dir, file))
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_save_motion(self):
         # This test is using the flexibility in the save_motion function,
         # which is not present in the actual data, I suspect.
@@ -632,6 +642,7 @@ class Test_Output_manager(unittest.TestCase):
             os.remove(file_name)
         os.rmdir(eqrm_flags.output_dir)
 
+    @perf.benchmark
     def test_load_save_damage(self):
         save_dir = tempfile.mkdtemp('test_load_save_damage') + os.sep
         site_tag = "site_tag"
@@ -655,7 +666,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(name)
         os.rmdir(save_dir)
 
-
+    @perf.benchmark
     def test_save_event_set(self):
         rupture_centroid_lat = [-33.351170370959323, -32.763381339789468]
         rupture_centroid_lon = [151.45946928787703, 151.77787395867014]
@@ -733,7 +744,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(file_full_name)
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_join_parallel_files(self):
         compress = False
         file_num = 5
@@ -760,7 +771,7 @@ class Test_Output_manager(unittest.TestCase):
         f_check.close()
         os.remove(base_file_name)
 
-
+    @perf.benchmark
     def test_join_parallel_files_column(self):
         compress = False
         file_num = 6
@@ -800,6 +811,7 @@ class Test_Output_manager(unittest.TestCase):
         f_check.close()
         os.remove(base_file_name)
 
+    @perf.benchmark
     def test_save_structures(self):
         eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp('test_save_structures') + os.sep
@@ -860,6 +872,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(name)
         os.rmdir(eqrm_flags.output_dir)
 
+    @perf.benchmark
     def test_save_ecloss(self):
         ecloss_name = '_total_building'
         eqrm_flags = DummyEventSet()
@@ -890,6 +903,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(name + parallel_tag)
         os.rmdir(eqrm_flags.output_dir)
 
+    @perf.benchmark
     def test_save_eclossII(self):
         ecloss_name = '_total_building'
         eqrm_flags = DummyEventSet()
@@ -912,7 +926,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(name)
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_save_eclossIII(self):
         # testing a one row file
         ecloss_name = '_total_building'
@@ -936,7 +950,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(name)
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_load_lat_long_haz_SA(self):
         eqrm_flags=DummyEventSet()
         soil_amp = True
@@ -993,7 +1007,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(base_name)
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_load_structures(self):
         eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -1035,7 +1049,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(base_file)
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_load_ecloss_and_sites(self):
         eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -1099,7 +1113,7 @@ class Test_Output_manager(unittest.TestCase):
                 print e
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_save_bridges(self):
         eqrm_flags = DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp('test_save_bridges') + os.sep
@@ -1144,6 +1158,7 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(name)
         os.rmdir(eqrm_flags.output_dir)
 
+    @perf.benchmark
     def test_load_motion(self):       
         eqrm_flags=DummyEventSet()
         soil_amp = False
@@ -1166,7 +1181,7 @@ class Test_Output_manager(unittest.TestCase):
         #print "eqrm_flags.output_dir", eqrm_flags.output_dir
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_load_collapsed_motion_sitess(self):      
         eqrm_flags=DummyEventSet()
         soil_amp = True
@@ -1205,7 +1220,7 @@ class Test_Output_manager(unittest.TestCase):
         #print "eqrm_flags.output_dir", eqrm_flags.output_dir
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_load_collapsed_motion_sitesII(self):      
         eqrm_flags=DummyEventSet()
         soil_amp = True
@@ -1250,7 +1265,7 @@ class Test_Output_manager(unittest.TestCase):
         #print "eqrm_flags.output_dir", eqrm_flags.output_dir
         os.rmdir(eqrm_flags.output_dir)
 
-
+    @perf.benchmark
     def test_load_motion_sites(self):      
         eqrm_flags=DummyEventSet()
         soil_amp = True
@@ -1292,6 +1307,7 @@ class Test_Output_manager(unittest.TestCase):
         #print "eqrm_flags.output_dir", eqrm_flags.output_dir
         os.rmdir(eqrm_flags.output_dir)
         
+    @perf.benchmark
     def test_load_motion_file(self):
         eqrm_flags=DummyEventSet()
         soil_amp = False
@@ -1320,7 +1336,7 @@ class Test_Output_manager(unittest.TestCase):
         #print "eqrm_flags.output_dir", eqrm_flags.output_dir
         os.rmdir(eqrm_flags.output_dir)
         
-
+    @perf.benchmark
     def test_get_days_to_complete_file_name(self):
         site_tag = 'a'
         functional_percentage = 50
@@ -1361,7 +1377,7 @@ class Test_Output_manager(unittest.TestCase):
         self.failUnlessEqual('a_bridge_days_to_complete_rp[50p01]b',
                              base_name)
                              
- 
+    @perf.benchmark 
     def test_save_bridge_days_to_complete(self):
         eqrm_flags=DummyEventSet()
         eqrm_flags.output_dir = tempfile.mkdtemp(
