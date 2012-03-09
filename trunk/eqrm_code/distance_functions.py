@@ -192,7 +192,7 @@ def Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths):
     """
     x, y are the site locations on a 2D surface, refferenced to a local
     co-ordinate system.  The mid point of the
-    rupture as the origin and the direction of the rupture trace is 
+    rupture or the mid point of the rupture trace is the origin and the direction of the rupture trace is 
     the +ve x direction.
     """
     
