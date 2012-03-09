@@ -5,20 +5,21 @@ import unittest
 from scipy import (asarray, allclose, newaxis, sqrt, arccos, sin, cos, pi,
                    newaxis)
 
-from eqrm_code.distance_functions import distance_functions, Horizontal
+from eqrm_code.distance_functions import * #distance_functions, Horizontal, \
+
 from eqrm_code.projections import (azimuthal_orthographic,
                                    azimuthal_orthographic_ll_to_xy as ll2xy)
 from eqrm_code.sites import Sites
 from eqrm_code.distances import Distances
 
-#site=Sites(None,None)
-projection=azimuthal_orthographic
 
-lengths=0.0
-azimuths=0.0
-widths=0.0
+# Warning - a bunch of global variables.
+projection = azimuthal_orthographic
+lengths = 0.0
+azimuths = 0.0
+widths = 0.0
 dips = 10.0
-depths=0.0
+depths = 0.0
 
 class Test_Distance_functions(unittest.TestCase):
     def test_Epicentral(self):
@@ -41,8 +42,6 @@ class Test_Distance_functions(unittest.TestCase):
 
         d=asarray((0,1,2,3))*(1.852*60)
         d=d[:,newaxis]
-        #rupture_centroid_lat=rupture_centroid_lat[newaxis,:]
-        #rupture_centroid_lon=rupture_centroid_lon[newaxis,:]
         d2=self.as_the_cockey_flies(rupture_centroid_lat,
                                     rupture_centroid_lon,
                                     site_lat,site_lon)
@@ -153,7 +152,7 @@ class Test_Distance_functions(unittest.TestCase):
 
         azimuths = asarray((0.0,))
         widths = asarray((10.0,))
-        lengths = asarray((20.0,))
+        lengths = asarray((40.0,))
         dips = asarray((90.0,))
         depths = asarray((30.0,))
         trace_start_lat = asarray((0.0,))
@@ -189,6 +188,198 @@ class Test_Distance_functions(unittest.TestCase):
         msg = ('Expected Rx=\n%s\ngot\n%s' % (str(expected_Rx), str(Rx)))
         self.failUnless(allclose(Rx, expected_Rx, rtol=5.0e-3), msg)
 
+        
+    def test_Rupture(self):
+        # calculate length of 1 degree of great circle
+        R = 6367.0		# Earth radius (km)
+        circumference = 2 * pi * R
+        km_per_degree = circumference / 360.0
+
+
+        # define varying sites, at different positions, units is deg
+        #                      1        2        3
+        #                  (-0.1,.5)  (0,.5)  (0.1,.5)
+        #			 .	.      .
+        #
+        #                               (0,.4) end
+        #				|
+        #				|
+        #				|
+        #				|
+        #	    4  (-0.1,.2) .	. 5     .  6 (0.1,.2)
+        #				|
+        #				|
+        #				|
+        #				|
+        #                               (0,0) start
+        #
+        #			 .	.      .
+        #                  (-0.1,-.1)  (0,-.1)  (0.1,-.1)
+        #                       7         8         9
+        #
+        
+        # y values, since long is y due to local co-ord system
+        lon_sites = asarray((-0.1, 0., 0.1, -0.1, 0., 0.1,-0.1, 0., 0.1))
+        
+        # x values, since lat is x due to local co-ord system
+        lat_sites = asarray((0.5, 0.5, 0.5, 0.2, 0.2, 0.2, -0.1, -0.1, -0.1))
+
+        
+        # define array of events, all at 0,0
+        lat_events = asarray((0.0,))
+        lon_events = asarray((0.0,))
+
+        azimuths = asarray((0.0,))
+        widths = asarray((10.0,)) # No used in test
+        lengths = asarray((km_per_degree * 0.4,))
+        dips = asarray((90.0,))
+        depths = asarray((0.0,))
+        trace_start_lat = asarray((0.0,))
+        trace_start_lon = asarray((0.0,))
+        trace_start_x = asarray((0.0,))
+        trace_start_y = asarray((0.0,))
+        
+        projection = azimuthal_orthographic
+
+        # define expected Rx values
+        expected_Rrup_deg = asarray(
+            [[2**0.5*0.1],
+             [.1],
+             [ 2**0.5*0.1],
+             [.1],
+             [0.0],
+             [.1],
+             [2**0.5*0.1],
+             [.1],
+             [2**0.5*0.1]])
+        expected_Rrup = expected_Rrup_deg * km_per_degree
+
+        Rrup = Rupture(lat_sites, lon_sites, lat_events, lon_events, lengths,
+                     azimuths, widths, dips, depths, projection,
+                     trace_start_lat, trace_start_lon,
+                     trace_start_x, trace_start_y)
+
+        msg = ('Expected Rx=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
+        self.failUnless(allclose(Rrup, expected_Rrup, rtol=5.0e-3), msg)
+        
+        
+    def fails_test_Rupture_xy(self):
+        # This is assuming that the sites are refferenced against
+        # the trace start.
+        
+        
+        # define varying sites, at different positions, units km
+        #                      1        2        3
+        #                  (-0.1,.5)  (0,.5)  (0.1,.5)
+        #			 .	.      .
+        #
+        #                               (0,.4) end
+        #				|
+        #				|
+        #				|
+        #				|
+        #	    4  (-0.1,.2) .	. 5     .  6 (0.1,.2)
+        #				|
+        #				|
+        #				|
+        #				|
+        #                               (0,0) start
+        #
+        #			 .	.      .
+        #                  (-0.1,-.1)  (0,-.1)  (0.1,-.1)
+        #                       7         8         9
+        #
+        
+        # x axis points North based on the local co-ord axis
+        y_sites = asarray((-0.1, 0., 0.1, -0.1, 0., 0.1,-0.1, 0., 0.1))
+        x_sites = asarray((0.5, 0.5, 0.5, 0.2, 0.2, 0.2, -0.1, -0.1, -0.1))
+
+        azimuths = asarray((0.0,))
+        widths = asarray((10.0,)) # No used in test
+        lengths = asarray((0.4,))
+        dips = asarray((90.0,))
+        depths = asarray((0.0,))
+
+        rad = pi/180
+        cos_dip = cos(dips*rad)
+        sin_dip = sin(dips*rad)
+    
+        # define expected Rx values
+        expected_Rrup = asarray([
+                2**0.5*0.1,
+                .1,
+                2**0.5*0.1,
+                .1,
+                0.0,
+                .1,
+                2**0.5*0.1,
+                .1,
+                2**0.5*0.1])
+
+        Rrup = Rupture_xy(x_sites, y_sites, lengths, widths, cos_dip, 
+                          sin_dip, depths)
+
+        msg = ('Expected Rx=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
+        self.failUnless(allclose(Rrup, expected_Rrup, rtol=5.0e-3), msg)
+        
+    def test_mid_point_Rupture_xy(self):
+
+        # define varying sites, at different positions, units km
+        #                      1        2        3
+        #                  (-0.1,.3)  (0,.3)  (0.1,.3)
+        #			 .	.      .
+        #
+        #                               (0,.4) end
+        #				|
+        #				|
+        #				|
+        #				|
+        #	    4  (-0.1,.0) .	. 5     .  6 (0.1,.0)
+        #				|
+        #				|
+        #				|
+        #				|
+        #                               (0,-.2) start
+        #
+        #			 .	.      .
+        #                  (-0.1,-.3)  (0,-.3)  (0.1,-.3)
+        #                       7         8         9
+        #
+        
+        # x axis points North based on the local co-ord axis
+        y_sites = asarray((-0.1, 0., 0.1, -0.1, 0., 0.1,-0.1, 0., 0.1))
+        x_sites = asarray((0.3, 0.3, 0.3, 0.0, 0.0, 0.0, -0.3, -0.3, -0.3))
+
+        azimuths = asarray((0.0,))
+        widths = asarray((10.0,)) # No used in test
+        lengths = asarray((0.4,))
+        dips = asarray((90.0,))
+        depths = asarray((0.0,))
+
+        rad = pi/180
+        cos_dip = cos(dips*rad)
+        sin_dip = sin(dips*rad)
+    
+        # define expected Rx values
+        
+        expected_Rrup = asarray([
+                2**0.5*0.1,
+                .1,
+                2**0.5*0.1,
+                .1,
+                0.0,
+                .1,
+                2**0.5*0.1,
+                .1,
+                2**0.5*0.1])
+        
+        Rrup = Rupture_xy(x_sites, y_sites, lengths, widths, cos_dip, 
+                          sin_dip, depths)
+
+        msg = ('Expected Rx=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
+        self.failUnless(allclose(Rrup, expected_Rrup, atol=5.0e-3), msg)     
+        
+        
 def m_to_py1(m):
     """
     Input

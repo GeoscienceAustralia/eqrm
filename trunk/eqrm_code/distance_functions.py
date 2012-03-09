@@ -145,14 +145,17 @@ def Rupture(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
     cos_dip = cos(dips*rad)
     sin_dip = sin(dips*rad)
     
+    # project lat,lon to local x,y
     (x, y) = projection.angular_to_cartesian(lat_sites, lon_sites,
                                              lat_events, lon_events,
                                              azimuths)
-
-    # project lat,lon to x,y
+                                             
+    # x, y are the sites location vectors in the local co-ord system
     return Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths)
 
+    
 def Mendez_Rupture_xy(cos_dip, sin_dip, lengths, widths, depths, x0, y0, x, y):
+
     # find the closest points to site on the infinite rupure plane
     y_closest = y*cos_dip*cos_dip
     z_closest = y*cos_dip*sin_dip
@@ -184,7 +187,15 @@ def Mendez_Rupture_xy(cos_dip, sin_dip, lengths, widths, depths, x0, y0, x, y):
     return where(rupture_distance < DISTANCE_LIMIT,
                  DISTANCE_LIMIT, rupture_distance)
 
+                 
 def Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths):
+    """
+    x, y are the site locations on a 2D surface, refferenced to a local
+    co-ordinate system.  The mid point of the
+    rupture as the origin and the direction of the rupture trace is 
+    the +ve x direction.
+    """
+    
     y_rup = y*cos_dip - depths*sin_dip
     z_rup = y*sin_dip + depths*cos_dip
 
