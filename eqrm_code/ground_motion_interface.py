@@ -5984,6 +5984,7 @@ Allen_2012_model_shallow = array([
          -2.93022777e+00,  -2.60091894e+00,   1.27404634e-01,
           2.67585186e-01]])
 
+          #  results are log10 of cm/sec**2
 Allen_2012_sigma_shallow = array([
        [ 0.35533697,  0.35624902,  0.35704694,  0.35764279,  0.35845709,
          0.35903936,  0.35960383,  0.36082654,  0.36312035,  0.36584991,
@@ -6081,7 +6082,7 @@ def Allen_2012_distribution(**kwargs):
     # TA:
     # r01 = 80;
     # r02 = 150;
-    r01 = 80
+    r01 = 80  # should be 90
     r02 = 150
     
     # TA:
@@ -6106,12 +6107,15 @@ def Allen_2012_distribution(**kwargs):
     #       + (ones(size(minr1)).*(1+c5*(M-4))).^2)) ...
     #       + maxr2.*(c6 + c7*(M-4)) ...
     #       + maxr3.*(c9 + c10*(M-4)));
+    
+    # results are log10 of cm/sec**2
     log_mean = (c0 + c1*(Mw-4) + c2*(Mw-4)**2 \
              + (c3 + c4*(Mw-4))*log10(sqrt(minr1**2 \
              + (ones(minr1.shape)*(1 + c5*(Mw-4)))**2)) \
              + maxr2 * (c6 + c7*(Mw-4)) \
              + maxr3 * (c9 + c10*(Mw-4)))/LOG10E
-    
+    # FIXME remove /LOG10E to be in the right log space/units
+    # given in the comments
     
     # Deep sigma
     sd = sigma_coefficient[0]
@@ -6126,6 +6130,11 @@ def Allen_2012_distribution(**kwargs):
     #     load 'AUS11_shallow.mat
     # end   
     log_sigma = where(depth >= 10, sd, ss)
+    
+    
+    # Convert
+    #log_mean_new = log_mean_old - log10(981)
+    #log_sigma_new = log_sigma_old - log10(981)
     
     return log_mean, log_sigma
     
