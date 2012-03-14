@@ -42,8 +42,8 @@ from projections import azimuthal_orthographic_ll_to_xy as ll2xy
 # constant used to convert degrees to radians: rad = deg * DegreesToRadians
 DegreesToRadians = pi / 180.0
 
-#DISTANCE_LIMIT = 0.000001
-DISTANCE_LIMIT = 1.0
+DISTANCE_LIMIT = 0.000001
+#DISTANCE_LIMIT = 1.0
 
 def Hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
                 widths, dips, depths, projection, trace_start_lat,
