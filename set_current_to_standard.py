@@ -1,7 +1,8 @@
 """
 
 Title: set_current_to_standard - move the current scenario result
-  files to the standard dir.  You do this when the standard needs to
+  files to the standard dir and move the long current scenario result
+  files to the long standard dir.  You do this when the standard needs to
   be updated.
  
   Author:  Duncan Gray, Duncan.gray@ga.gov.au 
@@ -28,6 +29,8 @@ from eqrm_code.check_scenarios import STANDARD_DIR, CURRENT_DIR, \
 
 from shutil import copyfile
 
+EXCEPTIONS = ['.svn', 'log.txt', 'THE_PARAM_T.txt', 'current_event_set']
+
 def main():
     current2standard(CURRENT_DIR, STANDARD_DIR)
     current2standard(LONG_CURRENT_DIR, LONG_STANDARD_DIR)
@@ -44,20 +47,15 @@ def current2standard(current_dir, standard_dir):
         print dir
         cur_files = listdir(path.join(current_dir, dir))
         
-        try:
-            cur_files.remove('.svn')
-        except:
-            pass
-        try:
-            cur_files.remove('log.txt')
-        except:
-            pass
-        try:
-            cur_files.remove('THE_PARAM_T.txt')
-        except:
-            pass
+        for ditch in EXCEPTIONS:
+            try:
+                cur_files.remove(ditch)
+            except:
+                pass
+                
         for file in cur_files:
             move_file = path.join(current_dir, dir, file)
+            print "file", file
             move_to_here = path.join(standard_dir, dir, file)
             copyfile(move_file,move_to_here)
 
@@ -65,6 +63,7 @@ def current2standard(current_dir, standard_dir):
 #-------------------------------------------------------------
 if __name__ == "__main__":
      main()
+     print "WARNING - You must run long_check_scenarios.py as well."
 #     if sys.platform == 'linux2':  #Windows
 #         main()
 #     else:
