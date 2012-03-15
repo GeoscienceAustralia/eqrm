@@ -202,15 +202,20 @@ class Test_Recurrence_functions(unittest.TestCase):
         dummy = Dummy()
         dummy.magnitude_dist = {}
         dummy.magnitude_dist['minimum'] = actual_generation_min_mag
-        dummy.magnitude_dist['maximum'] = recurrence_max_mag        
+        dummy.magnitude_dist['maximum'] = recurrence_max_mag    
         dummy.generation_min_mag = generation_min_mag
-        dummy.recurrence_max_mag  = recurrence_max_mag  
-        dummy.recurrence_min_mag  = recurrence_min_mag  
-        dummy.A_min = A_min
-        dummy.b = b
+        
+        dummyRm = Dummy()
+        dummyRm.max_magnitude  = recurrence_max_mag  
+        dummyRm.min_magnitude  = recurrence_min_mag  
+        dummyRm.A_min = A_min
+        dummyRm.b = b
+        dummyRm.recurrence_model_distribution = 'bounded_gutenberg_richter'
+        dummyRm.raw_weight = 1.0
+        dummy.recurrence_models = [dummyRm]
+        
         dummy.event_type = "background"
         dummy.name = 'name'
-        dummy.distribution = 'bounded_gutenberg_richter'
         fsg_list = [dummy]
             
         magnitude_type = 'Mw'
@@ -281,13 +286,18 @@ class Test_Recurrence_functions(unittest.TestCase):
         dummy.magnitude_dist['minimum'] = actual_generation_min_mag
         dummy.magnitude_dist['maximum'] = recurrence_max_mag        
         dummy.generation_min_mag = generation_min_mag
-        dummy.recurrence_max_mag  = recurrence_max_mag  
-        dummy.recurrence_min_mag  = recurrence_min_mag  
-        dummy.A_min = A_min
-        dummy.b = b
         dummy.event_type = "background"
         dummy.name = 'name'
-        dummy.distribution = 'bounded_gutenberg_richter'
+        
+        dummyRm = Dummy()
+        dummyRm.max_magnitude  = recurrence_max_mag  
+        dummyRm.min_magnitude  = recurrence_min_mag  
+        dummyRm.A_min = A_min
+        dummyRm.b = b
+        dummyRm.recurrence_model_distribution = 'bounded_gutenberg_richter'
+        dummyRm.raw_weight = 1.0
+        dummy.recurrence_models = [dummyRm]
+        
         fsg_list = [dummy]
             
         magnitude_type = 'Mw'
@@ -347,20 +357,25 @@ class Test_Recurrence_functions(unittest.TestCase):
         dummy.magnitude_dist['minimum'] = actual_generation_min_mag
         dummy.magnitude_dist['maximum'] = recurrence_max_mag        
         dummy.generation_min_mag = generation_min_mag
-        dummy.recurrence_max_mag  = recurrence_max_mag  
-        dummy.recurrence_min_mag  = recurrence_min_mag  
-        dummy.A_min = A_min
-        dummy.b = b
         dummy.event_type = "background"
         dummy.name = 'name'
-        dummy.distribution = 'bounded_gutenberg_richter'
+        
+        dummyRm = Dummy()
+        dummyRm.max_magnitude  = recurrence_max_mag  
+        dummyRm.min_magnitude  = recurrence_min_mag  
+        dummyRm.A_min = A_min
+        dummyRm.b = b
+        dummyRm.recurrence_model_distribution = 'bounded_gutenberg_richter'
+        dummyRm.raw_weight = 1.0
+        dummy.recurrence_models = [dummyRm]
+        
         fsg_list = [dummy]
             
         magnitude_type = 'Mw'
         
         source_model = create_fault_sources(file_name, 
-                                           fsg_list, 
-                                           magnitude_type)
+                                            fsg_list, 
+                                            magnitude_type)
         for sm in source_model:
             sm.set_event_set_indexes( range(len(event_set)))
         event_activity_matrix = calc_event_activity(event_set, source_model)
@@ -369,6 +384,91 @@ class Test_Recurrence_functions(unittest.TestCase):
         
         self.assert_(allclose(lamba, sum(event_activity_matrix)))
 
+    def test_calc_event_activity_summing_MR(self):
+        """Same as test_calc_event_activity_summing with added multiple 
+        recurrence"""
+    
+        # Create an event set
+        Mw = [4.5, 5.5, 6.5, 7.5]
+        Mw = [7.65, 7.75, 7.85, 7.95 ]
+        
+        Mw = [4.5, 5.5, 6.5, 7.5]
+        step = 0.1
+        Mw = r_[4:8:step]
+        #print "len(Mw)", len(Mw)
+        event_set = Dummy_event_set(array(Mw))
+        
+        # Create a list of Sources  - eventually
+        (handle, file_name) = tempfile.mkstemp('.xml', __name__+'_')
+        os.close(handle)
+        handle = open(file_name,'w')
+
+        sample = '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>',
+                            '<event_type_controlfile>'
+                            ' <event_group event_type = "background">'
+                            '  <GMPE fault_type = "normal">'
+                            '     <branch model = "Toro" weight = "1.0"/>'
+                            '  </GMPE>'
+                            '  <scaling scaling_rule = "Wells_and_Coppersmith_94" scaling_fault_type = "unspecified" />'
+                            ' </event_group>'
+                            '</event_type_controlfile>'])
+        handle.write(sample)
+        handle.close()
+        
+        generation_min_mag = 4
+        generation_max_mag = 8
+        
+        dummy = Dummy()
+        dummy.magnitude_dist = {}
+        dummy.magnitude_dist['minimum'] = generation_min_mag
+        dummy.magnitude_dist['maximum'] = generation_max_mag        
+        dummy.generation_min_mag = generation_min_mag
+        dummy.event_type = "background"
+        dummy.name = 'name'
+        
+        dummyRm = Dummy()
+        dummyRm.max_magnitude  = 8.0  
+        dummyRm.min_magnitude  = 3.0
+        dummyRm.A_min = 10
+        dummyRm.b = 1.4
+        dummyRm.recurrence_model_distribution = 'bounded_gutenberg_richter'
+        dummyRm.raw_weight = 0.4
+        
+        dummyRm2 = Dummy()
+        dummyRm2.max_magnitude  = 7.0  
+        dummyRm2.min_magnitude  = 4.5  
+        dummyRm2.A_min = 15
+        dummyRm2.b = 1.0
+        dummyRm2.recurrence_model_distribution = 'bounded_gutenberg_richter'
+        dummyRm2.raw_weight = 0.6
+        
+        dummy.recurrence_models = [dummyRm, dummyRm2]
+        
+        fsg_list = [dummy]
+            
+        magnitude_type = 'Mw'
+        
+        source_model = create_fault_sources(file_name, 
+                                            fsg_list, 
+                                            magnitude_type)
+        for sm in source_model:
+            sm.set_event_set_indexes( range(len(event_set)))
+        event_activity_matrix = calc_event_activity(event_set, source_model)
+        
+        dummyRm_sum = dummyRm.A_min * grscale(dummyRm.b, 
+                                              dummyRm.max_magnitude, 
+                                              generation_min_mag, 
+                                              dummyRm.min_magnitude)
+
+        dummyRm2_sum = dummyRm2.A_min * grscale(dummyRm2.b, 
+                                                dummyRm2.max_magnitude, 
+                                                generation_min_mag, 
+                                                dummyRm2.min_magnitude)
+        
+        expected_sum = dummyRm_sum * dummyRm.raw_weight + \
+                       dummyRm2_sum * dummyRm2.raw_weight
+        
+        self.assert_(allclose(expected_sum, sum(event_activity_matrix)))
         
 
         

@@ -538,13 +538,18 @@ class Test_Source_model(unittest.TestCase):
             dummy.magnitude_dist['minimum'] = actual_generation_min_mag + i
             dummy.magnitude_dist['maximum'] = recurrence_max_mag + i        
             dummy.generation_min_mag = generation_min_mag + i
-            dummy.recurrence_max_mag  = recurrence_max_mag + i
-            dummy.recurrence_min_mag  = recurrence_min_mag + i
-            dummy.A_min = A_min + i
-            dummy.b = b + i
             dummy.event_type = event_type
             dummy.name = 'name' + str(i)
-            dummy.distribution = 'distribution' + str(i)
+            
+            dummyRm = DummyEventSet()
+            dummyRm.max_magnitude  = recurrence_max_mag + i
+            dummyRm.min_magnitude  = recurrence_min_mag + i
+            dummyRm.A_min = A_min + i
+            dummyRm.b = b + i
+            dummyRm.recurrence_model_distribution = 'distribution' + str(i)
+            dummyRm.raw_weight = 1.0
+            dummy.recurrence_models = [dummyRm]
+            
             fsg_list.append(dummy)
             
         magnitude_type = 'Mw'

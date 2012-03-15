@@ -323,9 +323,12 @@ class RecurrenceModel(object):
     Describes the coefficients for a recurrence model.
     """
     def __init__(self,
-                 recurrence_min_mag, recurrence_max_mag,
-                 A_min, b,
-                 distribution=None, weight=1.0):
+                 recurrence_min_mag, 
+                 recurrence_max_mag,
+                 A_min, 
+                 b,
+                 distribution=None, 
+                 weight=1.0):
         """
         recurrence_min_mag: float. minimum magnitude coefficient
         recurrence_max_mag: float. maximum magnitude coefficient
@@ -563,15 +566,8 @@ def create_fault_sources(event_control_file, fsg_list, magnitude_type):
     source_list = []
     for fsg in fsg_list:
         # create a Source object with some FSG attributes
-        min_magnitude = fsg.magnitude_dist['minimum']
-        max_magnitude = fsg.magnitude_dist['maximum']
         source = Source(
-            (RecurrenceModel(
-                    fsg.recurrence_min_mag,
-                    fsg.recurrence_max_mag,
-                    fsg.A_min,
-                    fsg.b,
-                    fsg.distribution),),
+            [rm for rm in fsg.recurrence_models],
             fsg.generation_min_mag,
             fsg.event_type,
             fsg.name)
