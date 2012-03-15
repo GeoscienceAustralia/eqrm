@@ -21,7 +21,7 @@ from eqrm_code.polygon_class import polygon_object
 from eqrm_code.xml_interface import Xml_Interface
 from eqrm_code.conversions import azimuth_of_trace
 from eqrm_code.recurrence_functions import calc_A_min_from_slip_rate
-from source_model import get_recurrence_elements
+from source_model import get_recurrence_elements, RecurrenceModel
 
 class FileError(exceptions.Exception): pass
 
@@ -131,14 +131,20 @@ class Fault_Source_Generator(object):
                      'number_of_events': int,
                     }
 
-    def __init__(self, filename, fault_name, fault_event_type,
-                 geometry_dict, recurrence_model_dict):
+    def __init__(self, 
+                 filename, 
+                 fault_name, 
+                 fault_event_type,
+                 geometry_dict, 
+                 recurrence_models,
+                 event_generation_dict):
         """Initialise a Fault_Source_Generator instance.
 
         fault_name             fault name
         fault_event_type       fault event type
         geometry_dict          dictionary of all <geometry> data
-        recurrence_model_dict  dictionary of all <recurrence_model> data
+        recurrence_models      a list of dictionaries with <recurrence_model> data
+        event_generation_dict  dictionary of all <event_generation> data
 
         The *_dict parameters contain exactly what was in the XML and must be
         checked for required data.  We ignore extra parameters.
@@ -155,12 +161,7 @@ class Fault_Source_Generator(object):
             .trace_end_lat
             .trace_end_lon
             .azimuth_dist
-            .distribution
-            .recurrence_min_mag
-            .recurrence_max_mag
-            .b
-            .slip_rate
-            .A_min
+            .recurrence_models (a list of source_model.RecurrenceModel objects)
             .generation_min_mag
             .number_of_events
             .magnitude_dist
@@ -212,7 +213,8 @@ class Fault_Source_Generator(object):
                                    self.trace_end_lat, self.trace_end_lon)
         self.azimuth_dist = {'distribution': 'constant', 'mean': azimuth}
 
-        # look in recurrence_model_dict parameter - we expect:
+        # recurrence_models -> a list of recurrence_model_dicts
+        # we expect:
         #    {'distribution': <value>,
         #     'recurrence_min_mag': <value>,
         #     'recurrence_max_mag': <value>,
@@ -224,50 +226,68 @@ class Fault_Source_Generator(object):
         #     }
         #
         # Exactly one of 'slip_rate' and 'A_min' must exist.
-        # All other paremeters are required.
-
-        self.distribution = self.n2t(recurrence_model_dict, 'distribution')
-        self.recurrence_min_mag = self.n2t(recurrence_model_dict,
-                                           'recurrence_min_mag')
-        self.recurrence_max_mag = self.n2t(recurrence_model_dict,
-                                           'recurrence_max_mag')
-        self.b = self.n2t(recurrence_model_dict, 'b')
-
-        # only save A_min, convert from slip_rate if required
-        slip_rate = self.n2t(recurrence_model_dict, 'slip_rate')
-        self.A_min = self.n2t(recurrence_model_dict, 'A_min')
-        if ((slip_rate and self.A_min) or (not slip_rate and not self.A_min)):
-            msg = ("Badly formed XML in file %s: expected exactly one of "
-                   "'slip_rate' and 'A_min' attributes in fault '%s'"
-                   % (filename, fault_name))
-            raise Exception(msg)
-        if slip_rate:
-            self.A_min = calc_A_min_from_slip_rate(self.b,
-                                                   self.recurrence_min_mag,
-                                                   self.recurrence_max_mag,
-                                                   slip_rate,
-                                                   self.distribution,
-                                                   self.trace_start_lat,
-                                                   self.trace_start_lon,
-                                                   self.trace_end_lat,
-                                                   self.trace_end_lon,
-                                                   depth_top, depth_bottom,
-                                                   dip)
-       
-        # now unpack the <event_generation> dictionary
-        eg_dict = recurrence_model_dict['event_generation']
+        # All other parameters are required.
+        self.recurrence_models = []
+        for recurrence_model in recurrence_models:
+            recurrence_model_dict = recurrence_model.attributes
+            recurrence_min_mag =    self.n2t(recurrence_model_dict,
+                                             'recurrence_min_mag')
+            recurrence_max_mag =    self.n2t(recurrence_model_dict,
+                                             'recurrence_max_mag')
+            b =                     self.n2t(recurrence_model_dict, 
+                                             'b')
+            distribution =          self.n2t(recurrence_model_dict, 
+                                             'distribution')
+                
+            # only save A_min, convert from slip_rate if required
+            slip_rate =             self.n2t(recurrence_model_dict, 
+                                             'slip_rate')
+            A_min =                 self.n2t(recurrence_model_dict, 
+                                             'A_min')
+            
+            if ((slip_rate and A_min) or (not slip_rate and not A_min)):
+                msg = ("Badly formed XML in file %s: expected exactly one of "
+                       "'slip_rate' and 'A_min' attributes in fault '%s'"
+                       % (filename, fault_name))
+                raise Exception(msg)
+            
+            if slip_rate:
+                A_min = calc_A_min_from_slip_rate(b,
+                                                  recurrence_min_mag,
+                                                  recurrence_max_mag,
+                                                  slip_rate,
+                                                  distribution,
+                                                  self.trace_start_lat,
+                                                  self.trace_start_lon,
+                                                  self.trace_end_lat,
+                                                  self.trace_end_lon,
+                                                  depth_top, 
+                                                  depth_bottom,
+                                                  dip)
+            
+            weight = self.n2t(recurrence_model_dict, 'weight')
+            # Set to 100% if not there
+            if weight is None:
+                weight = 1.0
+                
+            self.recurrence_models.append(RecurrenceModel(recurrence_min_mag,
+                                                          recurrence_max_mag,
+                                                          A_min,
+                                                          b,
+                                                          distribution,
+                                                          weight))
+            
+        self.generation_min_mag = self.n2t(event_generation_dict, 
+                                           'generation_min_mag')
         
-        self.generation_min_mag = self.n2t(eg_dict, 'generation_min_mag')
+        self.number_of_events = self.n2t(event_generation_dict, 
+                                         'number_of_events')
         
-        self.number_of_events = self.n2t(eg_dict, 'number_of_events')
-
-        # calculate magnitude distribution
-        minmag = max(self.generation_min_mag, 
-                     self.recurrence_min_mag)
+        minmag = min(rm.min_magnitude for rm in self.recurrence_models)
+        maxmag = max(rm.max_magnitude for rm in self.recurrence_models)
         self.magnitude_dist = {'distribution': 'uniform',
-                               'minimum': minmag,
-                               'maximum': self.recurrence_max_mag}
-        # Used for setting the Source values
+                               'minimum': max(minmag, self.generation_min_mag),
+                               'maximum': maxmag}
         
 
     def n2t(self, d, name):
@@ -490,33 +510,16 @@ def xml_fault_generators(filename):
         geometry_dict['trace'] = trace_dict
 
         # get <recurrence_model> attributes/children
-        recurrence_model = fault['recurrence_model']
-        if len(recurrence_model) != 1:
-            msg = ("Badly formed XML in file %s: Expected exactly one "
-                   "'recurrence_model' tag in fault named '%s'"
-                   % (filename, fault_name))
-            raise Exception(msg)
-        recurrence_model = recurrence_model[0]
-
-        recurrence_model_dict = recurrence_model.attributes
-
-        # get <event_generation> data from <recurrence_model> tag
-        event_generation = recurrence_model['event_generation']
-        if len(event_generation) != 1:
-            msg = ("Badly formed XML in file %s: Expected exactly one "
-                   "'event_generation' tag in fault named '%s'"
-                   % (filename, fault_name))
-            raise Exception(msg)
-        event_generation = event_generation[0]
-
+        recurrence_models,  event_generation = get_recurrence_elements(fault)
+        
         event_generation_dict = event_generation.attributes
 
-        recurrence_model_dict['event_generation'] = event_generation_dict
-
-        fault_obj = Fault_Source_Generator(filename, fault_name,
+        fault_obj = Fault_Source_Generator(filename, 
+                                           fault_name,
                                            fault_event_type,
                                            geometry_dict,
-                                           recurrence_model_dict)
+                                           recurrence_models,
+                                           event_generation_dict)
         fsg_list.append(fault_obj)
 
     return (fsg_list, magnitude_type)

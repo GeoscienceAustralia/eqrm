@@ -325,12 +325,16 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnlessEqual(fault.trace_end_lon, 110.0)
         expected = {'distribution': 'constant', 'mean': 0.0}
         self.failUnlessEqual(fault.azimuth_dist, expected)
-        self.failUnlessEqual(fault.distribution, 'bounded_gutenberg_richter')
-        self.failUnlessEqual(fault.recurrence_min_mag, 4.0)
-        self.failUnlessEqual(fault.recurrence_max_mag, 7.0)
-        self.failUnlessEqual(fault.b, 1.0)
+        
+        recurrence_model = fault.recurrence_models[0]
+        self.failUnlessEqual(recurrence_model.recurrence_model_distribution, 
+                             'bounded_gutenberg_richter')
+        self.failUnlessEqual(recurrence_model.min_magnitude, 4.0)
+        self.failUnlessEqual(recurrence_model.max_magnitude, 7.0)
+        self.failUnlessEqual(recurrence_model.b, 1.0)
         # A_min not supplied above, should be there (converted from slip_rate)
-        self.failUnless(not fault.A_min is None)
+        self.failUnless(not recurrence_model.A_min is None)
+        
         self.failUnlessEqual(fault.generation_min_mag, 4.0)
         self.failUnlessEqual(fault.number_of_events, 1500)
         expected = {'distribution': 'uniform', 'minimum': 4.0, 'maximum': 7.0}
@@ -346,7 +350,10 @@ class Test_Generation_polygon(unittest.TestCase):
         self.failUnlessEqual(fault.event_type, 'intraplate')
         expected = {'distribution': 'constant', 'mean': 20.0}
         self.failUnlessEqual(fault.dip_dist, expected)
-        self.failUnlessEqual(fault.A_min, 0.58)
+        
+        recurrence_model = fault.recurrence_models[0]
+        self.failUnlessEqual(recurrence_model.A_min, 0.58)
+        
         self.failUnlessEqual(fault.number_of_events, 3000)
         
         #test for Fault_Source_Generator.populate_out_of_dip_theta
