@@ -189,7 +189,7 @@ class Test_Distance_functions(unittest.TestCase):
         self.failUnless(allclose(Rx, expected_Rx, rtol=5.0e-3), msg)
 
         
-    def test_Rupture(self):
+    def dont_test_Rupture(self):
         # calculate length of 1 degree of great circle
         R = 6367.0		# Earth radius (km)
         circumference = 2 * pi * R
