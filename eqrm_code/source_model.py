@@ -85,7 +85,7 @@ class Source_Model(object):
         # Make save dir if necessary
         save_dir = os.path.join(dir, 'source_model')
         if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
+            os.makedirs(save_dir)
         
         pickle.dump(self, open(os.path.join(save_dir, 'source_model.p'), "wb"))
         
