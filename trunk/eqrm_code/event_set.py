@@ -1501,6 +1501,8 @@ def generate_event_set(parallel, eqrm_flags):
     event_set.save(save_dir)
     event_activity.save(save_dir)
     source_model.save(save_dir)
+    
+    return (event_set, event_activity, source_model)
 
 def load_event_set(parallel, eqrm_flags):
     """
@@ -1558,16 +1560,18 @@ def create_event_set(eqrm_flags, parallel):
     elif mode == 'generate':
             
         if parallel.rank == 0:
-            generate_event_set(parallel, eqrm_flags)
+            (event_set,
+             event_activity,
+             source_model) = generate_event_set(parallel, eqrm_flags)
             # Let the workers know they can continue 
             parallel.notifyworkers(msg=parallel.load_event_set)
         else:
             log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
             parallel.waitfor(msg=parallel.load_event_set, source=0)
         
-        (event_set,
-         event_activity,
-         source_model) = load_event_set(parallel, eqrm_flags)
+            (event_set,
+             event_activity,
+             source_model) = load_event_set(parallel, eqrm_flags)
          
     elif mode == 'save':
                 
