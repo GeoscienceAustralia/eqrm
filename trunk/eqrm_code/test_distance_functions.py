@@ -245,7 +245,7 @@ class Test_Distance_functions(unittest.TestCase):
         self.failUnless(allclose(Rx, expected_Rx, rtol=5.0e-3), msg)
 
         
-    def test_Kaklamanos_Rupture_vertical(self):
+    def test_Rupture_vertical(self):
         # define varying sites, at different positions, units is deg
         #                      1        2        3
         #                  (-0.1,.5)  (0,.5)  (0.1,.5)
@@ -310,26 +310,26 @@ class Test_Distance_functions(unittest.TestCase):
              [2**0.5*0.1]])
         expected_Rrup = expected_Rrup_deg
 
-        Rrup = Kaklamanos_Rupture(lat_sites, 
-                                  lon_sites, 
-                                  lat_events, 
-                                  lon_events, 
-                                  lengths,
-                                  azimuths, 
-                                  widths, 
-                                  dips, 
-                                  depths, 
-                                  depths_to_top,
-                                  projection,
-                                  trace_start_lat, 
-                                  trace_start_lon,
-                                  rupture_centroid_x, 
-                                  rupture_centroid_y)
+        Rrup = Rupture(lat_sites, 
+                       lon_sites, 
+                       lat_events, 
+                       lon_events, 
+                       lengths,
+                       azimuths, 
+                       widths, 
+                       dips, 
+                       depths, 
+                       depths_to_top,
+                       projection,
+                       trace_start_lat, 
+                       trace_start_lon,
+                       rupture_centroid_x, 
+                       rupture_centroid_y)
 
         msg = ('Expected Rrup=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
         self.failUnless(allclose(Rrup, expected_Rrup, atol=1e-06), msg)
         
-    def test_Kaklamanos_Rupture_non_vertical(self):
+    def test_Rupture_non_vertical(self):
         # define varying sites, at different positions, units is deg
         #                      1        2        3
         #                  (-0.1,.5)  (0,.5)  (0.1,.5)
@@ -397,21 +397,21 @@ class Test_Distance_functions(unittest.TestCase):
              [0.12247449, 0.17320508]])
         expected_Rrup = expected_Rrup_deg
 
-        Rrup = Kaklamanos_Rupture(lat_sites, 
-                                  lon_sites, 
-                                  lat_events, 
-                                  lon_events, 
-                                  lengths,
-                                  azimuths, 
-                                  widths, 
-                                  dips, 
-                                  depths, 
-                                  depths_to_top,
-                                  projection,
-                                  trace_start_lat, 
-                                  trace_start_lon,
-                                  rupture_centroid_x, 
-                                  rupture_centroid_y)
+        Rrup = Rupture(lat_sites, 
+                       lon_sites, 
+                       lat_events, 
+                       lon_events, 
+                       lengths,
+                       azimuths, 
+                       widths, 
+                       dips, 
+                       depths, 
+                       depths_to_top,
+                       projection,
+                       trace_start_lat, 
+                       trace_start_lon,
+                       rupture_centroid_x, 
+                       rupture_centroid_y)
 
         msg = ('Expected Rrup=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
         self.failUnless(allclose(Rrup, expected_Rrup, atol=1e-06), msg)
@@ -504,124 +504,7 @@ class Test_Distance_functions(unittest.TestCase):
                            rupture_centroid_y)
 
         msg = ('Expected Rjb=\n%s\ngot\n%s' % (expected_Rjb, Rjb))
-        self.failUnless(allclose(Rjb, expected_Rjb, atol=1e-06), msg)
-        
-        
-    def fails_test_Rupture_xy(self):
-        # This is assuming that the sites are refferenced against
-        # the trace start.
-        
-        
-        # define varying sites, at different positions, units km
-        #                      1        2        3
-        #                  (-0.1,.5)  (0,.5)  (0.1,.5)
-        #			 .	.      .
-        #
-        #                               (0,.4) end
-        #				|
-        #				|
-        #				|
-        #				|
-        #	    4  (-0.1,.2) .	. 5     .  6 (0.1,.2)
-        #				|
-        #				|
-        #				|
-        #				|
-        #                               (0,0) start
-        #
-        #			 .	.      .
-        #                  (-0.1,-.1)  (0,-.1)  (0.1,-.1)
-        #                       7         8         9
-        #
-        
-        # x axis points North based on the local co-ord axis
-        y_sites = asarray((-0.1, 0., 0.1, -0.1, 0., 0.1,-0.1, 0., 0.1))
-        x_sites = asarray((0.5, 0.5, 0.5, 0.2, 0.2, 0.2, -0.1, -0.1, -0.1))
-
-        azimuths = asarray((0.0,))
-        widths = asarray((10.0,)) # No used in test
-        lengths = asarray((0.4,))
-        dips = asarray((90.0,))
-        depths = asarray((0.0,))
-
-        rad = pi/180
-        cos_dip = cos(dips*rad)
-        sin_dip = sin(dips*rad)
-    
-        # define expected Rx values
-        expected_Rrup = asarray([
-                2**0.5*0.1,
-                .1,
-                2**0.5*0.1,
-                .1,
-                0.0,
-                .1,
-                2**0.5*0.1,
-                .1,
-                2**0.5*0.1])
-
-        Rrup = Rupture_xy(x_sites, y_sites, lengths, widths, cos_dip, 
-                          sin_dip, depths)
-
-        msg = ('Expected Rx=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
-        self.failUnless(allclose(Rrup, expected_Rrup, rtol=5.0e-3), msg)
-        
-    def test_mid_point_Rupture_xy(self):
-
-        # define varying sites, at different positions, units km
-        #                      1        2        3
-        #                  (-0.1,.3)  (0,.3)  (0.1,.3)
-        #			 .	.      .
-        #
-        #                               (0,.4) end
-        #				|
-        #				|
-        #				|
-        #				|
-        #	    4  (-0.1,.0) .	. 5     .  6 (0.1,.0)
-        #				|
-        #				|
-        #				|
-        #				|
-        #                               (0,-.2) start
-        #
-        #			 .	.      .
-        #                  (-0.1,-.3)  (0,-.3)  (0.1,-.3)
-        #                       7         8         9
-        #
-        
-        # x axis points North based on the local co-ord axis
-        y_sites = asarray((-0.1, 0., 0.1, -0.1, 0., 0.1,-0.1, 0., 0.1))
-        x_sites = asarray((0.3, 0.3, 0.3, 0.0, 0.0, 0.0, -0.3, -0.3, -0.3))
-
-        azimuths = asarray((0.0,))
-        widths = asarray((10.0,)) # No used in test
-        lengths = asarray((0.4,))
-        dips = asarray((90.0,))
-        depths = asarray((0.0,))
-
-        rad = pi/180
-        cos_dip = cos(dips*rad)
-        sin_dip = sin(dips*rad)
-    
-        # define expected Rx values
-        
-        expected_Rrup = asarray([
-                2**0.5*0.1,
-                .1,
-                2**0.5*0.1,
-                .1,
-                0.0,
-                .1,
-                2**0.5*0.1,
-                .1,
-                2**0.5*0.1])
-        
-        Rrup = Rupture_xy(x_sites, y_sites, lengths, widths, cos_dip, 
-                          sin_dip, depths)
-
-        msg = ('Expected Rx=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
-        self.failUnless(allclose(Rrup, expected_Rrup, atol=5.0e-3), msg)     
+        self.failUnless(allclose(Rjb, expected_Rjb, atol=1e-06), msg)    
         
         
 def m_to_py1(m):

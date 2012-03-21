@@ -141,7 +141,7 @@ def Mendez_rupture(lat_sites, lon_sites, lat_events, lon_events, lengths,
     return Mendez_Rupture_xy(cos_dip, sin_dip, lengths, widths, depths,
                              x0, y0, x, y)
 
-def Rupture(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
+def Obsolete_Rupture(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
             widths, dips, depths, depths_to_top, projection, trace_start_lat, 
             trace_start_lon, rupture_centroid_x, rupture_centroid_y):  
     lat_sites = lat_sites[:,newaxis]
@@ -157,7 +157,7 @@ def Rupture(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
                                              azimuths)
                                              
     # x, y are the sites location vectors in the local co-ord system
-    return Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths)
+    return Obsolete_Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths)
 
     
 def Mendez_Rupture_xy(cos_dip, sin_dip, lengths, widths, depths, x0, y0, x, y):
@@ -194,7 +194,7 @@ def Mendez_Rupture_xy(cos_dip, sin_dip, lengths, widths, depths, x0, y0, x, y):
                  DISTANCE_LIMIT, rupture_distance)
 
                  
-def Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths):
+def Obsolete_Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths):
     """
     x, y are the site locations on a 2D surface, referenced to a local
     co-ordinate system.  The mid point of the rupture or the mid point of the 
@@ -386,8 +386,7 @@ def Kaklamanos_Rrup_prime(Rx, widths, dips, depths_to_top):
                     /
     """
     
-    # Define dips in terms of radians
-    d = dips * pi / 180
+    d = dips * pi / 180 # define dips in terms of radians
     Ztor = depths_to_top
     W = widths
     
@@ -413,8 +412,7 @@ def Kaklamanos_Rrup_prime(Rx, widths, dips, depths_to_top):
 def Kaklamanos_Vertical_Rrup(Rjb, depths_to_top):
     return sqrt(Rjb**2 + depths_to_top**2)
 
-def Kaklamanos_Non_Vertical_Rrup(Rjb, 
-                                 lat_sites, 
+def Kaklamanos_Non_Vertical_Rrup(lat_sites, 
                                  lon_sites, 
                                  lat_events, 
                                  lon_events, 
@@ -472,21 +470,21 @@ def Kaklamanos_Non_Vertical_Rrup(Rjb,
     return Rrup
     
 
-def Kaklamanos_Rupture(lat_sites, 
-                       lon_sites, 
-                       lat_events, 
-                       lon_events, 
-                       lengths, 
-                       azimuths, 
-                       widths, 
-                       dips, 
-                       depths,
-                       depths_to_top, 
-                       projection, 
-                       trace_start_lat, 
-                       trace_start_lon, 
-                       rupture_centroid_x, 
-                       rupture_centroid_y):
+def Rupture(lat_sites, 
+            lon_sites, 
+            lat_events, 
+            lon_events, 
+            lengths, 
+            azimuths, 
+            widths, 
+            dips, 
+            depths,
+            depths_to_top, 
+            projection, 
+            trace_start_lat, 
+            trace_start_lon, 
+            rupture_centroid_x, 
+            rupture_centroid_y):
     """
     Implementation of Rupture Distance as specified by
     Kaklamanos et al. (2011)
@@ -509,8 +507,7 @@ def Kaklamanos_Rupture(lat_sites,
                        rupture_centroid_x, 
                        rupture_centroid_y)
     
-    Rrup_non_vertical = Kaklamanos_Non_Vertical_Rrup(Rjb,
-                                                     lat_sites, 
+    Rrup_non_vertical = Kaklamanos_Non_Vertical_Rrup(lat_sites, 
                                                      lon_sites, 
                                                      lat_events, 
                                                      lon_events, 
