@@ -150,6 +150,7 @@ class Sites(object):
                              event_set.width,
                              event_set.dip,
                              event_set.depth,
+                             event_set.depth_to_top,
                              projection,
                              trace_start_lat=event_set.trace_start_lat,
                              trace_start_lon=event_set.trace_start_lon,
@@ -165,6 +166,7 @@ class Sites(object):
                              event_set.widths,
                              event_set.dips,
                              event_set.depths,
+                             event_set.depths_to_top,
                              projection)
 
     def join(self, other):

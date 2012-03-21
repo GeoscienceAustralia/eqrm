@@ -24,10 +24,22 @@ from distance_functions import distance_functions
   #  """
 
 class Distances(object):
-    def __init__(self, site_latitude, site_longitude, rupture_centroids_lat,
-                 rupture_centroids_lon, lengths, azimuths, widths, dips, depths,
-                 projection, trace_start_lat=None, trace_start_lon=None,
-                 rupture_centroid_x=None, rupture_centroid_y=None):
+    def __init__(self, 
+                 site_latitude, 
+                 site_longitude, 
+                 rupture_centroids_lat,
+                 rupture_centroids_lon, 
+                 lengths, 
+                 azimuths, 
+                 widths, 
+                 dips, 
+                 depths,
+                 depths_to_top, 
+                 projection, 
+                 trace_start_lat=None, 
+                 trace_start_lon=None, 
+                 rupture_centroid_x=None, 
+                 rupture_centroid_y=None):
 
         self.distance_functions = distance_functions
 
@@ -41,6 +53,7 @@ class Distances(object):
         self.widths = widths
         self.dips = dips
         self.depths = depths
+        self.depths_to_top = depths_to_top
 
         self.projection = projection
 
@@ -70,23 +83,37 @@ class Distances(object):
     def distance(self, distance_type):
         return self.raw_distances(site_latitude=self.site_latitude,
                                   site_longitude=self.site_longitude,
-                                  rupture_centroid_lat=
-                                      self.rupture_centroid_lat,
-                                  rupture_centroid_lon=
-                                      self.rupture_centroid_lon,
-                                  lengths=self.lengths,azimuths=self.azimuths,
-                                  widths=self.widths,dips=self.dips,
-                                  depths=self.depths,projection=self.projection,
+                                  rupture_centroid_lat=self.rupture_centroid_lat,
+                                  rupture_centroid_lon=self.rupture_centroid_lon,
+                                  lengths=self.lengths,
+                                  azimuths=self.azimuths,
+                                  widths=self.widths,
+                                  dips=self.dips,
+                                  depths=self.depths,
+                                  depths_to_top=self.depths_to_top,
+                                  projection=self.projection,
                                   distance_type=distance_type,
                                   trace_start_lat=self.trace_start_lat,
                                   trace_start_lon=self.trace_start_lon,
                                   rupture_centroid_x=self.rupture_centroid_x,
                                   rupture_centroid_y=self.rupture_centroid_y)
 
-    def raw_distances(self, site_latitude, site_longitude, rupture_centroid_lat,
-                      rupture_centroid_lon, lengths, azimuths, widths, dips,
-                      depths, distance_type, projection, trace_start_lat=None,
-                      trace_start_lon=None, rupture_centroid_x=None,
+    def raw_distances(self, 
+                      site_latitude, 
+                      site_longitude, 
+                      rupture_centroid_lat,
+                      rupture_centroid_lon, 
+                      lengths, 
+                      azimuths, 
+                      widths, 
+                      dips,
+                      depths, 
+                      depths_to_top, 
+                      distance_type, 
+                      projection, 
+                      trace_start_lat=None, 
+                      trace_start_lon=None, 
+                      rupture_centroid_x=None, 
                       rupture_centroid_y=None):
         """Calculate the distance from 'locations' to 'rupture_centroid'.
 
@@ -94,11 +121,20 @@ class Distances(object):
         """
 
         distance_function = self.distance_functions[distance_type]
-        return distance_function(site_latitude, site_longitude,
-                                 rupture_centroid_lat, rupture_centroid_lon,
-                                 lengths, azimuths, widths, dips, depths,
-                                 projection, trace_start_lat, trace_start_lon,
-                                 rupture_centroid_x, rupture_centroid_y)
+        return distance_function(site_latitude, 
+                                 site_longitude,
+                                 rupture_centroid_lat, 
+                                 rupture_centroid_lon,
+                                 lengths, azimuths, 
+                                 widths, 
+                                 dips, 
+                                 depths,
+                                 depths_to_top, 
+                                 projection, 
+                                 trace_start_lat, 
+                                 trace_start_lon, 
+                                 rupture_centroid_x, 
+                                 rupture_centroid_y)
 
     def __getitem__(self, key):
         try:
@@ -115,6 +151,7 @@ class Distances(object):
         widths = self.widths[event]
         dips = self.dips[event]
         depths = self.depths[event]
+        depths_to_top = self.depths_to_top[event]
 
         projection = self.projection
 
@@ -131,9 +168,18 @@ class Distances(object):
             rupture_centroid_x = self.rupture_centroid_x[event]
             rupture_centroid_y = self.rupture_centroid_y[event]
 
-        return Distances(site_latitude, site_longitude, rupture_centroid_lat,
-                         rupture_centroid_lon, lengths, azimuths, widths, dips,
-                         depths, projection, trace_start_lat=trace_start_lat,
+        return Distances(site_latitude, 
+                         site_longitude, 
+                         rupture_centroid_lat,
+                         rupture_centroid_lon, 
+                         lengths, 
+                         azimuths, 
+                         widths, 
+                         dips,
+                         depths, 
+                         depths_to_top, 
+                         projection, 
+                         trace_start_lat=trace_start_lat,
                          trace_start_lon=trace_start_lon,
                          rupture_centroid_x=rupture_centroid_x,
                          rupture_centroid_y=rupture_centroid_y)
