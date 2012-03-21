@@ -17,6 +17,7 @@ consisting of the following parameters:
   widths           array of event widths (km)
   dips             array of event dips
   depths           array of event depths
+  depths_to_top    array of depths to the top of each events rupture plane
   projection       ??
   trace_start_lat  array of trace start latitudes
   trace_start_lon  array of trace start longitudes
@@ -50,7 +51,7 @@ DISTANCE_LIMIT = 0.000001
 #DISTANCE_LIMIT = 1.0
 
 def Hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
-                widths, dips, depths, projection, trace_start_lat,
+                widths, dips, depths, depths_to_top, projection, trace_start_lat,
                 trace_start_lon, rupture_centroid_x, rupture_centroid_y):
     # Increase the rank of lat_sites to (num_sites,1)
     # Now (lat_sites+lat_events).shape = (num_sites,num_events)
@@ -65,7 +66,7 @@ def Hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
     return sqrt(site_x*site_x + site_y*site_y + depths*depths)
 
 def Obsolete_Mendez_hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths,
-                       azimuths, widths, dips, depths, projection,
+                       azimuths, widths, dips, depths, depths_to_top, projection,
                        trace_start_lat, trace_start_lon, rupture_centroid_x,
                        rupture_centroid_y):
     # Increase the rank of lat_sites to (num_sites,1)
@@ -85,7 +86,7 @@ def Obsolete_Mendez_hypocentral(lat_sites, lon_sites, lat_events, lon_events, le
     return sqrt((x-x0)**2 + (y-y0)**2 + depths*depths)
 
 def Epicentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
-               widths, dips, depths, projection, trace_start_lat,
+               widths, dips, depths, depths_to_top, projection, trace_start_lat,
                trace_start_lon, rupture_centroid_x, rupture_centroid_y):
     lat_sites = lat_sites[:,newaxis]
     lon_sites = lon_sites[:,newaxis]
@@ -98,7 +99,7 @@ def Epicentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
     return sqrt(site_x*site_x + site_y*site_y)
 
 def Obsolete_Mendez_epicentral(lat_sites, lon_sites, lat_events, lon_events, lengths,
-                      azimuths, widths, dips, depths, projection,
+                      azimuths, widths, dips, depths, depths_to_top, projection,
                       trace_start_lat, trace_start_lon, rupture_centroid_x,
                       rupture_centroid_y):
     lat_sites = lat_sites[:,newaxis]
@@ -118,8 +119,9 @@ def Obsolete_Mendez_epicentral(lat_sites, lon_sites, lat_events, lon_events, len
     return sqrt((x-x0)**2 + (y-y0)**2)
 
 def Mendez_rupture(lat_sites, lon_sites, lat_events, lon_events, lengths,
-                   azimuths, widths, dips, depths, projection, trace_start_lat,
-                   trace_start_lon, rupture_centroid_x, rupture_centroid_y):
+                   azimuths, widths, dips, depths, depths_to_top, projection, 
+                   trace_start_lat, trace_start_lon, rupture_centroid_x, 
+                   rupture_centroid_y):
     lat_sites = lat_sites[:,newaxis]
     lon_sites = lon_sites[:,newaxis]
     
@@ -140,8 +142,8 @@ def Mendez_rupture(lat_sites, lon_sites, lat_events, lon_events, lengths,
                              x0, y0, x, y)
 
 def Rupture(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
-            widths, dips, depths, projection, trace_start_lat, trace_start_lon,
-            rupture_centroid_x, rupture_centroid_y):  
+            widths, dips, depths, depths_to_top, projection, trace_start_lat, 
+            trace_start_lon, rupture_centroid_x, rupture_centroid_y):  
     lat_sites = lat_sites[:,newaxis]
     lon_sites = lon_sites[:,newaxis]
     
@@ -240,7 +242,8 @@ def Joyner_Boore_xy(lat_sites,
                     azimuths, 
                     widths, 
                     dips, 
-                    depths, 
+                    depths,
+                    depths_to_top, 
                     projection, 
                     trace_start_lat,
                     trace_start_lon, 
@@ -291,8 +294,9 @@ def Joyner_Boore(*args):
                  DISTANCE_LIMIT, joyner_boore_distance)
 
 def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
-               azimuths, widths, dips, depths, projection, trace_start_lat,
-               trace_start_lon, rupture_centroid_x, rupture_centroid_y):
+               azimuths, widths, dips, depths, depths_to_top, projection, 
+               trace_start_lat, trace_start_lon, rupture_centroid_x, 
+               rupture_centroid_y):
     """Distance function that calculates 'Rx'.
 
     Rx is the shortest horizontal distance (km) from a site to the line defined
@@ -347,7 +351,7 @@ def Kaklamanos_Ry(*args):
     
     return Ry
 
-def Kaklamanos_Rrup_prime(Rx, widths, dips, depths):
+def Kaklamanos_Rrup_prime(Rx, widths, dips, depths_to_top):
     """
     Calculation for the in-plane rupture distance based on 3 zones 
     (Fig. 4 Kaklamanos et al. (2011)
@@ -384,28 +388,30 @@ def Kaklamanos_Rrup_prime(Rx, widths, dips, depths):
     
     # Define dips in terms of radians
     d = dips * pi / 180
+    Ztor = depths_to_top
+    W = widths
     
     Rrup_p = zeros(Rx.shape)
     
     # Zone A
-    Rrup_p = where(Rx < depths*tan(d),
-                   sqrt(Rx**2 + depths**2),
+    Rrup_p = where(Rx < Ztor*tan(d),
+                   sqrt(Rx**2 + Ztor**2),
                    Rrup_p)
     
     # Zone B
-    Rrup_p = where((Rx >= depths*tan(d)) & (Rx <= depths*tan(d)+widths*sec(d)),
-                   Rx*sin(d) + depths*cos(d),
+    Rrup_p = where((Rx >= Ztor*tan(d)) & (Rx <= Ztor*tan(d)+W*sec(d)),
+                   Rx*sin(d) + Ztor*cos(d),
                    Rrup_p)
     
     # Zone C
-    Rrup_p = where(Rx > depths*tan(d) + widths*sec(d),
-                   sqrt((Rx - widths*cos(d))**2 + (depths + widths*sin(d))**2),
+    Rrup_p = where(Rx > Ztor*tan(d) + W*sec(d),
+                   sqrt((Rx - W*cos(d))**2 + (Ztor + W*sin(d))**2),
                    Rrup_p)
     
     return Rrup_p
 
-def Kaklamanos_Vertical_Rrup(Rjb, depths):
-    return sqrt(Rjb**2 + depths**2)
+def Kaklamanos_Vertical_Rrup(Rjb, depths_to_top):
+    return sqrt(Rjb**2 + depths_to_top**2)
 
 def Kaklamanos_Non_Vertical_Rrup(Rjb, 
                                  lat_sites, 
@@ -416,7 +422,8 @@ def Kaklamanos_Non_Vertical_Rrup(Rjb,
                                  azimuths,
                                  widths, 
                                  dips, 
-                                 depths, 
+                                 depths,
+                                 depths_to_top,
                                  projection, 
                                  trace_start_lat, 
                                  trace_start_lon,
@@ -432,7 +439,8 @@ def Kaklamanos_Non_Vertical_Rrup(Rjb,
                     azimuths,
                     widths, 
                     dips, 
-                    depths, 
+                    depths,
+                    depths_to_top,
                     projection, 
                     trace_start_lat, 
                     trace_start_lon,
@@ -440,7 +448,7 @@ def Kaklamanos_Non_Vertical_Rrup(Rjb,
                     rupture_centroid_y)
     
     # Calculate Rrup_inplane
-    Rrup_prime = Kaklamanos_Rrup_prime(Rx, widths, dips, depths)
+    Rrup_prime = Kaklamanos_Rrup_prime(Rx, widths, dips, depths_to_top)
     
     # Calculate Ry
     Ry = Kaklamanos_Ry(lat_sites, 
@@ -451,7 +459,8 @@ def Kaklamanos_Non_Vertical_Rrup(Rjb,
                        azimuths,
                        widths, 
                        dips, 
-                       depths, 
+                       depths,
+                       depths_to_top,
                        projection, 
                        trace_start_lat, 
                        trace_start_lon,
@@ -471,7 +480,8 @@ def Kaklamanos_Rupture(lat_sites,
                        azimuths, 
                        widths, 
                        dips, 
-                       depths, 
+                       depths,
+                       depths_to_top, 
                        projection, 
                        trace_start_lat, 
                        trace_start_lon, 
@@ -492,6 +502,7 @@ def Kaklamanos_Rupture(lat_sites,
                        widths, 
                        dips, 
                        depths, 
+                       depths_to_top,
                        projection, 
                        trace_start_lat, 
                        trace_start_lon, 
@@ -508,13 +519,14 @@ def Kaklamanos_Rupture(lat_sites,
                                                      widths, 
                                                      dips, 
                                                      depths, 
+                                                     depths_to_top,
                                                      projection, 
                                                      trace_start_lat, 
                                                      trace_start_lon,
                                                      rupture_centroid_x,
                                                      rupture_centroid_y)
     
-    Rrup_vertical = Kaklamanos_Vertical_Rrup(Rjb, depths)
+    Rrup_vertical = Kaklamanos_Vertical_Rrup(Rjb, depths_to_top)
     
     # Calculate Rrup
     Rrup = where(dips == 90.0, Rrup_vertical, Rrup_non_vertical)
