@@ -35,9 +35,13 @@ Copyright 2007 by Geoscience Australia
 """
 
 from scipy import newaxis, sqrt, pi, cos, sin, where, reshape, arctan, sign
+from scipy import tan, arcsin, zeros
 
 from projections import azimuthal_orthographic_ll_to_xy as ll2xy
- 
+
+csc = lambda x: 1 / sin(x)
+sec = lambda x: 1 / cos(x)
+cot = lambda x: 1 / tan(x)
 
 # constant used to convert degrees to radians: rad = deg * DegreesToRadians
 DegreesToRadians = pi / 180.0
@@ -190,9 +194,9 @@ def Mendez_Rupture_xy(cos_dip, sin_dip, lengths, widths, depths, x0, y0, x, y):
                  
 def Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths):
     """
-    x, y are the site locations on a 2D surface, refferenced to a local
-    co-ordinate system.  The mid point of the
-    rupture or the mid point of the rupture trace is the origin and the direction of the rupture trace is 
+    x, y are the site locations on a 2D surface, referenced to a local
+    co-ordinate system.  The mid point of the rupture or the mid point of the 
+    rupture trace is the origin and the direction of the rupture trace is 
     the +ve x direction.
     """
     
@@ -224,24 +228,26 @@ def Rupture_xy(x, y, lengths, widths, cos_dip, sin_dip, depths):
     y = y - w
     
     rupture_distance = sqrt(x*x + y*y + z*z)
+    
     return where(rupture_distance < DISTANCE_LIMIT,
                  DISTANCE_LIMIT, rupture_distance)
 
-def Joyner_Boore(lat_sites, lon_sites, lat_events, lon_events, lengths,
-                 azimuths, widths, dips, depths, projection, trace_start_lat,
-                 trace_start_lon, rupture_centroid_x, rupture_centroid_y):
+def Joyner_Boore_xy(lat_sites, 
+                    lon_sites, 
+                    lat_events, 
+                    lon_events, 
+                    lengths,
+                    azimuths, 
+                    widths, 
+                    dips, 
+                    depths, 
+                    projection, 
+                    trace_start_lat,
+                    trace_start_lon, 
+                    rupture_centroid_x, 
+                    rupture_centroid_y):
     """ #FIXME This code needs comments """
-
-    #import copy
-    # Trying to avoid "ValueError: array dimensions must agree"
-    # errors in the 'where' statement further on. 
-#     lengths = copy.copy(lengths)
-#     if lengths.shape == (1,1):
-#         lengths.shape = (1)
-#     widths = copy.copy(widths)
-#     if widths.shape == (1,1):
-#         widths.shape = (1)
-
+    
     lat_sites = lat_sites[:,newaxis]
     lon_sites = lon_sites[:,newaxis]
     
@@ -251,7 +257,7 @@ def Joyner_Boore(lat_sites, lon_sites, lat_events, lon_events, lengths,
     
     x0 = rupture_centroid_x
     y0 = rupture_centroid_y
-    
+        
     (x ,y) = ll2xy(lat_sites, lon_sites, trace_start_lat,
                    trace_start_lon, azimuths)
 
@@ -264,15 +270,22 @@ def Joyner_Boore(lat_sites, lon_sites, lat_events, lon_events, lengths,
 
     if l.shape == (1,1):
         l = reshape(l, (1))
-    x = where(x < l, l, x)	# max(l, x)
-
+    x = where(x < l, l, x)    # max(l, x)
+    
     if w.shape == (1,1):
         w = reshape(w, (1))    
-    y = where(y < w, w, y)	# max(w, y)
-    
+    y = where(y < w, w, y)    # max(w, y)
+        
     x = x-l
     y = y-w
     
+    return x, y
+
+def Joyner_Boore(*args):
+    """ #FIXME This code needs comments """
+
+    x, y = Joyner_Boore_xy(*args)
+        
     joyner_boore_distance = sqrt(x*x + y*y)
     return where(joyner_boore_distance < DISTANCE_LIMIT,
                  DISTANCE_LIMIT, joyner_boore_distance)
@@ -317,6 +330,197 @@ def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
     # limit distance to 1.0km minimum
     return where(abs(Rx) < DISTANCE_LIMIT, 
                  sign(Rx) * DISTANCE_LIMIT, Rx)
+    
+def Kaklamanos_Ry(*args):
+    """
+    Calculation for Ry, the distance from the site to the surface projection of
+    the ruptured area, measured parallel to the strike. It is essentially the y
+    component of Rjb, which in the case of Joyner_Boore() is actually x
+    (Fig. 5 Kaklamanos et al. (2011)
+    """
+    
+    x, y = Joyner_Boore_xy(*args)
+    
+    # The x component of Joyner_Boore_xy is the y component that the 
+    # Kaklamanos et al. (2011) functions are after.
+    Ry = x
+    
+    return Ry
+
+def Kaklamanos_Rrup_prime(Rx, widths, dips, depths):
+    """
+    Calculation for the in-plane rupture distance based on 3 zones 
+    (Fig. 4 Kaklamanos et al. (2011)
+    
+    
+    ~-----------Zone A--------->|<--Zone B-->|<--Zone C--~
+    ____________________________|____________|____________
+          ^     |              /            /   #####   ^
+          |     |             /            /           /
+          |     |            /            /   Ground _/
+          |     |           /            /    Surface
+          |     |          /            /
+          |     |         /            /
+          |     |        /            /
+        depth   |       /            /
+          |     |      /            /
+          |     |     /            /
+          |     |    /            /
+          |     |   /            /
+          |     |  /            /
+          |     | /            /
+       ___._____|/____        /
+                / dip        /
+               / #          /
+              /   #        /
+             /^    #      /
+               \    #    /
+             width   #  / 90 degrees
+                 \    #/
+                  \   /
+                   . /
+                    /
+    """
+    
+    # Define dips in terms of radians
+    d = dips * pi / 180
+    
+    Rrup_p = zeros(Rx.shape)
+    
+    # Zone A
+    Rrup_p = where(Rx < depths*tan(d),
+                   sqrt(Rx**2 + depths**2),
+                   Rrup_p)
+    
+    # Zone B
+    Rrup_p = where((Rx >= depths*tan(d)) & (Rx <= depths*tan(d)+widths*sec(d)),
+                   Rx*sin(d) + depths*cos(d),
+                   Rrup_p)
+    
+    # Zone C
+    Rrup_p = where(Rx > depths*tan(d) + widths*sec(d),
+                   sqrt((Rx - widths*cos(d))**2 + (depths + widths*sin(d))**2),
+                   Rrup_p)
+    
+    return Rrup_p
+
+def Kaklamanos_Vertical_Rrup(Rjb, depths):
+    return sqrt(Rjb**2 + depths**2)
+
+def Kaklamanos_Non_Vertical_Rrup(Rjb, 
+                                 lat_sites, 
+                                 lon_sites, 
+                                 lat_events, 
+                                 lon_events, 
+                                 lengths, 
+                                 azimuths,
+                                 widths, 
+                                 dips, 
+                                 depths, 
+                                 projection, 
+                                 trace_start_lat, 
+                                 trace_start_lon,
+                                 rupture_centroid_x, 
+                                 rupture_centroid_y):
+    
+    # Calculate Rx
+    Rx = Horizontal(lat_sites, 
+                    lon_sites, 
+                    lat_events, 
+                    lon_events, 
+                    lengths, 
+                    azimuths,
+                    widths, 
+                    dips, 
+                    depths, 
+                    projection, 
+                    trace_start_lat, 
+                    trace_start_lon,
+                    rupture_centroid_x, 
+                    rupture_centroid_y)
+    
+    # Calculate Rrup_inplane
+    Rrup_prime = Kaklamanos_Rrup_prime(Rx, widths, dips, depths)
+    
+    # Calculate Ry
+    Ry = Kaklamanos_Ry(lat_sites, 
+                       lon_sites, 
+                       lat_events, 
+                       lon_events, 
+                       lengths, 
+                       azimuths,
+                       widths, 
+                       dips, 
+                       depths, 
+                       projection, 
+                       trace_start_lat, 
+                       trace_start_lon,
+                       rupture_centroid_x, 
+                       rupture_centroid_y)
+    
+    Rrup = sqrt(Rrup_prime**2 + Ry**2)
+    
+    return Rrup
+    
+
+def Kaklamanos_Rupture(lat_sites, 
+                       lon_sites, 
+                       lat_events, 
+                       lon_events, 
+                       lengths, 
+                       azimuths, 
+                       widths, 
+                       dips, 
+                       depths, 
+                       projection, 
+                       trace_start_lat, 
+                       trace_start_lon, 
+                       rupture_centroid_x, 
+                       rupture_centroid_y):
+    """
+    Implementation of Rupture Distance as specified by
+    Kaklamanos et al. (2011)
+    """
+    
+    # Calculate Rjb    
+    Rjb = Joyner_Boore(lat_sites, 
+                       lon_sites, 
+                       lat_events, 
+                       lon_events, 
+                       lengths,
+                       azimuths, 
+                       widths, 
+                       dips, 
+                       depths, 
+                       projection, 
+                       trace_start_lat, 
+                       trace_start_lon, 
+                       rupture_centroid_x, 
+                       rupture_centroid_y)
+    
+    Rrup_non_vertical = Kaklamanos_Non_Vertical_Rrup(Rjb,
+                                                     lat_sites, 
+                                                     lon_sites, 
+                                                     lat_events, 
+                                                     lon_events, 
+                                                     lengths, 
+                                                     azimuths,
+                                                     widths, 
+                                                     dips, 
+                                                     depths, 
+                                                     projection, 
+                                                     trace_start_lat, 
+                                                     trace_start_lon,
+                                                     rupture_centroid_x,
+                                                     rupture_centroid_y)
+    
+    Rrup_vertical = Kaklamanos_Vertical_Rrup(Rjb, depths)
+    
+    # Calculate Rrup
+    Rrup = where(dips == 90.0, Rrup_vertical, Rrup_non_vertical)
+    
+    return where(Rrup < DISTANCE_LIMIT, DISTANCE_LIMIT, Rrup)
+    
 
 ###################
 # END OF FUNCTIONS#
