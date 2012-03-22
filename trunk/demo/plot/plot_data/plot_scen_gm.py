@@ -72,6 +72,8 @@ save_contents_loss = False
 save_motion = True
 save_prob_structural_damage = None
 
+file_array = False
+
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM attributes variables. 
 if __name__ == '__main__':
