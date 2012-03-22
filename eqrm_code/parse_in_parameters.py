@@ -83,6 +83,7 @@ except ImportError:
                 results += seq.split(seperator)
         return results
 
+from eqrm_code import file_store
 
 ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
@@ -429,6 +430,9 @@ CONV_NEW = [{'order': 10.0,
              {'order': 110.04,
               'new_para': 'data_array_storage',
               'default_to_attr': 'output_dir'}, # see _add_default_values
+             {'order': 110.05,
+              'new_para': 'file_array',
+              'default': True},
              {'order': 120.01,
               'new_para': 'file_log_level',
               'default': 'debug'},
@@ -606,7 +610,10 @@ def _add_default_values(eqrm_flags):
                 "Attribute Error: Attribute "  + param['new_para']
                 + " must be defined.")
             
-            
+    if eqrm_flags.file_array:
+        file_store.SAVE_METHOD = 'npy'
+    else:
+        file_store.SAVE_METHOD = None
 
 # In the dictionary DEPRECIATED_PARAS
 # the key is the depreciated attribute.

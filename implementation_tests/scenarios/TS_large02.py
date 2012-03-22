@@ -72,6 +72,8 @@ data_dir = join('.', 'implementation_tests', 'input')
 event_set_name = 'TS_large02'
 event_set_handler = 'load'
 
+file_array = False
+
 # If this file is executed the simulation will start
 # Delete all variables that are not EQRM parameters variables. 
 if __name__ == '__main__':

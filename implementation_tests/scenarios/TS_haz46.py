@@ -61,6 +61,8 @@ amp_max_factor = 10000
 # Save
 save_hazard_map = True
 
+file_array = False
+
 # If this file is executed the simulation will start.
 # Delete all variables that are not EQRM parameters variables. 
 if __name__ == '__main__':
