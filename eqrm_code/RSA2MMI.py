@@ -15,7 +15,7 @@ Creator: Jonathan Griffin, Australia-Indonesia Facility for Disaster Reduction
 Created: 26 April 2010
 """
 
-from scipy import zeros, nonzero, log10, array
+from scipy import zeros, log10, array, where
 
     
 # Convert RSA to MMI using Atkinson and Kaka (2007) formula
@@ -63,16 +63,21 @@ def rsa2mmi_array(data,period = 1.0):
     
     data *= 980
     MMI = zeros(data.shape)
-    ind = nonzero(log10(data)<=logy15)
-    MMI[ind] = C1 + C2*(log10((data[ind])))
-    ind = nonzero(log10(data)>logy15)
-    MMI[ind] = C3 + C4*(log10((data[ind])))
-    ind = nonzero(MMI>10)
-    MMI[ind] = 10
+    
+    # Avoid divide by zero errors in log10.
+    data_positive_inds = where(data > 0)
+    data_negative_inds = where(data <= 0)
+    
+    MMI[data_positive_inds] = where(log10(data[data_positive_inds]) <= logy15,
+                                    C1 + C2*log10(data[data_positive_inds]),
+                                    C3 + C4*log10(data[data_positive_inds]))
+               
+    MMI[data_positive_inds] = where(MMI[data_positive_inds] > 10, 
+                                    10, 
+                                    MMI[data_positive_inds])
     
     # This will never have any indexes, since you can only take the log10 of a 
     # positive number, and you do log10(data) above.
-    ind = nonzero(data<=0)
-    MMI[ind] = 0
+    MMI[data_negative_inds] = 0
     
     return MMI
