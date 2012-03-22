@@ -260,16 +260,16 @@ def Joyner_Boore_xy(lat_sites,
     
     x0 = rupture_centroid_x
     y0 = rupture_centroid_y
-        
+    
     (x ,y) = ll2xy(lat_sites, lon_sites, trace_start_lat,
                    trace_start_lon, azimuths)
 
     # STARTING Matlab code:
-    x = abs(x-x0)
-    y = abs(y-y0)
-    
-    l = lengths/2   
-    w = cos_dip*widths/2
+    x = abs(x-x0) # distance from x to rupture_centroid_x
+    y = abs(y-y0) # distance from y to rupture_centroid_y
+
+    l = lengths/2.0        # length from start/end to rupture_centroid_x
+    w = cos_dip*widths/2.0 # width from start/end to rupture_centroid_x
 
     if l.shape == (1,1):
         l = reshape(l, (1))
@@ -279,8 +279,8 @@ def Joyner_Boore_xy(lat_sites,
         w = reshape(w, (1))    
     y = where(y < w, w, y)    # max(w, y)
         
-    x = x-l
-    y = y-w
+    x = x-l # distance from x to edge of rupture plane
+    y = y-w # distance from y to edge of rupture plane
     
     return x, y
 
