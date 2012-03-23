@@ -160,3 +160,23 @@ def Leonard_SCR_constants(Mw):
     f = (d*c-b)/a - 3.0
     
     return e, f
+
+
+def PEER_rup_area(Mw, **kwargs):
+    """
+    Returns 1 km^2 to standardise on area for replication of results from 
+    Verification of Probabalistic Seismic Hazard Analysis Computer Programs
+    Thomas et al. (2010)
+    Pacific Earthquake Engineering Research Center (PEER)
+    """
+    return 1.
+    
+
+def PEER_rup_width(dip, Mw, area, max_rup_width, **kwargs):
+    """
+    Returns 1 km to standardise on area for replication of results from 
+    Verification of Probabalistic Seismic Hazard Analysis Computer Programs
+    Thomas et al. (2010)
+    Pacific Earthquake Engineering Research Center (PEER)
+    """
+    return 1.
