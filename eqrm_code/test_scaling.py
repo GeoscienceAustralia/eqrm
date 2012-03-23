@@ -172,7 +172,24 @@ class Test_scaling(unittest.TestCase):
         e, f = Leonard_SCR_constants(Mw)
         assert allclose(e, [1.5/3., 1.5/2.5])
         assert allclose(f, [(1.5*6.07-6.39)/3.-3.0, (1.5*6.07-8.08)/2.5-3.0])
+    
+    def test_PEER_area(self):
         
+        Mw = array([5.5, 6.5, 7.0, 7.5])
+        scaling_dic = {'scaling_rule':'PEER'}           
+        area = scaling_calc_rup_area(Mw, scaling_dic)  
+        correct = [ 1., 1., 1., 1. ]
+        assert allclose(correct, area)
+
+    def test_PEER_width(self):
+        scaling_dic = {'scaling_rule':'PEER'} 
+        area = 1.0   
+        Mw = array([5.5])     
+        width = scaling_calc_rup_width(Mw, scaling_dic, dip=None, rup_area=area) 
+        length = 1.0
+        width_actual = area/length
+        assert allclose(width_actual, width)
+    
         
 def Mw_to_Mo(Mw):
     """
