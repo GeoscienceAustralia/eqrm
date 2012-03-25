@@ -19,7 +19,6 @@ from os.path import join
 # Operation Mode
 run_type = "hazard" 
 is_scenario = False
-max_width = 15
 site_tag = "box" 
 site_db_tag = ""
 

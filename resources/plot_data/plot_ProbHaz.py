@@ -19,7 +19,6 @@ from os.path import join
 # Operation Mode
 run_type = "hazard" 
 is_scenario = False
-max_width = 15
 site_tag = "newc" 
 site_db_tag = "" 
 return_periods = [10,25,50,100,200,500,1000,2000,5000,7500,10000]

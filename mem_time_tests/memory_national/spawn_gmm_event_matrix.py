@@ -21,7 +21,6 @@ def create_base():
     # Operation Mode
     sdp.run_type = "hazard" 
     sdp.is_scenario = False
-    sdp.max_width = 15
     sdp.site_tag = "bench"
     sdp.return_periods = [100.75, 200.0, 300.0, 400.0, 500.0, 
     600.0, 700.0, 800.0, 900]

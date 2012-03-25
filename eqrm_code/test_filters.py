@@ -40,7 +40,7 @@ def create_event_set():
     eqrm_flags.scenario_azimuth = [340, 330]
     eqrm_flags.dip = [37, 30]
     eqrm_flags.scenario_magnitude = [8, 7.5]
-    eqrm_flags.max_width = [15, 7]
+    eqrm_flags.scenario_max_width = [15, 7]
     eqrm_flags.scenario_depth = [11.5, 11.0]
     eqrm_flags.scenario_number_of_events = 1
         
@@ -50,7 +50,7 @@ def create_event_set():
             azimuth=[eqrm_flags.scenario_azimuth],
             dip=[eqrm_flags.dip],
             Mw=[eqrm_flags.scenario_magnitude],
-            fault_width=eqrm_flags.max_width,
+            fault_width=eqrm_flags.scenario_max_width,
             depth=[eqrm_flags.scenario_depth],
             scenario_number_of_events=eqrm_flags.scenario_number_of_events)
     
