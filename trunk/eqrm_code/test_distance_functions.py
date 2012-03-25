@@ -329,6 +329,68 @@ class Test_Distance_functions(unittest.TestCase):
         msg = ('Expected Rrup=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
         self.failUnless(allclose(Rrup, expected_Rrup, atol=1e-06), msg)
         
+    def test_Rupture_Peer_2010(self):
+        """
+        Peer 2010/106 May 2010 Test Set 1, Cases 1 through 9  
+        A vertical strike and depth_to_top = 0, so Rrup == Rjb
+        """
+        
+        sites = asarray([[38.113, -122.000],
+                         [38.113, -122.114],
+                         [38.111, -122.570],
+                         [38.000, -122.000],
+                         [37.910, -122.000],
+                         [38.225, -122.000],
+                         [38.113, -121.886]]).T
+        lat_sites = sites[0]
+        lon_sites = sites[1]
+        
+        trace_start_lat = asarray([38.000])
+        trace_start_lon = asarray([-122.000])
+        
+        lat_events = asarray([38.113])
+        lon_events = asarray([-122.000])
+
+        azimuths = asarray([0])
+        widths = asarray([12])
+        lengths = asarray([25])
+        dips = asarray([90])
+        depths_to_top = asarray([0])
+        rupture_centroid_x = asarray([12.5])
+        rupture_centroid_y = asarray([0])
+        
+        projection = azimuthal_orthographic
+
+        # Expected Rrup == closest distance to rupture plane
+        # Using values manually calculated using as_the_cockey_flies
+        expected_Rrup= asarray([[0.0],
+                                [9.9668666681573406],
+                                [49.835436019848508],
+                                [0.0],
+                                [10.000800000041201],
+                                [0.0],
+                                [9.9668666681573406]])
+
+        Rrup = Rupture(lat_sites, 
+                       lon_sites, 
+                       lat_events, 
+                       lon_events, 
+                       lengths,
+                       azimuths, 
+                       widths, 
+                       dips, 
+                       depths, 
+                       depths_to_top,
+                       projection,
+                       trace_start_lat, 
+                       trace_start_lon,
+                       rupture_centroid_x, 
+                       rupture_centroid_y)
+
+        msg = ('Expected Rrup=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
+        # Using absolute tolerance of 0.005 due to as_the_cockey_flies accuracy
+        self.failUnless(allclose(Rrup, expected_Rrup, atol=5.0e-3), msg)
+        
     def test_Rupture_non_vertical(self):
         # define varying sites, at different positions, units is deg
         #                      1        2        3
