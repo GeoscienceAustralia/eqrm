@@ -1356,7 +1356,7 @@ def generate_event_set(parallel, eqrm_flags):
             dip=[eqrm_flags.scenario_dip],
             Mw=[eqrm_flags.scenario_magnitude],
             depth=[eqrm_flags.scenario_depth],
-            fault_width=eqrm_flags.max_width,
+            fault_width=eqrm_flags.scenario_max_width,
             scenario_number_of_events=eqrm_flags.scenario_number_of_events,
             length=eqrm_flags.scenario_length,
             width=eqrm_flags.scenario_width,

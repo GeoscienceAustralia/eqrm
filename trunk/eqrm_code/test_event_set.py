@@ -154,7 +154,7 @@ class Test_Event_Set(unittest.TestCase):
         eqrm_flags.scenario_azimuth = 340
         eqrm_flags.dip = 35
         eqrm_flags.scenario_magnitude = 8
-        eqrm_flags.max_width = 15
+        eqrm_flags.scenario_max_width = 15
         eqrm_flags.scenario_depth = 11.5
         eqrm_flags.scenario_number_of_events = 1
         
@@ -164,7 +164,7 @@ class Test_Event_Set(unittest.TestCase):
             azimuth=[eqrm_flags.scenario_azimuth],
             dip=[eqrm_flags.dip],
             Mw=[eqrm_flags.scenario_magnitude],
-            fault_width=eqrm_flags.max_width,
+            fault_width=eqrm_flags.scenario_max_width,
             depth=[eqrm_flags.scenario_depth],
             scenario_number_of_events=eqrm_flags.scenario_number_of_events)
 
@@ -184,7 +184,7 @@ class Test_Event_Set(unittest.TestCase):
         answer = array(eqrm_flags.scenario_magnitude)
         self.assert_(allclose(event_set.Mw, answer))
         
-        answer = array(eqrm_flags.max_width)
+        answer = array(eqrm_flags.scenario_max_width)
         self.assert_(allclose(event_set.fault_width, answer))
         
         answer = array(eqrm_flags.scenario_depth)
@@ -198,7 +198,7 @@ class Test_Event_Set(unittest.TestCase):
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             eqrm_flags.dip,
-            eqrm_flags.scenario_magnitude, area, eqrm_flags.max_width ))
+            eqrm_flags.scenario_magnitude, area, eqrm_flags.scenario_max_width))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
@@ -211,7 +211,7 @@ class Test_Event_Set(unittest.TestCase):
         eqrm_flags.scenario_azimuth = [340, 330]
         eqrm_flags.dip = [37, 30]
         eqrm_flags.scenario_magnitude = [8, 7.5]
-        eqrm_flags.max_width = [15, 7]
+        eqrm_flags.scenario_max_width = [15, 7]
         eqrm_flags.scenario_depth = [11.5, 11.0]
         eqrm_flags.scenario_number_of_events = 1 # If this is 2 it fails
         
@@ -221,7 +221,7 @@ class Test_Event_Set(unittest.TestCase):
             azimuth=eqrm_flags.scenario_azimuth,
             dip=eqrm_flags.dip,
             Mw=eqrm_flags.scenario_magnitude,
-            fault_width=eqrm_flags.max_width,
+            fault_width=eqrm_flags.scenario_max_width,
             depth=eqrm_flags.scenario_depth,
             scenario_number_of_events=eqrm_flags.scenario_number_of_events)
     
@@ -240,7 +240,7 @@ class Test_Event_Set(unittest.TestCase):
         answer = array(eqrm_flags.scenario_magnitude)
         self.assert_(allclose(event_set.Mw, answer))
         
-        answer = array(eqrm_flags.max_width)
+        answer = array(eqrm_flags.scenario_max_width)
         self.assert_(allclose(event_set.fault_width, answer))
         
         answer = array(eqrm_flags.scenario_depth)
@@ -256,7 +256,7 @@ class Test_Event_Set(unittest.TestCase):
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             eqrm_flags.dip, eqrm_flags.scenario_magnitude, area,
-            eqrm_flags.max_width ))
+            eqrm_flags.scenario_max_width ))
         self.assert_(allclose(event_set.width, width))
         
         answer = area/width 
@@ -270,7 +270,7 @@ class Test_Event_Set(unittest.TestCase):
         eqrm_flags.scenario_azimuth = 340
         eqrm_flags.dip = 35
         eqrm_flags.scenario_magnitude = 8
-        eqrm_flags.max_width = 15
+        eqrm_flags.scenario_max_width = 15
         eqrm_flags.scenario_depth = 11.5
         eqrm_flags.scenario_number_of_events = 2
         
@@ -280,7 +280,7 @@ class Test_Event_Set(unittest.TestCase):
             azimuth=[eqrm_flags.scenario_azimuth],
             dip=[eqrm_flags.dip],
             Mw=[eqrm_flags.scenario_magnitude],
-            fault_width=eqrm_flags.max_width,
+            fault_width=eqrm_flags.scenario_max_width,
             depth=[eqrm_flags.scenario_depth],
             scenario_number_of_events=eqrm_flags.scenario_number_of_events)
 
@@ -307,7 +307,7 @@ class Test_Event_Set(unittest.TestCase):
         # in allclose [8 8] == 8
         self.assert_ (allclose(event_set.Mw, answer))
         
-        answer = array(eqrm_flags.max_width)
+        answer = array(eqrm_flags.scenario_max_width)
         self.assert_ (allclose(event_set.fault_width, answer))
         
         answer = array(eqrm_flags.scenario_depth)
@@ -321,7 +321,7 @@ class Test_Event_Set(unittest.TestCase):
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             eqrm_flags.dip, eqrm_flags.scenario_magnitude,
-            area, eqrm_flags.max_width ))
+            area, eqrm_flags.scenario_max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
@@ -339,7 +339,7 @@ class Test_Event_Set(unittest.TestCase):
         eqrm_flags.scenario_azimuth = [0]
         eqrm_flags.dip = [45]
         eqrm_flags.scenario_magnitude = [6.02]
-        eqrm_flags.max_width = [5]
+        eqrm_flags.scenario_max_width = [5]
         eqrm_flags.scenario_depth = [7]
         eqrm_flags.scenario_number_of_events = 1 # If this is 2 it fails
         
@@ -349,12 +349,12 @@ class Test_Event_Set(unittest.TestCase):
             azimuth=eqrm_flags.scenario_azimuth,
             dip=eqrm_flags.dip,
             Mw=eqrm_flags.scenario_magnitude,
-            fault_width=eqrm_flags.max_width,
+            fault_width=eqrm_flags.scenario_max_width,
             depth=eqrm_flags.scenario_depth,
             scenario_number_of_events=eqrm_flags.scenario_number_of_events)
 
     
-        answer = array(eqrm_flags.max_width)
+        answer = array(eqrm_flags.scenario_max_width)
         self.assert_ (allclose(event_set.width, answer))
         
         area = array((conversions.modified_Wells_and_Coppersmith_94_area(
@@ -365,7 +365,7 @@ class Test_Event_Set(unittest.TestCase):
         width = array(
             conversions.modified_Wells_and_Coppersmith_94_width(
             eqrm_flags.dip, eqrm_flags.scenario_magnitude,
-            area, eqrm_flags.max_width ))
+            area, eqrm_flags.scenario_max_width ))
         self.assert_ (allclose(5., width))
         self.assert_ (allclose(event_set.width, width))
         
@@ -429,7 +429,7 @@ class Test_Event_Set(unittest.TestCase):
         eqrm_flags.scenario_azimuth = 340
         eqrm_flags.dip = 35
         eqrm_flags.scenario_magnitude = 8
-        eqrm_flags.max_width = None
+        eqrm_flags.scenario_max_width = None
         eqrm_flags.scenario_depth = 11.5
         eqrm_flags.scenario_number_of_events = 1
         
@@ -439,7 +439,7 @@ class Test_Event_Set(unittest.TestCase):
             azimuth=[eqrm_flags.scenario_azimuth],
             dip=[eqrm_flags.dip],
             Mw=[eqrm_flags.scenario_magnitude],
-            fault_width=eqrm_flags.max_width,
+            fault_width=eqrm_flags.scenario_max_width,
             depth=[eqrm_flags.scenario_depth],
             scenario_number_of_events=eqrm_flags.scenario_number_of_events)
 
@@ -459,7 +459,7 @@ class Test_Event_Set(unittest.TestCase):
         answer = array(eqrm_flags.scenario_magnitude)
         self.assert_(allclose(event_set.Mw, answer))
         
-        self.assertEqual(event_set.fault_width, eqrm_flags.max_width)
+        self.assertEqual(event_set.fault_width, eqrm_flags.scenario_max_width)
         
         answer = array(eqrm_flags.scenario_depth)
         self.assert_(allclose(event_set.depth, answer))
@@ -472,7 +472,7 @@ class Test_Event_Set(unittest.TestCase):
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             eqrm_flags.dip,
-            eqrm_flags.scenario_magnitude, area, eqrm_flags.max_width ))
+            eqrm_flags.scenario_magnitude, area, eqrm_flags.scenario_max_width ))
         self.assert_ (allclose(event_set.width, width))
         
         answer = area/width 
@@ -494,7 +494,7 @@ class Test_Event_Set(unittest.TestCase):
     def test_scenario_event_width(self):
         eqrm_flags = self.scenario_event_set()
         
-        eqrm_flags.max_width = 5 # should be ignored
+        eqrm_flags.scenario_max_width = 5 # should be ignored
         eqrm_flags.width = 10
         
         event_set = Event_Set.create_scenario_events(
@@ -503,7 +503,7 @@ class Test_Event_Set(unittest.TestCase):
             azimuth=[eqrm_flags.scenario_azimuth],
             dip=[eqrm_flags.dip],
             Mw=[eqrm_flags.scenario_magnitude],
-            fault_width=eqrm_flags.max_width,
+            fault_width=eqrm_flags.scenario_max_width,
             depth=[eqrm_flags.scenario_depth],
             scenario_number_of_events=eqrm_flags.scenario_number_of_events,
             width=eqrm_flags.width,)

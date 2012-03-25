@@ -19,7 +19,6 @@ from os.path import join
 # Operation Mode
 run_type = "hazard" 
 is_scenario = False
-max_width = 15
 site_tag = "java" 
 return_periods = [500, 1000, 2500]
 input_dir = join('.', 'implementation_tests', 'long_input')

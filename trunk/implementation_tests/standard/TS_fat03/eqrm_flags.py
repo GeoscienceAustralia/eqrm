@@ -19,7 +19,6 @@ from os.path import join
 # Operation Mode
 run_type = "fatality" 
 is_scenario = False
-max_width = 15
 site_tag = "java" 
 site_db_tag = "" 
 return_periods = [500, 1000, 2500]

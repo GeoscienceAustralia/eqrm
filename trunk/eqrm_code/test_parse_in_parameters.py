@@ -59,7 +59,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.scenario_length = 0.5
 
         # Probabilistic input
-        set.max_width = 15
+        set.scenario_max_width = 15
         set.prob_number_of_events_in_zones = [5000,1000]
         
         #  Attenuation   
@@ -151,7 +151,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.scenario_width == 1.5)
         self.failUnless(TPT.scenario_length == 0.5)
         
-        self.failUnless(TPT.max_width == 15)
+        self.failUnless(TPT.scenario_max_width == 15)
         self.failUnless(allclose(TPT.prob_number_of_events_in_zones,
                                  asarray([5000,1000])))
         self.failUnless(allclose(TPT.atten_periods, asarray([0,0.30303,1])))
