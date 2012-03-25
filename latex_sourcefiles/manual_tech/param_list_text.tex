@@ -92,11 +92,6 @@ Event simulation type: \\
   \hspace{0.5em} True $\Rightarrow$ a specific scenario event (Use Scenario input); \\
   \hspace{0.5em} False $\Rightarrow$ probabilistic simulation, PSHA or PSRA (Use Probabilistic input) \\
 %---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{max\_width}: (Optional)\\
-Maximum width along
-virtual faults i.e. synthetic rupture width can
-not exceed \typepar{max\_width}{}{} (km).\\
-%---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{site\_tag}: (Mandatory)\\
 String used in input and
 output file
@@ -196,11 +191,15 @@ Longitude of rupture centroid.    \\
 \hline \vspace{0.1em} \texttt{scenario\_dip}: \\
 Dip of rupture plane (degrees from horizontal).  \\
 %---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{scenario\_max\_width}: (Optional)\\
+Maximum width along virtual faults i.e. rupture width can
+not exceed \typepar{scenario\_max\_width}{}{} (km).\\
+%---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{scenario\_width}: \\
 DEFAULT = \texttt{None} \\
 Width of rupture centroid (km). \\
-If \texttt{None}, dip, magnitude, area and \texttt{max\_width} used to calculate 
-using a Wells and Coppersmith (1994) conversion. \\
+If \texttt{None}, dip, magnitude, area and \texttt{scenario\_max\_width} used 
+to calculate using a Wells and Coppersmith (1994) conversion. \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{scenario\_length}: \\
 DEFAULT = \texttt{None} \\
