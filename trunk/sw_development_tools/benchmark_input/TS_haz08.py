@@ -20,7 +20,6 @@ from os.path import join
 # Operation Mode
 run_type = "hazard" 
 is_scenario = False
-max_width = 15
 zone_source_tag = "TS_haz08" 
 event_control_tag = "use" 
 input_dir = r"..\implementation_tests\input/" 
