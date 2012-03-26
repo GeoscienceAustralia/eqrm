@@ -1752,7 +1752,7 @@ def ground_motion_interface_conformance(GM_class, model_name):
     elif GM_class is Multiple_ground_motion_calculator:
         model_weights = [1]
         gm = GM_class([model_name], periods, model_weights)
-        # ignoring event_activity, event_id
+        # ignoring event_activity
         log_mean, log_sigma = \
             gm._distribution_function(distances, magnitudes, periods=periods,
                                       depth=depths, Vs30=Vs30,

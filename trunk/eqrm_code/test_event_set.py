@@ -184,9 +184,6 @@ class Test_Event_Set(unittest.TestCase):
         answer = array(eqrm_flags.scenario_magnitude)
         self.assert_(allclose(event_set.Mw, answer))
         
-        answer = array(eqrm_flags.scenario_max_width)
-        self.assert_(allclose(event_set.fault_width, answer))
-        
         answer = array(eqrm_flags.scenario_depth)
         self.assert_(allclose(event_set.depth, answer))
         
@@ -194,7 +191,6 @@ class Test_Event_Set(unittest.TestCase):
 
         area = array(conversions.modified_Wells_and_Coppersmith_94_area(
             eqrm_flags.scenario_magnitude))
-        self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             eqrm_flags.dip,
@@ -240,9 +236,6 @@ class Test_Event_Set(unittest.TestCase):
         answer = array(eqrm_flags.scenario_magnitude)
         self.assert_(allclose(event_set.Mw, answer))
         
-        answer = array(eqrm_flags.scenario_max_width)
-        self.assert_(allclose(event_set.fault_width, answer))
-        
         answer = array(eqrm_flags.scenario_depth)
         self.assert_(allclose(event_set.depth, answer))
         
@@ -252,7 +245,6 @@ class Test_Event_Set(unittest.TestCase):
             eqrm_flags.scenario_magnitude[0]),
             conversions.modified_Wells_and_Coppersmith_94_area(
             eqrm_flags.scenario_magnitude[1])))
-        self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             eqrm_flags.dip, eqrm_flags.scenario_magnitude, area,
@@ -307,9 +299,6 @@ class Test_Event_Set(unittest.TestCase):
         # in allclose [8 8] == 8
         self.assert_ (allclose(event_set.Mw, answer))
         
-        answer = array(eqrm_flags.scenario_max_width)
-        self.assert_ (allclose(event_set.fault_width, answer))
-        
         answer = array(eqrm_flags.scenario_depth)
         self.assert_ (allclose(event_set.depth, answer))
         
@@ -317,7 +306,6 @@ class Test_Event_Set(unittest.TestCase):
 
         area = array(conversions.modified_Wells_and_Coppersmith_94_area(
             eqrm_flags.scenario_magnitude))
-        self.assert_ (allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             eqrm_flags.dip, eqrm_flags.scenario_magnitude,
@@ -360,7 +348,6 @@ class Test_Event_Set(unittest.TestCase):
         area = array((conversions.modified_Wells_and_Coppersmith_94_area(
             eqrm_flags.scenario_magnitude[0])))
         self.assert_ (allclose(100., area))
-        self.assert_ (allclose(event_set.area, area))
 
         width = array(
             conversions.modified_Wells_and_Coppersmith_94_width(
@@ -378,8 +365,6 @@ class Test_Event_Set(unittest.TestCase):
 
         #event_set.trace_start_lat [-30.09]
         #event_set.trace_start_lon [ 149.93]
-        #event_set.trace_end_lat [-29.91001134]
-        #event_set.trace_end_lon [ 149.92726303]
 
         
         # Zone:   56 
@@ -402,9 +387,6 @@ class Test_Event_Set(unittest.TestCase):
 
         self.assert_ (allclose(event_set.trace_start_lat, -30.08,0.001))
         self.assert_ (allclose(event_set.trace_start_lon, 149.9,0.001))
-        
-        self.assert_ (allclose(event_set.trace_end_lat, -29.9,0.001))
-        self.assert_ (allclose(event_set.trace_end_lon, 149.9,0.001))
         
         repr = event_set.__repr__()
         repr_list = repr.split('\n')
@@ -459,8 +441,6 @@ class Test_Event_Set(unittest.TestCase):
         answer = array(eqrm_flags.scenario_magnitude)
         self.assert_(allclose(event_set.Mw, answer))
         
-        self.assertEqual(event_set.fault_width, eqrm_flags.scenario_max_width)
-        
         answer = array(eqrm_flags.scenario_depth)
         self.assert_(allclose(event_set.depth, answer))
         
@@ -468,7 +448,6 @@ class Test_Event_Set(unittest.TestCase):
 
         area = array(conversions.modified_Wells_and_Coppersmith_94_area(
             eqrm_flags.scenario_magnitude))
-        self.assert_(allclose(event_set.area, area))
 
         width = array(conversions.modified_Wells_and_Coppersmith_94_width(
             eqrm_flags.dip,
@@ -611,7 +590,6 @@ class Test_Event_Set(unittest.TestCase):
             prob_number_of_events_in_zones=prob_number_of_events_in_zones)
 #         print "events.trace_start_lat", events.trace_start_lat
 #         print " events.trace_start_lon", events.trace_start_lon
-#         print "events.trace_end_lat", events.trace_end_lat
 #         print "events.trace_end_lon", events.trace_end_lon
 #         print "events.rupture_centroid_lat", events.rupture_centroid_lat
 #         print "events.rupture_centroid_lon", events.rupture_centroid_lon
@@ -767,7 +745,6 @@ class Test_Event_Set(unittest.TestCase):
             None, #depth,
             fault_width,
             depth_top_seismogenic=depth_top_seismogenic)
-        set.source_zone_id = asarray([0,1]) #FIXME
         for i,event in enumerate(set):
             self.assert_(event.trace_start_lat == set.trace_start_lat[i])
             self.assert_(event.azimuth == set.azimuth[i])
@@ -778,13 +755,11 @@ class Test_Event_Set(unittest.TestCase):
             self.assert_(event.width == set.width[i])
             self.assert_(event.length == set.length[i])
             self.assert_(event.trace_start_lat == set.trace_start_lat[i])
+            self.assert_(event.trace_start_lon == set.trace_start_lon[i])
             self.assert_(event.rupture_centroid_lat == set.rupture_centroid_lat[i])
             self.assert_(event.rupture_centroid_lon == set.rupture_centroid_lon[i])
             self.assert_(event.rupture_centroid_y == set.rupture_centroid_y[i])
             self.assert_(event.rupture_centroid_x == set.rupture_centroid_x[i])
-            self.assert_(event.source_zone_id == set.source_zone_id[i])
-            self.assert_(event.trace_end_lat == set.trace_end_lat[i])
-            self.assert_(event.trace_end_lon == set.trace_end_lon[i])
            
 
         
@@ -1067,10 +1042,10 @@ class Test_Event_Set(unittest.TestCase):
 
     def test_merge_events_and_sources(self):
         para = array([0, 1., 2.])
-        para_list = [para]*20
+        para_list = [para]*15
         events_zone = Event_Set(*para_list)
         para = array([3., 4., 5., 6.])
-        para_list = [para]*20
+        para_list = [para]*15
         events_fault = Event_Set(*para_list)
 
         atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]

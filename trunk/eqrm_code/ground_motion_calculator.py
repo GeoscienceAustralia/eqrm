@@ -101,7 +101,7 @@ class Ground_motion_calculator(object):
                               depth=None, depth_to_top=None, fault_type=None,
                               Vs30=None, dist_type=None, mag_type=None,
                               Z25=None, dip=None, width=None,
-                              event_activity=None, event_id=None):
+                              event_activity=None):
         """
         dist_object must give distance info if dist_object.distance(dist_type)
         is called.  The distance info must be an array.
@@ -248,7 +248,7 @@ class Multiple_ground_motion_calculator(object):
                                                            periods))
 
     def distribution(self, sites, event_set, event_activity=None,
-                     event_id=None, Vs30=None, GM_models=None):
+                     Vs30=None, GM_models=None):
         """
         Calculate the ground motion shaking at a site, given an array of
         events.
@@ -279,7 +279,6 @@ class Multiple_ground_motion_calculator(object):
             Vs30=Vs30, Z25=None, dip=event_set.dip,
             width=event_set.width,
             event_activity=event_activity,
-            event_id=event_id,
             periods=self.periods,
             GM_models=GM_models)
 
@@ -290,10 +289,10 @@ class Multiple_ground_motion_calculator(object):
                                depth=None, depth_to_top=None,
                                fault_type=None, Vs30=None, Z25=None,
                                dip=None, width=None,
-                               event_activity=None, event_id=None,
+                               event_activity=None,
                                GM_models=None):
         """
-        The event_activity and event_id are not used currently.
+        The event_activity not used currently.
         But if we spawn they will be.
 
         returning values

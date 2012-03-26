@@ -188,7 +188,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         gm = Multiple_ground_motion_calculator([model_name], periods,
                                                model_weights)
 
-        # ignoring event_activity, event_id
+        # ignoring event_activity
         log_mean,log_sigma = gm._distribution_function(distances,
                                                             magnitudes,
                                                             depth=depths)

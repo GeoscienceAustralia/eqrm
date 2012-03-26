@@ -59,19 +59,13 @@ class Event_Set(file_store.File_Store):
                  depth_to_top, 
                  fault_type,
                  width, 
-                 length, 
-                 area, 
-                 fault_width,
-                 source_zone_id,
+                 length,
                  trace_start_lat, 
                  trace_start_lon,
-                 trace_end_lat, 
-                 trace_end_lon,
                  rupture_centroid_x, 
                  rupture_centroid_y,
                  rupture_centroid_lat, 
                  rupture_centroid_lon,
-                 event_id=None,
                  dir=None):
         """
     A set of seismic events. Can be created  either directly or from an
@@ -129,21 +123,13 @@ class Event_Set(file_store.File_Store):
         self.fault_type = fault_type
         self.width = width
         self.length = length
-        self.area = area
-        self.fault_width = fault_width
-        self.source_zone_id = source_zone_id # Warning sometimes = to None
         self.trace_start_lat = trace_start_lat
         self.trace_start_lon = trace_start_lon
-        self.trace_end_lat = trace_end_lat
-        self.trace_end_lon = trace_end_lon
         self.rupture_centroid_x = rupture_centroid_x
         self.rupture_centroid_y = rupture_centroid_y
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
-        if event_id is None and depth is not None:
-           self.event_id = r_[0:len(self.depth)] # gives every event an id
-        else:
-            self.event_id = event_id
+        
         self.check_arguments()
         
 
@@ -180,26 +166,11 @@ class Event_Set(file_store.File_Store):
     length = property(lambda self: self._get_file_array('length'), 
                       lambda self, value: self._set_file_array('length', value))
     
-    area = property(lambda self: self._get_file_array('area'), 
-                    lambda self, value: self._set_file_array('area', value))
-    
-    fault_width = property(lambda self: self._get_file_array('fault_width'), 
-                           lambda self, value: self._set_file_array('fault_width', value))
-    
-    source_zone_id = property(lambda self: self._get_file_array('source_zone_id'), 
-                              lambda self, value: self._set_file_array('source_zone_id', value))
-    
     trace_start_lat = property(lambda self: self._get_file_array('trace_start_lat'), 
                                lambda self, value: self._set_file_array('trace_start_lat', value))
     
     trace_start_lon = property(lambda self: self._get_file_array('trace_start_lon'), 
                                lambda self, value: self._set_file_array('trace_start_lon', value))
-    
-    trace_end_lat = property(lambda self: self._get_file_array('trace_end_lat'), 
-                             lambda self, value: self._set_file_array('trace_end_lat', value))
-    
-    trace_end_lon = property(lambda self: self._get_file_array('trace_end_lon'), 
-                             lambda self, value: self._set_file_array('trace_end_lon', value))
     
     rupture_centroid_x = property(lambda self: self._get_file_array('rupture_centroid_x'), 
                                   lambda self, value: self._set_file_array('rupture_centroid_x', value))
@@ -212,9 +183,6 @@ class Event_Set(file_store.File_Store):
     
     rupture_centroid_lon = property(lambda self: self._get_file_array('rupture_centroid_lon'), 
                                     lambda self, value: self._set_file_array('rupture_centroid_lon', value))
-    
-    event_id = property(lambda self: self._get_file_array('event_id'), 
-                        lambda self, value: self._set_file_array('event_id', value))
     # END PROPERTIES #
 
     @classmethod
@@ -232,13 +200,8 @@ class Event_Set(file_store.File_Store):
                         fault_type=None,
                         width=None,
                         length=None,
-                        area=None,
-                        fault_width=None,
-                        source_zone_id=None,
                         trace_start_lat=None,
                         trace_start_lon=None,
-                        trace_end_lat=None,
-                        trace_end_lon=None,
                         rupture_centroid_x=None,
                         rupture_centroid_y=None,
                         rupture_centroid_lat=None,
@@ -372,11 +335,6 @@ class Event_Set(file_store.File_Store):
                                      rupture_centroid_lat,rupture_centroid_lon,
                                      azimuth)
 
-        (trace_end_lat,
-         trace_end_lon) = xy_to_ll(rupture_centroid_x,-rupture_centroid_y,
-                                   rupture_centroid_lat,rupture_centroid_lon,
-                                   azimuth)  
-
         # Create an Event_Set instance
         event_set = cls(azimuth,
                         dip,
@@ -387,13 +345,8 @@ class Event_Set(file_store.File_Store):
                         fault_type,
                         width,
                         length,
-                        area,
-                        fault_width,
-                        None, #source_zone_id
                         trace_start_lat,
                         trace_start_lon,
-                        trace_end_lat,
-                        trace_end_lon,
                         rupture_centroid_x,
                         rupture_centroid_y,
                         rupture_centroid_lat,
@@ -553,7 +506,6 @@ class Event_Set(file_store.File_Store):
         width = zeros((num_events), dtype=EVENT_FLOAT)
         fault_width = zeros((num_events), dtype=EVENT_FLOAT)
         magnitude = zeros((num_events), dtype=EVENT_FLOAT)
-        source_zone_id = zeros((num_events), dtype=EVENT_INT)
         
         start = 0
         for i, source in enumerate(source_model):
@@ -620,11 +572,6 @@ class Event_Set(file_store.File_Store):
                                           max_rup_width=fault_width[start:end])
             eqrmlog.debug('Memory: event set lists have been combined')
             eqrmlog.resource_usage()
-
-            
-            # Does this mean source zone objects know nothing about
-            # their id? Yes
-            source_zone_id[start:end] = [i]*num
             
             
             start = end
@@ -649,7 +596,6 @@ class Event_Set(file_store.File_Store):
                                  area=area,
                                  width=width,
                                  dir=store_dir)
-        event.source_zone_id = asarray(source_zone_id)
         eqrmlog.debug('Memory: finished generating events')
         eqrmlog.resource_usage()
 
@@ -682,12 +628,14 @@ class Event_Set(file_store.File_Store):
         Returns the length of the arguments.
         """
 
-        arguments = {'depth': self.depth, 'azimuth': self.azimuth,
-                     'dip': self.dip, 'ML': self.ML,
-                     'Mw': self.Mw, 'length': self.length,
+        arguments = {'depth': self.depth, 
+                     'azimuth': self.azimuth,
+                     'dip': self.dip, 
+                     'ML': self.ML,
+                     'Mw': self.Mw, 
+                     'length': self.length,
                      'rupture_centroid_lat': self.rupture_centroid_lat,
-                     'rupture_centroid_lon': self.rupture_centroid_lon,
-                     'event_id': self.event_id}
+                     'rupture_centroid_lon': self.rupture_centroid_lon}
 
         n = 1     #initialise number of arguments to 1
         for key in arguments.keys():
@@ -728,7 +676,7 @@ class Event_Set(file_store.File_Store):
         """Get slice of this Event_Set.
 
         Returns a new Event_Set object containing the sliced data.
-        Additional attributes aren't carried over. eg event_id.
+        Additional attributes aren't carried over.
         """
         
         # 'key' has to be an array.
@@ -740,13 +688,6 @@ class Event_Set(file_store.File_Store):
                            (key.shape == (len(self.depth),)) and
                            (key == r_[0:len(self.depth)]).all()):
             return self
-
-        # special handling for some data
-        if self.fault_width.shape == tuple():
-            # Zero-rank or scalar. Broadcast to same shape as self.width
-            fault_width = self.fault_width + 0*self.width
-        else:
-            fault_width = self.fault_width
 
         # some variables/array are set to None after the Event_set has
         # been saved, so this method now checks for None values.
@@ -870,17 +811,12 @@ def generate_synthetic_events_fault(fault_xml_file,
     azimuth = zeros((num_events), dtype=EVENT_FLOAT)
     dip = zeros((num_events), dtype=EVENT_FLOAT)
     magnitude = zeros((num_events), dtype=EVENT_FLOAT)
-    source_zone_id = zeros((num_events), dtype=EVENT_INT)
     fault_type = zeros((num_events), dtype=EVENT_INT)
     depth = zeros((num_events), dtype=EVENT_FLOAT)
-    fault_w=zeros((num_events), dtype=EVENT_FLOAT)
-    area =zeros((num_events), dtype=EVENT_FLOAT)
     width =zeros((num_events), dtype=EVENT_FLOAT)
     length =zeros((num_events), dtype=EVENT_FLOAT)
     trace_start_lat =zeros((num_events), dtype=EVENT_FLOAT)
     trace_start_lon =zeros((num_events), dtype=EVENT_FLOAT)
-    trace_end_lat =zeros((num_events), dtype=EVENT_FLOAT)
-    trace_end_lon =zeros((num_events), dtype=EVENT_FLOAT)
     rupture_centroid_x =zeros((num_events), dtype=EVENT_FLOAT)
     rupture_centroid_y =zeros((num_events), dtype=EVENT_FLOAT)
     
@@ -1047,11 +983,7 @@ def generate_synthetic_events_fault(fault_xml_file,
          r_start_lon) = xy_to_ll(r_x_start,r_y_start,
                                      r_centroid_lat,r_centroid_lon,
                                      fault_azimuth)
-
-        (r_end_lat,
-         r_end_lon) = xy_to_ll(-r_x_start,r_y_start,
-                                   r_centroid_lat,r_centroid_lon,
-                                   fault_azimuth)  
+  
           #FIXME DSG-EQRM the events will not to randomly placed,
             # Due to  lat, lon being spherical coords and popolate
             # working in x,y (flat 2D).
@@ -1074,22 +1006,16 @@ def generate_synthetic_events_fault(fault_xml_file,
         fault_type[start:end] = ground_motion_misc.FaultTypeDictionary[
             source.fault_type]
         depth[start:end] = r_depth_centroid
-        fault_w[start:end] = fault_width
-        area[start:end] = rup_width*rup_length
         width[start:end] = rup_width
         length[start:end] = rup_length
         trace_start_lat[start:end] = r_start_lat
         trace_start_lon[start:end] = r_start_lon
-        trace_end_lat[start:end] = r_end_lat
-        trace_end_lon[start:end] = r_end_lon
         rupture_centroid_x[start:end] = r_x_centroid
         rupture_centroid_y[start:end] = r_y_centroid
-        #magnitude[start:end] = polygon_magnitude
-            #print "magnitude.dtype.name", magnitude.dtype.name
+        
         eqrmlog.debug('Memory: event set lists have been combined')
         eqrmlog.resource_usage()
         source.set_event_set_indexes(asarray(range(start,end),dtype=EVENT_INT))
-        source_zone_id[start:end] = [i]*num
         start = end
     
     ML=None
@@ -1104,10 +1030,7 @@ def generate_synthetic_events_fault(fault_xml_file,
         Mw = conversions.Johnston_89_Mw(ML)
     if ML is None:
         ML = conversions.Johnston_01_ML(Mw)
-     #should use rupture_top
-     # calculate depth_to_top from depth, width, dip
-    #depth_to_top = conversions.calc_depth_to_top(depth, width, dip)
-    #assert (depth_to_top == depth_top_seismogenic)
+    
     event = Event_Set(azimuth,
                         dip,
                         ML,
@@ -1117,22 +1040,14 @@ def generate_synthetic_events_fault(fault_xml_file,
                         fault_type,
                         width,
                         length,
-                        area,
-                        fault_w,
-                        None, #source_zone_id
                         trace_start_lat,
                         trace_start_lon,
-                        trace_end_lat,
-                        trace_end_lon,
                         rupture_centroid_x,
                         rupture_centroid_y,
                         rupture_centroid_lat,
                         rupture_centroid_lon,
                         dir=store_dir)
 
-    event.source_zone_id = asarray(source_zone_id)
-    
-        #print "event.source_zone_id", event.source_zone_id
     eqrmlog.debug('Memory: finished generating events')
     eqrmlog.resource_usage()
 
@@ -1491,11 +1406,6 @@ def generate_event_set(parallel, eqrm_flags):
                    event_activity,
                    source_model,
                    compress=eqrm_flags.compress_output)
-    event_set.area = None
-    event_set.trace_end_lat = None
-    event_set.trace_end_lon = None
-    event_set.source_zone_id = None
-    event_set.event_id = None
     
     # Save event_set, event_activity and source_model to data files
     event_set.save(save_dir)
