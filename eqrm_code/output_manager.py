@@ -416,7 +416,7 @@ def save_motion(soil_amp, eqrm_flags, motion, compress=False,
     There is a file for each event.
     First row are rsa periods - subsequent rows are sites.
     
-    There is a eqrm_flags.save_motion.  If it is equal to 1 a
+    There is a eqrm_flags.save_motion.  If it is True a
     motion file is created.
 
     parameters:
