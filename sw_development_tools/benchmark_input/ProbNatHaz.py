@@ -21,7 +21,6 @@ sdp = Parameter_data()
 # Operation Mode
 sdp.run_type = "hazard" 
 sdp.is_scenario = False
-sdp.max_width = 15
 
 # Scenario input
 sdp.scenario_azimuth = 340

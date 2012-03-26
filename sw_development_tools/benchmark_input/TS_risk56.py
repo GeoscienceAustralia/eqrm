@@ -20,7 +20,6 @@ from os.path import join
 # Operation Mode
 run_type = "risk" 
 is_scenario = False
-max_width = 15
 site_db_tag = "" 
 input_dir = r"..\implementation_tests\input/" 
 output_dir = r".\benchmark_output\TS_risk56/" 
