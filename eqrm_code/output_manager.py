@@ -21,6 +21,8 @@ from scipy import isfinite, array, allclose, asarray, swapaxes, transpose, \
      newaxis, reshape, nan, isnan, zeros, rollaxis, string_
 import numpy as np
 
+from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
+
 from csv_interface import csv2dict
 
 EXTENSION = '.txt'
@@ -789,18 +791,10 @@ def save_event_set(eqrm_flags, event_set, event_activity, source_model,
 
     # This is for speed, at the expense of memory
     # It is avoiding lots of expensive psudo-event lookups.
-    trace_start_lat = event_set.trace_start_lat
-    trace_start_lon = event_set.trace_start_lon
-    trace_end_lat = event_set.trace_end_lat
-    trace_end_lon = event_set.trace_end_lon
     azimuth = event_set.azimuth
     dip = event_set.dip
     event_activity = event_activity.get_ea_event_dimsion_only()
     sources_of_event_set = source_model.sources_of_event_set(len(event_set))
-
-    #name = event_set.name
-    #print('name=%s' % str(name))
-
     Mw = event_set.Mw
     rupture_centroid_lat = event_set.rupture_centroid_lat
     rupture_centroid_lon = event_set.rupture_centroid_lon
@@ -809,7 +803,16 @@ def save_event_set(eqrm_flags, event_set, event_activity, source_model,
     rupture_centroid_y = event_set.rupture_centroid_y
     length = event_set.length
     width = event_set.width
-    event_id = event_set.event_id
+    
+    trace_start_lat = event_set.trace_start_lat
+    trace_start_lon = event_set.trace_start_lon
+    
+    (trace_end_lat,
+     trace_end_lon) = xy_to_ll( rupture_centroid_x,
+                               -rupture_centroid_y,
+                                rupture_centroid_lat,
+                                rupture_centroid_lon,
+                                azimuth)
     
     for i in range(len(event_set)):
         s = []     
@@ -828,11 +831,8 @@ def save_event_set(eqrm_flags, event_set, event_activity, source_model,
         s.append(str(rupture_centroid_y[i]))
         s.append(str(length[i]))
         s.append(str(width[i]))
-        s.append(str(event_id[i]))
+        s.append(str(i)) # event_num
         s.append(str(sources_of_event_set[i].name))
-
-        # finally, append the fault name
-        #s.append(name[i])
         
         line = ','.join(s)
         event_file.write(line + '\n')
@@ -982,8 +982,12 @@ def load_event_set(saved_dir, site_tag):
         }
     attribute_dic, title_index_dic = csv2dict(file, convert=convert,
                                               delimiter=',')
-    attribute_dic['event_id'] = attribute_dic['event_num']
+    
+    # These don't map to anything so remove from the dict
+    del(attribute_dic['trace_end_lat'])
+    del(attribute_dic['trace_end_lon'])
     del(attribute_dic['event_num'])
+    
     return attribute_dic
      
 

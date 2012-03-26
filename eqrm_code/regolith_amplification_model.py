@@ -59,8 +59,7 @@ class Regolith_amplification_model(object):
 
     def distribution(self,ground_motion,site_classes,
                      Mw,event_periods,
-                     event_activity=None,
-                     event_id=None):
+                     event_activity=None):
         """
         Calculate the distribution of surface motion, given log of ground
         (bedrock) motion, site classes of events, event magnitudes,
@@ -86,9 +85,8 @@ class Regolith_amplification_model(object):
         [samples * ground_motion_samples]*[sites]*...
 
         parameters:
-          event_id: Being phased out of here.  Don't use.
+          event_activity: Being phased out of here.  Don't use.
           Don't clean up though, just incase we need to spawn.
-          event_activity: ditto.  
         """
         if not Mw.size == ground_motion.shape[1]:
             raise ValueError
