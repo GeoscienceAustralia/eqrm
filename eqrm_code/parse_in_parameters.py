@@ -116,10 +116,6 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 10.02,
              'new_para': 'is_scenario'},
-            {'old_para': 'wdth',
-             'order': 10.03,
-             'new_para': 'scenario_max_width',
-             'default': None},
             {'old_para': 'reset_seed_using_time',
              'order': 10.05,
              'new_para': 'reset_seed_using_time',
@@ -201,6 +197,9 @@ CONV_NEW = [{'order': 10.0,
              'default': None},
             {'order': 30.10,
              'new_para': 'scenario_length',
+             'default': None},
+            {'order': 30.11,
+             'new_para': 'scenario_max_width',
              'default': None},
             {'order': 40.0,
              'title': '\n# Probabilistic input\n'},
@@ -618,52 +617,46 @@ def _add_default_values(eqrm_flags):
 # In the dictionary DEPRECIATED_PARAS
 # the key is the depreciated attribute.
 # the value is
-# None, which means the only action is a warming,
+# None, which means the only action is a warning,
 #   OR
 # a string, which replaces the depreciated attribute,
 #   OR
-# the value has a dictinary where the the keys are the value of the
+# the value has a dictionary where the the keys are the value of the
 # depreciated attribute and the values are attribute and value pairs
 # to use, based on the value of the attribute.  
 #   OR
-# True, which means a warming, and deleting the attribute.
+# True, which means a warning, and deleting the attribute.
 
-DEPRECIATED_PARAS = {'atten_use_variability':
-                     {True:None,
-                      False:('atten_variability_method', None)},
-                     'amp_use_variability':
-                     {True:None,
-                      False:('amp_variability_method', None)},
-                     'atten_use_rescale_curve_from_pga':
-                     {True:None, # Do nothing
-                      False:('atten_override_RSA_shape', None)},
-                     'csm_use_hysteretic_damping':
-                     {True:None, # Do nothing
-                      False:('csm_hysteretic_damping', None)},
-                     'atten_use_pga_scaling_cutoff':
-                     {True:None, # Do nothing
-                      False:('atten_pga_scaling_cutoff', None)},
-                     'atten_aggregate_Sa_of_atten_models':
-                     'atten_collapse_Sa_of_atten_models',
-                     'atten_rescale_curve_from_pga':
-                     'atten_override_RSA_shape',
-                     'scenario_azimith':'scenario_azimuth',
-                     'determ_azimith':'scenario_azimuth',
-                     'determ_depth':'scenario_depth',
-                     'determ_latitude':'scenario_latitude',
-                     'determ_longitude':'scenario_longitude',
-                     'determ_magnitude':'scenario_magnitude',
-                     'determ_dip':'scenario_dip',
-                     'determ_number_of_events':'scenario_number_of_events',
-                     'is_deterministic':'is_scenario',
-                     'prob_azimuth_in_zones':None,
-                     'prob_delta_azimuth_in_zones':None,
-                     'prob_dip_in_zones':None,
-                     'prob_number_of_mag_sample_bins':None,
-                     'save_prob_strucutural_damage':
-                     'save_prob_structural_damage', 
-                     'prob_min_mag_cutoff':True
-                     }
+DEPRECIATED_PARAS = {
+    'atten_use_variability':                {True: None,
+                                             False:('atten_variability_method', None)},
+    'amp_use_variability':                  {True: None,
+                                             False:('amp_variability_method', None)},
+    'atten_use_rescale_curve_from_pga':     {True: None, # Do nothing
+                                             False:('atten_override_RSA_shape', None)},
+    'csm_use_hysteretic_damping':           {True: None, # Do nothing
+                                             False:('csm_hysteretic_damping', None)},
+    'atten_use_pga_scaling_cutoff':         {True: None, # Do nothing
+                                             False:('atten_pga_scaling_cutoff', None)},
+    'atten_aggregate_Sa_of_atten_models':   'atten_collapse_Sa_of_atten_models',
+    'atten_rescale_curve_from_pga':         'atten_override_RSA_shape',
+    'scenario_azimith':                     'scenario_azimuth',
+    'determ_azimith':                       'scenario_azimuth',
+    'determ_depth':                         'scenario_depth',
+    'determ_latitude':                      'scenario_latitude',
+    'determ_longitude':                     'scenario_longitude',
+    'determ_magnitude':                     'scenario_magnitude',
+    'determ_dip':                           'scenario_dip',
+    'determ_number_of_events':              'scenario_number_of_events',
+    'is_deterministic':                     'is_scenario',
+    'prob_azimuth_in_zones':                None,
+    'prob_delta_azimuth_in_zones':          None,
+    'prob_dip_in_zones':                    None,
+    'prob_number_of_mag_sample_bins':       None,
+    'save_prob_strucutural_damage':         'save_prob_structural_damage',
+    'prob_min_mag_cutoff':                  True,
+    'max_width':                            'scenario_max_width',
+    }
 
 def depreciated_attributes(eqrm_flags):
     """
@@ -674,6 +667,10 @@ def depreciated_attributes(eqrm_flags):
     """
     for param in DEPRECIATED_PARAS:
         if eqrm_flags.has_key(param):
+            
+            msg = 'WARNING: ' + param + \
+                  ' term in EQRM control file is deprecated.'
+            
             handle_logic = DEPRECIATED_PARAS[param]
             if handle_logic is None:
                 pass
@@ -681,9 +678,16 @@ def depreciated_attributes(eqrm_flags):
                 # handle_logic is a replacement string
                 # for the attribute name
                 eqrm_flags[handle_logic] = eqrm_flags[param]
+                
+                msg = '%s Replaced with %s=%s.' % (msg, 
+                                                   handle_logic,
+                                                   eqrm_flags[param])
+                
                 del eqrm_flags[param]
             elif handle_logic is True:
                 # Delete the attribute
+                msg = '%s Ignoring.' % msg
+                
                 del eqrm_flags[param]
             else:                
                 # handle_logic is a dictionary
@@ -692,10 +696,14 @@ def depreciated_attributes(eqrm_flags):
                     # The value is a tuple.
                     # the first value is the att name
                     # the second value is the att value
-                    eqrm_flags[what_to_do[0]] = what_to_do[1]                
+                    eqrm_flags[what_to_do[0]] = what_to_do[1]    
+                    
+                    msg = '%s Replaced with %s=%s.' % (msg, 
+                                                       what_to_do[0],
+                                                       what_to_do[1])
+                                
                 del eqrm_flags[param]
-            msg = 'WARNING: ' + param + \
-                  ' term in EQRM control file is depreciated.'
+            
             # logging is only set-up after the para file has been passed.
             # So these warnings will not be in the logs.
             if log_imported:
