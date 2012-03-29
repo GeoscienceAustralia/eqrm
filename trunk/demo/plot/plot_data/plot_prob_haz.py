@@ -26,7 +26,8 @@ return_periods = [100, 500, 7500, 10000.0]
 input_dir = join('.', 'input')
 output_dir = join('.', 'output', 'plot_prob_haz')
 use_site_indexes = False
-fault_source_tag = "no_fault" 
+zone_source_tag = ""
+event_control_tag = ""
 
 # Scenario input
 

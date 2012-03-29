@@ -26,7 +26,6 @@ output_dir = join('.', 'implementation_tests', 'current', 'TS_haz30MR')
 use_site_indexes = True
 site_indexes = [2997, 2657, 3004, 3500]
 fault_source_tag = "faultingMR" 
-zone_source_tag = "nofile" 
 event_control_tag = "use" 
 
 # Scenario input

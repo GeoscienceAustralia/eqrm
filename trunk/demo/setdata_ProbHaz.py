@@ -27,7 +27,8 @@ input_dir = join('.', 'input')
 output_dir = join('.', 'output', 'prob_haz')
 use_site_indexes = True
 site_indexes = [2255, 11511, 10963, 686]
-fault_source_tag = "no_fault" 
+zone_source_tag = ""
+event_control_tag = ""
 
 # Scenario input
 

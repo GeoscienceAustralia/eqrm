@@ -28,7 +28,7 @@ input_dir = join('.', 'implementation_tests', 'input', 'national')
 output_dir = join('.', 'implementation_tests', 'current', 'TS_large01')
 use_site_indexes = True # If this is False it will take some time to run
 site_indexes = range(100)
-fault_source_tag = "no_fault"
+zone_source_tag = ""
 event_control_tag = "use"
 
 

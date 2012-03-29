@@ -1299,7 +1299,7 @@ def generate_event_set(parallel, eqrm_flags):
                                                  source_file_type='event_type')
         except IOError, e:
             fid_event_types = None
-            log.debug('No event typlecontrol XML file found')
+            log.debug('No event type control XML file found')
             log.debug(e)
         try:
             fid_sourcepolys = get_source_file_handle(eqrm_flags, 

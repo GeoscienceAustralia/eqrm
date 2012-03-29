@@ -28,7 +28,6 @@ output_dir = join('.', 'implementation_tests', 'long_current', 'nat01')
 use_site_indexes = False
 site_indexes = [1]
 zone_source_tag = "01"
-fault_source_tag = "no_fault"
 event_control_tag = "01"
 
 

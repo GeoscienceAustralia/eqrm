@@ -27,7 +27,7 @@ output_dir = join('.', 'implementation_tests', 'current', 'TS_risk57')
 use_site_indexes = True
 site_indexes = 3541
 zone_source_tag = "3_mods_TAS" 
-event_control_tag = "use" 
+event_control_tag = "use"
 
 # Scenario input
 

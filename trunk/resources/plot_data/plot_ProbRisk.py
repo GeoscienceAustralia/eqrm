@@ -25,7 +25,8 @@ return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 
 input_dir = r".\input/" 
 output_dir = r".\output\plot_prob_risk/" 
 use_site_indexes = False
-fault_source_tag = "no_fault" 
+zone_source_tag = ""
+event_control_tag = ""
 
 # Scenario input
 

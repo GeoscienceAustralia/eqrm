@@ -853,6 +853,11 @@ def _verify_eqrm_flags(eqrm_flags):
         raise AttributeSyntaxError(
             'data_array_storage %s must exist and be accessible from %s' % (eqrm_flags.data_array_storage,
                                                                             socket.gethostname()))
+        
+    if eqrm_flags.fault_source_tag is None and \
+            eqrm_flags.zone_source_tag is None:
+        raise AttributeSyntaxError(
+            'Either fault_source_tag or zone_source_tag must be set.')
 
   
 def find_set_data_py_files(path):

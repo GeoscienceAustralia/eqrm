@@ -26,7 +26,8 @@ output_dir = join('.', 'implementation_tests', 'long_current', 'java02')
 use_site_indexes = True
 site_indexes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
 fault_source_tag = "div100_local_mag_min" 
-zone_source_tag = "div100_local_mag_min" 
+zone_source_tag = "div100_local_mag_min"
+event_control_tag = "" 
 
 # Scenario input
 

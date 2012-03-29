@@ -22,6 +22,7 @@ from scipy import isfinite, array, allclose, asarray, swapaxes, transpose, \
 import numpy as np
 
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
+from eqrm_code.ANUGA_utilities import log
 
 from csv_interface import csv2dict
 
@@ -1349,13 +1350,23 @@ def get_source_file_handle(eqrm_flags, source_file_type='zone'):
         file_constant = EVENT_CONTROL_FILE
     else:
         raise IOError(source_file_type, " is not a valid source file type.")
+    
     if source_tag is None:
-        source_file = eqrm_flags.site_tag + file_constant + '.xml'
+        return None
     else:
-        source_file = eqrm_flags.site_tag  + file_constant + '_' \
-                      + source_tag + '.xml'
-    source_file = os.path.join(eqrm_flags.input_dir, source_file)
-    return open(source_file)
+        # Support for source_tags of length zero - put the underscort in here
+        if len(source_tag) > 0:
+            source_tag = '_%s' % source_tag
+        
+        filename = '%s%s%s.xml' % (eqrm_flags.site_tag, file_constant, source_tag)
+        source_file = os.path.join(eqrm_flags.input_dir, filename)
+        
+        if not os.path.exists(source_file):
+            raise RuntimeError('Source file %s does not exist' % filename)
+        
+        log.info('Using file %s for %s source' % (source_file, source_file_type))
+        
+        return open(source_file)
     
     
 def save_bridge_days_to_complete(eqrm_flags,
