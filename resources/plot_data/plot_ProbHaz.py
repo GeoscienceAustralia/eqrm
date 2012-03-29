@@ -25,7 +25,8 @@ return_periods = [10,25,50,100,200,500,1000,2000,5000,7500,10000]
 input_dir = r".\input/" 
 output_dir = r".\output\plot_prob_haz/" 
 use_site_indexes = False
-fault_source_tag = "no_fault" 
+zone_source_tag = ""
+event_control_tag = ""
 
 # Scenario input
 

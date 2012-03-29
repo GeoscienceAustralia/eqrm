@@ -129,32 +129,37 @@ List whose elements represent the site
  index of the first row of data  (i.e. first data row in site file) is 1.\\
  \hline
 \end{tabular}
+\end{table}
 
 \vspace{2em}
 \begin{tabular}{|p{\textwidth}|}
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{fault\_source\_tag}: \\
-Extra tag for specifying a unique source fault file. 
+Tag for specifying a source fault file. \\
 If  \texttt{fault\_source\_tag} is defined the
 filename for the fault source file is
 \texttt{<site\_tag>\_fault\_source\_<fault\_source\_tag>.xml}.
-Otherwise it is \texttt{<site\_tag>\_fault\_source.xml}.
+Otherwise it is not used. \\
+Note that one of \texttt{fault\_source\_tag} and \texttt{zone\_source\_tag} must
+be set. \\
 \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{zone\_source\_tag}: \\
-Extra tag for specifying a unique source zone file. 
+Tag for specifying a source zone file. \\
 If  \texttt{zone\_source\_tag} is defined the
 filename for the zone source file is
-\texttt{<site\_tag>\_zone\_source\_<fault\_source\_tag>.xml}.
-Otherwise it is \texttt{<site\_tag>\_zone\_source.xml}.
+\texttt{<site\_tag>\_zone\_source\_<zone\_source\_tag>.xml}.
+Otherwise it is not used. \\
+Note that one of \texttt{zone\_source\_tag} and \texttt{fault\_source\_tag} must
+be set. \\
 \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{event\_control\_tag}: \\
-Extra tag for specifying a unique event control file.
-If  \texttt{fault\_source\_tag} is defined the
+Tag for specifying a event control file. \\
+If  \texttt{event\_control\_tag} is defined the
 filename for the event control is
 \texttt{<site\_tag>\_}\texttt{event\_control\_}\texttt{<event\_control\_tag>}\texttt{.xml}
-Otherwise it is \texttt{<site\_tag>\_event\_control.xml}.
+Otherwise it is not used. \\
 \\
  %---------------------------------------------------------
 % DR - must check if this is operational for hazard site file
@@ -165,7 +170,6 @@ Otherwise it is \texttt{<site\_tag>\_event\_control.xml}.
 %\\
 \hline
  \end{tabular}
-\end{table}
 
 \vspace{2em}
 \begin{tabular}{|p{\textwidth}|}

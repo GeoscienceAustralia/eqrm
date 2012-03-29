@@ -26,6 +26,7 @@ input_dir = join('.', 'implementation_tests', 'input')
 output_dir = join('.', 'implementation_tests', 'current', 'TS_haz44')
 use_site_indexes = True
 site_indexes = [2997, 2657, 3004, 3500]
+zone_source_tag = ""
 event_control_tag = "use" 
 
 # Scenario input

@@ -26,7 +26,8 @@ return_periods = [500]
 input_dir = join('.', 'rec_extent_input')
 output_dir = join('.', 'output', 'plot_prob_haz2')
 use_site_indexes = False
-fault_source_tag = "no_fault" 
+zone_source_tag = ""
+event_control_tag = ""
 
 # Scenario input
 

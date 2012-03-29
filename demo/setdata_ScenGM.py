@@ -27,7 +27,8 @@ input_dir = join('.', 'input')
 output_dir = join('.', 'output', 'scen_gm')
 use_site_indexes = True
 site_indexes = [2997, 2657, 3004, 3500]
-fault_source_tag = "no_fault" 
+zone_source_tag = ""
+event_control_tag = ""
 
 # Scenario input
 scenario_azimuth = 340

@@ -26,6 +26,7 @@ input_dir = join('.', 'implementation_tests', 'input')
 output_dir = join('.', 'implementation_tests', 'current', 'TS_risk32')
 use_site_indexes = True
 site_indexes = [6294, 567, 2222, 4659, 4951, 291, 2372]
+zone_source_tag = ""
 
 # Scenario input
 scenario_max_width = 15

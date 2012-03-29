@@ -26,7 +26,6 @@ input_dir = join('.', 'implementation_tests', 'long_input')
 output_dir = join('.', 'implementation_tests', 'long_current', 'peer01')
 use_site_indexes = False
 zone_source_tag = "01"
-fault_source_tag = "no_fault"
 event_control_tag = "01"
 
 
