@@ -46,6 +46,8 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.input_dir = self.inputDir
         set.output_dir = self.outputDir
         set.return_periods = [22,11]
+        set.zone_source_tag = ''
+        set.fault_source_tag = ''
         
         # Scenario input 
         set.scenario_azimuth = 20
@@ -282,6 +284,8 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.use_amplification = False
         set.site_tag = 'test_convert_py_2_THE'
         set.run_type = 'risk'
+        set.zone_source_tag = ''
+        set.fault_source_tag = ''
         
         # Other stuff - needed?
         set.csm_damping_regimes = 0
