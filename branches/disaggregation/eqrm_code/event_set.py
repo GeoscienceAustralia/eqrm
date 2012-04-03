@@ -1257,7 +1257,8 @@ class Event_Activity(file_store.File_Store):
 
 ####################################################################
 from eqrm_code.source_model import source_model_from_xml, Source_Model
-from eqrm_code.output_manager import save_event_set, get_source_file_handle
+from eqrm_code.output_manager import get_source_file_handle
+from eqrm_code.output_manager import save_event_set as save_event_set_to_csv
 
 def generate_event_set(parallel, eqrm_flags):
     """
@@ -1266,8 +1267,7 @@ def generate_event_set(parallel, eqrm_flags):
     objects to store to file.
     """
     
-    save_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.simulation_name)
-    log.info('P%s: Generating event set and saving to %s' % (parallel.rank, save_dir))
+    log.info('P%s: Generating event set' % parallel.rank)
     
     if eqrm_flags.is_scenario is True:
         # generate a scenario event set
@@ -1403,17 +1403,28 @@ def generate_event_set(parallel, eqrm_flags):
     source_model.set_ground_motion_calcs(eqrm_flags.atten_periods)
     
     # Save event set to standard output file
-    save_event_set(eqrm_flags, event_set,
-                   event_activity,
-                   source_model,
-                   compress=eqrm_flags.compress_output)
+    save_event_set_to_csv(eqrm_flags, 
+                          event_set,
+                          event_activity,
+                          source_model,
+                          compress=eqrm_flags.compress_output)
+    
+    return (event_set, event_activity, source_model)
+
+def save_event_set(event_set, 
+                   event_activity, 
+                   source_model, 
+                   parallel,
+                   eqrm_flags):
+    
+    save_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.simulation_name)
+    
+    log.info('P%s: Saving event set to %s' % (parallel.rank, save_dir))
     
     # Save event_set, event_activity and source_model to data files
     event_set.save(save_dir)
     event_activity.save(save_dir)
     source_model.save(save_dir)
-    
-    return (event_set, event_activity, source_model)
 
 def load_event_set(parallel, eqrm_flags):
     """
@@ -1469,11 +1480,19 @@ def create_event_set(eqrm_flags, parallel):
     elif mode == 'generate':
             
         if parallel.rank == 0:
+            
             (event_set,
              event_activity,
              source_model) = generate_event_set(parallel, eqrm_flags)
-            # Let the workers know they can continue 
-            parallel.notifyworkers(msg=parallel.load_event_set)
+             
+            if parallel.is_parallel:
+                save_event_set(event_set, 
+                               event_activity, 
+                               source_model, 
+                               parallel,
+                               eqrm_flags)
+                # Let the workers know they can continue
+                parallel.notifyworkers(msg=parallel.load_event_set)
         else:
             log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
             parallel.waitfor(msg=parallel.load_event_set, source=0)
@@ -1485,7 +1504,16 @@ def create_event_set(eqrm_flags, parallel):
     elif mode == 'save':
                 
         if parallel.rank == 0:
-            generate_event_set(parallel, eqrm_flags)
+            
+            (event_set,
+             event_activity,
+             source_model) = generate_event_set(parallel, eqrm_flags)
+             
+            save_event_set(event_set, 
+                           event_activity, 
+                           source_model, 
+                           parallel,
+                           eqrm_flags)
         else:
             log.warning('P%s: Saving the event set is not a parallel operation' 
                         % parallel.rank)
