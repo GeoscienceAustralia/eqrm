@@ -66,7 +66,7 @@ class Event_Set(file_store.File_Store):
                  rupture_centroid_y,
                  rupture_centroid_lat, 
                  rupture_centroid_lon,
-                 dir=None):
+                 source):
         """
     A set of seismic events. Can be created  either directly or from an
     XML file which generates the events from eqrm_code.generation polygons.
@@ -112,7 +112,7 @@ class Event_Set(file_store.File_Store):
 
 
         """
-        super(Event_Set, self).__init__('event_set', dir)
+        super(Event_Set, self).__init__('event_set')
         
         self.azimuth = azimuth
         self.dip = dip
@@ -129,6 +129,7 @@ class Event_Set(file_store.File_Store):
         self.rupture_centroid_y = rupture_centroid_y
         self.rupture_centroid_lat = rupture_centroid_lat
         self.rupture_centroid_lon = rupture_centroid_lon
+        self.source = source
         
         self.check_arguments()
         
@@ -183,10 +184,13 @@ class Event_Set(file_store.File_Store):
     
     rupture_centroid_lon = property(lambda self: self._get_file_array('rupture_centroid_lon'), 
                                     lambda self, value: self._set_file_array('rupture_centroid_lon', value))
+    
+    source = property(lambda self: self._get_file_array('source'), 
+                      lambda self, value: self._set_file_array('source', value))
     # END PROPERTIES #
 
     @classmethod
-    def load(cls, load_dir, store_dir=None):
+    def load(cls, load_dir):
         """
         Return an Event_Set object from the .npy files stored in the specified
         directory
@@ -206,7 +210,7 @@ class Event_Set(file_store.File_Store):
                         rupture_centroid_y=None,
                         rupture_centroid_lat=None,
                         rupture_centroid_lon=None,
-                        dir=store_dir)
+                        source=None)
         event_set._load(load_dir)
         return event_set
 
@@ -226,7 +230,7 @@ class Event_Set(file_store.File_Store):
                area=None, 
                width=None, 
                length=None,
-               dir=None):
+               source=None):
         """generate a scenario event set or a synthetic event set.
         Args:
           rupture_centroid_lat: Latitude of rupture centriod
@@ -241,7 +245,7 @@ class Event_Set(file_store.File_Store):
           
           Note, if you supply either ML or Mw, the other will be
           calculated. If you supply both, it is up to you to ensure that
-          they are consitant. Note that most funtions in EQRM use Mw (ML
+          they are consistnt. Note that most functions in EQRM use Mw (ML
           based attenuation models being one exception).
 
         The degrees of freedom of this interface is not quite right.      
@@ -282,6 +286,8 @@ class Event_Set(file_store.File_Store):
             ML = asarray(ML)
         if Mw is not None:
             Mw = asarray(Mw)
+        if source is not None:
+            source = asarray(source)
         # finish turning into arrays
 
         if Mw is None:
@@ -351,7 +357,7 @@ class Event_Set(file_store.File_Store):
                         rupture_centroid_y,
                         rupture_centroid_lat,
                         rupture_centroid_lon,
-                        dir=dir)
+                        source)
         return event_set
     
     
@@ -368,8 +374,7 @@ class Event_Set(file_store.File_Store):
                                depth_top_seismogenic=None, 
                                depth_bottom_seismogenic=None,
                                width=None,
-                               length=None,
-                               store_dir=None):
+                               length=None):
         
         __len__ = '__len__'
         if scenario_number_of_events > 1:
@@ -430,8 +435,7 @@ class Event_Set(file_store.File_Store):
                                  depth_bottom_seismogenic=
                                  depth_bottom_seismogenic,
                                  width=width,
-                                 length=length,
-                                 dir=store_dir)
+                                 length=length)
         return event
         
 
@@ -439,8 +443,7 @@ class Event_Set(file_store.File_Store):
     def generate_synthetic_events(cls, 
                                   fid_genpolys,
                                   source_model,
-                                  prob_number_of_events_in_zones=None,
-                                  store_dir=None):
+                                  prob_number_of_events_in_zones=None):
         """Randomly generate the event_set parameters.
 
         Note: The rupture centroid are within the polygons.  The trace
@@ -506,6 +509,7 @@ class Event_Set(file_store.File_Store):
         width = zeros((num_events), dtype=EVENT_FLOAT)
         fault_width = zeros((num_events), dtype=EVENT_FLOAT)
         magnitude = zeros((num_events), dtype=EVENT_FLOAT)
+        source_zone = zeros((num_events), dtype=EVENT_FLOAT)
         
         start = 0
         for i, source in enumerate(source_model):
@@ -573,6 +577,7 @@ class Event_Set(file_store.File_Store):
             eqrmlog.debug('Memory: event set lists have been combined')
             eqrmlog.resource_usage()
             
+            source_zone[start:end] = [i]*num
             
             start = end
             
@@ -595,7 +600,7 @@ class Event_Set(file_store.File_Store):
                                  fault_width=fault_width,
                                  area=area,
                                  width=width,
-                                 dir=store_dir)
+                                 source=source_zone)
         eqrmlog.debug('Memory: finished generating events')
         eqrmlog.resource_usage()
 
@@ -619,7 +624,7 @@ class Event_Set(file_store.File_Store):
         Attributes that are tacked onto an event_set instance.
         """
         # Moved from analysis        
-        self.source_zone_id = array(0*self.depth+1) # create a vector of 1's
+        self.source = array(0*self.depth+1) # create a vector of 1's
 
 
     def check_arguments(self):
@@ -699,9 +704,6 @@ class Event_Set(file_store.File_Store):
                 args[att] = None
             else:
                 args[att] = getattr(self, att)[key]
-                
-        # Keep the file_store data directory intact
-        args['dir'] = self._dir
         
         return Event_Set(**args) # FIXME relies on arg/attr name correspondence
    
@@ -747,8 +749,12 @@ def merge_events_and_sources(event_set_zone, event_set_fault,
     event_set_merged = event_set_zone + event_set_fault
     # assumes event_set_fault is at the end of event_set_zone
     source_model_merged = _add_sources(source_model_zone,
-                                      source_model_fault,
-                                      source_model_zone_event_set_length)
+                                       source_model_fault,
+                                       source_model_zone_event_set_length)
+    # Do the same for the sources vector in Event_Set
+    event_set_merged.source[source_model_zone_event_set_length:] += \
+        source_model_zone_event_set_length
+     
    
     return event_set_merged, source_model_merged
 
@@ -776,8 +782,7 @@ def _add_sources(source_model_zone, source_model_fault,
     
 def generate_synthetic_events_fault(fault_xml_file, 
                                     event_control_file,
-                                    prob_number_of_events_in_faults=None,
-                                    store_dir=None):
+                                    prob_number_of_events_in_faults=None):
     """Create Source objects from XML files for faults and events.
 
     fault_xml_file                   path to the FSG XML file
@@ -819,6 +824,7 @@ def generate_synthetic_events_fault(fault_xml_file,
     trace_start_lon =zeros((num_events), dtype=EVENT_FLOAT)
     rupture_centroid_x =zeros((num_events), dtype=EVENT_FLOAT)
     rupture_centroid_y =zeros((num_events), dtype=EVENT_FLOAT)
+    source_zone = zeros((num_events), dtype=EVENT_FLOAT)
     
     start=0
 
@@ -1012,6 +1018,7 @@ def generate_synthetic_events_fault(fault_xml_file,
         trace_start_lon[start:end] = r_start_lon
         rupture_centroid_x[start:end] = r_x_centroid
         rupture_centroid_y[start:end] = r_y_centroid
+        source_zone[start:end] = [i]*num
         
         eqrmlog.debug('Memory: event set lists have been combined')
         eqrmlog.resource_usage()
@@ -1046,7 +1053,7 @@ def generate_synthetic_events_fault(fault_xml_file,
                         rupture_centroid_y,
                         rupture_centroid_lat,
                         rupture_centroid_lon,
-                        dir=store_dir)
+                        source_zone)
 
     eqrmlog.debug('Memory: finished generating events')
     eqrmlog.resource_usage()
@@ -1081,11 +1088,11 @@ class Event_Activity(file_store.File_Store):
     The dimensions of the event_activity are;
       (num_spawns, num_gm_models, num_recurrence_models, num_events)
     """
-    def __init__(self, num_events, dir=None):
+    def __init__(self, num_events):
         """
         num_events is number of events
         """
-        super(Event_Activity, self).__init__('event_activity', dir)
+        super(Event_Activity, self).__init__('event_activity')
         
         self.event_activity = None
         self.num_events = num_events
@@ -1101,12 +1108,12 @@ class Event_Activity(file_store.File_Store):
     # END PROPERTIES #
     
     @classmethod
-    def load(cls, num_events, load_dir, store_dir=None):
+    def load(cls, num_events, load_dir):
         """
         Return an Event_Activity object from the .npy files stored in the specified
         directory
         """
-        event_activity = cls(num_events, store_dir)
+        event_activity = cls(num_events)
         event_activity._load(load_dir)
         return event_activity
 
@@ -1259,7 +1266,7 @@ def generate_event_set(parallel, eqrm_flags):
     objects to store to file.
     """
     
-    save_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
+    save_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.simulation_name)
     log.info('P%s: Generating event set and saving to %s' % (parallel.rank, save_dir))
     
     if eqrm_flags.is_scenario is True:
@@ -1274,21 +1281,18 @@ def generate_event_set(parallel, eqrm_flags):
             fault_width=eqrm_flags.scenario_max_width,
             scenario_number_of_events=eqrm_flags.scenario_number_of_events,
             length=eqrm_flags.scenario_length,
-            width=eqrm_flags.scenario_width,
-            store_dir=eqrm_flags.data_array_storage)
+            width=eqrm_flags.scenario_width)
         # Other rupture parameters are calculated by event_set object.
         # trace start is calculated from centroid and azimuth.
         # Rupture area, length, and width are calculated from Mw
         # using Wells and Coppersmith 94 (modified so rupture
         # width is less than fault_width).
-        event_activity = Event_Activity(num_events=len(event_set), 
-                                        dir=eqrm_flags.data_array_storage)
+        event_activity = Event_Activity(num_events=len(event_set))
         event_activity.set_scenario_event_activity()
         event_set.scenario_setup()
-        source_model = Source_Model.create_scenario_source_model(
-            len(event_set))
+        source_model = Source_Model.create_scenario_source_model(len(event_set))
         source_model.set_attenuation(eqrm_flags.atten_models,
-                                          eqrm_flags.atten_model_weights)
+                                     eqrm_flags.atten_model_weights)
     else:
         # (i.e. is_scenario is False) generate a probablistic event set
         # (using eqrm_flags.source_filename)
@@ -1329,8 +1333,7 @@ def generate_event_set(parallel, eqrm_flags):
                 fid_genpolys=fid_sourcepolys,
                 source_model=source_model_zone,
                 prob_number_of_events_in_zones=\
-                eqrm_flags.prob_number_of_events_in_zones,
-                store_dir=eqrm_flags.data_array_storage)
+                eqrm_flags.prob_number_of_events_in_zones)
 
             log.debug('Memory: event_set_zone created')
             log.resource_usage()
@@ -1354,8 +1357,7 @@ def generate_event_set(parallel, eqrm_flags):
             event_set_fault, source_model_fault = generate_synthetic_events_fault(
                 fid_sourcefaults, 
                 fid_event_types.name,
-                eqrm_flags.prob_number_of_events_in_faults,
-                store_dir=eqrm_flags.data_array_storage)
+                eqrm_flags.prob_number_of_events_in_faults)
             
         else:
             event_set_fault = None
@@ -1379,8 +1381,7 @@ def generate_event_set(parallel, eqrm_flags):
                 
         
         # event activity is calculated
-        event_activity = Event_Activity(num_events=len(event_set), 
-                                        dir=eqrm_flags.data_array_storage)
+        event_activity = Event_Activity(num_events=len(event_set))
         source_model.calculate_recurrence(
             event_set,
             event_activity)
@@ -1420,13 +1421,11 @@ def load_event_set(parallel, eqrm_flags):
     specified in eqrm_flags
     """
     
-    load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
+    load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.simulation_name)
     log.info('P%s: Loading event set from %s' % (parallel.rank, load_dir))
     
-    store_dir = eqrm_flags.data_array_storage
-    
-    event_set = Event_Set.load(load_dir, store_dir)
-    event_activity = Event_Activity.load(len(event_set), load_dir, store_dir)
+    event_set = Event_Set.load(load_dir)
+    event_activity = Event_Activity.load(len(event_set), load_dir)
     source_model = Source_Model.load(load_dir)
     
     return (event_set, event_activity, source_model)
@@ -1445,18 +1444,18 @@ def create_event_set(eqrm_flags, parallel):
                  caller
                  
     Other eqrm_flags used
-    data_dir       - specifies the base directory for event set files
-    event_set_name - a name for the event set generated
+    data_dir        - specifies the base directory for event set files
+    simulation_name - a name for the event set generated
     
     These are used to construct the directory to save to and load from. i.e.
-    the files are referenced in data_dir/event_set_name
+    the files are referenced in data_dir/simulation_name
     """
     
     mode = eqrm_flags.event_set_handler
     
     if parallel.rank == 0:
         log.info('event_set_handler = %s' % mode)
-        log.info('event_set_name = %s' % eqrm_flags.event_set_name)
+        log.info('simulation_name = %s' % eqrm_flags.simulation_name)
     
     # Wait for all nodes to be at this point to start
     parallel.barrier()

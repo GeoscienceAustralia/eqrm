@@ -22,6 +22,11 @@ SAVE_METHOD = 'npy'
 if sys.platform == 'win32':
     SAVE_METHOD = None
 
+# DATA_DIR
+# Specifies where the temporary data files get stored 
+# (set using eqrm_flags.data_array_storage)
+DATA_DIR = None
+
 class FileStoreException(Exception):
     pass
 
@@ -94,11 +99,10 @@ class File_Store(object):
     """
     
     
-    def __init__(self, name, dir):
+    def __init__(self, name):
         """__init__: create a file store instance with name and dir"""
         self._name = name
         self._array_files = {}
-        self._dir = dir # if this is None tempfile will use /tmp
 
     def __del__(self):
         """__del__: Make sure any data files are cleaned up"""
@@ -122,7 +126,7 @@ class File_Store(object):
             if filename is None:
                 handle, filename = tempfile.mkstemp(prefix='%s.%s.' % (self._name, name), 
                                                     suffix='.npy',
-                                                    dir=self._dir)
+                                                    dir=DATA_DIR)
                 os.close(handle)
                 self._array_files[name] = filename
                 

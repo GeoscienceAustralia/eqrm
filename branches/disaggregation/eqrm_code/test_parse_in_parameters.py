@@ -117,7 +117,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         # Data
         set.data_dir = self.dataDir
         set.event_set_handler = 'generate'
-        set.event_set_name = 'test'
+        set.simulation_name = 'test'
         set.data_array_storage = self.dataStoreDir
         
         # Log
@@ -205,7 +205,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(os.stat(os.path.abspath(TPT.data_dir)) == 
                         os.stat(os.path.abspath(self.dataDir)))
         self.failUnless(TPT.event_set_handler == 'generate')
-        self.failUnless(TPT.event_set_name == 'test')
+        self.failUnless(TPT.simulation_name == 'test')
         self.failUnless(os.stat(os.path.abspath(TPT.data_array_storage)) == 
                         os.stat(os.path.abspath(self.dataStoreDir)))
         

@@ -414,9 +414,9 @@ CONV_NEW = [{'order': 10.0,
              'new_para': 'save_prob_structural_damage',
              'default': False},
              {'old_para': 'save_fatalities',
-             'order': 100.07,
-             'new_para': 'save_fatalities',
-             'default': False},
+              'order': 100.07,
+              'new_para': 'save_fatalities',
+              'default': False},
              {'order': 110.01,
               'new_para': 'data_dir',
               'default_to_attr': 'output_dir'}, # see _add_default_values
@@ -424,8 +424,8 @@ CONV_NEW = [{'order': 10.0,
               'new_para': 'event_set_handler',
               'default': 'generate'},
              {'order': 110.03,
-              'new_para': 'event_set_name',
-              'default': 'current_event_set'},
+              'new_para': 'simulation_name',
+              'default': 'current_simulation'},
              {'order': 110.04,
               'new_para': 'data_array_storage',
               'default_to_attr': 'output_dir'}, # see _add_default_values
@@ -613,6 +613,8 @@ def _add_default_values(eqrm_flags):
         file_store.SAVE_METHOD = 'npy'
     else:
         file_store.SAVE_METHOD = None
+    
+    file_store.DATA_DIR = eqrm_flags.data_array_storage
 
 # In the dictionary DEPRECIATED_PARAS
 # the key is the depreciated attribute.
@@ -656,6 +658,7 @@ DEPRECIATED_PARAS = {
     'save_prob_strucutural_damage':         'save_prob_structural_damage',
     'prob_min_mag_cutoff':                  True,
     'max_width':                            'scenario_max_width',
+    'event_set_name':                       'simulation_name'
     }
 
 def depreciated_attributes(eqrm_flags):
@@ -835,10 +838,10 @@ def _verify_eqrm_flags(eqrm_flags):
             'Cannot spawn on amplification.')
     
     if eqrm_flags.event_set_handler == 'load':
-        load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.event_set_name)
+        load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.simulation_name)
         if not os.path.exists(load_dir):
             raise AttributeSyntaxError(
-                'data_dir/event_set_name %s must exist if event_set_handler is load.' % load_dir)
+                'data_dir/simulation_name %s must exist if event_set_handler is load.' % load_dir)
     
     # Only do these checks if different from output_dir 
     # (output_dir gets created if not exists

@@ -250,7 +250,7 @@ def main(parameter_handle,
     # are filled while looping over sites.  Wether they are needed or
     # not often depends on what is being saved.
     
-    data = Analysis_Data(dir=eqrm_flags.data_array_storage)
+    data = Analysis_Data()
 
     if eqrm_flags.save_hazard_map is True:
         data.bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),

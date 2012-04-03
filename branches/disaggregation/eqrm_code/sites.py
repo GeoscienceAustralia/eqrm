@@ -33,9 +33,10 @@ import scipy as np
 from eqrm_code.distances import Distances
 from eqrm_code.csv_interface import csv_to_arrays
 from eqrm_code.projections import azimuthal_orthographic as projection
+from eqrm_code import file_store
 
 
-class Sites(object):
+class Sites(file_store.File_Store):
     """An object to hold site data."""
 
     def __init__(self, latitude, longitude, **attributes):
@@ -45,6 +46,8 @@ class Sites(object):
         longitude   longitude of sites (vector)
         attributes  dictionary of site attributes (vectors of data)
         """
+        super(Sites, self).__init__('sites')
+        
         self.latitude = asarray(latitude)
         self.longitude = asarray(longitude)
         self.attributes = attributes
@@ -52,6 +55,38 @@ class Sites(object):
         assert(len(self.latitude) == len(self.longitude))
         for key in self.attributes:
             assert(len(self.latitude) == len(self.attributes[key]))
+            
+    def __del__(self):
+        super(Sites, self).__del__()
+    
+    # PROPERTIES #
+    # Define getters and setters for each attribute to exercise the 
+    # file-based data structure
+    latitude = property(lambda self: self._get_file_array('latitude'), 
+                        lambda self, value: self._set_file_array('latitude', value))
+    
+    longitude = property(lambda self: self._get_file_array('longitude'), 
+                         lambda self, value: self._set_file_array('longitude', value))
+    # END PROPERTIES #
+
+    def save(self, dir=None):
+        """
+        Save the ndarray objects to the specified directory
+        """
+        self._save(dir)
+    
+    @classmethod
+    def load(cls, load_dir):
+        """
+        Return an Sites object from the .npy files stored in the specified
+        directory.
+        Note: Attributes are not set by this method.
+        """
+        # An empty sites object
+        sites = cls(latitude=[], longitude=[])
+        # Set lat/lon vectors by load_dir
+        sites._load(load_dir)
+        return sites
 
     @classmethod
     def from_csv(cls, file, **attribute_conversions):
