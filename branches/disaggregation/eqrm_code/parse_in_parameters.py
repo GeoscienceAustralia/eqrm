@@ -417,21 +417,18 @@ CONV_NEW = [{'order': 10.0,
               'order': 100.07,
               'new_para': 'save_fatalities',
               'default': False},
-             {'order': 110.01,
-              'new_para': 'data_dir',
-              'default_to_attr': 'output_dir'}, # see _add_default_values
              {'order': 110.02,
               'new_para': 'event_set_handler',
               'default': 'generate'},
-             {'order': 110.03,
-              'new_para': 'simulation_name',
-              'default': 'current_simulation'},
              {'order': 110.04,
               'new_para': 'data_array_storage',
               'default_to_attr': 'output_dir'}, # see _add_default_values
              {'order': 110.05,
               'new_para': 'file_array',
               'default': True},
+             {'order': 110.06,
+              'new_para': 'event_set_load_dir',
+              'default': None}, # see _verify_eqrm_flags
              {'order': 120.01,
               'new_para': 'file_log_level',
               'default': 'debug'},
@@ -658,7 +655,9 @@ DEPRECIATED_PARAS = {
     'save_prob_strucutural_damage':         'save_prob_structural_damage',
     'prob_min_mag_cutoff':                  True,
     'max_width':                            'scenario_max_width',
-    'event_set_name':                       'simulation_name'
+    'event_set_name':                       True,
+    'data_dir':                             True,
+    'simulation_name':                      True
     }
 
 def depreciated_attributes(eqrm_flags):
@@ -739,13 +738,10 @@ def _att_value_fixes(eqrm_flags):
         eqrm_flags['output_dir'] = eqrm_flags.output_dir+'/'
     if not eqrm_flags.input_dir[-1] == '/':
         eqrm_flags['input_dir'] = eqrm_flags.input_dir+ '/'
-    if not eqrm_flags.data_dir[-1] == '/':
-        eqrm_flags['data_dir'] = eqrm_flags.data_dir+ '/'
     if not eqrm_flags.data_array_storage[-1] == '/':
         eqrm_flags['data_array_storage'] = eqrm_flags.data_array_storage+ '/'
     eqrm_flags['output_dir'] = _change_slashes(eqrm_flags.output_dir)
     eqrm_flags['input_dir'] = _change_slashes(eqrm_flags.input_dir)
-    eqrm_flags['data_dir'] = _change_slashes(eqrm_flags.data_dir)
     eqrm_flags['data_array_storage'] = _change_slashes(eqrm_flags.data_array_storage)
     
     if eqrm_flags.atten_variability_method == None:
@@ -837,25 +833,24 @@ def _verify_eqrm_flags(eqrm_flags):
         raise AttributeSyntaxError(
             'Cannot spawn on amplification.')
     
-    if eqrm_flags.event_set_handler == 'load':
-        load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.simulation_name)
-        if not os.path.exists(load_dir):
-            raise AttributeSyntaxError(
-                'data_dir/simulation_name %s must exist if event_set_handler is load.' % load_dir)
+    if eqrm_flags.event_set_handler == 'load' and \
+            eqrm_flags.event_set_load_dir is None:
+        raise AttributeSyntaxError(
+            'event_set_load_dir must be set if event_set_handler is load.')
+    
+    if eqrm_flags.event_set_handler == 'load' and \
+            not os.path.exists(eqrm_flags.event_set_load_dir):
+        raise AttributeSyntaxError(
+            'event_set_load_dir %s must exist if event_set_handler is load.' % \
+                eqrm_flags.event_set_load_dir)
     
     # Only do these checks if different from output_dir 
-    # (output_dir gets created if not exists
-    if eqrm_flags.data_dir != eqrm_flags.output_dir and \
-            not os.path.exists(eqrm_flags.data_dir):
-        raise AttributeSyntaxError(
-            'data_dir %s must exist and be accessible from %s' % (eqrm_flags.data_dir,
-                                                                  socket.gethostname()))
-        
+    # (output_dir gets created if not exists)
     if eqrm_flags.data_array_storage != eqrm_flags.output_dir and \
             not os.path.exists(eqrm_flags.data_array_storage):
         raise AttributeSyntaxError(
-            'data_array_storage %s must exist and be accessible from %s' % (eqrm_flags.data_array_storage,
-                                                                            socket.gethostname()))
+            'data_array_storage %s must exist and be accessible from %s' % \
+                (eqrm_flags.data_array_storage, socket.gethostname()))
         
     if eqrm_flags.fault_source_tag is None and \
             eqrm_flags.zone_source_tag is None:
@@ -960,7 +955,6 @@ def eqrm_flags_to_control_file(py_file_name, eqrm_flags):
             val = eqrm_flags[para_dic['new_para']]
             if line[0] in ['input_dir',
                            'output_dir',
-                           'data_dir',
                            'data_array_storage']:
                 if not 'join' in val:
                     val = convert_path_string_to_join(val)

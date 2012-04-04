@@ -18,7 +18,6 @@ from os.path import join
 # Operation Mode
 run_type = "hazard" 
 is_scenario = False
-max_width = 20
 site_tag = "nat" 
 site_db_tag = ""
 # General

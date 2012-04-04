@@ -1417,7 +1417,8 @@ def save_event_set(event_set,
                    parallel,
                    eqrm_flags):
     
-    save_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.simulation_name)
+    save_dir = os.path.join(eqrm_flags.output_dir, 
+                            '%s_event_set' % eqrm_flags.site_tag)
     
     log.info('P%s: Saving event set to %s' % (parallel.rank, save_dir))
     
@@ -1425,6 +1426,8 @@ def save_event_set(event_set,
     event_set.save(save_dir)
     event_activity.save(save_dir)
     source_model.save(save_dir)
+    
+    return save_dir
 
 def load_event_set(parallel, eqrm_flags):
     """
@@ -1432,7 +1435,7 @@ def load_event_set(parallel, eqrm_flags):
     specified in eqrm_flags
     """
     
-    load_dir = os.path.join(eqrm_flags.data_dir, eqrm_flags.simulation_name)
+    load_dir = eqrm_flags.event_set_load_dir
     log.info('P%s: Loading event set from %s' % (parallel.rank, load_dir))
     
     event_set = Event_Set.load(load_dir)
@@ -1453,20 +1456,13 @@ def create_event_set(eqrm_flags, parallel):
                - all nodes exit after completion
     'load'     - all nodes load the event set data from file and return to the 
                  caller
-                 
-    Other eqrm_flags used
-    data_dir        - specifies the base directory for event set files
-    simulation_name - a name for the event set generated
-    
-    These are used to construct the directory to save to and load from. i.e.
-    the files are referenced in data_dir/simulation_name
     """
+    # FIXME: Can we make this logic simpler?    
     
     mode = eqrm_flags.event_set_handler
     
     if parallel.rank == 0:
         log.info('event_set_handler = %s' % mode)
-        log.info('simulation_name = %s' % eqrm_flags.simulation_name)
     
     # Wait for all nodes to be at this point to start
     parallel.barrier()
@@ -1476,6 +1472,12 @@ def create_event_set(eqrm_flags, parallel):
         (event_set,
          event_activity,
          source_model) = load_event_set(parallel, eqrm_flags)
+         
+        save_event_set(event_set, 
+                       event_activity, 
+                       source_model, 
+                       parallel,
+                       eqrm_flags)
         
     elif mode == 'generate':
             
@@ -1485,17 +1487,19 @@ def create_event_set(eqrm_flags, parallel):
              event_activity,
              source_model) = generate_event_set(parallel, eqrm_flags)
              
+            save_dir = save_event_set(event_set, 
+                                      event_activity, 
+                                      source_model, 
+                                      parallel,
+                                      eqrm_flags)
+             
             if parallel.is_parallel:
-                save_event_set(event_set, 
-                               event_activity, 
-                               source_model, 
-                               parallel,
-                               eqrm_flags)
                 # Let the workers know they can continue
-                parallel.notifyworkers(msg=parallel.load_event_set)
+                parallel.notifyworkers(msg=save_dir)
         else:
             log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
-            parallel.waitfor(msg=parallel.load_event_set, source=0)
+            # load_event_set loads from for eqrm_flags.event_set_load_dir
+            eqrm_flags['event_set_load_dir'] = parallel.receive(source=0)
         
             (event_set,
              event_activity,

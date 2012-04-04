@@ -26,6 +26,7 @@
 
 
 import copy
+import os
 from scipy import array, asarray
 #import numpy as np
 import scipy as np
@@ -34,6 +35,8 @@ from eqrm_code.distances import Distances
 from eqrm_code.csv_interface import csv_to_arrays
 from eqrm_code.projections import azimuthal_orthographic as projection
 from eqrm_code import file_store
+
+from eqrm_code.ANUGA_utilities import log
 
 
 class Sites(file_store.File_Store):
@@ -268,6 +271,15 @@ class Sites(file_store.File_Store):
 
         return Sites(new_lat, new_lon, **new_attr)
 
+def save_sites(sites, parallel, eqrm_flags):
+    save_dir = os.path.join(eqrm_flags.output_dir, 
+                            '%s_sites' % eqrm_flags.site_tag)
+    
+    log.info('P%s: Saving sites to %s' % (parallel.rank, save_dir))
+    
+    sites.save(save_dir)
+    
+    return save_dir
 
 def truncate_sites_for_test(use_site_indexes, sites, site_indexes):
     """Sample sites (for testing).

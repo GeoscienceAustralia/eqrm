@@ -29,7 +29,30 @@ from eqrm_code.check_scenarios import STANDARD_DIR, CURRENT_DIR, \
 
 from shutil import copyfile
 
-EXCEPTIONS = ['.svn', 'log.txt', 'THE_PARAM_T.txt', 'current_event_set']
+EXCEPTIONS = ['.svn', 
+              'log.txt', 
+              'log-0.txt', 
+              'THE_PARAM_T.txt', 
+              'current_event_set',
+              'current_simulation',
+              'newc_event_set',
+              'newc_sites',
+              'newc_motion',
+              'java_event_set',
+              'java_sites',
+              'java_motion',
+              'box_event_set',
+              'box_sites',
+              'box_motion',
+              'slab_event_set',
+              'slab_sites',
+              'slab_motion',
+              'peer_event_set',
+              'peer_sites',
+              'peer_motion',
+              'nat_event_set',
+              'nat_sites',
+              'nat_motion']
 
 def main():
     current2standard(CURRENT_DIR, STANDARD_DIR)

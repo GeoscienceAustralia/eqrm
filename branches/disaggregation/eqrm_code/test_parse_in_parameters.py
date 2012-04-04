@@ -23,13 +23,13 @@ class Test_Parse_in_parameters(unittest.TestCase):
     def setUp(self):
         self.inputDir = tempfile.mkdtemp(prefix="inputDir")
         self.outputDir = tempfile.mkdtemp(prefix="outputDir")
-        self.dataDir = tempfile.mkdtemp(prefix="dataDir")
+        self.eventSetLoadDir = tempfile.mkdtemp(prefix="eventSetLoadDir")
         self.dataStoreDir = tempfile.mkdtemp(prefix="dataStoreDir")
         
     def tearDown(self):
         shutil.rmtree(self.inputDir)
         shutil.rmtree(self.outputDir)
-        shutil.rmtree(self.dataDir)
+        shutil.rmtree(self.eventSetLoadDir)
         shutil.rmtree(self.dataStoreDir)
 
     def build_instance_to_eqrm_flags(self):
@@ -115,9 +115,8 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.save_prob_structural_damage = True
         
         # Data
-        set.data_dir = self.dataDir
-        set.event_set_handler = 'generate'
-        set.simulation_name = 'test'
+        set.event_set_load_dir = self.eventSetLoadDir
+        set.event_set_handler = 'load'
         set.data_array_storage = self.dataStoreDir
         
         # Log
@@ -196,16 +195,14 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.save_building_loss == True)
         self.failUnless(TPT.save_contents_loss == True)
         self.failUnless(TPT.save_total_financial_loss == True)
-        self.failUnless(TPT.atten_models[0] == \
-                        'my_attenuation_model')
+        self.failUnless(TPT.atten_models[0] == 'my_attenuation_model')
         self.failUnless(TPT.atten_models[1] == 'Gaull_1990_WA')
         self.failUnless(TPT.atten_model_weights[0] == 0.3)
         self.failUnless(TPT.atten_model_weights[1] == 0.7)
         
-        self.failUnless(os.stat(os.path.abspath(TPT.data_dir)) == 
-                        os.stat(os.path.abspath(self.dataDir)))
-        self.failUnless(TPT.event_set_handler == 'generate')
-        self.failUnless(TPT.simulation_name == 'test')
+        self.failUnless(os.stat(os.path.abspath(TPT.event_set_load_dir)) == 
+                        os.stat(os.path.abspath(self.eventSetLoadDir)))
+        self.failUnless(TPT.event_set_handler == 'load')
         self.failUnless(os.stat(os.path.abspath(TPT.data_array_storage)) == 
                         os.stat(os.path.abspath(self.dataStoreDir)))
         
@@ -302,7 +299,6 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.is_scenario = True    # If False, probabilistic input used
         set.input_dir = '.'
         set.output_dir = '.'
-        set.data_dir = '.'
 
         return set
 
@@ -398,15 +394,11 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set = self.build_instance_to_eqrm_flags()
         
         # these should default to output_dir
-        del set.data_dir
         del set.data_array_storage
         
         eqrm_flags = create_parameter_data(set)
         
         expected_dir = os.path.abspath(eqrm_flags.output_dir)
-        
-        data_dir = os.path.abspath(eqrm_flags.data_dir)
-        self.failUnlessEqual(data_dir, expected_dir)
         
         data_array_storage = os.path.abspath(eqrm_flags.data_array_storage)
         self.failUnlessEqual(data_array_storage, expected_dir)

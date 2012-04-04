@@ -64,8 +64,7 @@ save_hazard_map = True
 
 
 # Data
-data_dir = join('.', 'implementation_tests', 'input')
-event_set_name = 'TS_haz45'
+event_set_load_dir = join('.', 'implementation_tests', 'input', 'TS_haz45')
 event_set_handler = 'load'
 data_array_storage = join('.')
 

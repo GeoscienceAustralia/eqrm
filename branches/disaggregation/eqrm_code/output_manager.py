@@ -18,7 +18,8 @@ from gzip import GzipFile
 from os import listdir
 
 from scipy import isfinite, array, allclose, asarray, swapaxes, transpose, \
-     newaxis, reshape, nan, isnan, zeros, rollaxis, string_
+     newaxis, reshape, nan, isnan, zeros, rollaxis, string_, save, load, \
+     concatenate
 import numpy as np
 
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
@@ -410,15 +411,10 @@ def load_distance(save_dir, site_tag, is_rjb):
         dist = reshape(dist, (-1,1))
     return dist
 
-def save_motion(soil_amp, eqrm_flags, motion, compress=False,
-                parallel_tag=None, write_title=True):
+def save_motion(soil_amp, eqrm_flags, motion, parallel_tag=None):
     """
-    Who creates this motion data structure?
-    How is it defined?
+    Write a numpy binary file for the given motion
 
-    There is a file for each event.
-    First row are rsa periods - subsequent rows are sites.
-    
     There is a eqrm_flags.save_motion.  If it is True a
     motion file is created.
 
@@ -439,40 +435,18 @@ def save_motion(soil_amp, eqrm_flags, motion, compress=False,
     else:
         raise IOError("soil_amp must be True or False")
     
-    if compress: open = myGzipFile
-    else: open = file
-    if parallel_tag is None:
-        parallel_tag = ''
-    base_names = []
-    for i_spawn in range(motion.shape[0]): # spawn
-        for i_gmm in range(motion.shape[1]): # ground motion model
-            for i_rm in xrange(motion.shape[2]): # recurrence model
-                for i in range(motion.shape[4]): # events
-                    # for all events
-                    base_name =  eqrm_flags.output_dir + eqrm_flags.site_tag + \
-                                '_' + \
-                                motion_name + '_motion_' + str(i) + '_spawn_' + \
-                                str(i_spawn) + '_gmm_' + \
-                                str(i_gmm) + '_rm_' + str(i_rm) + '.txt'
-
-                    name = base_name + parallel_tag
-                    base_names.append(base_name)
-                    f=open(name,'w')
-                    if write_title:
-                        f.write('% Event = '+str(i)+'\n')
-                        f.write('% Spawn = '+str(i_spawn)+'\n')
-                        f.write('% ground motion model = '+str(i_gmm)+'\n')
-                        f.write('%% Recurrence model = %d\n' % i_rm)
-                        f.write('% First row are rsa periods, then rows are sites'
-                                '\n')
-                        f.write(
-                            ' '.join([str(p) for p in eqrm_flags.atten_periods]) \
-                                + '\n')
-                    for j in range(motion.shape[3]): # sites
-                        mi=motion[i_spawn, i_gmm, i_rm, j, i, :]
-                        f.write(' '.join(['%.10g'%(m) for m in mi])+ '\n')
-                    f.close()
-    return base_names
+    save_dir = os.path.join(eqrm_flags.output_dir,
+                            '%s_motion' % eqrm_flags.site_tag)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    
+    base_name = os.path.join(save_dir, '%s' % motion_name)
+    name = base_name + parallel_tag
+    
+    # Save to .npy data file
+    save(name, motion)
+    
+    return base_name
 
 def load_motion(saved_dir, site_tag, soil_amp):
     """
@@ -1191,6 +1165,25 @@ def load_fatalities(fatalities_name, save_dir, site_tag):
     
     return fatalities_loaded, lat, lon
     
+def join_parallel_data_files(base_names, size):
+    """
+    Append a common set of numpy binary files produced by running EQRM in 
+    parallel.
+
+    The input is a list of base names.
+    """
+    for base_name in base_names:
+        sa = None
+        for i in range(size):
+            name = base_name + FILE_TAG_DELIMITER + str(i) + '.npy'
+            if i == 0:
+                sa = load(open(name, mode='rb'))
+            else:
+                # concat on sites axis
+                sa = concatenate((sa, load(open(name, mode='rb'))), axis=3)
+            os.remove(name)
+        save(base_name, sa)
+
 def join_parallel_files(base_names, size, compress=False):
     """
     Row append a common set of files produced by running EQRM in parallel.
