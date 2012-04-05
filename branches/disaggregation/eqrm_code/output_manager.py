@@ -65,7 +65,7 @@ def save_hazard(soil_amp,eqrm_flags,
         raise IOError("soil_amp must be True or False")  
     base_names = []
     if sites is not None:
-        file_name = save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
+        file_name = save_sites_to_csv(eqrm_flags.output_dir, eqrm_flags.site_tag,
                    sites, compress, parallel_tag, write_title)
         base_names.append(file_name)
     if compress:
@@ -298,9 +298,15 @@ def load_ecloss_and_sites(save_dir, site_tag):
     assert total_building_loss.shape[0] == lat.shape[0]
     assert lat.shape[0] == lon.shape[0] == BID.shape[0]
     return total_building_loss, total_building_value, lon, lat
-    
-def save_sites(output_dir, site_tag, sites, compress=False,
-                parallel_tag=None, write_title=True):
+
+def save_sites_to_binary(output_dir, site_tag, sites):
+    save_dir = os.path.join(output_dir, 
+                            '%s_sites' % site_tag)
+    sites.save(save_dir)
+    return save_dir
+
+def save_sites_to_csv(output_dir, site_tag, sites, compress=False,
+                      parallel_tag=None, write_title=True):
     """
     Saves Lat and Long info for all sites to a text file.
     One row per site.
@@ -411,10 +417,52 @@ def load_distance(save_dir, site_tag, is_rjb):
         dist = reshape(dist, (-1,1))
     return dist
 
-def save_motion(soil_amp, eqrm_flags, motion, parallel_tag=None):
+
+def save_motion_to_binary(soil_amp, eqrm_flags, motion, parallel_tag=None):
     """
     Write a numpy binary file for the given motion
 
+    There is a eqrm_flags.save_motion.  If it is True a
+    motion file is created.
+
+    parameters:
+    soil_amp: False -> 'bedrock_SA', True -> 'soil_SA'
+    motion: Array of spectral acceleration, units g
+        dimensions (spawn, gmm, rec_model, sites, events, periods)
+
+    """
+    if soil_amp is True:
+        motion_name = 'soil_SA'
+    elif soil_amp is False:
+        motion_name = 'bedrock_SA'
+    else:
+        raise IOError("soil_amp must be True or False")
+    
+    if parallel_tag is None:
+        parallel_tag = ''
+    
+    save_dir = os.path.join(eqrm_flags.output_dir,
+                            '%s_motion' % eqrm_flags.site_tag)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    
+    base_name = os.path.join(save_dir, '%s' % motion_name)
+    name = base_name + parallel_tag
+    
+    # Save to .npy data file
+    save(name, motion)
+    
+    return base_name
+
+def save_motion_to_csv(soil_amp, eqrm_flags, motion, compress=False,
+                       parallel_tag=None, write_title=True):
+    """
+    Who creates this motion data structure?
+    How is it defined?
+
+    There is a file for each event.
+    First row are rsa periods - subsequent rows are sites.
+    
     There is a eqrm_flags.save_motion.  If it is True a
     motion file is created.
 
@@ -435,20 +483,42 @@ def save_motion(soil_amp, eqrm_flags, motion, parallel_tag=None):
     else:
         raise IOError("soil_amp must be True or False")
     
-    save_dir = os.path.join(eqrm_flags.output_dir,
-                            '%s_motion' % eqrm_flags.site_tag)
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-    
-    base_name = os.path.join(save_dir, '%s' % motion_name)
-    name = base_name + parallel_tag
-    
-    # Save to .npy data file
-    save(name, motion)
-    
-    return base_name
+    if compress: open = myGzipFile
+    else: open = file
+    if parallel_tag is None:
+        parallel_tag = ''
+    base_names = []
+    for i_spawn in range(motion.shape[0]): # spawn
+        for i_gmm in range(motion.shape[1]): # ground motion model
+            for i_rm in xrange(motion.shape[2]): # recurrence model
+                for i in range(motion.shape[4]): # events
+                    # for all events
+                    base_name =  eqrm_flags.output_dir + eqrm_flags.site_tag + \
+                                '_' + \
+                                motion_name + '_motion_' + str(i) + '_spawn_' + \
+                                str(i_spawn) + '_gmm_' + \
+                                str(i_gmm) + '_rm_' + str(i_rm) + '.txt'
 
-def load_motion(saved_dir, site_tag, soil_amp):
+                    name = base_name + parallel_tag
+                    base_names.append(base_name)
+                    f=open(name,'w')
+                    if write_title:
+                        f.write('% Event = '+str(i)+'\n')
+                        f.write('% Spawn = '+str(i_spawn)+'\n')
+                        f.write('% ground motion model = '+str(i_gmm)+'\n')
+                        f.write('%% Recurrence model = %d\n' % i_rm)
+                        f.write('% First row are rsa periods, then rows are sites'
+                                '\n')
+                        f.write(
+                            ' '.join([str(p) for p in eqrm_flags.atten_periods]) \
+                                + '\n')
+                    for j in range(motion.shape[3]): # sites
+                        mi=motion[i_spawn, i_gmm, i_rm, j, i, :]
+                        f.write(' '.join(['%.10g'%(m) for m in mi])+ '\n')
+                    f.close()
+    return base_names
+
+def load_motion_from_csv(saved_dir, site_tag, soil_amp):
     """
     Load in all of the data written by save motion.
     This is SA w.r.t. location,rsa periods, spawn and ground motion model.
@@ -462,6 +532,7 @@ def load_motion(saved_dir, site_tag, soil_amp):
         dimensions (spawn, gmm, rm, sites, events, periods)
       periods: A list of periods of the SA values
     """
+    # TODO: Implement at per changes to save_motion
 
     # convert 'soil_amp' to a filename fragment
     motion_name = 'soil_SA' if soil_amp else 'bedrock_SA'
@@ -480,7 +551,7 @@ def load_motion(saved_dir, site_tag, soil_amp):
     max_gmm_ind = 0
     max_rm_index = 0
     for file in files:
-        tmp = load_motion_file(os.path.join(saved_dir, file))
+        tmp = load_motion_from_csv_file(os.path.join(saved_dir, file))
         SA, periods, event_index, spawn_index, gmm_index, rm_index = tmp
         # SA dimensions (sites, periods)
         # assume that the periods do not change
@@ -505,7 +576,7 @@ def load_motion(saved_dir, site_tag, soil_amp):
     return SA, periods
                 
 
-def load_collapsed_motion_sites(saved_dir, site_tag, soil_amp):
+def load_collapsed_motion_sites_from_csv(saved_dir, site_tag, soil_amp):
     """
     Load in all of the data written by save motion.
 
@@ -518,7 +589,7 @@ def load_collapsed_motion_sites(saved_dir, site_tag, soil_amp):
       lon: a vector of longitude values, site long
     """
     lat, lon = load_sites(saved_dir, site_tag)
-    SA, periods = load_motion(saved_dir, site_tag, soil_amp)
+    SA, periods = load_motion_from_csv(saved_dir, site_tag, soil_amp)
     #  SA dimensions (spawn, gmm, rm, sites, events, periods)
     newshape = (SA.shape[3],
                 SA.shape[0]*SA.shape[1]*SA.shape[2]*SA.shape[4],
@@ -545,7 +616,7 @@ def collapsed_motion_index(motion_shape, spawn_i,  gmm_i,  rm_i,  event_i):
         motion_shape[4] * motion_shape[2] * gmm_i + \
         motion_shape[4] * motion_shape[2] * motion_shape[1] * spawn_i
 
-def load_motion_sites(output_dir, site_tag, soil_amp, period):
+def load_motion_sites_from_csv(output_dir, site_tag, soil_amp, period):
     """
     Given a hazard output from EQRM, return the long, lat and SA for a
     specified period and return_period.
@@ -557,9 +628,11 @@ def load_motion_sites(output_dir, site_tag, soil_amp, period):
       lon: a vector of longitude values, site long
     """
     
-    SA, periods_f, lat, lon = load_collapsed_motion_sites(output_dir, site_tag, soil_amp)
+    SA, periods_f, lat, lon = load_collapsed_motion_sites_from_csv(output_dir, 
+                                                                   site_tag, 
+                                                                   soil_amp)
     #if period not in periods_f:
-    #   print "Bad period" # Throw acception here
+    #   print "Bad period" # Throw exception here
 
     tol = 0.0001
     SA_slice = None
@@ -567,12 +640,12 @@ def load_motion_sites(output_dir, site_tag, soil_amp, period):
         if period - tol < array_period and period + tol > array_period:
             SA_slice = SA[:,:,i]
     if SA_slice is None:
-        print "Bad period" # Throw acception here
+        print "Bad period" # Throw exception here
     
     return SA_slice, lat, lon
 
 
-def load_motion_file(file_full_name):
+def load_motion_from_csv_file(file_full_name):
     """
     Given a file in the standard motion SA format, load it.
     The SA returned has the axis site, period.
@@ -1132,7 +1205,7 @@ def save_fatalities(fatalities_name,eqrm_flags,fatalities,sites,compress=False,
     name = base_name + parallel_tag
     
     if sites is not None:
-        save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
+        save_sites_to_csv(eqrm_flags.output_dir, eqrm_flags.site_tag,
                        sites, compress, parallel_tag, write_title)
                     
     f=open(name,'w')

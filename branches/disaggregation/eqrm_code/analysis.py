@@ -34,8 +34,9 @@ from eqrm_code.ground_motion_calculator import \
 from eqrm_code.ground_motion_interface import BEDROCKVs30
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
      Regolith_amplification_model, load_site_class2Vs30
-from eqrm_code.output_manager import save_motion, save_distances, \
-         save_sites as save_sites_to_csv, \
+from eqrm_code.output_manager import save_motion_to_csv, \
+         save_motion_to_binary, save_distances, \
+         save_sites_to_csv, save_sites_to_binary, \
          save_hazard, save_structures, save_val, save_ecloss, \
          join_parallel_files, join_parallel_files_column, \
          join_parallel_data_files, \
@@ -47,7 +48,7 @@ from ground_motion_distribution import Distribution_Log_Normal, GroundMotionDist
 from eqrm_code.structures import Structures, build_par_file
 from eqrm_code.exceedance_curves import hzd_do_value, \
      collapse_att_model, collapse_source_gmms
-from eqrm_code.sites import Sites, truncate_sites_for_test, save_sites
+from eqrm_code.sites import Sites, truncate_sites_for_test
 from eqrm_code.damage_model import calc_total_loss
 from eqrm_code.parallel import Parallel
 from eqrm_code.ANUGA_utilities import log
@@ -176,10 +177,12 @@ def main(parameter_handle,
     all_sites = truncate_sites_for_test(eqrm_flags.use_site_indexes, sites,
                                         eqrm_flags.site_indexes)
     
-    # Save sites set
+    # Save sites to numpy array
     if parallel.rank == 0:
-        save_sites(all_sites, parallel, eqrm_flags)
-
+        save_sites_to_binary(eqrm_flags.output_dir, 
+                             eqrm_flags.site_tag,
+                             sites=all_sites)
+    
     del sites
     num_sites = len(all_sites)
 
@@ -555,7 +558,11 @@ def main(parameter_handle,
 
     # Save Ground Motion
     if eqrm_flags.save_motion is True and parallel.lo != parallel.hi:
-        a_file = save_sites_to_csv(eqrm_flags.output_dir, eqrm_flags.site_tag,
+
+        # Save to csv
+        # TODO: This is deprecated, remove once post-processing scripts written
+        a_file = save_sites_to_csv(eqrm_flags.output_dir,
+                                   eqrm_flags.site_tag,
                                    sites=all_sites,
                                    compress=eqrm_flags.compress_output,
                                    parallel_tag=parallel.file_tag,
@@ -566,18 +573,38 @@ def main(parameter_handle,
         if a_file not in row_files_that_parallel_splits:
             row_files_that_parallel_splits.append(a_file)
 
-        file = save_motion(soil_amp=False, 
-                           eqrm_flags=eqrm_flags,
-                           motion=data.bedrock_SA_all,
-                           parallel_tag=parallel.file_tag)
+        # Save to numpy binary
+        file = save_motion_to_binary(soil_amp=False, 
+                                     eqrm_flags=eqrm_flags,
+                                     motion=data.bedrock_SA_all,
+                                     parallel_tag=parallel.file_tag)
         data_files_that_parallel_splits.append(file)
+        
+        # Save to csv
+        # TODO: This is deprecated, remove once post-processing scripts written
+        files = save_motion_to_csv(soil_amp=False, 
+                                   eqrm_flags=eqrm_flags,
+                                   motion=data.bedrock_SA_all,
+                                   parallel_tag=parallel.file_tag,
+                                   write_title=(parallel.rank == False))
+        row_files_that_parallel_splits.extend(files)
 
         if data.soil_SA_all is not None:
-            file = save_motion(soil_amp=True, 
-                               eqrm_flags=eqrm_flags,
-                               motion=data.soil_SA_all,
-                               parallel_tag=parallel.file_tag)
+            # Save to numpy binary
+            file = save_motion_to_binary(soil_amp=True, 
+                                         eqrm_flags=eqrm_flags,
+                                         motion=data.soil_SA_all,
+                                         parallel_tag=parallel.file_tag)
             data_files_that_parallel_splits.append(file)
+            
+            # Save to csv
+            # TODO: This is deprecated, remove once post-processing scripts written
+            files = save_motion_to_csv(soil_amp=True, 
+                                       eqrm_flags=eqrm_flags,
+                                       motion=data.soil_SA_all,
+                                       parallel_tag=parallel.file_tag,
+                                       write_title=(parallel.rank == False))
+            row_files_that_parallel_splits.extend(files)
 
 
     # Save damage information
