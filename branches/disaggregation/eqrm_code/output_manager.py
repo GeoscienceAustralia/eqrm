@@ -1241,7 +1241,7 @@ def load_fatalities(fatalities_name, save_dir, site_tag):
 def join_parallel_data_files(base_names, size):
     """
     Append a common set of numpy binary files produced by running EQRM in 
-    parallel.
+    parallel. Concatenates based on axis=3.
 
     The input is a list of base names.
     """

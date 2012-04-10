@@ -3,11 +3,17 @@
 
 """
 import scipy
-from scipy import loadtxt
+from scipy import loadtxt, load, where
 import csv 
+import os
 
 from eqrm_code.csv_interface import csv_to_arrays
 from eqrm_code.structures import attribute_conversions
+from eqrm_code.event_set import Event_Set, Event_Activity
+from eqrm_code.source_model import Source_Model
+from eqrm_code.sites import Sites
+from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
+from eqrm_code.parse_in_parameters import create_parameter_data
 
 def calc_loss_deagg_suburb(bval_path_file, total_building_loss_path_file,
                             site_db_path_file, file_out):
@@ -71,7 +77,158 @@ def calc_loss_deagg_suburb(bval_path_file, total_building_loss_path_file,
             sum_bval += bvals[row]
         handle.writerow([key[0],sum_loss/1000000., sum_bval/1000000., 
                          sum_loss/sum_bval*100.])
+
+# TODO: Move to output_manager
+def load_event_set(output_dir, site_tag):
+    load_dir = os.path.join(output_dir, '%s_event_set' % site_tag)
+    
+    event_set = Event_Set.load(load_dir)
+    event_activity = Event_Activity.load(len(event_set), load_dir)
+    source_model = Source_Model.load(load_dir)
+    
+    return (event_set, event_activity, source_model)
+
+# TODO: Move to output_manager
+def load_sites(output_dir, site_tag):
+    load_dir = os.path.join(output_dir, '%s_sites' % site_tag)
+    
+    sites = Sites.load(load_dir)
+    
+    return sites
+
+# TODO: Move to output_manager
+def load_motion(output_dir, site_tag, is_bedrock):
+    if is_bedrock:
+        motion_name = 'bedrock_SA'
+    else:
+        motion_name = 'soil_SA'
+    
+    load_dir = os.path.join(output_dir, '%s_motion' % site_tag)
+    
+    return load(open(os.path.join(load_dir, '%s.npy' % motion_name), mode='rb'))
+
+def events_shaking_a_site(output_dir,
+                          site_tag,
+                          site_lat,
+                          site_lon,
+                          period,
+                          is_bedrock):
+    
+    # Set up objects
+    # EQRM flags
+    eqrm_flags = create_parameter_data(os.path.join(output_dir, 
+                                                    'eqrm_flags.py'))
+    atten_periods = eqrm_flags.atten_periods
+    if period not in eqrm_flags.atten_periods:
+        raise Exception("Period %s not in atten_periods %s" % (period,
+                                                               atten_periods))
+    period_ind = where(period == atten_periods)[0][0]
+    
+    # Event set objects
+    (event_set,
+     event_activity,
+     source_model) = load_event_set(output_dir, site_tag)
+    
+    # Site objects
+    sites = load_sites(output_dir, site_tag)
+    closest_site_ind = sites.closest_site(site_lat, site_lon)
+    closest_site_lat = sites[closest_site_ind].latitude[0]
+    closest_site_lon = sites[closest_site_ind].longitude[0]
+    
+    # Ground motion
+    motion = load_motion(output_dir, site_tag, is_bedrock)
+    
+    # Get the motion that corresponds to this site, collapsing spawn, rm, period
+    # Motion dimensions - spawn, gmm, rm, sites, events, period
+    motion_for_site = motion[0,:,0,closest_site_ind,:,period_ind]
+    
+    (event_set.trace_end_lat,
+     event_set.trace_end_lon) = xy_to_ll( event_set.rupture_centroid_x,
+                                         -event_set.rupture_centroid_y,
+                                          event_set.rupture_centroid_lat,
+                                          event_set.rupture_centroid_lon,
+                                          event_set.azimuth)
+    
+    # Event activity dimensions - spawn, gmm, rm, events
+    # Collapse spawn and rm
+    event_activity = event_activity.event_activity[0,:,0,:]
+    
+    # Distances
+    Rjb = sites.distances_from_event_set(event_set).distance('Joyner_Boore')
+    Rjb_for_site = Rjb.swapaxes(0,1)[:,closest_site_ind]
+    Rrup = sites.distances_from_event_set(event_set).distance('Rupture')
+    Rrup_for_site = Rrup.swapaxes(0,1)[:,closest_site_ind]
+    
+    # Create file and write headers
+    filename = '%s_%s_events_ap%s_lat%s_lon%s.csv' % (site_tag,
+                                                      'bedrock' if is_bedrock else 'soil',
+                                                      period,
+                                                      closest_site_lat,
+                                                      closest_site_lon)
+    handle = csv.writer(open(filename, 'w'), lineterminator='\n')
+    handle.writerow(['ground_motion',
+                     'ground_motion_model',
+                     'trace_start_lat',
+                     'trace_start_lon',
+                     'trace_end_lat',
+                     'trace_end_lon',
+                     'azimuth',
+                     'dip',
+                     'Mw',
+                     'rupture_centroid_x',
+                     'rupture_centroid_y',
+                     'length',
+                     'width',
+                     'activity',
+                     'Rjb',
+                     'Rrup',
+                     'site_lat',
+                     'site_lon'])
+    
+    # Loop over events
+    for i in range(motion_for_site.shape[1]): # events
+        trace_start_lat = event_set.trace_start_lat[i]
+        trace_start_lon = event_set.trace_start_lon[i]
+        trace_end_lat = event_set.trace_end_lat[i]
+        trace_end_lon = event_set.trace_end_lon[i]
+        azimuth = event_set.azimuth[i]
+        dip = event_set.dip[i]
+        mw = event_set.dip[i]
+        rupture_centroid_x = event_set.rupture_centroid_x[i]
+        rupture_centroid_y = event_set.rupture_centroid_y[i]
+        length = event_set.length[i]
+        width = event_set.width[i]
         
+        rjb = Rjb_for_site[i]
+        rrup = Rrup_for_site[i]
+        
+        ground_motion = motion_for_site[:,i]
+        activity = event_activity[:,i]
+        
+        event_source = source_model[int(event_set.source[i])]
+        for gmm in event_source.atten_models:
+            gmm_index = event_source.atten_models.index(gmm)
+            handle.writerow([ground_motion[gmm_index],
+                             gmm,
+                             trace_start_lat,
+                             trace_start_lon,
+                             trace_end_lat,
+                             trace_end_lon,
+                             azimuth,
+                             dip,
+                             mw,
+                             rupture_centroid_x,
+                             rupture_centroid_y,
+                             length,
+                             width,
+                             activity[gmm_index],
+                             rjb,
+                             rrup,
+                             closest_site_lat,
+                             closest_site_lon])
+    
+    print "filename", filename
+    
 # ------------------------------------------------------------
 if __name__ == '__main__':  
     pass

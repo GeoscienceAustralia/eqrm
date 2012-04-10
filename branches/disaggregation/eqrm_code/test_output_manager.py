@@ -4,7 +4,7 @@ import unittest
 import tempfile
 import shutil
 from scipy import array, zeros, allclose, asarray, transpose, fromfunction, who
-from scipy import load
+from scipy import load, random
 from eqrm_code.output_manager import *
 from eqrm_code.sites import Sites
 from eqrm_code.source_model import Source_Model
@@ -823,6 +823,51 @@ class Test_Output_manager(unittest.TestCase):
 
         f_check.close()
         os.remove(base_file_name)
+
+    def test_join_parallel_data_files(self):
+        num_spawning = 5
+        num_gmm_dimensions = 3
+        num_rm = 2
+        num_site_block = 20
+        num_events = 10
+        num_atten_periods = 10
+        
+        file_num = 6
+        random_arrays = []
+        
+        handle, base_file_name = tempfile.mkstemp('.npy')
+        os.close(handle)
+        
+        # Create some random arrays and save to file
+        for i in range(file_num):
+            file_name = base_file_name + FILE_TAG_DELIMITER + str(i) + '.npy'
+            
+            random_array = random.random((num_spawning,
+                                          num_gmm_dimensions,
+                                          num_rm,
+                                          num_site_block,
+                                          num_events,
+                                          num_atten_periods))
+            random_arrays.append(random_array)
+            
+            save(file_name, random_array)
+        
+        # Join these (this will also remove the individual files)
+        join_parallel_data_files([base_file_name], file_num)
+        
+        # Now load this file
+        joined_data = load(open(base_file_name, mode='rb'))
+        
+        # Compare arrays
+        for i in range(file_num):
+            x = i*num_site_block
+            self.assert_(allclose(joined_data[:,:,:,x:x+num_site_block,:,:],
+                                  random_arrays[i]))
+        
+        # Remove base file
+        os.remove(base_file_name)
+        
+        
 
     def test_save_structures(self):
         eqrm_flags=DummyEventSet()

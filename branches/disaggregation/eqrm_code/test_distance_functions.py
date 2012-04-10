@@ -51,9 +51,10 @@ class Test_Distance_functions(unittest.TestCase):
 
         d=asarray((0,1,2,3))*(1.852*60)
         d=d[:,newaxis]
-        d2=self.as_the_cockey_flies(rupture_centroid_lat,
-                                    rupture_centroid_lon,
-                                    site_lat,site_lon)
+        d2=As_The_Cockey_Flies(rupture_centroid_lat,
+                               rupture_centroid_lon,
+                               site_lat,
+                               site_lon)
 
         assert allclose(d,distance,rtol=0.001)
         assert allclose(d,d2)
@@ -84,8 +85,10 @@ class Test_Distance_functions(unittest.TestCase):
         
 
         
-        d=self.as_the_cockey_flies(rupture_centroid_lat,rupture_centroid_lon,
-                                   site_lat,site_lon)
+        d = As_The_Cockey_Flies(rupture_centroid_lat,
+                                rupture_centroid_lon,
+                                site_lat,
+                                site_lon)
 
         assert allclose(d,distance,rtol=0.1)
 
@@ -172,18 +175,6 @@ class Test_Distance_functions(unittest.TestCase):
 
         d=sqrt(d*d+depths*depths)
         assert allclose(d,distance)
-
-    def as_the_cockey_flies(self,lat0,lon0,lat,lon):
-        # Algorithm from ga website
-        # Uses spherical geometry (rather than a projection)
-        # to calculate epicentral distance
-        lat=lat[:,newaxis]
-        lon=lon[:,newaxis]
-        L1=lat0*(pi/180)
-        L2=lat*(pi/180)
-        DG=(lon-lon0)*(pi/180)
-        D = 1.852*60*180/pi*arccos(sin(L1)*sin(L2)+cos(L1)*cos(L2)*cos(DG))
-        return D
 
     def test_Horizontal(self):
         # calculate length of 1 degree of great circle

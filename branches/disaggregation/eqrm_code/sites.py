@@ -32,6 +32,7 @@ from scipy import array, asarray
 import scipy as np
 
 from eqrm_code.distances import Distances
+from eqrm_code.distance_functions import As_The_Cockey_Flies
 from eqrm_code.csv_interface import csv_to_arrays
 from eqrm_code.projections import azimuthal_orthographic as projection
 from eqrm_code import file_store
@@ -271,6 +272,11 @@ class Sites(file_store.File_Store):
 
         return Sites(new_lat, new_lon, **new_attr)
     
+    def closest_site(self, lat, lon):
+        """Return the index of the closest site to the given lat and lon"""
+        distances = As_The_Cockey_Flies(lat, lon, self.latitude, self.longitude)
+        return distances.argmin()
+        
 
 def truncate_sites_for_test(use_site_indexes, sites, site_indexes):
     """Sample sites (for testing).
