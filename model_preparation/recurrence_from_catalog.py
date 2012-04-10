@@ -242,7 +242,7 @@ def calc_recurrence(event_set, min_mag = None, max_mag = None, max_mag_ls = None
     if min_mag is None:
         min_mag = min(magnitudes)
     else:
-        min_mag = min(min(magnitudes, min_mag))
+        min_mag = min(min(magnitudes), min_mag)
                       
     # If maximum magnitude is not specified default value to maximum in catalogue
     if max_mag is not None:
