@@ -13,14 +13,14 @@ class EarthquakeEvent(object):
         """
         lon, lat = latitude and longitude of earthquake
         magnitude = magnitude of event
-        time = list expected as [year, month, day, hour, minute, second]. Can be
+        time = Datetime object. Can be
                 incomplete but must have year.
         kwargs: other parameters:
             depth = depth of hypocenter
             magnitude_type = e.g. Mw, Ms, Mb 
         """
 
-        # Get basic data
+        # Get basic datadata
         self.lon = lon
         self.lat = lat
         self.magnitude = magnitude
@@ -41,6 +41,9 @@ class EventSet(object):
         """
         #self.event_set = event_list
         self.catalogue_subset = {'all': event_list}
+        self.magnitudes = {}
+        self.times = {}
+        self.depths= {}
 
     def create_subset(self, subset_name, **kwargs):
         """
@@ -77,7 +80,7 @@ class EventSet(object):
                 continue
             if self.min_mag is None:
                 pass
-            elif event.magnitude < self.max_mag:
+            elif event.magnitude < self.min_mag:
                 continue
             
             # Select locations
@@ -142,3 +145,27 @@ class EventSet(object):
             catalogue_subset.append(event)
             self.catalogue_subset[subset_name] = catalogue_subset
         
+    def get_magnitudes(self, subset_name='all'):
+        """ Get numpy array of all magnitudes"""
+        magnitudes = []
+        for event in self.catalogue_subset[subset_name]:
+            magnitudes.append(event.magnitude)
+        self.magnitudes[subset_name] = np.array(magnitudes)
+
+    def get_times(self, subset_name='all'):
+        """ Get numpy array of all times"""
+        times = []
+        for event in self.catalogue_subset[subset_name]:
+            times.append(event.time)
+        self.times[subset_name] = np.array(times)
+
+    def get_depths(self, subset_name='all'):
+        """ Get numpy array of all magnitudes"""
+        depths = []
+        for event in self.catalogue_subset[subset_name]:
+            depths.append(event.depth)
+        self.depths[subset_name].depths = np.array(depths)
+            
+
+
+            

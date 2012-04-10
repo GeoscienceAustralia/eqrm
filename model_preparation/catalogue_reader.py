@@ -66,7 +66,7 @@ class CatalogueReader(object):
                 # Approximate midnight case as datetime doesn't like seconds = 60.0
                 if second >= 60.0:
                     minute += 1
-                    second = second - 60.0
+                    second = second - 60
                 if minute >= 60:
                     hour += 1
                     minute = minute - 60
@@ -75,7 +75,7 @@ class CatalogueReader(object):
                     minute = 59
                     second = 59
                     microsecond = 999999
-                #print year, month, day, hour, minute, second
+#                print year, month, day, hour, minute, second
                 if microsecond is not None:
                     event_time = datetime.datetime(year, month, day, hour, minute, second, microsecond)
                 else:
