@@ -278,6 +278,17 @@ class Sites(file_store.File_Store):
         return distances.argmin()
         
 
+def load_sites(parallel, load_dir):
+    """
+    Load the site object from file in load_dir
+    """
+    log.info('P%s: Loading site from %s' % (parallel.rank, load_dir))
+    
+    sites = Sites.load(load_dir)
+    
+    return sites
+
+
 def truncate_sites_for_test(use_site_indexes, sites, site_indexes):
     """Sample sites (for testing).
 

@@ -1037,7 +1037,12 @@ def load_event_set(saved_dir, site_tag):
     del(attribute_dic['event_num'])
     
     return attribute_dic
-     
+
+
+def load_motion(output_dir, site_tag, motion_name):
+    load_dir = os.path.join(output_dir, '%s_motion' % site_tag)
+    
+    return load(open(os.path.join(load_dir, '%s.npy' % motion_name), mode='rb'))
 
 
 def save_damage(save_dir, site_tag, damage_name, damage, building_ids,

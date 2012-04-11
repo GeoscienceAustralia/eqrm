@@ -9,11 +9,12 @@ import os
 
 from eqrm_code.csv_interface import csv_to_arrays
 from eqrm_code.structures import attribute_conversions
-from eqrm_code.event_set import Event_Set, Event_Activity
-from eqrm_code.source_model import Source_Model
-from eqrm_code.sites import Sites
 from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
 from eqrm_code.parse_in_parameters import create_parameter_data
+from eqrm_code.event_set import load_event_set
+from eqrm_code.sites import load_sites
+from eqrm_code.output_manager import load_motion
+from eqrm_code.parallel import Parallel
 
 def calc_loss_deagg_suburb(bval_path_file, total_building_loss_path_file,
                             site_db_path_file, file_out):
@@ -78,35 +79,6 @@ def calc_loss_deagg_suburb(bval_path_file, total_building_loss_path_file,
         handle.writerow([key[0],sum_loss/1000000., sum_bval/1000000., 
                          sum_loss/sum_bval*100.])
 
-# TODO: Move to output_manager
-def load_event_set(output_dir, site_tag):
-    load_dir = os.path.join(output_dir, '%s_event_set' % site_tag)
-    
-    event_set = Event_Set.load(load_dir)
-    event_activity = Event_Activity.load(len(event_set), load_dir)
-    source_model = Source_Model.load(load_dir)
-    
-    return (event_set, event_activity, source_model)
-
-# TODO: Move to output_manager
-def load_sites(output_dir, site_tag):
-    load_dir = os.path.join(output_dir, '%s_sites' % site_tag)
-    
-    sites = Sites.load(load_dir)
-    
-    return sites
-
-# TODO: Move to output_manager
-def load_motion(output_dir, site_tag, is_bedrock):
-    if is_bedrock:
-        motion_name = 'bedrock_SA'
-    else:
-        motion_name = 'soil_SA'
-    
-    load_dir = os.path.join(output_dir, '%s_motion' % site_tag)
-    
-    return load(open(os.path.join(load_dir, '%s.npy' % motion_name), mode='rb'))
-
 def events_shaking_a_site(output_dir,
                           site_tag,
                           site_lat,
@@ -115,28 +87,38 @@ def events_shaking_a_site(output_dir,
                           is_bedrock):
     
     # Set up objects
+    if is_bedrock:
+        motion_name = 'bedrock_SA'
+    else:
+        motion_name = 'soil_SA'
+    
     # EQRM flags
     eqrm_flags = create_parameter_data(os.path.join(output_dir, 
                                                     'eqrm_flags.py'))
+    eqrm_flags['event_set_load_dir'] = output_dir
     atten_periods = eqrm_flags.atten_periods
     if period not in eqrm_flags.atten_periods:
         raise Exception("Period %s not in atten_periods %s" % (period,
                                                                atten_periods))
     period_ind = where(period == atten_periods)[0][0]
     
+    parallel = Parallel(is_parallel=False)
+    
     # Event set objects
     (event_set,
      event_activity,
-     source_model) = load_event_set(output_dir, site_tag)
+     source_model) = load_event_set(parallel, 
+                                    os.path.join(output_dir,
+                                                 '%s_event_set' % site_tag))
     
     # Site objects
-    sites = load_sites(output_dir, site_tag)
+    sites = load_sites(parallel, os.path.join(output_dir,'%s_sites' % site_tag))
     closest_site_ind = sites.closest_site(site_lat, site_lon)
     closest_site_lat = sites[closest_site_ind].latitude[0]
     closest_site_lon = sites[closest_site_ind].longitude[0]
     
     # Ground motion
-    motion = load_motion(output_dir, site_tag, is_bedrock)
+    motion = load_motion(output_dir, site_tag, motion_name)
     
     # Get the motion that corresponds to this site, collapsing spawn, rm, period
     # Motion dimensions - spawn, gmm, rm, sites, events, period
@@ -161,11 +143,11 @@ def events_shaking_a_site(output_dir,
     
     # Create file and write headers
     filename = '%s_%s_events_ap%s_lat%s_lon%s.csv' % (site_tag,
-                                                      'bedrock' if is_bedrock else 'soil',
+                                                      motion_name,
                                                       period,
                                                       closest_site_lat,
                                                       closest_site_lon)
-    handle = csv.writer(open(filename, 'w'), lineterminator='\n')
+    handle = csv.writer(open(os.path.join(output_dir, filename), 'w'))
     handle.writerow(['ground_motion',
                      'ground_motion_model',
                      'trace_start_lat',

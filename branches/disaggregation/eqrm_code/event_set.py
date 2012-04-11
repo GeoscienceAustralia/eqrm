@@ -1429,13 +1429,11 @@ def save_event_set(event_set,
     
     return save_dir
 
-def load_event_set(parallel, eqrm_flags):
+def load_event_set(parallel, load_dir):
     """
     Load the event set, event activity and source model objects from file as
     specified in eqrm_flags
     """
-    
-    load_dir = eqrm_flags.event_set_load_dir
     log.info('P%s: Loading event set from %s' % (parallel.rank, load_dir))
     
     event_set = Event_Set.load(load_dir)
@@ -1471,7 +1469,8 @@ def create_event_set(eqrm_flags, parallel):
         
         (event_set,
          event_activity,
-         source_model) = load_event_set(parallel, eqrm_flags)
+         source_model) = load_event_set(parallel, 
+                                        eqrm_flags.event_set_load_dir)
          
         save_event_set(event_set, 
                        event_activity, 
@@ -1498,12 +1497,11 @@ def create_event_set(eqrm_flags, parallel):
                 parallel.notifyworkers(msg=save_dir)
         else:
             log.info('P%s: Waiting for P0 to generate event set' % parallel.rank)
-            # load_event_set loads from for eqrm_flags.event_set_load_dir
-            eqrm_flags['event_set_load_dir'] = parallel.receive(source=0)
+            load_dir = parallel.receive(source=0)
         
             (event_set,
              event_activity,
-             source_model) = load_event_set(parallel, eqrm_flags)
+             source_model) = load_event_set(parallel, load_dir)
          
     elif mode == 'save':
                 
