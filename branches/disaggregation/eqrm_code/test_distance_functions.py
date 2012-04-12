@@ -24,6 +24,36 @@ depths = 0.0
 depths_to_top = 0.0
 
 class Test_Distance_functions(unittest.TestCase):
+    def test_As_The_Cockey_Flies(self):
+        # Test data from GA website 
+        # As_The_Cockey_Flies implements the Great Circle method
+        # 
+        # http://www.ga.gov.au/earth-monitoring/geodesy/geodetic-techniques/distance-calculation-algorithms.html
+        rupture_centroid_lat = asarray((-30))
+        rupture_centroid_lon = asarray((150))
+        
+        site_lat = asarray((-31,-31,-32,-33,-34,-35,-40,-50,-60,-70,-80))
+        site_lon = asarray((150,151,151,151,151,151,151,151,151,151,151))
+        
+        expected = asarray([[111.120],
+                            [146.677],
+                            [241.787],
+                            [346.556],
+                            [454.351],
+                            [563.438],
+                            [1114.899],
+                            [2223.978],
+                            [3334.440],
+                            [4445.247],
+                            [5556.190]])
+        
+        d = As_The_Cockey_Flies(rupture_centroid_lat,
+                                rupture_centroid_lon,
+                                site_lat,
+                                site_lon)
+        
+        assert allclose(d,expected)
+    
     def test_Epicentral(self):
         dist = Distances(None,None,None,None,None,None,None,None,None,None,None)
         

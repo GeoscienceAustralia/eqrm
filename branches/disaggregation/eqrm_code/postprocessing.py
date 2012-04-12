@@ -85,6 +85,7 @@ def events_shaking_a_site(output_dir,
                           site_lon,
                           period,
                           is_bedrock):
+    """TODO: docstring"""
     
     # Set up objects
     if is_bedrock:
@@ -95,7 +96,6 @@ def events_shaking_a_site(output_dir,
     # EQRM flags
     eqrm_flags = create_parameter_data(os.path.join(output_dir, 
                                                     'eqrm_flags.py'))
-    eqrm_flags['event_set_load_dir'] = output_dir
     atten_periods = eqrm_flags.atten_periods
     if period not in eqrm_flags.atten_periods:
         raise Exception("Period %s not in atten_periods %s" % (period,
@@ -154,11 +154,12 @@ def events_shaking_a_site(output_dir,
                      'trace_start_lon',
                      'trace_end_lat',
                      'trace_end_lon',
+                     'rupture_centroid_lat',
+                     'rupture_centroid_lon',
+                     'depth',
                      'azimuth',
                      'dip',
                      'Mw',
-                     'rupture_centroid_x',
-                     'rupture_centroid_y',
                      'length',
                      'width',
                      'activity',
@@ -173,11 +174,12 @@ def events_shaking_a_site(output_dir,
         trace_start_lon = event_set.trace_start_lon[i]
         trace_end_lat = event_set.trace_end_lat[i]
         trace_end_lon = event_set.trace_end_lon[i]
+        rupture_centroid_lat = event_set.rupture_centroid_lat[i]
+        rupture_centroid_lon = event_set.rupture_centroid_lon[i]
+        depth = event_set.depth[i]
         azimuth = event_set.azimuth[i]
         dip = event_set.dip[i]
         mw = event_set.dip[i]
-        rupture_centroid_x = event_set.rupture_centroid_x[i]
-        rupture_centroid_y = event_set.rupture_centroid_y[i]
         length = event_set.length[i]
         width = event_set.width[i]
         
@@ -189,18 +191,19 @@ def events_shaking_a_site(output_dir,
         
         event_source = source_model[int(event_set.source[i])]
         for gmm in event_source.atten_models:
-            gmm_index = event_source.atten_models.index(gmm)
+            gmm_index = where(event_source.atten_models == gmm)[0][0]
             handle.writerow([ground_motion[gmm_index],
                              gmm,
                              trace_start_lat,
                              trace_start_lon,
                              trace_end_lat,
                              trace_end_lon,
+                             rupture_centroid_lat,
+                             rupture_centroid_lon,
+                             depth,
                              azimuth,
                              dip,
                              mw,
-                             rupture_centroid_x,
-                             rupture_centroid_y,
                              length,
                              width,
                              activity[gmm_index],
@@ -209,8 +212,8 @@ def events_shaking_a_site(output_dir,
                              closest_site_lat,
                              closest_site_lon])
     
-    print "filename", filename
-    
+    return os.path.join(output_dir, filename)
+
 # ------------------------------------------------------------
 if __name__ == '__main__':  
     pass

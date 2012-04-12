@@ -3,18 +3,197 @@ import sys
 import unittest
 import tempfile
 import scipy
-from scipy import loadtxt, array
+from scipy import loadtxt, array, asarray, zeros, save, allclose, ones
+import shutil
 
+from eqrm_code.csv_interface import csv_to_arrays
 from eqrm_code.util import dict2csv
+from eqrm_code.event_set import Event_Set, Event_Activity
+from eqrm_code.source_model import Source_Model
+from eqrm_code.sites import Sites
+from eqrm_code.parse_in_parameters import eqrm_flags_to_control_file
+
 from eqrm_code.postprocessing import *
+
 
 class Test_postprocessing(unittest.TestCase):
     
     def setUp(self):
-        pass
+        self.dir = tempfile.mkdtemp()
         
     def tearDown(self):
-        pass
+        shutil.rmtree(self.dir)
+    
+    def create_analysis_objects(self):
+        # Parameters
+        rupture_centroid_lat = asarray([-30])
+        rupture_centroid_lon = asarray([150])
+        length = asarray([0.0])
+        azimuth = asarray([0.0])
+        width = asarray([0.0])
+        dip = asarray([10.0])
+        depth = asarray([0.0])
+        Mw = asarray([5.4])
+        atten_models = asarray(['Allen', 
+                                'Toro_1997_midcontinent', 
+                                'Sadigh_97', 
+                                'Youngs_97_interface', 
+                                'Youngs_97_intraslab'])
+        atten_model_weights = asarray([0.2, 0.2, 0.2, 0.2, 0.2])
+        atten_periods = asarray([0, 1.0, 2.0])
+        sites_lat = asarray([-31])
+        sites_lon = asarray([150])
+        
+        # Event Set
+        event_set = Event_Set.create(rupture_centroid_lat=rupture_centroid_lat,
+                                     rupture_centroid_lon=rupture_centroid_lon,
+                                     azimuth=azimuth,
+                                     dip=dip,
+                                     Mw=Mw,
+                                     depth=depth,
+                                     area=length*width,
+                                     width=width, 
+                                     length=length)
+        
+        # Event Activity
+        event_activity = Event_Activity(len(event_set))
+        event_activity.set_scenario_event_activity()
+        
+        # Source Model
+        source_model = Source_Model.create_scenario_source_model(len(event_set))
+        source_model.set_attenuation(atten_models, atten_model_weights)
+        source_model.set_ground_motion_calcs(atten_periods)
+        event_set.scenario_setup()
+        event_activity.ground_motion_model_logic_split(source_model, True)
+        
+        # Sites
+        sites = Sites(sites_lat, sites_lon)
+        
+        # SA
+        # Set up synthetic SA figures
+        # Dimensions -  spawn, gmm, rm, sites, events, period
+        motion = zeros((1, 
+                        len(atten_models), 
+                        1, 
+                        len(sites), 
+                        len(event_set),
+                        len(atten_periods)), dtype=float)
+        # Allen
+        motion[:,0,:,:,:,0] = 0 # period 0
+        motion[:,0,:,:,:,1] = 1 # period 1.0
+        motion[:,0,:,:,:,2] = 2 # period 2.0
+        # Toro_1997_midcontinent
+        motion[:,1,:,:,:,0] = 3 # period 0
+        motion[:,1,:,:,:,1] = 4 # period 1.0
+        motion[:,1,:,:,:,2] = 5 # period 2.0
+        # Sadigh_97
+        motion[:,2,:,:,:,0] = 6 # period 0
+        motion[:,2,:,:,:,1] = 7 # period 1.0
+        motion[:,2,:,:,:,2] = 8 # period 2.0
+        # Youngs_97_interface
+        motion[:,3,:,:,:,0] = 9  # period 0
+        motion[:,3,:,:,:,1] = 10 # period 1.0
+        motion[:,3,:,:,:,2] = 11 # period 2.0
+        # Young_97_intraslab
+        motion[:,4,:,:,:,0] = 12 # period 0
+        motion[:,4,:,:,:,1] = 13 # period 1.0
+        motion[:,4,:,:,:,2] = 14 # period 2.0
+        
+        # A minimal set of eqrm_flags so create_parameter_data passes
+        # We only care about atten_models -> everything else are dummy values
+        eqrm_flags = {}
+        eqrm_flags['run_type'] = 'hazard'
+        eqrm_flags['is_scenario'] = True
+        eqrm_flags['output_dir'] = self.dir
+        eqrm_flags['input_dir'] = self.dir
+        eqrm_flags['site_tag'] = 'different_to_function'
+        eqrm_flags['return_periods'] = [0.0]
+        eqrm_flags['use_amplification'] = False
+        eqrm_flags['zone_source_tag'] = 'not_used'
+        eqrm_flags['atten_periods'] = atten_periods
+        eqrm_flags['atten_models'] = atten_models
+        
+        return (event_set, 
+                event_activity, 
+                source_model, 
+                sites, 
+                motion, 
+                eqrm_flags)
+    
+    def test_events_shaking_a_site(self):
+        # Parameters
+        output_dir = self.dir
+        site_tag = 'ernabella'
+        site_lat = -31.5
+        site_lon = 150.5
+        period = 1.0
+        is_bedrock = True
+        
+        # 1. Get objects
+        (event_set,
+         event_activity,
+         source_model,
+         sites,
+         motion,
+         eqrm_flags) = self.create_analysis_objects()
+         
+        # 2. Save test objects to file
+        event_set.save(os.path.join(output_dir, '%s_event_set' % site_tag))
+        event_activity.save(os.path.join(output_dir, '%s_event_set' % site_tag))
+        source_model.save(os.path.join(output_dir, '%s_event_set' % site_tag))
+        sites.save(os.path.join(output_dir, '%s_sites' % site_tag))
+        # Motion is an numpy.ndarray so save manually
+        os.mkdir(os.path.join(output_dir, '%s_motion' % site_tag))
+        save(os.path.join(output_dir, '%s_motion' % site_tag, 'bedrock_SA.npy'), 
+             motion)
+        # ... and eqrm_flags
+        eqrm_flags_to_control_file(os.path.join(output_dir, 'eqrm_flags.py'),
+                                   eqrm_flags)
+        
+        # 3. Run through events_shaking_a_site
+        events_filename = events_shaking_a_site(output_dir,
+                                                site_tag,
+                                                site_lat,
+                                                site_lon,
+                                                period,
+                                                is_bedrock)
+        
+        # 4. Read in generated CSV to a dict
+        events_attributes = {'ground_motion': float,
+                             'ground_motion_model': str,
+                             'trace_start_lat': float,
+                             'trace_start_lon': float,
+                             'trace_end_lat': float,
+                             'trace_end_lon': float,
+                             'rupture_centroid_lat': float,
+                             'rupture_centroid_lon': float,
+                             'depth': float,
+                             'azimuth': float,
+                             'dip': float,
+                             'Mw': float,
+                             'length': float,
+                             'width': float,
+                             'activity': float,
+                             'Rjb': float,
+                             'Rrup': float,
+                             'site_lat': float,
+                             'site_lon': float}
+        events_arrays = csv_to_arrays(events_filename, **events_attributes)
+        
+        # 5. Expected results
+        expected_ground_motion = asarray([1, 4, 7, 10, 13]) # period == 1.0
+        expected_site_lat = -31*ones(5) # different to input site_lat
+        expected_site_lon = 150*ones(5) # different to input site_lon
+        
+        # 6. Compare results
+        self.assert_(allclose(expected_ground_motion, 
+                              events_arrays['ground_motion']))
+        
+        self.assert_(allclose(expected_site_lat, 
+                              events_arrays['site_lat']))
+        
+        self.assert_(allclose(expected_site_lon, 
+                              events_arrays['site_lon']))
     
     def test_calc_loss_deagg_suburb(self):
         

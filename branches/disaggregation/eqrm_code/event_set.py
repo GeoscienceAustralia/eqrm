@@ -624,7 +624,7 @@ class Event_Set(file_store.File_Store):
         Attributes that are tacked onto an event_set instance.
         """
         # Moved from analysis        
-        self.source = array(0*self.depth+1) # create a vector of 1's
+        self.source = array(0*self.depth) # create a vector of 0's
 
 
     def check_arguments(self):
