@@ -85,7 +85,48 @@ def events_shaking_a_site(output_dir,
                           site_lon,
                           period,
                           is_bedrock):
-    """TODO: docstring"""
+    """events_shaking_a_site
+    Given disaggregated output data produce a csv file showing ground motion 
+    and event information for the given site and period. 
+    
+    Parameters:
+    output_dir - path to directory where the simulation data has been produced,
+                 and where the output files will be placed
+    site_tag   - used to identify the appropriate data as input
+    site_lat   - site latitude
+    site_lon   - site longitude (use the closest site as the cockey flies)
+    period     - attenuation period (must be an exact match)
+    is_bedrock - if True use bedrock results, else use soil results
+    
+    Output file:
+    <output_dir>/
+    - if is_bedrock:
+    <site_tag>_bedrock_SA_events_ap[<period>]_lat[<site_lat>]_lon[<site_lon>].csv
+    - else:
+    <site_tag>_soil_SA_events_ap[<period>]_lat[<site_lat>]_lon[<site_lon>].csv
+    
+    Columns:
+    'ground_motion'         - ground motion value
+    'ground_motion_model'   - ground motion model used
+    'trace_start_lat'       - rupture trace start latitude
+    'trace_start_lon'       - rupture trace start longitude
+    'trace_end_lat'         - rupture trace end latitude
+    'trace_end_lon'         - rupture trace end longitude
+    'rupture_centroid_lat'  - rupture centroid latitude
+    'rupture_centroid_lon'  - rupture centroid longitude
+    'depth'                 - rupture depth to centroid (km)
+    'azimuth'               - rupture azimuth (degrees from true North)
+    'dip'                   - rupture dip
+    'Mw'                    - rupture moment magnitude
+    'length'                - rupture length
+    'width'                 - rupture width
+    'activity'              - event activity (probability that the event will
+                              occur this year)
+    'Rjb'                   - Joyner-Boore distance to rupture plane
+    'Rrup'                  - Closest distance to rupture plane
+    'site_lat'              - Closest site latitude
+    'site_lon'              - Closest site longitude
+    """
     
     # Set up objects
     if is_bedrock:
