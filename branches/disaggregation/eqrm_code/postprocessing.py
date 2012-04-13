@@ -13,7 +13,7 @@ from eqrm_code.projections import azimuthal_orthographic_xy_to_ll as xy_to_ll
 from eqrm_code.parse_in_parameters import create_parameter_data
 from eqrm_code.event_set import load_event_set
 from eqrm_code.sites import load_sites
-from eqrm_code.output_manager import load_motion
+from eqrm_code.output_manager import load_motion, save_motion_to_csv
 from eqrm_code.parallel import Parallel
 
 def calc_loss_deagg_suburb(bval_path_file, total_building_loss_path_file,
@@ -255,6 +255,28 @@ def events_shaking_a_site(output_dir,
     
     return os.path.join(output_dir, filename)
 
+
+def generate_motion_csv(output_dir,
+                        site_tag,
+                        is_bedrock):
+    """A wrapper for save_motion_to_csv, previously used by analysis
+    TODO: better docstring!
+    """
+    # Set up objects
+    if is_bedrock:
+        motion_name = 'bedrock_SA'
+    else:
+        motion_name = 'soil_SA'
+    
+    # EQRM flags
+    eqrm_flags = create_parameter_data(os.path.join(output_dir,'eqrm_flags.py'))
+    
+    # Ground motion
+    motion = load_motion(output_dir, site_tag, motion_name)
+    
+    return save_motion_to_csv(not is_bedrock, eqrm_flags, motion)
+
+    
 # ------------------------------------------------------------
 if __name__ == '__main__':  
     pass

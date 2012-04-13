@@ -62,6 +62,7 @@ from eqrm_code.parallel import Parallel
 from eqrm_code import util
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import parse_in_parameters
+from eqrm_code import postprocessing
 
 # Use predictable random variates
 from eqrm_code import ground_motion_distribution, test_rvs
@@ -167,8 +168,20 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
         #Initial time and memory
         t0 = time.clock()
         
-        # Run the scenarios
+        # Run the scenario
         analysis.main(pull_path, True)
+        
+        # Run post-processing (if needed)
+        if eqrm_flags['save_motion']:
+            postprocessing.generate_motion_csv(eqrm_flags['output_dir'],
+                                               eqrm_flags['site_tag'],
+                                               is_bedrock=True)
+            if eqrm_flags['use_amplification']:
+                postprocessing.generate_motion_csv(eqrm_flags['output_dir'],
+                                               eqrm_flags['site_tag'],
+                                               is_bedrock=False)
+                
+            
         root, ext = splitext(file)
         time_taken_sec = (time.clock()-t0)
         timings[root] = time_taken_sec

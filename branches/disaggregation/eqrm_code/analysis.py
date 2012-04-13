@@ -34,8 +34,7 @@ from eqrm_code.ground_motion_calculator import \
 from eqrm_code.ground_motion_interface import BEDROCKVs30
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
      Regolith_amplification_model, load_site_class2Vs30
-from eqrm_code.output_manager import save_motion_to_csv, \
-         save_motion_to_binary, save_distances, \
+from eqrm_code.output_manager import save_motion_to_binary, save_distances, \
          save_sites_to_csv, save_sites_to_binary, \
          save_hazard, save_structures, save_val, save_ecloss, \
          join_parallel_files, join_parallel_files_column, \
@@ -579,15 +578,6 @@ def main(parameter_handle,
                                      motion=data.bedrock_SA_all,
                                      parallel_tag=parallel.file_tag)
         data_files_that_parallel_splits.append(file)
-        
-        # Save to csv
-        # TODO: This is deprecated, remove once post-processing scripts written
-        files = save_motion_to_csv(soil_amp=False, 
-                                   eqrm_flags=eqrm_flags,
-                                   motion=data.bedrock_SA_all,
-                                   parallel_tag=parallel.file_tag,
-                                   write_title=(parallel.rank == False))
-        row_files_that_parallel_splits.extend(files)
 
         if data.soil_SA_all is not None:
             # Save to numpy binary
@@ -596,15 +586,6 @@ def main(parameter_handle,
                                          motion=data.soil_SA_all,
                                          parallel_tag=parallel.file_tag)
             data_files_that_parallel_splits.append(file)
-            
-            # Save to csv
-            # TODO: This is deprecated, remove once post-processing scripts written
-            files = save_motion_to_csv(soil_amp=True, 
-                                       eqrm_flags=eqrm_flags,
-                                       motion=data.soil_SA_all,
-                                       parallel_tag=parallel.file_tag,
-                                       write_title=(parallel.rank == False))
-            row_files_that_parallel_splits.extend(files)
 
 
     # Save damage information
