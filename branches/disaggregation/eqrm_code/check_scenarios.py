@@ -201,7 +201,7 @@ def directory_diff(dirA, dirB):
         fileB = join(dirB, file)
         
         if os.path.isdir(fileA):
-            result, lineA, lineB = binary_diff(fileA, fileB)
+            result, lineA, lineB = directory_diff(fileA, fileB)
             
         elif fileA[-3:] == 'npy':
             # .npy files
