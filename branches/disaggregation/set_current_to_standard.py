@@ -27,32 +27,14 @@ from os import listdir, path
 from eqrm_code.check_scenarios import STANDARD_DIR, CURRENT_DIR, \
      LONG_STANDARD_DIR,LONG_CURRENT_DIR
 
-from shutil import copyfile
+from shutil import copyfile, copytree, rmtree
 
 EXCEPTIONS = ['.svn', 
               'log.txt', 
               'log-0.txt', 
               'THE_PARAM_T.txt', 
               'current_event_set',
-              'current_simulation',
-              'newc_event_set',
-              'newc_sites',
-              'newc_motion',
-              'java_event_set',
-              'java_sites',
-              'java_motion',
-              'box_event_set',
-              'box_sites',
-              'box_motion',
-              'slab_event_set',
-              'slab_sites',
-              'slab_motion',
-              'peer_event_set',
-              'peer_sites',
-              'peer_motion',
-              'nat_event_set',
-              'nat_sites',
-              'nat_motion']
+              'current_simulation',]
 
 def main():
     current2standard(CURRENT_DIR, STANDARD_DIR)
@@ -79,7 +61,16 @@ def current2standard(current_dir, standard_dir):
         for file in cur_files:
             move_file = path.join(current_dir, dir, file)
             move_to_here = path.join(standard_dir, dir, file)
-            copyfile(move_file,move_to_here)
+            
+            if path.isdir(move_file):
+                # Move the binary directories
+                if path.exists(move_to_here):
+                    # Delete any destination directories first
+                    rmtree(move_to_here)
+                copytree(move_file,move_to_here)
+            else:
+                # Move the standard output files
+                copyfile(move_file,move_to_here)
 
 
 #-------------------------------------------------------------
