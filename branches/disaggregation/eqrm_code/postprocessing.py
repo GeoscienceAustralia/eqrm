@@ -220,7 +220,7 @@ def events_shaking_a_site(output_dir,
         depth = event_set.depth[i]
         azimuth = event_set.azimuth[i]
         dip = event_set.dip[i]
-        mw = event_set.dip[i]
+        mw = event_set.Mw[i]
         length = event_set.length[i]
         width = event_set.width[i]
         

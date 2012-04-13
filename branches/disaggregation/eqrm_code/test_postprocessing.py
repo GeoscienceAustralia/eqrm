@@ -2,12 +2,11 @@ import os
 import sys
 import unittest
 import tempfile
-import scipy
-from scipy import loadtxt, array, asarray, zeros, save, allclose, ones
+from scipy import array, asarray, zeros, save, allclose, array_equal, ones
 import shutil
 
 from eqrm_code.csv_interface import csv_to_arrays
-from eqrm_code.util import dict2csv
+from eqrm_code.util import dict2csv, string_array_equal
 from eqrm_code.event_set import Event_Set, Event_Activity
 from eqrm_code.source_model import Source_Model
 from eqrm_code.sites import Sites
@@ -28,12 +27,12 @@ class Test_postprocessing(unittest.TestCase):
         # Parameters
         rupture_centroid_lat = asarray([-30])
         rupture_centroid_lon = asarray([150])
-        length = asarray([0.0])
-        azimuth = asarray([0.0])
-        width = asarray([0.0])
-        dip = asarray([10.0])
-        depth = asarray([0.0])
-        Mw = asarray([5.4])
+        length = asarray([1.0])
+        azimuth = asarray([2.0])
+        width = asarray([3.0])
+        dip = asarray([4.0])
+        depth = asarray([5.0])
+        Mw = asarray([6.0])
         atten_models = asarray(['Allen', 
                                 'Toro_1997_midcontinent', 
                                 'Sadigh_97', 
@@ -182,18 +181,98 @@ class Test_postprocessing(unittest.TestCase):
         
         # 5. Expected results
         expected_ground_motion = asarray([1, 4, 7, 10, 13]) # period == 1.0
-        expected_site_lat = -31*ones(5) # different to input site_lat
-        expected_site_lon = 150*ones(5) # different to input site_lon
+        expected_ground_motion_model = asarray(['Allen', 
+                                                'Toro_1997_midcontinent', 
+                                                'Sadigh_97', 
+                                                'Youngs_97_interface', 
+                                                'Youngs_97_intraslab'])
+        
+        # Manually calculated
+        expected_trace_start_lat = -29.98204065*ones(5)
+        expected_trace_start_lon = 149.25728051*ones(5)
+        expected_trace_end_lat = -29.97304727*ones(5)
+        expected_trace_end_lon = 149.25764315*ones(5)
+        
+        # Input values
+        expected_rupture_centroid_lat = -30*ones(5)
+        expected_rupture_centroid_lon = 150*ones(5)
+        expected_length = 1.0*ones(5)
+        expected_azimuth = 2.0*ones(5)
+        expected_width = 3.0*ones(5)
+        expected_dip = 4.0*ones(5)
+        expected_depth = 5.0*ones(5)
+        expected_Mw = 6.0*ones(5)
+        
+        # Same as atten_model_weights
+        expected_activity = 0.2*ones(5) 
+        
+        # Manually calculated
+        expected_Rjb = 110.59526125*ones(5)
+        expected_Rrup = 131.86940242*ones(5)
+        
+        # Different to input site lat/lon
+        expected_site_lat = -31*ones(5) 
+        expected_site_lon = 150*ones(5)
         
         # 6. Compare results
         self.assert_(allclose(expected_ground_motion, 
                               events_arrays['ground_motion']))
+        
+        self.assert_(string_array_equal(expected_ground_motion_model,
+                                        events_arrays['ground_motion_model']))
+        
+        self.assert_(allclose(expected_trace_start_lat, 
+                              events_arrays['trace_start_lat']))
+        
+        self.assert_(allclose(expected_trace_start_lon, 
+                              events_arrays['trace_start_lon']))
+        
+        self.assert_(allclose(expected_trace_end_lat, 
+                              events_arrays['trace_end_lat']))
+        
+        self.assert_(allclose(expected_trace_end_lon, 
+                              events_arrays['trace_end_lon']))
+        
+        self.assert_(allclose(expected_rupture_centroid_lat, 
+                              events_arrays['rupture_centroid_lat']))
+        
+        self.assert_(allclose(expected_rupture_centroid_lon, 
+                              events_arrays['rupture_centroid_lon']))
+        
+        self.assert_(allclose(expected_length, 
+                              events_arrays['length']))
+        
+        self.assert_(allclose(expected_azimuth, 
+                              events_arrays['azimuth']))
+        
+        self.assert_(allclose(expected_width, 
+                              events_arrays['width']))
+        
+        self.assert_(allclose(expected_dip, 
+                              events_arrays['dip']))
+        
+        self.assert_(allclose(expected_depth, 
+                              events_arrays['depth']))
+        
+        self.assert_(allclose(expected_Mw, 
+                              events_arrays['Mw']))
+        
+        self.assert_(allclose(expected_Rjb, 
+                              events_arrays['Rjb']))
+        
+        self.assert_(allclose(expected_Rrup, 
+                              events_arrays['Rrup']))
+        
+        self.assert_(allclose(expected_activity, 
+                              events_arrays['activity']))
         
         self.assert_(allclose(expected_site_lat, 
                               events_arrays['site_lat']))
         
         self.assert_(allclose(expected_site_lon, 
                               events_arrays['site_lon']))
+        
+        
     
     def test_calc_loss_deagg_suburb(self):
         
