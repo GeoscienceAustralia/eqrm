@@ -259,8 +259,14 @@ def events_shaking_a_site(output_dir,
 def generate_motion_csv(output_dir,
                         site_tag,
                         is_bedrock):
-    """A wrapper for save_motion_to_csv, previously used by analysis
-    TODO: better docstring!
+    """Produce scenario motion CSV files.
+    (previously produced if save_motion=True)
+    
+    Parameters:
+    output_dir - path to directory where the simulation data has been produced,
+                 and where the output files will be placed
+    site_tag   - used to identify the appropriate data as input
+    is_bedrock - if True use bedrock results, else use soil results
     """
     # Set up objects
     if is_bedrock:
