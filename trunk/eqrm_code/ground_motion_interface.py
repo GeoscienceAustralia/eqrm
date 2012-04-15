@@ -20,7 +20,7 @@ Description:
 
     The data required to calculate the ground motion (coefficients, constants,
     etc) is placed into a list which is stored in a dictionary
-    'ground_motion_init' (sic) with the model name as key.
+    'ground_motion_init' with the model name as key.
 
     Each dictionary list contains (in the following order):
         distribution function
