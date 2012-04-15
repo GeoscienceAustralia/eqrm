@@ -86,3 +86,7 @@ if __name__ == "__main__":
    0.4, 0.5, 0.75, 1., 1.4993, 2., 3.003, 4., 5., 7.5019, 10.,]
     cgd.write_gmm_data_file(gmm, mag, dist, result_type,
                         periods, file_name)
+    result_type = 'TOTAL_STDDEV'
+    file_name = "SOMMERVILLE_YILGARN2009_STD_TOTAL.csv"
+    cgd.write_gmm_data_file(gmm, mag, dist, result_type,
+                        periods, file_name)
