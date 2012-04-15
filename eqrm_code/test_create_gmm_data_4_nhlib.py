@@ -1,0 +1,44 @@
+import os
+#import sys
+#import string
+import unittest
+import tempfile
+import csv
+
+import eqrm_code.create_gmm_data_4_nhlib as cgd
+
+
+"""
+Test 
+"""
+
+class Test_create_gmm_data_4_nhlib(unittest.TestCase):
+    def test_write_gmm_data_file(self):
+        (handle, file_name) = tempfile.mkstemp('.csv', 
+                                               'test_create_gmm_data_4_nhlibt')
+        os.close(handle)
+
+        gmm = 'Somerville09_Yilgarn'
+        mag = ['rup_mag', [5, 7]]
+        dist = ['dist_rjb', [1.,10.]]
+        result_type = 'MEAN'
+        periods = [0.3, 0.7, 1.0]
+        cgd.write_gmm_data_file(gmm, mag, dist, result_type,
+                        periods, file_name)
+        handle = open(file_name, 'rb')
+        reader = csv.reader(handle,  delimiter=',', quoting=csv.QUOTE_NONE)
+        row = reader.next()
+        string_periods = [str(x) for x in periods]
+        actual = [mag[0], dist[0], 'result_type', 'component_type'] + \
+                 string_periods
+        
+        self.assertEqual(row, actual)
+        os.remove(file_name)
+           
+
+################################################################################
+
+if __name__ == "__main__":
+    suite = unittest.makeSuite(Test_create_gmm_data_4_nhlib,'test')
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
