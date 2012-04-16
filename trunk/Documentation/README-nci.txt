@@ -3,8 +3,8 @@ Running EQRM at NCI
 
 The user has to be able to access /short/w84
 
-Install pypar
-=============
+Install pypar (this only needs to be done once)
+============
 Note, the module commands could have already been done.
 
 curl -O http://pypar.googlecode.com/files/pypar-2.1.4_94.tgz
@@ -33,3 +33,11 @@ How to run a job
 ================
 Firstly install EQRM in your home directory, using svn.
 Do 'bash' to start the bash shell.
+
+To run a job script do;
+qsub -v PYTHONPATH [job_script]
+
+There are currently 3 job scripts
+job_test_all
+job_check_scenarios
+demo/job_nci
