@@ -232,9 +232,8 @@ def events_shaking_a_site(output_dir,
         activity = event_activity[:,i]
         
         event_source = source_model[int(event_set.source[i])]
-        for gmm in event_source.atten_models:
-            gmm_index = where(strip(event_source.atten_models) == gmm)[0][0]
-            handle.writerow([ground_motion[gmm_index],
+        for gmm_ind, gmm in enumerate(event_source.atten_models):
+            handle.writerow([ground_motion[gmm_ind],
                              gmm,
                              trace_start_lat,
                              trace_start_lon,
@@ -248,7 +247,7 @@ def events_shaking_a_site(output_dir,
                              mw,
                              length,
                              width,
-                             activity[gmm_index],
+                             activity[gmm_ind],
                              rjb,
                              rrup,
                              closest_site_lat,

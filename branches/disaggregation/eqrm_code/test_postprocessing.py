@@ -11,6 +11,7 @@ from eqrm_code.event_set import Event_Set, Event_Activity
 from eqrm_code.source_model import Source_Model
 from eqrm_code.sites import Sites
 from eqrm_code.parse_in_parameters import eqrm_flags_to_control_file
+from eqrm_code import file_store
 
 from eqrm_code.postprocessing import *
 
@@ -19,9 +20,35 @@ class Test_postprocessing(unittest.TestCase):
     
     def setUp(self):
         self.dir = tempfile.mkdtemp()
+        self.data_dir = tempfile.mkdtemp()
+        self.orig_data_dir = file_store.DATA_DIR
+        file_store.DATA_DIR = self.data_dir
         
     def tearDown(self):
         shutil.rmtree(self.dir)
+        shutil.rmtree(self.data_dir)
+        file_store.DATA_DIR = self.orig_data_dir
+        
+    def save_analysis_objects(self, output_dir, site_tag):
+        (event_set,
+         event_activity,
+         source_model,
+         sites,
+         motion,
+         eqrm_flags) = self.create_analysis_objects()
+         
+        # 2. Save test objects to file
+        event_set.save(os.path.join(output_dir, '%s_event_set' % site_tag))
+        event_activity.save(os.path.join(output_dir, '%s_event_set' % site_tag))
+        source_model.save(os.path.join(output_dir, '%s_event_set' % site_tag))
+        sites.save(os.path.join(output_dir, '%s_sites' % site_tag))
+        # Motion is an numpy.ndarray so save manually
+        os.mkdir(os.path.join(output_dir, '%s_motion' % site_tag))
+        save(os.path.join(output_dir, '%s_motion' % site_tag, 'bedrock_SA.npy'), 
+             motion)
+        # ... and eqrm_flags
+        eqrm_flags_to_control_file(os.path.join(output_dir, 'eqrm_flags.py'),
+                                   eqrm_flags)
     
     def create_analysis_objects(self):
         # Parameters
@@ -119,6 +146,48 @@ class Test_postprocessing(unittest.TestCase):
                 motion, 
                 eqrm_flags)
     
+    def test_generate_motion_csv(self):
+        # Parameters
+        output_dir = self.dir
+        site_tag = 'ernabella'
+        is_bedrock = True
+        
+        # 1. Create and save analysis objects objects
+        self.save_analysis_objects(output_dir, site_tag)
+        
+        # 2. Run through generate_motion_csv
+        output_filenames = generate_motion_csv(output_dir,
+                                               site_tag,
+                                               is_bedrock)
+        
+        expected_ground_motion = asarray([[0,  1,  2],
+                                          [3,  4,  5],
+                                          [6,  7,  8],
+                                          [9,  10, 11],
+                                          [12, 13, 14]])
+        expected_atten_periods = asarray([0, 1.0, 2.0])
+        
+        # 3. Read in generated files
+        for gmm_i, filename in enumerate(output_filenames):
+            file_h=open(filename,'r')
+
+            text = file_h.read().splitlines()
+            # ditch the comment lines
+            text.pop(0)
+            text.pop(0)
+            text.pop(0)
+            text.pop(0)
+            text.pop(0)
+            # Convert a space separated text line into a numeric float array
+            periods_f = array([float(ix) for ix in text[0].split(' ')])
+            self.assert_ (allclose(periods_f,array(expected_atten_periods)))
+            text.pop(0)
+
+            motion_f = array([float(ix) for ix in text[0].split(' ')])
+            self.assert_ (allclose(motion_f, expected_ground_motion[gmm_i]))
+            
+            file_h.close()
+    
     def test_events_shaking_a_site(self):
         # Parameters
         output_dir = self.dir
@@ -128,28 +197,10 @@ class Test_postprocessing(unittest.TestCase):
         period = 1.0
         is_bedrock = True
         
-        # 1. Get objects
-        (event_set,
-         event_activity,
-         source_model,
-         sites,
-         motion,
-         eqrm_flags) = self.create_analysis_objects()
-         
-        # 2. Save test objects to file
-        event_set.save(os.path.join(output_dir, '%s_event_set' % site_tag))
-        event_activity.save(os.path.join(output_dir, '%s_event_set' % site_tag))
-        source_model.save(os.path.join(output_dir, '%s_event_set' % site_tag))
-        sites.save(os.path.join(output_dir, '%s_sites' % site_tag))
-        # Motion is an numpy.ndarray so save manually
-        os.mkdir(os.path.join(output_dir, '%s_motion' % site_tag))
-        save(os.path.join(output_dir, '%s_motion' % site_tag, 'bedrock_SA.npy'), 
-             motion)
-        # ... and eqrm_flags
-        eqrm_flags_to_control_file(os.path.join(output_dir, 'eqrm_flags.py'),
-                                   eqrm_flags)
+        # 1. Create and save analysis objects objects
+        self.save_analysis_objects(output_dir, site_tag)
         
-        # 3. Run through events_shaking_a_site
+        # 2. Run through events_shaking_a_site
         events_filename = events_shaking_a_site(output_dir,
                                                 site_tag,
                                                 site_lat,
@@ -157,7 +208,7 @@ class Test_postprocessing(unittest.TestCase):
                                                 period,
                                                 is_bedrock)
         
-        # 4. Read in generated CSV to a dict
+        # 3. Read in generated CSV to a dict
         events_attributes = {'ground_motion': float,
                              'ground_motion_model': str,
                              'trace_start_lat': float,
@@ -179,7 +230,7 @@ class Test_postprocessing(unittest.TestCase):
                              'site_lon': float}
         events_arrays = csv_to_arrays(events_filename, **events_attributes)
         
-        # 5. Expected results
+        # 4. Expected results
         expected_ground_motion = asarray([1, 4, 7, 10, 13]) # period == 1.0
         expected_ground_motion_model = asarray(['Allen', 
                                                 'Toro_1997_midcontinent', 
@@ -214,7 +265,7 @@ class Test_postprocessing(unittest.TestCase):
         expected_site_lat = -31*ones(5) 
         expected_site_lon = 150*ones(5)
         
-        # 6. Compare results
+        # 5. Compare results
         self.assert_(allclose(expected_ground_motion, 
                               events_arrays['ground_motion']))
         
