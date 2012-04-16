@@ -3,7 +3,8 @@
 
 """
 import scipy
-from scipy import loadtxt, load, where
+from scipy import loadtxt, where
+from numpy.core.defchararray import strip
 import csv 
 import os
 
@@ -232,7 +233,7 @@ def events_shaking_a_site(output_dir,
         
         event_source = source_model[int(event_set.source[i])]
         for gmm in event_source.atten_models:
-            gmm_index = where(event_source.atten_models == gmm)[0][0]
+            gmm_index = where(strip(event_source.atten_models) == gmm)[0][0]
             handle.writerow([ground_motion[gmm_index],
                              gmm,
                              trace_start_lat,

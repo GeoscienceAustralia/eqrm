@@ -532,7 +532,6 @@ def load_motion_from_csv(saved_dir, site_tag, soil_amp):
         dimensions (spawn, gmm, rm, sites, events, periods)
       periods: A list of periods of the SA values
     """
-    # TODO: Implement at per changes to save_motion
 
     # convert 'soil_amp' to a filename fragment
     motion_name = 'soil_SA' if soil_amp else 'bedrock_SA'
