@@ -20,7 +20,7 @@ Description:
 
     The data required to calculate the ground motion (coefficients, constants,
     etc) is placed into a list which is stored in a dictionary
-    'ground_motion_init' (sic) with the model name as key.
+    'ground_motion_init' with the model name as key.
 
     Each dictionary list contains (in the following order):
         distribution function
@@ -5604,7 +5604,7 @@ def Abrahamson_Silva_1997_distribution(dist_object,
     # element index info to the functions it calls - all they ever see
     # is a 1D array regardless of the shape of the input - so isn't
     # generally usable here. The "where()" approach leads to a lot of
-    # arithmetic that is simply thrown away. Once again, numpy is the
+    # arithmetic that is simply thrown away. Numpy is the
     # wrong tool for this job.
     
     f3 = where(mag <= 5.8, a5, a6) #  [sites, events, peiods]

@@ -57,66 +57,28 @@ import catalogue_reader
 import earthquake_event
 
 
-
-def calc_recurrence(event_subset, min_mag = None, max_mag = None, max_mag_ls = None, interval = 0.1, figurepath = None):
-
-    """This function reads an earthquake catalogue file and calculates the
-    Gutenberg-Richter recurrence parameters using both least squares and
-    maximum likelihood (Aki 1965) approaches.
-
-    Results are plotted for both straightline fits and bounded
-    Gutenberg-Richter curves. Also plotted is the curve that would result
-    assuming a b-value of 1.
-
-    Funtion arguments:
-
-        infile: file containing earthquake catalogue
-                Expected input file format: csv
-                One header line
-                Year of earthquake in 3rd column, magnitude in 6th column.
-        min_mag: minimum magnitude for which data will be used - i.e. catalogue
-                completeness
-        max_mag: maximum magnitude used in bounded G-R curve. If not specified,
-                defined as the maximum magnitude in the catlogue + 0.1 magnitude
-                units.
-        maximum magnitude for least squares: The maxumum magnitude used in the least squares
-            analysis. Defaults to the maximum magnitude in the catalogue minus 1.0
-            magnitude units.
-        interval: Width of magnitude bins for generating cumulative histogram
-                of earthquake recurrence for least squares fit. Default value is
-                0.1 magnitude units.  
-    
+def maximum_likelihood(magnitudes, min_mag):
+    """ Maximum Likelihood Estimator fitting
+    Use Aki 1965 for continuous, unbounded data b value
     """
+    b_mle = np.log10(np.exp(1)) / (np.mean(magnitudes) - min_mag)
+    beta_mle = np.log(10) * b_mle    
+    return b_mle, beta_mle
 
+def least_squares(bins, log_cum_sum):
+    """ Fit a least squares curve
+    """
+    b,a = np.polyfit(bins, log_cum_sum, 1)
+    alpha = np.log(10) * a
+    beta = -1.0 * np.log(10) * b
+    return a, b, alpha, beta
 
-    # Define catalogue completeness intervals. Increase weight of small events
-    # to extend completeness
-##    mag_intervals = [3.5, 6.0]
-##    interval_multipliers = [55., 1.7]
-    mag_intervals = []
-    interval_multipliers = []
-
-    # If minimum magnitude is not specified, read all magnitudes
-    if min_mag is not None:
-        pass
-    else:
-        min_mag = -1.0
-
-    # Define lists
-    magnitudes = []
-    years = []
-    depths = []
-    for event in event_subset:
-        if event.magnitude >= min_mag:
-            magnitudes.append(event.magnitude)
-            years.append(event.time)
-            depths.append(event.depth)
-
-
-
-    ###########################################################################
-    # Handle catalogue completeness
-    ###########################################################################
+def completeness(magnitudes, mag_intervals, interval_multipliers):
+    """ Handle catalogue in-completeness by scaling number of event from complete
+    years to incopmlete ones. Define catalogue completeness intervals. Increase weight of small events
+    to extend completeness.
+    FIXME - this has not been tested yet
+    """
     counter = []
     magnitudes_old = copy.copy(magnitudes)
     for i in range(len(mag_intervals)):
@@ -149,73 +111,55 @@ def calc_recurrence(event_subset, min_mag = None, max_mag = None, max_mag_ls = N
                     j +=1
                     if j > factor:
                         break
-    
-    # If minimum magnitude is not specified default value to minimum in catalogue
-    if min_mag == -1.0:
-        min_mag = min(magnitudes)
-    # If maximum magnitude is not specified default value to maximum in catalogue
-    if max_mag is not None:
-        pass
-    else:
-        max_mag = max(magnitudes) + 0.1
 
-    num_eq = len(magnitudes)
-    max_depth = max(depths)
-    print 'Maximum depth:', max_depth
-    print 'Minimum magnitude:', min_mag
-    print 'Total number of earthquakes:', num_eq
-    num_years = max(years).year-min(years).year
-    print 'years', num_years
-    annual_num_eq = float(num_eq)/num_years
-    print 'Annual number of earthquakes greater than Mw', min_mag,':', \
-    annual_num_eq
-    max_catalogue = max(magnitudes)
-    print 'Maximum catalog magnitude:', max_catalogue
-    print 'Mmax = ', max_mag
 
+def build_histograms(magnitudes, min_mag, max_catalogue, num_years, max_mag_ls = None, interval = 0.1):
+    """ Build histograms for least-squares analysis and plotting
+    """
     # Maximum magnitude for least square fit
+    # Ignore largest magnitudes because we want to fit the straight part of
+    # the G-R relationship
     if max_mag_ls is None:
-        max_mag_bin = max(max_catalogue - 1.0, min(magnitudes) + 1.0)
+        max_mag_bin = max(max_catalogue - 1.0, min(magnitudes) + 1.0) + interval
     else:
-        max_mag_bin = max_mag_ls
+        max_mag_bin = max_mag_ls + interval
     print 'Maximum magnitude used in least squares analysis ', max_mag_bin
-    
-    
 
     # Magnitude bins - we will re-arrange bins later
     bins = np.arange(min_mag, max_mag_bin, interval)
 
     # Magnitude bins for plotting - we will re-arrange bins later
-    bins_plot = np.arange(min_mag, max_catalogue + 0.15, interval)  
-    
-
-    ###########################################################################
-    # Generate distribution
-    ###########################################################################
+    bins_plot = np.arange(min_mag, max_catalogue + 2*interval, interval)
 
     # Generate histogram for LS analysis
-    hist = np.histogram(magnitudes, bins=bins_plot, new=True)
+    # Note that numpy bins are closed on the LHS and open on the RHS
+    # i.e. the bin [1, 2) includes 1 but not 2 (which would be in the
+    # bin [2, 3). Except for the last bin which is closed on both sides
+    # e.g. [8, 9]
+    hist = np.histogram(magnitudes, bins=bins_plot)
+
     # Generate histogram for plotting
-    hist_plot = np.histogram(magnitudes, bins=bins_plot, new=True)
+    hist_plot = np.histogram(magnitudes, bins=bins_plot)
 
     # Reverse array orders
-    hist = hist[0][::-1]
-    bins = bins[::-1]
+    bins = hist[1][::-1]
+    counts = hist[0][::-1]
+
     hist_plot = hist_plot[0][::-1]
     bins_plot = bins_plot[::-1]
     
     # Calculate cumulative sums
-    cum_hist = hist.cumsum()
+    cum_hist = counts.cumsum()
     cum_hist_plot = hist_plot.cumsum()    
-            
+
     # Ensure bins have the same length as the cumulative histogram.
     # Remove the upper bound for the highest interval.
     bins = bins[1:]
     bins_plot = bins_plot[1:]
 
     # Get annual rate
-    cum_annual_rate = cum_hist/num_years
-    cum_annual_rate_plot = cum_hist_plot/num_years
+    cum_annual_rate = cum_hist/float(num_years)
+    cum_annual_rate_plot = cum_hist_plot/float(num_years)
     
     new_cum_annual_rate = []
     for i in cum_annual_rate:
@@ -246,24 +190,94 @@ def calc_recurrence(event_subset, min_mag = None, max_mag = None, max_mag_ls = N
         else:
             pass
 
+    return bins, log_cum_sum, bins_plot, new_cum_annual_rate_plot, annual_rate_mean_eq
+    
+def calc_recurrence(event_set, min_mag = None, max_mag = None, max_mag_ls = None,
+                    interval = 0.1, figurepath = None, subset = 'all'):
+
+    """This function reads an earthquake catalogue file and calculates the
+    Gutenberg-Richter recurrence parameters using both least squares and
+    maximum likelihood (Aki 1965) approaches.
+
+    Results are plotted for both straightline fits and bounded
+    Gutenberg-Richter curves. Also plotted is the curve that would result
+    assuming a b-value of 1.
+
+    Funtion arguments:
+
+        infile: file containing earthquake catalogue
+                Expected input file format: csv
+                One header line
+                Year of earthquake in 3rd column, magnitude in 6th column.
+        min_mag: minimum magnitude for which data will be used - i.e. catalogue
+                completeness
+        max_mag: maximum magnitude used in bounded G-R curve. If not specified,
+                defined as the maximum magnitude in the catlogue + 0.1 magnitude
+                units.
+        maximum magnitude for least squares: The maxumum magnitude used in the least squares
+            analysis. Defaults to the maximum magnitude in the catalogue minus 1.0
+            magnitude units.
+        interval: Width of magnitude bins for generating cumulative histogram
+                of earthquake recurrence for least squares fit. Default value is
+                0.1 magnitude units.  
+    
+    """
+    
+    # If minimum magnitude is not specified, read all magnitudes
+    if min_mag is not None:
+        subset_name = 'clip_min_mag'
+        event_set.create_subset(subset_name, min_mag=min_mag)
+        event_subset = event_set.catalogue_subset[subset_name]
+    else:
+        subset_name = subset
+        event_subset = event_set.catalogue_subset[subset_name]
+
+    # Get data from catalogue
+    event_set.get_magnitudes(subset_name=subset_name)
+    magnitudes = event_set.magnitudes[subset_name]    
+    event_set.get_times(subset_name=subset_name)
+    years = event_set.times[subset_name]
+    
+    # If minimum magnitude is not specified default value to minimum in catalogue
+    if min_mag is None:
+        min_mag = min(magnitudes)
+    else:
+        min_mag = min(min(magnitudes), min_mag)
+                      
+    # If maximum magnitude is not specified default value to maximum in catalogue
+    if max_mag is not None:
+        pass
+    else:
+        max_mag = max(magnitudes) + 0.1
+
+    num_eq = len(magnitudes)
+    print 'Minimum magnitude:', min_mag
+    print 'Total number of earthquakes:', num_eq
+    num_years = max(years).year-min(years).year
+    print 'years', num_years
+    annual_num_eq = float(num_eq)/num_years
+    print 'Annual number of earthquakes greater than Mw', min_mag,':', \
+    annual_num_eq
+    max_catalogue = max(magnitudes)
+    print 'Maximum catalog magnitude:', max_catalogue
+    print 'Mmax = ', max_mag 
+    
+    bins, log_cum_sum, bins_plot, new_cum_annual_rate_plot, annual_rate_mean_eq = \
+                                        build_histograms(magnitudes, min_mag,
+                                                         max_catalogue, num_years,
+                                                         max_mag_ls = max_mag_ls,
+                                                         interval = interval)
+
+
     
     ###########################################################################
     # Fit a and b parameters using a varity of methods
     ###########################################################################
-    
-    # Fit a least squares curve
-    b,a = np.polyfit(bins, log_cum_sum, 1)
+    a, b, alpha, beta = least_squares(bins, log_cum_sum)  
     print 'Least Squares: b value', -1. * b, 'a value', a
-    alpha = np.log(10) * a
-    beta = -1.0 * np.log(10) * b
-
-    # Maximum Likelihood Estimator fitting
-    # Use Aki 1965 for continuous, unbounded data
-    # b value
-    b_mle = np.log10(np.exp(1)) / (np.mean(magnitudes) - min_mag)
-    beta_mle = np.log(10) * b_mle
+    b_mle, beta_mle = maximum_likelihood(magnitudes, min_mag)
     print 'Maximum Likelihood: b value', b_mle
-
+    
     ###########################################################################
     # Generate data to plot results
     ###########################################################################
@@ -324,6 +338,8 @@ def calc_recurrence(event_subset, min_mag = None, max_mag = None, max_mag_ls = N
     ax.set_ylabel('Annual probability', fontsize = '20')
     ax.set_xlabel('Magnitude', fontsize = '20')
 
+    ax.grid(True)
+
     s = 'Minimum magnitude: %.1f \nAnnual number earthquakes > min mag: %.2f \nLS a,b: %.2f, %.2f \nMLE b: %.2f' \
     % (min_mag, annual_num_eq, a, -1. * b, b_mle)
     ax.text(min_mag - 0.25, min(log_ls_fit)* 0.5, s, fontsize = '14',
@@ -331,6 +347,10 @@ def calc_recurrence(event_subset, min_mag = None, max_mag = None, max_mag_ls = N
 
     if figurepath is not None:
         py.savefig(figurepath)
+        print 'Figure saved as', figurepath
+
+    ##############################
+    return a, b, b_mle, annual_num_eq
 
 
 ###############################################################################
@@ -369,7 +389,10 @@ the data.'
     except IndexError:
         print '\nMagnitude bin interval not specfied, defaulting to 0.1 magnitude units'
         interval = 0.1
-        
+
+    figurepath = infile[:-4] + '.png'  
     EventSet = catalogue_reader.CatalogueReader(infile).EventSet
-    calc_recurrence(EventSet.catalogue_subset['all'], min_mag = min_mag, max_mag = max_mag, max_mag_ls = max_mag_ls, interval = interval)
+    calc_recurrence(EventSet, min_mag = min_mag, max_mag = max_mag,
+                    max_mag_ls = max_mag_ls, interval = interval,
+                    figurepath = figurepath, subset='all')
     py.show()
