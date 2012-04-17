@@ -7,8 +7,8 @@ from eqrm_code import file_store
 
 class Analysis_Data(file_store.File_Store):
     
-    def __init__(self, dir=None):
-        super(Analysis_Data, self).__init__('analysis_data', dir)
+    def __init__(self):
+        super(Analysis_Data, self).__init__('analysis_data')
 
     def __del__(self):
         super(Analysis_Data, self).__del__()

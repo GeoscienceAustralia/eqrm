@@ -36,7 +36,7 @@ Copyright 2007 by Geoscience Australia
 """
 
 from scipy import newaxis, sqrt, pi, cos, sin, where, reshape, arctan, sign
-from scipy import tan, arcsin, zeros
+from scipy import tan, arcsin, arccos, zeros
 
 from projections import azimuthal_orthographic_ll_to_xy as ll2xy
 
@@ -49,6 +49,18 @@ DegreesToRadians = pi / 180.0
 
 DISTANCE_LIMIT = 0.000001
 #DISTANCE_LIMIT = 1.0
+
+def As_The_Cockey_Flies(lat0,lon0,lat,lon):
+    # Algorithm from GA website
+    # Uses spherical geometry (rather than a projection)
+    # to calculate epicentral distance
+    lat=lat[:,newaxis]
+    lon=lon[:,newaxis]
+    L1=lat0*(pi/180)
+    L2=lat*(pi/180)
+    DG=(lon-lon0)*(pi/180)
+    D = 1.852*60*180/pi*arccos(sin(L1)*sin(L2)+cos(L1)*cos(L2)*cos(DG))
+    return D
 
 def Hypocentral(lat_sites, lon_sites, lat_events, lon_events, lengths, azimuths,
                 widths, dips, depths, depths_to_top, projection, trace_start_lat,

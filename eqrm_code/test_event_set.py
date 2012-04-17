@@ -1042,10 +1042,10 @@ class Test_Event_Set(unittest.TestCase):
 
     def test_merge_events_and_sources(self):
         para = array([0, 1., 2.])
-        para_list = [para]*15
+        para_list = [para]*16
         events_zone = Event_Set(*para_list)
         para = array([3., 4., 5., 6.])
-        para_list = [para]*15
+        para_list = [para]*16
         events_fault = Event_Set(*para_list)
 
         atten_model_weights = [array([.4, .6]),array([.1, .4, .5])]

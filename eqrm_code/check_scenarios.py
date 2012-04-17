@@ -54,7 +54,7 @@ import os
 
 from os.path import join, splitext, abspath
 
-from scipy import asarray, allclose
+from scipy import asarray, allclose, load
 
 from eqrm_code import analysis
 from eqrm_code.get_version import get_version
@@ -62,6 +62,7 @@ from eqrm_code.parallel import Parallel
 from eqrm_code import util
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code import parse_in_parameters
+from eqrm_code import postprocessing
 
 # Use predictable random variates
 from eqrm_code import ground_motion_distribution, test_rvs
@@ -167,8 +168,20 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
         #Initial time and memory
         t0 = time.clock()
         
-        # Run the scenarios
+        # Run the scenario
         analysis.main(pull_path, True)
+        
+        # Run post-processing (if needed)
+        if eqrm_flags['save_motion']:
+            postprocessing.generate_motion_csv(eqrm_flags['output_dir'],
+                                               eqrm_flags['site_tag'],
+                                               is_bedrock=True)
+            if eqrm_flags['use_amplification']:
+                postprocessing.generate_motion_csv(eqrm_flags['output_dir'],
+                                               eqrm_flags['site_tag'],
+                                               is_bedrock=False)
+                
+            
         root, ext = splitext(file)
         time_taken_sec = (time.clock()-t0)
         timings[root] = time_taken_sec
@@ -181,6 +194,56 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
     fd.close()
     timings =  Scenario_times(timings, current_string=current_string)
     return timings, output_dirs
+
+def directory_diff(dirA, dirB):
+    """
+    Recursively checks the directories for files to and checks for differences.
+    
+    Supports .npy and ascii files:
+    - If an npy file is encountered load both and do an allclose to compare
+    - Else assume an ascii file and run through file_diff 
+    
+    Returns the first different file in the directory tree.
+        
+    Results returned in the same format at file_diff for interchangeability.
+    """
+    
+    for file in listdir(dirA):
+        
+        fileA = join(dirA, file)
+        fileB = join(dirB, file)
+        
+        if os.path.isdir(fileA):
+            result, lineA, lineB = directory_diff(fileA, fileB)
+            
+        elif fileA[-3:] == 'npy':
+            # .npy files
+            # 1. Load files into arrays
+            # 2. Do an allclose
+            arrayA = load(open(fileA, 'rb'))
+            arrayB = load(open(fileB, 'rb'))
+            
+            result = True            
+            try:
+                if not allclose(arrayA, arrayB):
+                    result = False
+            except:
+                # allclose raises a TypeError if the arrays are None
+                if arrayA != arrayB:
+                    result = False
+            
+            lineA = fileA
+            lineB = fileB
+            
+        else:
+            # Likely to be a pickled file
+            # Pickled files are ascii so lets use file_diff
+            result, lineA, lineB = file_diff(fileA, fileB)
+        
+        if not result:
+            return result, lineA, lineB
+            
+    return True, None, None
         
 def file_diff(fileA, fileB):
     """
@@ -363,8 +426,14 @@ def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR,
                 continue
             standard_file = join(standard_dir, dir, file)
             print ".", # To show something is happening
-            is_same, lineA, lineB = file_diff(standard_file,
-                                                          current_file)
+            
+            if os.path.isdir(standard_file):
+                # Inspect binary file directories
+                is_same, lineA, lineB = directory_diff(standard_file, 
+                                                       current_file)
+            else:
+                # Inspect normal text files
+                is_same, lineA, lineB = file_diff(standard_file, current_file)
             #remove(current_file)
             files_checked += 1
             if not is_same:

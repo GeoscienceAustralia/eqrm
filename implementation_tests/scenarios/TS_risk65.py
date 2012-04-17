@@ -77,8 +77,7 @@ loss_aus_contents = 0
 save_total_financial_loss = True
 
 # Data
-data_dir = join('.', 'implementation_tests', 'input')
-event_set_name = 'TS_risk65'
+event_set_load_dir = join('.', 'implementation_tests', 'input', 'TS_risk65')
 event_set_handler = 'load'
 
 # If this file is executed the simulation will start.

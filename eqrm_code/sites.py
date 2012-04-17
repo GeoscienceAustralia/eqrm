@@ -26,16 +26,21 @@
 
 
 import copy
+import os
 from scipy import array, asarray
 #import numpy as np
 import scipy as np
 
 from eqrm_code.distances import Distances
+from eqrm_code.distance_functions import As_The_Cockey_Flies
 from eqrm_code.csv_interface import csv_to_arrays
 from eqrm_code.projections import azimuthal_orthographic as projection
+from eqrm_code import file_store
+
+from eqrm_code.ANUGA_utilities import log
 
 
-class Sites(object):
+class Sites(file_store.File_Store):
     """An object to hold site data."""
 
     def __init__(self, latitude, longitude, **attributes):
@@ -45,6 +50,8 @@ class Sites(object):
         longitude   longitude of sites (vector)
         attributes  dictionary of site attributes (vectors of data)
         """
+        super(Sites, self).__init__('sites')
+        
         self.latitude = asarray(latitude)
         self.longitude = asarray(longitude)
         self.attributes = attributes
@@ -52,6 +59,38 @@ class Sites(object):
         assert(len(self.latitude) == len(self.longitude))
         for key in self.attributes:
             assert(len(self.latitude) == len(self.attributes[key]))
+            
+    def __del__(self):
+        super(Sites, self).__del__()
+    
+    # PROPERTIES #
+    # Define getters and setters for each attribute to exercise the 
+    # file-based data structure
+    latitude = property(lambda self: self._get_file_array('latitude'), 
+                        lambda self, value: self._set_file_array('latitude', value))
+    
+    longitude = property(lambda self: self._get_file_array('longitude'), 
+                         lambda self, value: self._set_file_array('longitude', value))
+    # END PROPERTIES #
+
+    def save(self, dir=None):
+        """
+        Save the ndarray objects to the specified directory
+        """
+        self._save(dir)
+    
+    @classmethod
+    def load(cls, load_dir):
+        """
+        Return an Sites object from the .npy files stored in the specified
+        directory.
+        Note: Attributes are not set by this method.
+        """
+        # An empty sites object
+        sites = cls(latitude=[], longitude=[])
+        # Set lat/lon vectors by load_dir
+        sites._load(load_dir)
+        return sites
 
     @classmethod
     def from_csv(cls, file, **attribute_conversions):
@@ -232,6 +271,22 @@ class Sites(object):
                                                  other.attributes[key]))
 
         return Sites(new_lat, new_lon, **new_attr)
+    
+    def closest_site(self, lat, lon):
+        """Return the index of the closest site to the given lat and lon"""
+        distances = As_The_Cockey_Flies(lat, lon, self.latitude, self.longitude)
+        return distances.argmin()
+        
+
+def load_sites(parallel, load_dir):
+    """
+    Load the site object from file in load_dir
+    """
+    log.info('P%s: Loading site from %s' % (parallel.rank, load_dir))
+    
+    sites = Sites.load(load_dir)
+    
+    return sites
 
 
 def truncate_sites_for_test(use_site_indexes, sites, site_indexes):
