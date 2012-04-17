@@ -208,7 +208,14 @@ def directory_diff(dirA, dirB):
     Results returned in the same format at file_diff for interchangeability.
     """
     
-    for file in listdir(dirA):
+    result_files = listdir(dirA)
+    
+    try:
+        result_files.remove('.svn')
+    except:
+        pass
+    
+    for file in result_files:
         
         fileA = join(dirA, file)
         fileB = join(dirB, file)
