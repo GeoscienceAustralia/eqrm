@@ -68,8 +68,7 @@ save_prob_structural_damage = None
 save_fatalities = True
 
 # Data
-data_dir = join('.', 'implementation_tests', 'input')
-event_set_name = 'TS_fat03'
+event_set_load_dir = join('.', 'implementation_tests', 'input', 'TS_fat03')
 event_set_handler = 'load'
 
 # If this file is executed the simulation will start.

@@ -188,6 +188,22 @@ class Test_Sites(unittest.TestCase):
         self.failUnless(np.all(joined_sites.attributes['SITE_CLASS_2'] == 
                                expected_site_class2))
 
+    def test_closest_site(self):
+        # Test data from GA website 
+        # http://www.ga.gov.au/earth-monitoring/geodesy/geodetic-techniques/distance-calculation-algorithms.html
+        latitude  = [-31,-31,-32,-33,-34,-35,-40,-50,-60,-70,-80]
+        longitude = [150,151,151,151,151,151,151,151,151,151,151]
+        sites = Sites(latitude, longitude)
+        
+        # Point A from website
+        point_lat = -30
+        point_lon = 150
+        
+        closest_site = sites.closest_site(point_lat, point_lon)
+        
+        assert sites.latitude[closest_site] == latitude[0]
+        assert sites.longitude[closest_site] == longitude[0]
+
 ################################################################################
 
 if __name__ == "__main__":

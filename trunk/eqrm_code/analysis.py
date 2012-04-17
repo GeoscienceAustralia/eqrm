@@ -34,9 +34,11 @@ from eqrm_code.ground_motion_calculator import \
 from eqrm_code.ground_motion_interface import BEDROCKVs30
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
      Regolith_amplification_model, load_site_class2Vs30
-from eqrm_code.output_manager import save_motion, save_distances, save_sites, \
-         save_hazard, save_structures, save_val, \
-         save_ecloss, join_parallel_files, join_parallel_files_column, \
+from eqrm_code.output_manager import save_motion_to_binary, save_distances, \
+         save_sites_to_csv, save_sites_to_binary, \
+         save_hazard, save_structures, save_val, save_ecloss, \
+         join_parallel_files, join_parallel_files_column, \
+         join_parallel_data_files, \
          save_damage, save_fatalities, \
          save_bridge_days_to_complete
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
@@ -173,7 +175,13 @@ def main(parameter_handle,
     # if required, 'thin' sites for testing
     all_sites = truncate_sites_for_test(eqrm_flags.use_site_indexes, sites,
                                         eqrm_flags.site_indexes)
-
+    
+    # Save sites to numpy array
+    if parallel.rank == 0:
+        save_sites_to_binary(eqrm_flags.output_dir, 
+                             eqrm_flags.site_tag,
+                             sites=all_sites)
+    
     del sites
     num_sites = len(all_sites)
 
@@ -247,10 +255,10 @@ def main(parameter_handle,
     log.debug(msg)
 
     # initialise some matrices.  These matrices have a site dimension and
-    # are filled while looping over sites.  Wether they are needed or
+    # are filled while looping over sites.  Whether they are needed or
     # not often depends on what is being saved.
     
-    data = Analysis_Data(dir=eqrm_flags.data_array_storage)
+    data = Analysis_Data()
 
     if eqrm_flags.save_hazard_map is True:
         data.bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
@@ -506,6 +514,7 @@ def main(parameter_handle,
 
     row_files_that_parallel_splits = []
     column_files_that_parallel_splits = []
+    data_files_that_parallel_splits = []
 
     event_loop_time = (time.clock() - t0)
     #time_taken_site_loop = event_loop_time - time_taken_pre_site_loop
@@ -548,31 +557,35 @@ def main(parameter_handle,
 
     # Save Ground Motion
     if eqrm_flags.save_motion is True and parallel.lo != parallel.hi:
-        a_file = save_sites(eqrm_flags.output_dir, eqrm_flags.site_tag,
-                          sites=all_sites,
-                          compress=eqrm_flags.compress_output,
-                          parallel_tag=parallel.file_tag,
-                          write_title=(parallel.rank == False))
+
+        # Save to csv
+        # TODO: This is deprecated, remove once post-processing scripts written
+        a_file = save_sites_to_csv(eqrm_flags.output_dir,
+                                   eqrm_flags.site_tag,
+                                   sites=all_sites,
+                                   compress=eqrm_flags.compress_output,
+                                   parallel_tag=parallel.file_tag,
+                                   write_title=(parallel.rank == False))
         # save_hazard also calls save_sites. Only append if not already exists.
         # FIXME: This will overwrite what is written in save_hazard. 
         #        Is this correct?
         if a_file not in row_files_that_parallel_splits:
             row_files_that_parallel_splits.append(a_file)
 
-        files = save_motion(soil_amp=False, eqrm_flags=eqrm_flags
-                            ,motion=data.bedrock_SA_all,
-                            compress=eqrm_flags.compress_output,
-                            parallel_tag=parallel.file_tag,
-                            write_title=(parallel.rank == False))
-        row_files_that_parallel_splits.extend(files)
+        # Save to numpy binary
+        file = save_motion_to_binary(soil_amp=False, 
+                                     eqrm_flags=eqrm_flags,
+                                     motion=data.bedrock_SA_all,
+                                     parallel_tag=parallel.file_tag)
+        data_files_that_parallel_splits.append(file)
 
         if data.soil_SA_all is not None:
-            files = save_motion(soil_amp=True, eqrm_flags=eqrm_flags,
-                                motion=data.soil_SA_all,
-                               compress=eqrm_flags.compress_output,
-                               parallel_tag=parallel.file_tag,
-                               write_title=(parallel.rank == False))
-            row_files_that_parallel_splits.extend(files)
+            # Save to numpy binary
+            file = save_motion_to_binary(soil_amp=True, 
+                                         eqrm_flags=eqrm_flags,
+                                         motion=data.soil_SA_all,
+                                         parallel_tag=parallel.file_tag)
+            data_files_that_parallel_splits.append(file)
 
 
     # Save damage information
@@ -715,6 +728,9 @@ def main(parameter_handle,
         join_parallel_files_column(column_files_that_parallel_splits,
                                    calc_num_blocks,
                                    compress=eqrm_flags.compress_output)
+        
+        join_parallel_data_files(data_files_that_parallel_splits,
+                                 calc_num_blocks)
 
     # Let's stop all the programs at the same time
     # Needed when scenarios are in series.

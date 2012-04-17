@@ -22,6 +22,11 @@ SAVE_METHOD = 'npy'
 if sys.platform == 'win32':
     SAVE_METHOD = None
 
+# DATA_DIR
+# Specifies where the temporary data files get stored 
+# (set using eqrm_flags.data_array_storage)
+DATA_DIR = None
+
 class FileStoreException(Exception):
     pass
 
@@ -94,11 +99,11 @@ class File_Store(object):
     """
     
     
-    def __init__(self, name, dir):
+    def __init__(self, name):
         """__init__: create a file store instance with name and dir"""
         self._name = name
         self._array_files = {}
-        self._dir = dir # if this is None tempfile will use /tmp
+        self._array_names = {}
 
     def __del__(self):
         """__del__: Make sure any data files are cleaned up"""
@@ -122,7 +127,7 @@ class File_Store(object):
             if filename is None:
                 handle, filename = tempfile.mkstemp(prefix='%s.%s.' % (self._name, name), 
                                                     suffix='.npy',
-                                                    dir=self._dir)
+                                                    dir=DATA_DIR)
                 os.close(handle)
                 self._array_files[name] = filename
                 
@@ -139,26 +144,26 @@ class File_Store(object):
             self._set_numpy_binary_array(name, array)
         else:
             self.__dict__[name] = array
+        self._array_names[name] = name
             
     def _save(self, dir=None):
-        """Save the associated .npy files in the given dir."""
-        if len(self._array_files) > 0:
-            if dir is None:
-                dir = os.path.curdir
+        """Save the arrays to .npy files in the given dir."""
+
+        if dir is None:
+            dir = os.path.curdir
+        
+        # Make save dir if necessary
+        save_dir = os.path.join(dir, self._name)
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
             
-            # Make save dir if necessary
-            save_dir = os.path.join(dir, self._name)
-            if not os.path.exists(save_dir):
-                os.makedirs(save_dir)
-            
-            # Place each array file in the save dir
-            for name, filename in self._array_files.items():
-                save(os.path.join(save_dir, '%s.npy' % name), load(filename))
-                
+        for name in self._array_names.keys():
+            filename = os.path.join(save_dir, '%s.npy' % name)
+            save(filename, self._get_file_array(name))
+                            
             
     def _load(self, dir=None):
-        """Load the associated .npy files from the given dir into file_store 
-        arrays"""
+        """Load the .npy files from the given dir into file_store arrays"""
         if dir is None:
             dir = os.path.curdir
         

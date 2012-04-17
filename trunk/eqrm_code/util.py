@@ -24,7 +24,7 @@ import random
 from subprocess import call
 from copy import deepcopy
 from os import remove, mkdir, access, F_OK, sep, path
-from scipy import array, log, newaxis, exp
+from scipy import array, log, newaxis, exp, logical_and
 
 
 def determine_eqrm_path(file=__file__):
@@ -303,6 +303,11 @@ def get_hostname():
         result = (hostname, '')
 
     return result
+
+def string_array_equal(a1, a2):
+    """Exists as np.array_equal does not work for strings. An implementation
+    of the suggested fix from http://projects.scipy.org/numpy/ticket/2095"""
+    return bool(logical_and.reduce((a1 == a2).ravel()))
     
 ################################################################################
 

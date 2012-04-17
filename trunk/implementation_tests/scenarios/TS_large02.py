@@ -67,8 +67,7 @@ save_contents_loss = False
 save_motion = False
 save_prob_structural_damage = None
 
-data_dir = join('.', 'implementation_tests', 'input')
-event_set_name = 'TS_large02'
+event_set_load_dir = join('.', 'implementation_tests', 'input', 'TS_large02')
 event_set_handler = 'load'
 
 file_array = False
