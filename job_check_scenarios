@@ -2,7 +2,7 @@
 #PBS -wd 
 #PBS -q express
 #PBS -l walltime=0:45:00,vmem=500MB
-PYTHONPATH=$PYTHONPATH:/short/w84/Shapely/lib/python2.6/site-packages/:.:/home/547/dsg547/eqrm/trunk/:
+PYTHONPATH=$PYTHONPATH:/short/w84/Shapely/lib/python2.6/site-packages/:.:$HOME/eqrm/trunk/:
 export PYTHONPATH
 
 module load python/2.6

@@ -28,9 +28,8 @@ export PYTHONPATH=/short/$PROJECT/Shapely/lib/python2.6/site-packages/:${PYTHONP
 export LD_LIBRARY_PATH=/short/$PROJECT/EQRM/LIBS/lib:${LD_LIBRARY_PATH}
 - Log out and log back in
 
-Install pypar (this only needs to be done once)
+Install pypar
 ==============
-Note, the module commands could have already been done.
 
 curl -O http://pypar.googlecode.com/files/pypar-2.1.4_94.tgz
 tar -xzvvf pypar-2.1.4_94.tgz 
@@ -41,11 +40,18 @@ ls $HOME/.local/lib
 cd ../demos
 mpirun -np 2 python demo.py # to test pypar
 
+Check out EQRM from svn
+========================
+Check out trunk in $HOME/eqrm/trunk
+
+cd $HOME
+mkdir eqrm
+cd eqrm
+svn co http://eqrm.googlecode.com/svn/trunk trunk
 
 How to run a job
 =================
-Firstly install EQRM in your home directory, using svn.
-Do 'bash' to start the bash shell.
+cd $HOME/eqrm/trunk
 
 To run a job script do;
 qsub -v PYTHONPATH [job_script]
