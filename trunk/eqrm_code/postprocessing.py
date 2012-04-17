@@ -4,7 +4,6 @@
 """
 import scipy
 from scipy import loadtxt, where
-from numpy.core.defchararray import strip
 import csv 
 import os
 
