@@ -75,11 +75,15 @@ def get_svn_revision_sandpit_linux(path=None):
     # Determine whether the path has svn info, then read from the info xml 
     entries_path = '%s/.svn/entries' % path
     if os.path.exists(entries_path):
-        info_xml = os.popen('svn info --xml %s' % path)
-        dom = minidom.parse(info_xml)
-        url = dom.getElementsByTagName('url')[0].firstChild.toxml()
-        commit = dom.getElementsByTagName('commit')[0].getAttribute('revision')
-        date = dom.getElementsByTagName('date')[0].firstChild.toxml()
+        try:
+            info_xml = os.popen('svn info --xml %s' % path)
+            dom = minidom.parse(info_xml)
+            url = dom.getElementsByTagName('url')[0].firstChild.toxml()
+            commit = dom.getElementsByTagName('commit')[0].getAttribute('revision')
+            date = dom.getElementsByTagName('date')[0].firstChild.toxml()
+        except:
+            # for NCI - nodes higher than 8 do not appear to return output 
+            pass
         
     return commit, date, url
 
