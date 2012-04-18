@@ -25,8 +25,7 @@ site_db_tag = ""
 return_periods = [10, 50, 100, 10000]
 input_dir = join('.', 'input')
 output_dir = join('/short', getenv('PROJECT'), 'output', 'probhaz')
-use_site_indexes = True
-site_indexes = [2255, 11511, 10963, 686]
+use_site_indexes = False
 zone_source_tag = ""
 event_control_tag = ""
 
