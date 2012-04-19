@@ -593,7 +593,7 @@ tRp158
 (I1
 tg25
 I00
-S'kua\xff\x7f@\x14@'
+S'\xc3\xfb\xb8\xbc\xae/\x14@'
 tbsS'scaling_rule'
 p159
 g107

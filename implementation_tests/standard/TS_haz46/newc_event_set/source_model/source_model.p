@@ -2730,7 +2730,7 @@ tRp382
 (I1
 tg25
 I00
-S'\xb8R\x88\xae\xa7Z\x14@'
+S'\xa1\x9b\x83f\xc6\xd7\x13@'
 tbsS'scaling_rule'
 p383
 S'modified_Wells_and_Coppersmith_94'

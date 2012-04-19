@@ -546,7 +546,7 @@ tRp130
 (I1
 tg27
 I00
-S'\xe5\xcf\x91xxy\x17@'
+S'\xbc\xb1\xe3\xfdN\xe6\x15@'
 tbsS'scaling_rule'
 p131
 S'modified_Wells_and_Coppersmith_94'

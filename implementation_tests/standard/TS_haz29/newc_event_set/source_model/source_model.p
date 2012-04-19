@@ -634,7 +634,7 @@ tRp171
 (I1
 tg25
 I00
-S'\xc8 m\xfa\x7fD\x14@'
+S'\xe1\xd9\x80\xa2$\xad\x13@'
 tbsS'scaling_rule'
 p172
 g108
@@ -1033,7 +1033,7 @@ tRp246
 (I1
 tg25
 I00
-S'Y%nh\x88+\x19@'
+S'<\x93h\x98t3\x18@'
 tbsS'scaling_rule'
 p247
 g108

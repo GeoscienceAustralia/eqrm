@@ -4,8 +4,8 @@
 """
 
 from scipy import radians, degrees, arcsin, zeros, ones, array, concatenate, \
-    dot, reshape, pi, sin
-from random import uniform, random, randrange, seed as seed_function
+    dot, reshape, pi, sin, random
+from random import uniform, randrange, seed as seed_function
 
 from projections import azimuthal_orthographic_ll_to_xy as ll2xy
  
@@ -556,10 +556,13 @@ def populate_geo_coord_polygon(polygon, number_of_points, seed = None,
     """
      
     if seed is not None:
-        seed_function(seed)
+        random.seed(seed)
         
     if randoms is None:
-        randoms = [random() for i in xrange(number_of_points)]
+        randoms = random.random(number_of_points)
+    else:
+        # Ensure randoms is a numpy array
+        randoms = array(randoms)
         
     #print polygon
     points = []
@@ -575,36 +578,29 @@ def populate_geo_coord_polygon(polygon, number_of_points, seed = None,
         if y > max_y: max_y = y
         if y < min_y: min_y = y
 
- #   max_x_rad = radians(max_x)
-    northlimit_rad = radians(max_y)
-#    min_x_rad = radians(min_x)
-    southlimit_rad = radians(min_y)
-    
-    i=0
+    max_y_rad = radians(max_y)
+    min_y_rad = radians(min_y)
+
+    # Do this until we have a points array of points inside the polygon that
+    # greater or equal the number of points requested (we'll slice at return)
     while len(points) < number_of_points:
-        rand_num =randoms[i]
-        y_rad = arcsin(rand_num * abs((sin(northlimit_rad)- 
-        sin(southlimit_rad)))  + sin(southlimit_rad)) 
-        y= degrees(y_rad)
-        x = uniform(min_x, max_x)
-        #y = uniform(min_y, max_y)
-
-        append = False
-        if is_inside_polygon([y,x], polygon):
-            append = True
-
-            #Check exclusions
-            if exclude is not None:
-                for ex_poly in exclude:
-                    if is_inside_polygon([y,x], ex_poly):
-                        append = False
-        if append is True:
-            points.append([y,x])
-        i+=1
-        if i >= number_of_points:
-            randoms = [random() for i in xrange(number_of_points)]
-            i=0        
-    return points
+        y_p_rad = arcsin(randoms * abs((sin(max_y_rad) - sin(min_y_rad))) + 
+                         sin(min_y_rad))
+        y_p = degrees(y_p_rad)
+        x_p = random.uniform(min_x, max_x, number_of_points)
+        points_p = array([y_p, x_p]).T
+        
+        points_p = points_p[inside_polygon(points_p.tolist(), polygon)]
+        if exclude is not None and len(points_p) > 0:
+            for ex_poly in exclude:
+                points_p = points_p[outside_polygon(points_p.tolist(), ex_poly)]
+        
+        if len(points_p) > 0:
+            points.extend(points_p.tolist())
+        
+        randoms = random.random(number_of_points)
+    
+    return points[:number_of_points]
     
     
 def populate_polygon(polygon, number_of_points, seed = None, exclude = None):

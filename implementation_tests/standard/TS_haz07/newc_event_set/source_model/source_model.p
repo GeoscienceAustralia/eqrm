@@ -338,7 +338,7 @@ tRp105
 (I1
 tg25
 I00
-S'[\xdc\xea\xf0\xf9I\x19@'
+S'\x8cHr\xce\xf4\x8f\x17@'
 tbsS'scaling_rule'
 p106
 S'modified_Wells_and_Coppersmith_94'

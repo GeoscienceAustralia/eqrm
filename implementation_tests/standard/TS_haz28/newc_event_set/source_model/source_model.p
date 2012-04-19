@@ -339,7 +339,7 @@ tRp106
 (I1
 tg25
 I00
-S'\xbc\xb1\xe3\xfdN\xe6\x15@'
+S'\xb5~E\xd7\xed\x18\x19@'
 tbsS'scaling_rule'
 p107
 S'modified_Wells_and_Coppersmith_94'
@@ -633,7 +633,7 @@ tRp171
 (I1
 tg25
 I00
-S'\x1ctv\xe0\xb8}\x18@'
+S'6\x19!B6\xdf\x17@'
 tbsS'scaling_rule'
 p172
 g108
@@ -1032,7 +1032,7 @@ tRp246
 (I1
 tg25
 I00
-S'6\x17\xe3\x0f\x8b\x8f\x17@'
+S'\x84\xc8\x93\xfe{\xf6\x16@'
 tbsS'scaling_rule'
 p247
 g108

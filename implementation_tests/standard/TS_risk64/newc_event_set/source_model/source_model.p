@@ -594,7 +594,7 @@ tRp134
 (I2
 tg25
 I00
-S'L\x85#\x10\xc0b\x17@t\xa0?E\xc3T\x19@'
+S'\x1ctv\xe0\xb8}\x18@\x8b-O\x0e\xe8R\x18@'
 tbsS'scaling_rule'
 p135
 S'modified_Wells_and_Coppersmith_94'
