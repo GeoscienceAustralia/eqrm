@@ -634,7 +634,7 @@ tRp171
 (I1
 tg25
 I00
-S'kua\xff\x7f@\x14@'
+S'\xc3\xfb\xb8\xbc\xae/\x14@'
 tbsS'scaling_rule'
 p172
 g108
@@ -902,7 +902,7 @@ tRp206
 (I1
 tg25
 I00
-S'h37Y\xfa\xc2\x14@'
+S'\xe2\xa2\xf2\xd6\x0fD\x18@'
 tbsS'scaling_rule'
 p207
 S'Wells_and_Coppersmith_94'
