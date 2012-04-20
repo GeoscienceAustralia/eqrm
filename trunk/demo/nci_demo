@@ -1,8 +1,9 @@
 #!/bin/bash
 #PBS -wd
 #PBS -q normal
-#PBS -l walltime=2:00:00,vmem=20GB
 #PBS -l ncpus=64
+#PBS -l walltime=2:00:00
+#PBS -l vmem=20GB
 #PBS -l jobfs=200GB
 PYTHONPATH=$PYTHONPATH:/short/w84/Shapely/lib/python2.6/site-packages/:.:$HOME/eqrm/trunk/:
 export PYTHONPATH

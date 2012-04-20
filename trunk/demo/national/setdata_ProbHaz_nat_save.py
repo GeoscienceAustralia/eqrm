@@ -26,7 +26,7 @@ site_db_tag = ""
 #return_periods = [474.56, 500, 974.79, 2474.9, 2500]
 return_periods = [100.0, 250.0, 474.56, 500.0, 974.79, 2474.9, 2500, 5000.0, 10000.0]
 input_dir = join('.', 'input')
-output_dir = join('/short', getenv('PROJECT'), 'output', 'national', 'load')
+output_dir = join('.', 'output', 'save')
 use_site_indexes = False
 site_indexes = [1]
 zone_source_tag = "bck"
@@ -59,9 +59,7 @@ amp_variability_method = 2
 amp_min_factor = 0.6
 amp_max_factor = 10000
 
-event_set_handler = 'load'
-event_set_load_dir = join('/short', getenv('PROJECT'), 'output', 'national', 'save', 'nat_event_set')
-data_array_storage = getenv('PBS_JOBFS')
+event_set_handler = 'save'
 
 # Buildings
 

@@ -73,5 +73,4 @@ data_array_storage = getenv('PBS_JOBFS')
 # Delete all variables that are not EQRM attributes variables. 
 if __name__ == '__main__':
     from eqrm_code.analysis import main
-    print "jobfs dir", getenv('PBS_JOBFS')
     main(locals())
