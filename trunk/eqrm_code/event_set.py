@@ -1471,12 +1471,12 @@ def create_event_set(eqrm_flags, parallel):
          event_activity,
          source_model) = load_event_set(parallel, 
                                         eqrm_flags.event_set_load_dir)
-         
-        save_event_set(event_set, 
-                       event_activity, 
-                       source_model, 
-                       parallel,
-                       eqrm_flags)
+        if parallel.rank == 0:
+            save_event_set(event_set, 
+                           event_activity, 
+                           source_model, 
+                           parallel,
+                           eqrm_flags)
         
     elif mode == 'generate':
             
