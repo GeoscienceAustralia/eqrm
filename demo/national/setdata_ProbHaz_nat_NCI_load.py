@@ -59,6 +59,10 @@ amp_variability_method = 2
 amp_min_factor = 0.6
 amp_max_factor = 10000
 
+event_set_handler = 'load'
+event_set_load_dir = join('/short', getenv('PROJECT'), 'output', 'national','nat_event_set')
+data_array_storage = getenv('PBS_JOBFS')
+
 # Buildings
 
 # Capacity Spectrum Method
