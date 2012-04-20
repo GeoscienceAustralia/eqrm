@@ -58,7 +58,8 @@ import eqrm_filesystem as eq_fs
 from eqrm_code.RSA2MMI import rsa2mmi_array
 from eqrm_code.fatalities import forecast_fatality
 from eqrm_code.filters import source_model_threshold_distance_subset
-from eqrm_code.analysis_data import Analysis_Data
+from eqrm_code.analysis_data import Analysis_Data, SA_Calc_Data
+
 
 
 # data columns expected in a BRIDGE data file
@@ -391,7 +392,9 @@ def main(parameter_handle,
                                       source_model,
                                       eqrm_flags.atten_threshold_distance)
         
-        soil_SA, bedrock_SA = calc_and_save_SA(
+        sa_data = SA_Calc_Data()
+        
+        sa_data.soil_SA, sa_data.bedrock_SA = calc_and_save_SA(
             eqrm_flags,
             sites,
             event_set,
@@ -411,10 +414,10 @@ def main(parameter_handle,
         if eqrm_flags.run_type == "fatality":
             #print 'STARTING fatality calculations'
             # Decide which SA to use
-            if soil_SA is not None:
-                SA = soil_SA
+            if sa_data.soil_SA is not None:
+                SA = sa_data.soil_SA
             else:
-                SA = bedrock_SA
+                SA = sa_data.bedrock_SA
             
             #print SA.shape
             #print SA
@@ -438,10 +441,10 @@ def main(parameter_handle,
         if eqrm_flags.run_type == "risk":
             #print 'STARTING building damage calculations'
             # Decide which SA to use
-            if soil_SA is not None:
-                SA = soil_SA
+            if sa_data.soil_SA is not None:
+                SA = sa_data.soil_SA
             else:
-                SA = bedrock_SA
+                SA = sa_data.bedrock_SA
 
         
             # smooth SA (function of periods) using a weighted
@@ -911,7 +914,8 @@ def calc_and_save_SA(eqrm_flags,
             # Build collapsed_bedrock_SA for all events
             # before getting out of the loop
             # collapsed_bedrock_SA shape (spawn, gmm, sites, events, periods)
-            coll_rock_SA_all_events[:, :, :, :, event_inds, :] = collapsed_bedrock_SA
+            coll_rock_SA_all_events[:, :, :, :, event_inds, :] = \
+                                                          collapsed_bedrock_SA
             if soil_SA is not None:
                 # Build collapsed_soil_SA for all events
                 coll_soil_SA_all_events[:, :, :, :, event_inds, :] = \

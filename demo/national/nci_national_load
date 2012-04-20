@@ -4,7 +4,7 @@
 #PBS -l ncpus=64
 #PBS -l walltime=6:00:00
 #PBS -l vmem=192GB
-#PBS -l jobfs=1TB
+#PBS -l jobfs=500GB
 PYTHONPATH=$PYTHONPATH:/short/w84/Shapely/lib/python2.6/site-packages/:.:$HOME/eqrm/trunk/:
 export PYTHONPATH
 

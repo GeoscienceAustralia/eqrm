@@ -27,5 +27,23 @@ class Analysis_Data(file_store.File_Store):
                               lambda self, value: self._set_file_array('bedrock_SA_all', value))
     
     soil_SA_all = property(lambda self: self._get_file_array('soil_SA_all'),
-                              lambda self, value: self._set_file_array('soil_SA_all', value))
+                           lambda self, value: self._set_file_array('soil_SA_all', value))
+
+class SA_Calc_Data(file_store.File_Store):
+    
+    def __init__(self):
+        super(SA_Calc_Data, self).__init__('sa_calc_data')
+
+    def __del__(self):
+        super(SA_Calc_Data, self).__del__()
+    
+    
+    # PROPERTIES #
+    # Define getters and setters for each attribute to exercise the 
+    # file-based data structure
+    soil_SA = property(lambda self: self._get_file_array('soil_SA'),
+                       lambda self, value: self._set_file_array('soil_SA', value))
+
+    bedrock_SA = property(lambda self: self._get_file_array('bedrock_SA'), 
+                          lambda self, value: self._set_file_array('bedrock_SA', value))
     

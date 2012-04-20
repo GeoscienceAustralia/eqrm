@@ -3,7 +3,7 @@
 #PBS -q normal
 #PBS -l ncpus=1
 #PBS -l walltime=00:10:00
-#PBS -l vmem=6GB
+#PBS -l vmem=2560MB
 PYTHONPATH=$PYTHONPATH:/short/w84/Shapely/lib/python2.6/site-packages/:.:$HOME/eqrm/trunk/:
 export PYTHONPATH
 
