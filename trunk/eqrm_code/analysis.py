@@ -58,7 +58,7 @@ import eqrm_filesystem as eq_fs
 from eqrm_code.RSA2MMI import rsa2mmi_array
 from eqrm_code.fatalities import forecast_fatality
 from eqrm_code.filters import source_model_threshold_distance_subset
-from eqrm_code.analysis_data import Analysis_Data, SA_Calc_Data
+from eqrm_code.analysis_data import Analysis_Data
 
 
 
@@ -392,9 +392,7 @@ def main(parameter_handle,
                                       source_model,
                                       eqrm_flags.atten_threshold_distance)
         
-        sa_data = SA_Calc_Data()
-        
-        sa_data.soil_SA, sa_data.bedrock_SA = calc_and_save_SA(
+        soil_SA, bedrock_SA = calc_and_save_SA(
             eqrm_flags,
             sites,
             event_set,
@@ -409,15 +407,15 @@ def main(parameter_handle,
             amp_distribution,
             event_activity,
             source_model_subset)
-
+        
         # calculate fatality
         if eqrm_flags.run_type == "fatality":
             #print 'STARTING fatality calculations'
             # Decide which SA to use
-            if sa_data.soil_SA is not None:
-                SA = sa_data.soil_SA
+            if soil_SA is not None:
+                SA = soil_SA
             else:
-                SA = sa_data.bedrock_SA
+                SA = bedrock_SA
             
             #print SA.shape
             #print SA
@@ -441,10 +439,10 @@ def main(parameter_handle,
         if eqrm_flags.run_type == "risk":
             #print 'STARTING building damage calculations'
             # Decide which SA to use
-            if sa_data.soil_SA is not None:
-                SA = sa_data.soil_SA
+            if soil_SA is not None:
+                SA = soil_SA
             else:
-                SA = sa_data.bedrock_SA
+                SA = bedrock_SA
 
         
             # smooth SA (function of periods) using a weighted
