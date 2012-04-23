@@ -27,6 +27,12 @@ class Test_catalogue_reader(unittest.TestCase):
 
 
     def test_recurrence_from_catalog(self):
+        # don't test if DISPLAY environment variable undefined
+        if sys.platform != 'win32':
+            try:
+                display = os.environ['DISPLAY']
+            except KeyError:
+                return
 
         ###################################################################
         # Generate test data
