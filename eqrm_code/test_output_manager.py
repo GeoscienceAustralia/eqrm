@@ -839,12 +839,12 @@ class Test_Output_manager(unittest.TestCase):
                 pass
             elif i == 1:
                 for j in range(0,file_num):
-                    self.assert_ (int(nums[j*2]) == j)
-                    self.assert_ (int(nums[(j*2) + 1]) == j + 1)
+                    self.assert_ (float(nums[j*2]) == j)
+                    self.assert_ (float(nums[(j*2) + 1]) == j + 1)
             elif i == 2:
                 for j in range(0,file_num):
-                    self.assert_ (int(nums[j*2]) == j*10)
-                    self.assert_ (int(nums[(j*2) + 1]) == (j + 1)*10)
+                    self.assert_ (float(nums[j*2]) == j*10)
+                    self.assert_ (float(nums[(j*2) + 1]) == (j + 1)*10)
 
         f_check.close()
         os.remove(base_file_name)
