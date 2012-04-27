@@ -1,0 +1,5 @@
+% First row is bid (building id) - subsequent rows are events
+3562
+0
+115.7832393
+0
