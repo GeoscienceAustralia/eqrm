@@ -237,11 +237,10 @@ def main(parameter_handle,
     # Also, let's do some timings.
     time_taken_pre_site_loop = (time.clock()-t0)
 
-    #print 'STARTING loop over sites'
     # parallelising over the site loop.
     parallel.calc_lo_hi(num_sites)
-    all_sites = all_sites[parallel.lo:parallel.hi]
-    num_site_block = parallel.hi - parallel.lo   # block_size
+    all_sites = all_sites[parallel.calc_indices(num_sites)]
+    num_site_block = len(all_sites)
     msg = ('blocking over sites if running in parallel. block_size=' +
            str(num_site_block))
     log.debug(msg)
@@ -670,14 +669,6 @@ def main(parameter_handle,
                            parallel_tag=parallel.file_tag)
         column_files_that_parallel_splits.append(a_file)
 
-#         a_file = save_val(eqrm_flags,sum( \
-#             all_sites.cost_breakdown(
-# ci=eqrm_flags.loss_regional_cost_index_multiplier)[:-1]),
-#                         '_bval',
-#                         compress=eqrm_flags.compress_output,
-#                         parallel_tag=parallel.file_tag)
-#         row_files_that_parallel_splits.append(a_file)
-
     if eqrm_flags.save_contents_loss is True and parallel.lo != parallel.hi:
         new_contents_loss_qw = collapse_source_gmms(
             contents_loss_qw[...,newaxis,:,newaxis],
@@ -718,20 +709,25 @@ def main(parameter_handle,
         column_files_that_parallel_splits.extend(files)
 
     # parallel code.  Needed if # of processes is > # of structures
-    calc_num_blocks = parallel.calc_num_blocks()
+    num_blocks = parallel.calc_num_blocks()
 
-    # Now process 0 can stich some files together.
-    if parallel.is_parallel and parallel.rank == 0:
+    # Now process 0 can stitch some files together.
+    if parallel.is_parallel and parallel.rank == 0:    
+        block_indices = parallel.calc_all_indices(num_sites)
+        
         join_parallel_files(row_files_that_parallel_splits,
-                            calc_num_blocks,
+                            num_blocks,
+                            block_indices,
                             compress=eqrm_flags.compress_output)
 
         join_parallel_files_column(column_files_that_parallel_splits,
-                                   calc_num_blocks,
+                                   num_blocks,
+                                   block_indices,
                                    compress=eqrm_flags.compress_output)
         
         join_parallel_data_files(data_files_that_parallel_splits,
-                                 calc_num_blocks)
+                                 num_blocks,
+                                 block_indices)
 
     # Let's stop all the programs at the same time
     # Needed when scenarios are in series.

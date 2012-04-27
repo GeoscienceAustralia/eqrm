@@ -53,9 +53,13 @@ def save_hazard(soil_amp,eqrm_flags,
     In these files columns are the period, rows are the location and the
     data is SA, in g.
     
+    Returns list of tuple (base_name, header_size=3)
     """
     assert isfinite(hazard).all()
 
+    # Used for parallel processing
+    header_size = 3
+    
     # interpret 'soil_amp' into filename fragment
     if soil_amp is True:
         hazard_name = 'soil_SA'
@@ -78,7 +82,7 @@ def save_hazard(soil_amp,eqrm_flags,
         rp=str(eqrm_flags.return_periods[i])
         base_name = eqrm_flags.output_dir + get_hazard_file_name(
             eqrm_flags.site_tag, hazard_name, rp, EXTENSION)
-        base_names.append(base_name)
+        base_names.append((base_name, header_size))
         name = base_name + parallel_tag
         f=open(name,'w')
         if write_title:
@@ -310,7 +314,12 @@ def save_sites_to_csv(output_dir, site_tag, sites, compress=False,
     """
     Saves Lat and Long info for all sites to a text file.
     One row per site.
+    
+    Returns list of tuple (base_name, header_size=1)
     """
+    # Used for parallel processing
+    header_size = 1
+    
     if compress:
         open = myGzipFile
     else:
@@ -329,7 +338,7 @@ def save_sites_to_csv(output_dir, site_tag, sites, compress=False,
     loc_file.write(s)
     loc_file.write('\n')
     loc_file.close()
-    return base_name
+    return base_name, header_size
 
 def get_sites_file_name(site_tag):
     """Create the sites file name.
@@ -685,7 +694,12 @@ def save_structures(eqrm_flags,structures,compress=False,
     """
     Save structure information to file.
     This funtion is called in eqrm analysis.
+    
+    Returns list of tuple (base_name, header_size=1)
     """
+    # Used for parallel processing
+    header_size = 1
+    
     if compress: open = myGzipFile
     else: open = file
     if parallel_tag is None:
@@ -763,7 +777,7 @@ def save_structures(eqrm_flags,structures,compress=False,
             loc_file.write('%s\n'%
                            (maybe_nan['HAZUS_USAGE']))
     loc_file.close()
-    return base_name
+    return base_name, header_size
 
 
 def get_structures_file_name(site_tag):
@@ -1056,7 +1070,12 @@ def save_damage(save_dir, site_tag, damage_name, damage, building_ids,
              Axis site, damage state (4 damage states, slight, moderate,
              extensive and complete)
     building_id - a 1D array of building ids                  
+    
+    Returns list of tuple (base_name, header_size=1)
     """
+    # Used for parallel processing
+    header_size = 1
+    
     if compress:
         open = myGzipFile
     else:
@@ -1076,7 +1095,7 @@ def save_damage(save_dir, site_tag, damage_name, damage, building_ids,
         f.write(damage_st)
         f.write("\n")
     f.close()
-    return base_name
+    return base_name, header_size
       
 def save_ecloss(ecloss_name,eqrm_flags,ecloss,structures,compress=False,
                 parallel_tag=None):
@@ -1146,7 +1165,11 @@ def save_val(eqrm_flags, val, file_tag, compress=False, parallel_tag=None):
     contents cost for all sites), assuming val is
     all_sites.cost_breakdown(ci=eqrm_flags.ci)
     
+    Returns list of tuple (base_name, header_size=0)
     """
+    # Used for parallel processing
+    header_size = 0
+    
     if compress:
         open = myGzipFile
     else:
@@ -1166,7 +1189,7 @@ def save_val(eqrm_flags, val, file_tag, compress=False, parallel_tag=None):
         else:
             f.write('%.10g\n'%(value))
     f.close()
-    return base_name
+    return base_name, header_size
 
 def get_val_file_name(site_tag, file_tag='_bval'):
     return site_tag + file_tag + '.txt'
@@ -1242,7 +1265,8 @@ def load_fatalities(fatalities_name, save_dir, site_tag):
     
     return fatalities_loaded, lat, lon
     
-def join_parallel_data_files(base_names, size):
+
+def join_parallel_data_files(base_names, size, block_indices):
     """
     Append a common set of numpy binary files produced by running EQRM in 
     parallel. Concatenates based on axis=3.
@@ -1250,18 +1274,26 @@ def join_parallel_data_files(base_names, size):
     The input is a list of base names.
     """
     for base_name in base_names:
-        sa = None
+        output_data = None
+        input_data_list = []
         for i in range(size):
             name = base_name + FILE_TAG_DELIMITER + str(i) + '.npy'
+            input_data_list.append(load(open(name, mode='rb')))
             if i == 0:
-                sa = load(open(name, mode='rb'))
+                output_data = load(open(name, mode='rb'))
             else:
                 # concat on sites axis
-                sa = concatenate((sa, load(open(name, mode='rb'))), axis=3)
+                output_data = concatenate((output_data, 
+                                           load(open(name, mode='rb'))), axis=3)
             os.remove(name)
-        save(base_name, sa)
+        
+        for i in range(size):
+            output_data[:,:,:,block_indices[i],:] = input_data_list[i]
+        
+        save(base_name, output_data)
+        
 
-def join_parallel_files(base_names, size, compress=False):
+def join_parallel_files(base_names, size, block_indices, compress=False):
     """
     Row append a common set of files produced by running EQRM in parallel.
 
@@ -1269,20 +1301,41 @@ def join_parallel_files(base_names, size, compress=False):
     """
     if compress: my_open = myGzipFile
     else: my_open = open
-    for base_name in base_names:
-        f=my_open(base_name,'w')
+    for base_name, header_size in base_names:
+        # Read in each file and save lines to a list of lines
+        # Create master string list of size all lines
+        # Concatate like so
+        # >>> master_list[block_indices] = file_list[i]
+        output_file_lines = []
+        input_file_lines = []
         for i in range(size):
             name = base_name + FILE_TAG_DELIMITER + str(i)
-            f_block =  my_open(name, 'r')
-            try:
-                for line in f_block:
-                    f.write(line)
-            finally:
-                f_block.close()
+            file_lines = my_open(name, 'r').readlines()
+            input_file_lines.append(file_lines)
+            output_file_lines.extend(file_lines)
             os.remove(name)
         
-    
-def join_parallel_files_column(base_names, size, compress=False,
+        # Turn these into numpy arrays so we can use it's indexing
+        output_file_lines = asarray(output_file_lines)
+        input_file_lines = asarray(input_file_lines)
+        
+        for i in range(size):
+            output_indices = block_indices[i] + header_size
+            input_lines = input_file_lines[i]
+            if i == 0:
+                output_file_lines[0:header_size] = input_lines[0:header_size]
+                output_file_lines[output_indices] = input_lines[header_size:]
+            else:
+                output_file_lines[output_indices] = input_lines
+        
+        output_file = my_open(base_name,'w')
+        output_file.writelines(output_file_lines)
+
+
+def join_parallel_files_column(base_names, 
+                               size, 
+                               block_indices, 
+                               compress=False,
                                delimiter=' '):
     """
     If files are writen where each column represents a structure, combine
@@ -1291,30 +1344,47 @@ def join_parallel_files_column(base_names, size, compress=False,
     """
     if compress: my_open = myGzipFile
     else: my_open = open
-   
     for base_name in base_names:
-        f=my_open(base_name,'w')
+        # Read in each file and save lines to a list of lines that represent
+        # each block
+        # - Comment is first line
+        # - For each subsequent line, split by delimeter
+        # Concatenate each list by the block indices
+        
+        f = my_open(base_name,'w')
         f_blocks = []
         for i in range(size):       
             name = base_name + FILE_TAG_DELIMITER + str(i)
             f_blocks.append(my_open(name, 'r'))
             comment = f_blocks[i].readline() # Comment from last file.
-
+        
         f.write(comment)
+        
+        # Concatenate each block and turn into numpy arrays
+        input_arrays = []
+        output_rows = []
         while True:
             line_blocks = []
             for f_block in f_blocks:
                 section = f_block.readline()
-                line_blocks.append(section[:-1] + delimiter)
-            line_blocks.append('\n')
+                line_blocks.append(scipy.fromstring(section,
+                                                    dtype=scipy.float64,
+                                                    sep=delimiter))
             if section == '':
                 break
-            row = ''.join(line_blocks)
-            f.write(row)
-        f.close()
-
+            input_arrays.append(line_blocks)
+            output_rows.append(scipy.concatenate(line_blocks))
+        
+        # Rearrange each row according to block_indices
+        for i, input_array in enumerate(input_arrays):
+            for n in range(size):
+                output_rows[i][block_indices[n]] = input_array[n]
+            # Now turn this into a string again and write to the file
+            f.write(' '.join([str(row) for row in output_rows[i]]))
+            f.write('\n')  
+        
         # Remove all of the block files for this base name.
-        for i,f_block in enumerate(f_blocks):
+        for i, f_block in enumerate(f_blocks):
             f_block.close()
             os.remove(base_name + FILE_TAG_DELIMITER + str(i))
 
@@ -1450,7 +1520,11 @@ def save_bridge_days_to_complete(eqrm_flags,
     In these files columns are the event, rows are the location and the
     data is days to complete.
     
-    """   
+    Returns list of tuple (base_name, header_size=2)
+    """
+    # Used for parallel processing
+    header_size = 2
+
     base_names = []
     if compress:
         open = myGzipFile
@@ -1462,7 +1536,7 @@ def save_bridge_days_to_complete(eqrm_flags,
        
         base_name = eqrm_flags.output_dir + get_days_to_complete_file_name(
             eqrm_flags.site_tag, func_p, CSV_EXTENSION)
-        base_names.append(base_name)
+        base_names.append((base_name, header_size))
         name = base_name + parallel_tag
         f=open(name,'w')
         if write_title:

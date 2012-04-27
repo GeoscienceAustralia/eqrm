@@ -4,7 +4,7 @@ import unittest
 import tempfile
 import shutil
 from scipy import array, zeros, allclose, asarray, transpose, fromfunction, who
-from scipy import load, random
+from scipy import load, random, arange
 from eqrm_code.output_manager import *
 from eqrm_code.sites import Sites
 from eqrm_code.source_model import Source_Model
@@ -123,8 +123,11 @@ class Test_Output_manager(unittest.TestCase):
                     #hazard[i,j,k] = site*period*int(rtrn[0])
                     hazard[i,j,k] = site*period*rtrn[0]
 
-        save_hazard(soil_amp,eqrm_flags,
-                hazard,sites,compress=False)
+        base_names = save_hazard(soil_amp, 
+                                 eqrm_flags, 
+                                 hazard, 
+                                 sites, 
+                                 compress=False)
 
 
         # check the site files
@@ -133,11 +136,16 @@ class Test_Output_manager(unittest.TestCase):
             haz = get_hazard_file_name(eqrm_flags.site_tag, hazard_name, rp)
             file_name = eqrm_flags.output_dir + haz
             f=open(file_name,'r')
-
             text = f.read().splitlines()
-            # ditch the comment lines
-            text.pop(0)
-            text.pop(0)
+            
+            # the first file is a locations file so use i+1 
+            base_name, header_size = base_names[i+1]
+            
+            # check to see whether we're looking at the same file
+            self.assert_(file_name == base_name)
+
+            # ditch the comments part of the header
+            del text[:header_size-1]
 
             # Check the periods
             # Convert a space separated text line into a numeric float array
@@ -349,16 +357,19 @@ class Test_Output_manager(unittest.TestCase):
         lon = [120]
         sites = Sites(lat,lon)
 
-        save_sites_to_csv(output_dir, site_tag,sites,compress=False)
+        loc_file_name, header_size = save_sites_to_csv(output_dir, 
+                                                       site_tag,
+                                                       sites,
+                                                       compress=False)
 
         # Check the location file output
-        loc_file_name = output_dir + \
-                        site_tag + '_locations.txt'
         loc_file=open(loc_file_name,'r')
 
         text = loc_file.read().splitlines()
-        # ditch the comment line
-        text.pop(0)
+        
+        # ditch the header
+        del text[:header_size]
+        
         for line, lat_value, lon_value in map(None, text, lat, lon):
             self.assertEqual(float(line.split(' ')[0]), float(lat_value))
             self.assertEqual(float(line.split(' ')[1]), float(lon_value))
@@ -663,15 +674,15 @@ class Test_Output_manager(unittest.TestCase):
         damage_name = 'test_load_save_damage_'
         damage = array([[1, 2, 3, 4], [10, 20, 30, 40]])
         building_ids = array([1, 2])
-        name = save_damage(save_dir, site_tag, damage_name, damage,
+        name, header = save_damage(save_dir, site_tag, damage_name, damage,
                            building_ids)
 
         # Check the file output
         file_h=open(name,'r')
 
         text = file_h.read().splitlines()
-        # ditch the comment lines
-        text.pop(0)
+        # ditch the header
+        del text[:header]
         for i, line in enumerate(text):
             id_damage = array([float(ix) for ix in line.split(',')])
             self.assert_ (allclose(id_damage[0],building_ids[i]))
@@ -761,7 +772,9 @@ class Test_Output_manager(unittest.TestCase):
     def test_join_parallel_files(self):
         compress = False
         file_num = 5
+        header_size = 0
         cleanup_file_names = []
+        join_indices = []
 
         handle, base_file_name = tempfile.mkstemp('.txt', __name__ + '_')
         os.close(handle)
@@ -775,8 +788,13 @@ class Test_Output_manager(unittest.TestCase):
             f_handle = my_open(file_name, 'w')
             f_handle.write(str(i)+ '\n')
             f_handle.close()
+            join_indices.append(array([i]))
+        
 
-        join_parallel_files([base_file_name], file_num, compress=False)
+        join_parallel_files([(base_file_name, header_size)], 
+                            file_num, 
+                            join_indices, 
+                            compress=False)
 
         f_check =  my_open(base_file_name, 'r')
         for i,line in enumerate(f_check):
@@ -789,6 +807,8 @@ class Test_Output_manager(unittest.TestCase):
         compress = False
         file_num = 6
         cleanup_file_names = []
+        join_indices = []
+        num_site_block = 2
 
         handle, base_file_name = tempfile.mkstemp('.txt', __name__ + '_')
         os.close(handle)
@@ -804,8 +824,13 @@ class Test_Output_manager(unittest.TestCase):
             f_handle.write(str(i)+ ' ' + str(i+1) + '\n')
             f_handle.write(str(i*10)+ ' ' + str((i+1)*10) + '\n')
             f_handle.close()
+            join_indices.append(arange(i*num_site_block,
+                                       i*num_site_block+num_site_block))
 
-        join_parallel_files_column([base_file_name], file_num, compress=False)
+        join_parallel_files_column([base_file_name], 
+                                   file_num, 
+                                   join_indices, 
+                                   compress=False)
 
         f_check =  my_open(base_file_name, 'r')
         for i,line in enumerate(f_check):
@@ -834,6 +859,7 @@ class Test_Output_manager(unittest.TestCase):
         
         file_num = 6
         random_arrays = []
+        join_indices = []
         
         handle, base_file_name = tempfile.mkstemp('.npy')
         os.close(handle)
@@ -849,11 +875,13 @@ class Test_Output_manager(unittest.TestCase):
                                           num_events,
                                           num_atten_periods))
             random_arrays.append(random_array)
+            join_indices.append(arange(i*num_site_block,
+                                       i*num_site_block+num_site_block))
             
             save(file_name, random_array)
         
         # Join these (this will also remove the individual files)
-        join_parallel_data_files([base_file_name], file_num)
+        join_parallel_data_files([base_file_name], file_num, join_indices)
         
         # Now load this file
         joined_data = load(open(base_file_name, mode='rb'))
@@ -898,16 +926,20 @@ class Test_Output_manager(unittest.TestCase):
             buildings_usage_classification='HAZUS' # HAZUS usage
             )
         parallel_tag = 'test_output_manager'
-        base_file = save_structures(eqrm_flags, sites, compress=False,
-                parallel_tag=parallel_tag, write_title=True)
+        base_file, header_size = save_structures(eqrm_flags, 
+                                                 sites, 
+                                                 compress=False,
+                                                 parallel_tag=parallel_tag, 
+                                                 write_title=True)
         name = base_file + parallel_tag
 
         # Check the file output
         file_h=open(name, 'r')
 
         text = file_h.read().splitlines()
-        # ditch the comment line
-        text.pop(0)
+        
+        # ditch the header
+        del text[:header_size]
 
         for i, line in enumerate(text):
             values = array([ix for ix in line.split(' ')])
@@ -1055,7 +1087,6 @@ class Test_Output_manager(unittest.TestCase):
         eqrm_flags.site_tag = 'site_tag'
         file_tag = 'ham'
         val_actual = array([3.4, 3.5, 3.6])
-        base_name = save_val(eqrm_flags, val_actual, file_tag)
         val = load_val(eqrm_flags.output_dir, eqrm_flags.site_tag,
                        file_tag=file_tag)
         self.assert_ (allclose(val_actual, val))
@@ -1090,8 +1121,10 @@ class Test_Output_manager(unittest.TestCase):
             attribute_dic,
             buildings_usage_classification='HAZUS' # HAZUS usage
             )
-        base_file = save_structures(eqrm_flags, sites, compress=False,
-                                    write_title=True)
+        base_file, _ = save_structures(eqrm_flags, 
+                                       sites, 
+                                       compress=False,
+                                       write_title=True)
         att_dic = load_structures(eqrm_flags.output_dir, eqrm_flags.site_tag)
         #att_dic['SITE_CLASS'] = ['A','B','c']
         #att_dic['LATITUDE'] = [-32.9,-32.7,-32.7]
@@ -1144,7 +1177,7 @@ class Test_Output_manager(unittest.TestCase):
 
         val_actual = array([3.4, 3.5, 3.6])
         file_tag = '_bval'
-        val_file = save_val(eqrm_flags, val_actual, file_tag)
+        val_file, val_header = save_val(eqrm_flags, val_actual, file_tag)
         results = load_ecloss_and_sites(eqrm_flags.output_dir,
                                         eqrm_flags.site_tag)
         total_building_loss, total_building_value, lon, lat = results
@@ -1250,8 +1283,9 @@ class Test_Output_manager(unittest.TestCase):
         lat_actual = array([-32., -31.])
         lon_actual = array([120., 121.])
         sites = Sites(lat_actual,lon_actual)
-        base_name = save_sites_to_csv(eqrm_flags.output_dir, eqrm_flags.site_tag,
-                   sites)
+        base_name, _ = save_sites_to_csv(eqrm_flags.output_dir, 
+                                         eqrm_flags.site_tag,
+                                         sites)
         
         base_names = save_motion_to_csv(soil_amp, eqrm_flags, motion)
         tmp = load_collapsed_motion_sites_from_csv(eqrm_flags.output_dir,
@@ -1289,7 +1323,7 @@ class Test_Output_manager(unittest.TestCase):
         lat_actual = array([-32., -31., -32., -31.])
         lon_actual = array([120., 121., 3., 4.])
         sites = Sites(lat_actual,lon_actual)
-        base_name = save_sites_to_csv(eqrm_flags.output_dir, 
+        base_name, _ = save_sites_to_csv(eqrm_flags.output_dir, 
                                       eqrm_flags.site_tag,
                                       sites)
         
@@ -1335,7 +1369,7 @@ class Test_Output_manager(unittest.TestCase):
         lat_actual = array([-32., -31., -32., -31.])
         lon_actual = array([120., 121., 3., 4.])
         sites = Sites(lat_actual,lon_actual)
-        base_name = save_sites_to_csv(eqrm_flags.output_dir, 
+        base_name, _ = save_sites_to_csv(eqrm_flags.output_dir, 
                                       eqrm_flags.site_tag,
                                       sites)
         base_names = save_motion_to_csv(soil_amp, eqrm_flags, motion)
@@ -1427,24 +1461,28 @@ class Test_Output_manager(unittest.TestCase):
                                                   compress=False)
                                                   
         # check the site files
-        for bfp in eqrm_flags.bridges_functional_percentages:
-           file_name = get_days_to_complete_file_name(eqrm_flags.site_tag, 
-                                                      bfp)
-           file_name = os.path.join(eqrm_flags.output_dir, file_name)
-           f = open(file_name, 'r')
-           text = f.read().splitlines()
-            # ditch the comment lines
-           text.pop(0)
-           text.pop(0)
-           
-           for j, site in enumerate(sites):
-               split = text[j].split(', ')
-               for k, event in enumerate(events):
-                    #hazard[i,j,k] = site*period*int(rtrn[0])
-                   self.assert_ (allclose(array(float(split[k])),
-                                          array(float(event + site * bfp))))
-                   f.close()
-           os.remove(file_name)
+        for i, bfp in enumerate(eqrm_flags.bridges_functional_percentages):
+            file_name = get_days_to_complete_file_name(eqrm_flags.site_tag, 
+                                                       bfp)
+            file_name = os.path.join(eqrm_flags.output_dir, file_name)
+            f = open(file_name, 'r')
+            text = f.read().splitlines()
+            
+            base_name, header_size = base_names[i]
+            
+            # check to see whether we're looking at the same file
+            self.assert_(file_name == base_name)
+            
+            # ditch the header
+            del text[:header_size]
+            
+            for j, site in enumerate(sites):
+                split = text[j].split(', ')
+                for k, event in enumerate(events):
+                    self.assert_ (allclose(array(float(split[k])),
+                                           array(float(event + site * bfp))))
+                    f.close()
+            os.remove(file_name)
         os.rmdir(eqrm_flags.output_dir)
         
 ################################################################################
