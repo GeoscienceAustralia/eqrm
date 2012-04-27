@@ -14,6 +14,7 @@
 import math
 from eqrm_code.output_manager import FILE_TAG_DELIMITER
 import socket
+from numpy import arange
 
 
 class Parallel(object):
@@ -58,7 +59,36 @@ class Parallel(object):
             
         # Some constants to identify messages
         self.load_event_set = 0
-
+    
+    def all_striped_indices(self, elements):
+        """
+        Return the indices for all nodes given the number of elements,
+        using the striping pattern
+        """
+        all_elements = arange(elements)
+        indices = []
+        for node in range(self.size):
+            indices.append(all_elements[node::self.size])
+        return indices
+        
+    def calc_all_indices(self, elements):
+        """
+        A wrapper for the blocking algorithm used.
+        """
+        return self.all_striped_indices(elements)
+        
+    def striped_indices(self, elements):
+        """
+        Return the indices for the current node given the number of elements,
+        using the striping pattern
+        """
+        return arange(elements)[self.rank::self.size]
+    
+    def calc_indices(self, elements):
+        """
+        A wrapper for the blocking algorithm used.
+        """
+        return self.striped_indices(elements)        
             
     def calc_lo_hi(self, elements):
         """
