@@ -69,7 +69,7 @@ class Test_catalogue_reader(unittest.TestCase):
         ##################################################################
         # Test recurrence calulation
         #a, b, b_mle, annual_num_eq = calc_recurrence(event_set, min_mag=5.5, interval=0.5)
-        a, b, b_mle, annual_num_eq = calc_recurrence(event_set, interval=1.0)
+        a, b, b_mle, annual_num_eq = calc_recurrence(event_set, interval=1.0, verbose = False)
 
         msg = a_least_squares_test, a
         assert numpy.allclose(a_least_squares_test, a, rtol=1e-15), msg
