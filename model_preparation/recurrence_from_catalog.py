@@ -113,7 +113,7 @@ def completeness(magnitudes, mag_intervals, interval_multipliers):
                         break
 
 
-def build_histograms(magnitudes, min_mag, max_catalogue, num_years, max_mag_ls = None, interval = 0.1):
+def build_histograms(magnitudes, min_mag, max_catalogue, num_years, max_mag_ls = None, interval = 0.1, verbose = True):
     """ Build histograms for least-squares analysis and plotting
     """
     # Maximum magnitude for least square fit
@@ -123,7 +123,9 @@ def build_histograms(magnitudes, min_mag, max_catalogue, num_years, max_mag_ls =
         max_mag_bin = max(max_catalogue - 1.0, min(magnitudes) + 1.0) + interval
     else:
         max_mag_bin = max_mag_ls + interval
-    print 'Maximum magnitude used in least squares analysis ', max_mag_bin
+
+    if verbose:
+        print 'Maximum magnitude used in least squares analysis ', max_mag_bin
 
     # Magnitude bins - we will re-arrange bins later
     bins = np.arange(min_mag, max_mag_bin, interval)
@@ -193,7 +195,7 @@ def build_histograms(magnitudes, min_mag, max_catalogue, num_years, max_mag_ls =
     return bins, log_cum_sum, bins_plot, new_cum_annual_rate_plot, annual_rate_mean_eq
     
 def calc_recurrence(event_set, min_mag = None, max_mag = None, max_mag_ls = None,
-                    interval = 0.1, figurepath = None, subset = 'all'):
+                    interval = 0.1, figurepath = None, subset = 'all', verbose = True):
 
     """This function reads an earthquake catalogue file and calculates the
     Gutenberg-Richter recurrence parameters using both least squares and
@@ -251,32 +253,37 @@ def calc_recurrence(event_set, min_mag = None, max_mag = None, max_mag_ls = None
         max_mag = max(magnitudes) + 0.1
 
     num_eq = len(magnitudes)
-    print 'Minimum magnitude:', min_mag
-    print 'Total number of earthquakes:', num_eq
     num_years = max(years).year-min(years).year
-    print 'years', num_years
     annual_num_eq = float(num_eq)/num_years
-    print 'Annual number of earthquakes greater than Mw', min_mag,':', \
-    annual_num_eq
     max_catalogue = max(magnitudes)
-    print 'Maximum catalog magnitude:', max_catalogue
-    print 'Mmax = ', max_mag 
+
+    if verbose:    
+        print 'Minimum magnitude:', min_mag
+        print 'Total number of earthquakes:', num_eq
+        print 'years', num_years    
+        print 'Annual number of earthquakes greater than Mw', min_mag,':', \
+        annual_num_eq    
+        print 'Maximum catalog magnitude:', max_catalogue
+        print 'Mmax = ', max_mag 
     
     bins, log_cum_sum, bins_plot, new_cum_annual_rate_plot, annual_rate_mean_eq = \
                                         build_histograms(magnitudes, min_mag,
                                                          max_catalogue, num_years,
                                                          max_mag_ls = max_mag_ls,
-                                                         interval = interval)
+                                                         interval = interval,
+                                                         verbose = verbose)
 
 
     
     ###########################################################################
     # Fit a and b parameters using a varity of methods
     ###########################################################################
-    a, b, alpha, beta = least_squares(bins, log_cum_sum)  
-    print 'Least Squares: b value', -1. * b, 'a value', a
+    a, b, alpha, beta = least_squares(bins, log_cum_sum)
+    if verbose:
+        print 'Least Squares: b value', -1. * b, 'a value', a
     b_mle, beta_mle = maximum_likelihood(magnitudes, min_mag)
-    print 'Maximum Likelihood: b value', b_mle
+    if verbose:
+        print 'Maximum Likelihood: b value', b_mle
     
     ###########################################################################
     # Generate data to plot results
