@@ -364,6 +364,7 @@ def main(parameter_handle,
         rel_i = i #- parallel.lo
 
         sites = all_sites[i:i+1] # take site i
+        distances = sites.distances_from_event_set(event_set)
 
         # note if you take sites[i], it will collapse the dimension
 
@@ -386,8 +387,8 @@ def main(parameter_handle,
         # meets the attenuation threshold criteria
         # TODO: Can we move this outside the site loop and save to file/
         # load from file?
-        source_model_subset = source_model_threshold_distance_subset(sites,
-                                      event_set,
+        source_model_subset = source_model_threshold_distance_subset(
+                                      distances,
                                       source_model,
                                       eqrm_flags.atten_threshold_distance)
         
@@ -395,6 +396,7 @@ def main(parameter_handle,
             eqrm_flags,
             sites,
             event_set,
+            distances,
             data.bedrock_SA_all,
             data.soil_SA_all,
             data.bedrock_hazard,
@@ -507,6 +509,7 @@ def main(parameter_handle,
             
         # Delete some objects before next loop to avoid memory spikes
         del sites
+        del distances
         del source_model_subset
         del soil_SA
         del bedrock_SA
@@ -772,6 +775,7 @@ def main(parameter_handle,
 def calc_and_save_SA(eqrm_flags,
                      sites,
                      event_set,
+                     distances,
                      bedrock_SA_all,
                      soil_SA_all,
                      bedrock_hazard,
@@ -830,12 +834,14 @@ def calc_and_save_SA(eqrm_flags,
         if len(event_inds) == 0:
             continue
         sub_event_set = event_set[event_inds]
+        distance_subset = distances[event_inds]
         atten_model_weights = source.atten_model_weights
         ground_motion_calc = source.ground_motion_calculator
         
         log_mean_extend_GM, log_sigma_extend_GM  = ground_motion_calc.distribution(
             event_set=sub_event_set,
             sites=sites,
+            distances=distance_subset,
             Vs30=BEDROCKVs30)
         
         # *_extend_GM has shape of (GM_model, sites, events, periods)
@@ -861,6 +867,7 @@ def calc_and_save_SA(eqrm_flags,
                                   amp_distribution, ground_motion_calc,
                                   sub_event_set,
                                   sites,
+                                  distance_subset,
                                   ground_motion_distribution)
             # Amplification factor cutoffs
             # Applies a minimum and maxium acceptable amplification factor
