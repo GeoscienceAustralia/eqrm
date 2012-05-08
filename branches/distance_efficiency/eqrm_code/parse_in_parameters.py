@@ -956,7 +956,7 @@ def eqrm_flags_to_control_file(py_file_name, eqrm_flags):
             if line[0] in ['input_dir',
                            'output_dir',
                            'data_array_storage']:
-                if not 'join' in val:
+                if not 'join' in val and not 'getenv' in val:
                     val = convert_path_string_to_join(val)
             line.append(val)
             paras2print.append(line)
@@ -1000,6 +1000,7 @@ class WriteEqrmControlFile(object):
             '\n'
             '"""\n'
             '\n'
+            'from os import getenv\n'
             'from os.path import join\n')
         if log_imported: # as a proxy for the PYTHONPATH being set up.
             self.handle.write('from eqrm_code.parse_in_parameters import '
@@ -1047,7 +1048,7 @@ def add_value(val):
       A string value, which will be written to represent the passed in value.
     """
     if isinstance(val, str):
-        if 'join' in val:
+        if 'join' in val or 'getenv' in val:
             # This is hacky.  Is is assuming the string join means
             # the join command is being used.
             val_str = val

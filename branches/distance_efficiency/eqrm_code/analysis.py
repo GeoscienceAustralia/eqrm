@@ -504,6 +504,13 @@ def main(parameter_handle,
                    and have_bridge_data:
                 saved_days_to_complete[rel_i,:,:] = days_to_complete
 
+            
+        # Delete some objects before next loop to avoid memory spikes
+        del sites
+        del source_model_subset
+        del soil_SA
+        del bedrock_SA
+
             #print 'ENDING building damage calculations'
         # ENDED BUILDING DAMAGE
     # --------------------------------------------------------------
@@ -975,6 +982,9 @@ def calc_and_save_SA(eqrm_flags,
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
                                       1.0/array(eqrm_flags.return_periods))
+
+    log.debug('Memory: calc_and_save_SA before return')
+    log.resource_usage()
                 
     return soil_SA_overloaded, rock_SA_overloaded
     
