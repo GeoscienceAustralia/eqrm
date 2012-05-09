@@ -29,29 +29,13 @@ def get_bridges_from_dic(attributes=None):
     Returns (bridge_obj, attributes)
     """
 
-    attributes = {'BID': int,
-                  'LATITUDE': float,
-                  'LONGITUDE': float,
-                  'STRUCTURE_CLASSIFICATION': str,
-                  'STRUCTURE_CATEGORY': str,
-                  'SKEW': float,
-                  'SPAN': int,
-                  'SITE_CLASS': str}
-
     # get a temporary file
     (handle, filename) = tempfile.mkstemp('.csv','get_bridges_from_dic_')
     os.close(handle)
 
     (filename, _) = write_test_bridges_file(filename)
 
-    # create links to required building parameters
-    eqrm_dir = determine_eqrm_path()
-    data_dir = os.path.join(eqrm_dir, efs.Resources_Data_Path)
-    default_input_dir=os.path.join(eqrm_dir, efs.Resources_Data_Path)
-
-    #bridges = Bridges.from_csv(filename, default_input_dir,
-    #                           eqrm_dir=eqrm_dir, **attributes)
-    bridges = Bridges.from_csv(filename, **attributes)
+    bridges = Bridges.from_csv(filename)
 
     # clean up
     os.remove(filename)

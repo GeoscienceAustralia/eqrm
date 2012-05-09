@@ -61,18 +61,6 @@ from eqrm_code.filters import source_model_threshold_distance_subset
 from eqrm_code.analysis_data import Analysis_Data
 
 
-
-# data columns expected in a BRIDGE data file
-BridgeDataColumns = {'BID': int,
-                     'LONGITUDE': float,
-                     'LATITUDE': float,
-                     'STRUCTURE_CLASSIFICATION': str,
-                     'STRUCTURE_CATEGORY': str,
-                     'SKEW': float,
-                     'SPAN': int,
-                     'SITE_CLASS': str}
-
-
 def main(parameter_handle,
          use_determ_seed=True,
          compress_output=False,
@@ -1090,7 +1078,7 @@ def load_data(eqrm_flags):
 
         if bridge_file:
             bridge_data = True
-            bridges = Bridges.from_csv(bridge_file, **BridgeDataColumns)
+            bridges = Bridges.from_csv(bridge_file)
 
             if sites:
                 new_sites = sites.join(bridges)
