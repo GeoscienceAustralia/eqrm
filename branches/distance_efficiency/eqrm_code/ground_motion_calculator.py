@@ -247,7 +247,7 @@ class Multiple_ground_motion_calculator(object):
             self.GM_models.append(Ground_motion_calculator(GM_model_name,
                                                            periods))
 
-    def distribution(self, sites, event_set, distances, event_activity=None,
+    def distribution(self, sites, event_set, pre_calc_distances, event_activity=None,
                      Vs30=None, GM_models=None):
         """
         Calculate the ground motion shaking at a site, given an array of
@@ -262,14 +262,13 @@ class Multiple_ground_motion_calculator(object):
         returns:
           *_extend_GM has shape of (GM_model, sites, events, periods)
         """
-
-        # get distances, etc
+        
         magnitudes = {'Mw': event_set.Mw, 'ML': event_set.ML}
         if Vs30 is None:
             Vs30 = sites.attributes.get('Vs30', None)
 
         log_mean_extend_GM, log_sigma_extend_GM = self._distribution_function(
-            distances, magnitudes,
+            pre_calc_distances, magnitudes,
             depth=event_set.depth,
             depth_to_top=event_set.depth_to_top,
             fault_type=event_set.fault_type,

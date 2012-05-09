@@ -104,8 +104,8 @@ class Test_Filters(unittest.TestCase):
         #print "event_set", self.event_set
         #print "len(event_set)=", len(self.event_set)
         
-        # Set up test distance object
-        self.distances = self.sites.distances_from_event_set(self.event_set)
+        self.distances = self.sites.distances_from_event_set(self.event_set). \
+                                                        distance('Epicentral')
         
         # Set up test source_model object
         self.source_model = create_source_model()
