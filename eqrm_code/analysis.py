@@ -235,7 +235,6 @@ def main(parameter_handle,
     # This is where info should be given to all the subprocesses.
     # But what info is there?
     # Also, let's do some timings.
-    time_taken_pre_site_loop = (time.clock()-t0)
 
     # parallelising over the site loop.
     parallel.calc_lo_hi(num_sites)
@@ -259,6 +258,13 @@ def main(parameter_handle,
     # not often depends on what is being saved.
     
     data = Analysis_Data()
+    distances = all_sites.distances_from_event_set(event_set)
+    # Cache distances up front
+    distances.calc_distance('Joyner_Boore')
+    distances.calc_distance('Rupture')
+    distances.calc_distance('Epicentral')
+    distances.calc_distance('Hypocentral')
+    distances.calc_distance('Horizontal')
 
     if eqrm_flags.save_hazard_map is True:
         data.bedrock_hazard = zeros((num_site_block, len(eqrm_flags.atten_periods),
@@ -354,6 +360,8 @@ def main(parameter_handle,
             raise RuntimeError(msg)   
          
     
+    time_taken_pre_site_loop = (time.clock()-t0)
+    
     for i in xrange(num_site_block):
         msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + \
             str(num_site_block)
@@ -364,7 +372,7 @@ def main(parameter_handle,
         rel_i = i #- parallel.lo
 
         sites = all_sites[i:i+1] # take site i
-        distances = sites.distances_from_event_set(event_set)
+        site_distances = distances[i:i+1]
 
         # note if you take sites[i], it will collapse the dimension
 
@@ -388,7 +396,7 @@ def main(parameter_handle,
         # TODO: Can we move this outside the site loop and save to file/
         # load from file?
         source_model_subset = source_model_threshold_distance_subset(
-                                      distances,
+                                      site_distances.Joyner_Boore,
                                       source_model,
                                       eqrm_flags.atten_threshold_distance)
         
@@ -396,7 +404,7 @@ def main(parameter_handle,
             eqrm_flags,
             sites,
             event_set,
-            distances,
+            site_distances,
             data.bedrock_SA_all,
             data.soil_SA_all,
             data.bedrock_hazard,
@@ -505,14 +513,6 @@ def main(parameter_handle,
             if eqrm_flags.bridges_functional_percentages is not None \
                    and have_bridge_data:
                 saved_days_to_complete[rel_i,:,:] = days_to_complete
-
-            
-        # Delete some objects before next loop to avoid memory spikes
-        del sites
-        del distances
-        del source_model_subset
-        del soil_SA
-        del bedrock_SA
 
             #print 'ENDING building damage calculations'
         # ENDED BUILDING DAMAGE
@@ -834,14 +834,18 @@ def calc_and_save_SA(eqrm_flags,
         if len(event_inds) == 0:
             continue
         sub_event_set = event_set[event_inds]
-        distance_subset = distances[event_inds]
         atten_model_weights = source.atten_model_weights
         ground_motion_calc = source.ground_motion_calculator
+        
+        # We need the subset of distances too.
+        sub_distances = distances[(arange(num_sites),event_inds)]
+        if sub_distances.Rupture.shape != (num_sites,len(sub_event_set)):
+            sub_distances = sub_distances[newaxis,:]
         
         log_mean_extend_GM, log_sigma_extend_GM  = ground_motion_calc.distribution(
             event_set=sub_event_set,
             sites=sites,
-            distances=distance_subset,
+            pre_calc_distances=sub_distances,
             Vs30=BEDROCKVs30)
         
         # *_extend_GM has shape of (GM_model, sites, events, periods)
@@ -867,7 +871,7 @@ def calc_and_save_SA(eqrm_flags,
                                   amp_distribution, ground_motion_calc,
                                   sub_event_set,
                                   sites,
-                                  distance_subset,
+                                  sub_distances,
                                   ground_motion_distribution)
             # Amplification factor cutoffs
             # Applies a minimum and maxium acceptable amplification factor
@@ -882,7 +886,7 @@ def calc_and_save_SA(eqrm_flags,
             assert isfinite(soil_SA).all()
             cutoff_pga(soil_SA,
                        eqrm_flags.atten_pga_scaling_cutoff)
-        else: 	# No soil amplification
+        else:     # No soil amplification
             soil_SA = None
         cutoff_pga(bedrock_SA,
                    eqrm_flags.atten_pga_scaling_cutoff)
@@ -989,9 +993,6 @@ def calc_and_save_SA(eqrm_flags,
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
                                       1.0/array(eqrm_flags.return_periods))
-
-    log.debug('Memory: calc_and_save_SA before return')
-    log.resource_usage()
                 
     return soil_SA_overloaded, rock_SA_overloaded
     
@@ -1129,7 +1130,7 @@ def load_data(eqrm_flags):
         # FIXME this is a bit of a hack.  re Vs30 and VS30.
         sites.attributes['Vs30'] = sites.attributes['VS30']
     elif eqrm_flags.run_type == "fatality":
-		#raise RuntimeError('run_type "hazard" not yet modified for Bridges')
+        #raise RuntimeError('run_type "hazard" not yet modified for Bridges')
 
         # we are running fatality calculation
         name = eqrm_flags.site_tag + '_popexp.csv'

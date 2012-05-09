@@ -60,11 +60,9 @@ def source_model_threshold_distance_subset(distances,
     # A rethink of apply_threshold distance
     # Calculate the distances of the event_set from the sites array and
     # return an event_set where distance <= atten_threshold_distance
-    Rjb = distances.distance('Joyner_Boore')
-                
     # distances is an ndarray where [sites, events]. We only want the events 
     # dimension for this function as we're trimming events
-    (sites_to_keep, events_to_keep) = where(Rjb <= atten_threshold_distance)
+    (sites_to_keep, events_to_keep) = where(distances <= atten_threshold_distance)
 
     source_model_subset = copy.deepcopy(source_model)
     # Re-sync the event indices in the source model. As we don't want to add
