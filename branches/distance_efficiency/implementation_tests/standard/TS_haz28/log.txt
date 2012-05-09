@@ -1,0 +1,122 @@
+2010-10-24 20:35:39,046 Level 29                  analysis:154 |Logfile is '.\implementation_tests\current\TS_haz28/log.txt' with logging level of DEBUG, console logging level is WARNING
+2010-10-24 20:35:39,046 DEBUG                     analysis:155 |host name: duncan-d28
+2010-10-24 20:35:39,421 DEBUG                     analysis:157 |SVN version: 401
+2010-10-24 20:35:39,421 DEBUG                     analysis:158 |SVN date: 2010/10/23 22:37:11
+2010-10-24 20:35:39,421 DEBUG                     analysis:159 |SVN modified: Modified
+2010-10-24 20:35:39,421 DEBUG                     analysis:160 |Memory: Initial
+2010-10-24 20:35:39,421 DEBUG                     analysis:161 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,453 DEBUG                     analysis:228 |Memory: source_model_zone created
+2010-10-24 20:35:39,453 DEBUG                     analysis:229 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,453 INFO                     event_set:380 |generating events
+2010-10-24 20:35:39,467 DEBUG                    event_set:431 |Memory: populate_depth_top_seismogenic created
+2010-10-24 20:35:39,467 DEBUG                    event_set:432 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,467 DEBUG                    event_set:434 |Memory: populate_azimuth created
+2010-10-24 20:35:39,467 DEBUG                    event_set:435 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,467 DEBUG                    event_set:438 |Memory: populate_dip created
+2010-10-24 20:35:39,467 DEBUG                    event_set:439 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,467 DEBUG                    event_set:441 |Memory: populate_magnitude created
+2010-10-24 20:35:39,467 DEBUG                    event_set:442 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,467 DEBUG                    event_set:449 |Memory: lat,lon created
+2010-10-24 20:35:39,467 DEBUG                    event_set:450 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,467 DEBUG                    event_set:463 |Memory: event set lists have been combined
+2010-10-24 20:35:39,467 DEBUG                    event_set:464 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,467 DEBUG                    event_set:431 |Memory: populate_depth_top_seismogenic created
+2010-10-24 20:35:39,467 DEBUG                    event_set:432 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,467 DEBUG                    event_set:434 |Memory: populate_azimuth created
+2010-10-24 20:35:39,467 DEBUG                    event_set:435 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:438 |Memory: populate_dip created
+2010-10-24 20:35:39,483 DEBUG                    event_set:439 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:441 |Memory: populate_magnitude created
+2010-10-24 20:35:39,483 DEBUG                    event_set:442 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:449 |Memory: lat,lon created
+2010-10-24 20:35:39,483 DEBUG                    event_set:450 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:463 |Memory: event set lists have been combined
+2010-10-24 20:35:39,483 DEBUG                    event_set:464 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:431 |Memory: populate_depth_top_seismogenic created
+2010-10-24 20:35:39,483 DEBUG                    event_set:432 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:434 |Memory: populate_azimuth created
+2010-10-24 20:35:39,483 DEBUG                    event_set:435 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:438 |Memory: populate_dip created
+2010-10-24 20:35:39,483 DEBUG                    event_set:439 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:441 |Memory: populate_magnitude created
+2010-10-24 20:35:39,483 DEBUG                    event_set:442 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:449 |Memory: lat,lon created
+2010-10-24 20:35:39,483 DEBUG                    event_set:450 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,483 DEBUG                    event_set:463 |Memory: event set lists have been combined
+2010-10-24 20:35:39,483 DEBUG                    event_set:464 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:431 |Memory: populate_depth_top_seismogenic created
+2010-10-24 20:35:39,500 DEBUG                    event_set:432 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:434 |Memory: populate_azimuth created
+2010-10-24 20:35:39,500 DEBUG                    event_set:435 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:438 |Memory: populate_dip created
+2010-10-24 20:35:39,500 DEBUG                    event_set:439 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:441 |Memory: populate_magnitude created
+2010-10-24 20:35:39,500 DEBUG                    event_set:442 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:449 |Memory: lat,lon created
+2010-10-24 20:35:39,500 DEBUG                    event_set:450 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:463 |Memory: event set lists have been combined
+2010-10-24 20:35:39,500 DEBUG                    event_set:464 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:431 |Memory: populate_depth_top_seismogenic created
+2010-10-24 20:35:39,500 DEBUG                    event_set:432 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:434 |Memory: populate_azimuth created
+2010-10-24 20:35:39,500 DEBUG                    event_set:435 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:438 |Memory: populate_dip created
+2010-10-24 20:35:39,500 DEBUG                    event_set:439 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:441 |Memory: populate_magnitude created
+2010-10-24 20:35:39,500 DEBUG                    event_set:442 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,500 DEBUG                    event_set:449 |Memory: lat,lon created
+2010-10-24 20:35:39,500 DEBUG                    event_set:450 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,515 DEBUG                    event_set:463 |Memory: event set lists have been combined
+2010-10-24 20:35:39,515 DEBUG                    event_set:464 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,515 DEBUG                    event_set:431 |Memory: populate_depth_top_seismogenic created
+2010-10-24 20:35:39,515 DEBUG                    event_set:432 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,515 DEBUG                    event_set:434 |Memory: populate_azimuth created
+2010-10-24 20:35:39,515 DEBUG                    event_set:435 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,515 DEBUG                    event_set:438 |Memory: populate_dip created
+2010-10-24 20:35:39,515 DEBUG                    event_set:439 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,515 DEBUG                    event_set:441 |Memory: populate_magnitude created
+2010-10-24 20:35:39,515 DEBUG                    event_set:442 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,515 DEBUG                    event_set:449 |Memory: lat,lon created
+2010-10-24 20:35:39,515 DEBUG                    event_set:450 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,515 DEBUG                    event_set:463 |Memory: event set lists have been combined
+2010-10-24 20:35:39,515 DEBUG                    event_set:464 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,515 DEBUG                    event_set:492 |Memory: finished generating events
+2010-10-24 20:35:39,515 DEBUG                    event_set:493 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,515 DEBUG                     analysis:246 |Memory: event_set_zone created
+2010-10-24 20:35:39,515 DEBUG                     analysis:247 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,530 DEBUG                     analysis:258 |No fault source XML file found
+2010-10-24 20:35:39,530 DEBUG         recurrence_functions:36  |Memory: event_activity_matrix weight_matrix created
+2010-10-24 20:35:39,530 DEBUG         recurrence_functions:37  |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,530 DEBUG         recurrence_functions:118 |Memory: Out of the event_activity loop
+2010-10-24 20:35:39,530 DEBUG         recurrence_functions:119 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,530 DEBUG                     analysis:296 |Memory: event activity has been calculated
+2010-10-24 20:35:39,530 DEBUG                     analysis:297 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:39,530 INFO                      analysis:305 |Event set created. Number of events=6
+2010-10-24 20:35:39,530 DEBUG                     analysis:306 |Memory: Event Set created
+2010-10-24 20:35:39,530 DEBUG                     analysis:307 |Resource usage: total memory=1022.0MB free memory=416.0MB
+2010-10-24 20:35:40,046 INFO                      analysis:320 |Sites set created. Number of sites=4
+2010-10-24 20:35:40,046 DEBUG                     analysis:321 |Memory: Sites created
+2010-10-24 20:35:40,046 DEBUG                     analysis:322 |Resource usage: total memory=1022.0MB free memory=417.0MB
+2010-10-24 20:35:40,046 DEBUG                     analysis:336 |Pseudo event set created. Number of pseudo_events=6
+2010-10-24 20:35:40,046 DEBUG                     analysis:337 |Memory: Pseudo Event Set created
+2010-10-24 20:35:40,046 DEBUG                     analysis:338 |Resource usage: total memory=1022.0MB free memory=417.0MB
+2010-10-24 20:35:40,062 DEBUG                     analysis:386 |blocking over sites if running in parallel. block_size=4
+2010-10-24 20:35:40,062 DEBUG                     analysis:389 |Number of atten_periods=3
+2010-10-24 20:35:40,062 DEBUG                     analysis:395 |Number of SA_surfaces=1
+2010-10-24 20:35:40,062 DEBUG                     analysis:415 |Memory: hazard_map array created
+2010-10-24 20:35:40,062 DEBUG                     analysis:416 |Resource usage: total memory=1022.0MB free memory=419.0MB
+2010-10-24 20:35:40,062 DEBUG                     analysis:434 |Memory: save_motion array created
+2010-10-24 20:35:40,078 DEBUG                     analysis:435 |Resource usage: total memory=1022.0MB free memory=419.0MB
+2010-10-24 20:35:40,078 DEBUG                     analysis:465 |Memory: Created all data collection arrays.
+2010-10-24 20:35:40,078 DEBUG                     analysis:466 |Resource usage: total memory=1022.0MB free memory=419.0MB
+2010-10-24 20:35:40,078 INFO                      analysis:482 |do site 1 of 4
+2010-10-24 20:35:40,078 INFO                      analysis:482 |do site 2 of 4
+2010-10-24 20:35:40,092 INFO                      analysis:482 |do site 3 of 4
+2010-10-24 20:35:40,108 INFO                      analysis:482 |do site 4 of 4
+2010-10-24 20:35:40,125 DEBUG                     analysis:583 |Memory: Ended looping over sites
+2010-10-24 20:35:40,125 DEBUG                     analysis:584 |Resource usage: total memory=1022.0MB free memory=420.0MB
+2010-10-24 20:35:40,125 INFO                      analysis:594 |time_pre_site_loop_fraction 0.947082896555
+2010-10-24 20:35:40,125 INFO                      analysis:597 |loop_time (excluding file saving) 0:00:01.120489 hr:min:sec
+2010-10-24 20:35:40,155 INFO                      analysis:784 |On node 0, duncan-d28 time_taken_overall 0:00:01.158192 hr:min:sec
+2010-10-24 20:35:40,171 DEBUG                     analysis:786 |Memory: End
+2010-10-24 20:35:40,171 DEBUG                     analysis:787 |Resource usage: total memory=1022.0MB free memory=420.0MB

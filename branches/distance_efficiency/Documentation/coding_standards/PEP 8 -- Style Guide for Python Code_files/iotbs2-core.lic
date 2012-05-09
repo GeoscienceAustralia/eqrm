@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+  <ga_license_file>
+    <metadata>
+      <author>?</author>
+    </metadata>
+    <datafile>
+      <filename>iotbs2-core</filename>
+      <checksum>-1844662033</checksum>
+      <publishable>Yes</publishable>
+      <accountable>Duncan Gray</accountable>
+      <source>HAZUS</source>
+      <IP_owner>?</IP_owner>
+      <IP_info>GNU General Public License</IP_info>
+    </datafile>
+
+  </ga_license_file>
