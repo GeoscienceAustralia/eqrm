@@ -104,6 +104,9 @@ class Test_Filters(unittest.TestCase):
         #print "event_set", self.event_set
         #print "len(event_set)=", len(self.event_set)
         
+        # Set up test distance object
+        self.distances = self.sites.distances_from_event_set(self.event_set)
+        
         # Set up test source_model object
         self.source_model = create_source_model()
         
@@ -235,8 +238,8 @@ class Test_Filters(unittest.TestCase):
         for source in source_model_expected:
             source.set_event_set_indexes([])
         
-        source_model_subset = source_model_threshold_distance_subset(self.sites,
-                                                        self.event_set,
+        source_model_subset = source_model_threshold_distance_subset(
+                                                        self.distances,
                                                         self.source_model,
                                                         atten_threshold_distance)
         
@@ -262,8 +265,8 @@ class Test_Filters(unittest.TestCase):
             event_inds = [0]
             source.set_event_set_indexes(event_inds)
         
-        source_model_subset = source_model_threshold_distance_subset(self.sites,
-                                                        self.event_set,
+        source_model_subset = source_model_threshold_distance_subset(
+                                                        self.distances,
                                                         self.source_model,
                                                         atten_threshold_distance)
         
@@ -285,8 +288,8 @@ class Test_Filters(unittest.TestCase):
         # Expected result - an unchanged source model
         source_model_expected = create_source_model()
         
-        source_model_subset = source_model_threshold_distance_subset(self.sites,
-                                                        self.event_set,
+        source_model_subset = source_model_threshold_distance_subset(
+                                                        self.distances,
                                                         self.source_model,
                                                         atten_threshold_distance)
         

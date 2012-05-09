@@ -42,6 +42,7 @@ class Distances(object):
                  rupture_centroid_y=None):
 
         self.distance_functions = distance_functions
+        self.distance_cache = {}
 
         self.site_latitude = site_latitude
         self.site_longitude = site_longitude
@@ -73,7 +74,7 @@ class Distances(object):
             self.rupture_centroid_y = array(self.rupture_centroid_y)
 
     def __getattr__(self, distance_type):
-        """self.Epicentral = self.distance['Epicentral'])"""
+        """self.Epicentral = self.distance['Epicentral']"""
 
         if not self.distance_functions.has_key(distance_type):
             raise AttributeError
@@ -81,7 +82,9 @@ class Distances(object):
             return self.distance(distance_type)
 
     def distance(self, distance_type):
-        return self.raw_distances(site_latitude=self.site_latitude,
+        if not self.distance_cache.has_key(distance_type):
+            self.distance_cache[distance_type] = self.raw_distances(
+                                  site_latitude=self.site_latitude,
                                   site_longitude=self.site_longitude,
                                   rupture_centroid_lat=self.rupture_centroid_lat,
                                   rupture_centroid_lon=self.rupture_centroid_lon,
@@ -97,6 +100,8 @@ class Distances(object):
                                   trace_start_lon=self.trace_start_lon,
                                   rupture_centroid_x=self.rupture_centroid_x,
                                   rupture_centroid_y=self.rupture_centroid_y)
+        return self.distance_cache[distance_type]
+            
 
     def raw_distances(self, 
                       site_latitude, 
@@ -137,13 +142,14 @@ class Distances(object):
                                  rupture_centroid_y)
 
     def __getitem__(self, key):
-        try:
-            site, event = key
-        except:
-            site, event = key, slice(None)
+        """
+        Take a slice by the event dimension
+        """
+        # TODO: Do we want to support slicing via site dimension?
+        event = key
 
-        site_latitude = self.site_latitude[site]
-        site_longitude = self.site_longitude[site]
+        site_latitude = self.site_latitude
+        site_longitude = self.site_longitude
         rupture_centroid_lat = self.rupture_centroid_lat[event]
         rupture_centroid_lon = self.rupture_centroid_lon[event]
         lengths = self.lengths[event]
@@ -167,20 +173,27 @@ class Distances(object):
         if self.rupture_centroid_x is not None:
             rupture_centroid_x = self.rupture_centroid_x[event]
             rupture_centroid_y = self.rupture_centroid_y[event]
-
-        return Distances(site_latitude, 
-                         site_longitude, 
-                         rupture_centroid_lat,
-                         rupture_centroid_lon, 
-                         lengths, 
-                         azimuths, 
-                         widths, 
-                         dips,
-                         depths, 
-                         depths_to_top, 
-                         projection, 
-                         trace_start_lat=trace_start_lat,
-                         trace_start_lon=trace_start_lon,
-                         rupture_centroid_x=rupture_centroid_x,
-                         rupture_centroid_y=rupture_centroid_y)
-
+        
+        distances = Distances(site_latitude, 
+                              site_longitude, 
+                              rupture_centroid_lat,
+                              rupture_centroid_lon, 
+                              lengths, 
+                              azimuths, 
+                              widths, 
+                              dips,
+                              depths, 
+                              depths_to_top, 
+                              projection, 
+                              trace_start_lat=trace_start_lat,
+                              trace_start_lon=trace_start_lon,
+                              rupture_centroid_x=rupture_centroid_x,
+                              rupture_centroid_y=rupture_centroid_y)
+        
+        # Take a slice of the cached distances
+        distance_cache = {}
+        for dist_func, dist_cache in self.distance_cache.iteritems():
+            distance_cache[dist_func] = dist_cache[:,event]
+        distances.distance_cache = distance_cache
+        
+        return distances

@@ -279,7 +279,7 @@ def load_site_class2Vs30_old(file_name):
 
 def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
                 soil_amplification_model, amp_distribution,
-                ground_motion_calc, event_set, sites,
+                ground_motion_calc, event_set, sites, distances,
                 ground_motion_distribution):
     """
     Determine the soil_SA.
@@ -307,7 +307,7 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
     for i_gmm, gmm in enumerate(ground_motion_calc.GM_models):
         if gmm.GM_spec.uses_Vs30 is True:
             log_mean, log_sigma = ground_motion_calc.distribution(
-                sites, event_set,
+                sites, event_set, distances,
                 GM_models=[gmm])
             sub_soil_SA = ground_motion_distribution.ground_motion_sample(
                 log_mean, log_sigma)

@@ -35,7 +35,7 @@ def timeit(func):
         t0 = default_timer()
         result = func(*args, **kw)
         tdiff_msecs = 1000 * (default_timer() - t0)
-        print "%s(%s) time = %0.2f msecs" % (func.__name__ , str(*args), tdiff_msecs)
+        print "%s%s time = %0.2f msecs" % (func.__name__ , str(args), tdiff_msecs)
         return result
     return wrapper
 
@@ -111,7 +111,7 @@ def stats(func):
             
             fd.close()
             
-            print "STATS %s(%s) Wrote to performance file %s" % (func.__name__, str(*args), os.path.join(output_dir, default_csv_file))
+            print "STATS %s%s Wrote to performance file %s" % (func.__name__, str(args), os.path.join(output_dir, default_csv_file))
         
         return result
     
