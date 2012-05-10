@@ -116,7 +116,6 @@ def create_nci_job(nodes, param_file):
     job_file.write('#PBS -l walltime=%s\n' % req_walltime)
     job_file.write('#PBS -l vmem=%sMB\n' % req_memory)
     job_file.write('#PBS -l jobfs=%sMB\n' % req_jobfs)
-    job_file.write('#PBS -l other=fc\n')
     job_file.write('\n')
     job_file.write('mpirun python %s\n' % param_file)
     job_file.close()
