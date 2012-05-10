@@ -23,6 +23,7 @@ from eqrm_code.csv_interface import csv_to_arrays, csv2dict
 from eqrm_code.sites import Sites
 from eqrm_code.building_params_from_csv import building_params_from_csv
 from eqrm_code.util import determine_eqrm_path
+from eqrm_code.damage_model import Damage_model
 
 
 attribute_conversions = {'LATITUDE': float,
@@ -205,6 +206,75 @@ class Structures(Sites):
                        contents_cost)
         return total_costs
 
+    def calc_total_loss(self, SA, eqrm_flags, event_set_Mw):
+        """
+        Calculate the economic loss and damage state at a site.
+        
+        eqrm_flags        high level controlling object
+        SA                 array of Spectral Acceleration, in g, with axis;
+                               sites, events, periods
+                           the site axis usually has a size of 1
+        event_set_Mw       array of Mw, 1D, dimension (events)
+                           (used only by buildings)
+    
+        Returns a tuple (total_loss, damage_model) where:
+          total_loss    a 4 long list of dollar loss.  The loss categories are;
+                        (structure_loss, nsd_loss, accel_loss, contents_loss)
+                        These dollar losses have the dimensions of;
+                        (site, event)
+          damage_model  an instance of the damage model.
+                        used in risk.py to get damage states.
+        """
+        # note: damage_model has an object called capacity_spectrum_model
+        #       buried inside, which will now calculate capacity curves
+        #       parameters
+        # csm_params are parameters for the capacity_spectrum_model
+        csm_params = {'csm_damping_regimes':
+                          eqrm_flags.csm_damping_regimes,
+                      'csm_damping_modify_Tav':
+                          eqrm_flags.csm_damping_modify_Tav,
+                      'csm_damping_use_smoothing':
+                          eqrm_flags.csm_damping_use_smoothing,
+                      'rtol':
+                          eqrm_flags.csm_SDcr_tolerance_percentage/100.0,
+                      'csm_damping_max_iterations':
+                          eqrm_flags.csm_damping_max_iterations,
+                      'sdtcap':            #FIXME sdt -> std
+                          eqrm_flags.csm_standard_deviation,
+                      'csm_use_variability':
+                          eqrm_flags.csm_use_variability,
+                      'csm_variability_method':
+                          eqrm_flags.csm_variability_method,
+                      'csm_hysteretic_damping':
+                          eqrm_flags.csm_hysteretic_damping,
+                      'atten_override_RSA_shape':
+                          eqrm_flags.atten_override_RSA_shape,
+                      'atten_cutoff_max_spectral_displacement':
+                          eqrm_flags.atten_cutoff_max_spectral_displacement,
+                      'loss_min_pga': eqrm_flags.loss_min_pga}
+
+        damage_model = Damage_model(self, SA, eqrm_flags.atten_periods,
+                                    event_set_Mw,
+                                    eqrm_flags.csm_use_variability,
+                                    float(eqrm_flags.csm_standard_deviation),
+                                    csm_params=csm_params)
+
+        # Note, aggregate slight, medium, critical damage
+        # Compute building damage and loss (LOTS done here!)
+        total_loss = \
+            damage_model.aggregated_building_loss(
+                        ci=eqrm_flags.loss_regional_cost_index_multiplier,
+                        loss_aus_contents=eqrm_flags.loss_aus_contents)
+
+        if eqrm_flags.bridges_functional_percentages is not None:
+            # get NaN array for 'days_to_complete'
+            dtc_shape = list(total_loss[0].shape)
+            dtc_shape.append(len(eqrm_flags.bridges_functional_percentages))
+            days_to_complete = np.ones(dtc_shape) * np.nan
+        else:
+            days_to_complete = None
+    
+        return (total_loss, damage_model, days_to_complete)
 
     def __getitem__(self, key):
         """Get single indexed entry from a Structures object."""

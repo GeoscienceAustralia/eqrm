@@ -14,7 +14,6 @@ import unittest
 import bridge_damage as bd
 import numpy as np
 
-import eqrm_code.damage_model as dm
 import eqrm_code.bridges as bridges
 
 
@@ -1761,9 +1760,6 @@ class TestBridgeDamage(unittest.TestCase):
 
         sites = bridges.Bridges(lat, lon, **attributes)
 
-        # indices in atten_periods that are 0.3 and 1.0
-        bridge_SA_indices = (2, 6)
-
         # any values, except columns 2 & 6 must be from test_array_array():
         #sa_1_0 = np.array([[0.75, 0.444, 0.11, 0.085]])
         #sa_0_3 = np.array([[01.5, 01, 0.5, 0.25]])
@@ -1802,10 +1798,11 @@ class TestBridgeDamage(unittest.TestCase):
         pseudo_event_set_Mw = None		# not needed for bridges
        
         # now call calc_total_loss, check results 
-        (total_loss, damage,
-             days_to_complete) = dm.calc_total_loss(sites, SA, eqrm_flags,
-                                                    pseudo_event_set_Mw,
-                                                    bridge_SA_indices)
+        (total_loss, 
+         damage,
+         days_to_complete) = sites.calc_total_loss(SA, 
+                                                   eqrm_flags,
+                                                   pseudo_event_set_Mw)
         (structure_state, non_structural_state,
              acceleration_sensitive_state) = damage.get_states()
 
