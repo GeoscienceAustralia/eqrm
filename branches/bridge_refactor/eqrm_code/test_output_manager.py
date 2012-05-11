@@ -1390,7 +1390,7 @@ class Test_Output_manager(unittest.TestCase):
             site_tag, 
             functional_percentage,
             extension)
-        self.failUnlessEqual('a_bridge_days_to_complete_rp[50]b',
+        self.failUnlessEqual('a_bridge_days_to_complete_fp[50]b',
                              base_name)
         site_tag = 'a'
         functional_percentage = 50.
@@ -1399,7 +1399,7 @@ class Test_Output_manager(unittest.TestCase):
             site_tag, 
             functional_percentage,
             extension)
-        self.failUnlessEqual('a_bridge_days_to_complete_rp[50]b',
+        self.failUnlessEqual('a_bridge_days_to_complete_fp[50]b',
                              base_name)
         
         site_tag = 'a'
@@ -1409,7 +1409,7 @@ class Test_Output_manager(unittest.TestCase):
             site_tag, 
             functional_percentage,
             extension)
-        self.failUnlessEqual('a_bridge_days_to_complete_rp[50]b',
+        self.failUnlessEqual('a_bridge_days_to_complete_fp[50]b',
                              base_name)
             
         site_tag = 'a'
@@ -1419,7 +1419,7 @@ class Test_Output_manager(unittest.TestCase):
             site_tag, 
             functional_percentage,
             extension)
-        self.failUnlessEqual('a_bridge_days_to_complete_rp[50p01]b',
+        self.failUnlessEqual('a_bridge_days_to_complete_fp[50p01]b',
                              base_name)
                              
  
