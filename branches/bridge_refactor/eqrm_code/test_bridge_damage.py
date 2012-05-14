@@ -1795,14 +1795,11 @@ class TestBridgeDamage(unittest.TestCase):
         fp = np.array([20, 30, 40, 50, 60, 70, 80])
         eqrm_flags = DataObj(atten_periods=atten_periods,
                               bridges_functional_percentages=fp)
-        pseudo_event_set_Mw = None		# not needed for bridges
        
         # now call calc_total_loss, check results 
-        (total_loss, 
-         damage,
+        (damage,
          days_to_complete) = sites.calc_total_loss(SA, 
-                                                   eqrm_flags,
-                                                   pseudo_event_set_Mw)
+                                                   eqrm_flags)
         (structure_state, non_structural_state,
              acceleration_sensitive_state) = damage.get_states()
 

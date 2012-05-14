@@ -71,7 +71,7 @@ class Bridges(Sites):
         # call class constructor
         return cls(latitude, longitude, **attributes)
 
-    def calc_total_loss(self, SA, eqrm_flags, event_set_Mw):
+    def calc_total_loss(self, SA, eqrm_flags):
         """
         Calculate the economic loss and damage state at a site.
     
@@ -96,7 +96,6 @@ class Bridges(Sites):
                                            sa_indices)
         states = damage_model.get_states()    # to set up self.structure_state
         state = choose_random_state(states[0])
-        total_loss = damage_model.aggregated_loss()
 
         if eqrm_flags.bridges_functional_percentages is not None:
             # calculate days to complete for each bridge
@@ -106,7 +105,7 @@ class Bridges(Sites):
             days_to_complete = None
                 
     
-        return (total_loss, damage_model, days_to_complete)
+        return (damage_model, days_to_complete)
 
     def __getitem__(self, key):
         """Get single indexed entry from a Bridges object."""

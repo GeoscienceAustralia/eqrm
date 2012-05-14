@@ -183,8 +183,7 @@ def main(parameter_handle,
     num_events = len(event_set)
     num_spawning = eqrm_flags.atten_spawn_bins
    
-    num_psudo_events = num_gmm_max * num_events * \
-                       num_spawning
+    num_pseudo_events = num_gmm_max * num_events * num_spawning
     num_rm = event_activity.recurrence_model_count()
 
     ground_motion_distribution = GroundMotionDistributionLogNormal(
@@ -195,7 +194,7 @@ def main(parameter_handle,
     event_activity.spawn(ground_motion_distribution.spawn_weights)
 
     msg = ('Pseudo event set created. Number of pseudo_events=' +
-           str(num_psudo_events))
+           str(num_pseudo_events))
     log.debug(msg)
     log.debug('Memory: Pseudo Event Set created')
     log.resource_usage()
@@ -289,7 +288,7 @@ def main(parameter_handle,
     log.resource_usage()
 
     if eqrm_flags.save_fatalities is True:
-        total_fatalities = zeros((num_site_block, num_psudo_events),
+        total_fatalities = zeros((num_site_block, num_pseudo_events),
                                     dtype=float)
 
     if eqrm_flags.save_total_financial_loss is True:
@@ -305,7 +304,7 @@ def main(parameter_handle,
                                         num_gmm_max, num_rm, num_events),
                               dtype=float)
     if (eqrm_flags.save_prob_structural_damage is True and
-        num_psudo_events == 1 and eqrm_flags.run_type == "risk"):
+        num_pseudo_events == 1):
         # total_structure_damage, given as a non-cumulative
         # probability. The axis are  sites, model_generated_psudo_events,
         # damage_states
@@ -316,10 +315,9 @@ def main(parameter_handle,
     # create result array to save 'days to complete' data
     # need to store 'fp' days + state field
     
-    if eqrm_flags.bridges_functional_percentages is not None and \
-           eqrm_flags.site_type == "bridge":
+    if eqrm_flags.bridges_functional_percentages is not None:
         saved_days_to_complete = zeros((
-            num_site_block, num_psudo_events,
+            num_site_block, num_pseudo_events,
             len(eqrm_flags.bridges_functional_percentages)))
 
     log.debug('Memory: Created all data collection arrays.')
@@ -345,6 +343,8 @@ def main(parameter_handle,
 
         sites = all_sites[i:i+1] # take site i
         distances = sites.distances_from_event_set(event_set)
+
+        ### HAZARD CALCULATIONS ###
 
         # note if you take sites[i], it will collapse the dimension
 
@@ -389,49 +389,38 @@ def main(parameter_handle,
             event_activity,
             source_model_subset)
         
+        ### POST-HARZARD SETUP ###
+        
+        # Decide which SA to use post-hazard
+        if soil_SA is not None:
+            SA = soil_SA
+        else:
+            SA = bedrock_SA
+        
+        # smooth SA (function of periods) using a weighted
+        # running 3-point smoother
+        if eqrm_flags.atten_smooth_spectral_acceleration is True:
+            SA[...,1:-2] = (0.25*SA[...,0:-3] +
+                            0.50*SA[...,1:-2] +
+                            0.25*SA[...,2:-1])
+        
+        ### RUN TYPE CALCULATIONS ###
+        
         # calculate fatality
         if eqrm_flags.run_type == "fatality":
-            #print 'STARTING fatality calculations'
-            # Decide which SA to use
-            if soil_SA is not None:
-                SA = soil_SA
-            else:
-                SA = bedrock_SA
             
-            #print SA.shape
-            #print SA
             MMI = rsa2mmi_array(SA)
-            #print MMI.shape
-            #print MMI
-            
-            #print sites, sites.attributes['POPULATION'][0]
             
             fatality = forecast_fatality(MMI, 
                                          sites.attributes['POPULATION'][0])
-                
-            #print fatality
+            
             numelement = MMI.shape[1]
             
-            #print fatality.shape
             if eqrm_flags.save_fatalities is True:
                 total_fatalities[rel_i,:] = reshape(fatality[0,:,0], numelement)
             
         # calculate damage
         elif eqrm_flags.run_type == "risk":
-            #print 'STARTING building damage calculations'
-            # Decide which SA to use
-            if soil_SA is not None:
-                SA = soil_SA
-            else:
-                SA = bedrock_SA
-
-        
-            # smooth SA (function of periods) using a weighted
-            # running 3-point smoother
-            if eqrm_flags.atten_smooth_spectral_acceleration is True:
-                SA[...,1:-2] = (0.25*SA[...,0:-3] +
-                                0.50*SA[...,1:-2] +
-                                0.25*SA[...,2:-1])
             
             # This means calc_total_loss does not know about the
             # dimensions of multiple gmms and spawning.
@@ -479,15 +468,26 @@ def main(parameter_handle,
                 contents_loss_qw[rel_i,...] = con_loss_qw[0,...]
 
             if (eqrm_flags.save_prob_structural_damage is True and
-                    num_psudo_events == 1):
+                    num_pseudo_events == 1):
                 # This is not cumulative
                 total_structure_damage[rel_i,:] = damage.structure_state
 
+        # calculate bridge damage
+        elif eqrm_flags.run_type == "bridge":
+            #print 'STARTING bridge damage calculations'
+            
+            (damage,
+             days_to_complete) = sites.calc_total_loss(SA, eqrm_flags)
+            
             # accumulate days to complete           
-            if eqrm_flags.bridges_functional_percentages is not None \
-                   and eqrm_flags.site_type == "bridge":
+            if eqrm_flags.bridges_functional_percentages is not None:
                 saved_days_to_complete[rel_i,:,:] = days_to_complete
-
+            
+            if (eqrm_flags.save_prob_structural_damage is True and
+                    num_pseudo_events == 1):
+                # This is not cumulative
+                total_structure_damage[rel_i,:] = damage.structure_state
+            
             
         # Delete some objects before next loop to avoid memory spikes
         del sites
@@ -582,8 +582,7 @@ def main(parameter_handle,
 
     # Save damage information
     if (eqrm_flags.save_prob_structural_damage is True and
-            num_psudo_events == 1 and
-            eqrm_flags.run_type == 'risk' and
+            num_pseudo_events == 1 and
             parallel.lo != parallel.hi):
         # No sites were investigated.
         a_file = save_damage(eqrm_flags.output_dir, eqrm_flags.site_tag,
@@ -609,7 +608,6 @@ def main(parameter_handle,
     if ((eqrm_flags.save_total_financial_loss is True or
          eqrm_flags.save_building_loss is True or
          eqrm_flags.save_contents_loss is True) and
-        eqrm_flags.site_type == 'site' and
         parallel.lo != parallel.hi):
         a_file = save_structures(eqrm_flags, all_sites,
                                compress=eqrm_flags.compress_output,
@@ -618,7 +616,6 @@ def main(parameter_handle,
         row_files_that_parallel_splits.append(a_file)
 
     if (eqrm_flags.save_total_financial_loss is True and
-        eqrm_flags.site_type == 'site' and
         parallel.lo != parallel.hi):
         
         #  dimensions of total_building_loss_qw;
@@ -679,7 +676,7 @@ def main(parameter_handle,
         column_files_that_parallel_splits.append(a_file)
         
     if eqrm_flags.bridges_functional_percentages is not None and \
-           eqrm_flags.site_type == 'bridge' and parallel.lo != parallel.hi:  
+           parallel.lo != parallel.hi:  
         files = save_bridge_days_to_complete(
             eqrm_flags,
             saved_days_to_complete, compress=eqrm_flags.compress_output,
@@ -1027,7 +1024,7 @@ def load_data(eqrm_flags):
         building_par_file = build_par_file(eqrm_flags.buildpars_flag)
 
         # Find location of site database (i.e. building database) and get FID
-        site_file = (eqrm_flags.site_type + 'db_' + eqrm_flags.site_tag +
+        site_file = ('sitedb_' + eqrm_flags.site_tag +
                      eqrm_flags.site_db_tag + '.csv')
         try:
             site_file = get_local_or_default(site_file,
@@ -1038,31 +1035,24 @@ def load_data(eqrm_flags):
             msg = "No site file was loaded.  Check file name; " + site_file
             raise RuntimeError(msg) 
 
-        if eqrm_flags.site_type == 'site':
-            # if indeed there is a BUILDING file
-            sites = Structures.from_csv(
-                site_file,
-                building_parameters_table=building_par_file,
-                default_input_dir=eqrm_flags.default_input_dir,
-                input_dir=eqrm_flags.input_dir,
-                eqrm_dir=eqrm_flags.eqrm_dir,
-                buildings_usage_classification=
-                eqrm_flags.buildings_usage_classification,
-                use_refined_btypes=True,
-                force_btype_flag=False,
-                loss_aus_contents=eqrm_flags.loss_aus_contents)
+        # if indeed there is a BUILDING file
+        sites = Structures.from_csv(
+            site_file,
+            building_parameters_table=building_par_file,
+            default_input_dir=eqrm_flags.default_input_dir,
+            input_dir=eqrm_flags.input_dir,
+            eqrm_dir=eqrm_flags.eqrm_dir,
+            buildings_usage_classification=
+            eqrm_flags.buildings_usage_classification,
+            use_refined_btypes=True,
+            force_btype_flag=False,
+            loss_aus_contents=eqrm_flags.loss_aus_contents)
 
-            #FIXME do this after subsampling the sites
-            # Hard wires the Demand Curve damping to 5%
-            if eqrm_flags.buildings_set_damping_Be_to_5_percent is True:
-                sites.building_parameters['damping_Be'] = 0.05 # + \
+        #FIXME do this after subsampling the sites
+        # Hard wires the Demand Curve damping to 5%
+        if eqrm_flags.buildings_set_damping_Be_to_5_percent is True:
+            sites.building_parameters['damping_Be'] = 0.05 # + \
 #                                      0*sites.building_parameters['damping_Be']
-        elif eqrm_flags.site_type == 'bridge':
-            sites = Bridges.from_csv(site_file)
-            
-        else:
-            msg = "Unsupported site_type; " + eqrm_flags.site_type
-            raise RuntimeError(msg)
 
         # Load the site_class 2 Vs30 mapping
         amp_factor_file = 'site_class2vs30.csv'
@@ -1092,6 +1082,7 @@ def load_data(eqrm_flags):
         sites = Sites.from_csv(name, SITE_CLASS=str, VS30=float)
         # FIXME this is a bit of a hack.  re Vs30 and VS30.
         sites.attributes['Vs30'] = sites.attributes['VS30']
+        
     elif eqrm_flags.run_type == "fatality":
 		#raise RuntimeError('run_type "hazard" not yet modified for Bridges')
 
@@ -1108,6 +1099,21 @@ def load_data(eqrm_flags):
                                POPULATION=float)
         # FIXME this is a bit of a hack.  re Vs30 and VS30.
         sites.attributes['Vs30'] = sites.attributes['VS30']
+    
+    elif eqrm_flags.run_type == "bridge":
+        #raise RuntimeError('run_type "hazard" not yet modified for Bridges')
+
+        # we are running fatality calculation
+        name = ('bridgedb_' + eqrm_flags.site_tag +
+                     eqrm_flags.site_db_tag + '.csv')
+
+        # find the location and FID for the grid file
+        # i.e. searches input_dir then defaultdir
+        name = get_local_or_default(name, eqrm_flags.default_input_dir,
+                                    eqrm_flags.input_dir)
+        
+        sites = Bridges.from_csv(name)
+    
     else:
         raise ValueError('Got bad value for eqrm_flags.run_type: %s'
                          % eqrm_flags.run_type)

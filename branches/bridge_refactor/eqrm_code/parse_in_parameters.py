@@ -89,7 +89,7 @@ ENV_EQRMDATAHOME = 'EQRMDATAHOME'
 VAR_NAME_IN_SET_DATA_FILE = 'sdp'
 SECOND_LINE = '  EQRM parameter file'
 
-# A list of paramter names and title names.
+# A list of parameter names and title names.
 #
 # Originally used to convert old attribute values, to the new
 # attribute values.  Now it is used to describe the attributes default
@@ -131,9 +131,6 @@ CONV_NEW = [{'order': 10.0,
              'order': 10.08,
              'new_para': 'site_db_tag',
              'default': ""},
-            {'order': 10.09,
-             'new_para': 'site_type',
-             'default': 'site'},
             {'old_para': 'rtrn_per',
              'order': 10.10,
              'new_para': 'return_periods'},
@@ -264,10 +261,12 @@ CONV_NEW = [{'order': 10.0,
                         4: 'HAZUS_Sa'},
              'order': 50.09,
              'new_para': 'atten_override_RSA_shape',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'order': 50.10,
              'new_para': 'atten_cutoff_max_spectral_displacement',
-             'default': False},
+             'default': False,
+             'run_type': ['risk']},
             {'old_para': 'pgacutoff',
              'order': 50.11,
              'new_para': 'atten_pga_scaling_cutoff',
@@ -278,7 +277,8 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 50.12,
              'new_para': 'atten_smooth_spectral_acceleration',
-             'default': False},
+             'default': False,
+             'run_type': ['risk','bridge']},
             {'old_para': 'log_sigma_eq_weight',
              'order': 50.13,
              'new_para': 'atten_log_sigma_eq_weight',
@@ -311,18 +311,21 @@ CONV_NEW = [{'order': 10.0,
                         2: 'FCB'},
              'order': 70.01,
              'new_para': 'buildings_usage_classification',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'old_para': 'hazus_dampingis5_flag',
              'values': {None: None,
                         1: True,
                         0: False},
              'order': 70.02,
              'new_para': 'buildings_set_damping_Be_to_5_percent',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {
              'order': 75.01,
              'new_para': 'bridges_functional_percentages',
-             'default': None},
+             'default': None,
+             'run_type': ['bridge']},
             {'order': 80.0,
              'title': '\n# Capacity Spectrum Method\n'},
             {'old_para': 'var_bcap_flag',
@@ -331,24 +334,30 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 80.01,
              'new_para': 'csm_use_variability',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'old_para': 'bcap_var_method',
              'order': 80.02,
              'new_para': 'csm_variability_method',
-             'default': 3},
+             'default': 3,
+             'run_type': ['risk']},
             {'old_para': 'stdcap',
              'order': 80.03,
              'new_para': 'csm_standard_deviation',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'order': 80.04,
              'new_para': 'csm_damping_regimes',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'order': 80.05,
              'new_para': 'csm_damping_modify_Tav',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'order': 80.06,
              'new_para': 'csm_damping_use_smoothing',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'old_para': 'Harea_flag',
              'values': {None: None,
                         1: 'Error',
@@ -356,30 +365,36 @@ CONV_NEW = [{'order': 10.0,
                         3: 'curve'},
              'order': 80.08,
              'new_para': 'csm_hysteretic_damping',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'old_para': 'SDRelTol',
              'order': 80.09,
              'new_para': 'csm_SDcr_tolerance_percentage',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'old_para': 'max_iterations',
              'order': 80.10,
              'new_para': 'csm_damping_max_iterations',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'order': 90.0,
              'title': '\n# Loss\n',
              'default': None},
             {'old_para': 'pga_mindamage',
              'order': 90.01,
              'new_para': 'loss_min_pga',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'old_para': 'ci',
              'order': 90.02,
              'new_para': 'loss_regional_cost_index_multiplier',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'old_para': 'aus_contents_flag',
              'order': 90.03,
              'new_para': 'loss_aus_contents',
-             'default': None},
+             'default': None,
+             'run_type': ['risk']},
             {'order': 100.0,
              'title': '\n# Save\n',
              'default': None},
@@ -393,15 +408,18 @@ CONV_NEW = [{'order': 10.0,
             {'old_para': 'save_total_financial_loss',
              'order': 100.02,
              'new_para': 'save_total_financial_loss',
-             'default': False},
+             'default': False,
+             'run_type': ['risk']},
             {'old_para': 'save_building_loss',
              'order': 100.03,
              'new_para': 'save_building_loss',
-             'default': False},
+             'default': False,
+             'run_type': ['risk']},
             {'old_para': 'save_contents_loss',
              'order': 100.04,
              'new_para': 'save_contents_loss',
-             'default': False},
+             'default': False,
+             'run_type': ['risk']},
             {'old_para': 'save_motion_flag',
              'values': {None: None,
                         1: True,
@@ -415,29 +433,31 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 100.06,
              'new_para': 'save_prob_structural_damage',
-             'default': False},
-             {'old_para': 'save_fatalities',
-              'order': 100.07,
-              'new_para': 'save_fatalities',
-              'default': False},
-             {'order': 110.02,
-              'new_para': 'event_set_handler',
-              'default': 'generate'},
-             {'order': 110.04,
-              'new_para': 'data_array_storage',
-              'default_to_attr': 'output_dir'}, # see _add_default_values
-             {'order': 110.05,
-              'new_para': 'file_array',
-              'default': True},
-             {'order': 110.06,
-              'new_para': 'event_set_load_dir',
-              'default': None}, # see _verify_eqrm_flags
-             {'order': 120.01,
-              'new_para': 'file_log_level',
-              'default': 'debug'},
-             {'order': 120.02,
-              'new_para': 'console_log_level',
-              'default': 'info'}
+             'default': False,
+             'run_type': ['risk','bridge']},
+            {'old_para': 'save_fatalities',
+             'order': 100.07,
+             'new_para': 'save_fatalities',
+             'default': False,
+             'run_type': ['fatality']},
+            {'order': 110.02,
+             'new_para': 'event_set_handler',
+             'default': 'generate'},
+            {'order': 110.04,
+             'new_para': 'data_array_storage',
+             'default_to_attr': 'output_dir'}, # see _add_default_values
+            {'order': 110.05,
+             'new_para': 'file_array',
+             'default': True},
+            {'order': 110.06,
+             'new_para': 'event_set_load_dir',
+             'default': None}, # see _verify_eqrm_flags
+            {'order': 120.01,
+             'new_para': 'file_log_level',
+             'default': 'debug'},
+            {'order': 120.02,
+             'new_para': 'console_log_level',
+             'default': 'info'}
             ]
 
 # Old style attributes that have not been removed yet.
@@ -597,7 +617,7 @@ def _add_default_values(eqrm_flags):
     """        
     for param in CONV_NEW: 
         if param.has_key('new_para') and \
-               not eqrm_flags.has_key(param['new_para']): 
+                not eqrm_flags.has_key(param['new_para']):
             if param.has_key('default'):
                 eqrm_flags[param['new_para']] = param['default']
             elif param.has_key('default_to_attr') and \
@@ -606,7 +626,7 @@ def _add_default_values(eqrm_flags):
                 eqrm_flags[param['new_para']] = eqrm_flags[param['default_to_attr']]
             else:
                 raise AttributeSyntaxError(
-                "Attribute Error: Attribute "  + param['new_para']
+                "Attribute Error: Attribute " + param['new_para']
                 + " must be defined.")
             
     if eqrm_flags.file_array:
@@ -859,7 +879,24 @@ def _verify_eqrm_flags(eqrm_flags):
             eqrm_flags.zone_source_tag is None:
         raise AttributeSyntaxError(
             'Either fault_source_tag or zone_source_tag must be set.')
+    
+    # Check to see if a parameter is defined that is incompatible with the
+    # defined run_type
+    # Note: _add_default_values should have already dealt with adding 
+    # incompatible defaults
+    # TODO: rethink this
+    #for param in CONV_NEW: 
+    #    if param.has_key('new_para') and \
+    #            eqrm_flags.has_key(param['new_para']) and \
+    #            not is_param_compatible_with_run_type(param, eqrm_flags.run_type):
+    #        raise AttributeSyntaxError(
+    #        "Attribute " + param['new_para'] +
+    #        " not compatible with run_type=" + eqrm_flags['run_type'] +
+    #        " - compatible run_type values are " + str(param['run_type']))
 
+def is_param_compatible_with_run_type(param, run_type):
+    # TODO: rethink this
+    return True
   
 def find_set_data_py_files(path):
     """Return a list of all the set_data .py files in a path directory.

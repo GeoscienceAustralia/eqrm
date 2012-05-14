@@ -251,18 +251,6 @@ class Bridge_damage_model(object):
         return (structure_state, non_structural_state,
                 acceleration_sensitive_state)
 
-    def aggregated_loss(self):
-        """Don't know what this does.
-
-        Just return what the building code does, with all values zero.
-        """
-
-        # figure out what shape we need this in
-        result_shape = self.structure_state.shape[:2]	# first 2 dimensions
-        element = np.zeros(result_shape)
-
-        return (element, element, element, element)
-
 
 def state_probability(threshold, beta,value):
     """Calculate the state probabilities for a given threshold, beta and value.
