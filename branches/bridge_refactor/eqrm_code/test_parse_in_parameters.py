@@ -86,9 +86,6 @@ class Test_Parse_in_parameters(unittest.TestCase):
         # Buildings
         set.buildings_usage_classification = 'HAZUS'   # ('HAZUS'|'FCB')
         set.buildings_set_damping_Be_to_5_percent = False
-        
-        # Bridges
-        set.bridges_functional_percentages = [45, 34.5]
 
         # Building capacity curve
         set.csm_use_variability = True
@@ -171,9 +168,6 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.buildings_usage_classification is 'HAZUS')
         self.failUnless(TPT.buildings_set_damping_Be_to_5_percent == 0)
         self.failUnless(TPT.buildpars_flag == 4)
-
-        self.failUnless(allclose(TPT.bridges_functional_percentages, \
-                                 asarray([45, 34.5])))
         
         self.failUnless(TPT.csm_use_variability is True)
         self.failUnless(TPT.csm_variability_method == 3)
@@ -425,6 +419,33 @@ class Test_Parse_in_parameters(unittest.TestCase):
         
         # Run again to see if no exception is raised
         create_parameter_data(set)
+        
+    def test_is_param_compatible(self):
+        # is_param_compatible business logic:
+        # A parameter is compatible with if
+        # - it is not None, and
+        # - it is non-default, and
+        # - is not compatible with the run_type specified
+        
+        # set up base set and test_param
+        eqrm_flags = create_parameter_data(self.build_instance_to_eqrm_flags())
+        param = {'new_para': 'atten_models',
+                 'default': False,
+                 'run_type': ['hazard']}
+        
+        eqrm_flags['run_type'] = "risk"
+        
+        eqrm_flags['atten_models'] = None
+        self.assertTrue(is_param_compatible(param, eqrm_flags))
+        
+        eqrm_flags['atten_models'] = False
+        self.assertTrue(is_param_compatible(param, eqrm_flags))
+        
+        eqrm_flags['atten_models'] = ['Sadigh_97']
+        self.assertFalse(is_param_compatible(param, eqrm_flags))
+        
+        eqrm_flags['run_type'] = "hazard"
+        self.assertTrue(is_param_compatible(param, eqrm_flags))
         
 #-------------------------------------------------------------
 if __name__ == "__main__":
