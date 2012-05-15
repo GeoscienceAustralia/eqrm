@@ -30,7 +30,7 @@
 'run_type': all
 
 'new_para': 'atten_smooth_spectral_acceleration',
-'run_type': ['risk','bridge']
+'run_type': all
 
 'new_para': 'atten_log_sigma_eq_weight', # not currently used in code
 'run_type': all

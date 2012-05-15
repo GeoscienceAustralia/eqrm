@@ -54,7 +54,6 @@ amp_max_factor = 10000
 # Buildings
 buildings_usage_classification = "HAZUS" 
 buildings_set_damping_Be_to_5_percent = False
-bridges_functional_percentages = [25, 50, 75]
 
 # Capacity Spectrum Method
 csm_use_variability = False

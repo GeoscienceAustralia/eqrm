@@ -65,7 +65,7 @@ save_total_financial_loss = False
 save_building_loss = False
 save_contents_loss = False
 save_motion = False
-save_prob_structural_damage = None
+save_prob_structural_damage = False
 
 event_set_load_dir = join('.', 'implementation_tests', 'input', 'TS_large02')
 event_set_handler = 'load'

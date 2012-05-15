@@ -277,8 +277,7 @@ CONV_NEW = [{'order': 10.0,
                         0: False},
              'order': 50.12,
              'new_para': 'atten_smooth_spectral_acceleration',
-             'default': False,
-             'run_type': ['risk','bridge']},
+             'default': False},
             {'old_para': 'log_sigma_eq_weight',
              'order': 50.13,
              'new_para': 'atten_log_sigma_eq_weight',
@@ -884,20 +883,45 @@ def _verify_eqrm_flags(eqrm_flags):
     # defined run_type
     # Note: _add_default_values should have already dealt with adding 
     # incompatible defaults
-    # TODO: rethink this
-    #for param in CONV_NEW: 
-    #    if param.has_key('new_para') and \
-    #            eqrm_flags.has_key(param['new_para']) and \
-    #            not is_param_compatible_with_run_type(param, eqrm_flags.run_type):
-    #        raise AttributeSyntaxError(
-    #        "Attribute " + param['new_para'] +
-    #        " not compatible with run_type=" + eqrm_flags['run_type'] +
-    #        " - compatible run_type values are " + str(param['run_type']))
+    for param in CONV_NEW: 
+        if not is_param_compatible(param, eqrm_flags):
+            raise AttributeSyntaxError(
+            "Attribute " + param['new_para'] +
+            " not compatible with run_type=" + eqrm_flags['run_type'] +
+            " - compatible run_type values are " + str(param['run_type']))
 
-def is_param_compatible_with_run_type(param, run_type):
-    # TODO: rethink this
-    return True
-  
+def is_param_compatible(param, eqrm_flags):
+    """
+    A parameter is compatible with if
+    - it is not None, and
+    - it is non-default, and
+    - is not compatible with the run_type specified
+    """
+    
+    # these parameters needed might not exist but _add_default_values should 
+    # take care of this
+    if not eqrm_flags.has_key('run_type') or \
+            not param.has_key('new_para'):
+        return True
+    
+    # If no run_type configured the parameter is ok
+    if not param.has_key('run_type'):
+        return True
+    
+    run_type = param['run_type']
+    param_name = param['new_para']
+    
+    run_type_supported = eqrm_flags['run_type'] in run_type
+    is_default = param.has_key('default') and \
+                    eqrm_flags[param_name] == param['default']
+    is_none = eqrm_flags[param_name] is None
+                    
+    if not is_none and not is_default and not run_type_supported:
+        return False
+    else:
+        return True
+        
+
 def find_set_data_py_files(path):
     """Return a list of all the set_data .py files in a path directory.
 

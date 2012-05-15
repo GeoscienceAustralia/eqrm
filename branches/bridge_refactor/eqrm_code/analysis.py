@@ -389,7 +389,7 @@ def main(parameter_handle,
             event_activity,
             source_model_subset)
         
-        ### POST-HARZARD SETUP ###
+        ### POST-HAZARD SETUP ###
         
         # Decide which SA to use post-hazard
         if soil_SA is not None:
@@ -496,8 +496,6 @@ def main(parameter_handle,
         del soil_SA
         del bedrock_SA
 
-            #print 'ENDING building damage calculations'
-        # ENDED BUILDING DAMAGE
     # --------------------------------------------------------------
     # THIS IS THE END OF THE LOOP OVER SITES
 
@@ -594,10 +592,11 @@ def main(parameter_handle,
         row_files_that_parallel_splits.append(a_file)
 
     if ((eqrm_flags.save_motion is True or
-                 eqrm_flags.save_total_financial_loss is True or
-                 eqrm_flags.save_building_loss is True or
-                 eqrm_flags.save_contents_loss is True) and
-            parallel.lo != parallel.hi):
+         eqrm_flags.save_total_financial_loss is True or
+         eqrm_flags.save_building_loss is True or
+         eqrm_flags.save_contents_loss is True or
+         eqrm_flags.save_prob_structural_damage is True) and
+        parallel.lo != parallel.hi):
         files = save_distances(eqrm_flags, sites=all_sites,
                                event_set=event_set,
                                compress=eqrm_flags.compress_output,
