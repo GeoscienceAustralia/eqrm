@@ -85,8 +85,10 @@ CSM is capacity spectrum method \\
 Defines the operation mode of the EQRM: \\
   \hspace{0.5em} `hazard' $\Rightarrow$ Scenario RSA and PSHA (probabilistic hazard); \\
   \hspace{0.5em} `risk' $\Rightarrow$ Scenario Loss and PSRA (probabilistic risk); \\
-  \hspace{0.5em} `fatality' $\Rightarrow$ To be completed; \\
-  \hspace{0.5em} `bridge' $\Rightarrow$ To be completed. \\
+  \hspace{0.5em} `fatality' $\Rightarrow$ Scenario Fatality forecast (based on 
+  MMI and population from USGS Open-File Report 2009-1136); \\
+  \hspace{0.5em} `bridge' $\Rightarrow$ Bridge damage (based on fragility curves
+  from Dale 2004). \\
 %---------------------------------------------------------
  \hline
 \vspace{0.1em} \texttt{is\_scenario}: (Mandatory) \\
@@ -383,7 +385,12 @@ Supported \texttt{run\_type} $=$ `risk' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em}
 \texttt{bridges\_functional\_percentages}: \\
-To be completed. \\
+Functional percentages used to estimate the number of days to complete repairs. \\
+Normal curves are used using mean and sigma for each damage state as specified
+in table 8, Dale 2004. \\
+Setting this parameter will produce one file per functional percentage, in the 
+format
+\texttt{<site\_tag>\_}\texttt{bridge\_days\_to\_complete\_}\texttt{fp[<func\_p>]>}\texttt{.csv}. \\
 \\
 Supported \texttt{run\_type} $=$ `bridge' \\
 \hline
@@ -561,9 +568,12 @@ Supported \texttt{run\_type} $=$ `risk', `bridge' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{save\_fatalities}: \\
 DEFAULT = \texttt{False} \\
-\texttt{True} $\Rightarrow$ To be completed. \\ 
+\texttt{True} $\Rightarrow$ Save fatality forecast (based on 
+  MMI and population from USGS Open-File Report 2009-1136). \\
+Setting this parameter will produce the file 
+\texttt{<site\_tag>\_}\texttt{fatalities}\texttt{.txt}. \\ 
 \\
-Supported \texttt{run\_type} $=$ `risk', `bridge' \\
+Supported \texttt{run\_type} $=$ `fatality' \\
 \hline
 %---------------------------------------------------------
  \end{tabular}
