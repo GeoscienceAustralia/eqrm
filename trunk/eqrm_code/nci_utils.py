@@ -162,7 +162,7 @@ def calc_memory(nodes, params):
     eqrm_flags.use_amplification
     eqrm_flags.collapse_atten_models
     
-    Note: 20% is added to this to accommodate memory mapped objects and other 
+    Note: 25% is added to this to accommodate memory mapped objects and other 
     difficult to estimate items, and a min memory limit per node is also 
     applied. The idea is to be as accurate as possible while keeping the 
     complexity low.
@@ -203,7 +203,7 @@ def calc_memory(nodes, params):
                               num_events *
                               num_periods) * 8 # size in bytes of float64
     
-    total_size_bytes = (SA_temp_size + SA_temp_size_collapsed) * 1.2
+    total_size_bytes = (SA_temp_size + SA_temp_size_collapsed) * 1.25
     
     return (LIMIT_MIN_MEMORY * nodes) + int(CONV_B2MB(total_size_bytes * nodes))
 
