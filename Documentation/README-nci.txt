@@ -138,7 +138,6 @@ drwxr-sr-x 5 u78240 gemd 2048 Apr 27 15:39 save
 #PBS -l walltime=30547
 #PBS -l vmem=126389MB
 #PBS -l jobfs=32768MB
-#PBS -l other=fc
 
 mpirun python setdata_ProbHaz_nat_load.py
 ./nci_job$ 
