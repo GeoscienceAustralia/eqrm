@@ -65,15 +65,7 @@ class Test_Bridges(unittest.TestCase):
                               % (self.lon[7], self.lat[7], self.clsf[7],
                                  self.cat[7], self.skew[7], self.span[7],
                                  self.cls[7])]
-        self.columns = {'BID': int,
-                        'LONGITUDE': float,
-                        'LATITUDE': float,
-                        'STRUCTURE_CLASSIFICATION': str,
-                        'STRUCTURE_CATEGORY': str,
-                        'SKEW': float,
-                        'SPAN': int,
-                        'SITE_CLASS': str}
-
+        
         (handle, self.file_name) = tempfile.mkstemp('.csv', 'test_bridges_')
         os.close(handle)
 
@@ -91,7 +83,7 @@ class Test_Bridges(unittest.TestCase):
     def test_load(self):
         """Test initial load of Bridges object."""
 
-        b = bridges.Bridges.from_csv(self.file_name, **self.columns)
+        b = bridges.Bridges.from_csv(self.file_name)
 
         actual = scipy.array(self.lat)
         b_lat_str = self.pp.pformat(b.latitude)
@@ -130,7 +122,7 @@ class Test_Bridges(unittest.TestCase):
     def test_get_item(self):
         """Test the __getitem__() method of Bridges object."""
 
-        b = bridges.Bridges.from_csv(self.file_name, **self.columns)
+        b = bridges.Bridges.from_csv(self.file_name)
 
         # test some indexing of a Bridges object
         for i in range(len(b.longitude)):

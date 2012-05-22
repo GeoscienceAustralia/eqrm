@@ -207,7 +207,7 @@ class Bridge_damage_model(object):
                     the site axis usually has a size of 1
         periods     array, 1 axis
         sa_indices  tuple (0.3, 1.0) of column indices for the 0.3s and 1.0s
-                    perdiod SA values in SA
+                    period SA values in SA
         """
 
         self.structures = structures
@@ -250,18 +250,6 @@ class Bridge_damage_model(object):
        
         return (structure_state, non_structural_state,
                 acceleration_sensitive_state)
-
-    def aggregated_loss(self):
-        """Don't know what this does.
-
-        Just return what the building code does, with all values zero.
-        """
-
-        # figure out what shape we need this in
-        result_shape = self.structure_state.shape[:2]	# first 2 dimensions
-        element = np.zeros(result_shape)
-
-        return (element, element, element, element)
 
 
 def state_probability(threshold, beta,value):
@@ -332,107 +320,5 @@ def cumulative_state_probability(threshold, beta,value):
     seterr(**oldsettings)
 
     return norm.cdf(temp)
-
-
-def calc_total_loss(sites, SA, eqrm_flags, event_set_Mw, bridge_sa_indices):
-    """Calculate the economic loss and damage state at a site.
-    Where the site is one of: Structure
-                              Bridge
-
-    sites              a Structures/Bridge instance
-    eqrm_flags        high level controlling object
-    SA                 array of Spectral Acceleration, in g, with axis;
-                           sites, events, periods
-                       the site axis usually has a size of 1
-    event_set_Mw       array of Mw, 1D, dimension (events)
-                       (used only by buildings)
-    bridge_sa_indices  a tuple (0.3, 1.0) of indices into
-                       eqrm_flags.atten_periods for bridge SA values
-                       (used only by bridges)
-
-    Returns a tuple (total_loss, damage_model) where:
-      total_loss    a 4 long list of dollar loss.  The loss categories are;
-                    (structure_loss, nsd_loss, accel_loss, contents_loss)
-                    These dollar losses have the dimensions of;
-                    (site, event)
-      damage_model  an instance of the damage model.
-                    used in risk.py to get damage states.
-
-    Note: we can't determine type of data from the 'sites' type.  We must look
-          at the .attributes['STRUCTURE_CATEGORY'] string.
-    """
-    # decide what sort of data we have in 'sites'
-    if sites.attributes['STRUCTURE_CATEGORY'][0].upper() == 'BUILDING':
-        # note: damage_model has an object called capacity_spectrum_model
-        #       buried inside, which will now calculate capacity curves
-        #       parameters
-        # csm_params are parameters for the capacity_spectrum_model
-        csm_params = {'csm_damping_regimes':
-                          eqrm_flags.csm_damping_regimes,
-                      'csm_damping_modify_Tav':
-                          eqrm_flags.csm_damping_modify_Tav,
-                      'csm_damping_use_smoothing':
-                          eqrm_flags.csm_damping_use_smoothing,
-                      'rtol':
-                          eqrm_flags.csm_SDcr_tolerance_percentage/100.0,
-                      'csm_damping_max_iterations':
-                          eqrm_flags.csm_damping_max_iterations,
-                      'sdtcap':			#FIXME sdt -> std
-                          eqrm_flags.csm_standard_deviation,
-                      'csm_use_variability':
-                          eqrm_flags.csm_use_variability,
-                      'csm_variability_method':
-                          eqrm_flags.csm_variability_method,
-                      'csm_hysteretic_damping':
-                          eqrm_flags.csm_hysteretic_damping,
-                      'atten_override_RSA_shape':
-                          eqrm_flags.atten_override_RSA_shape,
-                      'atten_cutoff_max_spectral_displacement':
-                          eqrm_flags.atten_cutoff_max_spectral_displacement,
-                      'loss_min_pga': eqrm_flags.loss_min_pga}
-
-        damage_model = Damage_model(sites, SA, eqrm_flags.atten_periods,
-                                    event_set_Mw,
-                                    eqrm_flags.csm_use_variability,
-                                    float(eqrm_flags.csm_standard_deviation),
-                                    csm_params=csm_params)
-
-        # Note, aggregate slight, medium, critical damage
-        # Compute building damage and loss (LOTS done here!)
-        total_loss = \
-            damage_model.aggregated_building_loss(
-                        ci=eqrm_flags.loss_regional_cost_index_multiplier,
-                        loss_aus_contents=eqrm_flags.loss_aus_contents)
-
-        if eqrm_flags.bridges_functional_percentages is not None:
-            # get NaN array for 'days_to_complete'
-            dtc_shape = list(total_loss[0].shape)
-            dtc_shape.append(len(eqrm_flags.bridges_functional_percentages))
-            days_to_complete = np.ones(dtc_shape) * np.nan
-        else:
-            days_to_complete = None
-    elif sites.attributes['STRUCTURE_CATEGORY'][0].upper() == 'BRIDGE':
-        # until we *have* a eqrm_flags.bridge_model value, pass None for model
-        #damage_model = Bridge_damage_model(sites, eqrm_flags.bridge_model, SA,
-        damage_model = Bridge_damage_model(sites, None, SA,
-                                           eqrm_flags.atten_periods,
-                                           bridge_sa_indices)
-        states = damage_model.get_states()	# to set up self.structure_state
-        state = bridge_damage.choose_random_state(states[0])
-        total_loss = damage_model.aggregated_loss()
-
-        if eqrm_flags.bridges_functional_percentages is not None:
-            # calculate days to complete for each bridge
-            days_to_complete = time_to_complete(eqrm_flags.bridges_functional_percentages,
-                                                state)
-        else:
-            days_to_complete = None
-            
-    else:
-        msg = ("Got bad STRUCTURE_CATEGORY: '%s'"
-               % sites.attributes['STRUCTURE_CATEGORY'][0])
-        raise RuntimeError(msg)
-
-    return (total_loss, damage_model, days_to_complete)
 
 

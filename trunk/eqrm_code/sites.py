@@ -208,69 +208,6 @@ class Sites(file_store.File_Store):
                              event_set.depths_to_top,
                              projection)
 
-    def join(self, other):
-        """Method used to join two Sites objects.
-
-        self   the first Sites object
-        other  the other Sites object
-
-        Returns a new Sites object containing both 'self' and 'other' data.
-        The notional result is:
-
-             lat  lon      attributes
-             vvv  vvv  vvvvvvvvvvvvvvvvvvvvvvvvv
-
-             +-+  +-+  +-+-+-------------------+
-           > |.|  |.|  |.|.|.........|         |
-         s > |.|  |.|  |.|.|.........|         |
-         e > |.|  |.|  |.|.|..self...|   NaN   |
-         l > |.|  |.|  |.|.|.........|         |
-         f > |.|  |.|  |.|.|.........|         |
-             +-+  +-+  +-+-+---------+---------+
-         o > |.|  |.|  |.|.|         |.........|
-         t > |.|  |.|  |.|.|         |.........|
-         h > |.|  |.|  |.|.|   NaN   |..other..|
-         e > |.|  |.|  |.|.|         |.........|
-         r > |.|  |.|  |.|.|         |.........|
-             +-+  +-+  +-+-+-------------------+
-
-                       ^^^^^
-                    common attributes
-
-        Where the lon & lat vectors are just concatenated.
-        The common attributes are concatenated.
-        The remaining attribute vectors are made final length with NaN in
-        positions with no data.
-        """
-
-        # combine the lat&lon vectors
-        new_lat = np.concatenate((self.latitude, other.latitude))
-        new_lon = np.concatenate((self.longitude, other.longitude))
-
-        # start new attributes dictionary, add in common attributes
-        self_len = len(self.latitude)
-        other_len = len(other.latitude)
-        new_attr = {}
-        common = []				# holds common column names
-        for key in self.attributes:
-            if key in other.attributes:
-                common.append(key)		# remember what is common
-                new_attr[key] = np.concatenate((self.attributes[key],
-                                                other.attributes[key]))
-
-        # now combine other *non-common* attribute vectors
-        # first 'self' attributes
-        for key in self.attributes:
-            if key not in common:
-                 new_attr[key] = np.concatenate((self.attributes[key], 
-                                                 np.array([np.nan]*other_len)))
-        # then 'other' attributes
-        for key in other.attributes:
-            if key not in common:
-                 new_attr[key] = np.concatenate((np.array([np.nan]*self_len),
-                                                 other.attributes[key]))
-
-        return Sites(new_lat, new_lon, **new_attr)
     
     def closest_site(self, lat, lon):
         """Return the index of the closest site to the given lat and lon"""

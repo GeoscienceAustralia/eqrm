@@ -25,7 +25,7 @@ site_db_tag = ""
 # General
 return_periods = [474.56, 500, 974.78999999999996, 2474.9000000000001, 10000]
 input_dir = join('.', 'implementation_tests', 'input', 'national')
-output_dir = join('.', 'implementation_tests', 'current', 'TS_large01')
+output_dir = join('.', 'implementation_tests', 'current', 'TS_haz47')
 use_site_indexes = True # If this is False it will take some time to run
 site_indexes = range(100)
 zone_source_tag = ""
@@ -65,7 +65,7 @@ save_total_financial_loss = False
 save_building_loss = False
 save_contents_loss = False
 save_motion = False
-save_prob_structural_damage = None
+save_prob_structural_damage = False
 
 file_array = False
 
