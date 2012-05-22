@@ -116,9 +116,10 @@ def bridge_states_ModelLinear(model, CLASS, sa_0_3, sa_1_0, skew, num_spans):
     # now calculate K3d value through the parameterised equation
     # if we get divide by zero, pretend num_spans = 2
     (A, B) = EQCoefficients[K3d]
-    try:
-        K3d_value = 1.0 + A/(num_spans - B)
-    except ZeroDivisionError:
+    divisor = num_spans - B
+    if divisor != 0:
+        K3d_value = 1.0 + A/divisor
+    else:
         K3d_value = 1.0 + A
 
     # calculate Kskew - convert degrees to radians

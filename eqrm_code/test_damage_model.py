@@ -24,8 +24,8 @@ from eqrm_code.util import reset_seed, determine_eqrm_path
 from eqrm_code.equivalent_linear_solver import find_intersection
 from eqrm_code.capacity_spectrum_functions import nonlin_damp, \
      calculate_reduction_factors, calculate_updated_demand
-from eqrm_code.damage_model import calc_total_loss, \
-     cumulative_state_probability, reduce_cumulative_to_pdf, Damage_model, \
+from eqrm_code.damage_model import cumulative_state_probability, \
+     reduce_cumulative_to_pdf, Damage_model, \
      Capacity_spectrum_model
 from eqrm_code.capacity_spectrum_model import Capacity_spectrum_model, \
      CSM_DAMPING_REGIMES_USE_ALL, CSM_DAMPING_MODIFY_TAV
@@ -560,11 +560,11 @@ class Test_damage_model(unittest.TestCase):
                             'BUILDING_COST_DENSITY': array([548.9594]),
                             'BID': array([3562]),
                             'PRE1989': array([0])}
-        bridge_sa_indices = array((0,1))
 
         reset_seed(True)
-        (total_loss, _, _) = calc_total_loss(sites, SA, eqrm_flags, event_set,
-                                             bridge_sa_indices)
+        (total_loss, _, _) = sites.calc_total_loss(SA, 
+                                                   eqrm_flags, 
+                                                   event_set)
 
         total_loss_windows = (array([[5.56013748, 0.00899564, 0.]]),
                               array([[4059.31954558, 1473.71938878, 0.]]),

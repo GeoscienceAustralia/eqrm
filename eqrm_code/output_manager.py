@@ -1559,7 +1559,7 @@ def get_days_to_complete_file_name(site_tag, func_p,
     func_p = float_as_string_no_points(func_p)
     if func_p[0] is not '[':
         func_p = '[' + func_p + ']'
-    base_name = site_tag + '_' + 'bridge_days_to_complete' +'_rp' + \
+    base_name = site_tag + '_' + 'bridge_days_to_complete' +'_fp' + \
         func_p + extension
     return base_name
     

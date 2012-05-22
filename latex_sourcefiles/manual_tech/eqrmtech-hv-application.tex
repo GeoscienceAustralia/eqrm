@@ -481,7 +481,7 @@ portfolio. It contains a list of points at which the risk (PSHA simulation)
     \tref{tab:v-dam-allbtypes}, \tref{tab:hazus-types}) for a full
     description of the types.
 
-\item \texttt{STRUCTURE\_CATEGORY}: Type of structure. Currently texttt{BUILDING} only
+\item \texttt{STRUCTURE\_CATEGORY}: Type of structure. Currently \texttt{BUILDING} only
 \item \texttt{HAZUS\_USAGE}: Index to HAZUS usage\index{building usgage!HAZUS} classification (\sref{sec:grids-usageclass})
 \item \texttt{SUBURB}: within which building is located
 \item \texttt{POSTCODE}: Postcode within which building is located
@@ -830,6 +830,121 @@ appropriate to do so. Users are encouraged to familiarise
 themselves with database metadata to ensure that they are using
 the EQRM appropriately for their own application.
 
+\clearpage
+
+\subsection{Bridge Site File}
+\label{sec:grids-bdatabase}
+
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\\
+Filename: \texttt{bridgedb\_<site\_tag><site\_db\_tag>.csv} \\
+\\
+\hline
+\end{tabular}
+\end{center}
+
+The site file for bridges is a csv file containing a header and a list
+of points at which the ground motion will be computed, and bridge damage 
+estimated. An example is given below in the grey shaded box:
+ 
+\lstinputlisting{xml_examples/bridgedb_newc.csv}
+
+\textbf{Parameters in the hazard site file:}
+\begin{itemize}
+\item \texttt{Latitude}: Latitude of the bridge of interest.
+\item \texttt{Longitude}: Longitude of the bridge of interest.
+\item \texttt{STRUCTURE\_CLASSIFICATION}: HAZUS bridge type. See 
+ \tref{tab:hazus-bridge-types} for a description of the types.
+\item \texttt{STRUCTURE\_CATEGORY}: Type of structure. Currently \texttt{BRIDGE} 
+ only.
+\item \texttt{SKEW}: Bridge skew (degrees).
+\item \texttt{SPAN}: Number of spans in the bridge.
+\item \texttt{SITE\_CLASS}: Regolith site class. Typically, this is defined
+by a letter. Note that the value of this parameter must match with
+an amplification factor defined in the amplification file (see
+\sref{sec:-appl-amplification}).
+\end{itemize}
+
+\begin{table}
+ \caption{Definitions of the HAZUS Highway Bridge Classification.} 
+ \vspace{0.8em} \label{tab:hazus-bridge-types}.
+\centering
+ {\footnotesize .
+\begin{tabular}{|c|p{0.8\textwidth}|}
+\hline
+code & description\\
+\hline
+HWB1 & Major Bridge - Length $>$ 150m (Conventional Design) \\
+HWB2 & Major Bridge - Length $>$ 150m (Seismic Design) \\
+HWB3 & Single Span – (Not HWB1 or HWB2) (Conventional Design) \\
+HWB4 & Single Span – (Not HWB1 or HWB2) (Seismic Design) \\
+HWB5 & Concrete, Multi-Column Bent, Simple Support (Conventional Design), Non-California (Non-CA) \\
+HWB6 & Concrete, Multi-Column Bent, Simple Support (Conventional Design), California (CA) \\
+HWB7 & Concrete, Multi-Column Bent, Simple Support (Seismic Design) \\
+HWB8 & Continuous Concrete, Single Column, Box Girder (Conventional Design) \\
+HWB9 & Continuous Concrete, Single Column, Box Girder (Seismic Design) \\
+HWB10 & Continuous Concrete, (Not HWB8 or HWB9) (Conventional Design) \\
+HWB11 & Continuous Concrete, (Not HWB8 or HWB9) (Seismic Design) \\
+HWB12 & Steel, Multi-Column Bent, Simple Support (Conventional Design), Non-California (Non-CA) \\
+HWB13 & Steel, Multi-Column Bent, Simple Support (Conventional Design), California (CA) \\
+HWB14 & Steel, Multi-Column Bent, Simple Support (Seismic Design) \\
+HWB15 & Continuous Steel (Conventional Design) \\
+HWB16 & Continuous Steel (Seismic Design) \\
+HWB17 & PS Concrete Multi-Column Bent, Simple Support - (Conventional Design), Non-California \\ 
+HWB18 & PS Concrete, Multi-Column Bent, Simple Support (Conventional Design), California (CA) \\
+HWB19 & PS Concrete, Multi-Column Bent, Simple Support (Seismic Design) \\
+HWB20 & PS Concrete, Single Column, Box Girder (Conventional Design) \\
+HWB21 & PS Concrete, Single Column, Box Girder (Seismic Design) \\
+HWB22 & Continuous Concrete, (Not HWB20/HWB21) (Conventional Design) \\
+HWB23 & Continuous Concrete, (Not HWB20/HWB21) (Seismic Design) \\
+HWB24 & Same definition as HWB12 except that the bridge length is less than 20 meters \\
+HWB25 & Same definition as HWB13 except that the bridge length is less than 20 meters \\
+HWB26 & Same definition as HWB15 except that the bridge length is less than 20 meters and Non-CA \\
+HWB27 & Same definition as HWB15 except that the bridge length is less than 20 meters and in CA \\
+HWB28 & All other bridges that are not classified (including wooden bridges) \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+\clearpage
+
+\subsection{Fatality Site File}
+\label{sec:grids-bdatabase}
+
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\\
+Filename: \texttt{<site\_tag>\_popexp.csv} \\
+\\
+\hline
+\end{tabular}
+\end{center}
+
+The site file for fatalities is a csv file containing a header and a list
+of points at which the ground motion will be computed and converted to Modified 
+Mercali Intensity (MMI), with which the population fatalities are estimated. 
+An example is given below in the grey shaded box:
+ 
+\lstinputlisting{xml_examples/java_popexp.csv}
+
+\textbf{Parameters in the hazard site file:}
+\begin{itemize}
+\item \texttt{Latitude}: Latitude of the points of interest.
+\item \texttt{Longitude}: Longitude of the points of interest.
+\item \texttt{SITE\_CLASS}: Regolith site class. Typically, this is defined
+by a letter. Note that the value of this parameter must match with
+an amplification factor defined in the amplification file (see
+\sref{sec:-appl-amplification})
+\item \texttt{VS30}: Average velocity in the top 30\,m (i.e. $V_{s30}$). This is used
+to incorporate regolith for GMPEs with a $V_{s30}$ term.
+\item \texttt{POPULATION}: Population of the point of interest. An estimate of 
+fatalities comes from the fatality rate as per the formula from USGS Open-File
+Report 2009-1136 multiplied by \texttt{POPULATION}.
+\end{itemize}
 
 \clearpage
 

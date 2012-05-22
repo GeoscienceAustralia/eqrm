@@ -142,52 +142,6 @@ class Test_Sites(unittest.TestCase):
                                             site_indexes)
         self.failUnlessEqual(site_indexes, new_sites.attributes['id'])
 
-    def test_join(self):
-        """Test the 'join two Sites' method."""
-
-        # create two small sites
-        attributes1 = {'mo': array(['money', 'soup']),
-                       'SITE_CLASS_1': array(['E', 'C']),
-                       'id1': array([1, 2])}
-        latitude1 = [10, 20]
-        longitude1 = [1, 2]
-        sites1 = Sites(latitude1, longitude1, **attributes1)
-        
-        attributes2 = {'mo': array(['money1', 'soup1']),
-                       'SITE_CLASS_2': array(['F', 'G']),
-                       'id2': array([3, 4])}
-        latitude2 = [11, 21]
-        longitude2 = [3, 4]
-        sites2 = Sites(latitude2, longitude2, **attributes2)
-
-        joined_sites = sites1.join(sites2)
-        
-        # now test result
-        len1 = len(sites1)
-        len2 = len(sites2)
-
-        expected_lat = np.concatenate((latitude1, latitude2))
-        self.failUnless(np.all(joined_sites.latitude == expected_lat))
-
-        expected_lon = np.concatenate((longitude1, longitude2))
-        self.failUnless(np.all(joined_sites.longitude == expected_lon))
-
-        # common column - 'mo'
-        expected_mo = np.concatenate((attributes1['mo'], attributes2['mo']))
-        self.failUnless(np.all(joined_sites.attributes['mo'] == expected_mo))
-
-        # column only in first object - 'SITE_CLASS_1'
-        expected_site_class1 = np.concatenate((attributes1['SITE_CLASS_1'],
-                                               np.array([np.nan]*len2)))
-        self.failUnless(np.all(joined_sites.attributes['SITE_CLASS_1'] == 
-                               expected_site_class1))
-
-        # column only in second object - 'SITE_CLASS_2'
-        expected_site_class2 = np.concatenate((np.array([np.nan]*len1),
-                                               attributes2['SITE_CLASS_2']))
-        self.failUnless(np.all(joined_sites.attributes['SITE_CLASS_2'] == 
-                               expected_site_class2))
-
     def test_closest_site(self):
         # Test data from GA website 
         # http://www.ga.gov.au/earth-monitoring/geodesy/geodetic-techniques/distance-calculation-algorithms.html
