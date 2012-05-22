@@ -4,6 +4,5 @@
 #PBS -l walltime=00:05:00
 #PBS -l vmem=500MB
 #PBS -l jobfs=500MB
-#PBS -l other=fc
 
 python test_all.py

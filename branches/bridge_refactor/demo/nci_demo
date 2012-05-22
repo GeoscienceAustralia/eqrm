@@ -4,7 +4,6 @@
 #PBS -l ncpus=64
 #PBS -l walltime=2:00:00
 #PBS -l vmem=20GB
-#PBS -l jobfs=200GB
-#PBS -l other=fc
+#PBS -l jobfs=64GB
 
 mpirun python setdata_ProbHaz_NCI.py
