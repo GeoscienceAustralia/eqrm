@@ -51,6 +51,7 @@ from os import sep, walk, listdir, path, remove
 import socket
 import csv
 import os
+import pickle
 
 from os.path import join, splitext, abspath
 
@@ -242,9 +243,24 @@ def directory_diff(dirA, dirB):
             lineA = fileA
             lineB = fileB
             
+        elif fileA[-2:] == '.p':
+            # Likely to be source_model. The comparison methods take care of the
+            # equality check.
+            # Note: If this is another pickled object then __eq__ and __ne__ 
+            # need to be defined for it.
+            
+            pickledObjA = pickle.load(open(fileA, 'rb'))
+            pickledObjB = pickle.load(open(fileB, 'rb'))
+            
+            if pickledObjA != pickledObjB:
+                result = False
+            else:
+                result = True
+                
+            lineA = '%r' % pickledObjA
+            lineB = '%r' % pickledObjB 
+            
         else:
-            # Likely to be a pickled file
-            # Pickled files are ascii so lets use file_diff
             result, lineA, lineB = file_diff(fileA, fileB)
         
         if not result:
