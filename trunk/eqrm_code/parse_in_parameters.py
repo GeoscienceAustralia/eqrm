@@ -33,6 +33,7 @@ import sys
 import os
 import socket
 import imp
+import base64
 from os.path import join
 from time import strftime, localtime
 from scipy import allclose, array, sort, asarray, ndarray
@@ -805,8 +806,6 @@ def _change_slashes(path):
             path = join(*split_path)
     return path
 
-
-unique_load_source_int = 0            
 def _from_file_get_params(path_file):
     """
     Convert an EQRM control file to dictionary of attributes.
@@ -817,9 +816,7 @@ def _from_file_get_params(path_file):
     returns:
       A dictionary of attribute values from the path_file file.
     """
-    global unique_load_source_int
-    name = 'name_' + str(unique_load_source_int)
-    unique_load_source_int += 1
+    name = 'name_' + base64.urlsafe_b64encode(os.urandom(32))
     try:
         para_imp = imp.load_source(name, path_file)
     except IOError, exc:
