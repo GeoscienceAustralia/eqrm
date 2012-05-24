@@ -892,7 +892,7 @@ def _verify_eqrm_flags(eqrm_flags):
 
 def is_param_compatible(param, eqrm_flags):
     """
-    A parameter is compatible with if
+    A parameter is not compatible if
     - it is not None, and
     - it is non-default, and
     - is not compatible with the run_type specified
