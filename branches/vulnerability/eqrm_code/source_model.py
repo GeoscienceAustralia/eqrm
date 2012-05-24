@@ -11,7 +11,7 @@
   
   Copyright 2007 by Geoscience Australia
 """
-from scipy import zeros, where, arange, asarray
+from scipy import zeros, where, arange, asarray, allclose
 
 from eqrm_code.recurrence_functions import calc_event_activity
 from eqrm_code.polygon_class import polygon_object
@@ -55,6 +55,28 @@ class Source_Model(object):
         s = s+'sources = '+str(self._sources)+n
         s = s+'magnitude_type = '+str(self._magnitude_type)+n
         return s
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
+    
+    def __eq__(self, other):
+        # Check each source for equality. Let's just use some EventZone 
+        # attributes since it may be a Source object is a subclass of EventZone
+        # Note that this doesn't compare all attributes so may be inaccurate
+        for i, source in enumerate(self):
+            other_source = other[i]
+            if source.name != other_source.name: 
+                return False
+            if not allclose(asarray(source.event_set_indexes), 
+                            asarray(other_source.event_set_indexes)):
+                return False
+            if not allclose(asarray(source.atten_model_weights),
+                            asarray(other_source.atten_model_weights)):
+                return False
+            if source.fault_type != other_source.fault_type:
+                return False
+        
+        return True
 
     @classmethod
     def load(cls, dir=None):
