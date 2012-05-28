@@ -28,7 +28,7 @@ class CatalogueReader(object):
             if self.infile.endswith('.nordic'):
                 self.file_format = 'nordic'
             elif self.infile.endswith('.csv'):
-                self.file_format = 'csv'
+                self.file_format = 'isc_csv'
             else:
                 msg = 'File format unknown or not implemented'
                 raise Exception(msg)
@@ -93,9 +93,58 @@ class CatalogueReader(object):
                 event_list.append(Event)
             self.EventSet = earthquake_event.EventSet(event_list)
                                                                  
+        if self.file_format == 'isc_csv':
+            ifile = open(self.infile,'r')
+            csvreader = csv.reader(ifile)
+            for i in range(6):
+                header = csvreader.next()
+            for row in csvreader:
+                #print 'row',row
+                event_id = row[0]
+                author = row[1].strip(' ')
+                date = row[2]
+                time = row[3]
+                lat = row[4]
+                lon = row[5]
+                depth = row[6]
+                #DEPFIX = row[7]
+                magnitudes = row[8:]
+                for i in range(len(magnitudes)):
+                    magnitudes[i] = magnitudes[i].strip(' ')
+                if magnitudes[-1] == '':
+                    magnitudes = magnitudes[:-1]
+
+                year, month, day = date.split('-')
+                hour, minute, second = time.split(':')
+                second, microsecond = second.split('.')
+                year, month, day, hour, minute, second, microsecond = \
+                      int(year), int(month), int(day), int(hour), int(minute),\
+                      int(second), int(microsecond)
+                event_time = datetime.datetime(year, month, day, hour, minute, second)
+
+                magnitude_author_list = magnitudes[0::3]
+                magnitude_type_list = magnitudes[1::3]
+                magnitude_value_list_str = magnitudes[2::3]
+                magnitude_value_list = []
+                for value in magnitude_value_list_str:
+                    magnitude_value_list.append(float(value))
+                
+                #print magnitude_value_list
+                if len(magnitude_value_list) > 0:
+                    Event  = earthquake_event.EarthquakeEvent(lon, lat, float(magnitudes[2]), event_time, 
+                                                              depth = depth, 
+                                                              event_id = event_id, author = author,
+                                                              magnitude_list = magnitude_value_list,
+                                                              magnitude_type_list = magnitude_type_list,
+                                                              magnitude_author_list = magnitude_author_list)
+                else:
+                    #print 'No magnitude recorded, ignoring entry'
+                    continue
+                event_list.append(Event)
+            self.EventSet = earthquake_event.EventSet(event_list)
 
         # Read 'csv' Engdahl format
-        if self.file_format == 'csv':
+        if self.file_format == 'engdahl_csv':
             ifile = open(self.infile,'r')
             csvreader = csv.reader(ifile)
             header = csvreader.next()               
