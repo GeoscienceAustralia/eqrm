@@ -87,7 +87,7 @@ class Test_catalogue_reader(unittest.TestCase):
             f_out.write(i + '\n')
         f_out.close()
 
-        read_catalogue = catalogue_reader.CatalogueReader(test_file).EventSet
+        read_catalogue = catalogue_reader.CatalogueReader(test_file, file_format = 'engdahl_csv').EventSet
 
         i = 0
         for event in read_catalogue.catalogue_subset['all']:
