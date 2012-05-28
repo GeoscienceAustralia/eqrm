@@ -29,6 +29,11 @@ class EarthquakeEvent(object):
         # Get kwargs
         self.depth = kwargs.get('depth', None)
         self.mag_type = kwargs.get('mag_type', None)
+        self.eventid = kwargs.get('event_id', None)
+        self.author = kwargs.get('author', None)
+        self.magnitude_list = kwargs.get('magnitude_list', None)
+        self.magnitude_type_list = kwargs.get('magnitude_type_list', None)
+        self.magnitude_author_list = kwargs.get('magnitude_author_list', None)
         
         
 
@@ -65,14 +70,18 @@ class EventSet(object):
         self.max_time = kwargs.get('max_time', None)
         self.min_time = kwargs.get('min_time', None)
         self.mag_type = kwargs.get('mag_type', None)
+        # Lists
+        self.magnitude_authors = kwargs.get('magnitude_authors', None)
+        self.magnitude_types = kwargs.get('magnitude_types', None)
 
         subset_name = subset_name
 
         # New list for catalogg subset
 
         catalogue_subset = []
-
+        
         for event in self.catalogue_subset['all']:
+            
             # Select magnitudes
             if self.max_mag is None:
                 pass
@@ -120,7 +129,7 @@ class EventSet(object):
                 pass
             elif event.depth < self.min_depth:
                 continue
-
+            
             # Select time
             if self.max_time is None:
                 pass
@@ -132,6 +141,7 @@ class EventSet(object):
                 continue
 
             # Select magnitude type
+            
             if self.mag_type is None:
                 pass
             elif event.mag_type is None:
@@ -140,10 +150,32 @@ class EventSet(object):
             elif event.mag_type != self.mag_type:
                 continue
 
+            # Select events which have magnitudes from specific stations (wanted_author_name)
+            author_index = None
+            #author_index_list = []
+            if self.magnitude_authors is None:
+                pass
+            elif self.magnitude_authors is not None:               
+                for wanted_author_name in self.magnitude_authors:
+                    try:
+                        author_index = event.magnitude_author_list.index(wanted_author_name)
+                        #author_index_list.append(author_index)
+                        pass
+                    except ValueError:
+                        author_index = None
+                        break
+            if author_index is not None:
+                pass
+            elif author_index is None:
+                continue
+                           
+                            
+                            
             # If the event is within the required parameters,
             # append to the new event set
             catalogue_subset.append(event)
             self.catalogue_subset[subset_name] = catalogue_subset
+            
         
     def get_magnitudes(self, subset_name='all'):
         """ Get numpy array of all magnitudes"""
@@ -160,7 +192,7 @@ class EventSet(object):
         self.times[subset_name] = np.array(times)
 
     def get_depths(self, subset_name='all'):
-        """ Get numpy array of all magnitudes"""
+        """ Get numpy array of all depths"""
         depths = []
         for event in self.catalogue_subset[subset_name]:
             depths.append(event.depth)
