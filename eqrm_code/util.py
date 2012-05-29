@@ -263,6 +263,9 @@ def convert_path_string_to_join(path):
     if out[0] == '' and len(out) > 1:
         out.pop(0)
         out[0] = os.sep + out[0]
+    # Don't make a drive reference point to a relative path
+    if out[0][-1] == ':':
+        out[0] += '\\\\' # == '\\' escape characters!
     out = "', '".join(out)
     out = "join('" + out + "')"
     return out
