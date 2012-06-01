@@ -25,12 +25,14 @@ SPAWN = 1
 # subclasses) in the test suite.
 gm_rvs = norm.rvs  # function from scipy.stats
 
-class Distribution_Log_Normal(object):
+class Distribution(object):
     """
-    Provides a way to pick log-normally distributed samples from a set
-    of normal distributions characterised by mean and
-    standard-deviation parameters.
-
+    Provides a way to pick normally or lognormally distributed samples from 
+    a set of normal distributions characterised by mean and standard-deviation 
+    parameters.
+    
+    Choose the distribution by overriding the return value function in the 
+    constructor.
     """
     sample_shape = (Ellipsis,) # Essentially a no-op in this base
                                # class. See ._monte_carlo()
@@ -38,57 +40,81 @@ class Distribution_Log_Normal(object):
     def __init__(self, var_method):
         self.var_method = var_method        
         self.rvs = gm_rvs
+        self.val_func = exp
             
-    def sample_for_eqrm(self, log_mean, log_sigma):
+    def sample_for_eqrm(self, mean, sigma):
         """
-        log_mean, log_sigma: ndarray. Must have identical shapes. See
-        GroundMotionDistributionLogNormal.ground_motion_sample() for
-        details.
+        mean, sigma: ndarray. Must have identical shapes.
 
-        Returns: ndarray in the same shape as log_mean. Estimated
+        Returns: ndarray in the same shape as mean. Estimated
         pectral accelerations at a site due to an event.
         """
-        assert log_sigma.shape == log_mean.shape
+        assert sigma.shape == mean.shape
         
         if self.var_method == None:
-            sample_values = exp(log_mean)           
+            sample_values = self.val_func(mean)
         elif self.var_method == 2:
             # monte carlo
-            sample_values = self._monte_carlo(log_mean, log_sigma)
+            sample_values = self._monte_carlo(mean, sigma)
         elif self.var_method == 3:
             # + 2 sigma
-            sample_values = exp(log_mean+2*log_sigma)  
+            sample_values = self.val_func(mean+2*sigma)
         elif self.var_method == 4:
             # + 1 sigma
-            sample_values = exp(log_mean+1*log_sigma)
+            sample_values = self.val_func(mean+1*sigma)
         elif self.var_method == 5:
             # - 1 sigma
-            sample_values = exp(log_mean-1*log_sigma)
+            sample_values = self.val_func(mean-1*sigma)
         elif self.var_method == 6:
             # - 2 sigma
-            sample_values = exp(log_mean-2*log_sigma)
+            sample_values = self.val_func(mean-2*sigma)
         else:
             raise RuntimeError('Unknown var_method %s' % str(self.var_method))
         return sample_values
         
-    def _vs(self, log_sigma):
+    def _vs(self, sigma):
         # Gets overridden in child class
-        return  self.rvs(size = log_sigma.size).reshape(log_sigma.shape)
+        return  self.rvs(size = sigma.size).reshape(sigma.shape)
 
-    def _monte_carlo(self, log_mean, log_sigma):
+    def _monte_carlo(self, mean, sigma):
         """
-        Perform random sampling about log_mean with log_sigma.
+        Perform random sampling about mean with sigma.
         self.sample_shape and self._vs() controls the shape of the
         result.
         """
-        assert log_sigma.shape == log_mean.shape
-        variate_site = self._vs(log_sigma)
+        assert sigma.shape == mean.shape
+        variate_site = self._vs(sigma)
 
         oldsettings = seterr(over='ignore')
         # self.sample_shape and variate_site will have compatible dims
-        sample_values = exp(log_mean[self.sample_shape] + variate_site * log_sigma[self.sample_shape])
+        sample_values = self.val_func(mean[self.sample_shape] + 
+                                      variate_site * sigma[self.sample_shape])
         seterr(**oldsettings)
         return sample_values
+
+class Distribution_Log_Normal(Distribution):
+    """
+    Provides a way to pick log-normally distributed samples from a set
+    of normal distributions characterised by mean and
+    standard-deviation parameters.
+
+    """
+    
+    def __init__(self, var_method):
+        super(Distribution_Log_Normal, self).__init__(var_method)
+        self.val_func = exp
+        
+class Distribution_Normal(Distribution):
+    """
+    Provides a way to pick normally distributed samples from a set
+    of normal distributions characterised by mean and
+    standard-deviation parameters.
+
+    """
+    
+    def __init__(self, var_method):
+        super(Distribution_Normal, self).__init__(var_method)
+        self.val_func = lambda x: x
 
 
 class GroundMotionDistributionLogNormal(Distribution_Log_Normal):

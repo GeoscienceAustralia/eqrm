@@ -562,9 +562,9 @@ class Test_damage_model(unittest.TestCase):
                             'PRE1989': array([0])}
 
         reset_seed(True)
-        (total_loss, _, _) = sites.calc_total_loss(SA, 
-                                                   eqrm_flags, 
-                                                   event_set)
+        total_loss, _ = sites.calc_total_loss(SA, 
+                                              eqrm_flags, 
+                                              event_set)
 
         total_loss_windows = (array([[5.56013748, 0.00899564, 0.]]),
                               array([[4059.31954558, 1473.71938878, 0.]]),
