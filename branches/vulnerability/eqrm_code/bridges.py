@@ -120,7 +120,12 @@ class Bridges(Sites):
             attributes[k] = self.attributes[k][key]
 
         # get final Sites object
-        return Bridges(self.latitude[key], self.longitude[key],
-                       **attributes)
+        bridges = Bridges(self.latitude[key], self.longitude[key],
+                          **attributes)
+        
+        if self.vulnerability_set is not None:
+            bridges.vulnerability_set = self.vulnerability_set
+        
+        return bridges
 
 
