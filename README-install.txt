@@ -138,7 +138,7 @@ installing each of the necessary packages is found at the website of
 each package, so only general instructions are given here.
 
 Install;
-* python 2.4 + (http://www.python.org/download/)
+* python 2.5 + (http://www.python.org/download/)
 * python-dev
 * python package numpy (http://numpy.scipy.org/)
 * python package scipy , (http://www.scipy.org/)
@@ -169,7 +169,7 @@ in the *\eqrm_core\ directory;
     
     14/09/11 - For Ubuntu 11.04 64 bit g++-4.5 is installed, and weave works.
 
-To install the components required for any plotting you may require, install:
+For plotting install;
 * python-matplotlib
 * gmt
 
@@ -224,9 +224,6 @@ NOTES:
 *** Scipy is dependent on numpy, so numpy must be installed before
     scipy, and the two versions must be compatible.
 
-*** If you use numpy version < 1 (NOT RECOMENDED), you will need to
-    search and replace newaxis with NewAxis throughout the code.
-    
 *** To find out the version of numpy, do
     import numpy
     numpy.version.version
