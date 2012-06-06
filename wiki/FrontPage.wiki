@@ -1,13 +1,17 @@
-#summary One-sentence summary of this page.
+# A quick guide to EQRM.
 
-= Introduction =
+<wiki:toc max_depth="1" />
 
-Creating a wiki page for EQRM.
+= Overview =
+EQRM is capable of earthquake scenario ground motion and scenario loss modeling as well as probabilistic seismic hazard (PSHA) and risk (PSRA) modeling. It is a product of Geoscience Australia an Australian Government Agency.
 
 
-= Details =
+= Getting started =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+EQRM can be downloaded using the Source tab.  
+
+EQRM is also zipped by and placed on SourceForge http://sourceforge.net/projects/eqrm/.
+
+For install information, the root directory of EQRM has a README-install.txt file.
+
+
