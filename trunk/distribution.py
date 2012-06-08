@@ -72,8 +72,8 @@ def create_distribution_zip(vername, distro_dirs=None,
 
     # When using this, make sure the expo_dir is not deleted in 2 places.
     
-    if False: # This needs a windows svn command line prompt 
-        s = 'svn --force export http://65.61.168.30/svn/eqrm_core/trunk '\
+    if True: # This needs a windows svn command line prompt 
+        s = 'svn --force export http://eqrm.googlecode.com/svn/trunk/ .'\
             + expo_dir
     
         print s
@@ -170,7 +170,7 @@ def create_distribution_zip(vername, distro_dirs=None,
         print "***  Could not move EQRM_inputs.pdf ***"
         print "***************************************"
 
-    if False:
+    if True:
         chdir('latex_sourcefiles')
         chdir('manual_tech')
         file_base = 'EQRM_inputs'
