@@ -83,8 +83,12 @@ CSM is capacity spectrum method \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{run\_type}: (Mandatory) \\
 Defines the operation mode of the EQRM: \\
-  \hspace{0.5em} `hazard' $\Rightarrow$ Scenario RSA and PSHA (probabilistic hazard); \\
-  \hspace{0.5em} `risk' $\Rightarrow$ Scenario Loss and PSRA (probabilistic risk); \\
+  \hspace{0.5em} `hazard' $\Rightarrow$ Scenario RSA and PSHA (probabilistic 
+  hazard); \\
+  \hspace{0.5em} `risk\_csm' $\Rightarrow$ Scenario Loss and PSRA (probabilistic 
+  risk) based on fragility curves; \\
+  \hspace{0.5em} `risk\_mmi' $\Rightarrow$ Scenario Loss and PSRA (probabilistic 
+  risk) based on user-defined vulnerability curves; \\
   \hspace{0.5em} `fatality' $\Rightarrow$ Scenario Fatality forecast (based on 
   MMI and population from USGS Open-File Report 2009-1136); \\
   \hspace{0.5em} `bridge' $\Rightarrow$ Bridge damage (based on fragility curves
@@ -126,17 +130,17 @@ DEFAULT = \texttt{False} \\
  \hspace{0.5em} True $\Rightarrow$ sample sites with indices in
 \typepar{site\_indexes}{}{} (for testing simulations);  \\
  \hspace{0.5em} \texttt{False} $\Rightarrow$ No sub-sampling. \\
-%---------------------------------------------------------
-\hline \vspace{0.1em} \texttt{site\_indexes}: \\
-List whose elements represent the site
- indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
- index of the first row of data  (i.e. first data row in site file) is 1.\\
  \hline
 \end{tabular}
 \end{table}
 
 \vspace{2em}
 \begin{tabular}{|p{\textwidth}|}
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{site\_indexes}: \\
+List whose elements represent the site
+ indices to be used (if $\typepar{use}{\_site}{\_indexes}=\texttt{True}$). The
+ index of the first row of data  (i.e. first data row in site file) is 1.\\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{fault\_source\_tag}: \\
 Tag for specifying a source fault file. \\
@@ -309,14 +313,14 @@ use RSA shape from Australian earthquake loading \\
 \hspace{11em} standard; \\
  \hspace{0.5em} \texttt{`HAZUS\_Sa'}  $\Rightarrow$ use RSA shape defined by HAZUS;\\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_cutoff\_max\_spectral\_displacement}: \\
 DEFAULT = \texttt{False} \\
 \hspace{0.5em} \texttt{True} $\Rightarrow$ cutoff maximum spectral displacement. \\
 \hspace{0.5em} \texttt{False} $\Rightarrow$ no cutoff applied to spectral displacement. \\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{atten\_pga\_scaling\_cutoff}: \\
 DEFAULT = 2 \\
@@ -374,14 +378,14 @@ This maximum is not used for $V_{s30}$ models.    \\
 \hline \vspace{0.1em} \texttt{buildings\_usage\_classification}: \\
 Building usage classification system - \texttt{'HAZUS'} or \texttt{'FCB'} \\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm', `risk\_mmi' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em}
 \texttt{buildings\_set\_damping\_Be\_to\_5\_percent}: \\
 SUGGESTED = \texttt{False} \\
 If \texttt{True} a damping $B_e$ of $5\%$ will be used for all building structures.\\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em}
 \texttt{bridges\_functional\_percentages}: \\
@@ -409,7 +413,7 @@ SUGGESTED = \texttt{True} \\
 \texttt{csm\_variability\_method};    \\
 \hspace{0.5em} \texttt{False} $\Rightarrow$ no aleatory variability applied.  \\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_variability\_method}: \\
 SUGGESTED = 3 \\
@@ -419,13 +423,13 @@ Method used to incorporate variability in capacity curve\index{capacity curve}: 
  point only and yield point \\
  \hspace{2.5em} re-calculated to satisfy capacity curve `shape' constraint. \\
  \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_standard\_deviation}: \\
 SUGGESTED = 0.3 \\
 Standard deviation for capacity curve\index{capacity curve} log--normal PDF.      \\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_regimes}: \\
 PREFERRED = 0 \\
@@ -435,7 +439,7 @@ used: \\
  \hspace{0.5em} 1 $\Rightarrow$ use $R_a$, $R_v$ and assign $R_d= R_v$; \\
  \hspace{0.5em} 2 $\Rightarrow$ use $R_v$ only and assign $R_a=R_d=R_v$. \\
  \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_modify\_Tav}: \\
 PREFERRED = \texttt{True} \\
@@ -443,7 +447,7 @@ Modify transition building period i.e. corner period $T_{av}$: \\
  \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: modify as in HAZUS; \\
  \hspace{0.5em}  \texttt{False} $\Rightarrow$ do NOT modify. \\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
  \hline
 \end{tabular}
 
@@ -459,7 +463,7 @@ Smoothing of damped curve: \\
  \hspace{0.5em} \texttt{True} $\Rightarrow$ \small{PREFERRED}: apply smoothing; \\
  \hspace{0.5em} \texttt{False} $\Rightarrow$ NO smoothing.\\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_hysteretic\_damping}: \\
 PREFERRED = \texttt{`curve'} \\
@@ -468,20 +472,20 @@ Technique for Hysteretic  damping: \\
  \hspace{0.5em} \texttt{`trapezoidal'} $\Rightarrow$ Hysteretic  damping via trapezoidal approximation; \\
  \hspace{0.5em} \texttt{`curve'} $\Rightarrow$ \small{PREFERRED}: Hysteretic  damping via curve fitting. \\
  \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_SDcr\_tolerance\_percentage}: \\
 SUGGESTED = 1.0 \\
 Convergence tolerance as a percentage for critical spectral
 displacement in nonlinear damping calculations. \\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_max\_iterations}: \\
 SUGGESTED = 7 \\
  Maximum iterations for nonlinear damping calculations.\\
  \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
  \hline
 %---------------------------------------------------------
  \end{tabular}
@@ -496,7 +500,7 @@ Supported \texttt{run\_type} $=$ `risk' \\
 SUGGESTED = 0.05 \\
 Minimum PGA(g) below which financial loss is assigned to zero. \\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline
 \vspace{0.1em} \texttt{loss\_regional\_cost\_index\_multiplier}: \\
@@ -504,7 +508,7 @@ SUGGESTED = 1 \\
 Regional cost index multiplier to convert dollar values in building
 database to desired regional and temporal (i.e. inflation) values.\\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{loss\_aus\_contents}: \\
 SUGGESTED = 0 \\
@@ -516,7 +520,30 @@ Contents value for residential buildings and salvageability after complete build
 building database and salvageability \\
 \hspace{2.5em} of zero.\\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
+  \hline
+%---------------------------------------------------------
+ \end{tabular}
+ 
+ 
+\vspace{2em}
+\begin{tabular}{|p{\textwidth}|}
+%---------------------------------------------------------
+\hline
+\vspace{0.3em} \noindent \Large \textbf{Vulnerability Input:} \normalsize \\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{vulnerability\_variability\_method}: \\
+DEFAULT = 2 \\
+Technique used to sample mean loss derived from vulnerability curves: \\
+ \hspace{0.5em} None $\Rightarrow$ No sampling; \\
+ \hspace{0.5em} 2 $\Rightarrow$ random sampling; \\
+ \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
+ \hspace{0.5em} 4 $\Rightarrow$ $+\sigma$; \\
+ \hspace{0.5em} 5 $\Rightarrow$ $-\sigma$; \\
+ \hspace{0.5em} 6 $\Rightarrow$ $-2\sigma$.\\
+ \hspace{0.5em} 7 $\Rightarrow$ $-2\sigma$.\\
+ \\
+ Supported \texttt{run\_type} $=$ `risk\_mmi' \\
   \hline
 %---------------------------------------------------------
  \end{tabular}
@@ -536,21 +563,21 @@ location, return period and period.\\
 DEFAULT = \texttt{False} \\
 \texttt{True} $\Rightarrow$ Save total financial loss. \\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
  \hline
 \vspace{0.1em} \texttt{save\_building\_loss}: \\
 DEFAULT = \texttt{False} \\
 \texttt{True} $\Rightarrow$ Save building loss. \\
 \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm', `risk\_mmi' \\
 %---------------------------------------------------------
  \hline
 \vspace{0.1em} \texttt{save\_contents\_loss}: \\
 DEFAULT = \texttt{False} \\
  \texttt{True} $\Rightarrow$ Save contents loss. \\
  \\
-Supported \texttt{run\_type} $=$ `risk' \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{save\_motion}: \\
 DEFAULT = \texttt{False} \\
@@ -564,7 +591,7 @@ DEFAULT = \texttt{False} \\
 probability of being in each
 damage state.  Note this is only supported for a single event. \\
 \\
-Supported \texttt{run\_type} $=$ `risk', `bridge' \\
+Supported \texttt{run\_type} $=$ `risk\_csm', `bridge' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{save\_fatalities}: \\
 DEFAULT = \texttt{False} \\
