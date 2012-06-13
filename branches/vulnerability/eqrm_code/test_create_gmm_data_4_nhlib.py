@@ -47,6 +47,7 @@ class Test_create_gmm_data_4_nhlib(unittest.TestCase):
                           'AVERAGE_HORIZONTAL'] + sa
                 self.assertEqual(row, actual)
 
+        handle.close()
         os.remove(file_name)
            
 
@@ -83,6 +84,7 @@ class Test_create_gmm_data_4_nhlib(unittest.TestCase):
                           'AVERAGE_HORIZONTAL'] + sa
                 self.assertEqual(row, actual)
 
+        handle.close()
         os.remove(file_name)
            
 ################################################################################

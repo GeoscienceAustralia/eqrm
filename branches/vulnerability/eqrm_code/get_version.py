@@ -12,7 +12,7 @@ SubWCRev.exe . ver.txt ver.py
 import os
 import re
 import sys
-import commands
+import subprocess
 from os.path import join
 import tempfile
 from xml.dom import minidom
@@ -40,7 +40,6 @@ def get_version():
     try:
         # The stored_version_info.py file is created during the distribution
         # process.
-        import stored_version_info
         version = stored_version_info.version
         date = None
         modified = None
@@ -115,21 +114,24 @@ def get_version_sandpit_windows():
     fid.write(asc)
     fid.close()
 
-    #Run conversion
-    cmd = 'SubWCRev.exe . %s %s' %(file_in, file_out)
-    err = os.system(cmd)
-    if err != 0:
-        #msg = 'Command %s could not execute.'
-        #msg += 'Make sure the program SubWCRev.exe is available on your path'
-        #raise msg
-        
+    # Run conversion
+    cmd = ['SubWCRev.exe', '.', file_in, file_out]
+    fnull = open(os.devnull, 'w') 
+    try:
+        # Suppress stdout and stderr by piping to devnull
+        subprocess.check_call(cmd, stdout=fnull, stderr=fnull)
+        fnull.close()
+    except:
+        fnull.close()
         # Delete files
         os.remove(file_out)
         os.remove(file_in)
         version = 0
         modified = 'Not known'
         date = 'Not known'
+        
         return version, date, modified
+    
     
     fid = open(file_out, 'r')
     lines = fid.read().splitlines()
@@ -143,6 +145,8 @@ def get_version_sandpit_windows():
     version = int(lines[0])
     modified = lines[1]
     date = lines[2]
+    
+    print "*******" + str(version) + "**********"
     return version, date, modified
 
 def broken_get_version(destination_path):
