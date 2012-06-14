@@ -111,6 +111,10 @@ class Sites(file_store.File_Store):
         attribute_conversions["LATITUDE"] = float
         attribute_conversions["LONGITUDE"] = float
 
+        # remove VS30 if exists - we'll deal with this later
+        if attribute_conversions.get('VS30') is not None:
+            attribute_conversions.pop('VS30')
+
         # read in data from file
         sites_dict = csv_to_arrays(file, **attribute_conversions)
 
@@ -120,6 +124,16 @@ class Sites(file_store.File_Store):
 
         # copy remaining attributes - don't need user changes reflected
         attributes = copy.copy(sites_dict)
+
+        # now lets do VS30
+        try:
+            attribute_conversions['VS30'] = float
+            sites_dict = csv_to_arrays(file, **attribute_conversions)
+            attributes['Vs30'] = sites_dict['VS30']
+        except:
+            # If not present in the file, analysis will add the mapping based 
+            # on site class
+            pass
 
         # call class constructor
         return cls(latitude, longitude, **attributes)

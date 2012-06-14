@@ -123,6 +123,49 @@ class Test_Sites(unittest.TestCase):
         # get rid of test data file 
         os.remove(filename)
 
+    def test_read_from_file_Vs30(self):
+        """Test reading Sites data from file taking into account Vs30 data.
+        1. If VS30 is present and requested, it should be an attribute
+        2. If VS30 is not present and requested, it should not be an attribute
+        """
+
+        raw_csv_no_vs30 = """BID,LATITUDE,LONGITUDE
+2,-6.4125,110.837502
+3,-6.4125,110.845833 
+4,-6.4125,110.854164"""
+
+        raw_csv_vs30 = """BID,LATITUDE,LONGITUDE,VS30
+2,-6.4125,110.837502,666
+3,-6.4125,110.845833,560
+4,-6.4125,110.854164,560"""
+
+        (handle, filename_vs30) = tempfile.mkstemp('.csv', 'test_sites_')
+        os.close(handle)
+        f = open(filename_vs30, 'wb')
+        f.write(raw_csv_vs30)
+        f.close()
+        
+        (handle, filename_no_vs30) = tempfile.mkstemp('.csv', 'test_sites_')
+        os.close(handle)
+        f = open(filename_no_vs30, 'wb')
+        f.write(raw_csv_no_vs30)
+        f.close()
+        
+        expected_vs30 = [666,560,560]
+        
+        # Test 1.
+        sites = Sites.from_csv(filename_vs30, VS30=float)
+        self.failUnless('Vs30' in sites.attributes)
+        self.failUnless(np.all(sites.attributes['Vs30'] == expected_vs30))
+        
+        # Test 2.
+        sites = Sites.from_csv(filename_no_vs30, VS30=float)
+        self.failUnless('Vs30' not in sites.attributes)
+
+        # get rid of test data files
+        os.remove(filename_vs30)
+        os.remove(filename_no_vs30)
+
     def testing_truncate_sites_for_test(self):
         attributes = {'mo': array(['money', 'soup']),
                       'SITE_CLASS': array(['E', 'C']),

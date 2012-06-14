@@ -1052,16 +1052,6 @@ def load_data(eqrm_flags):
         if eqrm_flags.buildings_set_damping_Be_to_5_percent is True:
             sites.building_parameters['damping_Be'] = 0.05 # + \
 #                                      0*sites.building_parameters['damping_Be']
-
-        # Load the site_class 2 Vs30 mapping
-        amp_factor_file = 'site_class2vs30.csv'
-        amp_factor_file = get_local_or_default(amp_factor_file,
-                                               eqrm_flags.default_input_dir,
-                                               eqrm_flags.input_dir)
-        # Load Vs30 mapping
-        site_class2Vs30 = load_site_class2Vs30(amp_factor_file)
-        # Use the mapping to add Vs30 info to add Vs30 info to structures
-        sites.set_Vs30(site_class2Vs30)
         
     elif eqrm_flags.run_type == "hazard":
         #raise RuntimeError('run_type "hazard" not yet modified for Bridges')
@@ -1079,8 +1069,6 @@ def load_data(eqrm_flags):
         name = get_local_or_default(name, eqrm_flags.default_input_dir,
                                     eqrm_flags.input_dir)
         sites = Sites.from_csv(name, SITE_CLASS=str, VS30=float)
-        # FIXME this is a bit of a hack.  re Vs30 and VS30.
-        sites.attributes['Vs30'] = sites.attributes['VS30']
         
     elif eqrm_flags.run_type == "fatality":
 		#raise RuntimeError('run_type "hazard" not yet modified for Bridges')
@@ -1096,8 +1084,6 @@ def load_data(eqrm_flags):
                                SITE_CLASS=str, 
                                VS30=float, 
                                POPULATION=float)
-        # FIXME this is a bit of a hack.  re Vs30 and VS30.
-        sites.attributes['Vs30'] = sites.attributes['VS30']
     
     elif eqrm_flags.run_type == "bridge":
         #raise RuntimeError('run_type "hazard" not yet modified for Bridges')
@@ -1121,7 +1107,7 @@ def load_data(eqrm_flags):
     if sites is None:
         raise RuntimeError("Couldn't find BUILDING or BRIDGE data?")
 
-    if False:
+    if sites.attributes.get('Vs30') is None:
         # Load the site_class 2 Vs30 mapping
         amp_factor_file = 'site_class2vs30.csv'
         amp_factor_file = get_local_or_default(amp_factor_file,
