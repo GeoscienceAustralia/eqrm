@@ -45,6 +45,8 @@ def csv_to_arrays(filename, **attributes):
     # ensure we have a file object
     if isinstance(filename, file):
         f = filename
+        if f.closed:
+            f = open(f.name, 'rb')
     else:
         f = open(filename, 'rb')
 
