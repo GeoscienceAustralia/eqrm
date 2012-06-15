@@ -265,16 +265,59 @@ class Structures(Sites):
             damage_model.aggregated_building_loss(
                         ci=eqrm_flags.loss_regional_cost_index_multiplier,
                         loss_aus_contents=eqrm_flags.loss_aus_contents)
-
-        if eqrm_flags.bridges_functional_percentages is not None:
-            # get NaN array for 'days_to_complete'
-            dtc_shape = list(total_loss[0].shape)
-            dtc_shape.append(len(eqrm_flags.bridges_functional_percentages))
-            days_to_complete = np.ones(dtc_shape) * np.nan
-        else:
-            days_to_complete = None
     
-        return (total_loss, damage_model, days_to_complete)
+        return (total_loss, damage_model)
+
+    def calc_vulnerability_loss(self, SA):
+        """
+        Calculate the economic loss at a site for a user defined vulnerability
+        curve. 
+        
+        The curve data should be loaded in with the analysis function
+        load_data() and self.vulnerability_set defined. If it hasn't and this 
+        function is called a runtime error is thrown.
+        
+        SA                 array of Spectral Acceleration, in g, with axis;
+                               sites, events, periods
+                           the site axis usually has a size of 1
+        
+        Returns economic_loss where:
+          economic_loss    A dollar loss, with the the dimensions of;
+                           (site, event)
+        """
+        
+        if self.vulnerability_set is None:
+            raise RuntimeError('Vulnerability set not found')
+        
+        # SA shape:
+        # (sites, pseudo_events, periods)
+        
+        # Calculate intensity measure level
+        IML = self.vulnerability_set.intensity_conversion(SA)
+        
+        # TODO: Can we assume this will be for a single site?
+        func_id = self.attributes['STRUCTURE_CLASSIFICATION'][0]
+        
+        # Get mean and sigma for this measure level and site type
+        mean_loss, sigma = self.vulnerability_set.calc_mean(func_id, IML)
+        
+        # Get the loss_ratio by taking a random sample
+        loss_ratio = self.vulnerability_set.sample(func_id, mean_loss, sigma)
+        
+        # Perform a cutoff for the ratio limits
+        loss_ratio = self.vulnerability_set.ratio_cutoff(loss_ratio)
+        
+        # Economic loss factors
+        bcd = self.attributes['BUILDING_COST_DENSITY']
+        fa = self.attributes['FLOOR_AREA']
+        sf = self.attributes['SURVEY_FACTOR']
+        
+        # Calculate economic loss
+        economic_loss = bcd * fa * sf * loss_ratio
+        
+        # Return figured summed at the periods axis
+        # Result shape (sites, pseudo_events)
+        return economic_loss.sum(axis=-1)
 
     def __getitem__(self, key):
         """Get single indexed entry from a Structures object."""
@@ -294,8 +337,13 @@ class Structures(Sites):
             building_parameters[k] = self.building_parameters[k][key]
 
         # create shiny new Structures object with this single structure
-        return Structures(self.latitude[key], self.longitude[key],
-                          building_parameters, **attributes)
+        structures = Structures(self.latitude[key], self.longitude[key],
+                                building_parameters, **attributes)
+
+        if self.vulnerability_set is not None:
+            structures.vulnerability_set = self.vulnerability_set
+
+        return structures
 
     def join(self, other):
         """Join data from a Structures object with some other object.

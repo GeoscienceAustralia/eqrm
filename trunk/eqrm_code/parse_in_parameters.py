@@ -108,7 +108,10 @@ CONV_NEW = [{'order': 10.0,
             {'old_para': 'run_type',
              'values': {None: None,
                         1: 'hazard',
-                        2: 'risk'},
+                        2: 'risk_csm',
+                        3: 'fatality',
+                        4: 'bridge',
+                        5: 'risk_mmi'},
              'order': 10.01,
              'new_para': 'run_type'},
             {'old_para': 'determ_flag',
@@ -263,11 +266,11 @@ CONV_NEW = [{'order': 10.0,
              'order': 50.09,
              'new_para': 'atten_override_RSA_shape',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'order': 50.10,
              'new_para': 'atten_cutoff_max_spectral_displacement',
              'default': False,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'pgacutoff',
              'order': 50.11,
              'new_para': 'atten_pga_scaling_cutoff',
@@ -312,7 +315,7 @@ CONV_NEW = [{'order': 10.0,
              'order': 70.01,
              'new_para': 'buildings_usage_classification',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm', 'risk_mmi']},
             {'old_para': 'hazus_dampingis5_flag',
              'values': {None: None,
                         1: True,
@@ -320,7 +323,7 @@ CONV_NEW = [{'order': 10.0,
              'order': 70.02,
              'new_para': 'buildings_set_damping_Be_to_5_percent',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {
              'order': 75.01,
              'new_para': 'bridges_functional_percentages',
@@ -335,29 +338,29 @@ CONV_NEW = [{'order': 10.0,
              'order': 80.01,
              'new_para': 'csm_use_variability',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'bcap_var_method',
              'order': 80.02,
              'new_para': 'csm_variability_method',
              'default': 3,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'stdcap',
              'order': 80.03,
              'new_para': 'csm_standard_deviation',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'order': 80.04,
              'new_para': 'csm_damping_regimes',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'order': 80.05,
              'new_para': 'csm_damping_modify_Tav',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'order': 80.06,
              'new_para': 'csm_damping_use_smoothing',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'Harea_flag',
              'values': {None: None,
                         1: 'Error',
@@ -366,17 +369,17 @@ CONV_NEW = [{'order': 10.0,
              'order': 80.08,
              'new_para': 'csm_hysteretic_damping',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'SDRelTol',
              'order': 80.09,
              'new_para': 'csm_SDcr_tolerance_percentage',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'max_iterations',
              'order': 80.10,
              'new_para': 'csm_damping_max_iterations',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'order': 90.0,
              'title': '\n# Loss\n',
              'default': None},
@@ -384,17 +387,23 @@ CONV_NEW = [{'order': 10.0,
              'order': 90.01,
              'new_para': 'loss_min_pga',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'ci',
              'order': 90.02,
              'new_para': 'loss_regional_cost_index_multiplier',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'aus_contents_flag',
              'order': 90.03,
              'new_para': 'loss_aus_contents',
              'default': None,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
+            {'order': 95.0,
+             'title': '\n# Vulnerability\n'},
+            {'order': 95.01,
+             'new_para': 'vulnerability_variability_method',
+             'default': 2, # random sampling
+             'run_type': ['risk_mmi']},
             {'order': 100.0,
              'title': '\n# Save\n',
              'default': None},
@@ -409,17 +418,17 @@ CONV_NEW = [{'order': 10.0,
              'order': 100.02,
              'new_para': 'save_total_financial_loss',
              'default': False,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'save_building_loss',
              'order': 100.03,
              'new_para': 'save_building_loss',
              'default': False,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm', 'risk_mmi']},
             {'old_para': 'save_contents_loss',
              'order': 100.04,
              'new_para': 'save_contents_loss',
              'default': False,
-             'run_type': ['risk']},
+             'run_type': ['risk_csm']},
             {'old_para': 'save_motion_flag',
              'values': {None: None,
                         1: True,
@@ -434,7 +443,7 @@ CONV_NEW = [{'order': 10.0,
              'order': 100.06,
              'new_para': 'save_prob_structural_damage',
              'default': False,
-             'run_type': ['risk','bridge']},
+             'run_type': ['risk_csm','bridge']},
             {'old_para': 'save_fatalities',
              'order': 100.07,
              'new_para': 'save_fatalities',
@@ -547,8 +556,8 @@ def create_parameter_data(handle, **kwargs):
     # Add Hard-wired results  
     eqrm_flags.update(OLD_STYLE_PARAS_HARD_WIRED)
 
-    # Remove or fix depreciated attributes
-    depreciated_attributes(eqrm_flags)
+    # Remove or fix deprecated attributes
+    deprecated_attributes(eqrm_flags)
     
     _add_default_values(eqrm_flags)
    
@@ -589,8 +598,8 @@ def update_control_file(file_name_path, new_file_name_path=None):
         new_file_name_path = file_name_path
     attributes = _from_file_get_params(file_name_path)
     
-    # Remove depreciated attributes
-    depreciated_attributes(attributes)
+    # Remove deprecated attributes
+    deprecated_attributes(attributes)
     eqrm_flags_to_control_file(new_file_name_path, attributes)
 
     
@@ -636,20 +645,20 @@ def _add_default_values(eqrm_flags):
     
     file_store.DATA_DIR = eqrm_flags.data_array_storage
 
-# In the dictionary DEPRECIATED_PARAS
-# the key is the depreciated attribute.
+# In the dictionary DEPRECATED_PARAS
+# the key is the deprecated attribute.
 # the value is
 # None, which means the only action is a warning,
 #   OR
 # a string, which replaces the depreciated attribute,
 #   OR
 # the value has a dictionary where the the keys are the value of the
-# depreciated attribute and the values are attribute and value pairs
+# deprecated attribute and the values are attribute and value pairs
 # to use, based on the value of the attribute.  
 #   OR
 # True, which means a warning, and deleting the attribute.
 
-DEPRECIATED_PARAS = {
+DEPRECATED_PARAS = {
     'atten_use_variability':                {True: None,
                                              False:('atten_variability_method', None)},
     'amp_use_variability':                  {True: None,
@@ -683,20 +692,29 @@ DEPRECIATED_PARAS = {
     'simulation_name':                      True
     }
 
-def depreciated_attributes(eqrm_flags):
+# In the dictionary DEPRECATED_VALUES
+# the key is the attribute where its value has been deprecated
+# the value is a second dictionary where 
+#     - the key is the old value
+#     - the value is either a replacement value or None (remove attribute)
+DEPRECATED_VALUES = {
+                     'run_type':            {'risk': 'risk_csm'}
+                     }
+
+def deprecated_attributes(eqrm_flags):
     """
-    Remove/fix/Give a warning about depreciated attributes.
+    Remove/fix/Give a warning about deprecated attributes.
     
     Args:
       eqrm_flags: A DictKeyAsAttributes instance.
     """
-    for param in DEPRECIATED_PARAS:
+    for param in DEPRECATED_PARAS:
         if eqrm_flags.has_key(param):
             
             msg = 'WARNING: ' + param + \
                   ' term in EQRM control file is deprecated.'
             
-            handle_logic = DEPRECIATED_PARAS[param]
+            handle_logic = DEPRECATED_PARAS[param]
             if handle_logic is None:
                 pass
             elif isinstance(handle_logic, str):
@@ -733,6 +751,25 @@ def depreciated_attributes(eqrm_flags):
             # So these warnings will not be in the logs.
             if log_imported:
                 log.warning(msg)
+    
+    for param in DEPRECATED_VALUES:
+        if eqrm_flags.has_key(param):
+            param_value = eqrm_flags.get(param)
+            param_to_replace = DEPRECATED_VALUES[param].get(param_value)
+            if param_to_replace is not None:
+                
+                eqrm_flags[param] = param_to_replace
+                
+                msg = 'WARNING: %s=%s is deprecated.' % (param,
+                                                         param_value)
+                msg = '%s Replaced with %s=%s.' % (msg,
+                                                   param,
+                                                   param_to_replace)
+                
+                # logging is only set-up after the para file has been passed.
+                # So these warnings will not be in the logs.
+                if log_imported:
+                    log.warning(msg)
 
 def _att_value_fixes(eqrm_flags):
     """
@@ -844,9 +881,9 @@ def _verify_eqrm_flags(eqrm_flags):
             'Cannot save the hazard map for a scenario.')
   
     if eqrm_flags.atten_variability_method == 1 and \
-           eqrm_flags.run_type == 'risk':
+           eqrm_flags.run_type == 'risk_csm':
         raise AttributeSyntaxError(
-            'Cannot use spawning when doing a risk simulation.')
+            'Cannot use spawning when doing a risk_csm simulation.')
 
     if eqrm_flags.amp_variability_method == 1:
         raise AttributeSyntaxError(

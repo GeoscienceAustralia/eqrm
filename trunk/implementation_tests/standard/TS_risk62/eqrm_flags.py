@@ -17,7 +17,7 @@ from os.path import join
 
 
 # Operation Mode
-run_type = "risk" 
+run_type = "risk_csm" 
 is_scenario = False
 site_tag = "newc" 
 site_db_tag = "_copy" 
