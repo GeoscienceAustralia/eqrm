@@ -35,7 +35,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
     def build_instance_to_eqrm_flags(self):
         set = Dummy()
         # Operation_Mode
-        set.run_type = 'risk'
+        set.run_type = 'risk_csm'
         set.is_scenario = True    # If False, probabilistic input used
 
         # General
@@ -125,7 +125,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         
     def check_eqrm_flags(self, TPT):
         # Check results
-        self.failUnless(TPT.run_type == 'risk')
+        self.failUnless(TPT.run_type == 'risk_csm')
         self.failUnless(TPT.site_tag == 'newc')
         self.failUnless(TPT.site_db_tag == 'fish')
         self.failUnless(allclose(TPT.site_indexes, asarray([2255,11511])))
@@ -274,7 +274,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.atten_cutoff_max_spectral_displacement = False
         set.use_amplification = False
         set.site_tag = 'test_convert_py_2_THE'
-        set.run_type = 'risk'
+        set.run_type = 'risk_csm'
         set.zone_source_tag = ''
         set.fault_source_tag = ''
         
@@ -433,7 +433,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
                  'default': False,
                  'run_type': ['hazard']}
         
-        eqrm_flags['run_type'] = "risk"
+        eqrm_flags['run_type'] = "risk_csm"
         
         eqrm_flags['atten_models'] = None
         self.assertTrue(is_param_compatible(param, eqrm_flags))

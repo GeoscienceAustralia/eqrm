@@ -18,7 +18,7 @@ from os.path import join
 
 
 # Operation Mode
-run_type = "risk" 
+run_type = "risk_csm" 
 is_scenario = False
 site_db_tag = "" 
 input_dir = r"..\implementation_tests\input/" 

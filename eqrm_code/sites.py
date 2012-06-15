@@ -55,6 +55,7 @@ class Sites(file_store.File_Store):
         self.latitude = asarray(latitude)
         self.longitude = asarray(longitude)
         self.attributes = attributes
+        self.vulnerability_set = None
 
         assert(len(self.latitude) == len(self.longitude))
         for key in self.attributes:
@@ -152,7 +153,12 @@ class Sites(file_store.File_Store):
         for k in self.attributes.keys():
             attributes[k] = self.attributes[k][key]
 
-        return Sites(self.latitude[key], self.longitude[key], **attributes)
+        sites = Sites(self.latitude[key], self.longitude[key], **attributes) 
+        
+        if self.vulnerability_set is not None:
+            sites.vulnerability_set = self.vulnerability_set
+        
+        return sites
     
     def __repr__(self):
         return ('Sites:\n'
@@ -185,7 +191,11 @@ class Sites(file_store.File_Store):
                 # site classes.
                 raise KeyError
         self.attributes['Vs30'] = array(Vs30_list)
-
+    
+    def validate_vulnerability_set(self):
+        msg = 'validate_vulnerability_set is not supported for this site object'
+        raise RuntimeError(msg)
+    
     #FIXME consider moving to event set
     def distances_from_event_set(self, event_set, event_set_trace_starts=True):
         """

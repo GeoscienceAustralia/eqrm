@@ -17,7 +17,7 @@ from eqrm_code.parse_in_parameters import eqrm_data_home, get_time_user
 
 
 # Operation Mode
-run_type = "risk" 
+run_type = "risk_csm" 
 is_scenario = True
 max_width = 15
 site_tag = "newc" 

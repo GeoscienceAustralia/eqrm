@@ -1014,3 +1014,79 @@ standard deviation. The standard deviation can be set to an arbitrarily small
 number such as 0.01 (as shown in grey shaded box above) when not known. Use of this standard deviation is controlled by
 the EQRM control file parameter \texttt{amp\_variability\_method} which can also be set to \texttt{None}.
 \end{itemize}
+
+\clearpage
+
+\section{Vulnerability File}
+\label{sec:-appl-vulnerability}
+
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\\
+Filename: \texttt{<site\_tag>\_vulnerability.xml} \\
+\\
+\hline
+\end{tabular}
+\end{center}
+
+Vulnerability curves in EQRM use the Natural Hazard's Risk Markup Language 
+(NRML) specified by The GEM Foundation for use in OpenQuake. An example 
+vulnerability file is shown in the grey box below.
+
+\lstinputlisting[language=XML]{xml_examples/padang_vulnerability.xml}
+
+The top level attributes are defined in \texttt{discreteVulnerabilitySet}: \\
+
+\begin{lstlisting}
+<discreteVulnerabilitySet vulnerabilitySetID="HAZUS"
+   assetCategory="buildings" lossCategory="economic_loss">
+\end{lstlisting}
+
+EQRM supports a single loss category option, \texttt{economic\_loss}, 
+and the two other attributes are not currently used. \\
+\\
+The curves in the set are all based on the intensity measure levels defined in 
+\texttt{IML}: \\
+
+\begin{lstlisting}
+<IML IMT="MMI">5 5.5 6 6.5 7 7.5 8 8.5 9 9.5 10 10.5 11</IML>
+\end{lstlisting}
+
+This is a list of intensity measure levels specified by the intensity measure 
+type (IMT) attribute. EQRM supports conversion from spectral acceleration to
+Modified Mercalli Intensity, \texttt{MMI}, as per the example above. \\
+\\
+The mean loss ratio and sigma are defined for each site type in 
+\texttt{discreteVulnerability}: \\
+
+\begin{lstlisting}
+   <discreteVulnerability vulnerabilityFunctionID="NEL 1.4.1"
+    probabilisticDistribution="N">
+    <lossRatio>
+     2.01E-07 1.94E-05 0.000587335 0.007251983 0.044241602
+     0.155404744 0.356384523 0.594100748 0.790940996 0.911550187
+     0.968789668 0.990643449 0.997571724
+    </lossRatio>
+    <coefficientsVariation>
+     0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3
+    </coefficientsVariation>
+   </discreteVulnerability>
+\end{lstlisting}
+
+Where:
+\begin{itemize}
+\item \texttt{vulnerabiltyFunctionID}: This specifies the site type that for 
+this curve. It must match the \texttt{STRUCTURE\_CLASSIFICATION} defined in the 
+\texttt{sitedb} file.
+\item \texttt{probabilisticDistribution}: Options are \texttt{LN} (lognormal) 
+and \texttt{N} (normal). The sampling technique will depend on the EQRM input 
+parameter \texttt{vulnerability\_variability\_method}.
+\item \texttt{lossRatio}: Mean loss values that correspond to the configured 
+\texttt{IML}.
+\item \texttt{coefficientsVariation}: Coefficient of variation that corresponds 
+to the configured \texttt{lossRatio}, where 
+\begin{equation}
+CoV = \frac{\sigma}{\mu}
+\end{equation}
+\end{itemize}

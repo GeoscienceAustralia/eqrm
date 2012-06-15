@@ -45,6 +45,7 @@ from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
 from ground_motion_distribution import Distribution_Log_Normal, GroundMotionDistributionLogNormal
 from eqrm_code.structures import Structures, build_par_file
+from eqrm_code.structures_vulnerability import Structures_Vulnerability
 from eqrm_code.exceedance_curves import hzd_do_value, \
      collapse_att_model, collapse_source_gmms
 from eqrm_code.sites import Sites, truncate_sites_for_test
@@ -420,7 +421,7 @@ def main(parameter_handle,
                 total_fatalities[rel_i,:] = reshape(fatality[0,:,0], numelement)
             
         # calculate damage
-        elif eqrm_flags.run_type == "risk":
+        elif eqrm_flags.run_type == "risk_csm":
             
             # This means calc_total_loss does not know about the
             # dimensions of multiple gmms and spawning.
@@ -428,10 +429,7 @@ def main(parameter_handle,
                                  num_gmm_max * num_spawning * num_rm)
             
             (total_loss, 
-             damage,
-             days_to_complete) = sites.calc_total_loss(SA, 
-                                                       eqrm_flags,
-                                                       overloaded_MW)
+             damage) = sites.calc_total_loss(SA, eqrm_flags, overloaded_MW)
             
             assert isfinite(total_loss[0]).all()
             
@@ -487,8 +485,19 @@ def main(parameter_handle,
                     num_pseudo_events == 1):
                 # This is not cumulative
                 total_structure_damage[rel_i,:] = damage.structure_state
+        
+        elif eqrm_flags.run_type == "risk_mmi":
+            # print 'STARTING vulnerability damage calculations
             
+            loss = sites.calc_loss(SA)
             
+            # TODO: Is this necessary?
+            newshape = (1,num_spawning, num_gmm_max, num_rm, num_events)
+            loss_qw = loss.reshape(newshape)
+            
+            if eqrm_flags.save_building_loss is True:
+                building_loss_qw[rel_i,...] = loss_qw[0,...]
+
         # Delete some objects before next loop to avoid memory spikes
         del sites
         del distances
@@ -1012,16 +1021,12 @@ def load_data(eqrm_flags):
     Returns a tuple (data, bridge_data) where:
         data         is a reference to a (possibly combined) structures+bridges
                      object
-        bridge_data  is a boolean, True if bridge data was found
     """
 
-    # assume there is no bridge data
-    bridge_data = False
-
-    if eqrm_flags.run_type == 'risk':
+    if eqrm_flags.run_type == 'risk_csm':
         # first, look for a BUILDING data file
         building_par_file = build_par_file(eqrm_flags.buildpars_flag)
-
+    
         # Find location of site database (i.e. building database) and get FID
         site_file = ('sitedb_' + eqrm_flags.site_tag +
                      eqrm_flags.site_db_tag + '.csv')
@@ -1033,7 +1038,7 @@ def load_data(eqrm_flags):
             #site_file = None
             msg = "No site file was loaded.  Check file name; " + site_file
             raise RuntimeError(msg) 
-
+    
         # if indeed there is a BUILDING file
         sites = Structures.from_csv(
             site_file,
@@ -1046,16 +1051,26 @@ def load_data(eqrm_flags):
             use_refined_btypes=True,
             force_btype_flag=False,
             loss_aus_contents=eqrm_flags.loss_aus_contents)
-
+    
         #FIXME do this after subsampling the sites
         # Hard wires the Demand Curve damping to 5%
         if eqrm_flags.buildings_set_damping_Be_to_5_percent is True:
             sites.building_parameters['damping_Be'] = 0.05 # + \
 #                                      0*sites.building_parameters['damping_Be']
         
+    elif eqrm_flags.run_type == 'risk_mmi':
+        # we are running a vulnerability calculation
+        name = 'sitedb_' + eqrm_flags.site_tag + eqrm_flags.site_db_tag + '.csv'
+        
+        # find the location and FID for the grid file
+        # i.e. searches input_dir then defaultdir
+        name = get_local_or_default(name, eqrm_flags.default_input_dir,
+                                    eqrm_flags.input_dir)
+        
+        sites = Structures_Vulnerability.from_csv(name, eqrm_flags)
+        
+        
     elif eqrm_flags.run_type == "hazard":
-        #raise RuntimeError('run_type "hazard" not yet modified for Bridges')
-
         # we are running hazard or ground motion scenario (i.e. no damage)
         if eqrm_flags.grid_flag == 1:
             # grid is from a GIS output
@@ -1071,8 +1086,6 @@ def load_data(eqrm_flags):
         sites = Sites.from_csv(name, SITE_CLASS=str, VS30=float)
         
     elif eqrm_flags.run_type == "fatality":
-		#raise RuntimeError('run_type "hazard" not yet modified for Bridges')
-
         # we are running fatality calculation
         name = eqrm_flags.site_tag + '_popexp.csv'
 
