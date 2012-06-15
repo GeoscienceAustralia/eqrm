@@ -1,3 +1,0 @@
-% latitude, longitude 
--9 109
--11 111
