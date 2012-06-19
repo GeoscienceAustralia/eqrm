@@ -32,8 +32,10 @@ class Damage_model(object):
         Axis of sites, model_generated_psudo_events, 4 (# of damage states)
     """
 
-    def __init__(self, structures, SA, periods, magnitudes, csm_use_variability,
-                 csm_standard_deviation, csm_params=None):
+    def __init__(self, structures, SA, periods, magnitudes, 
+                 csm_damage_state_use_variability, 
+                 csm_damage_state_standard_deviation, 
+                 csm_params=None):
         """Class to determine the damage and economic loss.
 
         structures  a Structures instance - But what is actually needed from it?
@@ -53,8 +55,8 @@ class Damage_model(object):
         self.periods = periods
         self.magnitudes = magnitudes
         self.SA = SA
-        self.csm_use_variability = csm_use_variability
-        self.csm_standard_deviation = csm_standard_deviation
+        self.csm_damage_state_use_variability = csm_damage_state_use_variability
+        self.csm_damage_state_standard_deviation = csm_damage_state_standard_deviation
 
         if csm_params is None:
             csm_params = {'csm_damping_regimes': CSM_DAMPING_REGIMES_USE_ALL,
@@ -63,8 +65,6 @@ class Damage_model(object):
                               CSM_DAMPING_USE_SMOOTHING,
                           'rtol': 0.01,
                           'csm_damping_max_iterations': 7,
-                          'sdtcap': 0.3,
-                          'csm_use_variability': False,
                           'csm_variability_method': None,
                           'csm_hysteretic_damping': 'Error',
                           'atten_override_RSA_shape': None,
@@ -84,21 +84,20 @@ class Damage_model(object):
         structure, non_structural, acceleration_sensitive.
         """
 
-        csm_use_variability = self.csm_use_variability
-        csm_standard_deviation = self.csm_standard_deviation
+        use_variability = self.csm_damage_state_use_variability
+        standard_deviation = self.csm_damage_state_standard_deviation
 
         beta_th_sd = 0.4
         beta_th_nsd_d = 0.5
         beta_th_nsd_a = 0.6
-        beta_bridge = 0.6
 
-        if (csm_use_variability is False):
+        if (use_variability is False):
             #incorporate buiding cap variability into the beta
             # (may not be correct!)
-            beta_sd =    (beta_th_sd**2+csm_standard_deviation**2)**(0.5)
-            beta_nsd_d = (beta_th_nsd_d**2+csm_standard_deviation**2)**(0.5)
-            beta_nsd_a = (beta_th_nsd_a**2+csm_standard_deviation**2)**(0.5)
-        elif (csm_use_variability is True):	#normal case:
+            beta_sd =    (beta_th_sd**2+standard_deviation**2)**(0.5)
+            beta_nsd_d = (beta_th_nsd_d**2+standard_deviation**2)**(0.5)
+            beta_nsd_a = (beta_th_nsd_a**2+standard_deviation**2)**(0.5)
+        elif (use_variability is True):	#normal case:
             beta_sd = beta_th_sd
             beta_nsd_d = beta_th_nsd_d
             beta_nsd_a = beta_th_nsd_a

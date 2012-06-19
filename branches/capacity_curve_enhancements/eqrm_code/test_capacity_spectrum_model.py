@@ -60,13 +60,16 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
             'residential_drift_threshold': array([[  21.9456,   43.8912,
                                                      109.728 ,  164.592 ]]),
             'design_strength': array([ 0.033]),
+            'design_strength_sigma': array([ 0.3]),
             'height': array([ 7315.2]),
             'ultimate_to_yield': array([ 3.]),
+            'ultimate_to_yield_sigma': array([ 0.3]),
             'structure_class':array(['BUILDING'],dtype='|S8'),
             'non_residential_drift_threshold': array([[   5.4864,   43.8912,
                                                       82.296 ,  137.16  ]]) ,
             'damping_Be': array([ 0.1]),
             'fraction_in_first_mode': array([ 0.8]),
+            'fraction_in_first_mode_sigma': array([ 0.3]),
             'nsd_a_ratio': array([ 0.7254902]),
             'acceleration_threshold': array([[ 0.2,  0.4,  0.8,  1.6]]),
             'nsd_d_ratio': array([ 0.11764706]),
@@ -74,20 +77,22 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
             'structural_damage_threshold': array([[  26.33472,   41.69664,
                                                      88.87968,  219.456  ]]),
             'natural_elastic_period': array([ 0.5]),
+            'natural_elastic_period_sigma': array([ 0.3]),
             'damping_s': array([ 0.4]),
             'drift_threshold': array([[   5.4864,   43.8912,
                                           82.296 ,  137.16  ]]),
             'yield_to_design': array([ 1.5]),
+            'yield_to_design_sigma': array([ 0.3]),
             'structure_classification': array(['S1L'],dtype='|S13'),
             'height_to_displacement': array([ 0.75]),
+            'height_to_displacement_sigma': array([ 0.3]),
             'ductility': array([ 5.]),
+            'ductility_sigma': array([ 0.3]),
             'damping_l': array([ 0.]),
             'damping_m': array([ 0.2])},
             'loss_min_pga': 0.050000000000000003,
             'csm_hysteretic_damping': 'Error',
-            'csm_use_variability': 1,
-            'sdtcap': 0.29999999999999999,
-            'csm_variability_method': 3,
+            'csm_variability_method': None,
             'rtol': 0.01,
             'csm_damping_regimes': CSM_DAMPING_REGIMES_USE_ALL,
             'csm_damping_modify_Tav': CSM_DAMPING_MODIFY_TAV,
@@ -105,9 +110,12 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
         reset_seed(True)
         capacity_spectrum_model=Capacity_spectrum_model(**csm_params)
         point=capacity_spectrum_model.building_response(SA)
-        point_windows= (array([[ 0.11670333,  0.06428497,  0.]]),
-                        array([[ 7.35287023,  3.98947559,  0.]]))
-        assert allclose(asarray(point),asarray(point_windows) )
+        point_windows= (array([[ 0.10708486,  0.0642546,   0.]]),
+                        array([[ 7.33157578,  3.98902927,  0.]]))
+        self.assert_(allclose(asarray(point), asarray(point_windows)),
+                     'Expected:\n%s,\nGot:\n%s' % (asarray(point_windows),
+                                                   asarray(point)))
+
 
     def test_OS_bug_searchII(self):
         """
@@ -123,13 +131,16 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
             'residential_drift_threshold': array([[  21.9456,   43.8912,
                                                      109.728 ,  164.592 ]]),
             'design_strength': array([ 0.033]),
+            'design_strength_sigma': array([ 0.3]),
             'height': array([ 7315.2]),
             'ultimate_to_yield': array([ 3.]),
+            'ultimate_to_yield_sigma': array([ 0.3]),
             'structure_class':array(['BUILDING'],dtype='|S8'),
             'non_residential_drift_threshold': array([[   5.4864,   43.8912,
                                                       82.296 ,  137.16  ]]) ,
             'damping_Be': array([ 0.1]),
             'fraction_in_first_mode': array([ 0.8]),
+            'fraction_in_first_mode_sigma': array([ 0.3]),
             'nsd_a_ratio': array([ 0.7254902]),
             'acceleration_threshold': array([[ 0.2,  0.4,  0.8,  1.6]]),
             'nsd_d_ratio': array([ 0.11764706]),
@@ -137,20 +148,22 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
             'structural_damage_threshold': array([[  26.33472,   41.69664,
                                                      88.87968,  219.456  ]]),
             'natural_elastic_period': array([ 0.5]),
+            'natural_elastic_period_sigma': array([ 0.3]),
             'damping_s': array([ 0.4]),
             'drift_threshold': array([[   5.4864,   43.8912,
                                           82.296 ,  137.16  ]]),
             'yield_to_design': array([ 1.5]),
+            'yield_to_design_sigma': array([ 0.3]),
             'structure_classification': array(['S1L'],dtype='|S13'),
             'height_to_displacement': array([ 0.75]),
+            'height_to_displacement_sigma': array([ 0.3]),
             'ductility': array([ 5.]),
+            'ductility_sigma': array([ 0.3]),
             'damping_l': array([ 0.]),
             'damping_m': array([ 0.2])},
             'loss_min_pga': 0.050000000000000003,
             'csm_hysteretic_damping': 'Error',
-            'csm_use_variability': 1,
-            'sdtcap': 0.29999999999999999,
-            'csm_variability_method': 3,
+            'csm_variability_method': None,
             'rtol': 0.01,
             'csm_damping_regimes': CSM_DAMPING_REGIMES_USE_ALL,
             'csm_damping_modify_Tav': CSM_DAMPING_MODIFY_TAV,
@@ -168,9 +181,11 @@ class Test_Capaciy_Spectrum_model(unittest.TestCase):
         reset_seed(True)
         capacity_spectrum_model=Capacity_spectrum_model(**csm_params)
         point=capacity_spectrum_model.building_response(SA)
-        point_windows= (array([[ 0.11670333]]),
-                        array([[ 7.35287023]]))
-        assert allclose(asarray(point),asarray(point_windows) )
+        point_windows= (array([[ 0.10708486]]),
+                        array([[ 7.33157578]]))
+        self.assert_(allclose(asarray(point), asarray(point_windows)),
+                     'Expected:\n%s,\nGot:\n%s' % (asarray(point_windows),
+                                                   asarray(point)))
 
 #-------------------------------------------------------------
 if __name__ == "__main__":
