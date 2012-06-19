@@ -1,0 +1,97 @@
+\documentclass[a4paper, 12pt]{report}
+\textwidth = 14.5cm \textheight = 21.5cm \topmargin = -.5cm
+\leftmargin = 5cm
+
+\setcounter{secnumdepth}{2} \setcounter{tocdepth}{3}
+
+%\oddsidemargin = 1cm
+%\leftmargin = -3cm
+%\evensidemargin = 5cm
+
+
+%\includeonly{eqrmtech-h-apps}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{natbib}
+\bibliographystyle{grfchicago}
+\usepackage{makeidx}
+\usepackage{url}
+\usepackage{psfrag}
+\usepackage{supertabular}
+\usepackage{drcaptionstyle}
+\usepackage{listings}
+%\usepackage{color}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{lscape}
+\usepackage{multirow}
+%\usepackage{bbding}
+% set up some environments
+\definecolor{light-gray}{gray}{0.8}
+\lstset{basicstyle=\scriptsize}
+%\lstset{frame=shadowbox, rulesepcolor=\color{blue}, fillcolor = \color{blue}} % create a frame and blue boundary for the xml file
+\lstset{frame=single, backgroundcolor=\color{light-gray}}
+
+
+\graphicspath{{diags/}}
+
+\input eqrmtech-macros
+
+\setlength{\parskip}{1em plus 0.1em minus 0.2em}
+\setlength{\parindent}{0pt}
+
+
+\makeindex
+
+
+
+\title{EQRM: Geoscience Australia's Earthquake Risk Model\\
+}
+
+%\begin{center}
+% Version 2.0
+%\end{center}
+
+\author{Technical Manual \\[1em]
+Version 3.0 \\[3em]
+David Robinson, Glenn Fulford and Trevor Dhu\\[1em]
+Geoscience Australia}
+
+
+
+\begin{document}
+\maketitle
+
+\pagenumbering{roman}
+
+this is a blank page \newpage
+
+
+this is a blank page
+\newpage
+
+ {\Huge \textbf{Acknowledgements}  }
+
+
+\newpage
+\pagenumbering{arabic}
+%\include{eqrmtech-intro}
+%\include{eqrmtech-hv-application}
+%\include{eqrmtech-h-source}
+%\include{eqrmtech-hv-grids}
+%\include{eqrmtech-h-attn}
+%\include{eqrmtech-h-regolith}
+%\include{eqrmtech-v-damage}
+%\include{eqrmtech-v-losses}
+\include{eqrmtech-v-risk}
+
+\appendix
+\include{eqrmtech-apps}
+
+\small
+\bibliography{drrefs,garefs,EQRM_refs}
+
+\printindex
+
+\end{document}

@@ -1,0 +1,45 @@
+<source_model_zone magnitude_type="Mw">
+  <zone 
+  area = "5054.035" 
+  name = "Zone 1"
+  event_type = "crustal fault">
+    
+    <geometry 
+       azimuth= "6" 
+       delta_azimuth= "2" 
+       dip= "15"
+       delta_dip = "5"
+       depth_top_seismogenic = "7"
+       depth_bottom_seismogenic = "30">
+      <boundary>
+	  -32.4000 151.1500   
+	  -32.7500 152.1700
+	  -33.4500 151.4300   
+	  -32.4000 151.1500 
+      </boundary>
+      <excludes>
+	  -32.4000 151.1500     
+	  -32.7500 152.1700    
+	  -33.4500 151.4300  
+      </excludes>
+    </geometry>
+    
+    <recurrence_model
+      distribution = "bounded_gutenberg_richter"
+      recurrence_min_mag = "3.3" 
+      recurrence_max_mag = "5.4" 
+      A_min= "0.568" 
+      b = "1">
+      <event_generation 
+      generation_min_mag = "3.3"
+	  number_of_mag_sample_bins = "15" 
+	  number_of_events = "1000" />
+    </recurrence_model>
+    
+  </zone>
+  <zone 
+      name = "Zone 2">
+    ...
+    ...
+  </zone>
+</source_model_zone>

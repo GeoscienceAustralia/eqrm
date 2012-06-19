@@ -1,0 +1,598 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%Creator: Mayura Draw, Version 3.1
+%%Title: fig-vdamage-frag
+%%CreationDate: Thu Jan 09 09:49:26 2003
+%%BoundingBox: 2 534 586 759
+%%DocumentFonts: Helvetica
+%%Orientation: Portrait
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset MayuraDraw_ops
+%%Version: 2.2
+%%Copyright: (c) 1993-98 Mayura Software
+/PDXDict 100 dict def
+PDXDict begin
+% width height matrix proc key cache
+% definepattern -\> font
+/definepattern { %def
+  7 dict begin
+    /FontDict 9 dict def
+    FontDict begin
+      /cache exch def
+      /key exch def
+      /proc exch cvx def
+      /mtx exch matrix invertmatrix def
+      /height exch def
+      /width exch def
+      /ctm matrix currentmatrix def
+      /ptm matrix identmatrix def
+      /str
+      (xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx)
+      def
+    end
+    /FontBBox [ %def
+      0 0 FontDict /width get
+      FontDict /height get
+    ] def
+    /FontMatrix FontDict /mtx get def
+    /Encoding StandardEncoding def
+    /FontType 3 def
+    /BuildChar { %def
+      pop begin
+      FontDict begin
+        width 0 cache { %ifelse
+          0 0 width height setcachedevice
+        }{ %else
+          setcharwidth
+        } ifelse
+        0 0 moveto width 0 lineto
+        width height lineto 0 height lineto
+        closepath clip newpath
+        gsave proc grestore
+      end end
+    } def
+    FontDict /key get currentdict definefont
+  end
+} bind def
+
+% dict patternpath -
+% dict matrix patternpath -
+/patternpath { %def
+  dup type /dicttype eq { %ifelse
+    begin FontDict /ctm get setmatrix
+  }{ %else
+    exch begin FontDict /ctm get setmatrix
+    concat
+  } ifelse
+  currentdict setfont
+  FontDict begin
+    FontMatrix concat
+    width 0 dtransform
+    round width div exch round width div exch
+    0 height dtransform
+    round height div exch
+    round height div exch
+    0 0 transform round exch round exch
+    ptm astore setmatrix
+
+    pathbbox
+    height div ceiling height mul 4 1 roll
+    width div ceiling width mul 4 1 roll
+    height div floor height mul 4 1 roll
+    width div floor width mul 4 1 roll
+
+    2 index sub height div ceiling cvi exch
+    3 index sub width div ceiling cvi exch
+    4 2 roll moveto
+
+    FontMatrix ptm invertmatrix pop
+    { %repeat
+      gsave
+        ptm concat
+        dup str length idiv { %repeat
+          str show
+        } repeat
+        dup str length mod str exch
+        0 exch getinterval show
+      grestore
+      0 height rmoveto
+    } repeat
+    pop
+  end end
+} bind def
+
+% dict patternfill -
+% dict matrix patternfill -
+/patternfill { %def
+  gsave
+    clip patternpath
+  grestore
+  newpath
+} bind def
+
+/img { %def
+  gsave
+  /imgh exch def
+  /imgw exch def
+  concat
+  imgw imgh 8
+  [imgw 0 0 imgh neg 0 imgh]
+  /colorstr 768 string def
+  /colorimage where {
+    pop
+    { currentfile colorstr readhexstring pop }
+    false 3 colorimage
+  }{
+    /graystr 256 string def
+    {
+      currentfile colorstr readhexstring pop
+      length 3 idiv
+      dup 1 sub 0 1 3 -1 roll
+      {
+        graystr exch
+        colorstr 1 index 3 mul get 30 mul
+        colorstr 2 index 3 mul 1 add get 59 mul
+        colorstr 3 index 3 mul 2 add get 11 mul
+        add add 100 idiv
+        put
+      } for
+      graystr 0 3 -1 roll getinterval
+    } image
+  } ifelse
+  grestore
+} bind def
+
+/arrowhead {
+  gsave
+    [] 0 setdash
+    strokeC strokeM strokeY strokeK setcmykcolor
+    2 copy moveto
+    4 2 roll exch 4 -1 roll exch
+    sub 3 1 roll sub
+    exch atan rotate dup scale
+    arrowtype
+    dup 0 eq {
+      0 0.5 rlineto -7 1.5 rlineto 1 -2 rlineto -1 -2 rlineto 7 1.5 rlineto
+      closepath fill
+    } if
+    dup 1 eq {
+      0 -0.5 rlineto -9 -2.5 rlineto 0 6 rlineto 9 -2.5 rlineto
+      closepath fill
+    } if
+    dup 2 eq {
+      currentpoint -6 -6 rmoveto lineto -6 6 rlineto
+      2 setlinewidth stroke
+    } if
+    pop
+  grestore
+} bind def
+
+/setcmykcolor where { %ifelse
+  pop
+}{ %else
+  /setcmykcolor {
+     /black exch def /yellow exch def
+     /magenta exch def /cyan exch def
+     cyan black add dup 1 gt { pop 1 } if 1 exch sub
+     magenta black add dup 1 gt { pop 1 } if 1 exch sub
+     yellow black add dup 1 gt { pop 1 } if 1 exch sub
+     setrgbcolor
+  } bind def
+} ifelse
+
+/RE { %def
+  findfont begin
+  currentdict dup length dict begin
+    { %forall
+      1 index /FID ne { def } { pop pop } ifelse
+    } forall
+    /FontName exch def dup length 0 ne { %if
+      /Encoding Encoding 256 array copy def
+      0 exch { %forall
+        dup type /nametype eq { %ifelse
+          Encoding 2 index 2 index put
+          pop 1 add
+        }{ %else
+          exch pop
+        } ifelse
+      } forall
+    } if pop
+  currentdict dup end end
+  /FontName get exch definefont pop
+} bind def
+
+/spacecount { %def
+  0 exch
+  ( ) { %loop
+    search { %ifelse
+      pop 3 -1 roll 1 add 3 1 roll
+    }{ pop exit } ifelse
+  } loop
+} bind def
+
+/WinAnsiEncoding [
+  39/quotesingle 96/grave 130/quotesinglbase/florin/quotedblbase
+  /ellipsis/dagger/daggerdbl/circumflex/perthousand
+  /Scaron/guilsinglleft/OE 145/quoteleft/quoteright
+  /quotedblleft/quotedblright/bullet/endash/emdash
+  /tilde/trademark/scaron/guilsinglright/oe/dotlessi
+  159/Ydieresis 164/currency 166/brokenbar 168/dieresis/copyright
+  /ordfeminine 172/logicalnot 174/registered/macron/ring
+  177/plusminus/twosuperior/threesuperior/acute/mu
+  183/periodcentered/cedilla/onesuperior/ordmasculine
+  188/onequarter/onehalf/threequarters 192/Agrave/Aacute
+  /Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla
+  /Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute
+  /Icircumflex/Idieresis/Eth/Ntilde/Ograve/Oacute
+  /Ocircumflex/Otilde/Odieresis/multiply/Oslash
+  /Ugrave/Uacute/Ucircumflex/Udieresis/Yacute/Thorn
+  /germandbls/agrave/aacute/acircumflex/atilde/adieresis
+  /aring/ae/ccedilla/egrave/eacute/ecircumflex
+  /edieresis/igrave/iacute/icircumflex/idieresis
+  /eth/ntilde/ograve/oacute/ocircumflex/otilde
+  /odieresis/divide/oslash/ugrave/uacute/ucircumflex
+  /udieresis/yacute/thorn/ydieresis
+] def
+
+/SymbolEncoding [
+  32/space/exclam/universal/numbersign/existential/percent
+  /ampersand/suchthat/parenleft/parenright/asteriskmath/plus
+  /comma/minus/period/slash/zero/one/two/three/four/five/six
+  /seven/eight/nine/colon/semicolon/less/equal/greater/question
+  /congruent/Alpha/Beta/Chi/Delta/Epsilon/Phi/Gamma/Eta/Iota
+  /theta1/Kappa/Lambda/Mu/Nu/Omicron/Pi/Theta/Rho/Sigma/Tau
+  /Upsilon/sigma1/Omega/Xi/Psi/Zeta/bracketleft/therefore
+  /bracketright/perpendicular/underscore/radicalex/alpha
+  /beta/chi/delta/epsilon/phi/gamma/eta/iota/phi1/kappa/lambda
+  /mu/nu/omicron/pi/theta/rho/sigma/tau/upsilon/omega1/omega
+  /xi/psi/zeta/braceleft/bar/braceright/similar/Upsilon1
+  /minute/lessequal/fraction/infinity/florin/club/diamond
+  /heart/spade/arrowboth/arrowleft/arrowup/arrowright
+  /arrowdown/degree/plusminus/second/greaterequal/multiply
+  /proportional/partialdiff/bullet/divide/notequal/equivalence
+  /approxequal/ellipsis/arrowvertex/arrowhorizex/carriagereturn
+  /aleph/Ifraktur/Rfraktur/weierstrass/circlemultiply
+  /circleplus/emptyset/intersection/union/propersuperset
+  /reflexsuperset/notsubset/propersubset/reflexsubset/element
+  /notelement/angle/gradient/registerserif/copyrightserif
+  /trademarkserif/product/radical/dotmath/logicalnot/logicaland
+  /logicalor/arrowdblboth/arrowdblleft/arrowdblup/arrowdblright
+  /arrowdbldown/lozenge/angleleft/registersans/copyrightsans
+  /trademarksans/summation/parenlefttp/parenleftex/parenleftbt
+  /bracketlefttp/bracketleftex/bracketleftbt/bracelefttp
+  /braceleftmid/braceleftbt/braceex/angleright/integral
+  /integraltp/integralex/integralbt/parenrighttp/parenrightex
+  /parenrightbt/bracketrighttp/bracketrightex/bracketrightbt
+  /bracerighttp/bracerightmid/bracerightbt
+] def
+
+/patarray [
+/leftdiagonal /rightdiagonal /crossdiagonal /horizontal
+/vertical /crosshatch /fishscale /wave /brick
+] def
+/arrowtype 0 def
+/fillC 0 def /fillM 0 def /fillY 0 def /fillK 0 def
+/strokeC 0 def /strokeM 0 def /strokeY 0 def /strokeK 1 def
+/pattern -1 def
+/mat matrix def
+/c /curveto load def
+/C /curveto load def
+/e { gsave concat 0 0 moveto } bind def
+/F {
+  pattern -1 eq { %ifelse
+    fillC fillM fillY fillK setcmykcolor fill
+  }{ %else
+    gsave fillC fillM fillY fillK setcmykcolor fill grestore
+    0 0 0 1 setcmykcolor
+    patarray pattern get findfont patternfill
+  } ifelse
+} bind def
+/f { closepath F } bind def
+/K { /strokeK exch def /strokeY exch def
+     /strokeM exch def /strokeC exch def } bind def
+/k { /fillK exch def /fillY exch def
+     /fillM exch def /fillC exch def } bind def
+/L /lineto load def
+/m /moveto load def
+/n /newpath load def
+/N /newpath load def
+/S { strokeC strokeM strokeY strokeK setcmykcolor stroke } bind def
+/s { closepath S } bind def
+/Tx { fillC fillM fillY fillK setcmykcolor show
+      0 leading neg translate 0 0 moveto } bind def
+/t { %def
+  fillC fillM fillY fillK setcmykcolor
+  align dup 0 eq { %ifelse
+    pop show
+  }{ %else
+    dup 1 eq { %ifelse
+      pop dup stringwidth pop 2 div neg 0 rmoveto show
+    }{ %else
+      dup 2 eq { %ifelse
+        pop dup stringwidth pop neg 0 rmoveto show
+      }{ %else
+        pop
+        dup stringwidth pop jwidth exch sub
+        1 index spacecount
+        dup 0 eq { %ifelse
+          pop pop show
+        }{ %else
+          div 0 8#040 4 -1 roll widthshow
+        } ifelse
+      } ifelse
+    } ifelse
+  } ifelse
+  0 leading neg translate 0 0 moveto
+} bind def
+/T { grestore } bind def
+/TX { pop } bind def
+/tbx { pop exch pop sub /jwidth exch def } def
+/u {} def
+/U {} def
+/w /setlinewidth load def
+/d /setdash load def
+/B { gsave F grestore S } bind def
+/b { closepath B } bind def
+/z { /align exch def pop /leading exch def exch findfont
+     exch scalefont setfont } bind def
+/Pat { /pattern exch def } bind def
+/At { /arrowtype exch def } bind def
+/Ln {
+  mat currentmatrix pop
+    concat
+    /y1 exch def /x1 exch def /y2 exch def /x2 exch def
+    dup 2 mod 1 eq { currentlinewidth x2 y2 x1 y1 arrowhead } if
+    2 idiv 1 eq { currentlinewidth x1 y1 x2 y2 arrowhead } if
+    x1 y1 moveto x2 y2 lineto
+  mat setmatrix
+} bind def
+/Ar {
+  mat currentmatrix pop
+    concat translate scale 0 0 1 5 -2 roll arc
+  mat setmatrix
+} bind def
+/Pi {
+  mat currentmatrix pop
+    concat translate scale
+    0 0 moveto 0 0 1 5 -2 roll arc closepath
+  mat setmatrix
+} bind def
+/Bx {
+  mat currentmatrix pop
+    concat /y1 exch def /x1 exch def /y2 exch def /x2 exch def
+    x1 y1 moveto x1 y2 lineto x2 y2 lineto x2 y1 lineto
+  mat setmatrix
+} bind def
+/Ov {
+  mat currentmatrix pop
+    concat translate scale 0 0 1 0 360 arc
+  mat setmatrix
+} bind def
+end
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%PDX g 13 13 1 0
+%%IncludeFont: Helvetica
+PDXDict begin
+%%EndSetup
+%%Page: 1 1
+%%BeginPageSetup
+/_PDX_savepage save def
+
+15 15 [300 72 div 0 0 300 72 div 0 0]
+{ %definepattern
+  2 setlinecap
+  7.5 0 moveto 15 7.5 lineto
+  0 7.5 moveto 7.5 15 lineto
+  2 setlinewidth stroke
+} bind
+/rightdiagonal true definepattern pop
+
+15 15 [300 72 div 0 0 300 72 div 0 0]
+{ %definepattern
+  2 setlinecap
+  7.5 0 moveto 0 7.5 lineto
+  15 7.5 moveto 7.5 15 lineto
+  2 setlinewidth stroke
+} bind
+/leftdiagonal true definepattern pop
+
+15 15 [300 72 div 0 0 300 72 div 0 0]
+{ %definepattern
+  2 setlinecap
+  0 7.5 moveto 15 7.5 lineto
+  2 setlinewidth stroke
+} bind
+/horizontal true definepattern pop
+
+15 15 [300 72 div 0 0 300 72 div 0 0]
+{ %definepattern
+  2 setlinecap
+  7.5 0 moveto 7.5 15 lineto
+  2 setlinewidth stroke
+} bind
+/vertical true definepattern pop
+
+15 15 [300 72 div 0 0 300 72 div 0 0]
+{ %definepattern
+  2 setlinecap
+  0 7.5 moveto 15 7.5 lineto
+  7.5 0 moveto 7.5 15 lineto
+  2 setlinewidth stroke
+} bind
+/crosshatch true definepattern pop
+
+30 30 [300 72 div 0 0 300 72 div 0 0]
+{ %definepattern
+  2 setlinecap
+  0 7.5 moveto 30 7.5 lineto
+  0 22.5 moveto 30 22.5 lineto
+  7.5 0 moveto 7.5 7.5 lineto
+  7.5 22.5 moveto 7.5 30 lineto
+  22.5 7.5 moveto 22.5 22.5 lineto
+  1 setlinewidth stroke
+} bind
+/brick true definepattern pop
+
+30 30 [300 72 div 0 0 300 72 div 0 0]
+{ %definepattern
+  2 2 scale
+  2 setlinecap
+  7.5 0 moveto 15 7.5 lineto
+  0 7.5 moveto 7.5 15 lineto
+  7.5 0 moveto 0 7.5 lineto
+  15 7.5 moveto 7.5 15 lineto
+  0.5 setlinewidth stroke
+} bind
+/crossdiagonal true definepattern pop
+
+30 30 [300 72 div 0 0 300 72 div 0 0]
+{ %definepattern
+  2 2 scale
+  1 setlinecap
+  0 7.5 moveto 0 15 7.5 270 360 arc
+  7.5 15 moveto 15 15 7.5 180 270 arc
+  0 7.5 moveto 7.5 7.5 7.5 180 360 arc
+  0.5 setlinewidth stroke
+} bind
+/fishscale true definepattern pop
+
+30 30 [300 72 div 0 0 300 72 div 0 0]
+{ %definepattern
+  1 setlinecap 0.5 setlinewidth
+  7.5 0 10.6 135 45 arcn
+  22.5 15 10.6 225 315 arc
+  stroke
+  7.5 15 10.6 135 45 arcn
+  22.5 30 10.6 225 315 arc
+  stroke
+} bind
+/wave true definepattern pop
+
+WinAnsiEncoding /_Helvetica /Helvetica RE
+
+newpath 0 setlinecap 0 setlinejoin 10 setmiterlimit
+1 setlinewidth [] 0 setdash
+2 534 moveto 2 759 lineto 586 759 lineto 586 534 lineto closepath clip
+newpath
+%%EndPageSetup
+u
+3 w
+1 At
+1 78 442 78 754 [0.55 0 0 0.55 -12.65 335.3] Ln
+S
+1 At
+2 507 442 78 442 [0.55 0 0 0.55 -12.65 335.3] Ln
+S
+1 w
+30.2502 578.376 m
+65.1842 594.231 79.4842 603.168 87.4502 614.126 c
+96.7342 626.898 96.4508 658.55 108.9 671.326 c
+130.053 693.036 158.95 699.926 230.45 699.926 c
+S
+30.2502 578.376 m
+81.3826 591.487 102.833 600.424 116.05 614.126 c
+127.633 626.134 129.394 659.787 144.65 671.326 c
+160.776 683.524 173.25 685.626 223.3 685.626 c
+S
+37.4002 578.376 m
+100.447 592.654 127.259 601.592 144.65 614.126 c
+151.983 619.412 155.052 642.437 158.95 649.876 c
+161.415 654.581 167.87 659.686 173.25 664.176 c
+182.274 671.707 194.786 673.495 223.3 671.326 c
+S
+30.2502 578.376 m
+52.3689 601.677 61.3064 612.402 66.0002 621.276 c
+71.8338 632.306 74.6036 660.291 80.3002 671.326 c
+85.3105 681.033 97.7321 701.273 108.9 707.076 c
+129.871 717.974 158.95 714.226 223.3 714.226 c
+S
+0 273 442 273 715 [0.55 0 0 0.55 -12.65 335.3] Ln
+S
+1 1 1 0 k
+/_Helvetica 24 26 0 0 z
+[0.55 0 0 0.55 237.6 709.4] e
+26 -5.088 0 21.72 tbx
+(S) t
+T
+[0.55 0 0 0.55 237.6 695.1] e
+26 -5.088 0 21.72 tbx
+(M) t
+T
+[0.55 0 0 0.55 230.5 680.9] e
+26 -5.088 0 21.72 tbx
+(E) t
+T
+[0.55 0 0 0.55 230.5 659.4] e
+26 -5.088 0 21.72 tbx
+(C) t
+T
+3 w
+0 52 715 429 715 [0.55 0 0 0.55 -6.228 336.1] Ln
+S
+[0.55 0 0 0.55 11.89 723.3] e
+24.8108 -5.088 0 21.72 tbx
+(1) t
+T
+U
+u
+0 221 299 221 299 [0.6 0 0 0.6 312.1 538.4] Ln
+S
+1 At
+1 78 104 78 338 [0.6 0 0 0.6 312.1 539.2] Ln
+S
+1 At
+2 442 104 78 104 [0.6 0 0 0.6 312.1 538.4] Ln
+S
+143 182 117 104 [0.6 0 0 0.6 312.1 538.4] Bx
+b
+195 221 169 104 [0.6 0 0 0.6 312.1 538.4] Bx
+b
+247 234 221 104 [0.6 0 0 0.6 312.1 538.4] Bx
+b
+299 208 273 104 [0.6 0 0 0.6 312.1 538.4] Bx
+b
+351 156 325 104 [0.6 0 0 0.6 312.1 538.4] Bx
+b
+[0.6 0 0 0.6 414.7 580.8] e
+26 -5.088 0 21.72 tbx
+(S) t
+T
+[0.6 0 0 0.6 446.7 582.6] e
+26 -5.088 0 21.72 tbx
+(M) t
+T
+[0.6 0 0 0.6 476.5 581.7] e
+26 -5.088 0 21.72 tbx
+(E) t
+T
+[0.6 0 0 0.6 512.4 581.9] e
+26 -5.088 0 21.72 tbx
+(C) t
+T
+0 438.811 296.757 72.4865 296.757 [0.6 0 0 0.6 312.1 538.4] Ln
+S
+[0.6 0 0 0.6 338.9 709.5] e
+24.8108 -5.088 0 21.72 tbx
+(1) t
+T
+[0.6 0 0 0.6 382.7 580.8] e
+24.8108 -5.088 0 21.72 tbx
+(N) t
+T
+U
+4 w
+1 At
+2 333.941 659.235 257.471 660.706 [1 0 0 1 0 0] Ln
+S
+[1 0 0 1 252 549.4] e
+58.3784 -5.088 0 21.72 tbx
+(Sd) t
+T
+%%PageTrailer
+_PDX_savepage restore
+%%Trailer
+end
+% showpage
+%%EOF

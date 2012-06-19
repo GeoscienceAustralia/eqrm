@@ -1,0 +1,62 @@
+2010-10-18 14:15:40,910 INFO                      analysis:153 |Logfile is './implementation_tests/current/TS_haz25/log.txt' with logging level of DEBUG, console logging level is INFO
+2010-10-18 14:15:40,910 DEBUG                     analysis:154 |host name: tornado.agso.gov.au
+2010-10-18 14:15:44,860 DEBUG                     analysis:156 |SVN version: 365M
+2010-10-18 14:15:44,862 DEBUG                     analysis:157 |SVN date: None
+2010-10-18 14:15:44,862 DEBUG                     analysis:158 |SVN modified: None
+2010-10-18 14:15:44,863 DEBUG                     analysis:159 |Memory: Initial
+2010-10-18 14:15:44,864 DEBUG                     analysis:160 |Resource usage: memory=415.3MB resident=29.5MB stacksize=0.2MB
+2010-10-18 14:15:44,941 DEBUG                     analysis:225 |Memory: source_model_zone created
+2010-10-18 14:15:44,942 DEBUG                     analysis:226 |Resource usage: memory=418.4MB resident=30.4MB stacksize=0.2MB
+2010-10-18 14:15:44,944 INFO                     event_set:374 |generating events
+2010-10-18 14:15:44,967 DEBUG                    event_set:419 |Memory: populate_depth_top_seismogenic created
+2010-10-18 14:15:44,968 DEBUG                    event_set:420 |Resource usage: memory=418.4MB resident=30.4MB stacksize=0.2MB
+2010-10-18 14:15:44,969 DEBUG                    event_set:422 |Memory: populate_azimuth created
+2010-10-18 14:15:44,970 DEBUG                    event_set:423 |Resource usage: memory=418.4MB resident=30.4MB stacksize=0.2MB
+2010-10-18 14:15:44,971 DEBUG                    event_set:426 |Memory: populate_dip created
+2010-10-18 14:15:44,972 DEBUG                    event_set:427 |Resource usage: memory=418.4MB resident=30.4MB stacksize=0.2MB
+2010-10-18 14:15:44,972 DEBUG                    event_set:429 |Memory: populate_magnitude created
+2010-10-18 14:15:44,974 DEBUG                    event_set:430 |Resource usage: memory=418.4MB resident=30.4MB stacksize=0.2MB
+2010-10-18 14:15:44,975 DEBUG                    event_set:440 |Memory: lat,lon created
+2010-10-18 14:15:44,976 DEBUG                    event_set:441 |Resource usage: memory=418.4MB resident=30.4MB stacksize=0.2MB
+2010-10-18 14:15:44,977 DEBUG                    event_set:455 |Memory: event set lists have been combined
+2010-10-18 14:15:44,978 DEBUG                    event_set:456 |Resource usage: memory=418.4MB resident=30.4MB stacksize=0.2MB
+2010-10-18 14:15:44,982 DEBUG                    event_set:482 |Memory: finished generating events
+2010-10-18 14:15:44,983 DEBUG                    event_set:483 |Resource usage: memory=418.4MB resident=30.5MB stacksize=0.2MB
+2010-10-18 14:15:44,984 DEBUG                     analysis:242 |Memory: event_set_zone created
+2010-10-18 14:15:44,985 DEBUG                     analysis:243 |Resource usage: memory=418.4MB resident=30.5MB stacksize=0.2MB
+2010-10-18 14:15:44,986 DEBUG                     analysis:254 |No fault source XML file found
+2010-10-18 14:15:44,993 DEBUG    Y:\eqrm_core\eqrm_code\recurrence_functions:36  |Memory: event_activity_matrix weight_matrix created
+2010-10-18 14:15:44,995 DEBUG    Y:\eqrm_core\eqrm_code\recurrence_functions:37  |Resource usage: memory=418.4MB resident=30.5MB stacksize=0.2MB
+2010-10-18 14:15:44,999 DEBUG    Y:\eqrm_core\eqrm_code\recurrence_functions:118 |Memory: Out of the event_activity loop
+2010-10-18 14:15:45,001 DEBUG    Y:\eqrm_core\eqrm_code\recurrence_functions:119 |Resource usage: memory=418.4MB resident=30.5MB stacksize=0.2MB
+2010-10-18 14:15:45,002 DEBUG                     analysis:278 |Memory: event activity has been calculated
+2010-10-18 14:15:45,003 DEBUG                     analysis:279 |Resource usage: memory=418.4MB resident=30.5MB stacksize=0.2MB
+2010-10-18 14:15:45,004 INFO                      analysis:284 |Event set created. Number of events=2
+2010-10-18 14:15:45,005 DEBUG                     analysis:285 |Memory: Event Set created
+2010-10-18 14:15:45,006 DEBUG                     analysis:286 |Resource usage: memory=418.4MB resident=30.5MB stacksize=0.2MB
+2010-10-18 14:15:45,505 INFO                      analysis:299 |Sites set created. Number of sites=4
+2010-10-18 14:15:45,507 DEBUG                     analysis:300 |Memory: Sites created
+2010-10-18 14:15:45,508 DEBUG                     analysis:301 |Resource usage: memory=419.8MB resident=31.8MB stacksize=0.2MB
+2010-10-18 14:15:45,510 DEBUG                     analysis:314 |Pseudo event set created. Number of pseudo_events=4
+2010-10-18 14:15:45,511 DEBUG                     analysis:315 |Memory: Pseudo Event Set created
+2010-10-18 14:15:45,512 DEBUG                     analysis:316 |Resource usage: memory=419.8MB resident=31.8MB stacksize=0.2MB
+2010-10-18 14:15:45,533 DEBUG                     analysis:364 |blocking over sites if running in parallel. block_size=4
+2010-10-18 14:15:45,533 DEBUG                     analysis:367 |Number of atten_periods=3
+2010-10-18 14:15:45,534 DEBUG                     analysis:373 |Number of SA_surfaces=1
+2010-10-18 14:15:45,535 DEBUG                     analysis:393 |Memory: hazard_map array created
+2010-10-18 14:15:45,536 DEBUG                     analysis:394 |Resource usage: memory=419.8MB resident=31.8MB stacksize=0.2MB
+2010-10-18 14:15:45,536 DEBUG                     analysis:409 |Memory: save_motion array created
+2010-10-18 14:15:45,538 DEBUG                     analysis:410 |Resource usage: memory=419.8MB resident=31.8MB stacksize=0.2MB
+2010-10-18 14:15:45,538 DEBUG                     analysis:440 |Memory: Created all data collection arrays.
+2010-10-18 14:15:45,539 DEBUG                     analysis:441 |Resource usage: memory=419.8MB resident=31.8MB stacksize=0.2MB
+2010-10-18 14:15:45,540 INFO                      analysis:457 |do site 1 of 4
+2010-10-18 14:15:45,550 INFO                      analysis:457 |do site 2 of 4
+2010-10-18 14:15:45,559 INFO                      analysis:457 |do site 3 of 4
+2010-10-18 14:15:45,568 INFO                      analysis:457 |do site 4 of 4
+2010-10-18 14:15:45,577 DEBUG                     analysis:558 |Memory: Ended looping over sites
+2010-10-18 14:15:45,579 DEBUG                     analysis:559 |Resource usage: memory=419.8MB resident=31.8MB stacksize=0.2MB
+2010-10-18 14:15:45,579 INFO                      analysis:569 |time_pre_site_loop_fraction 0.936708860759
+2010-10-18 14:15:45,580 INFO                      analysis:572 |loop_time (excluding file saving) 0:00:00.790000 hr:min:sec
+2010-10-18 14:15:45,597 INFO                      analysis:759 |On node 0, tornado.agso.gov.au time_taken_overall 0:00:00.790000 hr:min:sec
+2010-10-18 14:15:45,598 DEBUG                     analysis:761 |Memory: End
+2010-10-18 14:15:45,599 DEBUG                     analysis:762 |Resource usage: memory=419.8MB resident=31.8MB stacksize=0.2MB
