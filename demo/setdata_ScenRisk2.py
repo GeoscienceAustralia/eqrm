@@ -66,7 +66,7 @@ buildings_set_damping_Be_to_5_percent = False
 
 # Capacity Spectrum Method
 csm_use_variability = True
-csm_variability_method = 3
+csm_variability_method = 2
 csm_standard_deviation = 0.3
 csm_damping_regimes = 0
 csm_damping_modify_Tav = True

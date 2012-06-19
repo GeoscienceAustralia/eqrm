@@ -239,10 +239,6 @@ class Structures(Sites):
                           eqrm_flags.csm_SDcr_tolerance_percentage/100.0,
                       'csm_damping_max_iterations':
                           eqrm_flags.csm_damping_max_iterations,
-                      'sdtcap':            #FIXME sdt -> std
-                          eqrm_flags.csm_standard_deviation,
-                      'csm_use_variability':
-                          eqrm_flags.csm_use_variability,
                       'csm_variability_method':
                           eqrm_flags.csm_variability_method,
                       'csm_hysteretic_damping':
@@ -255,8 +251,8 @@ class Structures(Sites):
 
         damage_model = Damage_model(self, SA, eqrm_flags.atten_periods,
                                     event_set_Mw,
-                                    eqrm_flags.csm_use_variability,
-                                    float(eqrm_flags.csm_standard_deviation),
+                                    eqrm_flags.csm_damage_state_use_variability,
+                                    eqrm_flags.csm_damage_state_standard_deviation,
                                     csm_params=csm_params)
 
         # Note, aggregate slight, medium, critical damage
@@ -367,7 +363,7 @@ def build_par_file(buildpars_flag):
 
     # create links to required building parameters
     if isinstance(buildpars_flag, str):
-         buildpars = 'building_parameters_' + buildpars_flag
+        buildpars = 'building_parameters_' + buildpars_flag
     else:
         buildpars = buildpars_map[buildpars_flag]
 
