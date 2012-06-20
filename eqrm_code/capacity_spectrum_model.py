@@ -90,8 +90,7 @@ should NOT be set after initialization - read __init__ for reasons.
         # for specific sites from self.all_capacity_parameters[site_index]
         # using self.set_building_type_index(index)
         
-        self.capacity_parameters=self._calculate_parameters(
-            building_parameters,magnitudes)
+        self.capacity_parameters=self._calculate_parameters(building_parameters)
         
         self.kappa=self._calculate_kappa(building_parameters,magnitudes)
         self.kappa=self.kappa[:,:,newaxis]
@@ -218,16 +217,10 @@ should NOT be set after initialization - read __init__ for reasons.
         SAcap=calculate_capacity(SD,self.capacity_parameters)
         return SA,SD,SAcap
         
-    def _calculate_parameters(self, building_parameters, magnitude,
-                              building_type_index=None):
+    def _calculate_parameters(self, building_parameters):
         """
         Calculate the derived parameters
         """
-        number_events = len(magnitude)
-
-        if building_type_index is None:
-            building_type_index=slice(None)
-            
         # get some constants and expand to the
         # size of ground motion ([sites,mag,periods])
         #print "building_parameters['design_strength']", building_parameters['design_strength']
@@ -248,7 +241,7 @@ should NOT be set after initialization - read __init__ for reasons.
 
         csm_variability_method=self.csm_variability_method
 
-        # Take a sample of the parameters
+        # Take a sample of the parameters using the specified sigma values
         C,T,a1,a2,y,Lambda,u = sample_capacity_parameters(C,C_sigma,
                                                           T,T_sigma,
                                                           a1,a1_sigma,
