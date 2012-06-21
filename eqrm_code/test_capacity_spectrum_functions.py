@@ -197,8 +197,19 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         # h=ultimate_to_yield
         # u=ductility
         
-        capacity_parameters=calculate_capacity_parameters(C,T,a1,a2,y,h,u)
-        Dy,Ay,Du,Au,aa,bb,cc = capacity_parameters
+        # TODO: Fix once switched over
+        alpha, beta, delta, theta = 0, 0, 0, 0
+        
+        capacity_parameters=calculate_capacity_parameters(C,T,a1,a2,y,h,u,
+                                                          alpha,beta,
+                                                          delta,theta)
+        (Dy, Ay,
+         Du, Au, 
+         Du_alpha, Au_rev,
+         Du_beta, Au_rev_0_8,
+         Du_delta, Au_rev_0_2,
+         Du_theta, Au_rev_0_1,
+         aa, bb, cc) = capacity_parameters
         kappa=calculate_kappa(magnitude,damping_s,damping_m,damping_l)
 
         # out:
@@ -223,7 +234,18 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         
         Ay,Dy,Au,Du=(0.13417,2.9975,0.26833,41.964)
         aa,bb,cc,kappa=(-0.3647,0.33362,0.26833,0.001)
-        capacity_parameters=Dy,Ay,Du,Au,aa,bb,cc       
+        # TODO: Fix test data once capacity curve switched to degrading
+        Du_alpha,Au_rev=(0,0)
+        Du_beta,Au_rev_0_8=(0,0)
+        Du_delta,Au_rev_0_2=(0,0)
+        Du_theta,Au_rev_0_1=(0,0)
+        capacity_parameters=(Dy,Ay,
+                             Du,Au,
+                             Du_alpha,Au_rev,
+                             Du_beta,Au_rev_0_8,
+                             Du_delta,Au_rev_0_2,
+                             Du_theta,Au_rev_0_1,
+                             aa,bb,cc)     
         capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]
         capacity=calculate_capacity(surface_displacement,capacity_parameters)
 
@@ -248,7 +270,18 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         
         Ay,Dy,Au,Du=(0.13417,2.9975,0.26833,41.964)
         aa,bb,cc,kappa=(-0.3647,0.33362,0.26833,0.001)
-        capacity_parameters=Dy,Ay,Du,Au,aa,bb,cc       
+        # TODO: Fix test data once capacity curve switched to degrading
+        Du_alpha,Au_rev=(0,0)
+        Du_beta,Au_rev_0_8=(0,0)
+        Du_delta,Au_rev_0_2=(0,0)
+        Du_theta,Au_rev_0_1=(0,0)
+        capacity_parameters=(Dy,Ay,
+                             Du,Au,
+                             Du_alpha,Au_rev,
+                             Du_beta,Au_rev_0_8,
+                             Du_delta,Au_rev_0_2,
+                             Du_theta,Au_rev_0_1,
+                             aa,bb,cc)      
         capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]
         capacity=calculate_capacity(surface_displacement,capacity_parameters)
 
@@ -318,7 +351,18 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         
         Ay,Dy,Au,Du=(0.13417,2.9975,0.26833,41.964)
         aa,bb,cc,kappa=(-0.3647,0.33362,0.26833,0.001)
-        capacity_parameters=Dy,Ay,Du,Au,aa,bb,cc
+        # TODO: Fix test data once capacity curve switched to degrading
+        Du_alpha,Au_rev=(0,0)
+        Du_beta,Au_rev_0_8=(0,0)
+        Du_delta,Au_rev_0_2=(0,0)
+        Du_theta,Au_rev_0_1=(0,0)
+        capacity_parameters=(Dy,Ay,
+                             Du,Au,
+                             Du_alpha,Au_rev,
+                             Du_beta,Au_rev_0_8,
+                             Du_delta,Au_rev_0_2,
+                             Du_theta,Au_rev_0_1,
+                             aa,bb,cc)
         capacity_parameters=array(capacity_parameters)
         
         capacity_parameters=capacity_parameters[:,newaxis,newaxis,newaxis]
@@ -415,8 +459,20 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         # h=ultimate_to_yield
         # u=ductility
         
-        capacity_parameters=calculate_capacity_parameters(C,T,a1,a2,y,h,u)
-        Dy,Ay,Du,Au,aa,bb,cc = capacity_parameters
+        # TODO: Fix once switched over
+        alpha, beta, delta, theta = 0, 0, 0, 0
+        
+        capacity_parameters=calculate_capacity_parameters(C,T,a1,a2,y,h,u,
+                                                          alpha,beta,
+                                                          delta,theta)
+        (Dy, Ay,
+         Du, Au, 
+         Du_alpha, Au_rev,
+         Du_beta, Au_rev_0_8,
+         Du_delta, Au_rev_0_2,
+         Du_theta, Au_rev_0_1,
+         aa, bb, cc) = capacity_parameters
+        
         kappa=calculate_kappa(magnitude,damping_s,damping_m,damping_l)
 
         # out:
@@ -458,7 +514,18 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         
         Ay,Dy,Au,Du=(0.40000000000000,1.67808144348440,0.80000000000000,6.71232577393759)
         aa,bb,cc,kappa=(-1.08731273138362, 0.59591863308111,0.80000000000000,1.000000000000000e-003)
-        capacity_parameters=Dy,Ay,Du,Au,aa,bb,cc
+        # TODO: Fix test data once capacity curve switched to degrading
+        Du_alpha,Au_rev=(0,0)
+        Du_beta,Au_rev_0_8=(0,0)
+        Du_delta,Au_rev_0_2=(0,0)
+        Du_theta,Au_rev_0_1=(0,0)
+        capacity_parameters=(Dy,Ay,
+                             Du,Au,
+                             Du_alpha,Au_rev,
+                             Du_beta,Au_rev_0_8,
+                             Du_delta,Au_rev_0_2,
+                             Du_theta,Au_rev_0_1,
+                             aa,bb,cc)
         capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]
         capacity=calculate_capacity(surface_displacement,capacity_parameters)
 
@@ -613,7 +680,18 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         
         Ay,Dy,Au,Du=(0.40000000000000,1.67808144348440,0.80000000000000,6.71232577393759)
         aa,bb,cc,kappa=(-1.08731273138362, 0.59591863308111,0.80000000000000,1.000000000000000e-003)
-        capacity_parameters=Dy,Ay,Du,Au,aa,bb,cc      
+        # TODO: Fix test data once capacity curve switched to degrading
+        Du_alpha,Au_rev=(0,0)
+        Du_beta,Au_rev_0_8=(0,0)
+        Du_delta,Au_rev_0_2=(0,0)
+        Du_theta,Au_rev_0_1=(0,0)
+        capacity_parameters=(Dy,Ay,
+                             Du,Au,
+                             Du_alpha,Au_rev,
+                             Du_beta,Au_rev_0_8,
+                             Du_delta,Au_rev_0_2,
+                             Du_theta,Au_rev_0_1,
+                             aa,bb,cc)
         capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]  
         capacity=calculate_capacity(SD_new,capacity_parameters)
 

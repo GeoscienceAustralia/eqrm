@@ -13,7 +13,8 @@
 import exceptions
 
 from scipy import where, exp, pi, newaxis, stats, weave, zeros, log, \
-     asarray, array, seterr
+     asarray, array, seterr, concatenate
+from numpy import interp as npinterp
 from interp import interp
 
 from eqrm_code import util
@@ -35,7 +36,13 @@ def trapazoid_damp(capacity_parameters,kappa,acceleration,displacement,
     Calculate the damping correction (Fulford 02) using an approximation
     to the capcity curve.
     """
-    DyM,AyM,DuM,AuM,a,b,c=capacity_parameters
+    (DyM, AyM,
+     DuM, AuM,
+     Du_alpha, Au_rev,
+     Du_beta, Au_rev_0_8,
+     Du_delta, Au_rev_0_2,
+     Du_theta, Au_rev_0_1,
+     a, b, c) = capacity_parameters
     
     k=AyM/DyM
     Harea=4*acceleration*(displacement-acceleration/k)
@@ -49,7 +56,13 @@ def nonlin_damp(capacity_parameters,kappa,acceleration,displacement,
     Calculate the damping correction (Fulford 02) using the
     exact capacity curve.
     """
-    DyV,AyV,DuV,AuV,a,b,c=capacity_parameters    
+    (DyV, AyV,
+     DuV, AuV,
+     Du_alpha, Au_rev,
+     Du_beta, Au_rev_0_8,
+     Du_delta, Au_rev_0_2,
+     Du_theta, Au_rev_0_1,
+     a, b, c) = capacity_parameters 
     Harea=hyst_area_rand(displacement,acceleration,DyV,AyV,DuV,AuV,
                          csm_hysteretic_damping)
     oldsettings = seterr(invalid='ignore')
@@ -221,17 +234,21 @@ def sample_capacity_parameters(C,C_sigma,
             Lambda_sample,
             u_sample)
     
-def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u):
+def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u,
+                                  alpha, beta, delta, theta):
     """
     Use building parameters to calculate capacity parameters
-    
-        |         ___________
-        |     ___/* Du,Au - where it finally peaks
-     SA |   _/
-        |  /* Dy,Ay - end of linear region
-        | /
-        |/
-        |___________________
+        
+        |         |alpha*Du
+        |         |   _ _ _ _ _ _
+        |         | /
+        |Au_rev_ _|/ |beta*Du
+        |     ___/ \_|_ _ _ _ _ _ _ _ _ 0.8*Au_rev
+     SA |   _/       \_  |delta*Du
+        |  /* Dy,Ay    \_|_ _ _ _ _ _ _ 0.2*Au_rev
+        | /              \_ |theta*Du
+        |/                 \|__________ 0.1*Au_rev
+        |___________________________________
           SD
 
           
@@ -250,14 +267,31 @@ def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u):
     Dy=1000/(4*pi**2)*g*Ay*(T**2)        
     Au=Lambda*Ay        
     Du=Lambda*u*Dy
+    Du_alpha = Du*alpha
+    Du_beta = Du*beta
+    Du_delta = Du*delta
+    Du_theta = Du*theta
     
     ky=(Ay/Dy) #slope of linear part of capacity curve
     c=Au
     b=ky/(Au-Ay)
     a=(Ay-Au)*exp(b*Dy)
     
-    return Dy,Ay,Du,Au,a,b,c
+    # Find Au_rev
+    Au_rev = a*exp(Du_alpha*-b)+c
+    Au_rev_0_8 = 0.8 * Au_rev
+    Au_rev_0_2 = 0.2 * Au_rev
+    Au_rev_0_1 = 0.1 * Au_rev
     
+    return (Dy, Ay,
+            Du, Au, 
+            Du_alpha, Au_rev,
+            Du_beta, Au_rev_0_8,
+            Du_delta, Au_rev_0_2,
+            Du_theta, Au_rev_0_1,
+            a, b, c)
+
+
 def calculate_capacity_python(surface_displacement,capacity_parameters):
     """
     Calculate the building capacity curve
@@ -272,7 +306,15 @@ def calculate_capacity_python(surface_displacement,capacity_parameters):
           SD
           
     """
-    Dy,Ay,Du,Au,a,b,c=capacity_parameters
+    
+    (Dy, Ay,
+     Du, Au,
+     Du_alpha, Au_rev,
+     Du_beta, Au_rev_0_8,
+     Du_delta, Au_rev_0_2,
+     Du_theta, Au_rev_0_1,
+     a, b, c) = capacity_parameters
+    
     print 'speed hog 2'
     y1=(Ay/Dy)*surface_displacement # linear region
     y2=a*exp(surface_displacement*-b)+c # exp region
@@ -285,7 +327,85 @@ def calculate_capacity_python(surface_displacement,capacity_parameters):
     print 'end speed hog'
     return capacity
 
-def calculate_capacity(surface_displacement,capacity_parameters):
+
+def calculate_capacity_degrading_python(surface_displacement,capacity_parameters):
+    """
+    Calculate the degrading building capacity curve
+    
+        |         |alpha*Du
+        |         |   _ _ _ _ _ _
+        |         | /
+        |Au_rev_ _|/ |beta*Du
+        |     ___/ \_|_ _ _ _ _ _ _ _ _ 0.8*Au_rev
+     SA |   _/       \_  |delta*Du
+        |  /* Dy,Ay    \_|_ _ _ _ _ _ _ 0.2*Au_rev
+        | /              \_ |theta*Du
+        |/                 \|__________ 0.1*Au_rev
+        |___________________________________
+          SD
+          
+    """
+    (Dy, Ay,
+     Du, Au,
+     Du_alpha, Au_rev,
+     Du_beta, Au_rev_0_8,
+     Du_delta, Au_rev_0_2,
+     Du_theta, Au_rev_0_1,
+     a, b, c) = capacity_parameters
+    
+    print 'calculate_capacity_degrading_python'
+    
+    # Calculations
+    # linear region
+    y1 = (Ay/Dy)*surface_displacement
+    
+    # exp curve region
+    y2 = a*exp(surface_displacement*-b)+c
+    
+    # first degrading region - linear
+    y3 = npinterp(surface_displacement,
+                  concatenate((Du_alpha,Du_beta)).reshape(2), # two points only
+                  concatenate((Au_rev,Au_rev_0_8)).reshape(2))
+    
+    # second degrading region - linear
+    y4 = npinterp(surface_displacement,
+                  concatenate((Du_beta,Du_delta)).reshape(2),
+                  concatenate((Au_rev_0_8,Au_rev_0_2)).reshape(2))
+    
+    # third degrading region - linear
+    y5 = npinterp(surface_displacement,
+                  concatenate((Du_delta,Du_theta)).reshape(2),
+                  concatenate((Au_rev_0_2,Au_rev_0_1)).reshape(2))
+    
+    # flat region
+    y6 = Au_rev_0_1
+
+    # Regions
+    # linear region
+    b1 = (surface_displacement<=Dy)
+    
+    # exp_curve_region
+    b2 = ((surface_displacement>Dy)&(surface_displacement<=Du_alpha))
+    
+    # first degrading region
+    b3 = ((surface_displacement>Du_alpha)&(surface_displacement<=Du_beta))
+    
+    # second degrading region
+    b4 = ((surface_displacement>Du_beta)&(surface_displacement<=Du_delta))
+    
+    # third degrading region
+    b5 = ((surface_displacement>Du_delta)&(surface_displacement<=Du_theta))
+    
+    # flat region
+    b6=(surface_displacement>Du_theta)
+    
+    capacity=(b1*y1+b2*y2+b3*y3+b4*y4+b5*y5+b6*y6)
+    
+    print 'end calculate_capacity_degrading_python'
+    
+    return capacity
+
+def calculate_capacity_weave(surface_displacement,capacity_parameters):
     """
     Calculate the building capacity curve
     
@@ -299,8 +419,15 @@ def calculate_capacity(surface_displacement,capacity_parameters):
           SD
     #Fixme - add unit information.
     """
-    #print "surface_displacement", surface_displacement
-    Dy,Ay,Du,Au,a,b,c=capacity_parameters
+    
+    (Dy, Ay,
+     Du, Au,
+     Du_alpha, Au_rev,
+     Du_beta, Au_rev_0_8,
+     Du_delta, Au_rev_0_2,
+     Du_theta, Au_rev_0_1,
+     a, b, c) = capacity_parameters
+    
     num_sites,num_events,num_periods=surface_displacement.shape
     assert surface_displacement.shape==(num_sites,num_events,num_periods)
     assert Dy.shape==Ay.shape==Du.shape==Au.shape==a.shape==b.shape==c.shape
@@ -383,6 +510,8 @@ def calculate_capacity(surface_displacement,capacity_parameters):
         except IOError:
             raise WeaveIOError
     return capacity
+
+calculate_capacity = calculate_capacity_weave
 
 def calculate_reduction_factors(damping_factor):
     """

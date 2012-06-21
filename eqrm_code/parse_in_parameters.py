@@ -470,7 +470,7 @@ CONV_NEW = [{'order': 10.0,
             ]
 
 # Old style attributes that have not been removed yet.
-OLD_STYLE_PARAS_HARD_WIRED = {'buildpars_flag':4, 'grid_flag':1}
+OLD_STYLE_PARAS_HARD_WIRED = {'buildpars_flag':5, 'grid_flag':1}
 
 # 'attributes' that are added to eqrm_flags when executed on the command-line.
 KNOWN_KWARGS = {'use_determ_seed':None,

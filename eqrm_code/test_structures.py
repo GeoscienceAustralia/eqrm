@@ -349,10 +349,11 @@ def get_sites_from_dic(attribute_dic=None,
             1:'building_parameters_workshop',
             2:'building_parameters_hazus',
             3:'building_parameters_workshop_2',
-            4:'building_parameters_workshop_3'}
+            4:'building_parameters_workshop_3',
+            5:'building_parameters_degrading_capacity'}
 
         # create links to required building parameters
-        building_parameters = os.path.join(data_dir, buildpars[4])
+        building_parameters = os.path.join(data_dir, buildpars[5])
         
         default_input_dir=os.path.join(eqrm_dir, 'resources',
                                        'data')
