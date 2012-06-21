@@ -359,7 +359,8 @@ def build_par_file(buildpars_flag):
                    1: 'building_parameters_workshop',
                    2: 'building_parameters_hazus',
                    3: 'building_parameters_workshop_2',
-                   4: 'building_parameters_workshop_3'}
+                   4: 'building_parameters_workshop_3',
+                   5: 'building_parameters_degrading_capacity'}
 
     # create links to required building parameters
     if isinstance(buildpars_flag, str):

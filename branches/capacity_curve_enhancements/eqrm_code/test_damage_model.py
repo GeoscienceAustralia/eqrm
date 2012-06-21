@@ -120,7 +120,18 @@ class Test_damage_model(unittest.TestCase):
         SAcr = array([0.268333333333333])
         (Ay, Dy, Au, Du) = (0.13417, 2.9975, 0.26833, 41.964)
         (aa, bb, cc, kappa) = (-0.3647, 0.33362, 0.26833, 0.001)
-        capacity_parameters = (Dy, Ay, Du, Au, aa, bb, cc)
+        # TODO: Fix test data once capacity curve switched to degrading
+        Du_alpha,Au_rev=(0,0)
+        Du_beta,Au_rev_0_8=(0,0)
+        Du_delta,Au_rev_0_2=(0,0)
+        Du_theta,Au_rev_0_1=(0,0)
+        capacity_parameters=(Dy,Ay,
+                             Du,Au,
+                             Du_alpha,Au_rev,
+                             Du_beta,Au_rev_0_8,
+                             Du_delta,Au_rev_0_2,
+                             Du_theta,Au_rev_0_1,
+                             aa,bb,cc)
         damping = nonlin_damp(capacity_parameters, kappa, SAcr, SDcr)
 
         #out
@@ -242,12 +253,15 @@ class Test_damage_model(unittest.TestCase):
 
         params = (0.069, 13, 0.3, 0.9, 0.7, 1.75, 2, 7)
         dparams = (0.001, 0.001, 0.001, 0.08)
+        # TODO: Revisit when capacity curve switches over
+        degrading_params = (0.4, 0.6, 0.8, 1.0)
         
         sigma = 0.3
 
         (C, height, T, a1, a2, y, h, u) =params
         magnitudes = array([7.2])
         (damping_s, damping_m, damping_l, initial_damping) = dparams
+        (d_alpha, d_beta, d_delta, d_theta) = degrading_params
 
         periods = array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
                          0.9, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5])
@@ -268,6 +282,10 @@ class Test_damage_model(unittest.TestCase):
         building_parameters['ultimate_to_yield_sigma'] = array([sigma])
         building_parameters['ductility'] = array([u])
         building_parameters['ductility_sigma'] = array([sigma])
+        building_parameters['degrading_alpha'] = array([d_alpha])
+        building_parameters['degrading_beta'] = array([d_beta])
+        building_parameters['degrading_delta'] = array([d_delta])
+        building_parameters['degrading_theta'] = array([d_theta])
         building_parameters['damping_s'] = array([damping_s])
         building_parameters['damping_m'] = array([damping_m])
         building_parameters['damping_l'] = array([damping_l])
@@ -415,7 +433,7 @@ class Test_damage_model(unittest.TestCase):
         eqrm_dir = determine_eqrm_path()
         default_input_dir = join(eqrm_dir, 'resources', 'data', '')
         building_parameters = \
-            building_params_from_csv(csv_name='building_parameters_workshop_3',
+            building_params_from_csv(csv_name='building_parameters_degrading_capacity',
                                      default_input_dir=default_input_dir)
 
         # Pull the parameters out:
@@ -553,6 +571,10 @@ class Test_damage_model(unittest.TestCase):
                                'height_to_displacement_sigma': array([0.3]),
                                'ductility': array([5.]),
                                'ductility_sigma': array([0.3]),
+                               'degrading_alpha': array([0.4]),
+                               'degrading_beta': array([0.6]),
+                               'degrading_delta': array([0.8]),
+                               'degrading_theta': array([1]),
                                'damping_l': array([0.]),
                                'damping_m': array([0.2])}
 

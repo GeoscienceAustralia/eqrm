@@ -238,6 +238,11 @@ should NOT be set after initialization - read __init__ for reasons.
         Lambda_sigma=building_parameters['ultimate_to_yield_sigma'][:,newaxis,newaxis]
         u=building_parameters['ductility'][:,newaxis,newaxis]
         u_sigma=building_parameters['ductility_sigma'][:,newaxis,newaxis]
+        
+        alpha=building_parameters['degrading_alpha'][:,newaxis,newaxis]
+        beta=building_parameters['degrading_beta'][:,newaxis,newaxis]
+        delta=building_parameters['degrading_delta'][:,newaxis,newaxis]
+        theta=building_parameters['degrading_theta'][:,newaxis,newaxis]
 
         csm_variability_method=self.csm_variability_method
 
@@ -252,7 +257,8 @@ should NOT be set after initialization - read __init__ for reasons.
                                                           csm_variability_method)
 
         # calculate capacity curve parameters from building parameters:
-        params = calculate_capacity_parameters(C, T, a1, a2, y, Lambda, u)
+        params = calculate_capacity_parameters(C, T, a1, a2, y, Lambda, u,
+                                               alpha, beta, delta, theta)
         # note: params=Dy,Ay,Du,Au,aa,bb,cc
         #print "_calculate_parameters params", params
         return params

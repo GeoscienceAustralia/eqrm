@@ -46,10 +46,11 @@ class Agg_db_cd_code(unittest.TestCase):
             1:'building_parameters_workshop',
             2:'building_parameters_hazus',
             3:'building_parameters_workshop_2',
-            4:'building_parameters_workshop_3'}
+            4:'building_parameters_workshop_3',
+            5:'building_parameters_degrading_capacity'}
 
         # create links to required building parameters
-        building_parameters=data_dir+buildpars[4]
+        building_parameters=data_dir+buildpars[5]
         sites=Structures.from_csv(
             file_name,
             building_parameters,
@@ -259,10 +260,11 @@ def write_aggregate_read_struct(attribute_dic=None,
             1:'building_parameters_workshop',
             2:'building_parameters_hazus',
             3:'building_parameters_workshop_2',
-            4:'building_parameters_workshop_3'}
+            4:'building_parameters_workshop_3',
+            5:'building_parameters_degrading_capacity'}
 
         # create links to required building parameters
-        building_parameters = buildpars[4]
+        building_parameters = buildpars[5]
         default_input_dir = join(eqrm_dir,
                                  'resources','data','')
         sites=Structures.from_csv(
