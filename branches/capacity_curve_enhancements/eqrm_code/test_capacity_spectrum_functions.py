@@ -319,6 +319,64 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         #print "capacity", capacity
         assert allclose(capacity[0],capacity_m,rtol=5e-5)        
         
+    def test_calculate_capacity_degrading_weave(self):
+        """
+        Test the degrading capacity curve function implemented in C using scipy 
+        weave works as expected
+        """
+        
+        # Set up variables
+        surface_displacement=array([0.0,  # edge
+                                    0.5,  # linear region
+                                    1.0,  # edge
+                                    1.5,  # exponential region
+                                    20.0, # edge
+                                    20.5, # first degrading region
+                                    21.0, # edge
+                                    21.5, # second degrading region
+                                    22.0, # edge
+                                    22.5, # third degrading region
+                                    23.0, # edge
+                                    23.5, # flat region
+                                    ])    
+        surface_displacement.shape=1,12,-1
+        
+        Ay,Dy,Au,Du=(1,1,2,20)
+        a,b,c = (-2.7182818284590451,1,2)
+        Du_alpha,Au_rev=(20,2)
+        Du_beta,Au_rev_0_8=(21,1.6)
+        Du_delta,Au_rev_0_2=(22,0.4)
+        Du_theta,Au_rev_0_1=(23,0.2)
+        
+        capacity_parameters=(Dy,Ay,
+                             Du,Au,
+                             Du_alpha,Au_rev,
+                             Du_beta,Au_rev_0_8,
+                             Du_delta,Au_rev_0_2,
+                             Du_theta,Au_rev_0_1,
+                             a,b,c)      
+        capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]
+        
+        capacity=calculate_capacity_degrading_weave(surface_displacement,
+                                                    capacity_parameters)
+       
+        expected_capacity = array([0.0,             # edge
+                                   0.5,             # linear region
+                                   1.0,             # edge
+                                   a*exp(1.5*-b)+c, # exponential region
+                                   2.0,             # edge
+                                   (2.0+1.6)/2,     # first degrading region
+                                   1.6,             # edge
+                                   (1.6+0.4)/2,     # second degrading region
+                                   0.4,             # edge
+                                   (0.4+0.2)/2,     # third degrading region
+                                   0.2,             # edge
+                                   0.2,             # flat region
+                                   ])
+        expected_capacity.shape=1,12,-1
+        
+        assert allclose(capacity, expected_capacity, rtol=5e-5)   
+    
     def test_calculate_capacity_degrading_python(self):
         """
         Test the degrading capacity curve function implemented in pure python
@@ -339,6 +397,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                                     23.0, # edge
                                     23.5, # flat region
                                     ])    
+        surface_displacement.shape=1,12,-1
         
         Ay,Dy,Au,Du=(1,1,2,20)
         a,b,c = (-2.7182818284590451,1,2)
@@ -358,7 +417,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         
         capacity=calculate_capacity_degrading_python(surface_displacement,
                                                      capacity_parameters)
-        
+       
         expected_capacity = array([0.0,             # edge
                                    0.5,             # linear region
                                    1.0,             # edge
@@ -372,6 +431,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                                    0.2,             # edge
                                    0.2,             # flat region
                                    ])
+        expected_capacity.shape=1,12,-1
         
         assert allclose(capacity, expected_capacity, rtol=5e-5)   
         
