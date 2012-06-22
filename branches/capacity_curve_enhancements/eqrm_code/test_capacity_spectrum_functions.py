@@ -189,6 +189,9 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         C,height,T,a1,a2,y,h,u=params
         magnitude=array([7.2])
         damping_s,damping_m,damping_l,B0=dparams
+        
+        alpha, beta, delta, theta = 0.4, 0.6, 0.8, 1.0
+        
         # C=design_strength
         # T=natural_elastic_period
         # a1=fraction_in_first_mode
@@ -196,9 +199,10 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         # y=yield_to_design
         # h=ultimate_to_yield
         # u=ductility
-        
-        # TODO: Fix once switched over
-        alpha, beta, delta, theta = 0, 0, 0, 0
+        # alpha=degrading alpha
+        # beta=degrading beta
+        # delta=degrading delta
+        # theta=degrading theta
         
         capacity_parameters=calculate_capacity_parameters(C,T,a1,a2,y,h,u,
                                                           alpha,beta,
@@ -215,11 +219,35 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         # out:
         Aym,Dym,Aum,Dum=(0.13417,2.9975,0.26833,41.964)
         aam,bbm,ccm,kappam=(-0.3647,0.33362,0.26833,0.001)
+
+        # Du_alpha = alpha*Du
+        # Du_beta = beta*Du
+        # Du_delta = delta*Du
+        # Du_theta = theta*Du
+        Du_alpha_m = Dum * alpha
+        Du_beta_m = Dum * beta
+        Du_delta_m = Dum * delta
+        Du_theta_m = Dum * theta
+        
+        # Au_rev = = a*exp(Du_alpha*-b)+c
+        # Au_rev_0_8 = 0.8*Au_rev
+        # Au_rev_0_2 = 0.2*Au_rev
+        # Au_rev_0_1 = 0.1*Au_rev
+        Au_rev_m = aam * exp(Du_alpha_m*-bbm)+ccm
+        Au_rev_0_8_m = 0.8*Au_rev_m
+        Au_rev_0_2_m = 0.2*Au_rev_m
+        Au_rev_0_1_m = 0.1*Au_rev_m
+        
         assert allclose((Dy,Ay,Du,Au,aa,bb,cc),
                         (Dym,Aym,Dum,Aum,aam,bbm,ccm),
                         rtol=5e-5)
-        assert allclose(kappa,kappam)   
-       
+        assert allclose(kappa,kappam)
+        assert allclose((Du_alpha, Du_beta, Du_delta, Du_theta),
+                        (Du_alpha_m, Du_beta_m, Du_delta_m, Du_theta_m),
+                        rtol=5e-5)
+        assert allclose((Au_rev, Au_rev_0_8, Au_rev_0_2, Au_rev_0_1),
+                        (Au_rev_m, Au_rev_0_8_m, Au_rev_0_2_m, Au_rev_0_1_m),
+                        rtol=5e-5)
 
     def test_build_capacity(self):
         """
@@ -290,6 +318,62 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         capacity_m.shape = 1,2,-1  
         #print "capacity", capacity
         assert allclose(capacity[0],capacity_m,rtol=5e-5)        
+        
+    def test_calculate_capacity_degrading_python(self):
+        """
+        Test the degrading capacity curve function implemented in pure python
+        works as expected
+        """
+        
+        # Set up variables
+        surface_displacement=array([0.0,  # edge
+                                    0.5,  # linear region
+                                    1.0,  # edge
+                                    1.5,  # exponential region
+                                    20.0, # edge
+                                    20.5, # first degrading region
+                                    21.0, # edge
+                                    21.5, # second degrading region
+                                    22.0, # edge
+                                    22.5, # third degrading region
+                                    23.0, # edge
+                                    23.5, # flat region
+                                    ])    
+        
+        Ay,Dy,Au,Du=(1,1,2,20)
+        a,b,c = (-2.7182818284590451,1,2)
+        Du_alpha,Au_rev=(20,2)
+        Du_beta,Au_rev_0_8=(21,1.6)
+        Du_delta,Au_rev_0_2=(22,0.4)
+        Du_theta,Au_rev_0_1=(23,0.2)
+        
+        capacity_parameters=(Dy,Ay,
+                             Du,Au,
+                             Du_alpha,Au_rev,
+                             Du_beta,Au_rev_0_8,
+                             Du_delta,Au_rev_0_2,
+                             Du_theta,Au_rev_0_1,
+                             a,b,c)      
+        capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]
+        
+        capacity=calculate_capacity_degrading_python(surface_displacement,
+                                                     capacity_parameters)
+        
+        expected_capacity = array([0.0,             # edge
+                                   0.5,             # linear region
+                                   1.0,             # edge
+                                   a*exp(1.5*-b)+c, # exponential region
+                                   2.0,             # edge
+                                   (2.0+1.6)/2,     # first degrading region
+                                   1.6,             # edge
+                                   (1.6+0.4)/2,     # second degrading region
+                                   0.4,             # edge
+                                   (0.4+0.2)/2,     # third degrading region
+                                   0.2,             # edge
+                                   0.2,             # flat region
+                                   ])
+        
+        assert allclose(capacity, expected_capacity, rtol=5e-5)   
         
     def test_update_demand(self):
         """
