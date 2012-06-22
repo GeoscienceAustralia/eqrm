@@ -328,79 +328,6 @@ def calculate_capacity_python(surface_displacement,capacity_parameters):
     return capacity
 
 
-def calculate_capacity_degrading_python(surface_displacement,capacity_parameters):
-    """
-    Calculate the degrading building capacity curve
-    
-        |         |alpha*Du
-        |         |   _ _ _ _ _ _
-        |         | /
-        |Au_rev_ _|/ |beta*Du
-        |     ___/ \_|_ _ _ _ _ _ _ _ _ 0.8*Au_rev
-     SA |   _/       \_  |delta*Du
-        |  /* Dy,Ay    \_|_ _ _ _ _ _ _ 0.2*Au_rev
-        | /              \_ |theta*Du
-        |/                 \|__________ 0.1*Au_rev
-        |___________________________________
-          SD
-          
-    """
-    (Dy, Ay,
-     Du, Au,
-     Du_alpha, Au_rev,
-     Du_beta, Au_rev_0_8,
-     Du_delta, Au_rev_0_2,
-     Du_theta, Au_rev_0_1,
-     a, b, c) = capacity_parameters
-    
-    # Calculations
-    # linear region
-    y1 = (Ay/Dy)*surface_displacement
-    
-    # exp curve region
-    y2 = a*exp(surface_displacement*-b)+c
-    
-    # first degrading region - linear
-    y3 = npinterp(surface_displacement,
-                  concatenate((Du_alpha,Du_beta)).reshape(2), # two points only
-                  concatenate((Au_rev,Au_rev_0_8)).reshape(2))
-    
-    # second degrading region - linear
-    y4 = npinterp(surface_displacement,
-                  concatenate((Du_beta,Du_delta)).reshape(2),
-                  concatenate((Au_rev_0_8,Au_rev_0_2)).reshape(2))
-    
-    # third degrading region - linear
-    y5 = npinterp(surface_displacement,
-                  concatenate((Du_delta,Du_theta)).reshape(2),
-                  concatenate((Au_rev_0_2,Au_rev_0_1)).reshape(2))
-    
-    # flat region
-    y6 = Au_rev_0_1
-
-    # Regions
-    # linear region
-    b1 = (surface_displacement<=Dy)
-    
-    # exp_curve_region
-    b2 = ((surface_displacement>Dy)&(surface_displacement<=Du_alpha))
-    
-    # first degrading region
-    b3 = ((surface_displacement>Du_alpha)&(surface_displacement<=Du_beta))
-    
-    # second degrading region
-    b4 = ((surface_displacement>Du_beta)&(surface_displacement<=Du_delta))
-    
-    # third degrading region
-    b5 = ((surface_displacement>Du_delta)&(surface_displacement<=Du_theta))
-    
-    # flat region
-    b6=(surface_displacement>Du_theta)
-    
-    capacity=(b1*y1+b2*y2+b3*y3+b4*y4+b5*y5+b6*y6)
-    
-    return capacity
-
 def calculate_capacity_weave(surface_displacement,capacity_parameters):
     """
     Calculate the building capacity curve
@@ -501,6 +428,245 @@ def calculate_capacity_weave(surface_displacement,capacity_parameters):
                          ['num_sites','num_events','num_periods',
                           'surface_displacement','capacity',
                           'a','b','c','Du','Dy','Ay'],
+                         type_converters=weave_converters.eqrm,
+                         compiler='gcc')
+        except IOError:
+            raise WeaveIOError
+    return capacity
+
+
+def calculate_capacity_degrading_python(surface_displacement,capacity_parameters):
+    """
+    Calculate the degrading building capacity curve
+    
+        |         |alpha*Du
+        |         |   _ _ _ _ _ _
+        |         | /
+        |Au_rev_ _|/ |beta*Du
+        |     ___/ \_|_ _ _ _ _ _ _ _ _ 0.8*Au_rev
+     SA |   _/       \_  |delta*Du
+        |  /* Dy,Ay    \_|_ _ _ _ _ _ _ 0.2*Au_rev
+        | /              \_ |theta*Du
+        |/                 \|__________ 0.1*Au_rev
+        |___________________________________
+          SD
+          
+    """
+    (Dy, Ay,
+     Du, Au,
+     Du_alpha, Au_rev,
+     Du_beta, Au_rev_0_8,
+     Du_delta, Au_rev_0_2,
+     Du_theta, Au_rev_0_1,
+     a, b, c) = capacity_parameters
+    
+    # Calculations
+    # linear region
+    y1 = (Ay/Dy)*surface_displacement
+    
+    # exp curve region
+    y2 = a*exp(surface_displacement*-b)+c
+    
+    # first degrading region - linear
+    y3 = npinterp(surface_displacement,
+                  concatenate((Du_alpha,Du_beta)).reshape(2), # two points only
+                  concatenate((Au_rev,Au_rev_0_8)).reshape(2))
+    
+    # second degrading region - linear
+    y4 = npinterp(surface_displacement,
+                  concatenate((Du_beta,Du_delta)).reshape(2),
+                  concatenate((Au_rev_0_8,Au_rev_0_2)).reshape(2))
+    
+    # third degrading region - linear
+    y5 = npinterp(surface_displacement,
+                  concatenate((Du_delta,Du_theta)).reshape(2),
+                  concatenate((Au_rev_0_2,Au_rev_0_1)).reshape(2))
+    
+    # flat region
+    y6 = Au_rev_0_1
+
+    # Regions
+    # linear region
+    b1 = (surface_displacement<=Dy)
+    
+    # exp_curve_region
+    b2 = ((surface_displacement>Dy)&(surface_displacement<=Du_alpha))
+    
+    # first degrading region
+    b3 = ((surface_displacement>Du_alpha)&(surface_displacement<=Du_beta))
+    
+    # second degrading region
+    b4 = ((surface_displacement>Du_beta)&(surface_displacement<=Du_delta))
+    
+    # third degrading region
+    b5 = ((surface_displacement>Du_delta)&(surface_displacement<=Du_theta))
+    
+    # flat region
+    b6=(surface_displacement>Du_theta)
+    
+    capacity=(b1*y1+b2*y2+b3*y3+b4*y4+b5*y5+b6*y6)
+    
+    return capacity
+
+def calculate_capacity_degrading_weave(surface_displacement,capacity_parameters):
+    """
+    Calculate the degrading building capacity curve
+    
+        |         |alpha*Du
+        |         |   _ _ _ _ _ _
+        |         | /
+        |Au_rev_ _|/ |beta*Du
+        |     ___/ \_|_ _ _ _ _ _ _ _ _ 0.8*Au_rev
+     SA |   _/       \_  |delta*Du
+        |  /* Dy,Ay    \_|_ _ _ _ _ _ _ 0.2*Au_rev
+        | /              \_ |theta*Du
+        |/                 \|__________ 0.1*Au_rev
+        |___________________________________
+          SD
+          
+    """
+    
+    (Dy, Ay,
+     Du, Au,
+     Du_alpha, Au_rev,
+     Du_beta, Au_rev_0_8,
+     Du_delta, Au_rev_0_2,
+     Du_theta, Au_rev_0_1,
+     a, b, c) = capacity_parameters
+    
+    num_sites,num_events,num_periods=surface_displacement.shape
+    assert surface_displacement.shape==(num_sites,num_events,num_periods)
+    assert Dy.shape==Ay.shape==Du.shape==Au.shape==a.shape==b.shape==c.shape
+    assert Du_alpha.shape==Au_rev.shape==Du_beta.shape==Au_rev_0_8.shape
+    assert Du_delta.shape==Au_rev_0_2.shape==Du_theta.shape==Au_rev_0_1.shape
+    assert (Dy.shape==(num_sites,num_events,1)) or (Dy.shape==(num_sites,1,1))
+    capacity=zeros((num_sites,num_events,num_periods),dtype=float)
+
+    # y1 = (Ay/Dy)*surface_displacement
+    # y2 = a*exp(surface_displacement*-b)+c
+    # y3 = npinterp(surface_displacement,
+    #               concatenate((Du_alpha,Du_beta)).reshape(2),
+    #               concatenate((Au_rev,Au_rev_0_8)).reshape(2))
+    # y4 = npinterp(surface_displacement,
+    #               concatenate((Du_beta,Du_delta)).reshape(2),
+    #               concatenate((Au_rev_0_8,Au_rev_0_2)).reshape(2))
+    # y5 = npinterp(surface_displacement,
+    #               concatenate((Du_delta,Du_theta)).reshape(2),
+    #               concatenate((Au_rev_0_2,Au_rev_0_1)).reshape(2))
+    # y6 = Au_rev_0_1
+
+    # b1 = (surface_displacement<=Dy)
+    # b2 = ((surface_displacement>Dy)&(surface_displacement<=Du_alpha))
+    # b3 = ((surface_displacement>Du_alpha)&(surface_displacement<=Du_beta))
+    # b4 = ((surface_displacement>Du_beta)&(surface_displacement<=Du_delta))
+    # b5 = ((surface_displacement>Du_delta)&(surface_displacement<=Du_theta))
+    # b6=(surface_displacement>Du_theta)
+    
+    # capacity=(b1*y1+b2*y2+b3*y3+b4*y4+b5*y5+b6*y6)
+
+    # Interpolation formula
+    # y=y0+((x-x0)*y1-(x-x0)*y0)/(x1-x0)
+    code="""
+double Dyy,Duu,Ayy,aa,bb,cc;
+double Duu_alpha,Duu_beta,Duu_delta,Duu_theta;
+double Auu_rev,Auu_rev08,Auu_rev02,Auu_rev01;
+double sd;
+
+for (int i=0; i<num_sites; ++i){
+    for (int j=0; j<num_events; ++j){
+        get_constants
+        for (int k=0;k<num_periods;++k){
+            sd=surface_displacement(i,j,k);
+            if (sd<=Dyy){
+                capacity(i,j,k)=(Ayy/Dyy)*sd;
+            }
+            else if ((sd>Dyy)&(sd<=Duu_alpha)){
+                capacity(i,j,k)=aa*exp(sd*(-bb))+cc;
+            }
+            else if ((sd>Duu_alpha)&(sd<=Duu_beta)){
+                capacity(i,j,k)=Auu_rev+(sd-Duu_alpha)*((Auu_rev08-Auu_rev)/(Duu_beta-Duu_alpha));
+            }
+            else if ((sd>Duu_beta)&(sd<=Duu_delta)){
+                capacity(i,j,k)=Auu_rev08+(sd-Duu_beta)*((Auu_rev02-Auu_rev08)/(Duu_delta-Duu_beta));
+            }
+            else if ((sd>Duu_delta)&(sd<=Duu_theta)){
+                capacity(i,j,k)=Auu_rev02+(sd-Duu_delta)*((Auu_rev01-Auu_rev02)/(Duu_theta-Duu_delta));
+            }
+            else{
+                capacity(i,j,k)=Auu_rev01;
+            }
+        }       
+    }
+}
+return_val = 0;
+    """
+    if (Dy.shape==(num_sites,num_events,1)):
+        Ay=Ay[:,:,0]
+        Dy=Dy[:,:,0]
+        Du=Du[:,:,0]
+        Du_alpha=Du_alpha[:,:,0]
+        Au_rev=Au_rev[:,:,0]
+        Du_beta=Du_beta[:,:,0]
+        Au_rev08=Au_rev_0_8[:,:,0]
+        Du_delta=Du_delta[:,:,0]
+        Au_rev02=Au_rev_0_2[:,:,0]
+        Du_theta=Du_theta[:,:,0]
+        Au_rev01=Au_rev_0_1[:,:,0]
+        a=a[:,:,0]
+        b=b[:,:,0]
+        c=c[:,:,0]
+        code=code.replace('get_constants',
+                          
+                          'aa=a(i,j);bb=b(i,j);cc=c(i,j);'+
+                          'Duu=Du(i,j);Dyy=Dy(i,j);Ayy=Ay(i,j);'+
+                          'Duu_alpha=Du_alpha(i,j);Duu_beta=Du_beta(i,j);'+
+                          'Duu_delta=Du_delta(i,j);Duu_theta=Du_theta(i,j);'+
+                          'Auu_rev=Au_rev(i,j);Auu_rev08=Au_rev08(i,j);'+
+                          'Auu_rev02=Au_rev02(i,j);Auu_rev01=Au_rev01(i,j);')
+        #print code
+        try:
+            weave.inline(code,
+                         ['num_sites','num_events','num_periods',
+                          'surface_displacement','capacity',
+                          'a','b','c','Du','Dy','Ay',
+                          'Du_alpha','Au_rev','Du_beta','Au_rev08',
+                          'Du_delta','Au_rev02','Du_theta','Au_rev01'],
+                         type_converters=weave_converters.eqrm,
+                         compiler='gcc')
+        except IOError:
+            raise WeaveIOError
+    else:
+        assert Dy.shape==(num_sites,1,1)
+        Ay=Ay[:,0,0]
+        Dy=Dy[:,0,0]
+        Du=Du[:,0,0]
+        Du_alpha=Du_alpha[:,0,0]
+        Au_rev=Au_rev[:,0,0]
+        Du_beta=Du_beta[:,0,0]
+        Au_rev08=Au_rev_0_8[:,0,0]
+        Du_delta=Du_delta[:,0,0]
+        Au_rev02=Au_rev_0_2[:,0,0]
+        Du_theta=Du_theta[:,0,0]
+        Au_rev01=Au_rev_0_1[:,0,0]
+        a=a[:,0,0]
+        b=b[:,0,0]
+        c=c[:,0,0]
+        code=code.replace('get_constants',
+                          
+                          'aa=a(i);bb=b(i);cc=c(i);'+
+                          'Duu=Du(i);Dyy=Dy(i);Ayy=Ay(i);'+
+                          'Duu_alpha=Du_alpha(i);Duu_beta=Du_beta(i);'+
+                          'Duu_delta=Du_delta(i);Duu_theta=Du_theta(i);'+
+                          'Auu_rev=Au_rev(i);Auu_rev08=Au_rev08(i);'+
+                          'Auu_rev02=Au_rev02(i);Auu_rev01=Au_rev01(i);')
+        #print code
+        try:
+            weave.inline(code,
+                         ['num_sites','num_events','num_periods',
+                          'surface_displacement','capacity',
+                          'a','b','c','Du','Dy','Ay',
+                          'Du_alpha','Au_rev','Du_beta','Au_rev08',
+                          'Du_delta','Au_rev02','Du_theta','Au_rev01'],
                          type_converters=weave_converters.eqrm,
                          compiler='gcc')
         except IOError:
