@@ -264,8 +264,8 @@ def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u,
     g=9.8
     
     Ay=C*y/a1
-    Dy=1000/(4*pi**2)*g*Ay*(T**2)        
-    Au=Lambda*Ay        
+    Dy=1000/(4*pi**2)*g*Ay*(T**2)
+    Au=Lambda*Ay
     Du=Lambda*u*Dy
     Du_alpha = Du*alpha
     Du_beta = Du*beta
@@ -353,8 +353,6 @@ def calculate_capacity_degrading_python(surface_displacement,capacity_parameters
      Du_theta, Au_rev_0_1,
      a, b, c) = capacity_parameters
     
-    print 'calculate_capacity_degrading_python'
-    
     # Calculations
     # linear region
     y1 = (Ay/Dy)*surface_displacement
@@ -400,8 +398,6 @@ def calculate_capacity_degrading_python(surface_displacement,capacity_parameters
     b6=(surface_displacement>Du_theta)
     
     capacity=(b1*y1+b2*y2+b3*y3+b4*y4+b5*y5+b6*y6)
-    
-    print 'end calculate_capacity_degrading_python'
     
     return capacity
 
