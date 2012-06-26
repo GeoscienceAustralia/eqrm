@@ -45,7 +45,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         """
         
         model_name = 'Toro_1997_midcontinent'
-        (distances, magnitudes, test_mean,
+        (distances, distance_types, magnitudes, test_mean,
          test_sigma, periods, depths, _, _, _, _, _, _) = data2atts(model_name)
         
         event_activity = 0.5
@@ -53,7 +53,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         gm = Ground_motion_calculator(model_name, periods=periods)
         
         log_mean,log_sigma=gm.distribution_function(
-            distances, magnitudes,
+            distances, distance_types, magnitudes,
             depth=depths,
             event_activity=event_activity)
         
@@ -63,7 +63,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
     def test_log_sigma_BA08(self):
         model_name = 'Boore_08'
         
-        (distances, magnitudes, test_mean, test_sigma,
+        (distances, distance_types, magnitudes, test_mean, test_sigma,
          periods, depths, _, _, _, _, _, _) = data2atts('Toro_1997_midcontinent')
         event_activity = 0.5
         periods = array([0.015, 0.45, 4.5 ])
@@ -73,7 +73,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         Vs30 = 560*ones(magnitudes['Mw'].shape)
         fault_type = zeros(magnitudes['Mw'].shape, dtype=int64)
         log_mean,log_sigma=gm.distribution_function(
-            distances, magnitudes,
+            distances, distance_types, magnitudes,
             depth=depths,
             event_activity=event_activity,
             Vs30=560,
@@ -87,7 +87,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
     def test_log_sigma_Somerville09_Yilgarn(self):
         model_name = 'Somerville09_Yilgarn'
         
-        (distances, magnitudes, test_mean, test_sigma,
+        (distances, distance_types, magnitudes, test_mean, test_sigma,
          periods, depths, _, _, _, _, _, _) = data2atts(
             'Toro_1997_midcontinent')
         event_activity = 1
@@ -96,7 +96,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         gm = Ground_motion_calculator(model_name, periods=periods)
         
         log_mean,log_sigma=gm.distribution_function(
-            distances, magnitudes,
+            distances, distance_types, magnitudes,
             depth=depths,
             event_activity=event_activity)
         test_log_sigma = array([0.5512, 0.55095, 0.6817])
@@ -111,11 +111,11 @@ class Test_ground_motion_calculator(unittest.TestCase):
         """
         
         model_name = 'Combo_Sadigh_Youngs_M8_trimmed'        
-        (distances, magnitudes, test_mean,
+        (distances, distance_types, magnitudes, test_mean,
          test_sigma, periods, depths, _, _, _, _, _, _) = data2atts(model_name)
 
         model_name2 = 'Youngs_97_interface'        
-        (dist2 , mag2, test_mean2,
+        (dist2 , distance_types2, mag2, test_mean2,
          test_sigma2, periods2, depths2, _, _, _, _, _, _) = data2atts(
             model_name2)
 
@@ -131,9 +131,9 @@ class Test_ground_motion_calculator(unittest.TestCase):
         gm = Multiple_ground_motion_calculator(model_names, periods,
                                                model_weights)
         
-        log_mean, log_sigma = gm._distribution_function(distances,
-                                                             magnitudes,
-                                                             depth=depths)
+        log_mean, log_sigma = gm._distribution_function(distances, 
+                                                        magnitudes,
+                                                        depth=depths)
         
         mean_out = []
         for i in range(len(distances.distance(None))):
@@ -151,7 +151,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
         """
         
         model_name2 = 'Youngs_97_interface'        
-        (distances, magnitudes, test_mean,
+        (distances, distance_types, magnitudes, test_mean,
          test_sigma, periods, depths, _, _, _, _, _, _) = data2atts(
             model_name2)
         
@@ -161,8 +161,8 @@ class Test_ground_motion_calculator(unittest.TestCase):
                                                model_weights)
         
         log_mean, log_sigma = gm._distribution_function(distances,
-                                                             magnitudes,
-                                                             depth=depths)
+                                                        magnitudes,
+                                                        depth=depths)
         
         mean_out = []
         for i in range(len(distances.distance(None))):
@@ -182,7 +182,7 @@ class Test_ground_motion_calculator(unittest.TestCase):
 
         model_name = 'Toro_1997_midcontinent'
         
-        (distances, magnitudes, test_mean,
+        (distances, distance_types, magnitudes, test_mean,
          test_sigma, periods, depths, _, _, _, _, _, _) = data2atts(model_name)
         model_weights = [1]
         gm = Multiple_ground_motion_calculator([model_name], periods,
@@ -190,8 +190,8 @@ class Test_ground_motion_calculator(unittest.TestCase):
 
         # ignoring event_activity
         log_mean,log_sigma = gm._distribution_function(distances,
-                                                            magnitudes,
-                                                            depth=depths)
+                                                       magnitudes,
+                                                       depth=depths)
         
         self.assert_(allclose(exp(log_mean), test_mean, rtol=0.05),
                      "%s did not pass assert" % model_name)

@@ -891,9 +891,10 @@ class Campbell08_distance_object(object):
         self.Joyner_Boore = Rjb
 
     def distance(self, type):
-        """We *must* define a 'distance' method, results unused."""
-
-        return self.Rupture
+        if type == 'Rupture':
+            return self.Rupture
+        else:
+            return self.Joyner_Boore
 
 # Rjb distances - num_sites = 7
 tmp = zeros((7,4)) # initialise an array: (num_sites, num_events)
@@ -1681,13 +1682,15 @@ class Distance_stub(object):
     """
 
     def __init__(self, dist):
-        self.dist = asarray(dist)
-        self.Rupture = self.dist
-        self.Joyner_Boore = self.dist
-        self.Horizontal = self.dist
+        dist = asarray(dist)
+        self.Rupture = dist
+        self.Joyner_Boore = dist
+        self.Horizontal = dist
+        self.Hypocentral = dist
+        self.Epicentral = dist
 
     def distance(self, dummy):
-        return self.dist
+        return self.Rupture
 
 def mag2dict(mag):
     # when using multiple_g_m_calc the mag_type is determined from
@@ -1715,6 +1718,9 @@ def data2atts(model_name):
         distances = test_data[model_name+'_test_distance_object']
     except KeyError:
         distances = Distance_stub(test_data[model_name+'_test_distance'])
+        
+    distance_types = distances.__dict__.keys()
+        
 
     # params not there for every model (usually return None if not there)
     depths = test_data.get(model_name+'_test_depth', None)
@@ -1729,8 +1735,8 @@ def data2atts(model_name):
     Z25 = array(test_data.get(model_name+'_test_Z25', None))
     test_sigma = test_data.get(model_name+'_test_sigma', None)
 
-    return (distances, magnitudes, test_mean, test_sigma, periods, depths, Vs30,
-            depth_to_top, fault_type, Z25, dip, width)
+    return (distances, distance_types, magnitudes, test_mean, test_sigma, 
+            periods, depths, Vs30, depth_to_top, fault_type, Z25, dip, width)
 
 def ground_motion_interface_conformance(GM_class, model_name):
     """
@@ -1738,13 +1744,15 @@ def ground_motion_interface_conformance(GM_class, model_name):
     the calculated ground motion is the same as the test_ground_motion
     """
 
-    (distances, magnitudes, test_mean, test_sigma, periods, depths, Vs30,
-     depth_to_top, fault_type, Z25, dip, width) = data2atts(model_name)
+    (distances, distance_types, magnitudes, test_mean, test_sigma, periods, 
+     depths, Vs30, depth_to_top, fault_type, Z25, dip, 
+     width) = data2atts(model_name)
 
     if GM_class is Ground_motion_calculator:
         gm = GM_class(model_name, periods)
         (log_mean, log_sigma) = \
-            gm.distribution_function(distances, magnitudes, periods=periods,
+            gm.distribution_function(distances, distance_types,
+                                     magnitudes, periods=periods,
                                      depth=depths, Vs30=Vs30,
                                      depth_to_top=depth_to_top,
                                      fault_type=fault_type, Z25=Z25,
@@ -1809,7 +1817,7 @@ class Test_ground_motion_specification(unittest.TestCase):
         imported = ground_motion_init[model_name]
         self.failUnless(model.magnitude_type==imported[1],
                         'Model attributes incorrect.')
-        self.failUnless(model.distance_type==imported[2],
+        self.failUnless(model.distance_types==imported[2],
                         'Model attributes incorrect.')
         self.assert_(allclose(model.coefficient, imported[3]))
         self.failUnless(model.coefficient_period==imported[4],

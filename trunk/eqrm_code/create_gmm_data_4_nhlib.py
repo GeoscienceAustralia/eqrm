@@ -51,11 +51,11 @@ def write_gmm_data_file(model_name, mag, dist, result_type,
     # Iterate
     for magi in mag[1]:
         for disti in dist[1]:
-            log_mean,log_sigma = model.distribution(
-                mag=array([[[magi]]]),
-            distance=array([[[disti]]]),
-            coefficient=coeff,
-            sigma_coefficient=sigma_coeff) 
+            dist_args = {'mag': array([[[magi]]]),
+                         dist[0]: array([[[disti]]]),
+                         'coefficient': coeff,
+                         'sigma_coefficient': sigma_coeff}
+            log_mean,log_sigma = model.distribution(**dist_args) 
             sa_mod = list(log_mean.reshape(-1)) 
             sa_mod = [ math.exp(x) for x in sa_mod]
             sigma_mod = list(log_sigma.reshape(-1)) 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     
     gmm = 'Somerville09_Yilgarn'
     mag = ['rup_mag', [4.0, 5.0, 6.0, 7.0, 8.0]]
-    dist = ['dist_rjb', [0.0002, 5.0, 20.0, 50.0, 100.0, 400.0]]
+    dist = ['Joyner_Boore', [0.0002, 5.0, 20.0, 50.0, 100.0, 400.0]]
     result_type = 'MEAN'
     periods = [
     0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3003,

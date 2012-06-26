@@ -20,7 +20,7 @@ class Test_create_gmm_data_4_nhlib(unittest.TestCase):
 
         gmm = 'mean_10_sigma_1' #'Somerville09_Yilgarn'
         mag = ['rup_mag', [5, 7]]
-        dist = ['dist_rjb', [1.,10.]]
+        dist = ['Rupture', [1.,10.]]
         result_type = 'MEAN'
         periods = [0.0, 0.3, 0.7, 1.0]
         cgd.write_gmm_data_file(gmm, mag, dist, result_type,
@@ -58,7 +58,7 @@ class Test_create_gmm_data_4_nhlib(unittest.TestCase):
 
         gmm = 'mean_10_sigma_1' #'Somerville09_Yilgarn'
         mag = ['rup_mag', [5, 7]]
-        dist = ['dist_rjb', [1.,10.]]
+        dist = ['Rupture', [1.,10.]]
         result_type = 'TOTAL_STDDEV'
         periods = [0.0, 0.3, 0.7, 1.0]
         cgd.write_gmm_data_file(gmm, mag, dist, result_type,
