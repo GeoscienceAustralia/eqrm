@@ -97,9 +97,9 @@ class Ground_motion_calculator(object):
         self.sigma_coefficient = sigma_coefficient[:,newaxis,newaxis,:]
 
 
-    def distribution_function(self, dist_object, mag_dict, periods=None,
-                              depth=None, depth_to_top=None, fault_type=None,
-                              Vs30=None, dist_type=None, mag_type=None,
+    def distribution_function(self, dist_object, dist_types, mag_dict,
+                              periods=None, depth=None, depth_to_top=None, 
+                              fault_type=None, Vs30=None, mag_type=None,
                               Z25=None, dip=None, width=None,
                               event_activity=None):
         """
@@ -116,7 +116,10 @@ class Ground_motion_calculator(object):
         # dist_type and mag_type are attributes of self.GM_spec
         # we shouldn't pass them around.
 
-        dist = dist_object.distance(dist_type)
+        distances = {}
+        for dist_type in dist_types:
+            distances[dist_type] = dist_object.distance(dist_type)
+        
         mag = mag_dict[mag_type]
 
         if depth is not None:
@@ -125,22 +128,30 @@ class Ground_motion_calculator(object):
         (mag, depth, depth_to_top, fault_type,
          dip, width) = self.resize_mag_depth(mag, depth, depth_to_top,
                                              fault_type, dip, width)
-        dist = self.resize_dist(dist, mag.size)
+        for dist_type in dist_types:
+            distances[dist_type] = self.resize_dist(distances[dist_type], 
+                                                    mag.size)
 
         # This is calling the distribution functions described in the
         # ground_motion_interface module.
         # We add the new 'dist_object' parameter to cater to models that
         # require more than one distance.  Once all existing models use
         # the new parameter we can remove the 'distance' parameter.
-        (log_mean, log_sigma) = \
-            self.GM_spec.distribution(dist_object=dist_object,
-                                      mag=mag, distance=dist,
-                                      coefficient=self.coefficient,
-                                      sigma_coefficient=self.sigma_coefficient,
-                                      depth=depth, depth_to_top=depth_to_top,
-                                      fault_type=fault_type, Vs30=Vs30,
-                                      Z25=Z25, dip=dip, width=width,
-                                      periods=periods)
+        distribution_args = {'mag': mag,
+                             'coefficient': self.coefficient,
+                             'sigma_coefficient': self.sigma_coefficient,
+                             'depth': depth,
+                             'depth_to_top': depth_to_top,
+                             'fault_type': fault_type,
+                             'Vs30': Vs30,
+                             'Z25': Z25,
+                             'dip': dip,
+                             'width': width,
+                             'periods': periods}
+        for dist_type in dist_types:
+            distribution_args[dist_type] = distances[dist_type]
+        
+        (log_mean, log_sigma) = self.GM_spec.distribution(**distribution_args)
 
         # FIXME when will this fail?  Maybe let it fail then?
         # If it does not fail here it fails in analysis.py"
@@ -302,11 +313,11 @@ class Multiple_ground_motion_calculator(object):
             GM_models = self.GM_models
         for mod_i, GM_model in enumerate(GM_models):
             (log_mean, log_sigma) = GM_model.distribution_function(
-                dist_object, mag_dict, periods=periods,
+                dist_object, GM_model.GM_spec.distance_types,
+                mag_dict, periods=periods,
                 depth=depth, depth_to_top=depth_to_top,
                 fault_type=fault_type, Vs30=Vs30,
                 Z25=Z25, dip=dip, width=width,
-                dist_type=GM_model.GM_spec.distance_type,
                 mag_type=GM_model.GM_spec.magnitude_type)
             if mod_i == 0:
                 log_mean_extend_GM = log_mean[newaxis,:]

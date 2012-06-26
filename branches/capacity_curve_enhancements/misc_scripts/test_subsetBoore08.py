@@ -80,7 +80,7 @@ class Test_Boore_08(unittest.TestCase):
         
         coefficient = c_dict['0.01']
         sigma_coefficient = s_dict['0.01']
-        (log_mean, sigma) = model.distribution(mag=M, distance=R, Vs30=Vs30,
+        (log_mean, sigma) = model.distribution(mag=M, Joyner_Boore=R, Vs30=Vs30,
            coefficient=coefficient, sigma_coefficient=sigma_coefficient,
                                                fault_type=fault_type)
         msg1 = 'log_mean: T=0.01, M=4.0, R=5.0, Vs30=600.0: got=%s, expected=[[[-3.179415]]]' % str(log_mean)
@@ -96,7 +96,7 @@ class Test_Boore_08(unittest.TestCase):
         Vs30 = array([[[600.000000]]])
         coefficient = c_dict['0.01']
         sigma_coefficient = s_dict['0.01']
-        (log_mean, sigma) = model.distribution(mag=M, distance=R, Vs30=Vs30,
+        (log_mean, sigma) = model.distribution(mag=M, Joyner_Boore=R, Vs30=Vs30,
            coefficient=coefficient, sigma_coefficient=sigma_coefficient,
                                                fault_type=fault_type)
         msg1 = 'log_mean: T=0.01, M=4.0, R=10.0, Vs30=600.0: got=%s, expected=[[[-3.717279]]]' % str(log_mean)
@@ -112,7 +112,7 @@ class Test_Boore_08(unittest.TestCase):
         Vs30 = array([[[600.000000]]])
         coefficient = c_dict['0.01']
         sigma_coefficient = s_dict['0.01']
-        (log_mean, sigma) = model.distribution(mag=M, distance=R, Vs30=Vs30,
+        (log_mean, sigma) = model.distribution(mag=M, Joyner_Boore=R, Vs30=Vs30,
            coefficient=coefficient, sigma_coefficient=sigma_coefficient,
                                                fault_type=fault_type)
         msg1 = 'log_mean: T=0.01, M=4.0, R=25.0, Vs30=600.0: got=%s, expected=[[[-4.545958]]]' % str(log_mean)
@@ -129,7 +129,7 @@ class Test_Boore_08(unittest.TestCase):
         Vs30 = array([[[600.000000]]])
         coefficient = c_dict['0.20']
         sigma_coefficient = s_dict['0.20']
-        (log_mean, sigma) = model.distribution(mag=M, distance=R, Vs30=Vs30,
+        (log_mean, sigma) = model.distribution(mag=M, Joyner_Boore=R, Vs30=Vs30,
            coefficient=coefficient, sigma_coefficient=sigma_coefficient,
                                                fault_type=fault_type)
         msg1 = 'log_mean: T=0.20, M=8.0, R=5.0, Vs30=600.0: got=%s, expected=[[[-0.169129]]]' % str(log_mean)
@@ -146,7 +146,7 @@ class Test_Boore_08(unittest.TestCase):
         Vs30 = array([[[600.000000]]])
         coefficient = c_dict['0.20']
         sigma_coefficient = s_dict['0.20']
-        (log_mean, sigma) = model.distribution(mag=M, distance=R, Vs30=Vs30,
+        (log_mean, sigma) = model.distribution(mag=M, Joyner_Boore=R, Vs30=Vs30,
            coefficient=coefficient, sigma_coefficient=sigma_coefficient,
                                                fault_type=fault_type)
         msg1 = 'log_mean: T=0.20, M=4.0, R=5.0, Vs30=600.0: got=%s, expected=[[[-2.798686]]]' % str(log_mean)
@@ -162,7 +162,7 @@ class Test_Boore_08(unittest.TestCase):
         Vs30 = array([[[600.000000]]])
         coefficient = c_dict['0.20']
         sigma_coefficient = s_dict['0.20']
-        (log_mean, sigma) = model.distribution(mag=M, distance=R, Vs30=Vs30,
+        (log_mean, sigma) = model.distribution(mag=M, Joyner_Boore=R, Vs30=Vs30,
            coefficient=coefficient, sigma_coefficient=sigma_coefficient,
                                                fault_type=fault_type)
         msg1 = 'log_mean: T=0.20, M=4.0, R=25.0, Vs30=600.0: got=%s, expected=[[[-3.916533]]]' % str(log_mean)
@@ -178,7 +178,7 @@ class Test_Boore_08(unittest.TestCase):
         Vs30 = array([[[600.000000]]])
         coefficient = c_dict['1.00']
         sigma_coefficient = s_dict['1.00']
-        (log_mean, sigma) = model.distribution(mag=M, distance=R, Vs30=Vs30,
+        (log_mean, sigma) = model.distribution(mag=M, Joyner_Boore=R, Vs30=Vs30,
            coefficient=coefficient, sigma_coefficient=sigma_coefficient,
                                                fault_type=fault_type)
         msg1 = 'log_mean: T=1.00, M=4.0, R=5.0, Vs30=600.0: got=%s, expected=[[[-5.031195]]]' % str(log_mean)
@@ -194,7 +194,7 @@ class Test_Boore_08(unittest.TestCase):
         Vs30 = array([[[600.000000]]])
         coefficient = c_dict['1.00']
         sigma_coefficient = s_dict['1.00']
-        (log_mean, sigma) = model.distribution(mag=M, distance=R, Vs30=Vs30,
+        (log_mean, sigma) = model.distribution(mag=M, Joyner_Boore=R, Vs30=Vs30,
            coefficient=coefficient, sigma_coefficient=sigma_coefficient,
                                                fault_type=fault_type)
         msg1 = 'log_mean: T=1.00, M=4.0, R=10.0, Vs30=600.0: got=%s, expected=[[[-5.576974]]]' % str(log_mean)
@@ -210,7 +210,7 @@ class Test_Boore_08(unittest.TestCase):
         Vs30 = array([[[600.000000]]])
         coefficient = c_dict['1.00']
         sigma_coefficient = s_dict['1.00']
-        (log_mean, sigma) = model.distribution(mag=M, distance=R, Vs30=Vs30,
+        (log_mean, sigma) = model.distribution(mag=M, Joyner_Boore=R, Vs30=Vs30,
            coefficient=coefficient, sigma_coefficient=sigma_coefficient,
                                                fault_type=fault_type)
         msg1 = 'log_mean: T=1.00, M=4.0, R=25.0, Vs30=600.0: got=%s, expected=[[[-6.400938]]]' % str(log_mean)

@@ -28,9 +28,9 @@ Description:
         magnitude_type
             string describing the magnitude value used in the distribution
             function - currently 'Mw' and 'ML' are the only options.
-        distance_type
-            string determining how distance is measured - this is actually the
-            name of a distance *function* in distance_functions.py.
+        distance_types
+            list of strings determining how distance is measured - this is 
+            actually the names of distance *functions* in distance_functions.py.
         coefficient
             a reference to an array of model coefficients with shape of
             (num_coefficients, num_periods).  'num_coefficients' may vary from
@@ -209,7 +209,7 @@ def Allen_distribution(**kwargs):
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Hypocentral']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     
@@ -226,14 +226,14 @@ def Allen_distribution(**kwargs):
 
 
 Allen_magnitude_type='Mw'
-Allen_distance_type='Hypocentral'
+Allen_distance_types=['Hypocentral',]
 
 Allen_uses_Vs30 = False
 
 Allen_args=[
     Allen_distribution,
     Allen_magnitude_type,
-    Allen_distance_type,
+    Allen_distance_types,
     
     Allen_coefficient,
     Allen_coefficient_period,
@@ -252,7 +252,7 @@ ground_motion_init['Allen'] = Allen_args
 #***************  START OF Gaull 1990 WA MODEL  ****************************
 
 Gaull_1990_WA_magnitude_type='ML'
-Gaull_1990_WA_distance_type='Rupture'
+Gaull_1990_WA_distance_types=['Rupture',]
 #Gaull_1990_WA_coefficient=[log(0.025),1.10,1.03,log(9.8)]
 # log(0.025) - log(9.8) = -5.9712618397904631
 # Previously coefficient d was used to convert the results from
@@ -273,7 +273,7 @@ def Gaull_1990_WA_distribution(**kwargs):
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     
@@ -337,7 +337,7 @@ Gaull_1990_WA_uses_Vs30 = False
 Gaull_1990_WA_args=[
     Gaull_1990_WA_distribution,
     Gaull_1990_WA_magnitude_type,
-    Gaull_1990_WA_distance_type,
+    Gaull_1990_WA_distance_types,
     
     Gaull_1990_WA_coefficient,
     Gaull_1990_WA_coefficient_period,
@@ -413,7 +413,7 @@ def Toro_1997_midcontinent_distribution_python(**kwargs):
     """
 
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Joyner_Boore']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
@@ -454,7 +454,7 @@ def Toro_1997_midcontinent_distribution(**kwargs):
     """
 
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Joyner_Boore']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
@@ -542,7 +542,7 @@ def Toro_1997_midcontinent_distribution(**kwargs):
     return (log_mean, log_sigma)
 
 Toro_1997_midcontinent_magnitude_type='Mw'
-Toro_1997_midcontinent_distance_type='Joyner_Boore'
+Toro_1997_midcontinent_distance_types=['Joyner_Boore',]
 
 Toro_1997_midcontinent_interpolation=linear_interpolation
 Toro_1997_midcontinent_sigma_coefficient_interpolation=linear_interpolation
@@ -634,7 +634,7 @@ Toro_1997_midcontinent_uses_Vs30 = False
 Toro_1997_midcontinent_args=[
     Toro_1997_midcontinent_distribution,
     Toro_1997_midcontinent_magnitude_type,
-    Toro_1997_midcontinent_distance_type,
+    Toro_1997_midcontinent_distance_types,
     
     Toro_1997_midcontinent_coefficient,
     Toro_1997_midcontinent_coefficient_period,
@@ -688,7 +688,7 @@ Atkinson_Boore_97_sigma_coefficient_interpolation=linear_interpolation
 
 def Atkinson_Boore_97_distribution_python(**kwargs):
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
@@ -712,7 +712,7 @@ def Atkinson_Boore_97_distribution(**kwargs):
     """
 
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
    
@@ -765,7 +765,7 @@ def Atkinson_Boore_97_distribution(**kwargs):
   
     return (log_mean, log_sigma)
 
-Atkinson_Boore_97_distance_type='Rupture'
+Atkinson_Boore_97_distance_types=['Rupture',]
 Atkinson_Boore_97_magnitude_type='Mw'
 
 Atkinson_Boore_97_uses_Vs30 = False
@@ -773,7 +773,7 @@ Atkinson_Boore_97_uses_Vs30 = False
 Atkinson_Boore_97_args=[
     Atkinson_Boore_97_distribution,
     Atkinson_Boore_97_magnitude_type,
-    Atkinson_Boore_97_distance_type,
+    Atkinson_Boore_97_distance_types,
     
     Atkinson_Boore_97_coefficient,
     Atkinson_Boore_97_coefficient_period,
@@ -990,7 +990,7 @@ def Sadigh_97_distribution_python(**kwargs):
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     
@@ -1039,7 +1039,7 @@ def Sadigh_97_distribution(**kwargs):
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
 
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
@@ -1125,7 +1125,7 @@ def Sadigh_97_distribution(**kwargs):
 
     return (log_mean, log_sigma)
 
-Sadigh_97_distance_type='Rupture'
+Sadigh_97_distance_types=['Rupture',]
 Sadigh_97_magnitude_type='Mw'
 
 Sadigh_97_uses_Vs30 = False
@@ -1133,7 +1133,7 @@ Sadigh_97_uses_Vs30 = False
 Sadigh_97_args=[
     Sadigh_97_distribution,
     Sadigh_97_magnitude_type,
-    Sadigh_97_distance_type,
+    Sadigh_97_distance_types,
     
     Sadigh_97_coefficient,
     Sadigh_97_coefficient_period,
@@ -1235,7 +1235,7 @@ Sadigh_Original_97_sigma_coefficient = Sadigh_Original_97_sigma_model[1:]
 # TODO: Are these correct?
 Sadigh_Original_97_uses_Vs30 = False
 Sadigh_Original_97_magnitude_type='Mw'
-Sadigh_Original_97_distance_type='Rupture'
+Sadigh_Original_97_distance_types=['Rupture',]
 Sadigh_Original_97_interpolation=linear_interpolation
 
 def Sadigh_Original_97_distribution(**kwargs):
@@ -1247,13 +1247,10 @@ def Sadigh_Original_97_distribution(**kwargs):
     Idriss et al.,
     2007
     """
-    dist_object = kwargs['dist_object']
     Mw = kwargs['mag']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    
-    # Rrup from distance object
-    Rrup = dist_object.Rupture
+    Rrup = kwargs['Rupture']
 
     num_sites = Mw.shape[0]
     num_events = Mw.shape[1]
@@ -1267,14 +1264,14 @@ def Sadigh_Original_97_distribution(**kwargs):
                   str(Mw.shape)))
 
     # ignore first dimension of distances
-    assert Rrup.shape[1:] == (num_events,), (msg
-               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
+    #assert Rrup.shape[1:] == (num_events,), (msg
+    #           % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
 
     assert coefficient.shape == (14, 1, 1, num_periods), (msg
                % ('coefficient', '(14,1,1,%d)' % num_periods,
                   str(coefficient.shape)))
 
-    Rrup = dist_object.Rupture[:,:,newaxis]
+    #Rrup = Rrup[:,:,newaxis]
     
     # Low mag coefficients (M <= 6.5)
     c_low = coefficient[:7]
@@ -1306,7 +1303,7 @@ def Sadigh_Original_97_distribution(**kwargs):
 Sadigh_Original_97_args=[
     Sadigh_Original_97_distribution,
     Sadigh_Original_97_magnitude_type,
-    Sadigh_Original_97_distance_type,
+    Sadigh_Original_97_distance_types,
     
     Sadigh_Original_97_coefficient,
     Sadigh_Original_97_coefficient_period,
@@ -1381,7 +1378,7 @@ def Youngs_97_distribution_python(**kwargs):
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     depth = kwargs['depth']
@@ -1409,7 +1406,7 @@ def Youngs_97_distribution_python(**kwargs):
     assert isfinite(log_mean).all()
     return log_mean,log_sigma
 
-Youngs_97_distance_type='Rupture'
+Youngs_97_distance_types=['Rupture',]
 Youngs_97_magnitude_type='Mw'
 
 Youngs_97_uses_Vs30 = False
@@ -1427,7 +1424,7 @@ Youngs_97_interface_coefficient.append(Z_t_interface)
 Youngs_97_interface_args=[
     Youngs_97_distribution_python,
     Youngs_97_magnitude_type,
-    Youngs_97_distance_type,
+    Youngs_97_distance_types,
     
     Youngs_97_interface_coefficient,
     Youngs_97_coefficient_period,
@@ -1454,7 +1451,7 @@ Youngs_97_intraslab_coefficient.append(Z_t_intraslab)
 Youngs_97_intraslab_args=[
     Youngs_97_distribution_python,
     Youngs_97_magnitude_type,
-    Youngs_97_distance_type,
+    Youngs_97_distance_types,
     
     Youngs_97_intraslab_coefficient,
     Youngs_97_coefficient_period,
@@ -1496,7 +1493,7 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     depth = kwargs['depth']
@@ -1507,7 +1504,7 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
     use_y=use_y*1.0 # convert from boolean to float
     y_log_mean,y_log_sigma=Youngs_97_distribution_python(
         mag=mag*use_y,
-        distance=distance,
+        Rupture=distance,
         coefficient=y_coefficient,
         sigma_coefficient=y_sigma_coefficient,
         depth=depth)
@@ -1517,7 +1514,7 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
     use_s=(1-use_y)
     s_log_mean,s_log_sigma=Sadigh_97_distribution_python(
         mag=mag*use_s,
-        distance=distance,
+        Rupture=distance,
         coefficient=s_coefficient,
         sigma_coefficient=s_sigma_coefficient,
         depth=depth)
@@ -1528,7 +1525,7 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
 
     
     
-Youngs_97_distance_type='Rupture'
+Youngs_97_distance_types=['Rupture',]
 Youngs_97_magnitude_type='Mw'
 
 Combo_Sadigh_Youngs_M8_uses_Vs30 = False
@@ -1536,7 +1533,7 @@ Combo_Sadigh_Youngs_M8_uses_Vs30 = False
 Combo_Sadigh_Youngs_M8_args=[
     Combo_Sadigh_Youngs_M8_distribution_python,
     Youngs_97_magnitude_type,
-    Youngs_97_distance_type,
+    Youngs_97_distance_types,
     
     Combo_Sadigh_Youngs_M8_coeff,
     Sadigh_97_coefficient_period,
@@ -1608,7 +1605,7 @@ def Youngs_97_distribution_python(**kwargs):
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     depth = kwargs['depth']
@@ -1631,13 +1628,13 @@ def Youngs_97_distribution_python(**kwargs):
     assert isfinite(log_mean).all()
     return log_mean,log_sigma
 
-Youngs_97_distance_type='Rupture'
+Youngs_97_distance_types=['Rupture',]
 Youngs_97_magnitude_type='Mw'
 
 Youngs_97_args=[
     Youngs_97_distribution_python,
     Youngs_97_magnitude_type,
-    Youngs_97_distance_type,
+    Youngs_97_distance_types,
     
     Youngs_97_coefficient,
     Youngs_97_coefficient_period,
@@ -1675,7 +1672,7 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     depth = kwargs['depth']
@@ -1707,7 +1704,7 @@ def Combo_Sadigh_Youngs_M8_distribution_python(**kwargs):
 
     
     
-Youngs_97_distance_type='Rupture'
+Youngs_97_distance_types=['Rupture',]
 Youngs_97_magnitude_type='Mw'
 
 Youngs_97_uses_Vs30 = False
@@ -1715,7 +1712,7 @@ Youngs_97_uses_Vs30 = False
 Combo_Sadigh_Youngs_M8_args=[
     Combo_Sadigh_Youngs_M8_distribution_python,
     Youngs_97_magnitude_type,
-    Youngs_97_distance_type,    
+    Youngs_97_distance_types,    
     Combo_Sadigh_Youngs_M8_coeff,
     Sadigh_97_coefficient_period,
     linear_interpolation,   
@@ -1841,7 +1838,7 @@ def Boore_08_distribution(**kwargs):
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Joyner_Boore']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     Vs30 = kwargs['Vs30']
@@ -1991,7 +1988,7 @@ def fs_Boore_08(blin, pga4nl, bnl, Vs30):
     return flin + fnl   # BA08 (6)
 
 
-Boore_08_distance_type='Joyner_Boore'
+Boore_08_distance_types=['Joyner_Boore',]
 Boore_08_magnitude_type='Mw'
 
 Boore_08_uses_Vs30 = True
@@ -1999,7 +1996,7 @@ Boore_08_uses_Vs30 = True
 Boore_08_args=[
     Boore_08_distribution,
     Boore_08_magnitude_type,
-    Boore_08_distance_type,
+    Boore_08_distance_types,
     
     Boore_08_coefficient,
     Boore_08_coefficient_period,
@@ -2028,7 +2025,7 @@ def Somerville09_distribution(**kwargs):
     # The usual parameters passed are
     # mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Joyner_Boore']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     
@@ -2073,7 +2070,7 @@ def Somerville09_log_mean(coefficient, mag, distance):
                c8*(8.5 - mag)**2
     return log_mean
 
-Somerville09_distance_type='Joyner_Boore'
+Somerville09_distance_types=['Joyner_Boore',]
 Somerville09_magnitude_type='Mw'
 
 #***************  END COMMON_SOMMERVILLE BLOCK  ************
@@ -2127,7 +2124,7 @@ Somerville09_Yilgarn_uses_Vs30 = False
 Somerville09_Yilgarn_args=[
     Somerville09_distribution,
     Somerville09_magnitude_type,
-    Somerville09_distance_type,
+    Somerville09_distance_types,
     
     Somerville09_Yilgarn_coefficient,
     Somerville09_Yilgarn_coefficient_period,
@@ -2191,7 +2188,7 @@ Somerville09_Non_Cratonic_uses_Vs30 = False
 Somerville09_Non_Cratonic_args=[
     Somerville09_distribution,
     Somerville09_magnitude_type,
-    Somerville09_distance_type,
+    Somerville09_distance_types,
     
     Somerville09_Non_Cratonic_coefficient,
     Somerville09_Non_Cratonic_coefficient_period,
@@ -2231,7 +2228,7 @@ def Liang_2008_distribution(**kwargs):
 
     # get args
     mag = kwargs['mag']
-    distance = kwargs['distance']
+    distance = kwargs['Epicentral']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
@@ -2254,7 +2251,7 @@ def Liang_2008_distribution(**kwargs):
     return (log_mean - LnMmss2Lng, log_sigma - LnMmss2Lng)
 
 Liang_2008_magnitude_type='ML'
-Liang_2008_distance_type='Epicentral'
+Liang_2008_distance_types=['Epicentral',]
 
 # data here has dim = (#periods, #coefficients)
 tmp = array([[  3.688, 0.832, -0.016, -1.374, +0.147], # period=0.0, from eqn 22
@@ -2313,7 +2310,7 @@ Liang_2008_uses_Vs30 = False
 
 Liang_2008_args = [Liang_2008_distribution,
                    Liang_2008_magnitude_type,
-                   Liang_2008_distance_type,
+                   Liang_2008_distance_types,
                    Liang_2008_coefficient,
                    Liang_2008_coefficient_period,
                    Liang_2008_interpolation,
@@ -2362,7 +2359,7 @@ def Atkinson06_basic(**kwargs):
 
     # get args
     M = kwargs['mag']
-    Rcd = kwargs['distance']
+    Rcd = kwargs['Rupture']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
     S = kwargs['S']
@@ -2406,7 +2403,7 @@ def Atkinson06_hard_bedrock_distribution(**kwargs):
     # get args
     try:
         M = kwargs['mag']
-        Rcd = kwargs['distance']
+        Rcd = kwargs['Rupture']
         coefficient = kwargs['coefficient']
         sigma_coefficient = kwargs['sigma_coefficient']
     except KeyError, e:
@@ -2515,7 +2512,7 @@ def Atkinson06_soil_distribution(**kwargs):
     # get required kwarg values, check shapes
     try:
         mag = kwargs['mag']
-        distance = kwargs['distance']
+        distance = kwargs['Rupture']
         Vs30 = kwargs['Vs30']
         coefficient = kwargs['coefficient']
         sigma_coefficient = kwargs['sigma_coefficient']
@@ -2550,7 +2547,7 @@ def Atkinson06_soil_distribution(**kwargs):
 
     # calculate pgaBC here, use PGA (period=0.0) coefficients
     (pgaBC, _) = Atkinson06_basic(mag=kwargs['mag'],
-                                  distance=kwargs['distance'],
+                                  Rupture=kwargs['Rupture'],
                                   coefficient=Atkinson06_coefficient_pga,
                                   sigma_coefficient=kwargs['sigma_coefficient'],
                                   S=0.0)
@@ -2595,7 +2592,7 @@ def Atkinson06_bc_boundary_bedrock(**kwargs):
     # get args
     try:
         M = kwargs['mag']
-        Rcd = kwargs['distance']
+        Rcd = kwargs['Rupture']
         coefficient = kwargs['coefficient']
         sigma_coefficient = kwargs['sigma_coefficient']
     except KeyError, e:
@@ -2643,7 +2640,7 @@ def Atkinson06_bc_boundary_bedrock(**kwargs):
 
 
 Atkinson06_magnitude_type = 'Mw'
-Atkinson06_distance_type = 'Rupture'
+Atkinson06_distance_types = ['Rupture',]
 
 # dimension = (#periods, #coefficients)
 Atkinson06_Table6 = array([
@@ -2763,7 +2760,7 @@ Atkinson06_hard_bedrock_uses_Vs30 = False
 ground_motion_init['Atkinson06_hard_bedrock'] = \
                         [Atkinson06_hard_bedrock_distribution,
                          Atkinson06_magnitude_type,
-                         Atkinson06_distance_type,
+                         Atkinson06_distance_types,
                          Atkinson06_coefficient68,
                          Atkinson06_coefficient_period,
                          Atkinson06_interpolation,
@@ -2776,7 +2773,7 @@ Atkinson06_soil_uses_Vs30 = True
 
 ground_motion_init['Atkinson06_soil'] = [Atkinson06_soil_distribution,
                                         Atkinson06_magnitude_type,
-                                        Atkinson06_distance_type,
+                                        Atkinson06_distance_types,
                                         Atkinson06_coefficient68,
                                         Atkinson06_coefficient_period,
                                         Atkinson06_interpolation,
@@ -2790,7 +2787,7 @@ Atkinson06_bc_boundary_bedrock_uses_Vs30 = False
 ground_motion_init['Atkinson06_bc_boundary_bedrock'] = \
                         [Atkinson06_bc_boundary_bedrock,
                          Atkinson06_magnitude_type,
-                         Atkinson06_distance_type,
+                         Atkinson06_distance_types,
                          Atkinson06_coefficient98,
                          Atkinson06_coefficient_period,
                          Atkinson06_interpolation,
@@ -2852,7 +2849,6 @@ def Chiou08_distribution(**kwargs):
 
     # get args
     Mw = kwargs['mag']                   # event-specific
-    dist_object = kwargs['dist_object']
     fault_type = kwargs['fault_type']    # event-specific
     Ztor = kwargs['depth_to_top']        # event-specific
     Dip = kwargs['dip']                  # event-specific
@@ -2867,9 +2863,9 @@ def Chiou08_distribution(**kwargs):
     AS = 0
 
     # Rrup, Rjb and Rx from distance object
-    Rrup = dist_object.Rupture
-    Rjb = dist_object.Joyner_Boore
-    Rx = dist_object.Horizontal
+    Rrup = kwargs['Rupture']
+    Rjb = kwargs['Joyner_Boore']
+    Rx = kwargs['Horizontal']
 
     # check we have the right shapes
     num_sites = 1
@@ -2883,13 +2879,6 @@ def Chiou08_distribution(**kwargs):
                   str(Mw.shape)))
 
     # ignore first dimension of distances
-    assert Rrup.shape[1:] == (num_events,), (msg
-               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
-    assert Rjb.shape[1:] == (num_events,), (msg
-               % ('Rjb', '(?,%d)' % num_events, str(Rjb.shape)))
-    assert Rx.shape[1:] == (num_events,), (msg
-               % ('Rx', '(?,%d)' % num_events, str(Rx.shape)))
-
     assert fault_type.shape == (num_sites, num_events, 1), (msg
                % ('fault_type', '(%d,%d,%d)' % (num_sites, num_events, 1),
                   str(fault_type.shape)))
@@ -2923,9 +2912,6 @@ def Chiou08_distribution(**kwargs):
     Fnm = Ch_fault_type[:,1][fault_type]
 
     # resize to standard form
-    Rrup = Rrup[:,:,newaxis]
-    Rjb = Rjb[:,:,newaxis]
-    Rx = Rx[:,:,newaxis]
     Vs30 = Vs30[:,newaxis,newaxis]
 
     # estimate Z10 (m) from Vs30
@@ -3051,7 +3037,7 @@ Chiou08_PGA_sigma_coefficients = Chiou08_combined_coeff[0,30:]
 Chiou08_nper = len(Chiou08_coefficient_period)
 
 Chiou08_magnitude_type = 'Mw'
-Chiou08_distance_type = 'Rupture'
+Chiou08_distance_types = ['Rupture','Joyner_Boore','Horizontal']
 
 Chiou08_interpolation = linear_interpolation
 
@@ -3059,7 +3045,7 @@ Chiou08_uses_Vs30 = True
 
 ground_motion_init['Chiou08'] = [Chiou08_distribution,
                                 Chiou08_magnitude_type,
-                                Chiou08_distance_type,
+                                Chiou08_distance_types,
                                 Chiou08_coefficient,
                                 Chiou08_coefficient_period,
                                 Chiou08_interpolation,
@@ -3106,7 +3092,7 @@ def Campbell03_distribution(**kwargs):
 
     # get args
     Mw = kwargs['mag']				# event-specific
-    Rrup = kwargs['distance']			# event-site-specific
+    Rrup = kwargs['Rupture']			# event-site-specific
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
 
@@ -3172,7 +3158,7 @@ def Campbell03_distribution(**kwargs):
     return (log_mean, log_sigma)
 
 Campbell03_magnitude_type = 'Mw'
-Campbell03_distance_type = 'Rupture'
+Campbell03_distance_types = ['Rupture',]
 
 ######
 # Start building the coefficient array
@@ -3221,7 +3207,7 @@ Campbell03_uses_Vs30 = False
 
 ground_motion_init['Campbell03'] = [Campbell03_distribution,
                                    Campbell03_magnitude_type,
-                                   Campbell03_distance_type,
+                                   Campbell03_distance_types,
                                    Campbell03_coefficient,
                                    Campbell03_coefficient_period,
                                    Campbell03_interpolation,
@@ -3300,7 +3286,6 @@ def Campbell08_distribution(**kwargs):
     # get args
     periods = kwargs['periods']			# site-specific
     Mw = kwargs['mag']				# event-specific
-    dist_object = kwargs['dist_object']		# distance object
     Ztor = kwargs['depth_to_top']		# event-specific
     Vs30 = kwargs['Vs30']			# site-specific
     Dip = kwargs['dip']				# event-specific
@@ -3311,8 +3296,8 @@ def Campbell08_distribution(**kwargs):
     periods = array(periods)
 
     # get required distances
-    Rrup = dist_object.Rupture
-    Rjb = dist_object.Joyner_Boore
+    Rrup = kwargs['Rupture']
+    Rjb = kwargs['Joyner_Boore']
 
     # check we have the right shapes
     num_sites = 1
@@ -3326,11 +3311,6 @@ def Campbell08_distribution(**kwargs):
                   str(Mw.shape)))
 
     # ignore first dimension of distances
-    assert Rrup.shape[1:] == (num_events,), (msg
-               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
-    assert Rjb.shape[1:] == (num_events,), (msg
-               % ('Rjb', '(?,%d)' % num_events, str(Rjb.shape)))
-
     assert fault_type.shape == (num_sites, num_events, 1), (msg
                % ('fault_type', '(%d,%d,%d)' % (num_sites, num_events, 1),
                   str(fault_type.shape)))
@@ -3357,8 +3337,6 @@ def Campbell08_distribution(**kwargs):
     Fnm = Campbell08_fault_type[:,1][fault_type]
 
     # set correct shape for params
-    Rrup = Rrup[:,:,newaxis]
-    Rjb = Rjb[:,:,newaxis]
     Vs30 = array(Vs30)[:,newaxis,newaxis]
 
     # if user passed us Z25, use it, else calculate from Vs30 (result in km)
@@ -3612,13 +3590,13 @@ Campbell08_PGA_sigma_coefficient = array(tmp[0,19:]).transpose()
 
 # now for the rest of the model attributes
 Campbell08_magnitude_type = 'Mw'
-Campbell08_distance_type = 'Rupture'
+Campbell08_distance_types = ['Rupture','Joyner_Boore']
 Campbell08_interpolation = linear_interpolation
 Campbell08_uses_Vs30 = True
 
 ground_motion_init['Campbell08'] = [Campbell08_distribution,
                                    Campbell08_magnitude_type,
-                                   Campbell08_distance_type,
+                                   Campbell08_distance_types,
                                    Campbell08_coefficient,
                                    Campbell08_coefficient_period,
                                    Campbell08_interpolation,
@@ -3634,7 +3612,7 @@ del tmp
 
 #************  values to use in test ground motion models   ************
 mean_model_magnitude_type='ML'
-mean_model_distance_type='Rupture'
+mean_model_distance_types=['Rupture',]
 mean_model_coefficient=[[0.28,0.28],[0.28,0.28]]
 mean_model_coefficient_period=[0.0,1.0]
 mean_model_sigma_coefficient=[[0.28,0.28],[0.28,0.28]]
@@ -3647,8 +3625,8 @@ mean_model_uses_Vs30 = False
 
 def mean_10_sigma_1_distribution(**kwargs):
     
-    num_sites =  kwargs['distance'].shape[0]
-    num_events =  kwargs['distance'].shape[1]
+    num_sites =  kwargs['Rupture'].shape[0]
+    num_events =  kwargs['Rupture'].shape[1]
     num_periods = kwargs['coefficient'].shape[3]
 
     log_mean = ones((num_sites, num_events, num_periods))*10
@@ -3659,7 +3637,7 @@ def mean_10_sigma_1_distribution(**kwargs):
 mean_10_sigma_1_args=[
     mean_10_sigma_1_distribution,
     mean_model_magnitude_type,
-    mean_model_distance_type,
+    mean_model_distance_types,
     
     mean_model_coefficient,
     mean_model_coefficient_period,
@@ -3679,8 +3657,8 @@ ground_motion_init['mean_10_sigma_1'] = mean_10_sigma_1_args
 
 def mean_20_sigma_2_distribution(**kwargs):
     
-    num_sites =  kwargs['distance'].shape[0]
-    num_events =  kwargs['distance'].shape[1]
+    num_sites =  kwargs['Rupture'].shape[0]
+    num_events =  kwargs['Rupture'].shape[1]
     num_periods = kwargs['coefficient'].shape[3]
 
     log_mean = ones((num_sites, num_events, num_periods))*20
@@ -3690,7 +3668,7 @@ def mean_20_sigma_2_distribution(**kwargs):
 mean_20_sigma_2_args=[
     mean_20_sigma_2_distribution,
     mean_model_magnitude_type,
-    mean_model_distance_type,
+    mean_model_distance_types,
     
     mean_model_coefficient,
     mean_model_coefficient_period,
@@ -3711,8 +3689,8 @@ ground_motion_init['mean_20_sigma_2'] = mean_20_sigma_2_args
 
 def mean_1_sigma_0pt5_distribution(**kwargs):
     
-    num_sites =  kwargs['distance'].shape[0]
-    num_events =  kwargs['distance'].shape[1]
+    num_sites =  kwargs['Rupture'].shape[0]
+    num_events =  kwargs['Rupture'].shape[1]
     num_periods = kwargs['coefficient'].shape[3]
 
     log_mean = ones((num_sites, num_events, num_periods))
@@ -3723,7 +3701,7 @@ def mean_1_sigma_0pt5_distribution(**kwargs):
 mean_1_sigma_0pt5_args=[
     mean_1_sigma_0pt5_distribution,
     mean_model_magnitude_type,
-    mean_model_distance_type,
+    mean_model_distance_types,
     
     mean_model_coefficient,
     mean_model_coefficient_period,
@@ -3743,8 +3721,8 @@ ground_motion_init['mean_1_sigma_0pt5'] = mean_1_sigma_0pt5_args
 
 def return_Vs30_distribution(**kwargs):
     
-    num_sites =  kwargs['distance'].shape[0]
-    num_events =  kwargs['distance'].shape[1]
+    num_sites =  kwargs['Rupture'].shape[0]
+    num_events =  kwargs['Rupture'].shape[1]
     num_periods = kwargs['coefficient'].shape[3]
     Vs30 = kwargs['Vs30']
     log_mean = ones((num_sites, num_events, num_periods))*log(Vs30)
@@ -3758,7 +3736,7 @@ return_Vs30_uses_Vs30 = True
 return_Vs30_args=[
     return_Vs30_distribution,
     mean_model_magnitude_type,
-    mean_model_distance_type,
+    mean_model_distance_types,
     
     mean_model_coefficient,
     mean_model_coefficient_period,
@@ -3777,8 +3755,8 @@ ground_motion_init['return_Vs30'] = return_Vs30_args
 
 def mean_2_sigma_1_distribution(**kwargs):
     
-    num_sites =  kwargs['distance'].shape[0]
-    num_events =  kwargs['distance'].shape[1]
+    num_sites =  kwargs['Rupture'].shape[0]
+    num_events =  kwargs['Rupture'].shape[1]
     num_periods = kwargs['coefficient'].shape[3]
 
     log_mean = ones((num_sites, num_events, num_periods))*2
@@ -3788,7 +3766,7 @@ def mean_2_sigma_1_distribution(**kwargs):
 mean_2_sigma_1_args=[
     mean_2_sigma_1_distribution,
     mean_model_magnitude_type,
-    mean_model_distance_type,
+    mean_model_distance_types,
     
     mean_model_coefficient,
     mean_model_coefficient_period,
@@ -3823,7 +3801,6 @@ def Abrahamson08_distribution(**kwargs):
     # get args
     Per = kwargs['periods']
     Mw = kwargs['mag']
-    dist_object = kwargs['dist_object'] 
     fault_type = kwargs['fault_type']
     Ztor = kwargs['depth_to_top']
     Dip = kwargs['dip']
@@ -3837,9 +3814,9 @@ def Abrahamson08_distribution(**kwargs):
     Fhw = kwargs.get('Fhw', 0)
 
     # get required distance arrays
-    Rrup = dist_object.Rupture
-    Rjb = dist_object.Joyner_Boore
-    Rx = dist_object.Horizontal
+    Rrup = kwargs['Rupture']
+    Rjb = kwargs['Joyner_Boore']
+    Rx = kwargs['Horizontal']
 
     # check we have the right shapes
     num_sites = 1
@@ -3851,14 +3828,6 @@ def Abrahamson08_distribution(**kwargs):
     assert Mw.shape == (1, num_events, 1), (msg
                % ('Mw', '(%d,%d,%d)' % (num_sites, num_events, 1),
                   str(Mw.shape)))
-
-    # ignore first dimension of distances
-    assert Rrup.shape[1:] == (num_events,), (msg
-               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
-    assert Rjb.shape[1:] == (num_events,), (msg
-               % ('Rjb', '(?,%d)' % num_events, str(Rjb.shape)))
-    assert Rx.shape[1:] == (num_events,), (msg
-               % ('Rx', '(?,%d)' % num_events, str(Rx.shape)))
 
     assert fault_type.shape == (num_sites, num_events, 1), (msg
                % ('fault_type', '(%d,%d,%d)' % (num_sites, num_events, 1),
@@ -3892,9 +3861,7 @@ def Abrahamson08_distribution(**kwargs):
     Fas = 0
 
     # set correct shape for params
-    Rrup = Rrup[:,:,newaxis]
-    Rjb = Rjb[:,:,newaxis]
-    Rx = Rx[:,:,newaxis]
+    
     Per = array(Per)[newaxis,newaxis,:]
     Vs30 = array(Vs30)[:,newaxis,newaxis]
 
@@ -4467,7 +4434,7 @@ def Abrahamson08_distribution(**kwargs):
     # check result has right dimensions
     num_sites = Vs30.shape[0]
     assert Y.shape == (num_sites, num_events, num_periods), (msg
-               % ('Y', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
+              % ('Y', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
                   str(Y.shape)))
     assert SigTest.shape == (num_sites, num_events, num_periods), (msg
                % ('SigTest', '(%d,%d,%d)' % (num_sites, num_events, num_periods),
@@ -4551,14 +4518,14 @@ AS08_PGA_sigma_coefficients = AS08_coeff[0,21:28]
 AS08_nper = len(Abrahamson08_coefficient_period)
 
 Abrahamson08_magnitude_type='ML'
-Abrahamson08_distance_type='Epicentral'
+Abrahamson08_distance_types=['Horizontal','Joyner_Boore','Rupture']
 Abrahamson08_interpolation = linear_interpolation
 Abrahamson08_uses_Vs30 = True
 
 
 Abrahamson08_args = [Abrahamson08_distribution,
                      Abrahamson08_magnitude_type,
-                     Abrahamson08_distance_type,
+                     Abrahamson08_distance_types,
 
                      Abrahamson08_coefficient,
                      Abrahamson08_coefficient_period,
@@ -4587,7 +4554,7 @@ def Akkar_2010_crustal_distribution(**kwargs):
     # get args
     M = kwargs['mag']
 ##    print M
-    Rjb = kwargs['distance']
+    Rjb = kwargs['Joyner_Boore']
     FT = kwargs['fault_type']
     Vs30 = kwargs['Vs30']
 ##    Sso = kwargs['soft_soil']
@@ -4630,7 +4597,7 @@ def Akkar_2010_crustal_distribution(**kwargs):
     return (logSa , sigma)
 
 Akkar_2010_crustal_magnitude_type = 'Mw'
-Akkar_2010_crustal_distance_type = 'Joyner_Boore'
+Akkar_2010_crustal_distance_types = ['Joyner_Boore',]
 
 ######
 # Start building the coefficient array
@@ -4660,7 +4627,7 @@ Akkar_2010_crustal_uses_Vs30 = True
 
 ground_motion_init['Akkar_2010_crustal'] = [Akkar_2010_crustal_distribution,
                                 Akkar_2010_crustal_magnitude_type,
-                                Akkar_2010_crustal_distance_type,
+                                Akkar_2010_crustal_distance_types,
                                 
                                 Akkar_2010_crustal_coefficient,
                                 Akkar_2010_crustal_coefficient_period,
@@ -4774,7 +4741,7 @@ ground_motion_init['Akkar_2010_crustal'] = [Akkar_2010_crustal_distribution,
 ##    return (logSa, sigma)
 ##
 ##Atkinson_2003_interface_magnitude_type = 'Mw'
-##Atkinson_2003_interface_distance_type = 'Rupture'
+##Atkinson_2003_interface_distance_types = ['Rupture',]
 ####    
 ##    # Interslab Events Coefficients
 ##
@@ -4804,7 +4771,7 @@ ground_motion_init['Akkar_2010_crustal'] = [Akkar_2010_crustal_distribution,
 ##
 ##ground_motion_init['Atkinson_2003_interface'] = [Atkinson_2003_interface_distribution,
 ##                              Atkinson_2003_interface_magnitude_type,
-##                              Atkinson_2003_interface_distance_type,
+##                              Atkinson_2003_interface_distance_types,
 ##
 ##                              Atkinson_2003_interface_coefficient,
 ##                              Atkinson_2003_interface_coefficient_period,
@@ -4829,7 +4796,7 @@ def Atkinson_2003_intraslab_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     T = kwargs['periods']
     M = kwargs['mag']				# event-specific
     h = kwargs['depth']
-    Df = kwargs['distance']			# event-site-specific
+    Df = kwargs['Rupture']			# event-site-specific
     Vs30 = kwargs['Vs30']
 ##    Zl = kwargs['region']
     coefficient = kwargs['coefficient']
@@ -4917,7 +4884,7 @@ def Atkinson_2003_intraslab_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     return (logSa, sigma)
 
 Atkinson_2003_intraslab_magnitude_type = 'Mw'
-Atkinson_2003_intraslab_distance_type = 'Rupture'
+Atkinson_2003_intraslab_distance_types = ['Rupture',]
 ##    
     # Interslab Events Coefficients
 
@@ -4948,7 +4915,7 @@ Atkinson_2003_intraslab_uses_Vs30 = True
 
 ground_motion_init['Atkinson_2003_intraslab'] = [Atkinson_2003_intraslab_distribution,
                               Atkinson_2003_intraslab_magnitude_type,
-                              Atkinson_2003_intraslab_distance_type,
+                              Atkinson_2003_intraslab_distance_types,
 
                               Atkinson_2003_intraslab_coefficient,
                               Atkinson_2003_intraslab_coefficient_period,
@@ -4975,7 +4942,7 @@ ground_motion_init['Atkinson_2003_intraslab'] = [Atkinson_2003_intraslab_distrib
 ##    # get args
 ##    T = kwargs['periods']
 ##    M = kwargs['mag']
-##    x = kwargs['distance']
+##    x = kwargs['Rupture']
 ##    h = kwargs['depth']
 ##    Vs30 = kwargs['Vs30']
 ##    coefficient = kwargs['coefficient']
@@ -5041,7 +5008,7 @@ ground_motion_init['Atkinson_2003_intraslab'] = [Atkinson_2003_intraslab_distrib
 ##    return(logSa,sigma)
 ##
 ##Zhao_2006_intraslab_magnitude_type = 'Mw'
-##Zhao_2006_intraslab_distance_type = 'Rupture'
+##Zhao_2006_intraslab_distance_types = ['Rupture',]
 ##
 ####    
 ##    # Interslab Events Coefficients
@@ -5075,7 +5042,7 @@ ground_motion_init['Atkinson_2003_intraslab'] = [Atkinson_2003_intraslab_distrib
 ##
 ##ground_motion_init['Zhao_2006_intraslab'] = [Zhao_2006_intraslab_distribution,
 ##                              Zhao_2006_intraslab_magnitude_type,
-##                              Zhao_2006_intraslab_distance_type,
+##                              Zhao_2006_intraslab_distance_types,
 ##
 ##                              Zhao_2006_intraslab_coefficient,
 ##                              Zhao_2006_intraslab_coefficient_period,
@@ -5100,7 +5067,7 @@ def Zhao_2006_interface_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     # get args
     T = kwargs['periods']
     M = kwargs['mag']
-    x = kwargs['distance']
+    x = kwargs['Rupture']
     h = kwargs['depth']
     Vs30 = kwargs['Vs30']
     coefficient = kwargs['coefficient']
@@ -5168,7 +5135,7 @@ def Zhao_2006_interface_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     return(logSa,sigma)
 
 Zhao_2006_interface_magnitude_type = 'Mw'
-Zhao_2006_interface_distance_type = 'Rupture'
+Zhao_2006_interface_distance_types = ['Rupture',]
 
 ##    
     # Interface Events Coefficients
@@ -5201,7 +5168,7 @@ Zhao_2006_interface_uses_Vs30 = True
 
 ground_motion_init['Zhao_2006_interface'] = [Zhao_2006_interface_distribution,
                               Zhao_2006_interface_magnitude_type,
-                              Zhao_2006_interface_distance_type,
+                              Zhao_2006_interface_distance_types,
 
                               Zhao_2006_interface_coefficient,
                               Zhao_2006_interface_coefficient_period,
@@ -5229,7 +5196,7 @@ def Atkinson_2003_interface_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     T = kwargs['periods']
     M = kwargs['mag']				# event-specific
     h = kwargs['depth']
-    Df = kwargs['distance']			# event-site-specific
+    Df = kwargs['Rupture']			# event-site-specific
     Vs30 = kwargs['Vs30']
 ##    Zl = kwargs['region']
     coefficient = kwargs['coefficient']
@@ -5317,7 +5284,7 @@ def Atkinson_2003_interface_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     return (logSa, sigma)
 
 Atkinson_2003_interface_magnitude_type = 'Mw'
-Atkinson_2003_interface_distance_type = 'Rupture'
+Atkinson_2003_interface_distance_types = ['Rupture',]
 ##    
     # Interslab Events Coefficients
 
@@ -5347,7 +5314,7 @@ Atkinson_2003_interface_uses_Vs30 = True
 
 ground_motion_init['Atkinson_2003_interface'] = [Atkinson_2003_interface_distribution,
                               Atkinson_2003_interface_magnitude_type,
-                              Atkinson_2003_interface_distance_type,
+                              Atkinson_2003_interface_distance_types,
 
                               Atkinson_2003_interface_coefficient,
                               Atkinson_2003_interface_coefficient_period,
@@ -5373,7 +5340,7 @@ def Zhao_2006_intraslab_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     # get args
     T = kwargs['periods']
     M = kwargs['mag']
-    x = kwargs['distance']
+    x = kwargs['Rupture']
     h = kwargs['depth']
     Vs30 = kwargs['Vs30']
     coefficient = kwargs['coefficient']
@@ -5441,7 +5408,7 @@ def Zhao_2006_intraslab_distribution(**kwargs): #T,M,h,Df,Zt,Vs30,Zl):
     return(logSa,sigma)
 
 Zhao_2006_intraslab_magnitude_type = 'Mw'
-Zhao_2006_intraslab_distance_type = 'Rupture'
+Zhao_2006_intraslab_distance_types = ['Rupture',]
 
 ##    
     # Interslab Events Coefficients
@@ -5475,7 +5442,7 @@ Zhao_2006_intraslab_uses_Vs30 = True
 
 ground_motion_init['Zhao_2006_intraslab'] = [Zhao_2006_intraslab_distribution,
                               Zhao_2006_intraslab_magnitude_type,
-                              Zhao_2006_intraslab_distance_type,
+                              Zhao_2006_intraslab_distance_types,
 
                               Zhao_2006_intraslab_coefficient,
                               Zhao_2006_intraslab_coefficient_period,
@@ -5562,26 +5529,26 @@ Abrahamson_Silva_1997_sigma_coefficient = asarray([
 
 Abrahamson_Silva_1997_uses_Vs30=True
 Abrahamson_Silva_1997_magnitude_type = 'Mw'
-Abrahamson_Silva_1997_distance_type = 'Rupture'
+Abrahamson_Silva_1997_distance_types = ['Rupture',]
 
 
-def Abrahamson_Silva_1997_distribution(dist_object,
-                                       mag,
-                                       coefficient,
-                                       sigma_coefficient,
-                                       depth_to_top,
-                                       fault_type, Vs30,
-                                       dip, width,
-                                       periods,
-                                       depth=None,
-                                       distance=None,
-                                       Z25=None,
-                                       Fhw=0, # FIXME Fhw is only ever passed in from test suite
-                                       **kwargs):
+def Abrahamson_Silva_1997_distribution(**kwargs):
     """
     Abrahamson and Silva (1997, Seismological Research Letters, vol 68, num 1, pp 94-127)
     Adapted from OpenSHA Java implementation.
     """
+    mag = kwargs['mag']
+    coefficient = kwargs['coefficient']
+    sigma_coefficient = kwargs['sigma_coefficient']
+    fault_type = kwargs['fault_type']
+    Vs30 = kwargs['Vs30']
+    periods = kwargs['periods']
+    distance = kwargs['Rupture']
+    
+    Fhw = kwargs.get('Fhw')
+    if Fhw is None:
+        Fhw=0
+    
     assert len(periods) == coefficient.shape[3]
     assert len(periods) == sigma_coefficient.shape[3]
     
@@ -5617,7 +5584,7 @@ def Abrahamson_Silva_1997_distribution(dist_object,
                f3)
 
     fHWM = (mag - 5.5).clip(0.0, 1.0)
-    Rrup = dist_object.Rupture[:,:,newaxis] # [sites, events, 1] 
+    Rrup = distance
     fHWRrup = zeros(Rrup.shape[0:2] + (len(periods),)) # [sites, events, periods]
     fHWRrup = where(logical_and(Rrup > 4,  Rrup <= 8),
                     a9 * (Rrup - 4.0) / 4.0,
@@ -5647,7 +5614,7 @@ def Abrahamson_Silva_1997_distribution(dist_object,
 
 Abrahamson_Silva_1997_args = [Abrahamson_Silva_1997_distribution,
                               Abrahamson_Silva_1997_magnitude_type,
-                              Abrahamson_Silva_1997_distance_type,
+                              Abrahamson_Silva_1997_distance_types,
                               
                               Abrahamson_Silva_1997_coefficient,
                               Abrahamson_Silva_1997_coefficient_period,
@@ -5924,7 +5891,7 @@ Allen_2012_sigma_coefficient_period = deepcopy(Allen_2012_coefficient_period)
 # Other parameters
 Allen_2012_uses_Vs30 = False
 Allen_2012_magnitude_type = 'Mw'
-Allen_2012_distance_type = 'Rupture'
+Allen_2012_distance_types = ['Rupture',]
 Allen_2012_interpolation = linear_interpolation
 
 
@@ -5933,14 +5900,11 @@ def Allen_2012_distribution(**kwargs):
     Allen 2012 distribution
     Adapted from Trevor Allen's Matlab implementation
     """
-    dist_object = kwargs['dist_object']
     Mw = kwargs['mag']
     depth = kwargs['depth']
     coefficient = kwargs['coefficient']
     sigma_coefficient = kwargs['sigma_coefficient']
-    
-    # Rrup from distance object
-    Rrup = dist_object.Rupture
+    Rrup = kwargs['Rupture']
 
     num_sites = Mw.shape[0]
     num_events = Mw.shape[1]
@@ -5954,14 +5918,14 @@ def Allen_2012_distribution(**kwargs):
                   str(Mw.shape)))
 
     # ignore first dimension of distances
-    assert Rrup.shape[1:] == (num_events,), (msg
-               % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
+    #assert Rrup.shape[1:] == (num_events,), (msg
+    #           % ('Rrup', '(?,%d)' % num_events, str(Rrup.shape)))
 
     assert coefficient.shape == (24, 1, 1, num_periods), (msg
                % ('coefficient', '(24,1,1,%d)' % num_periods,
                   str(coefficient.shape)))
 
-    Rrup = dist_object.Rupture[:,:,newaxis]
+    #Rrup = Rrup[:,:,newaxis]
     
     # Deep coefficients
     cd = coefficient[:12]
@@ -6040,7 +6004,7 @@ def Allen_2012_distribution(**kwargs):
 
 Allen_2012_args = [Allen_2012_distribution,
                    Allen_2012_magnitude_type,
-                   Allen_2012_distance_type,
+                   Allen_2012_distance_types,
                    
                    Allen_2012_coefficient,
                    Allen_2012_coefficient_period,
