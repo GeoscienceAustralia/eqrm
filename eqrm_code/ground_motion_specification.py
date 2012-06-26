@@ -46,7 +46,7 @@ class Ground_motion_specification(object):
         self.ground_motion_model_name = ground_motion_model_name
         
     def _set_interface_values(self,distribution,magnitude_type,
-                              distance_type,
+                              distance_types,
                               coefficient,coefficient_period,
                               coefficient_interpolation,
                               sigma_coefficient,sigma_coefficient_period,
@@ -55,7 +55,7 @@ class Ground_motion_specification(object):
         
         self.distribution = distribution
         self.magnitude_type = magnitude_type
-        self.distance_type = distance_type
+        self.distance_types = distance_types
         
         self.coefficient = asarray(coefficient)
         self.coefficient_period = asarray(coefficient_period)

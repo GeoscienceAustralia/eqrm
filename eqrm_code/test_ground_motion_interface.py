@@ -60,7 +60,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         dummy  =  43543545
         sigma_coefficient = array([[[[sigma_1]]],[[[dummy]]]])
         log_mean,log_sigma = model.distribution(mag=mag,
-            distance=distance,
+            Rupture=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient)
         self.failUnless(log_sigma==sigma_1,
@@ -98,7 +98,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         log_mean,log_sigma=model.distribution(
             mag=mag,
-            distance= distance,
+            Rupture= distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient,
             depth=r_z)
@@ -149,7 +149,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         sigma_1=s1-s2*mag
         #sigma_1=-6
         log_mean,log_sigma=model.distribution(mag=mag,
-            distance=distance,
+            Rupture=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient)
         self.failUnless(sigma_1==log_sigma, 'Model incorrect.')
@@ -178,12 +178,12 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         log_mean,log_sigma=model.distribution(
             mag=mag,
-            distance=distance,
+            Joyner_Boore=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient)
         log_mean_p, log_sigma_p=Toro_1997_midcontinent_distribution_python(
             mag=mag,
-            distance=distance,
+            Joyner_Boore=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient)
 
@@ -231,11 +231,11 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         log_mean,log_sigma=model.distribution(
             mag=mag,
-            distance=distance,
+            Rupture=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient)
         log_mean_p, log_sigma_p=Atkinson_Boore_97_distribution_python(
-            mag=mag, distance=distance,
+            mag=mag, Rupture=distance,
             coefficient=coefficient,sigma_coefficient=sigma_coefficient)
         #print "log_mean", log_mean
         #print "log_mean_p", log_mean_p
@@ -404,7 +404,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         log_mean,log_sigma=model.distribution(
             mag=mag,
-            distance=distance,
+            Joyner_Boore=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient,
             Vs30=Vs30,
@@ -490,7 +490,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         log_mean,log_sigma=model.distribution(
             mag=mag,
-            distance=distance,
+            Joyner_Boore=distance,
             coefficient=coefficient,
             sigma_coefficient=sigma_coefficient,
             Vs30=Vs30,
@@ -708,7 +708,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean,
              log_sigma) = model.distribution(coefficient=coeffs,
                                              sigma_coefficient=sigma_coeffs,
-                                             mag=ML, distance=R)
+                                             mag=ML, Epicentral=R)
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
         self.failUnless(allclose(asarray(log_mean), log_mean_expected,
@@ -743,7 +743,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean,
              log_sigma) = model.distribution(coefficient=coeffs,
                                              sigma_coefficient=sigma_coeffs,
-                                             mag=ML, distance=R)
+                                             mag=ML, Epicentral=R)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
@@ -779,7 +779,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean,
              log_sigma) = model.distribution(coefficient=coeffs,
                                              sigma_coefficient=sigma_coeffs,
-                                             mag=ML, distance=R)
+                                             mag=ML, Epicentral=R)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
@@ -813,13 +813,13 @@ class Test_ground_motion_interface(unittest.TestCase):
         # get results for R=10.0 km
         (log_mean_10, _) = model.distribution(coefficient=coeffs,
                                               sigma_coefficient=sigma_coeffs,
-                                              mag=ML, distance=R)
+                                              mag=ML, Epicentral=R)
 
         # then get results for R=1.0 km
         R = numpy.array([[[1.0]]])
         (log_mean_1, _) = model.distribution(coefficient=coeffs,
                                              sigma_coefficient=sigma_coeffs,
-                                             mag=ML, distance=R)
+                                             mag=ML, Epicentral=R)
 
         # check results are same
         msg = ("Results for T=%.1f, ML=%.1f, R=%.1f:\n%s\n"
@@ -868,7 +868,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         (log_mean, log_sigma) = Atkinson06_basic(coefficient=coeffs,
                                                  sigma_coefficient=sigma_coeffs,
-                                                 mag=ML, distance=R, S=0.0)
+                                                 mag=ML, Rupture=R, S=0.0)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
@@ -923,7 +923,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
                                                        sigma_coeffs,
-                                                   mag=ML, distance=R)
+                                                   mag=ML, Rupture=R)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
@@ -963,7 +963,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
                                                        sigma_coeffs,
-                                                   mag=ML, distance=R)
+                                                   mag=ML, Rupture=R)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
@@ -1020,7 +1020,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
                                                        sigma_coeffs,
-                                                   mag=ML, distance=R,
+                                                   mag=ML, Rupture=R,
                                                    Vs30=Vs30)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
@@ -1076,7 +1076,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
                                                        sigma_coeffs,
-                                                   mag=ML, distance=R)
+                                                   mag=ML, Rupture=R)
 
         msg = ('T=%.1f, ML=%.1f, R=%.1f: log_mean=%s, expected=%s'
                % (period, ML, R, str(log_mean), str(log_mean_expected)))
@@ -1130,23 +1130,15 @@ class Test_ground_motion_interface(unittest.TestCase):
                                     [[[0.3459]]],[[[0.8000]]],[[[0.0663]]]])
 
 
-        # a fake dist_object class
-        # assume Rrup & Rx = the R value
-        class DistObj(object):
-            def __init__(self):
-                self.Rupture = numpy.array(R)
-                self.Joyner_Boore = numpy.array(R)
-                self.Horizontal = numpy.array(R)
-        distances = DistObj()
-
-        Rrup = distances.Rupture
-
         # expected values from paper (sigma can be anything, make it very small)
         log_mean_expected = numpy.array([[[math.log(1.565E-01)]]])
         log_sigma_expected = numpy.array([[[4.844E-01]]])
 
         (log_mean,
-             log_sigma) = Chiou08_distribution(mag=ML, dist_object=distances,
+             log_sigma) = Chiou08_distribution(mag=ML,
+                                               Rupture=numpy.array(R),
+                                               Joyner_Boore=numpy.array(R),
+                                               Horizontal=numpy.array(R),
                                                fault_type=fault_type, dip=dip,
                                                depth_to_top=Ztor, Vs30=Vs30,
                                                coefficient=coeffs,
@@ -1200,21 +1192,15 @@ class Test_ground_motion_interface(unittest.TestCase):
         sigma_coeffs = numpy.array([[[[0.3437]]],[[[0.2637]]],[[[0.4458]]],
                                     [[[0.3459]]],[[[0.8000]]],[[[0.0663]]]])
 
-        # a fake dist_object class
-        # assume Rrup & Rx = the R value
-        class DistObj(object):
-            def __init__(self):
-                self.Rupture = numpy.array(R)
-                self.Joyner_Boore = numpy.array(R)
-                self.Horizontal = numpy.array(R)
-        distances = DistObj()
-
         # expected values from paper (sigma can be anything, make it very small)
         log_mean_expected = numpy.array([[[math.log(5.581E-02)]]])
         log_sigma_expected = numpy.array([[[6.508E-01]]])
 
         (log_mean,
-             log_sigma) = model.distribution(mag=ML, dist_object=distances,
+             log_sigma) = model.distribution(mag=ML,
+                                             Rupture=numpy.array(R),
+                                             Joyner_Boore=numpy.array(R),
+                                             Horizontal=numpy.array(R),
                                              fault_type=fault_type, dip=dip,
                                              depth_to_top=Ztor, Vs30=Vs30,
                                              coefficient=coeffs,
@@ -1261,7 +1247,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_mean_expected = numpy.array([[[0.0663]]])
         log_sigma_expected = numpy.array([[[0.4904]]])
 
-        (log_mean, log_sigma) = model.distribution(mag=ML, distance=R,
+        (log_mean, log_sigma) = model.distribution(mag=ML, Rupture=R,
                                                    coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -1289,21 +1275,11 @@ class Test_ground_motion_interface(unittest.TestCase):
         model_name = 'Campbell08'
         model = Ground_motion_specification(model_name)
 
-
-
-        # a fake dist_object class
-        # assume Rjb=5.0 and Rjb=5.0
-        class DistObj(object):
-            def __init__(self):
-                self.Rupture = numpy.array([[5.0]])
-                self.Joyner_Boore = numpy.array([[5.0]])
-
         rtol = 1.0E-4
         atol = 1.0E-4
 
         period = 0.20
         periods = numpy.array([period])
-        dist_object = DistObj()
         ML = numpy.array([[[5.0]]])
         depth = numpy.array([[[0.0]]])
         dip = numpy.array([[[90.0]]])
@@ -1327,7 +1303,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_mean_expected = numpy.array([[[math.log(3.56477E-01)]]])
         sigma_expected = numpy.array([[[5.89200E-01]]])
 
-        (log_mean, sigma) = model.distribution(dist_object=dist_object,
+        (log_mean, sigma) = model.distribution(Rupture=numpy.array([[5.0]]),
+                                               Joyner_Boore=numpy.array([[5.0]]),
                                                mag=ML, periods=periods,
                                                depth_to_top=depth,
                                                fault_type=fault_type,
@@ -1351,87 +1328,12 @@ class Test_ground_motion_interface(unittest.TestCase):
                                          rtol=rtol, atol=atol),
                                  msg)
 
-    def test_Campbell08_SS1(self):
-        """Test the Campbell08 model - strike_slip fault."""
-
-        model_name = 'Campbell08'
-        model = Ground_motion_specification(model_name)
-
-        # a fake dist_object class
-        # assume Rrup=200 and Rjb=199.9
-        class DistObj(object):
-            def __init__(self):
-                self.Rupture = numpy.array([[2.0000e+2]])
-                self.Joyner_Boore = numpy.array([[1.9990e+2]])
-
-        ######
-        # period = 0.01, ML=5.0, Rrup=200.0, Rjb=199.9
-        ######
-
-        rtol = 1.0E-4
-        atol = 1.0E-4
-
-        period = 0.01
-        periods = numpy.array([period])
-        dist_object = DistObj()
-        ML = numpy.array([[[5.0]]])
-        depth = numpy.array([[[5.0]]])
-        dip = numpy.array([[[90.0]]])
-        fault_type = numpy.array([[[2]]], dtype=int)	# SS
-        Vs30 = numpy.array([760.0])
-        Z25 = numpy.array([conversions.convert_Vs30_to_Z25(760.0)])
-
-        # get coeffs for this period (C0 -> K3 from table 2)
-        coeffs = numpy.array([[[[-1.715]]], [[[0.500]]],  [[[-0.530]]],
-                              [[[-0.262]]], [[[-2.118]]], [[[0.170]]],
-                              [[[5.60]]],   [[[0.280]]],  [[[-0.120]]],
-                              [[[0.490]]],  [[[1.058]]],  [[[0.040]]],
-                              [[[0.610]]],  [[[865]]],    [[[-1.186]]],
-                              [[[1.839]]],  [[[1.88]]],   [[[1.18]]]])
-
-        # sigma coefficients for this period (ElnY -> rho from table 3)
-        sigma_coeffs = numpy.array([[[[0.478]]], [[[0.219]]], [[[0.300]]], [[[0.166]]], [[[1.000]]]])
-
-        # expected values from Campbell08_check.py
-        log_mean_expected = numpy.array([[[math.log(2.7675e-3)]]])
-        log_sigma_expected = numpy.array([[[4.7793e-1]]])
-
-        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
-                                                   mag=ML, periods=periods,
-                                                   depth_to_top=depth,
-                                                   fault_type=fault_type,
-                                                   dip=dip,
-                                                   Vs30=Vs30, Z25=Z25,
-                                                   coefficient=coeffs,
-                                                   sigma_coefficient=
-                                                       sigma_coeffs)
-
-        # tests for equality should be quite tight as we check against
-        # Campbell08_check.py
-        msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_mean=%s, expected=%s'
-               % (period, ML, 10.0, str(log_mean), str(log_mean_expected)))
-        self.failUnless(allclose(asarray(log_mean), log_mean_expected,
-                                         rtol=rtol, atol=atol),
-                                 msg)
-
-        msg = ('T=%.2f, ML=%.1f, Rrup=%.1f: log_sigma=%s, expected=%s'
-               % (period, ML, 10.0, str(log_sigma), str(log_sigma_expected)))
-        self.failUnless(allclose(asarray(log_sigma), log_sigma_expected,
-                                         rtol=rtol, atol=atol),
-                                 msg)
 
     def test_Campbell08_SS1(self):
         """Test the Campbell08 model - strike_slip fault."""
 
         model_name = 'Campbell08'
         model = Ground_motion_specification(model_name)
-
-        # a fake dist_object class
-        # assume Rrup=200 and Rjb=199.9
-        class DistObj(object):
-            def __init__(self):
-                self.Rupture = numpy.array([[2.0025e+2]])
-                self.Joyner_Boore = numpy.array([[2.0000e+2]])
 
         ######
         # period = 0.01, ML=5.0, Rrup=200.25, Rjb=200.0
@@ -1442,7 +1344,6 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         period = 0.01
         periods = numpy.array([period])
-        dist_object = DistObj()
         ML = numpy.array([[[5.0]]])
         depth = numpy.array([[[10.0]]])
         dip = numpy.array([[[90.0]]])
@@ -1465,7 +1366,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_mean_expected = numpy.array([[[-5.924202]]])
         log_sigma_expected = numpy.array([[[0.525742]]])
 
-        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+        (log_mean, log_sigma) = model.distribution(Rupture=numpy.array([[2.0025e+2]]),
+                                                   Joyner_Boore=numpy.array([[2.0000e+2]]),
                                                    mag=ML, periods=periods,
                                                    depth_to_top=depth,
                                                    fault_type=fault_type,
@@ -1498,12 +1400,6 @@ class Test_ground_motion_interface(unittest.TestCase):
         Rjb = 100.0
         Rrup = 100.5
 
-        # a fake dist_object class
-        class DistObj(object):
-            def __init__(self):
-                self.Rupture = numpy.array([[Rrup]])
-                self.Joyner_Boore = numpy.array([[Rjb]])
-
         ######
         # period = 0.2, ML=7.0
         ######
@@ -1513,7 +1409,6 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         period = 0.2
         periods = numpy.array([period])
-        dist_object = DistObj()
         ML = numpy.array([[[7.0]]])
         depth = numpy.array([[[10.0]]])
         dip = numpy.array([[[90.0]]])
@@ -1537,7 +1432,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_mean_expected = numpy.array([[[math.log(6.484E-02)]]])
         log_sigma_expected = numpy.array([[[5.892E-01]]])
 
-        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+        (log_mean, log_sigma) = model.distribution(Rupture=numpy.array([[Rrup]]),
+                                                   Joyner_Boore=numpy.array([[Rjb]]),
                                                    mag=ML, periods=periods,
                                                    depth_to_top=depth,
                                                    fault_type=fault_type,
@@ -1570,12 +1466,6 @@ class Test_ground_motion_interface(unittest.TestCase):
         Rrup = 100.0
         Rjb = 100.0
 
-        # a fake dist_object class
-        class DistObj(object):
-            def __init__(self):
-                self.Rupture = numpy.array([[Rrup]])
-                self.Joyner_Boore = numpy.array([[Rjb]])
-
         ######
         # period = 0.01, M=7.0
         ######
@@ -1585,7 +1475,6 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         period = 0.01
         periods = numpy.array([period])
-        dist_object = DistObj()
         M = numpy.array([[[7.0]]])
         depth = numpy.array([[[0.0]]])
         dip = numpy.array([[[45.0]]])
@@ -1608,7 +1497,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_mean_expected = numpy.array([[[math.log(3.373E-02)]]])
         log_sigma_expected = numpy.array([[[5.250E-01]]])
 
-        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+        (log_mean, log_sigma) = model.distribution(Rupture = numpy.array([[Rrup]]),
+                                                   Joyner_Boore = numpy.array([[Rjb]]),
                                                    mag=M, periods=periods,
                                                    depth_to_top=depth,
                                                    fault_type=fault_type,
@@ -1641,12 +1531,6 @@ class Test_ground_motion_interface(unittest.TestCase):
         Rrup = 100.0
         Rjb = 100.0
 
-        # a fake dist_object class
-        class DistObj(object):
-            def __init__(self):
-                self.Rupture = numpy.array([[Rrup]])
-                self.Joyner_Boore = numpy.array([[Rjb]])
-
         ######
         # period = 0.01, M=7.0
         ######
@@ -1656,7 +1540,6 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         period = 0.01
         periods = numpy.array([period])
-        dist_object = DistObj()
         M = numpy.array([[[7.0]]])
         depth = numpy.array([[[0.0]]])
         dip = numpy.array([[[45.0]]])
@@ -1679,7 +1562,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_mean_expected = numpy.array([[[math.log(3.373E-02)]]])
         log_sigma_expected = numpy.array([[[5.250E-01]]])
 
-        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+        (log_mean, log_sigma) = model.distribution(Rupture=numpy.array([[Rrup]]),
+                                                   Joyner_Boore=numpy.array([[Rjb]]),
                                                    mag=M, periods=periods,
                                                    depth_to_top=depth,
                                                    fault_type=fault_type,
@@ -1712,19 +1596,12 @@ class Test_ground_motion_interface(unittest.TestCase):
         model_name = 'Abrahamson08'
         model = Ground_motion_specification(model_name)
 
-        # a fake dist_object class
-        # it can be this simple since delta=90 and Ztor=0.0
-        class DistObj(object):
-            def __init__(self, distance):
-                self.Rupture = distance
-                self.Joyner_Boore = distance
-                self.Horizontal = distance
-
         # Test various scenarios for period=0.2
         period = 0.2
         periods = numpy.array([period])
         Rrup = 100.0
-        dist_object = DistObj(numpy.array(numpy.array([[Rrup, Rrup]])))
+        distance = numpy.array(numpy.array([[Rrup, Rrup]]))
+        distance = distance[:,:,newaxis]
         ML = numpy.array([[[7.0], [5.0]]])
         depth = numpy.array([[[0.0], [0.0]]])
         dip = numpy.array([[[90.0], [90.0]]])
@@ -1749,7 +1626,9 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_mean_expected = numpy.array([[[math.log(6.909E-02)], [math.log(6.699E-03)]]])
         log_sigma_expected = numpy.array([[[6.103E-01], [8.169E-01]]])
 
-        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+        (log_mean, log_sigma) = model.distribution(Rupture=distance,
+                                                   Joyner_Boore=distance,
+                                                   Horizontal=distance,
                                                    mag=ML, periods=periods,
                                                    depth_to_top=depth,
                                                    width=width,
@@ -1792,7 +1671,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         distance = zeros((num_sites, num_events, 1))
         coefficient = zeros((1, 1, 1, num_periods))
         (log_mean, log_sigma) = model.distribution(
-            distance=distance, coefficient=coefficient)
+            Rupture=distance, coefficient=coefficient)
         act_log_sigma = ones((num_sites, num_events, num_periods))
         act_log_mean = ones((num_sites, num_events, num_periods))*10
         self.failUnless(allclose(log_mean, act_log_mean))
@@ -1833,7 +1712,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_sigma_expected = numpy.array([[[0.6840]]])
 
         (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
-                                                   distance=R,depth = h,
+                                                   Rupture=R,depth = h,
                                                    Vs30 = Vs30,coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -1888,7 +1767,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_sigma_expected = numpy.array([[[0.6780]]])
 
         (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
-                                                   distance=R,depth = h,
+                                                   Rupture=R,depth = h,
                                                    Vs30 = Vs30,coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -1942,7 +1821,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_sigma_expected = numpy.array([[[0.5256]]])
 
         (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
-                                                   distance=R,depth = h,
+                                                   Rupture=R,depth = h,
                                                    Vs30 = Vs30,coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -1995,7 +1874,7 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_sigma_expected = numpy.array([[[ 0.6200]]])
 
         (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
-                                                   distance=R,depth = h,
+                                                   Rupture=R,depth = h,
                                                    Vs30 = Vs30,coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
@@ -2048,8 +1927,10 @@ class Test_ground_motion_interface(unittest.TestCase):
         log_sigma_expected = numpy.array([[[0.6431]]])
 
         (log_mean, log_sigma) = model.distribution(periods = period, mag=ML,
-                                                   distance=R,fault_type = FT,
-                                                   Vs30 = Vs30,coefficient=coeffs,
+                                                   Joyner_Boore=R,
+                                                   fault_type = FT,
+                                                   Vs30 = Vs30,
+                                                   coefficient=coeffs,
                                                    sigma_coefficient=
                                                        sigma_coeffs)
         # tests for equality should be quite tight as we check against
@@ -2614,7 +2495,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         
         Rrup = 100.0
-        dist_object = DistObj(numpy.array(numpy.array([[Rrup, Rrup]])))
+        distance = numpy.array(numpy.array([[Rrup, Rrup]]))
         Mw = numpy.array([[[7.0], [5.0]]])
         depth = numpy.array([[[0.0], [0.0]]])
         dip = numpy.array([[[90.0], [90.0]]])
@@ -2624,7 +2505,8 @@ class Test_ground_motion_interface(unittest.TestCase):
         
         model_name = 'Abrahamson_Silva_1997'
         model = Ground_motion_specification(model_name)
-        (log_mean, log_sigma) = model.distribution(dist_object=dist_object,
+        (log_mean, log_sigma) = model.distribution(Rupture = distance,
+                                                   Horizontal = distance,
                                                    mag=Mw, periods=periods,
                                                    depth_to_top=depth,
                                                    width=width,
