@@ -240,21 +240,30 @@ should NOT be set after initialization - read __init__ for reasons.
         u_sigma=building_parameters['ductility_sigma'][:,newaxis,newaxis]
         
         alpha=building_parameters['degrading_alpha'][:,newaxis,newaxis]
+        alpha_sigma=building_parameters['degrading_alpha_sigma'][:,newaxis,newaxis]
         beta=building_parameters['degrading_beta'][:,newaxis,newaxis]
+        beta_sigma=building_parameters['degrading_beta_sigma'][:,newaxis,newaxis]
         delta=building_parameters['degrading_delta'][:,newaxis,newaxis]
+        delta_sigma=building_parameters['degrading_delta_sigma'][:,newaxis,newaxis]
         theta=building_parameters['degrading_theta'][:,newaxis,newaxis]
+        theta_sigma=building_parameters['degrading_theta_sigma'][:,newaxis,newaxis]
 
         csm_variability_method=self.csm_variability_method
 
         # Take a sample of the parameters using the specified sigma values
-        C,T,a1,a2,y,Lambda,u = sample_capacity_parameters(C,C_sigma,
-                                                          T,T_sigma,
-                                                          a1,a1_sigma,
-                                                          a2,a2_sigma,
-                                                          y,y_sigma,
-                                                          Lambda,Lambda_sigma,
-                                                          u,u_sigma,
-                                                          csm_variability_method)
+        (C,T,a1,a2,y,Lambda,u,
+         alpha,beta,delta,theta) = sample_capacity_parameters(C,C_sigma,
+                                                              T,T_sigma,
+                                                              a1,a1_sigma,
+                                                              a2,a2_sigma,
+                                                              y,y_sigma,
+                                                              Lambda,Lambda_sigma,
+                                                              u,u_sigma,
+                                                              alpha,alpha_sigma,
+                                                              beta,beta_sigma,
+                                                              delta,delta_sigma,
+                                                              theta,theta_sigma,
+                                                              csm_variability_method)
 
         # calculate capacity curve parameters from building parameters:
         params = calculate_capacity_parameters(C, T, a1, a2, y, Lambda, u,

@@ -63,7 +63,14 @@ def nonlin_damp(capacity_parameters,kappa,acceleration,displacement,
      Du_delta, Au_rev_0_2,
      Du_theta, Au_rev_0_1,
      a, b, c) = capacity_parameters 
-    Harea=hyst_area_rand(displacement,acceleration,DyV,AyV,DuV,AuV,
+     
+    # Support for degrading curve:
+    # If the displacement is greater than Du_alpha then set:
+    # acceleration = Au_rev
+    # displacement = Du_alpha
+    alt_displacement =  where(displacement > Du_alpha, Du_alpha, displacement)
+    alt_acceleration = where(displacement > Du_alpha, Au_rev, acceleration)
+    Harea=hyst_area_rand(alt_displacement,alt_acceleration,DyV,AyV,DuV,AuV,
                          csm_hysteretic_damping)
     oldsettings = seterr(invalid='ignore')
     BH = kappa*Harea/(2*pi*displacement*acceleration)
@@ -142,6 +149,7 @@ The hysteresis area = 2(A1+A2-A3)
         aa=-ky/bb
         
         oldsettings = seterr(under='ignore')
+        #print D,A,DyV,AyV,DuV,AuV
         Harea1=cc*x1+aa/bb*(1-exp(-bb*x1))
         seterr(**oldsettings)
         Harea2=0.5*y1*y1/ky
@@ -202,6 +210,10 @@ def sample_capacity_parameters(C,C_sigma,
                                y,y_sigma,
                                Lambda,Lambda_sigma,
                                u,u_sigma,
+                               alpha,alpha_sigma,
+                               beta,beta_sigma,
+                               delta,delta_sigma,
+                               theta,theta_sigma,
                                csm_variability_method):
     """
     Take a sample from the normal distribution for the given parameters and
@@ -214,6 +226,11 @@ def sample_capacity_parameters(C,C_sigma,
     # y      = yield_to_design = gamma
     # Lambda = ultimate_to_yield = Lambda
     # u      = ductility = mu
+    
+    # alpha  = factor for edge of first degrading region
+    # beta   = factor for edge of second degrading region
+    # delta  = factor for edge of third degrading region
+    # theta  = factor for edge of fourth degrading region
     """
     
     dist = Distribution_Normal(csm_variability_method)
@@ -225,6 +242,10 @@ def sample_capacity_parameters(C,C_sigma,
     y_sample = dist.sample_for_eqrm(y, y_sigma)
     Lambda_sample = dist.sample_for_eqrm(Lambda, Lambda_sigma)
     u_sample = dist.sample_for_eqrm(u, u_sigma)
+    alpha_sample = dist.sample_for_eqrm(alpha, alpha_sigma)
+    beta_sample = dist.sample_for_eqrm(beta, beta_sigma)
+    delta_sample = dist.sample_for_eqrm(delta, delta_sigma)
+    theta_sample = dist.sample_for_eqrm(theta, theta_sigma)
     
     return (C_sample,
             T_sample,
@@ -232,7 +253,11 @@ def sample_capacity_parameters(C,C_sigma,
             a2_sample,
             y_sample,
             Lambda_sample,
-            u_sample)
+            u_sample,
+            alpha_sample,
+            beta_sample,
+            delta_sample,
+            theta_sample)
     
 def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u,
                                   alpha, beta, delta, theta):
@@ -673,7 +698,7 @@ return_val = 0;
             raise WeaveIOError
     return capacity
 
-calculate_capacity = calculate_capacity_weave
+calculate_capacity = calculate_capacity_degrading_weave
 
 def calculate_reduction_factors(damping_factor):
     """
