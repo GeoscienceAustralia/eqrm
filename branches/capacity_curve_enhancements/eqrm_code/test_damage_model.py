@@ -121,10 +121,10 @@ class Test_damage_model(unittest.TestCase):
         (Ay, Dy, Au, Du) = (0.13417, 2.9975, 0.26833, 41.964)
         (aa, bb, cc, kappa) = (-0.3647, 0.33362, 0.26833, 0.001)
         # TODO: Fix test data once capacity curve switched to degrading
-        Du_alpha,Au_rev=(0,0)
-        Du_beta,Au_rev_0_8=(0,0)
-        Du_delta,Au_rev_0_2=(0,0)
-        Du_theta,Au_rev_0_1=(0,0)
+        Du_alpha,Au_rev=(0.4*Du,0.9*Au)
+        Du_beta,Au_rev_0_8=(0.6*Du,0.8*Au_rev)
+        Du_delta,Au_rev_0_2=(0.8*Du,0.2*Au_rev)
+        Du_theta,Au_rev_0_1=(1*Du,0.1*Au_rev)
         capacity_parameters=(Dy,Ay,
                              Du,Au,
                              Du_alpha,Au_rev,
@@ -135,7 +135,8 @@ class Test_damage_model(unittest.TestCase):
         damping = nonlin_damp(capacity_parameters, kappa, SAcr, SDcr)
 
         #out
-        damping_m = 0.000540396780259699
+        #damping_m = 0.000540396780259699
+        damping_m = 0.00015124
         assert allclose(damping, damping_m)
     '''[BH, Harea, kappa, Harea0] = ...
                   nonlin_damp_rand( SDcrNew,               ...
@@ -283,9 +284,13 @@ class Test_damage_model(unittest.TestCase):
         building_parameters['ductility'] = array([u])
         building_parameters['ductility_sigma'] = array([sigma])
         building_parameters['degrading_alpha'] = array([d_alpha])
+        building_parameters['degrading_alpha_sigma'] = array([sigma])
         building_parameters['degrading_beta'] = array([d_beta])
+        building_parameters['degrading_beta_sigma'] = array([sigma])
         building_parameters['degrading_delta'] = array([d_delta])
+        building_parameters['degrading_delta_sigma'] = array([sigma])
         building_parameters['degrading_theta'] = array([d_theta])
+        building_parameters['degrading_theta_sigma'] = array([sigma])
         building_parameters['damping_s'] = array([damping_s])
         building_parameters['damping_m'] = array([damping_m])
         building_parameters['damping_l'] = array([damping_l])
@@ -309,9 +314,11 @@ class Test_damage_model(unittest.TestCase):
                  42.431, 49.04, 54.342, 78.577, 96.336, 109.67, 108.51, 106.5,
                  101.91, 94.879, 86.162]
 
-        SDcr = 41.810644943005
+        #SDcr = 41.810644943005
+        SDcr = 102.38856605
 
-        SAcr = 0.26833301410569
+        #SAcr = 0.26833301410569
+        SAcr = 0.02669847
 
         assert allclose(SAcr, point[0])
         assert allclose(SDcr, point[1])
@@ -572,9 +579,13 @@ class Test_damage_model(unittest.TestCase):
                                'ductility': array([5.]),
                                'ductility_sigma': array([0.3]),
                                'degrading_alpha': array([0.4]),
+                               'degrading_alpha_sigma': array([0.3]),
                                'degrading_beta': array([0.6]),
+                               'degrading_beta_sigma': array([0.3]),
                                'degrading_delta': array([0.8]),
+                               'degrading_delta_sigma': array([0.3]),
                                'degrading_theta': array([1]),
+                               'degrading_theta_sigma': array([0.3]),
                                'damping_l': array([0.]),
                                'damping_m': array([0.2])}
 

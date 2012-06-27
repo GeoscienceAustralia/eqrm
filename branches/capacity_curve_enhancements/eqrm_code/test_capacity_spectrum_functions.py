@@ -64,17 +64,30 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         Lambda_sigma = array([0.3])
         u = array([4.])
         u_sigma = array([0.3])
+        alpha = array([0.4])
+        alpha_sigma = array([0.3])
+        beta = array([0.6])
+        beta_sigma = array([0.3])
+        delta = array([0.8])
+        delta_sigma = array([0.3])
+        theta = array([1.])
+        theta_sigma = array([0.3])
         
         csm_variability_method = None
         
-        C,T,a1,a2,y,Lambda,u = sample_capacity_parameters(C,C_sigma,
-                                                          T,T_sigma,
-                                                          a1,a1_sigma,
-                                                          a2,a2_sigma,
-                                                          y,y_sigma,
-                                                          Lambda,Lambda_sigma,
-                                                          u,u_sigma,
-                                                          csm_variability_method)
+        (C,T,a1,a2,y,Lambda,u,
+         alpha,beta,delta,theta) = sample_capacity_parameters(C,C_sigma,
+                                                              T,T_sigma,
+                                                              a1,a1_sigma,
+                                                              a2,a2_sigma,
+                                                              y,y_sigma,
+                                                              Lambda,Lambda_sigma,
+                                                              u,u_sigma,
+                                                              alpha,alpha_sigma,
+                                                              beta,beta_sigma,
+                                                              delta,delta_sigma,
+                                                              theta,theta_sigma,
+                                                              csm_variability_method)
 
         # Expected values
         C_expected = array([0.2])
@@ -84,6 +97,10 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         y_expected = array([1.5])
         Lambda_expected = array([2.5])
         u_expected = array([4.])
+        alpha_expected = array([0.4])
+        beta_expected = array([0.6])
+        delta_expected = array([0.8])
+        theta_expected = array([1.])
 
         msg = "Expected: %s, Got: %s"
 
@@ -101,6 +118,14 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                      msg % (Lambda_expected, Lambda))
         self.assert_(u_expected == u, 
                      msg % (u_expected, u))
+        self.assert_(alpha_expected == alpha, 
+                     msg % (alpha_expected, alpha))
+        self.assert_(beta_expected == beta, 
+                     msg % (beta_expected, beta))
+        self.assert_(delta_expected == delta, 
+                     msg % (delta_expected, delta))
+        self.assert_(theta_expected == theta, 
+                     msg % (theta_expected, theta))
         
     def run_sample_capacity_parameters_sigmas(self, var_method, sigma_op):
 
@@ -118,8 +143,17 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         Lambda_sigma = array([0.3])
         u_input = array([4.])
         u_sigma = array([0.3])
+        alpha_input = array([0.4])
+        alpha_sigma = array([0.3])
+        beta_input = array([0.6])
+        beta_sigma = array([0.3])
+        delta_input = array([0.8])
+        delta_sigma = array([0.3])
+        theta_input = array([1.])
+        theta_sigma = array([0.3])
         
-        C,T,a1,a2,y,Lambda,u = sample_capacity_parameters(
+        (C,T,a1,a2,y,Lambda,u,
+         alpha,beta,delta,theta) = sample_capacity_parameters(
                                                     C_input,C_sigma,
                                                     T_input,T_sigma,
                                                     a1_input,a1_sigma,
@@ -127,6 +161,10 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                                                     y_input,y_sigma,
                                                     Lambda_input,Lambda_sigma,
                                                     u_input,u_sigma,
+                                                    alpha_input,alpha_sigma,
+                                                    beta_input,beta_sigma,
+                                                    delta_input,delta_sigma,
+                                                    theta_input,theta_sigma,
                                                     var_method)
 
         # Expected values
@@ -137,6 +175,10 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         y_expected = y_input + sigma_op * y_sigma
         Lambda_expected = Lambda_input + sigma_op * Lambda_sigma
         u_expected = u_input + sigma_op * u_sigma
+        alpha_expected = alpha_input + sigma_op * alpha_sigma
+        beta_expected = beta_input + sigma_op * beta_sigma
+        delta_expected = delta_input + sigma_op * delta_sigma
+        theta_expected = theta_input + sigma_op * theta_sigma
         
         msg = "Expected: %s, Got: %s"
 
@@ -154,6 +196,14 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                      msg % (Lambda_expected, Lambda))
         self.assert_(u_expected == u, 
                      msg % (u_expected, u))
+        self.assert_(alpha_expected == alpha, 
+                     msg % (alpha_expected, alpha))
+        self.assert_(beta_expected == beta, 
+                     msg % (beta_expected, beta))
+        self.assert_(delta_expected == delta, 
+                     msg % (delta_expected, delta))
+        self.assert_(theta_expected == theta, 
+                     msg % (theta_expected, theta))
         
     def test_sample_capacity_parameters_sigmas(self):
         
@@ -275,7 +325,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                              Du_theta,Au_rev_0_1,
                              aa,bb,cc)     
         capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]
-        capacity=calculate_capacity(surface_displacement,capacity_parameters)
+        capacity=calculate_capacity_weave(surface_displacement,capacity_parameters)
 
         #out
         capacity_m=[0,0.084818,0.22652,0.26135,0.2673,0.2682,0.26832,
@@ -311,7 +361,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                              Du_theta,Au_rev_0_1,
                              aa,bb,cc)      
         capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]
-        capacity=calculate_capacity(surface_displacement,capacity_parameters)
+        capacity=calculate_capacity_weave(surface_displacement,capacity_parameters)
 
         #out
         capacity_m=array([0,0.084818])
@@ -511,7 +561,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         
         capacity_parameters=capacity_parameters[:,newaxis,newaxis,newaxis]
         
-        capacity=calculate_capacity(SD_new,capacity_parameters)
+        capacity=calculate_capacity_weave(SD_new,capacity_parameters)
 
         #out
         SA_capm=array([ 0,0.0718547880987331,0.210114969058595,
@@ -671,7 +721,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                              Du_theta,Au_rev_0_1,
                              aa,bb,cc)
         capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]
-        capacity=calculate_capacity(surface_displacement,capacity_parameters)
+        capacity=calculate_capacity_weave(surface_displacement,capacity_parameters)
 
         #out
         capacity_m=[  0,
@@ -837,7 +887,7 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
                              Du_theta,Au_rev_0_1,
                              aa,bb,cc)
         capacity_parameters=array(capacity_parameters)[:,newaxis,newaxis,newaxis]  
-        capacity=calculate_capacity(SD_new,capacity_parameters)
+        capacity=calculate_capacity_weave(SD_new,capacity_parameters)
 
         #out
         SA_capm=array([0,
