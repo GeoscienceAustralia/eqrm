@@ -8,7 +8,12 @@
   Version: $Revision: 920 $  
   ModifiedBy: $Author: dgray $
   ModifiedDate: $Date: 2009-04-01 16:27:50 +1100 (Wed, 01 Apr 2009) $
-  
+  PLEASE NOTE you need to be very careful using these functions outside
+  of EQRM.  In EQRM the x axis runs along the rupture trace. the y axis 
+  is perpendicular to the rupture trace. please see the images of the 
+  orientation and dimension of the rupture plane in both 3D and a 2D 
+  in the eqrm manual.
+ 
   Copyright 2007 by Geoscience Australia
 """
 
@@ -61,9 +66,12 @@ def azimuthal_orthographic_ll_to_xy(lat,lon,lat0,lon0,azimuth=0,R=6367.0):
     lat0,lon0 = origin of coordinate system
         
     assumes that longitude increases towards the east
+    PLEASE NOTE you need to be very careful using these functions outside
+    of EQRM.  In EQRM the x axis runs along the rupture trace. the y axis 
+    is perpendicular to the rupture trace.
     """
-    x = R*PI_DIV_180*(lat-lat0)
-    y = R*PI_DIV_180*(lon-lon0)*cos(lat*PI_DIV_180)
+    y = R*PI_DIV_180*(lat-lat0)
+    x = R*PI_DIV_180*(lon-lon0)*cos(lat*PI_DIV_180)
     x,y=__rotate_frame(x,y,azimuth)
     return x,y
 
@@ -72,7 +80,10 @@ def azimuthal_orthographic_xy_to_ll(x,y,lat0,lon0,azimuth=0,R=6367.0):
     x,y = point for conversion to lat,lon
     lat0,lon0 = origin of coordinate system
     
-    assumes that longitude increases towards the east    
+    assumes that longitude increases towards the east 
+    PLEASE NOTE you need to be very careful using these functions outside
+    of EQRM.  In EQRM the x axis runs along the rupture trace. the y axis 
+    is perpendicular to the rupture trace.   
     """
     # x = site x, y = site x
     # lat0 = origin (event latitude), lon0 = origin (event longitude)
