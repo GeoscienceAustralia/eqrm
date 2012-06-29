@@ -47,6 +47,136 @@ class Test_capacity_spectrum_functions(unittest.TestCase):
         assert allclose(TVD_mat,TVD,rtol=5e-5)
         assert allclose(SD,SD_mat,rtol=5e-5)        
 
+    def test_sample_capacity_parameters_no_variability(self):
+        # The mean and sigma can be anything so we'll ignore the setup values
+
+        C = array([0.2])
+        C_sigma = array([0.3])
+        T = array([0.2])
+        T_sigma = array([0.3])
+        a1 = array([0.8])
+        a1_sigma = array([0.3])
+        a2 = array([0.8])
+        a2_sigma = array([0.3])
+        y = array([1.5])
+        y_sigma = array([0.3])
+        Lambda = array([2.5])
+        Lambda_sigma = array([0.3])
+        u = array([4.])
+        u_sigma = array([0.3])
+        
+        csm_variability_method = None
+        
+        C,T,a1,a2,y,Lambda,u = sample_capacity_parameters(C,C_sigma,
+                                                          T,T_sigma,
+                                                          a1,a1_sigma,
+                                                          a2,a2_sigma,
+                                                          y,y_sigma,
+                                                          Lambda,Lambda_sigma,
+                                                          u,u_sigma,
+                                                          csm_variability_method)
+
+        # Expected values
+        C_expected = array([0.2])
+        T_expected = array([0.2])
+        a1_expected = array([0.8])
+        a2_expected = array([0.8])
+        y_expected = array([1.5])
+        Lambda_expected = array([2.5])
+        u_expected = array([4.])
+
+        msg = "Expected: %s, Got: %s"
+
+        self.assert_(C_expected == C, 
+                     msg % (C_expected, C))
+        self.assert_(T_expected == T, 
+                     msg % (T_expected, T))
+        self.assert_(a1_expected == a1, 
+                     msg % (a1_expected, a1))
+        self.assert_(a2_expected == a2, 
+                     msg % (a2_expected, a2))
+        self.assert_(y_expected == y, 
+                     msg % (y_expected, y))
+        self.assert_(Lambda_expected == Lambda, 
+                     msg % (Lambda_expected, Lambda))
+        self.assert_(u_expected == u, 
+                     msg % (u_expected, u))
+        
+    def run_sample_capacity_parameters_sigmas(self, var_method, sigma_op):
+
+        C_input = array([0.2])
+        C_sigma = array([0.3])
+        T_input = array([0.2])
+        T_sigma = array([0.3])
+        a1_input = array([0.8])
+        a1_sigma = array([0.3])
+        a2_input = array([0.8])
+        a2_sigma = array([0.3])
+        y_input = array([1.5])
+        y_sigma = array([0.3])
+        Lambda_input = array([2.5])
+        Lambda_sigma = array([0.3])
+        u_input = array([4.])
+        u_sigma = array([0.3])
+        
+        C,T,a1,a2,y,Lambda,u = sample_capacity_parameters(
+                                                    C_input,C_sigma,
+                                                    T_input,T_sigma,
+                                                    a1_input,a1_sigma,
+                                                    a2_input,a2_sigma,
+                                                    y_input,y_sigma,
+                                                    Lambda_input,Lambda_sigma,
+                                                    u_input,u_sigma,
+                                                    var_method)
+
+        # Expected values
+        C_expected = C_input + sigma_op * C_sigma
+        T_expected = T_input + sigma_op * T_sigma
+        a1_expected = a1_input + sigma_op * a1_sigma
+        a2_expected = a2_input + sigma_op * a2_sigma
+        y_expected = y_input + sigma_op * y_sigma
+        Lambda_expected = Lambda_input + sigma_op * Lambda_sigma
+        u_expected = u_input + sigma_op * u_sigma
+        
+        msg = "Expected: %s, Got: %s"
+
+        self.assert_(C_expected == C, 
+                     msg % (C_expected, C))
+        self.assert_(T_expected == T, 
+                     msg % (T_expected, T))
+        self.assert_(a1_expected == a1, 
+                     msg % (a1_expected, a1))
+        self.assert_(a2_expected == a2, 
+                     msg % (a2_expected, a2))
+        self.assert_(y_expected == y, 
+                     msg % (y_expected, y))
+        self.assert_(Lambda_expected == Lambda, 
+                     msg % (Lambda_expected, Lambda))
+        self.assert_(u_expected == u, 
+                     msg % (u_expected, u))
+        
+    def test_sample_capacity_parameters_sigmas(self):
+        
+        # csm_variability_method 3 -> +2*sigma
+        var_method = 3
+        sigma_op = 2
+        self.run_sample_capacity_parameters_sigmas(var_method, sigma_op)
+        
+        # csm_variability_method 4 -> +sigma
+        var_method = 4
+        sigma_op = 1
+        self.run_sample_capacity_parameters_sigmas(var_method, sigma_op)
+        
+        # csm_variability_method 5 -> -sigma
+        var_method = 5
+        sigma_op = -1
+        self.run_sample_capacity_parameters_sigmas(var_method, sigma_op)
+        
+        # csm_variability_method 6 -> -2*sigma
+        var_method = 6
+        sigma_op = -2
+        self.run_sample_capacity_parameters_sigmas(var_method, sigma_op)
+
     def test_capacity_parameters(self):
         """
         Test that capacity parameters and kappa are the same as matlabs

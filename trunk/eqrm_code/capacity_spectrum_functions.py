@@ -18,6 +18,7 @@ from interp import interp
 
 from eqrm_code import util
 from eqrm_code import weave_converters
+from eqrm_code.ground_motion_distribution import Distribution_Normal
 
 class WeaveIOError(exceptions.Exception):
     def __init__(self, errno=None, msg=None):
@@ -180,11 +181,47 @@ def calculate_kappa(magnitude,damping_s,damping_m,damping_l):
     
     kappa=kappa.swapaxes(0,1)
     return kappa
+
+def sample_capacity_parameters(C,C_sigma,
+                               T,T_sigma,
+                               a1,a1_sigma,
+                               a2,a2_sigma,
+                               y,y_sigma,
+                               Lambda,Lambda_sigma,
+                               u,u_sigma,
+                               csm_variability_method):
+    """
+    Take a sample from the normal distribution for the given parameters and
+    corresponding standard deviations.
     
-def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u,sdtcap=None,
-                                  number_events=None,
-                                  csm_use_variability=False,
-                                  csm_variability_method=None):
+    # C      = design_strength = Cs
+    # T      = natural_elastic_period = T
+    # a1     = fraction_in_first_mode = alpha1
+    # a2     = height_to_displacement = alpha2
+    # y      = yield_to_design = gamma
+    # Lambda = ultimate_to_yield = Lambda
+    # u      = ductility = mu
+    """
+    
+    dist = Distribution_Normal(csm_variability_method)
+        
+    C_sample = dist.sample_for_eqrm(C, C_sigma)
+    T_sample = dist.sample_for_eqrm(T, T_sigma)
+    a1_sample = dist.sample_for_eqrm(a1, a1_sigma)
+    a2_sample = dist.sample_for_eqrm(a2, a2_sigma)
+    y_sample = dist.sample_for_eqrm(y, y_sigma)
+    Lambda_sample = dist.sample_for_eqrm(Lambda, Lambda_sigma)
+    u_sample = dist.sample_for_eqrm(u, u_sigma)
+    
+    return (C_sample,
+            T_sample,
+            a1_sample,
+            a2_sample,
+            y_sample,
+            Lambda_sample,
+            u_sample)
+    
+def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u):
     """
     Use building parameters to calculate capacity parameters
     
@@ -213,32 +250,12 @@ def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u,sdtcap=None,
     Dy=1000/(4*pi**2)*g*Ay*(T**2)        
     Au=Lambda*Ay        
     Du=Lambda*u*Dy
-
-    #if csm_variability_method is not None:
-    if csm_use_variability:
-        if csm_variability_method == 3:
-            variate=stats.norm.rvs(size=(Au.size*number_events))
-            variate.shape=(Au.size,number_events,1)
-            variate=variate*sdtcap
-        elif csm_variability_method == 4:
-            variate=2.0*sdtcap
-        elif csm_variability_method == 5:
-            variate=1.0*sdtcap
-        elif csm_variability_method == 6:
-            variate=-1.0*sdtcap
-        elif csm_variability_method == 7:
-            variate=-2.0*sdtcap        
-        else:
-            raise NotImplementedError
-        Au=Au*exp(variate)
-        Ay=Au/Lambda
-        Dy=(1000/(4*pi**2)*g)*Ay*(T**2)
-        Du=Du+0*Au
     
     ky=(Ay/Dy) #slope of linear part of capacity curve
     c=Au
     b=ky/(Au-Ay)
     a=(Ay-Au)*exp(b*Dy)
+    
     return Dy,Ay,Du,Au,a,b,c
     
 def calculate_capacity_python(surface_displacement,capacity_parameters):
