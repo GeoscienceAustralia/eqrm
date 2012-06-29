@@ -18,7 +18,8 @@ from eqrm_code.csv_interface import csv_to_arrays, csv2dict
 from eqrm_code.util import get_local_or_default
 
 # ie bp=building_params_from_csv('building_parameters_workshop_3')
-def building_params_from_csv(csv_name, 
+def building_params_from_csv(building_classification_tag,
+                             damage_extent_tag, 
                              default_input_dir,
                              input_dir=None):
     """create building parameters dictionary
@@ -49,7 +50,7 @@ def building_params_from_csv(csv_name,
                  'structural_damage_slight','structural_damage_moderate',
                  'structural_damage_extreme','structural_damage_complete']:
         attribute_conversions[name] = float
-    fid = get_local_or_default(csv_name + '_params.csv',
+    fid = get_local_or_default('building_parameters%s.csv' % building_classification_tag,
                                default_input_dir,
                                input_dir)
 
@@ -62,11 +63,10 @@ def building_params_from_csv(csv_name,
                  'residential_drift_threshold'
                  ,'acceleration_threshold']:
         attribute_conversions[name] = float    
-    file_location = join(
-        default_input_dir,
-        'building_parameters_workshop_3_non_structural_damage_params.csv')    
-    building_nsd_parameters = csv_to_arrays(file_location,
-                                            **attribute_conversions)
+    fid = get_local_or_default('damage_extent%s.csv' % damage_extent_tag,
+                               default_input_dir,
+                               input_dir)  
+    building_nsd_parameters = csv_to_arrays(fid, **attribute_conversions)
 
     
     for name in ['non_residential_drift_threshold',

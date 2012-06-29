@@ -44,7 +44,7 @@ from eqrm_code.output_manager import save_motion_to_binary, save_distances, \
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
 from ground_motion_distribution import Distribution_Log_Normal, GroundMotionDistributionLogNormal
-from eqrm_code.structures import Structures, build_par_file
+from eqrm_code.structures import Structures
 from eqrm_code.structures_vulnerability import Structures_Vulnerability
 from eqrm_code.exceedance_curves import hzd_do_value, \
      collapse_att_model, collapse_source_gmms
@@ -1024,8 +1024,6 @@ def load_data(eqrm_flags):
     """
 
     if eqrm_flags.run_type == 'risk_csm':
-        # first, look for a BUILDING data file
-        building_par_file = build_par_file(eqrm_flags.buildpars_flag)
     
         # Find location of site database (i.e. building database) and get FID
         site_file = ('sitedb_' + eqrm_flags.site_tag +
@@ -1042,7 +1040,8 @@ def load_data(eqrm_flags):
         # if indeed there is a BUILDING file
         sites = Structures.from_csv(
             site_file,
-            building_parameters_table=building_par_file,
+            building_classification_tag=eqrm_flags.building_classification_tag,
+            damage_extent_tag=eqrm_flags.damage_extent_tag,
             default_input_dir=eqrm_flags.default_input_dir,
             input_dir=eqrm_flags.input_dir,
             eqrm_dir=eqrm_flags.eqrm_dir,

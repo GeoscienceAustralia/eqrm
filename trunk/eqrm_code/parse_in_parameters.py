@@ -380,6 +380,14 @@ CONV_NEW = [{'order': 10.0,
              'new_para': 'csm_damping_max_iterations',
              'default': None,
              'run_type': ['risk_csm']},
+            {'order': 80.11,
+             'new_para': 'building_classification_tag',
+             'default': '',
+             'run_type': ['risk_csm']},
+            {'order': 80.12,
+             'new_para': 'damage_extent_tag',
+             'default': '',
+             'run_type': ['risk_csm']},
             {'order': 90.0,
              'title': '\n# Loss\n',
              'default': None},
@@ -470,7 +478,7 @@ CONV_NEW = [{'order': 10.0,
             ]
 
 # Old style attributes that have not been removed yet.
-OLD_STYLE_PARAS_HARD_WIRED = {'buildpars_flag':4, 'grid_flag':1}
+OLD_STYLE_PARAS_HARD_WIRED = {'grid_flag':1}
 
 # 'attributes' that are added to eqrm_flags when executed on the command-line.
 KNOWN_KWARGS = {'use_determ_seed':None,

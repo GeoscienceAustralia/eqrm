@@ -69,7 +69,8 @@ class Structures(Sites):
     @classmethod
     def from_csv(cls, 
                  sites_filename, 
-                 building_parameters_table,
+                 building_classification_tag,
+                 damage_extent_tag,
                  default_input_dir, 
                  input_dir=None, 
                  eqrm_dir=None,
@@ -124,7 +125,8 @@ class Structures(Sites):
         # classification, which is stored in
         # building_parameters_table['structure_classification']
         building_parameters_table = \
-                building_params_from_csv(building_parameters_table,
+                building_params_from_csv(building_classification_tag,
+                                         damage_extent_tag,
                                          default_input_dir=default_input_dir,
                                          input_dir=input_dir)
 
@@ -351,23 +353,6 @@ def get_index(key_order, desired_keys):
 
     # Map desired names to numbers
     return array([key_to_index[key] for key in desired_keys])
-
-
-def build_par_file(buildpars_flag):
-    # Build lookup table for building parameters
-    buildpars_map={0: 'building_parameters_workshop_1',
-                   1: 'building_parameters_workshop',
-                   2: 'building_parameters_hazus',
-                   3: 'building_parameters_workshop_2',
-                   4: 'building_parameters_workshop_3'}
-
-    # create links to required building parameters
-    if isinstance(buildpars_flag, str):
-        buildpars = 'building_parameters_' + buildpars_flag
-    else:
-        buildpars = buildpars_map[buildpars_flag]
-
-    return buildpars
 
 
 def build_replacement_ratios(usage_per_struct, buildings_usage_classification):
