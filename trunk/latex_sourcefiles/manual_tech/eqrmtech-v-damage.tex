@@ -187,48 +187,27 @@ yield point.
 \label{sec:dam-capacity-var}
 
 The uncertainty of the peak response of the building to a given
-ground-shaking is incorporated by using a log-normal distribution
+ground-shaking is incorporated by using a normal distribution
 of building capacity curve\index{capacity curve}s with a
-log-normal standard deviation parameter $\beta=0.3$. This value is
-taken from \cite{dr_FEMA99b} for pre-code buildings whilst a value
-of 0.25 is recommended for buildings constructed in alignment with
-building codes. HAZUS gives no explanation or reference to how
-these values were obtained. It was recommended in the Engineers'
-workshop, \cite{dr_Stehle01a}, that a value $\beta=0.4$ be used
-for Australian buildings, but there was no justification given for
-this, so a value of $\beta=0.3$ has been retained.
+normal standard deviation parameter defined for each building parameter
+specified in \ref{sec:v-dam-capspect-capcurve}.
 
-The variability of the building capacity curve\index{capacity
-curve} is described by a log-normal distribution for the vertical
-component of the ultimate point. That is, $A_u=\bar A_u\times
-e^{\beta\phi}$, where $\bar A_u$ is the median value of $A_u$ and
-$\phi$ is a random number selected from a standardised normal
-distribution.This sampling is
-analogous to the random sampling technique used elsewhere in the
-EQRM (e.g. \sref{attn:uncert-randomchoice}) because the median
- of a log-normally distributed random variable (e.g.$\bar A_u$) is the
- same as the exponential of the mean of the log (e.g. $exp(\mu_{ln(A)})$).
- This is illustrated in
-\fref{fig:vdamage-capcurve-random}. The yield point $(D_y, A_y)$
-on the random capacity curve\index{capacity curve} is chosen from
-the equations $D_u=\lambda\mu D_y$, with $D_u=\bar D_u$, and $D_y
-= 9.8A_yT_e^2$.
+This is a change from the previous method of capturing the variability of the
+vertical component $A_u$ of the ultimate point. Each building parameter used to
+define the curve has an assigned $\sigma$, specified in the building parameter
+file \texttt{building\_parameters\_workshop\_3.csv}. The parameters are sampled
+using the same technique used elsewhere in EQRM, with the input parameter
+\texttt{csm\_variability\_method} determining the type of sampling, e.g. for
+$C_s$,
 
-\begin{figure}[htp]
-\centering
-\psfrag{median}{median}
-\psfrag{p1b}{$+\beta$}
-\psfrag{m1b}{$-\beta$}
-\psfrag{Sa}{$S_a$}
-\psfrag{Sd}{$S_d$}
-\includegraphics[width=0.6\textwidth]{fig-vdamage-caprand}
-\caption{Illustration of the random selection of a building
-capacity curve\index{capacity curve} from a log-normal
-distribution of building capacity curve\index{capacity curve}s.
-The median, 84th percentile ($+\beta$) and 16th percentile
-($-\beta$) are shown.} \label{fig:vdamage-capcurve-random}
-\end{figure}
+\begin{lstlisting}
+C=building_parameters['design_strength']
+C_sigma=building_parameters['design_strength_sigma']
 
+dist = Distribution_Normal(csm_variability_method)
+
+C_sample = dist.sample_for_eqrm(C, C_sigma)
+\end{lstlisting}
 
 
 
