@@ -89,7 +89,7 @@ class Test_Parse_in_parameters(unittest.TestCase):
 
         # Building capacity curve
         set.csm_use_variability = True
-        set.csm_variability_method = 3
+        set.csm_variability_method = 2
         set.csm_standard_deviation = 0.3
         set.csm_damping_regimes = 0       # (0|1|2) See manual for this
         set.csm_damping_modify_Tav = True 
@@ -169,9 +169,9 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.buildings_set_damping_Be_to_5_percent == 0)
         self.failUnless(TPT.buildpars_flag == 4)
         
-        self.failUnless(TPT.csm_use_variability is True)
-        self.failUnless(TPT.csm_variability_method == 3)
-        self.failUnless(TPT.csm_standard_deviation == .3)
+        self.failUnless(TPT.csm_variability_method == 2)
+        self.failUnless(TPT.csm_damage_state_use_variability is True)
+        self.failUnless(TPT.csm_damage_state_standard_deviation == .3)
         self.failUnless(TPT.csm_damping_regimes == 0)
         self.failUnless(TPT.csm_damping_modify_Tav == True)
         self.failUnless(TPT.csm_damping_use_smoothing == True)
