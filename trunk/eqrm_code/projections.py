@@ -70,8 +70,8 @@ def azimuthal_orthographic_ll_to_xy(lat,lon,lat0,lon0,azimuth=0,R=6367.0):
     of EQRM.  In EQRM the x axis runs along the rupture trace. the y axis 
     is perpendicular to the rupture trace.
     """
-    y = R*PI_DIV_180*(lat-lat0)
-    x = R*PI_DIV_180*(lon-lon0)*cos(lat*PI_DIV_180)
+    x = R*PI_DIV_180*(lat-lat0)
+    y = R*PI_DIV_180*(lon-lon0)*cos(lat*PI_DIV_180)
     x,y=__rotate_frame(x,y,azimuth)
     return x,y
 
