@@ -415,7 +415,8 @@ class Test_damage_model(unittest.TestCase):
         eqrm_dir = determine_eqrm_path()
         default_input_dir = join(eqrm_dir, 'resources', 'data', '')
         building_parameters = \
-            building_params_from_csv(csv_name='building_parameters_workshop_3',
+            building_params_from_csv(building_classification_tag = '',
+                                     damage_extent_tag = '',
                                      default_input_dir=default_input_dir)
 
         # Pull the parameters out:

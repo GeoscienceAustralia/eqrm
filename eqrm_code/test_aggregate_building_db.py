@@ -41,18 +41,13 @@ class Test_Structures(unittest.TestCase):
         #print "data_dir", data_dir
 
         # Build lookup table for building parameters
-        buildpars={
-            0:'building_parameters_workshop_1',
-            1:'building_parameters_workshop',
-            2:'building_parameters_hazus',
-            3:'building_parameters_workshop_2',
-            4:'building_parameters_workshop_3'}
+        building_classification_tag = ''
+        damage_extent_tag = ''
 
-        # create links to required building parameters
-        building_parameters=data_dir+buildpars[4]
         sites=Structures.from_csv(
             file_name,
-            building_parameters,
+            building_classification_tag,
+            damage_extent_tag,
             eqrm_dir
             )
         os.remove(file_name)
@@ -201,20 +196,15 @@ def write_aggregate_read_struct(attribute_dic=None,
 
         
         # Build lookup table for building parameters
-        buildpars={
-            0:'building_parameters_workshop_1',
-            1:'building_parameters_workshop',
-            2:'building_parameters_hazus',
-            3:'building_parameters_workshop_2',
-            4:'building_parameters_workshop_3'}
+        building_classification_tag = ''
+        damage_extent_tag = ''
 
-        # create links to required building parameters
-        building_parameters = buildpars[4]
         default_input_dir = join(eqrm_dir,
                                  'resources','data','')
         sites=Structures.from_csv(
             file_name,
-            building_parameters,
+            building_classification_tag,
+            damage_extent_tag,
             default_input_dir=default_input_dir,
             eqrm_dir=eqrm_dir,
              buildings_usage_classification=buildings_usage_classification

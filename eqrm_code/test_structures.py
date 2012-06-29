@@ -20,35 +20,6 @@ class Test_Structures(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def not_test_how_it_works(self):
-        handle, file_name = tempfile.mkstemp('.csv','test_struct_')
-        os.close(handle)
-        file_name, attribute_dic = write_test_file(file_name)
-
-        eqrm_path = determine_eqrm_path()
-        
-        data_dir = os.path.join(eqrm_dir, 'resources', 'data')
-        #print "data_dir", data_dir
-
-        # Build lookup table for building parameters
-        buildpars={
-            0:'building_parameters_workshop_1',
-            1:'building_parameters_workshop',
-            2:'building_parameters_hazus',
-            3:'building_parameters_workshop_2',
-            4:'building_parameters_workshop_3'}
-
-        # create links to required building parameters
-        building_parameters = os.path.join(data_dir, buildpars[4])
-        default_input_dir=os.path.join(eqrm_dir, 'resources','data')
-        sites=Structures.from_csv(
-            file_name,
-            building_parameters,
-            default_input_dir,
-            eqrm_dir=eqrm_dir
-            )
-        os.remove(file_name)
-
     def test_building_parameters_values_hazus(self):
 
         # All these headings must be present
@@ -344,21 +315,15 @@ def get_sites_from_dic(attribute_dic=None,
         #print "data_dir", data_dir
 
         # Build lookup table for building parameters
-        buildpars={
-            0:'building_parameters_workshop_1',
-            1:'building_parameters_workshop',
-            2:'building_parameters_hazus',
-            3:'building_parameters_workshop_2',
-            4:'building_parameters_workshop_3'}
-
-        # create links to required building parameters
-        building_parameters = os.path.join(data_dir, buildpars[4])
+        building_classification_tag = ''
+        damage_extent_tag = ''
         
         default_input_dir=os.path.join(eqrm_dir, 'resources',
                                        'data')
         sites=Structures.from_csv(
             file_name,
-            building_parameters,
+            building_classification_tag,
+            damage_extent_tag,
             default_input_dir,
             eqrm_dir=eqrm_dir,
              buildings_usage_classification=buildings_usage_classification

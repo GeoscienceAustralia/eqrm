@@ -97,6 +97,8 @@ class Test_Parse_in_parameters(unittest.TestCase):
         set.csm_hysteretic_damping = 'curve'    # ('curve'|'trapezoidal'|None)
         set.csm_SDcr_tolerance_percentage = 2
         set.csm_damping_max_iterations = 7
+        set.building_classification_tag = ''
+        set.damage_extent_tag = ''
         
         # Loss
         set.loss_min_pga = 0.05 # May be a crap value to use
@@ -167,7 +169,6 @@ class Test_Parse_in_parameters(unittest.TestCase):
         
         self.failUnless(TPT.buildings_usage_classification is 'HAZUS')
         self.failUnless(TPT.buildings_set_damping_Be_to_5_percent == 0)
-        self.failUnless(TPT.buildpars_flag == 4)
         
         self.failUnless(TPT.csm_variability_method == 2)
         self.failUnless(TPT.csm_damage_state_use_variability is True)
@@ -178,6 +179,8 @@ class Test_Parse_in_parameters(unittest.TestCase):
         self.failUnless(TPT.csm_hysteretic_damping == 'curve')
         self.failUnless(TPT.csm_SDcr_tolerance_percentage == 2.)
         self.failUnless(TPT.csm_damping_max_iterations == 7)
+        self.failUnless(TPT.building_classification_tag == '')
+        self.failUnless(TPT.damage_extent_tag == '')
         
         self.failUnless(TPT.loss_min_pga == 0.05)
         self.failUnless(TPT.loss_regional_cost_index_multiplier == 3.2)
