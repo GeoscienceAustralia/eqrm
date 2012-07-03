@@ -88,14 +88,14 @@ def create_site():
     # now read file - pass attribute_conversion as **kwargs data
     sites = Sites.from_csv(filename, BID=int, STRUCTURE_CLASSIFICATION=str)
     
-    return sites
+    return sites, filename
     
     
 class Test_Filters(unittest.TestCase):
     
     def setUp(self):
         # Set up test sites object
-        self.sites = create_site()
+        self.sites, self.filename = create_site()
         #print "sites", self.sites
         #print "len(sites)=", len(self.sites)
         
@@ -135,8 +135,8 @@ class Test_Filters(unittest.TestCase):
         
         
     def tearDown(self):
-        # Run some analysis tearDown?
-        pass
+        #print "self.filename", self.filename
+        os.remove(self.filename)
     
     def test_apply_threshold_distance_all(self):
         """
