@@ -28,7 +28,8 @@ class Test_cadell(unittest.TestCase):
         default_input_dir = join(eqrm_dir,'resources',
                                  'data', '')
         sites=Structures.from_csv(natcadell_loc,
-                                  'building_parameters_workshop_3',
+                                  '',
+                                  '',
                                   default_input_dir,
                                   eqrm_dir=eqrm_dir,
                                   buildings_usage_classification='FCB')
