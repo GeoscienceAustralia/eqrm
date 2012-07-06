@@ -3,7 +3,7 @@ Distribution files
 When distribution.py is executed the resulting .zip file is placed
 here.
 
-They are stored at \georisk\downloads\eqrm. (manually move them to
+They are stored at \georisk\software_downloads\eqrm. (manually move them to
 this location)
 
 ______________________________________
@@ -13,15 +13,11 @@ log in user dgray_ga
 Password:[uni password] 
 
 
-develop >project admin > feature settings > file manager
-click on the gear next to the eqrm dir, select
-upload here (uploaded the new distribution)
+project admin > features > Manage option in file manager row
+click add file
 
+After the file is uploaded click on the i icon and select what OS's it
+is good for.  This helps to set this file up as the file associated
+with the green download button.
 
-This bit does not happen anymore;
-uploading files in sourceforge, example:
-trunk$ rsync -avP -e ssh eqrm_version1.0.svn830.zip
-dgray_ga@frs.sourceforge.net:uploads/
-
-It's the uni password.
 ________________________________________
