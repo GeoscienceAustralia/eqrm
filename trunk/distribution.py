@@ -47,7 +47,7 @@ distro_files = [
     ]
     
 def main():
-    create_distribution_zip('eqrm_version2.1.',distro_dirs=distro_dirs,
+    create_distribution_zip('eqrm_version2.3.',distro_dirs=distro_dirs,
                                    distro_files=distro_files)
     
 def create_distribution_zip(vername, distro_dirs=None,
