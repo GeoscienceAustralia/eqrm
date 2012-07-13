@@ -23,10 +23,10 @@ class Test_Util(unittest.TestCase):
         eqrm_dir = determine_eqrm_path()
         input_dir =  os.path.join(eqrm_dir, 'eqrm_code')
         default_input_dir = os.path.join(eqrm_dir, 'resources', 'data', '')
-        file_name = 'building_parameters_hazus_params.csv'
+        file_name = 'building_parameters.csv'
         fid = get_local_or_default(file_name, default_input_dir, input_dir)
 
-        # This will fail if the start of building_parameters_hazus_params.csv
+        # This will fail if the name of building_parameters.csv
         # changes, or if the file is removed.
         self.failUnless(fid.read(9) == 'structure')
 
