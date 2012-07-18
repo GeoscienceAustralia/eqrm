@@ -123,10 +123,10 @@ recurrence parameters. NOTE - the EQRM only supports moment magnitude
 \textbf{General zone inputs} (\texttt{zone})
 \begin{itemize}
 \item \texttt{area}: Area of the source zone in km$^2$.  This is
-  optional.  Currently the value is not used.
+  required but currently the value is not used.
 \item \texttt{name}: Name for the source zone.
 \item \texttt{event\_type}: Pointer to the collection of inputs described in the
-event type controlfile.
+event type control file.
 \end{itemize}
 
 \textbf{Geometry inputs} (\texttt{geometry})
@@ -176,9 +176,9 @@ Note, there is only one recurrence model per zone.
 \item \texttt{distribution}: Distribution used to define the magnitude recurrence relations. Note that
 the EQRM currently only supports a Bounded Gutenberg-Richter recurrence
 relationship for source zones (i.e.
-\typepar{bounded}{\_gutenberg}{\_richter})
+\typepar{bounded}{\_gutenberg}{\_richter}).
 \item \texttt{recurrence\_min\_mag}: Minimum magnitude used to
-define the recurrence relationship
+define the  \texttt{A\_min}.
 \item \texttt{recurrence\_max\_mag}: Maximum magnitude used to
 define the recurrence relationship. Typically, this is the magnitude
 of the largest earthquake expected in the zone.
@@ -293,8 +293,6 @@ subducting slab).
 \section{Event Type Control File}
 \label{sec:event-type-control_file}
 
-
-
 \begin{center}
 \begin{tabular}{|c|}
 \hline
@@ -305,17 +303,6 @@ subducting slab).
 \\
 Otherwise the file name is:\\
 \texttt{<site\_tag>\_}\texttt{event\_control}\texttt{.xml}\\
-\\
-\hline
-\end{tabular}
-\end{center}
-
-
-\begin{center}
-\begin{tabular}{|c|}
-\hline
-\\
-Filename: \texttt{<site\_tag>\_}\texttt{event\_control\_}\texttt{<event\_control\_tag>}\texttt{.xml}\\
 \\
 \hline
 \end{tabular}
@@ -340,8 +327,8 @@ define the use of ground motion prediction equations. These
 parameters include:
 \begin{itemize}
 \item \texttt{fault\_type}: fault mechanism used with the GMPE.
-Allowable options are \texttt{normal}, \texttt{reverse} and
-\texttt{strike\_slip}.
+Allowable options are \texttt{normal}, \texttt{reverse},
+\texttt{strike\_slip} or \texttt{unspecified}.
 \item \texttt{branch}: specifies a branch for the GMPE logic tree.
 There may be a single \texttt{branch} in which case a single GMPE is
 used or multiple \texttt{branch}es in which case multiple GMPEs are
@@ -360,7 +347,7 @@ The parameters enclosed within \texttt{<scaling} and \texttt{/>}
   link $M_w$ to area, length and/or width. Currently the only
   allowable options are \texttt{Wells\_and\_Coppersmith\_94},
    \texttt{modified\_Wells\_and\_Coppersmith\_94} and 
-  \texttt{Leonard\_SCR}.
+  \texttt{Leonard\_SCR} (see \citet{eqrm_Wells94} and \citet{eqrm_Leonard10}).
 
 \item \texttt{scaling\_fault\_type}: Fault mechanism used with the scaling rule.
 Allowable options are \texttt{normal}, \texttt{reverse},
@@ -482,22 +469,22 @@ portfolio. It contains a list of points at which the risk (PSHA simulation)
     description of the types.
 
 \item \texttt{STRUCTURE\_CATEGORY}: Type of structure. Currently \texttt{BUILDING} only
-\item \texttt{HAZUS\_USAGE}: Index to HAZUS usage\index{building usgage!HAZUS} classification (\sref{sec:grids-usageclass})
+\item \texttt{HAZUS\_USAGE}: HAZUS usage\index{building usgage!HAZUS}
+  classification (\tref{tab:tab:grids-HAZUSusage})
 \item \texttt{SUBURB}: within which building is located
 \item \texttt{POSTCODE}: Postcode within which building is located
 \item \texttt{PRE1989}: Logical index stating whether the building is pre- (0) or post- (1) the 1989 Newcastle earthquake
 \item \texttt{HAZUS\_STRUCTURE\_CLASSIFICATION}: HAZUS building
   type, not expanded. See \sref{sec:grids-constructionclass} for a full
   description of the types.
-\item \texttt{CONTENTS\_COST\_DENSITY}: Replacement cost of contents in dollars per square meter (\sref{sec:grids-replacecosts})
-\item \texttt{BUILDING\_COST\_DENSITY}: Replacement cost of building in dollars per square meter (\sref{sec:grids-replacecosts})
+\item \texttt{CONTENTS\_COST\_DENSITY}: Replacement cost of contents in dollars per square meter 
+\item \texttt{BUILDING\_COST\_DENSITY}: Replacement cost of building in dollars per square meter 
 \item \texttt{FLOOR\_AREA}: Total floor area in square meters (summed over all stories)
 \item \texttt{SURVEY\_FACTOR}: Survey factor indicating how many
   `real' buildings the database entry represents.  Multiple buildings
   are represented by single buildings to reduce computational time.
-\item \texttt{FCB\_USAGE}: FCB usage type. See
-  (\sref{sec:grids-usageclass})  for a list of the usage
-  classification
+\item \texttt{FCB\_USAGE}: FCB usage type (\tref{tab:grids-FCB})
+
   % FCB\index{building usgage!FCB} this could be a link?
 \item \texttt{SITE\_CLASS}:Regolith site class. Typically, this is defined
 by a letter. Note that the value of this parameter must match with
@@ -694,11 +681,11 @@ usage\index{building usgage!FCB} (ABS, 2001) %\citep{dr_ABS01a}
 \begin{tabular}{|c|p{0.8\textwidth}|}
  \hline
 \textbf{Residential: Separate, kit and transportable homes} \\
- 111: Separate Houses\\
+ 111: Separate Houses  % Removed \\ to reduce table length
  112: Kit Houses\\
  113: Transportable/relocatable homes\\
 \textbf{Residential: Semi-detached, row or terrace houses, townhouses}  \\
- 121: One storey\\
+ 121: One storey  % Removed \\ to reduce table length
  122: Two or more storeys\\
  \textbf{Residential: Flats, units or apartments} \\
  131:  In a one or two storey block\\
@@ -816,8 +803,7 @@ the two usage classifications.
 
 The replacement cost in dollars per square meter for each building
 and the replacement cost of the contents of each building are
-contained within the building database\index{building database}
-(see \sref{sec:grids-bdatabase}).
+contained within the building database\index{building database}.
 Typically these costs are a function of the usage classification
 of the building and are hence also dependent on whether the
 HAZUS\index{building usgage!HAZUS} or FCB\index{building
