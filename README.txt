@@ -5,9 +5,6 @@ on the performance of this code and are comfortable releasing it for open source
 use. You are welcome to use the code, however we do not gaurantee that it is bug
 free (see copyright.pdf for more information and license agreements).
 
-The majority of our tests have been based on comparisons between this version of
-the code and an earlier version written in Matlab. We have also begun writing 
-unit tests. Further testing is required before we upgrade the release status.
 
 Questions and comments are welcomed. Please join the list
     eqrm-user (https://sourceforge.net/mail/?group_id=198293).
