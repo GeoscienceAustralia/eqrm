@@ -488,8 +488,7 @@ def main(parameter_handle,
         
         elif eqrm_flags.run_type == "risk_mmi":
             # print 'STARTING vulnerability damage calculations
-            
-            loss = sites.calc_loss(SA)
+            loss = sites.calc_loss(SA, atten_periods = eqrm_flags.atten_periods)
             
             # TODO: Is this necessary?
             newshape = (1,num_spawning, num_gmm_max, num_rm, num_events)

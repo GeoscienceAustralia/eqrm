@@ -128,12 +128,12 @@ def par_files(path='.', extension=".py", files=None):
                 par_files = PARALLEL_FILES
                 print "WARNING: Running in parallel mode"
                 print "Only scenarios with no randomness will be executed"
-        #par_files = ['TS_haz20.py']
         #par_files = ['TS_risk60.py',''TS_haz20.py']
         par_files.sort()
         par_files.reverse()
     else:
-        par_files = files
+        par_files = files       
+        #par_files = ['TS_vuln04']
     return par_files
 
 def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
