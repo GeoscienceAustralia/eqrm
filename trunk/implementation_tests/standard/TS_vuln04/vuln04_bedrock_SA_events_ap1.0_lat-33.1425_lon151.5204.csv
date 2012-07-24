@@ -1,0 +1,2 @@
+ground_motion,ground_motion_model,trace_start_lat,trace_start_lon,trace_end_lat,trace_end_lon,rupture_centroid_lat,rupture_centroid_lon,depth,azimuth,dip,Mw,length,width,activity,Rjb,Rrup,site_lat,site_lon
+0.0102040816327,mean_10_sigma_1,-33.4271796985,151.62954295,-32.5739178259,151.259449908,-32.95,151.61,11.5,340,35,7.2,100.904083229,15.0,1.0,9.00316330146,7.31055523435,-33.1425,151.5204
