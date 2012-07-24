@@ -98,6 +98,41 @@ class Test_Util(unittest.TestCase):
         SA = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.999, 1.1, 1.2]
         self.failUnlessRaises(RuntimeError, find_bridge_sa_indices, SA)
 
+    def test_find_period_indices(self):
+        """Test the find_bridge_sa() function."""
+
+        # OK find, finds both, precise values
+        atten_periods = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
+                         1.1, 1.2]
+        expect = {0.3:3, 1.0:10}
+        got = find_period_indices(atten_periods)
+        self.failUnlessEqual(expect, got)
+
+        # OK find, finds both, imprecise values
+        atten_periods = [0.0, 0.1, 0.2, 0.31, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
+                          0.99, 1.1, 1.2]
+        expect = {0.3:3, 1.0:10}
+        got = find_period_indices(atten_periods, epsilon=0.02)
+        self.failUnlessEqual(expect, got)
+
+        # BAD find, doesn't find 0.3
+        atten_periods = [0.0, 0.1, 0.2, 0.301, 0.4, 0.5, 0.6, 0.7, 0.8,
+                         0.9, 1.0, 1.1, 1.2]
+        self.failUnlessRaises(RuntimeError, find_period_indices, atten_periods)
+
+        # BAD find, doesn't find 1.0
+        atten_periods = [0.0, 0.1, 0.2, 0.30, 0.4, 0.5, 0.6, 0.7, 0.8,
+                         0.9, 0.999, 1.1, 1.2]
+        self.failUnlessRaises(RuntimeError, find_period_indices, atten_periods)
+ 
+        # OK find one, precise value
+        atten_periods = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
+                         1.1, 1.2]
+        expect = {1.0:10}
+        got = find_period_indices(atten_periods, wanted_periods = [1.0])
+        self.failUnlessEqual(expect, got)
+        
+        
     def dont_test_run_call(self):
         # Too flaky for a test.
         retcode = run_call('get_python_version.py', 'python')

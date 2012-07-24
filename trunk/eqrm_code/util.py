@@ -215,33 +215,44 @@ def del_files_dirs_in_dir(folder):
         shutil.rmtree(folder, ignore_errors=False, onerror=handleRemoveReadonly)
     mkdir(folder)
 
+def find_period_indices(atten_periods, wanted_periods = [0.3, 1.0],
+                        epsilon=1.0e-3):
+    """Get the indices of the given periods in an atten periods array.
+
+    atten_periods        1D array of atten_periods
+    epsilon  acceptable 'slop' when comparing floats
+    wanted_periods    The periods were index values into the atten_periods array
+                      are wanted.
+
+    Return a dictionary of wanted_periods to the indexes
+    in the atten periods array.
+    """
+    periods_indexs = dict(zip(wanted_periods, [None]*len(wanted_periods)))
+    
+    for wanted_period in periods_indexs:
+        for (i, period) in enumerate(atten_periods):
+            if abs(period - wanted_period) <= epsilon:
+                periods_indexs[wanted_period] = i
+        if periods_indexs[wanted_period] == None:
+            msg = "Can't find period %s in atten_periods %s\n" \
+                % (str(wanted_period), str(atten_periods))
+            raise RuntimeError(msg)
+    return periods_indexs
+            
+    
 def find_bridge_sa_indices(SA, epsilon=1.0e-3):
     """Get the indices of the 0.3 and 1.0 sec accelerations in an SA array.
-
+    
     SA       spectral acceleration 1D array
     epsilon  acceptable 'slop' when comparing floats
 
     Return a tuple (SA0.3, SA1.0) of indices to the 0.3 & 1.0 sec accelerations.
     """
-
-    # look for period 0.3s
-    i03 = None
-    for (i, a) in enumerate(SA):
-        if abs(a-0.3) <= epsilon:
-            i03 = i
-
-    # look for period 1.0s
-    i10 = None
-    for (i, a) in enumerate(SA):
-        if abs(a-1.0) <= epsilon:
-            i10 = i
-
-    # check we found both accelerations
-    if i03 is None or i10 is None:
-        msg = "Can't find SA periods 0.3s and/or 1.0s in\n%s" % str(SA)
-        raise RuntimeError(msg)
-
-    return (i03, i10)
+    wanted_period = find_period_indices(SA, wanted_periods = [0.3, 1.0],
+                        epsilon=epsilon)
+    wanted_indexes = (wanted_period[0.3], wanted_period[1.0])
+    
+    return wanted_indexes
     
 def convert_path_string_to_join(path):
     """
