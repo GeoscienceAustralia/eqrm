@@ -85,9 +85,3 @@ if __name__ == '__main__':
     from eqrm_code.analysis import main
     from eqrm_code.postprocessing import events_shaking_a_site
     main(locals())
-    events_shaking_a_site(output_dir,
-                          site_tag,
-                          -33.1425,
-                          151.5204,
-                          1.0,
-                          True)
