@@ -390,6 +390,10 @@ def main(parameter_handle,
             event_activity,
             source_model_subset)
         
+        # soil_SA and bedrock_SA dimensions
+        # (num_sites, num_events*num_gmm_max*num_spawn*num_rm, num_periods)
+        # soil_SA can also be None
+        
         ### POST-HAZARD SETUP ###
         
         # Decide which SA to use post-hazard
@@ -490,7 +494,7 @@ def main(parameter_handle,
             # print 'STARTING vulnerability damage calculations
             loss = sites.calc_loss(SA, atten_periods = eqrm_flags.atten_periods)
             
-            # TODO: Is this necessary?
+            # This brings out all the psudo_event dimensions 
             newshape = (1,num_spawning, num_gmm_max, num_rm, num_events)
             loss_qw = loss.reshape(newshape)
             
