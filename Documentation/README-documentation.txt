@@ -27,9 +27,4 @@ Of particular note
 
 Description of all files in this directory:
 	1) EQRM_Tech.pdf:		Technical manual (Version 3.0)
-	2) new_param_list.pdf:	updated parameter list for EQRM
-	3) Building_damage.doc: working file on damage to assist EQRM programmers (may be of interest
-					to some users)
-	4) Distance2.doc:		working file on distance calculation to assist EQRM programmers (may
-					be of interest to some users)
- 
+	2) EQRM_inputs.pdf:	updated parameter list for EQRM
