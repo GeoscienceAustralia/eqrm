@@ -6,6 +6,8 @@ import shutil
 from scipy import array, zeros, allclose, asarray, transpose, fromfunction, who
 from scipy import load, random, arange
 from eqrm_code.output_manager import *
+from eqrm_code.output_manager import _load_motion_from_csv, \
+    _load_motion_from_binary
 from eqrm_code.sites import Sites
 from eqrm_code.source_model import Source_Model
 from eqrm_code.bridges import Bridges
@@ -596,10 +598,11 @@ class Test_Output_manager(unittest.TestCase):
         eqrm_flags.output_dir = tempfile.mkdtemp(
             'output_managertest_save_motion') + os.sep
         eqrm_flags.site_tag = "site_tag"
-        eqrm_flags.atten_periods = [0.3, 0.5, 0.9]
+        eqrm_flags.atten_periods = array([0.3, 0.5])
         soil_amp = True
         motion_name = "soil_SA"
-        motion = array([[[[[[4,5]],[[2,7,]]]]]])# spawn,gmm,rm,sites,event.periods
+        # spawn,gmm,rm,sites,event.periods
+        motion = array([[[[[[4,5]],[[2,7,]]]]]])
         save_motion_to_csv(soil_amp, eqrm_flags, motion)
         # Check the file output
         for i in range(motion.shape[4]):
@@ -638,18 +641,28 @@ class Test_Output_manager(unittest.TestCase):
         eqrm_flags.site_tag = "site_tag"
         soil_amp = True
         motion_name = "soil_SA"
+        eqrm_flags.atten_periods = asarray([0.3,1.0])
         
         # spawn,gmm,rm,sites,event,periods
         motion = array([[[[[[4,5]],[[2,7,]]]]]])
 
         save_motion_to_binary(soil_amp, eqrm_flags, motion)
         
-        # Check the file output
+        # Check the motion file output
         file_name = os.path.join(eqrm_flags.output_dir,
                                  '%s_motion' % eqrm_flags.site_tag,
                                  '%s.npy' % motion_name)
         file_motion = load(open(file_name, mode='rb'))
         self.assert_ (allclose(motion,file_motion))
+        
+        # Check the atten periods file output
+        file_name = os.path.join(eqrm_flags.output_dir,
+                                 '%s_motion' % eqrm_flags.site_tag,
+                                 'atten_periods.npy')
+        file_periods = load(open(file_name, mode='rb'))
+        self.assert_ (allclose(eqrm_flags.atten_periods, file_periods))
+        
+        
 
         os.remove(file_name)
         shutil.rmtree(eqrm_flags.output_dir)
@@ -661,15 +674,18 @@ class Test_Output_manager(unittest.TestCase):
             'output_managertest_save_motion') + os.sep
         eqrm_flags.site_tag = "site_tag"
         soil_amp = True
+        eqrm_flags.atten_periods = array([0.3,1.0])
         
         # spawn,gmm,rm,sites,event,periods
         motion = array([[[[[[4,5]],[[2,7,]]]]]])
 
         save_motion_to_binary(soil_amp, eqrm_flags, motion)
         
-        load_motion_from_binary(eqrm_flags.output_dir, 
-                                eqrm_flags.site_tag, 
-                                soil_amp)
+        file_motion, periods = _load_motion_from_binary(eqrm_flags.output_dir, 
+                                                       eqrm_flags.site_tag, 
+                                                       soil_amp)
+        self.assert_ (allclose(motion, file_motion))
+        self.assert_ (allclose(eqrm_flags.atten_periods, periods))
 
     def test_load_save_damage(self):
         save_dir = tempfile.mkdtemp('test_load_save_damage') + os.sep
@@ -1260,8 +1276,9 @@ class Test_Output_manager(unittest.TestCase):
         # (spawn, gmm, rm, sites, events, periods)
         motion = make_motion((2,3,4,5,6,7))
         base_names = save_motion_to_csv(soil_amp, eqrm_flags, motion)
-        SA, periods = load_motion_from_csv(eqrm_flags.output_dir,  eqrm_flags.site_tag,
-                                  soil_amp)
+        SA, periods = _load_motion_from_csv(eqrm_flags.output_dir, 
+                                           eqrm_flags.site_tag,
+                                           soil_amp)
         
         self.assert_(allclose(array(eqrm_flags.atten_periods),
                               periods))
@@ -1291,9 +1308,11 @@ class Test_Output_manager(unittest.TestCase):
                                          sites)
         
         base_names = save_motion_to_csv(soil_amp, eqrm_flags, motion)
-        tmp = load_collapsed_motion_sites_from_csv(eqrm_flags.output_dir,
-                                                   eqrm_flags.site_tag,
-                                                   soil_amp)
+        base_names_b = save_motion_to_binary(soil_amp, eqrm_flags, motion)
+        base_names = base_names +  base_names_b
+        tmp = load_collapsed_motion_sites(eqrm_flags.output_dir,
+                                          eqrm_flags.site_tag,
+                                          soil_amp, file_format='csv')
         SA, periods, lat, lon = tmp
         self.assert_(allclose(lat, lat_actual))
         self.assert_(allclose(lon, lon_actual))
@@ -1302,14 +1321,23 @@ class Test_Output_manager(unittest.TestCase):
         self.assert_(allclose(SA, motion[0,0,...]))
         self.assert_(allclose(array(eqrm_flags.atten_periods),
                               periods))
+                              
+        tmp = load_collapsed_motion_sites(eqrm_flags.output_dir,
+                                          eqrm_flags.site_tag,
+                                          soil_amp, file_format='binary')
+        SA_b, periods_b, lat_b, lon_b = tmp
+        self.assert_(allclose(lat_b, lat_actual))
+        self.assert_(allclose(lon_b, lon_actual))
+        #print "SA", SA
+        #print "motion[0,0,...]", motion[0,0,...]
+        self.assert_(allclose(SA_b, motion[0,0,...]))
+        self.assert_(allclose(array(eqrm_flags.atten_periods),
+                              periods_b))
 
         
-        os.remove(base_name)
-        for name in base_names:
-            #pass
-            os.remove(name)
-        #print "eqrm_flags.output_dir", eqrm_flags.output_dir
-        os.rmdir(eqrm_flags.output_dir)
+        shutil.rmtree(eqrm_flags.output_dir)
+        
+
 
 
     def test_load_collapsed_motion_sitesII(self):      
@@ -1331,9 +1359,9 @@ class Test_Output_manager(unittest.TestCase):
                                       sites)
         
         base_names = save_motion_to_csv(soil_amp, eqrm_flags, motion)
-        tmp = load_collapsed_motion_sites_from_csv(eqrm_flags.output_dir, 
+        tmp = load_collapsed_motion_sites(eqrm_flags.output_dir, 
                                           eqrm_flags.site_tag,
-                          soil_amp)
+                                          soil_amp, file_format='csv')
         SA, periods, lat, lon = tmp
         self.assert_(allclose(lat, lat_actual))
         self.assert_(allclose(lon, lon_actual))
@@ -1358,7 +1386,7 @@ class Test_Output_manager(unittest.TestCase):
         os.rmdir(eqrm_flags.output_dir)
 
 
-    def test_load_motion_sites(self):      
+    def test_load_motion_sites_csv(self):      
         eqrm_flags=DummyEventSet()
         soil_amp = True
         eqrm_flags.output_dir = tempfile.mkdtemp(
@@ -1376,8 +1404,10 @@ class Test_Output_manager(unittest.TestCase):
                                       eqrm_flags.site_tag,
                                       sites)
         base_names = save_motion_to_csv(soil_amp, eqrm_flags, motion)
-        tmp = load_motion_sites_from_csv(eqrm_flags.output_dir,  eqrm_flags.site_tag,
-                          soil_amp=True, period=0.2)
+        tmp = load_motion_sites(eqrm_flags.output_dir,  
+                                eqrm_flags.site_tag,
+                                soil_amp=True, period=0.2,
+                                file_format='csv')
         SA, lat, lon = tmp
         self.assert_(allclose(lat, lat_actual))
         self.assert_(allclose(lon, lon_actual))
@@ -1399,6 +1429,48 @@ class Test_Output_manager(unittest.TestCase):
             os.remove(name)
         #print "eqrm_flags.output_dir", eqrm_flags.output_dir
         os.rmdir(eqrm_flags.output_dir)
+        
+    def test_load_motion_sites_binary(self):      
+        eqrm_flags=DummyEventSet()
+        soil_amp = True
+        eqrm_flags.output_dir = tempfile.mkdtemp(
+            'output_managertest_load_motion_sites_binary') + os.sep
+        eqrm_flags.site_tag = "site_tag"
+        eqrm_flags.atten_periods = [0.1, 0.2]
+        
+        # (spawn, gmm, sites, events, periods)
+        motion = make_motion((1,2,2,4,3,2))
+
+        lat_actual = array([-32., -31., -32., -31.])
+        lon_actual = array([120., 121., 3., 4.])
+        sites = Sites(lat_actual,lon_actual)
+        base_name, _ = save_sites_to_csv(eqrm_flags.output_dir, 
+                                      eqrm_flags.site_tag,
+                                      sites)
+        base_names = save_motion_to_binary(soil_amp, eqrm_flags, motion)
+        tmp = load_motion_sites(eqrm_flags.output_dir,  
+                                eqrm_flags.site_tag,
+                                soil_amp=True, period=0.2,
+                                file_format='binary')
+        SA, lat, lon = tmp
+        self.assert_(allclose(lat, lat_actual))
+        self.assert_(allclose(lon, lon_actual))
+        #self.assert_(allclose(SA, motion[0,0,...]))
+        # (sites, events*rm*gmm*spawn, periods)
+
+        for spawn_i in range(motion.shape[0]):
+            for gmm_i in range(motion.shape[1]):
+                for rm_i in range(motion.shape[2]):
+                    for event_i in range(motion.shape[4]):
+                        overload_i =  collapsed_motion_index(motion.shape,
+                                                             spawn_i,  gmm_i,  rm_i,  event_i)
+                        self.assert_(allclose(motion[spawn_i, gmm_i, rm_i, :, event_i, 1],
+                                              SA[:, overload_i]))
+
+                
+        os.remove(base_name)
+        shutil.rmtree(eqrm_flags.output_dir)
+
         
 
     def test_get_days_to_complete_file_name(self):

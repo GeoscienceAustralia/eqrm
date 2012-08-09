@@ -84,7 +84,8 @@ def events_shaking_a_site(output_dir,
                           site_lat,
                           site_lon,
                           period,
-                          soil_amp):
+                          soil_amp, 
+                          file_format='binary'):
     """events_shaking_a_site
     Given disaggregated output data produce a csv file showing ground motion 
     and event information for the given site and period. 
@@ -129,12 +130,11 @@ def events_shaking_a_site(output_dir,
     """
     
     
-    
-    # EQRM flags
-    eqrm_flags = create_parameter_data(os.path.join(output_dir, 
-                                                    'eqrm_flags.py'))
-    atten_periods = eqrm_flags.atten_periods
-    if period not in eqrm_flags.atten_periods:
+    # Ground motion
+    motion, atten_periods = load_motion(output_dir,
+                                        site_tag, soil_amp, file_format)
+
+    if period not in atten_periods:
         raise Exception("Period %s not in atten_periods %s" % (period,
                                                                atten_periods))
     period_ind = where(period == atten_periods)[0][0]
@@ -154,8 +154,6 @@ def events_shaking_a_site(output_dir,
     closest_site_lat = sites[closest_site_ind].latitude[0]
     closest_site_lon = sites[closest_site_ind].longitude[0]
     
-    # Ground motion
-    motion = load_motion(output_dir, site_tag, soil_amp)
     
     # Get the motion that corresponds to this site, collapsing spawn, rm, period
     # Motion dimensions - spawn, gmm, rm, sites, events, period
@@ -178,6 +176,14 @@ def events_shaking_a_site(output_dir,
     Rrup = sites.distances_from_event_set(event_set).distance('Rupture')
     Rrup_for_site = Rrup.swapaxes(0,1)[:,closest_site_ind]
     
+    
+    if soil_amp is True:
+        motion_name = 'soil_SA'
+    elif soil_amp is False:
+        motion_name = 'bedrock_SA'
+    else:
+        raise IOError("soil_amp must be True or False")
+        
     # Create file and write headers
     filename = '%s_%s_events_ap%s_lat%s_lon%s.csv' % (site_tag,
                                                       motion_name,
@@ -253,7 +259,7 @@ def events_shaking_a_site(output_dir,
 
 def generate_motion_csv(output_dir,
                         site_tag,
-                        is_bedrock):
+                        soil_amp):
     """Produce scenario motion CSV files.
     (previously produced if save_motion=True)
     
@@ -263,19 +269,16 @@ def generate_motion_csv(output_dir,
     site_tag   - used to identify the appropriate data as input
     is_bedrock - if True use bedrock results, else use soil results
     """
-    # Set up objects
-    if is_bedrock:
-        motion_name = 'bedrock_SA'
-    else:
-        motion_name = 'soil_SA'
     
     # EQRM flags
     eqrm_flags = create_parameter_data(os.path.join(output_dir,'eqrm_flags.py'))
     
     # Ground motion
-    motion = load_motion(output_dir, site_tag, motion_name)
+    motion, atten_periods = load_motion(output_dir, 
+                                        site_tag, soil_amp, 
+                                        file_format='binary')
     
-    return save_motion_to_csv(not is_bedrock, eqrm_flags, motion)
+    return save_motion_to_csv(soil_amp, eqrm_flags, motion)
 
     
 # ------------------------------------------------------------
