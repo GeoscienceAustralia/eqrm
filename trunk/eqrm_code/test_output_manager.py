@@ -638,7 +638,9 @@ class Test_Output_manager(unittest.TestCase):
         eqrm_flags.site_tag = "site_tag"
         soil_amp = True
         motion_name = "soil_SA"
-        motion = array([[[[[[4,5]],[[2,7,]]]]]])# spawn,gmm,rm,sites,event.periods
+        
+        # spawn,gmm,rm,sites,event,periods
+        motion = array([[[[[[4,5]],[[2,7,]]]]]])
 
         save_motion_to_binary(soil_amp, eqrm_flags, motion)
         
@@ -651,6 +653,23 @@ class Test_Output_manager(unittest.TestCase):
 
         os.remove(file_name)
         shutil.rmtree(eqrm_flags.output_dir)
+        
+    def test_load_motion_from_binary(self):
+        # create the data
+        eqrm_flags=DummyEventSet()
+        eqrm_flags.output_dir = tempfile.mkdtemp(
+            'output_managertest_save_motion') + os.sep
+        eqrm_flags.site_tag = "site_tag"
+        soil_amp = True
+        
+        # spawn,gmm,rm,sites,event,periods
+        motion = array([[[[[[4,5]],[[2,7,]]]]]])
+
+        save_motion_to_binary(soil_amp, eqrm_flags, motion)
+        
+        load_motion_from_binary(eqrm_flags.output_dir, 
+                                eqrm_flags.site_tag, 
+                                soil_amp)
 
     def test_load_save_damage(self):
         save_dir = tempfile.mkdtemp('test_load_save_damage') + os.sep
