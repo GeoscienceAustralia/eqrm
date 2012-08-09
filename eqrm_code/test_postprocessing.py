@@ -150,7 +150,8 @@ class Test_postprocessing(unittest.TestCase):
         # Parameters
         output_dir = self.dir
         site_tag = 'ernabella'
-        is_bedrock = True
+        #is_bedrock = False
+        soil_amp = False
         
         # 1. Create and save analysis objects objects
         self.save_analysis_objects(output_dir, site_tag)
@@ -158,7 +159,7 @@ class Test_postprocessing(unittest.TestCase):
         # 2. Run through generate_motion_csv
         output_filenames = generate_motion_csv(output_dir,
                                                site_tag,
-                                               is_bedrock)
+                                               soil_amp)
         
         expected_ground_motion = asarray([[0,  1,  2],
                                           [3,  4,  5],
@@ -195,7 +196,7 @@ class Test_postprocessing(unittest.TestCase):
         site_lat = -31.5
         site_lon = 150.5
         period = 1.0
-        is_bedrock = True
+        soil_amp = False
         
         # 1. Create and save analysis objects objects
         self.save_analysis_objects(output_dir, site_tag)
@@ -206,7 +207,7 @@ class Test_postprocessing(unittest.TestCase):
                                                 site_lat,
                                                 site_lon,
                                                 period,
-                                                is_bedrock)
+                                                soil_amp)
         
         # 3. Read in generated CSV to a dict
         events_attributes = {'ground_motion': float,

@@ -84,7 +84,7 @@ def events_shaking_a_site(output_dir,
                           site_lat,
                           site_lon,
                           period,
-                          is_bedrock):
+                          soil_amp):
     """events_shaking_a_site
     Given disaggregated output data produce a csv file showing ground motion 
     and event information for the given site and period. 
@@ -96,11 +96,11 @@ def events_shaking_a_site(output_dir,
     site_lat   - site latitude
     site_lon   - site longitude (use the closest site as the cockey flies)
     period     - attenuation period (must be an exact match)
-    is_bedrock - if True use bedrock results, else use soil results
+    soil_amp   - if True use soil results, else use bedrock results
     
     Output file:
     <output_dir>/
-    - if is_bedrock:
+    - if soil_amp:
     <site_tag>_bedrock_SA_events_ap[<period>]_lat[<site_lat>]_lon[<site_lon>].csv
     - else:
     <site_tag>_soil_SA_events_ap[<period>]_lat[<site_lat>]_lon[<site_lon>].csv
@@ -128,11 +128,7 @@ def events_shaking_a_site(output_dir,
     'site_lon'              - Closest site longitude
     """
     
-    # Set up objects
-    if is_bedrock:
-        motion_name = 'bedrock_SA'
-    else:
-        motion_name = 'soil_SA'
+    
     
     # EQRM flags
     eqrm_flags = create_parameter_data(os.path.join(output_dir, 
@@ -159,7 +155,7 @@ def events_shaking_a_site(output_dir,
     closest_site_lon = sites[closest_site_ind].longitude[0]
     
     # Ground motion
-    motion = load_motion(output_dir, site_tag, motion_name)
+    motion = load_motion(output_dir, site_tag, soil_amp)
     
     # Get the motion that corresponds to this site, collapsing spawn, rm, period
     # Motion dimensions - spawn, gmm, rm, sites, events, period

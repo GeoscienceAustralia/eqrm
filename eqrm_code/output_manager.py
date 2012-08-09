@@ -611,6 +611,34 @@ def load_collapsed_motion_sites_from_csv(saved_dir, site_tag, soil_amp):
     
     return SA, periods, lat, lon
 
+    
+def load_collapsed_motion_sites_from_binary(saved_dir, site_tag, soil_amp):
+    """
+    Load in all of the data written by save motion.
+
+    
+    Returns:
+      SA: Array of spectral acceleration
+        dimensions (sites, events*gmm*rm*spawn, periods)
+      periods: A list of periods of the SA values
+      lat: a vector of latitude values, site long
+      lon: a vector of longitude values, site long
+    """
+    lat, lon = load_sites(saved_dir, site_tag)
+    SA, periods = load_motion_from_binary(saved_dir, site_tag, soil_amp)
+    #  SA dimensions (spawn, gmm, rm, sites, events, periods)
+    newshape = (SA.shape[3],
+                SA.shape[0]*SA.shape[1]*SA.shape[2]*SA.shape[4],
+                SA.shape[5])
+    SA = rollaxis(SA, 3)
+    SA = SA.reshape(newshape)
+    
+    site_n_from_lat = lat.shape[0]
+    site_n_from_SA = SA.shape[0]
+    assert site_n_from_lat == site_n_from_SA
+    
+    return SA, periods, lat, lon
+
 
 def collapsed_motion_index(motion_shape, spawn_i,  gmm_i,  rm_i,  event_i):
     """
@@ -652,6 +680,38 @@ def load_motion_sites_from_csv(output_dir, site_tag, soil_amp, period):
     
     return SA_slice, lat, lon
 
+ 
+def load_motion_sites_from_binary(output_dir, site_tag, soil_amp, period):
+    """
+    Given a hazard output from EQRM, return the long, lat and SA for a
+    specified period and return_period.
+    
+    Returns:
+      SA: Array of spectral acceleration
+        dimensions (sites, events*gmm*spawn)
+      lat: a vector of latitude values, site long
+      lon: a vector of longitude values, site long
+    """
+    
+    SA, periods_f, lat, lon = load_collapsed_motion_sites_from_binary(
+        output_dir, 
+        site_tag, 
+        soil_amp)
+        
+    #if period not in periods_f:
+    #   print "Bad period" # Throw exception here
+
+    tol = 0.0001
+    SA_slice = None
+    for i, array_period in enumerate(periods_f):
+        if period - tol < array_period and period + tol > array_period:
+            SA_slice = SA[:,:,i]
+    if SA_slice is None:
+        print "Bad period" # Throw exception here
+    
+    return SA_slice, lat, lon
+   
+    
 
 def load_motion_from_csv_file(file_full_name):
     """
@@ -1030,10 +1090,24 @@ def load_event_set(saved_dir, site_tag):
     return attribute_dic
 
 
-def load_motion(output_dir, site_tag, motion_name):
-    load_dir = os.path.join(output_dir, '%s_motion' % site_tag)
+def load_motion_from_binary(output_dir, site_tag, soil_amp):
+    """
+    returns;
+    motion: Array of spectral acceleration, units g
+        dimensions (spawn, gmm, rec_model, sites, events, periods)
+    """
     
-    return load(open(os.path.join(load_dir, '%s.npy' % motion_name), mode='rb'))
+    if soil_amp is True:
+        motion_name = 'soil_SA'
+    elif soil_amp is False:
+        motion_name = 'bedrock_SA'
+    else:
+        raise IOError("soil_amp must be True or False")
+        
+    load_dir = os.path.join(output_dir, '%s_motion' % site_tag)
+    motion = load(open(os.path.join(load_dir, '%s.npy' % motion_name), 
+                       mode='rb'))
+    return motion
 
 
 def save_damage(save_dir, site_tag, damage_name, damage, building_ids,
