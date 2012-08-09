@@ -176,11 +176,11 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
         if eqrm_flags['save_motion']:
             postprocessing.generate_motion_csv(eqrm_flags['output_dir'],
                                                eqrm_flags['site_tag'],
-                                               is_bedrock=True)
+                                               soil_amp=False)
             if eqrm_flags['use_amplification']:
                 postprocessing.generate_motion_csv(eqrm_flags['output_dir'],
                                                eqrm_flags['site_tag'],
-                                               is_bedrock=False)
+                                               soil_amp=True)
                 
             
         root, ext = splitext(file)

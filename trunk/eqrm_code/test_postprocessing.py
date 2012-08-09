@@ -46,6 +46,8 @@ class Test_postprocessing(unittest.TestCase):
         os.mkdir(os.path.join(output_dir, '%s_motion' % site_tag))
         save(os.path.join(output_dir, '%s_motion' % site_tag, 'bedrock_SA.npy'), 
              motion)
+        save(os.path.join(output_dir, '%s_motion' % site_tag, 'atten_periods.npy'), 
+             eqrm_flags['atten_periods'])
         # ... and eqrm_flags
         eqrm_flags_to_control_file(os.path.join(output_dir, 'eqrm_flags.py'),
                                    eqrm_flags)
