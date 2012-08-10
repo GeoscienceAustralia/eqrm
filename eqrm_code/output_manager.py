@@ -468,8 +468,7 @@ def save_motion_to_binary(soil_amp, eqrm_flags, motion, parallel_tag=None):
     assert len(eqrm_flags.atten_periods) == motion.shape[5]
     file_tag = ATTEN_PERIODS_FILE + NUMPY_EXTENSION
     atten_periods_base_name = os.path.join(save_dir, file_tag)
-    name = atten_periods_base_name + parallel_tag
-    save(name, eqrm_flags.atten_periods)
+    save(atten_periods_base_name, eqrm_flags.atten_periods)
     
     # motion_base_name is returned so the info can be joined in  a parallel
     # run, and files can be deleted.  

@@ -8,6 +8,7 @@ Copyright 2010 by Geoscience Australia
 """
 
 import sys
+import os
 
 from eqrm_code.plotting import plot_api
 from eqrm_code.eqrm_filesystem import Demo_Output_PlotScenGM_Path
@@ -20,7 +21,7 @@ soil_amp = False
 period = 1.0
 
 title = 'demo_motion.py'
-plot_file = 'demo_motion.eps'
+plot_file = os.path.join('.','demo_motion.jpg') 
 save_file = None
 np_posn = 'nw'
 s_posn = 'se'
