@@ -620,7 +620,6 @@ def fig_motion(input_dir, site_tag, soil_amp, period,
 
     # read in raw data
     data = om.load_motion_sites(input_dir, site_tag, soil_amp, period)
-
     # get function to use
     if collapse_function is None:
         collapse_function = 'mean'
@@ -640,12 +639,7 @@ def fig_motion(input_dir, site_tag, soil_amp, period,
     (SA, lat, lon) = data
 
     # collapse axis=1 with func object
-    # simplest approach - just try to call function and catch exception
-    try:
-        SA = func(SA, axis=1)
-    except:
-        msg = 'Exception calling function: %s' % str(func)
-        raise Exception(msg)
+    SA = func(SA, axis=1)
 
     # now combine collapsed SA, lat and lon into list of (x, y, z) tuples
     data = []
