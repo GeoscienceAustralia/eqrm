@@ -457,23 +457,24 @@ def save_motion_to_binary(soil_amp, eqrm_flags, motion, parallel_tag=None):
                             '%s_motion' % eqrm_flags.site_tag)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    base_names = []
-    #NUMPY_EXTENSION
-    base_name = os.path.join(save_dir, motion_name + NUMPY_EXTENSION)
-    name = base_name + parallel_tag
-    base_names.append(base_name)
+    
+    motion_base_name = os.path.join(save_dir, motion_name + NUMPY_EXTENSION)
+    name = motion_base_name + parallel_tag
     
     # Save to .npy data file
     save(name, motion)
     
     # Save the period information , atten_periods
     assert len(eqrm_flags.atten_periods) == motion.shape[5]
-    
-    base_name = os.path.join(save_dir, ATTEN_PERIODS_FILE + NUMPY_EXTENSION)
-    name = base_name + parallel_tag
-    base_names.append(base_name)
+    file_tag = ATTEN_PERIODS_FILE + NUMPY_EXTENSION
+    atten_periods_base_name = os.path.join(save_dir, file_tag)
+    name = atten_periods_base_name + parallel_tag
     save(name, eqrm_flags.atten_periods)
-    return base_names
+    
+    # motion_base_name is returned so the info can be joined in  a parallel
+    # run, and files can be deleted.  
+    # atten_periods_base_name is only returned so files can be deleted
+    return motion_base_name, atten_periods_base_name 
 
 def save_motion_to_csv(soil_amp, eqrm_flags, motion, compress=False,
                        parallel_tag=None, write_title=True):
