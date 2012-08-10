@@ -664,7 +664,6 @@ def fig_motion(input_dir, site_tag, soil_amp, period,
 
         if title is None:
             title = 'RP=%s, period=%s' % (return_period, period)
-
         pgxc.plot_gmt_xyz_contour(data, plot_file, title=title,
                                   np_posn=np_posn, s_posn=s_posn,
                                   cb_label=cb_label, cb_steps=cb_steps,

@@ -575,19 +575,19 @@ def main(parameter_handle,
             row_files_that_parallel_splits.append(a_file)
 
         # Save to numpy binary
-        file = save_motion_to_binary(soil_amp=False, 
-                                     eqrm_flags=eqrm_flags,
-                                     motion=data.bedrock_SA_all,
-                                     parallel_tag=parallel.file_tag)
-        data_files_that_parallel_splits.append(file)
+        a_file, _ = save_motion_to_binary(soil_amp=False, 
+                                          eqrm_flags=eqrm_flags,
+                                          motion=data.bedrock_SA_all,
+                                          parallel_tag=parallel.file_tag)
+        data_files_that_parallel_splits.append(a_file)
 
         if data.soil_SA_all is not None:
             # Save to numpy binary
-            file = save_motion_to_binary(soil_amp=True, 
-                                         eqrm_flags=eqrm_flags,
-                                         motion=data.soil_SA_all,
-                                         parallel_tag=parallel.file_tag)
-            data_files_that_parallel_splits.append(file)
+            a_file, _ = save_motion_to_binary(soil_amp=True, 
+                                              eqrm_flags=eqrm_flags,
+                                              motion=data.soil_SA_all,
+                                              parallel_tag=parallel.file_tag)
+            data_files_that_parallel_splits.append(a_file)
 
 
     # Save damage information

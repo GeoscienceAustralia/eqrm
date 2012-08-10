@@ -1307,9 +1307,8 @@ class Test_Output_manager(unittest.TestCase):
                                          eqrm_flags.site_tag,
                                          sites)
         
-        base_names = save_motion_to_csv(soil_amp, eqrm_flags, motion)
-        base_names_b = save_motion_to_binary(soil_amp, eqrm_flags, motion)
-        base_names = base_names +  base_names_b
+        save_motion_to_csv(soil_amp, eqrm_flags, motion)
+        save_motion_to_binary(soil_amp, eqrm_flags, motion)
         tmp = load_collapsed_motion_sites(eqrm_flags.output_dir,
                                           eqrm_flags.site_tag,
                                           soil_amp, file_format='csv')
@@ -1447,7 +1446,7 @@ class Test_Output_manager(unittest.TestCase):
         base_name, _ = save_sites_to_csv(eqrm_flags.output_dir, 
                                       eqrm_flags.site_tag,
                                       sites)
-        base_names = save_motion_to_binary(soil_amp, eqrm_flags, motion)
+        save_motion_to_binary(soil_amp, eqrm_flags, motion)
         tmp = load_motion_sites(eqrm_flags.output_dir,  
                                 eqrm_flags.site_tag,
                                 soil_amp=True, period=0.2,
