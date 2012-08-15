@@ -25,7 +25,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         sample_values = dist._monte_carlo(log_mean, log_sigma)
         
         oldsettings = seterr(over='ignore')
-        actual = exp(log_mean) + variate*exp(log_sigma)
+        actual = exp(log_mean + variate*log_sigma)
         seterr(**oldsettings)
         self.assert_(allclose(sample_values, actual))
         self.assert_(sample_values.shape == dim)
@@ -71,28 +71,28 @@ class Test_Log_normal_distribution(unittest.TestCase):
         var_method = 3       
         dist = Distribution_Log_Normal(var_method)
         sample_values = dist.sample_for_eqrm(log_mean,log_sigma)
-        actual = exp(log_mean) + 2*exp(log_sigma)
+        actual = exp(log_mean + 2*log_sigma)
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)
 
         var_method = 4      
         dist = Distribution_Log_Normal(var_method)
         sample_values = dist.sample_for_eqrm(log_mean,log_sigma)
-        actual = exp(log_mean) + exp(log_sigma)
+        actual = exp(log_mean + log_sigma)
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)
         
         var_method = 5      
         dist = Distribution_Log_Normal(var_method)
         sample_values = dist.sample_for_eqrm(log_mean,log_sigma)
-        actual = exp(log_mean) - exp(log_sigma)
+        actual = exp(log_mean - log_sigma)
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)
         
         var_method = 6    
         dist = Distribution_Log_Normal(var_method)
         sample_values = dist.sample_for_eqrm(log_mean,log_sigma)
-        actual = exp(log_mean) - 2* exp(log_sigma)
+        actual = exp(log_mean - 2*log_sigma)
         self.assert_(allclose(sample_values, actual))
         self.assert_(actual.shape == dim)       
 
@@ -146,9 +146,9 @@ class Test_Log_normal_distribution(unittest.TestCase):
         log_mean *= 10
         log_sigma = ones((1, 1, 3,4))
         sample_values = dln.ground_motion_sample(log_mean,log_sigma)
-        act_SA_0 = ones((1, 1, 1, 1, 3, 4)) * (exp(10) - exp(1)*2.5)
-        act_SA_1 = ones((1, 1, 1, 1, 3, 4)) * (exp(10) + exp(1) * 2.5)
-        act_SA = concatenate((act_SA_0, act_SA_1))
+        act_SA_0 = ones((1, 1, 1, 1, 3, 4)) * (10 - 2.5)
+        act_SA_1 = ones((1, 1, 1, 1, 3, 4)) * (10 + 2.5)
+        act_SA = exp(concatenate((act_SA_0, act_SA_1)))
         self.assert_(allclose(act_SA, sample_values))   
         
         
@@ -162,10 +162,10 @@ class Test_Log_normal_distribution(unittest.TestCase):
         log_mean *= 10
         log_sigma = ones((1, 2, 3, 4))
         sample_values = dln.ground_motion_sample(log_mean,log_sigma)
-        act_SA_0 = ones((1, 1, 1, 2, 3, 4)) * (exp(10) - exp(1)*2.5)
-        act_SA_1 = ones((1, 1, 1, 2, 3, 4)) * exp(10)
-        act_SA_2 = ones((1, 1, 1, 2, 3, 4)) * (exp(10) + exp(1) * 2.5)
-        act_SA = concatenate((act_SA_0, act_SA_1, act_SA_2))
+        act_SA_0 = ones((1, 1, 1, 2, 3, 4)) * (10 - 2.5)
+        act_SA_1 = ones((1, 1, 1, 2, 3, 4)) * (10)
+        act_SA_2 = ones((1, 1, 1, 2, 3, 4)) * (10 + 2.5)
+        act_SA = exp(concatenate((act_SA_0, act_SA_1, act_SA_2)))
         self.assert_(allclose(act_SA, sample_values))
                
         
