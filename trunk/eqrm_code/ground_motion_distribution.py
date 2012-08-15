@@ -58,16 +58,16 @@ class Distribution(object):
             sample_values = self._monte_carlo(mean, sigma)
         elif self.var_method == 3:
             # + 2 sigma
-            sample_values = self.val_func(mean+2*sigma)
+            sample_values = self.val_func(mean)+2*self.val_func(sigma)
         elif self.var_method == 4:
             # + 1 sigma
-            sample_values = self.val_func(mean+1*sigma)
+            sample_values = self.val_func(mean)+1*self.val_func(sigma)
         elif self.var_method == 5:
             # - 1 sigma
-            sample_values = self.val_func(mean-1*sigma)
+            sample_values = self.val_func(mean)-1*self.val_func(sigma)
         elif self.var_method == 6:
             # - 2 sigma
-            sample_values = self.val_func(mean-2*sigma)
+            sample_values = self.val_func(mean)-2*self.val_func(sigma)
         else:
             raise RuntimeError('Unknown var_method %s' % str(self.var_method))
         return sample_values
@@ -87,8 +87,8 @@ class Distribution(object):
 
         oldsettings = seterr(over='ignore')
         # self.sample_shape and variate_site will have compatible dims
-        sample_values = self.val_func(mean[self.sample_shape] + 
-                                      variate_site * sigma[self.sample_shape])
+        sample_values = self.val_func(mean[self.sample_shape]) + \
+            variate_site * self.val_func(sigma[self.sample_shape])
         seterr(**oldsettings)
         return sample_values
 
@@ -148,11 +148,11 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
         """
         new_shape = list(log_sigma.shape) + [1]
         log_sigma = log_sigma.reshape(new_shape)
-        spawned_log_sigma = log_sigma * self.spawn_centroids
+        spawned_sigma = exp(log_sigma) * self.spawn_centroids
         # roll the spawn dimension to the front
-        spawned_log_sigma = rollaxis(spawned_log_sigma,
-                                     spawned_log_sigma.ndim-1, 0)
-        sample_values = exp(log_mean + spawned_log_sigma)
+        spawned_sigma = rollaxis(spawned_sigma,
+                                     spawned_sigma.ndim-1, 0)
+        sample_values = exp(log_mean) +  spawned_sigma
         return sample_values
 
     
