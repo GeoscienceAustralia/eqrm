@@ -38,20 +38,18 @@ WINDOWS INSTALL INSTRUCTIONS:
 
 2. Unzip the eqrm_install file (e.g.eqrm_versionX.X.svn_X.zip)
  
-3. Install python from
+3. Install python 2.X from
    http://www.python.org/download/
-   - We recommend python2.5 although python2.4 is also acceptable.
    Note the python packages you install must be for your version of
    python.
 
 4. Install numpy from
    http://numpy.scipy.org/
-    (Use version 1.3.0 or later)
+
 
 5. Install scipy from 
-   http://scipy.org 
-   (if you are installing to python 2.4, the version must be no later than 
-   http://prdownloads.sourceforge.net/scipy/scipy-0.5.2.1.win32-py2.4.exe?download)
+   http://numpy.scipy.org/
+
 
 6. If you are updating an existing copy of numpy, delete the "python24_compiled" folder:
 On WINNT "C:\WINNT\Profiles\YOUR USERNAME\Local Settings\Temp\YOUR
@@ -66,7 +64,7 @@ now forces weave to re-compile the required components)
    http://pypi.python.org/pypi/Shapely/.   
    (If you are using Python 2.4, you will have to install ctypes as well)
 
-8. Install GMT from http://gmt.soest.hawaii.edu/gmt/gmt_windows.html.
+8. Install GMT from http://gmt.soest.hawaii.edu/gmt/gmt_download.html.
    Install the basic and highfull executables.
 
 9. Install matplotlib (http://matplotlib.sourceforge.net/).
