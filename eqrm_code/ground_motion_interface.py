@@ -2434,9 +2434,11 @@ def Atkinson06_hard_bedrock_distribution(**kwargs):
     # get result in log10(cm/s/s)
     (log_mean, log_sigma) = Atkinson06_basic(S=0.0, **kwargs)
 
-    # convert to g and natural log
+    # convert mean to g and natural log
     log_mean = log_mean/Log102Ln - LnCmss2Lng
-    log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+    # convert sigma to natural log
+    #note we don't have to convert units because it is a ratio
+    log_sigma = log_sigma/Log102Ln #- LnCmss2Lng
 
     # check result has right dimensions
     num_sites = Rcd.shape[0]
@@ -2563,7 +2565,9 @@ def Atkinson06_soil_distribution(**kwargs):
 
     # convert to g and natural log
     log_mean = log_mean/Log102Ln - LnCmss2Lng
-    log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+    # convert sigma to natural log
+    #note we don't have to convert units because it is a ratio
+    log_sigma = log_sigma/Log102Ln #- LnCmss2Lng
 
     # check result has right dimensions
     num_sites = distance.shape[0]
@@ -2625,7 +2629,9 @@ def Atkinson06_bc_boundary_bedrock(**kwargs):
 
     # convert to g and natural log
     log_mean = log_mean/Log102Ln - LnCmss2Lng
-    log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+    # convert sigma to natural log
+    #note we don't have to convert units because it is a ratio
+    log_sigma = log_sigma/Log102Ln #- LnCmss2Lng
 
     # check result has right dimensions
     num_sites = Rcd.shape[0]
@@ -5997,7 +6003,9 @@ def Allen_2012_distribution(**kwargs):
     
     # Convert from cm/sec**2 to g and natural log
     log_mean = log_mean/Log102Ln - LnCmss2Lng
-    log_sigma = log_sigma/Log102Ln - LnCmss2Lng
+    # convert sigma to natural log
+    #note we don't have to convert units because it is a ratio
+    log_sigma = log_sigma/Log102Ln # - LnCmss2Lng
     
     return log_mean, log_sigma
     
