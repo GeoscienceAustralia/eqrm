@@ -1627,7 +1627,7 @@ tmp[9,:] =  test_data['Allen_2012_test_sigma_deep']    # accelM40R100D10
 tmp[10,:] = test_data['Allen_2012_test_sigma_shallow'] # accelM35R10D5
 tmp[11,:] = test_data['Allen_2012_test_sigma_shallow'] # accelM35R100D5
 # Convert cm/sec**2 to natural log of g
-test_data['Allen_2012_test_sigma'] = tmp/Log102Ln - LnCmss2Lng
+test_data['Allen_2012_test_sigma'] = tmp/Log102Ln #- LnCmss2Lng
 del tmp
     
 # Mw

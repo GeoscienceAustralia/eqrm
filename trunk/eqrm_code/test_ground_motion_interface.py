@@ -918,7 +918,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         # expected values from paper (converted to ln g)
         log_mean_expected = numpy.array([[[0.33]]])/ln_factor - g_factor
-        log_sigma_expected = 0.30/ln_factor - g_factor
+        log_sigma_expected = 0.30/ln_factor #- g_factor
 
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
@@ -958,7 +958,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         # expected values from paper (converted to ln g)
         log_mean_expected = numpy.array([[[1.08]]])/ln_factor - g_factor
-        log_sigma_expected = 0.30/ln_factor - g_factor
+        log_sigma_expected = 0.30/ln_factor #- g_factor
 
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
@@ -1014,8 +1014,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         # expected values from Atkinson06_soil_check.py (converted to ln g)
         log_mean_expected = numpy.array([[[1.757910]]])/ln_factor - g_factor
-        log_sigma_expected = Atkinson06_sigma_coefficient[0][0]/ln_factor - \
-                                 g_factor
+        log_sigma_expected = Atkinson06_sigma_coefficient[0][0]/ln_factor
 
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
@@ -1071,7 +1070,7 @@ class Test_ground_motion_interface(unittest.TestCase):
 
         # expected values from paper (converted to ln g)
         log_mean_expected = numpy.array([[[0.455175]]])/ln_factor - g_factor
-        log_sigma_expected = 0.30/ln_factor - g_factor
+        log_sigma_expected = 0.30/ln_factor #- g_factor
 
         (log_mean, log_sigma) = model.distribution(coefficient=coeffs,
                                                    sigma_coefficient=\
