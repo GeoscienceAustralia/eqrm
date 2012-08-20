@@ -18,7 +18,7 @@ We would also like to hear from you if you
 are not able to install the software. 
 
 EQRM DEPENDANCIES:
-1) python (version 2.5 or greater)
+1) python (version 2.5 or greater. Version 2.X only.)
 2) numpy (version 1.6.0 or later)
 3) scipy (version 0.9.0 or later)
 4) Shapely (version 1.2.15 or later)
@@ -81,7 +81,7 @@ OPTION 1 (RECOMENDED): Download the latest trunk from Google Code
   to look at: 
       http://subversion.apache.org/.   
 
-* We recommend Option1 because you can update EQRM more quickly and hence 
+* We recommend Option 1 because you can update EQRM more quickly and hence 
   take advantage of the latest features. Also, the EQRM development team will 
   commit bug fixes to the svn trunk. We won't necessarily update the stable 
   release (see Option 2 below) for every bug fix.  
@@ -108,13 +108,6 @@ C. WINDOWS INSTALL INSTRUCTIONS:
 
 3. Install scipy from 
    http://numpy.scipy.org/
-
-4. If you are updating an existing copy of numpy, delete the "python25_compiled" folder:
-   On WINNT "C:\WINNT\Profiles\YOUR USERNAME\Local Settings\Temp\<YOUR USERNAME>\python25_compiled". 
-   ON XP "C:\Documents and Settings\YOUR USERNAME\Local Settings\Temp\<YOUR USERNAME>\python25_compiled"
-   (this is where your inline c code is
-   compiled - it is not compatible between numpy versions - deleting it
-   now forces weave to re-compile the required components)
 
 5. Install Shapely (python GIS kit) from
    http://pypi.python.org/pypi/Shapely/.   
@@ -155,6 +148,7 @@ C. WINDOWS INSTALL INSTRUCTIONS:
   
 13. At the dos prompt:
     cd *\eqrm_code
+    python clean_all.py (When prompted to proceed press 'y')
     python test_all.py	
     cd ..
     python check_scenarios.py
@@ -175,7 +169,7 @@ Install;
      for some versions of Shapely and thus not needed.)
 * python package python-setuptolls (for installing shapely using easy_install)
 * python package shapely  (see notes below) (http://pypi.python.org/pypi/Shapely/)
-* gcc also needs to be installed. Using versions higher than 4.2 have
+* gcc also needs to be installed. Using versions 4.2, 4.3 and 4.4 have
 caused problems with weave.
  
 Set the environment variable PYTHONPATH to *\eqrm_core (where the
