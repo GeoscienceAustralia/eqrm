@@ -224,7 +224,7 @@ copies of the event to be generated. Typically, copies are taken
 if random sampling is used to incorporate aleatory uncertainty
 in GMPE (i.e. \typepar{atten\_}{variability\_}{method}$=2$),
 amplification (i.e. \typepar{amp\_}{variability\_}{method}$=2$)
-or the CSM (\typepar{csm\_}{variability\_}{method}$=2$).\\
+or the CSM (\typepar{csm\_}{variability\_}{method}$=3$).\\
 \hline
 %---------------------------------------------------------
  \end{tabular}
@@ -407,20 +407,28 @@ Supported \texttt{run\_type} $=$ `bridge' \\
 \hline
 \vspace{0.3em} \noindent \Large \textbf{Capacity Spectrum Method Input:} \normalsize \\
 %---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{csm\_use\_variability}: \\
+SUGGESTED = \texttt{True} \\
+\hspace{0.5em} \texttt{True} $\Rightarrow$ use the variability method described by
+\texttt{csm\_variability\_method};    \\
+\hspace{0.5em} \texttt{False} $\Rightarrow$ no aleatory variability applied.  \\
+\\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
+%---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_variability\_method}: \\
-DEFAULT = 2 \\
+SUGGESTED = 3 \\
 Method used to incorporate variability in capacity curve\index{capacity curve}: \\
  \hspace{0.5em} None $\Rightarrow$ No sampling; \\
- \hspace{0.5em} 2 $\Rightarrow$ Random sampling applied to the building 
- parameters that define the \\
- \hspace{2.5em} capacity curve: \\
- \hspace{2.5em} $C_s$, $T_e$, $\alpha_1$, $\alpha_2$, $\gamma$, $\lambda$ and 
- $\mu$ (see section~\ref{sec:v-dam-capspect-capcurve} on 
- page~\pageref{sec:v-dam-capspect-capcurve}); \\
- \hspace{0.5em} 3 $\Rightarrow$ $+2\sigma$; \\
- \hspace{0.5em} 4 $\Rightarrow$ $+\sigma$; \\
- \hspace{0.5em} 5 $\Rightarrow$ $-\sigma$; \\
- \hspace{0.5em} 6 $\Rightarrow$ $-2\sigma$.\\
+ \hspace{0.5em} 3 $\Rightarrow$ Random sampling applied to ultimate
+ point only and yield point \\
+ \hspace{2.5em} re-calculated to satisfy capacity curve `shape' constraint. \\
+ \\
+Supported \texttt{run\_type} $=$ `risk\_csm' \\
+%---------------------------------------------------------
+\hline \vspace{0.1em} \texttt{csm\_standard\_deviation}: \\
+SUGGESTED = 0.3 \\
+Standard deviation for capacity curve\index{capacity curve} log--normal PDF.      \\
+\\
 Supported \texttt{run\_type} $=$ `risk\_csm' \\
 %---------------------------------------------------------
 \hline \vspace{0.1em} \texttt{csm\_damping\_regimes}: \\

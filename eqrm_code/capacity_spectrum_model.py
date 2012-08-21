@@ -14,7 +14,7 @@ from scipy import newaxis, where
     
 from eqrm_code.equivalent_linear_solver import solve
 from eqrm_code.capacity_spectrum_functions import \
-     sample_capacity_parameters, calculate_capacity_parameters, \
+     calculate_capacity_parameters, \
      calculate_kappa, undamped_response, calculate_corner_periods, \
      calculate_reduction_factors, calculate_updated_demand, \
      calculate_capacity, nonlin_damp, CSM_DAMPING_USE_SMOOTHING
@@ -41,6 +41,8 @@ class Capacity_spectrum_model(object):
                  csm_hysteretic_damping='Error',
                  rtol=.01,
                  csm_damping_max_iterations=7,
+                 sdtcap=.3,
+                 csm_use_variability=False,
                  csm_variability_method=None):
         """
 Usage:
@@ -68,6 +70,7 @@ should NOT be set after initialization - read __init__ for reasons.
         and the damping parameter kappa), calculate the initial
         response, and remember periods.
         """
+        self.sdtcap=sdtcap
         self.periods=periods
         self.magnitudes=magnitudes
 
@@ -79,6 +82,7 @@ should NOT be set after initialization - read __init__ for reasons.
         self.rtol=rtol
         self.csm_damping_max_iterations=csm_damping_max_iterations
 
+        self.csm_use_variability=csm_use_variability
         self.csm_variability_method=csm_variability_method
 
         self.atten_override_RSA_shape=atten_override_RSA_shape
@@ -90,7 +94,8 @@ should NOT be set after initialization - read __init__ for reasons.
         # for specific sites from self.all_capacity_parameters[site_index]
         # using self.set_building_type_index(index)
         
-        self.capacity_parameters=self._calculate_parameters(building_parameters)
+        self.capacity_parameters=self._calculate_parameters(
+            building_parameters,magnitudes)
         
         self.kappa=self._calculate_kappa(building_parameters,magnitudes)
         self.kappa=self.kappa[:,:,newaxis]
@@ -217,42 +222,39 @@ should NOT be set after initialization - read __init__ for reasons.
         SAcap=calculate_capacity(SD,self.capacity_parameters)
         return SA,SD,SAcap
         
-    def _calculate_parameters(self, building_parameters):
+    def _calculate_parameters(self, building_parameters, magnitude,
+                              building_type_index=None):
         """
         Calculate the derived parameters
         """
+        number_events = len(magnitude)
+
+        if building_type_index is None:
+            building_type_index=slice(None)
+            
         # get some constants and expand to the
         # size of ground motion ([sites,mag,periods])
         #print "building_parameters['design_strength']", building_parameters['design_strength']
         C=building_parameters['design_strength'][:,newaxis,newaxis]
-        C_sigma=building_parameters['design_strength_sigma'][:,newaxis,newaxis]
         T=building_parameters['natural_elastic_period'][:,newaxis,newaxis]
-        T_sigma=building_parameters['natural_elastic_period_sigma'][:,newaxis,newaxis]
         a1=building_parameters['fraction_in_first_mode'][:,newaxis,newaxis]
-        a1_sigma=building_parameters['fraction_in_first_mode_sigma'][:,newaxis,newaxis]
         a2=building_parameters['height_to_displacement'][:,newaxis,newaxis]
-        a2_sigma=building_parameters['height_to_displacement_sigma'][:,newaxis,newaxis]
         y=building_parameters['yield_to_design'][:,newaxis,newaxis]
-        y_sigma=building_parameters['yield_to_design_sigma'][:,newaxis,newaxis]
         Lambda=building_parameters['ultimate_to_yield'][:,newaxis,newaxis]
-        Lambda_sigma=building_parameters['ultimate_to_yield_sigma'][:,newaxis,newaxis]
         u=building_parameters['ductility'][:,newaxis,newaxis]
-        u_sigma=building_parameters['ductility_sigma'][:,newaxis,newaxis]
 
+        sdtcap=self.sdtcap
+        csm_use_variability=self.csm_use_variability
         csm_variability_method=self.csm_variability_method
 
-        # Take a sample of the parameters using the specified sigma values
-        C,T,a1,a2,y,Lambda,u = sample_capacity_parameters(C,C_sigma,
-                                                          T,T_sigma,
-                                                          a1,a1_sigma,
-                                                          a2,a2_sigma,
-                                                          y,y_sigma,
-                                                          Lambda,Lambda_sigma,
-                                                          u,u_sigma,
-                                                          csm_variability_method)
-
         # calculate capacity curve parameters from building parameters:
-        params = calculate_capacity_parameters(C, T, a1, a2, y, Lambda, u)
+        params = calculate_capacity_parameters(
+            C,
+            T,a1,a2,y,Lambda,u,
+            sdtcap=sdtcap,
+            number_events=number_events,
+            csm_use_variability=csm_use_variability,
+            csm_variability_method=csm_variability_method)
         # note: params=Dy,Ay,Du,Au,aa,bb,cc
         #print "_calculate_parameters params", params
         return params

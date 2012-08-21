@@ -64,9 +64,9 @@ buildings_usage_classification = None
 buildings_set_damping_Be_to_5_percent = None
 
 # Capacity Spectrum Method
+csm_use_variability = None
 csm_variability_method = None
-csm_damage_state_use_variability = None
-csm_damage_state_standard_deviation = None
+csm_standard_deviation = None
 csm_damping_regimes = None
 csm_damping_modify_Tav = None
 csm_damping_use_smoothing = None

@@ -241,6 +241,10 @@ class Structures(Sites):
                           eqrm_flags.csm_SDcr_tolerance_percentage/100.0,
                       'csm_damping_max_iterations':
                           eqrm_flags.csm_damping_max_iterations,
+                      'sdtcap':            #FIXME sdt -> std
+                          eqrm_flags.csm_standard_deviation,
+                      'csm_use_variability':
+                          eqrm_flags.csm_use_variability,
                       'csm_variability_method':
                           eqrm_flags.csm_variability_method,
                       'csm_hysteretic_damping':
@@ -253,8 +257,8 @@ class Structures(Sites):
 
         damage_model = Damage_model(self, SA, eqrm_flags.atten_periods,
                                     event_set_Mw,
-                                    eqrm_flags.csm_damage_state_use_variability,
-                                    eqrm_flags.csm_damage_state_standard_deviation,
+                                    eqrm_flags.csm_use_variability,
+                                    float(eqrm_flags.csm_standard_deviation),
                                     csm_params=csm_params)
 
         # Note, aggregate slight, medium, critical damage
@@ -353,6 +357,23 @@ def get_index(key_order, desired_keys):
 
     # Map desired names to numbers
     return array([key_to_index[key] for key in desired_keys])
+
+
+def build_par_file(buildpars_flag):
+    # Build lookup table for building parameters
+    buildpars_map={0: 'building_parameters_workshop_1',
+                   1: 'building_parameters_workshop',
+                   2: 'building_parameters_hazus',
+                   3: 'building_parameters_workshop_2',
+                   4: 'building_parameters_workshop_3'}
+
+    # create links to required building parameters
+    if isinstance(buildpars_flag, str):
+         buildpars = 'building_parameters_' + buildpars_flag
+    else:
+        buildpars = buildpars_map[buildpars_flag]
+
+    return buildpars
 
 
 def build_replacement_ratios(usage_per_struct, buildings_usage_classification):

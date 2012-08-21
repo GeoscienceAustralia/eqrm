@@ -83,5 +83,4 @@ save_prob_structural_damage = False
 # Delete all variables that are not EQRM parameters variables. 
 if __name__ == '__main__':
     from eqrm_code.analysis import main
-    from eqrm_code.postprocessing import events_shaking_a_site
     main(locals())
