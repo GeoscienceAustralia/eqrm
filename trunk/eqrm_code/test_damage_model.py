@@ -242,8 +242,6 @@ class Test_damage_model(unittest.TestCase):
 
         params = (0.069, 13, 0.3, 0.9, 0.7, 1.75, 2, 7)
         dparams = (0.001, 0.001, 0.001, 0.08)
-        
-        sigma = 0.3
 
         (C, height, T, a1, a2, y, h, u) =params
         magnitudes = array([7.2])
@@ -255,19 +253,12 @@ class Test_damage_model(unittest.TestCase):
         building_parameters = {}
 
         building_parameters['design_strength'] = array([C])
-        building_parameters['design_strength_sigma'] = array([sigma])
         building_parameters['natural_elastic_period'] = array([T])
-        building_parameters['natural_elastic_period_sigma'] = array([sigma])
         building_parameters['fraction_in_first_mode'] = array([a1])
-        building_parameters['fraction_in_first_mode_sigma'] = array([sigma])
         building_parameters['height_to_displacement'] = array([a2])
-        building_parameters['height_to_displacement_sigma'] = array([sigma])
         building_parameters['yield_to_design'] = array([y])
-        building_parameters['yield_to_design_sigma'] = array([sigma])
         building_parameters['ultimate_to_yield'] = array([h])
-        building_parameters['ultimate_to_yield_sigma'] = array([sigma])
         building_parameters['ductility'] = array([u])
-        building_parameters['ductility_sigma'] = array([sigma])
         building_parameters['damping_s'] = array([damping_s])
         building_parameters['damping_m'] = array([damping_m])
         building_parameters['damping_l'] = array([damping_l])
@@ -496,14 +487,14 @@ class Test_damage_model(unittest.TestCase):
         event_set = array([6.0201519, 6.0201519, 6.0201519])
 
         eqrm_flags = Dummy()
-        eqrm_flags.csm_variability_method = 2
+        eqrm_flags.csm_variability_method = 3
         eqrm_flags.atten_periods = array([0., 0.17544,0.35088, 0.52632,
                                            0.70175, 0.87719, 1.0526, 1.2281,
                                            1.4035, 1.5789, 1.7544, 1.9298,
                                            2.1053, 2.2807, 2.4561, 2.6316,
                                            2.807,  2.9825, 3.1579, 3.3333 ])
-        eqrm_flags.csm_damage_state_use_variability = True
-        eqrm_flags.csm_damage_state_standard_deviation = 0.3
+        eqrm_flags.csm_use_variability = True
+        eqrm_flags.csm_standard_deviation = 0.3
         eqrm_flags.csm_damping_regimes = CSM_DAMPING_REGIMES_USE_ALL
         eqrm_flags.csm_damping_modify_Tav = CSM_DAMPING_MODIFY_TAV
         eqrm_flags.csm_damping_use_smoothing = CSM_DAMPING_USE_SMOOTHING
@@ -526,14 +517,11 @@ class Test_damage_model(unittest.TestCase):
                                'height': array([7315.2]),
                                'nsd_a_ratio': array([0.7254902]),
                                'design_strength': array([0.033]),
-                               'design_strength_sigma': array([0.3]),
                                'non_residential_drift_threshold':
                                    array([[5.4864, 43.8912, 82.296, 137.16]]),
                                'damping_Be': array([0.1]),
                                'fraction_in_first_mode': array([0.8]),
-                               'fraction_in_first_mode_sigma': array([0.3]),
                                'ultimate_to_yield': array([3.]),
-                               'ultimate_to_yield_sigma': array([0.3]),
                                'acceleration_threshold':
                                    array([[0.2, 0.4, 0.8, 1.6]]),
                                'nsd_d_ratio': array([0.11764706]),
@@ -542,18 +530,14 @@ class Test_damage_model(unittest.TestCase):
                                    array([[26.33472, 41.69664,
                                            88.87968, 219.456]]),
                                'natural_elastic_period': array([0.5]),
-                               'natural_elastic_period_sigma': array([0.3]),
                                'damping_s': array([0.4]),
                                'drift_threshold':
                                    array([[5.4864, 43.8912, 82.296, 137.16]]),
                                'yield_to_design': array([1.5]),
-                               'yield_to_design_sigma': array([0.3]),
                                'structure_classification':
                                    array(['S1L'], dtype='|S13'),
                                'height_to_displacement': array([0.75]),
-                               'height_to_displacement_sigma': array([0.3]),
                                'ductility': array([5.]),
-                               'ductility_sigma': array([0.3]),
                                'damping_l': array([0.]),
                                'damping_m': array([0.2])}
 
@@ -583,14 +567,11 @@ class Test_damage_model(unittest.TestCase):
                                               eqrm_flags, 
                                               event_set)
 
-        total_loss_windows = (array([[9.51807899e+01, 2.94830076e-04, 0.]]),
-                              array([[5.14978382e+03, 6.92585493e+02, 0.]]),
-                              array([[3.02240640e+02, 1.30419853e-01, 0.]]),
-                              array([[3.12872441e+02, 1.34827942e-01, 0.]]))
-        
-        self.assert_(allclose(asarray(total_loss), asarray(total_loss_windows)),
-                     'Expected:\n%s,\nGot:\n%s' % (asarray(total_loss_windows),
-                                                   asarray(total_loss)))
+        total_loss_windows = (array([[5.56013748, 0.00899564, 0.]]),
+                              array([[4059.31954558, 1473.71938878, 0.]]),
+                              array([[9423.06584855, 1181.40856505, 0.]]),
+                              array([[9978.48421213, 1226.05473008, 0.]]))
+        assert allclose(asarray(total_loss), asarray(total_loss_windows))
 
     def test_save_structure_damage_states(self):
         pass

@@ -39,14 +39,10 @@ def building_params_from_csv(building_classification_tag,
     attribute_conversions={}
     attribute_conversions['structure_class'] = str
     attribute_conversions['structure_classification'] = str
-    for name in ['design_strength','design_strength_sigma',
-                 'natural_elastic_period','natural_elastic_period_sigma',
-                 'fraction_in_first_mode','fraction_in_first_mode_sigma',
-                 'height_to_displacement','height_to_displacement_sigma',
-                 'yield_to_design','yield_to_design_sigma',
-                 'ultimate_to_yield','ultimate_to_yield_sigma',
-                 'ductility','ductility_sigma',
-                 'height','damping_s','damping_m','damping_l','damping_Be',
+    for name in ['design_strength','height','natural_elastic_period',
+                 'fraction_in_first_mode','height_to_displacement',
+                 'yield_to_design','ultimate_to_yield','ductility',
+                 'damping_s','damping_m','damping_l','damping_Be',
                  'structural_damage_slight','structural_damage_moderate',
                  'structural_damage_extreme','structural_damage_complete']:
         attribute_conversions[name] = float
