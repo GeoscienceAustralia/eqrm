@@ -227,7 +227,9 @@ def calculate_capacity_parameters(C,T,a1,unused_a2,y,Lambda,u,sdtcap=None,
         elif csm_variability_method == 6:
             variate=-1.0*sdtcap
         elif csm_variability_method == 7:
-            variate=-2.0*sdtcap        
+            variate=-2.0*sdtcap   
+        elif csm_variability_method == None:
+            variate= 0.0  
         else:
             raise NotImplementedError
         Au=Au*exp(variate)
