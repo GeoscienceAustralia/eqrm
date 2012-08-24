@@ -55,6 +55,10 @@ module load python-eqrm
 - Remove the Intel Fortran and C compiler lines from .profile
 #module load intel-fc
 #module load intel-cc
+- set up paths for GMT
+#setup GMT4
+export GMTROOT=/short/w84/GMT/share
+export PATH=$PATH:/short/w84/GMT/bin
 - Log out and log back in
 
 
