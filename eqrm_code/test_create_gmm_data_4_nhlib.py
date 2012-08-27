@@ -14,7 +14,7 @@ Test
 
 class Test_create_gmm_data_4_nhlib(unittest.TestCase):
     def test_write_gmm_data_file(self):
-        if os.name == 'mac': 
+        if os.name == 'posix': 
             return
         (handle, file_name) = tempfile.mkstemp('.csv', 
                                                'test_create_gmm_data_4_nhlibt')
