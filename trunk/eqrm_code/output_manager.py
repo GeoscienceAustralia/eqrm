@@ -292,13 +292,26 @@ def load_ecloss_and_sites(save_dir, site_tag):
     """
 
     struct_dic = load_structures(save_dir, site_tag)
+    building_loss_tag = '_total_building'
+    building_value_tag = '_bval'
     
-    total_building_loss, BID = load_ecloss('_total_building',
-                                           save_dir, site_tag)
+    try:
+        total_building_loss, BID = load_ecloss(building_loss_tag,
+                                               save_dir, site_tag)
+    except IOError:
+        # Lets see if the results are just building loss/values
+        # not building and contents loss/values
+        # This occurs in MMI runs.
+        building_loss_tag = '_building'
+        building_value_tag = '_building_value'
+        total_building_loss, BID = load_ecloss(building_loss_tag,
+                                               save_dir, site_tag)
+        
     assert allclose(array(struct_dic['BID']), BID)
     lat = array(struct_dic['LATITUDE'])
     lon = array(struct_dic['LONGITUDE'])
-    total_building_value = load_val(save_dir, site_tag, file_tag='_bval')
+    total_building_value = load_val(save_dir, site_tag, 
+                                    file_tag=building_value_tag)
     
     # assert that the site dimension is the same for all arrays.
     assert total_building_value.shape[0] == BID.shape[0]
@@ -1215,11 +1228,12 @@ def save_val(eqrm_flags, val, file_tag, compress=False, parallel_tag=None):
     General file to save one vector of values.
 
     Currently only used to save total building cost;
-    flie_tag is '_bval'
+    flie_tag is '_bval' or '_building_value'
     Writes a file of the total building cost, (3 building costs plus
     contents cost for all sites), assuming val is
     all_sites.cost_breakdown(ci=eqrm_flags.ci)
     
+    val is a 1D vector
     Returns list of tuple (base_name, header_size=0)
     """
     # Used for parallel processing
