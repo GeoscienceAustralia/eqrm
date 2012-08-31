@@ -33,7 +33,7 @@ BEGIN {
       ncpu=nice/ctot*100;                         # nice   % cpu utilization
       wcpu=wait/ctot*100;                         # wait   % cpu utilization
 
-      printf "%3.1f%% %3.1f%% %3.1f%% %3.1f%% %3.1f%%\n",tcpu,ucpu,scpu,ncpu,wcpu
+      printf "total:%3.1f%% user:%3.1f%% system:%3.1f%% nice:%3.1f%% wait:%3.1f%%\n",tcpu,ucpu,scpu,ncpu,wcpu
 
 
       user_saved=$2;                              # save the current jiffies 
