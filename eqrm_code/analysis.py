@@ -676,7 +676,6 @@ def main(parameter_handle,
             #all_sites.cost_breakdown(
             #ci=eqrm_flags.loss_regional_cost_index_multiplier)
             structure_costs = all_sites.cost_breakdown()
-            print "yeah"
             a_file = save_val(eqrm_flags,
                         structure_costs,
                         '_building_value',
