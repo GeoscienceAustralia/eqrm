@@ -127,6 +127,24 @@ if _new_python:
     FMT = '%(asctime)s %(levelname)-8s %(mname)25s:%(lnum)-4d|%(message)s'
 else:
     FMT = '%(asctime)s %(levelname)-8s |%(message)s'
+
+def _proc_stat():
+    if sys.platform != 'win32':
+        try:
+            stat_fd = open('/proc/stat')
+            stat_buf = stat_fd.readlines()[0].split()
+            stat_fd.close()
+        except IOError:
+            stat_buf = [0.0]*8
+    else:
+        stat_buf = [0.0]*8
+    #  user, nice, syst, idle, wait, irq, sirq
+    return ( float(stat_buf[1]), float(stat_buf[2]), 
+          float(stat_buf[3]), float(stat_buf[4]),
+          float(stat_buf[5]), float(stat_buf[6]),
+          float(stat_buf[7]) )
+
+user, nice, syst, idle, wait, irq, sirq = _proc_stat()
     
 ##############################################################################
 # Module code.
@@ -379,8 +397,52 @@ def critical(msg=''):
 
     log(msg, logging.CRITICAL)
 
-
 def resource_usage(level=logging.DEBUG):
+    resource_usage_mem()
+    io_wait()
+
+def io_wait(level=logging.DEBUG):
+    """
+    Log the io_wait percentage.
+
+    WARNING: This result is based on what the CPU has been doing
+    Since the last time this function was called, or when this module 
+    was loaded, for the first function call.
+    """
+    
+    # The results from the last call
+    global user, nice, syst, idle, wait, irq, sirq
+
+    user_n, nice_n, syst_n, idle_n, wait_n, irq_n, sirq_n = _proc_stat()
+
+    user_d = user_n - user
+    nice_d = nice_n - nice
+    syst_d = syst_n - syst
+    idle_d = idle_n - idle
+    wait_d = wait_n - wait
+    irq_d = irq_n - irq
+    sirq_d = sirq_n - sirq
+    
+    cact = user_d + syst_d + nice_d 
+    ctot = user_d + nice_d + syst_d + idle_d + wait_d + irq_d + sirq_d 
+    if ctot == 0.0:   
+        msg = 'cpu utilisation: unknown'
+    else:
+        wcpu = wait_d/ctot*100
+        msg = 'cpu utilisation: iowait=%3.1f' % wcpu
+    log(msg, level)
+
+    user = user_n
+    nice = nice_n
+    syst = syst_n
+    idle = idle_n
+    wait = wait_n
+    irq = irq_n
+    sirq = sirq_n
+
+
+
+def resource_usage_mem(level=logging.DEBUG):
     """Log memory usage at given log level."""
 
     _scale = {'KB': 1024, 'MB': 1024*1024, 'GB': 1024*1024*1024,
@@ -434,7 +496,7 @@ def resource_usage(level=logging.DEBUG):
             import ctypes
             import _winreg
         except:
-            log(level, 'Windows resource usage not available')
+            log('Windows resource usage not available', level)
             return
 
         kernel32 = ctypes.windll.kernel32
