@@ -72,7 +72,7 @@ def multi_run(base_control,
     Run several simulations
     
     Arg:
-    base_control -  will have the initial paramters.
+    base_control -  An instance with attributes of EQRM paramters.
     input_dir_funct -  a function that can make the input_dir string, 
                        **kwargs is passed in.
     output_dir_funct -  a function that can make the output_dir string, 
