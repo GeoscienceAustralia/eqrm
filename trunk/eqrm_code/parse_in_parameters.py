@@ -474,7 +474,13 @@ CONV_NEW = [{'order': 10.0,
              'default': 'debug'},
             {'order': 120.02,
              'new_para': 'console_log_level',
-             'default': 'info'}
+             'default': 'info'},
+            {'order': 120.03,
+             'new_para': 'file_parallel_log_level',
+             'default': 'warning'},
+            {'order': 120.04,
+             'new_para': 'console_parallel_log_level',
+             'default': 'warning'}
             ]
 
 # Old style attributes that have not been removed yet.
