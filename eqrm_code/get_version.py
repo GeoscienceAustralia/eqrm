@@ -52,7 +52,8 @@ def get_version():
 
 def get_version_sandpit_linux():
     version, date, _ = get_svn_revision_sandpit_linux()
-    print "*******" + str(version) + "**********"
+    # This is not good when in parallel
+    #print "*******" + str(version) + "**********"
     
     modified = None
     return version, date, modified
