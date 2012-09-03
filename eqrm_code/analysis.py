@@ -144,11 +144,16 @@ def main(parameter_handle,
                                 'log' + parallel.log_file_tag + '.txt')
     log.log_filename = log_filename
     log.remove_log_file()
-    log.set_log_level(eqrm_flags.file_log_level, eqrm_flags.console_log_level)
+    if parallel.rank == 0:
+        log.set_log_level(eqrm_flags.file_log_level, 
+                          eqrm_flags.console_log_level)
+    else:
+        log.set_log_level(eqrm_flags.file_parallel_log_level, 
+                          eqrm_flags.console_parallel_log_level)
     log.set_log_file(log_filename)
-    log.debug('host name: ' + str(parallel.node))
+    log.info('host name: ' + str(parallel.node))
     version, date, modified = get_version()
-    log.debug('SVN version: ' + str(version))
+    log.info('SVN version: ' + str(version))
     log.debug('SVN date: ' + str(date))
     log.debug('SVN modified: ' + str(modified))
     log.debug('Memory: Initial')
