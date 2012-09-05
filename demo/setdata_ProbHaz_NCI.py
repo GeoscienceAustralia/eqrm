@@ -24,8 +24,10 @@ site_tag = "newc"
 site_db_tag = "" 
 return_periods = [10, 50, 100, 10000]
 input_dir = join('.', 'input')
-output_dir = join('/short', getenv('PROJECT'), 'output', 'probhaz')
-use_site_indexes = False
+#output_dir = join('/short', getenv('PROJECT'), 'output', 'probhaz')
+output_dir = join('.', 'output', 'probhaz_nci')
+use_site_indexes = True
+site_indexes = [2255, 11511, 10963, 686]
 zone_source_tag = ""
 event_control_tag = ""
 

@@ -1,9 +1,10 @@
 #!/bin/bash
 #PBS -wd
-#PBS -q normal
-#PBS -l ncpus=64
-#PBS -l walltime=2:00:00
-#PBS -l vmem=20GB
-#PBS -l jobfs=64GB
+#PBS -q normal 
+#PBS -l ncpus=1
+#PBS -l walltime=0:00:30
+#PBS -l vmem=500MB
+#PBS -l jobfs=100MB
+#PBS -m e
 
 mpirun python setdata_ProbHaz_NCI.py
