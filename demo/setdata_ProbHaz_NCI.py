@@ -66,7 +66,7 @@ save_contents_loss = False
 save_motion = False
 save_prob_structural_damage = None
 
-file_array = True
+file_array = False # To reduce io
 data_array_storage = getenv('PBS_JOBFS')
 
 # If this file is executed the simulation will start.
