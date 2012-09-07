@@ -14,4 +14,4 @@ EQRM is also zipped by and placed on SourceForge http://sourceforge.net/projects
 
 For install information, the root directory of EQRM has a README-install.txt file.
 
-
+NB. Don't forget to run test_all.py or go_clean_test_all.py after install or after getting a new copy of the code.  Do this before running anything else.
