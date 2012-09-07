@@ -465,7 +465,7 @@ CONV_NEW = [{'order': 10.0,
              'default_to_attr': 'output_dir'}, # see _add_default_values
             {'order': 110.05,
              'new_para': 'file_array',
-             'default': True},
+             'default': False},
             {'order': 110.06,
              'new_para': 'event_set_load_dir',
              'default': None}, # see _verify_eqrm_flags
