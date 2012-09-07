@@ -43,11 +43,12 @@ def trapazoid_damp(capacity_parameters,kappa,acceleration,displacement,
     return BH
 
 def nonlin_damp(capacity_parameters,kappa,acceleration,displacement,
-                csm_hysteretic_damping='Error'):
+                csm_hysteretic_damping):
     """
     Calculate the damping correction (Fulford 02) using the
     exact capacity curve.
     """
+    #print "csm_hysteretic_damping", csm_hysteretic_damping
     DyV,AyV,DuV,AuV,a,b,c=capacity_parameters    
     Harea=hyst_area_rand(displacement,acceleration,DyV,AyV,DuV,AuV,
                          csm_hysteretic_damping)
@@ -117,7 +118,7 @@ The hysteresis area = 2(A1+A2-A3)
     linear_region=where(D<=DyV)
    
     x2=D-A/ky  # translation along displacement axis
-    if csm_hysteretic_damping is 'Error':
+    if csm_hysteretic_damping is 'trapezoidal':
         y1=(A-AyV) # y distance from linear part (<=0 implies point is linear)
         y1[linear_region]=-1 # avoid NaNs - only Harea3 has any impact there
    
@@ -135,7 +136,6 @@ The hysteresis area = 2(A1+A2-A3)
 
         Harea=2*(Harea1-Harea2+Harea3)
         Harea[linear_region]=0
-
     elif csm_hysteretic_damping is 'curve':
         cc=AuV
         bb=ky/(AuV-AyV)
