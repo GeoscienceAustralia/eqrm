@@ -25,7 +25,7 @@ CSM_DAMPING_REGIMES_USE_RV = 2
 
 CSM_DAMPING_MODIFY_TAV = True # TRUE 0 
 CSM_DAMPING_DO_NOT_MODIFY_TAV = False # FALSE 1
-
+CSM_HYSTERETIC_DAMPING_DEFAULT = 'trapezoidal'
 
 class Capacity_spectrum_model(object):
     def __init__(self,
@@ -38,7 +38,7 @@ class Capacity_spectrum_model(object):
                  csm_damping_regimes=CSM_DAMPING_REGIMES_USE_ALL,
                  csm_damping_modify_Tav=CSM_DAMPING_MODIFY_TAV,
                  csm_damping_use_smoothing=CSM_DAMPING_USE_SMOOTHING,
-                 csm_hysteretic_damping='Error',
+                 csm_hysteretic_damping=CSM_HYSTERETIC_DAMPING_DEFAULT,
                  rtol=.01,
                  csm_damping_max_iterations=7,
                  sdtcap=.3,

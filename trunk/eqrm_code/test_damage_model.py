@@ -121,7 +121,9 @@ class Test_damage_model(unittest.TestCase):
         (Ay, Dy, Au, Du) = (0.13417, 2.9975, 0.26833, 41.964)
         (aa, bb, cc, kappa) = (-0.3647, 0.33362, 0.26833, 0.001)
         capacity_parameters = (Dy, Ay, Du, Au, aa, bb, cc)
-        damping = nonlin_damp(capacity_parameters, kappa, SAcr, SDcr)
+        csm_hysteretic_damping='trapezoidal'
+        damping = nonlin_damp(capacity_parameters, kappa, SAcr, SDcr,
+                              csm_hysteretic_damping)
 
         #out
         damping_m = 0.000540396780259699
@@ -264,7 +266,7 @@ class Test_damage_model(unittest.TestCase):
         building_parameters['damping_l'] = array([damping_l])
         building_parameters['damping_Be'] = array([initial_damping])
         building_parameters['structure_classification'] = ['test_blg']
-
+        
         csm = Capacity_spectrum_model(periods, magnitudes, building_parameters)
         csm.rtol = 0.01
         csm.csm_damping_max_iterations = 7
@@ -500,7 +502,7 @@ class Test_damage_model(unittest.TestCase):
         eqrm_flags.csm_damping_use_smoothing = CSM_DAMPING_USE_SMOOTHING
         eqrm_flags.csm_SDcr_tolerance_percentage = 1
         eqrm_flags.csm_damping_max_iterations = 7
-        eqrm_flags.csm_hysteretic_damping = 'Error'
+        eqrm_flags.csm_hysteretic_damping = 'trapezoidal'
         eqrm_flags.bridges_functional_percentages = None
         eqrm_flags.atten_override_RSA_shape = None
         eqrm_flags.atten_pga_scaling_cutoff = False

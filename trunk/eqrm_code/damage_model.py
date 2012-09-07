@@ -66,7 +66,7 @@ class Damage_model(object):
                           'sdtcap': 0.3,
                           'csm_use_variability': False,
                           'csm_variability_method': None,
-                          'csm_hysteretic_damping': 'Error',
+                          'csm_hysteretic_damping': 'trapezoidal',
                           'atten_override_RSA_shape': None,
                           'atten_cutoff_max_spectral_displacement': False,
                           'loss_min_pga': 0.0}
