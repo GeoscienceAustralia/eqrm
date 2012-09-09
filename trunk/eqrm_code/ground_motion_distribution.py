@@ -42,7 +42,7 @@ class Distribution(object):
         self.rvs = gm_rvs
         self.val_func = exp
             
-    def sample_for_eqrm(self, mean, sigma, var_in_last_axis=True): #False):
+    def sample_for_eqrm(self, mean, sigma, var_in_last_axis=False):
         """
         mean, sigma: ndarray. Must have identical shapes.
 
