@@ -4,7 +4,7 @@ import sys
 import unittest
 from ground_motion_distribution import *
 from scipy import array, log, exp, newaxis, concatenate, allclose, sqrt, \
-     r_, alltrue, where, arange, resize, sum, ones, seterr
+     r_, alltrue, where, arange, resize, sum, ones, seterr, zeros
 
 
 class Test_Log_normal_distribution(unittest.TestCase):
@@ -22,7 +22,7 @@ class Test_Log_normal_distribution(unittest.TestCase):
         dist = Distribution_Log_Normal(var_method)
         # Provide a predictable sample
         dist.rvs = lambda size: count_up_2
-        sample_values = dist._monte_carlo(log_mean, log_sigma)
+        sample_values = dist._monte_carlo(log_mean, log_sigma, True)
         
         oldsettings = seterr(over='ignore')
         actual = exp(log_mean + variate*log_sigma)
@@ -39,11 +39,28 @@ class Test_Log_normal_distribution(unittest.TestCase):
         var_method = 2
         
         dist = Distribution_Log_Normal(var_method)
-        sample_values = dist._monte_carlo(log_mean,log_sigma)
+        sample_values = dist._monte_carlo(log_mean,log_sigma, True)
 
         # Can not check result, it's random 
         self.assert_(sample_values.shape == dim)
 
+
+    def test_DN_monte_carlo4(self):
+        # Check no randomness in the last dimension
+        dim = (1,1,3)
+        count_up = arange(1,4)
+        log_mean = zeros(dim)
+        log_sigma = resize(count_up, dim)
+        var_method = 2
+        
+        dist = Distribution_Normal(var_method)
+        sample_values = dist._monte_carlo(log_mean,log_sigma, False)
+
+        
+        actual = sample_values[0,0,0] * log_sigma
+        #print "actual", actual
+        #print "sample_values", sample_values 
+        self.assert_(allclose(sample_values, actual))
 
     def test_DLN_no_variability(self):
         # dimensions (2,1,3,4) = 24 elements
@@ -172,6 +189,6 @@ class Test_Log_normal_distribution(unittest.TestCase):
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Log_normal_distribution,'test')
-    #suite = unittest.makeSuite(Test_Log_normal_distribution,'test_DLN_monte_carlo')
+    suite = unittest.makeSuite(Test_Log_normal_distribution,'test_DN_monte_carlo4')
     runner = unittest.TextTestRunner() #verbosity=2
     runner.run(suite)
