@@ -42,7 +42,7 @@ class Distribution(object):
         self.rvs = gm_rvs
         self.val_func = exp
             
-    def sample_for_eqrm(self, mean, sigma, var_in_last_axis=True): #False):
+    def sample_for_eqrm(self, mean, sigma, var_in_last_axis=False):
         """
         mean, sigma: ndarray. Must have identical shapes.
 
@@ -85,7 +85,6 @@ class Distribution(object):
             shape[-1] = 1
 
         variate = self.rvs(size=size).reshape(shape)
-
         if not var_in_last_axis:
             variate = repeat(variate, sigma.shape[-1],  
                              axis=len(variate.shape)-1)
@@ -187,7 +186,7 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
         variate = self.rvs(size = new_size).reshape(s)
       
         if not var_in_last_axis:
-            variate = repeat(variate, np, axis=3)
+            variate = repeat(variate, np, axis=4)
         return variate
 
     def ground_motion_sample(self, log_mean, log_sigma):
