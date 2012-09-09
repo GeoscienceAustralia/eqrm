@@ -42,7 +42,7 @@ class Distribution(object):
         self.rvs = gm_rvs
         self.val_func = exp
             
-    def sample_for_eqrm(self, mean, sigma):
+    def sample_for_eqrm(self, mean, sigma, var_in_last_axis=True): #False):
         """
         mean, sigma: ndarray. Must have identical shapes.
 
@@ -55,7 +55,8 @@ class Distribution(object):
             sample_values = self.val_func(mean)
         elif self.var_method == 2:
             # monte carlo
-            sample_values = self._monte_carlo(mean, sigma)
+            sample_values = self._monte_carlo(mean, sigma, var_in_last_axis=
+                                              var_in_last_axis)
         elif self.var_method == 3:
             # + 2 sigma
             sample_values = self.val_func(mean+2*sigma)
@@ -72,18 +73,33 @@ class Distribution(object):
             raise RuntimeError('Unknown var_method %s' % str(self.var_method))
         return sample_values
         
-    def _vs(self, sigma):
+    def _vs(self, sigma, var_in_last_axis):
         # Gets overridden in child class
-        return  self.rvs(size = sigma.size).reshape(sigma.shape)
+        #return self.rvs(size=sigma.size).reshape(sigma.shape)
+        if var_in_last_axis:
+            size =  sigma.size
+            shape = sigma.shape
+        else:
+            size =  sigma.size/sigma.shape[-1]
+            shape = list(sigma.shape)
+            shape[-1] = 1
 
-    def _monte_carlo(self, mean, sigma):
+        variate = self.rvs(size=size).reshape(shape)
+
+        if not var_in_last_axis:
+            variate = repeat(variate, sigma.shape[-1],  
+                             axis=len(variate.shape)-1)
+
+        return variate 
+
+    def _monte_carlo(self, mean, sigma, var_in_last_axis):
         """
         Perform random sampling about mean with sigma.
         self.sample_shape and self._vs() controls the shape of the
         result.
         """
         assert sigma.shape == mean.shape
-        variate_site = self._vs(sigma)
+        variate_site = self._vs(sigma, var_in_last_axis)
 
         oldsettings = seterr(over='ignore')
         # self.sample_shape and variate_site will have compatible dims
@@ -136,7 +152,8 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
         # Get the dimensions ready for applying to log_sigma's
         self.spawn_centroids = centroids #.reshape(1,-1)        
 
-    sample_shape = (slice(None), newaxis, Ellipsis) # Makes ._monte_carlo() insert a
+    sample_shape = (slice(None), newaxis, Ellipsis) 
+    # Makes ._monte_carlo() insert a
     # recurence model axis after  gmm. Will get broadcasted in ._monte_carlo()
 
     
@@ -156,11 +173,22 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
         return sample_values
 
     
-    def _vs(self, log_sigma):
-        # Overriding to cater for multiple recurrence models. Called by ._monte_carlo()
+    def _vs(self, log_sigma, var_in_last_axis):
+        # Overriding to cater for multiple recurrence models. 
+        # Called by ._monte_carlo()
         ngmm, ns, ne, np = log_sigma.shape
-        s = (ngmm, self.n_recurrence_models, ns, ne, np)
-        return self.rvs(size = log_sigma.size*self.n_recurrence_models).reshape(s)
+        if  var_in_last_axis:
+            s = (ngmm, self.n_recurrence_models, ns, ne, np)
+            new_size = log_sigma.size * self.n_recurrence_models
+        else:
+            s = (ngmm, self.n_recurrence_models, ns, ne, 1)
+            new_size = log_sigma.size * self.n_recurrence_models / np
+
+        variate = self.rvs(size = new_size).reshape(s)
+      
+        if not var_in_last_axis:
+            variate = repeat(variate, np, axis=3)
+        return variate
 
     def ground_motion_sample(self, log_mean, log_sigma):
         """
