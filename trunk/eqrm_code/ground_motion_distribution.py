@@ -18,6 +18,8 @@ from scipy import exp, log, where, isfinite, reshape, array, r_, rollaxis, \
 from scipy.stats import norm
 
 SPAWN = 1 
+RANDOM_SAMPLING = 2
+#DEFAULT_VILA = Fa
 
 # By assigning gm_rvs here, it can be reset to something deterministic
 # in the test suites in order to produce repeatable results. Note that
@@ -53,7 +55,7 @@ class Distribution(object):
         
         if self.var_method == None:
             sample_values = self.val_func(mean)
-        elif self.var_method == 2:
+        elif self.var_method == RANDOM_SAMPLING:
             # monte carlo
             sample_values = self._monte_carlo(mean, sigma, var_in_last_axis=
                                               var_in_last_axis)
@@ -86,6 +88,7 @@ class Distribution(object):
 
         variate = self.rvs(size=size).reshape(shape)
         if not var_in_last_axis:
+            #consume = self.rvs(size=size*(sigma.shape[-1]-1))
             variate = repeat(variate, sigma.shape[-1],  
                              axis=len(variate.shape)-1)
 
@@ -149,7 +152,8 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
         weights, centroids = normalised_pdf(sigma_delta, atten_spawn_bins)
         self.spawn_weights = weights
         # Get the dimensions ready for applying to log_sigma's
-        self.spawn_centroids = centroids #.reshape(1,-1)        
+        self.spawn_centroids = centroids #.reshape(1,-1)      
+        self.var_in_last_axis = False # Never sample the period dimension  
 
     sample_shape = (slice(None), newaxis, Ellipsis) 
     # Makes ._monte_carlo() insert a
@@ -205,11 +209,14 @@ class GroundMotionDistributionLogNormal(Distribution_Log_Normal):
         
         """
         assert log_mean.ndim == 4
-        s = (self._spawn(log_mean, log_sigma) if self.var_method == SPAWN
-             else self.sample_for_eqrm(log_mean, log_sigma)[newaxis, ...])
+        
+        if self.var_method == SPAWN:
+            s = self._spawn(log_mean, log_sigma)
+        else:  
+            s = self.sample_for_eqrm(log_mean, log_sigma, self.var_in_last_axis)[newaxis, ...]
 
-        if self.var_method == 2: # monte_carlo has added and populated
-                                 # the recurrence model dimension
+        # monte_carlo has added and populated the recurrence model dimension
+        if self.var_method == RANDOM_SAMPLING:
             return s
 
         # Add the recurrence model dimension and "manually" broadcast
