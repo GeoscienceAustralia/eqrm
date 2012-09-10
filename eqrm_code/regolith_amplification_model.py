@@ -321,8 +321,10 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
                         site_classes,
                         Mw,
                         atten_periods)
-
-                    sub_soil_SA = amp_distribution.sample_for_eqrm(log_mean, log_sigma)
+                    # No variability in the period axis
+                    var_in_last_axis = True #False 
+                    sub_soil_SA = amp_distribution.sample_for_eqrm(log_mean, log_sigma,
+                                                                   var_in_last_axis)
 
                     assert sub_soil_SA.ndim == 3 # site, event, period
                     soil_SA_new[i_spawn, i_gmm, i_rm, :,:,:] = sub_soil_SA

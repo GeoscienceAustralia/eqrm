@@ -185,10 +185,33 @@ class Test_Log_normal_distribution(unittest.TestCase):
         act_SA = exp(concatenate((act_SA_0, act_SA_1, act_SA_2)))
         self.assert_(allclose(act_SA, sample_values))
                
+
+    def test_GroundMotionDistributionLogNormal(self):
+        # Check no randomness in the last dimension
+        
+        dln = GroundMotionDistributionLogNormal(var_method=RANDOM_SAMPLING,
+                                                atten_spawn_bins=1,
+                                                n_recurrence_models=1)
+        dim = (1, 1, 1,4)
+        log_mean = zeros(dim)
+        log_sigma = ones(dim)
+        count_up = arange(1,4)
+        log_sigma = resize(count_up, dim)
+        sample_values = dln.ground_motion_sample(log_mean,log_sigma)
+        # Returns: ndarray[spawn, GMmodel, rec_model, site, event,period]
+        #  spectral accelerations, measured in G.
+        self.assert_(sample_values.shape == (1,1,1,1,1,4))
+        
+        var = log(sample_values[0,0,0,0,0,0])
+        actual = exp(var * log_sigma)
+        #print "actual", actual
+        #print "sample_values", sample_values 
+        self.assert_(allclose(sample_values, actual))
+               
         
 #-------------------------------------------------------------
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Log_normal_distribution,'test')
-    suite = unittest.makeSuite(Test_Log_normal_distribution,'test_DN_monte_carlo4')
+    #suite = unittest.makeSuite(Test_Log_normal_distribution,'test_DN_monte_carlo4')
     runner = unittest.TextTestRunner() #verbosity=2
     runner.run(suite)
