@@ -322,7 +322,7 @@ def get_soil_SA(bedrock_SA, site_classes, Mw, atten_periods,
                         Mw,
                         atten_periods)
                     # No variability in the period axis
-                    var_in_last_axis = True #False 
+                    var_in_last_axis = False 
                     sub_soil_SA = amp_distribution.sample_for_eqrm(log_mean, log_sigma,
                                                                    var_in_last_axis)
 
