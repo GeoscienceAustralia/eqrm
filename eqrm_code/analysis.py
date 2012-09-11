@@ -43,7 +43,8 @@ from eqrm_code.output_manager import save_motion_to_binary, save_distances, \
          save_bridge_days_to_complete
 from eqrm_code.util import reset_seed, determine_eqrm_path, \
      get_local_or_default, add_last_directory
-from ground_motion_distribution import Distribution_Log_Normal, GroundMotionDistributionLogNormal
+from ground_motion_distribution import Distribution_Log_Normal, \
+    GroundMotionDistributionLogNormal
 from eqrm_code.structures import Structures
 from eqrm_code.structures_vulnerability import Structures_Vulnerability
 from eqrm_code.exceedance_curves import hzd_do_value, \
