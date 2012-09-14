@@ -121,11 +121,43 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     if linewidth < 1.0:
         w_opt = '-W+1'
 
+    
+    #Apply blockmean to avoid aliasing short wavelengths
+    my_grd_file = os.path.join(tmp_dir, 'temp.grd')
+    my_grd_file2 = os.path.join(tmp_dir, 'temp2.grd') 
+    print my_grd_file    
+    print my_grd_file2 
+    #util.do_cmd('blockmean %s %s -I0.01 > %s'
+    #           % (my_xyz_file, r_opt, my_grd_file))
+    
+    # Create a grid file
+    print "doing surface"
+    util.do_cmd('surface %s -G%s %s -I0.001 -T0.5'
+                % (my_xyz_file, my_grd_file2,r_opt))
+
+    #util.do_cmd('triangulate %s -G%s %s -I0.001'
+    #            % (my_xyz_file, my_grd_file,r_opt))
+        
     # draw contoured data on map
-    util.do_cmd('pscontour %s -K -A- -C%s %s %s -I %s > %s'
-                % (my_xyz_file, my_cpt_file, r_opt, j_opt, w_opt,
+    #print "doing pscontour"
+    #util.do_cmd('gmtset DOTS_PR_INCH = 9000')
+    #util.do_cmd('pscontour %s -K -A- -C%s %s %s -I %s > %s'
+    #            % (my_xyz_file, my_cpt_file, r_opt, j_opt, w_opt,
+    #               my_ps_file))
+    
+    #util.do_cmd('grdfilter %s -G%s -D0 -Fc1'
+    #            % (my_grd_file,my_grd_file2))
+
+    # draw contoured data on mapgrdview
+    util.do_cmd('grdview %s -K -Qs -C%s %s %s %s > %s'
+                % (my_grd_file2, my_cpt_file, r_opt, j_opt, w_opt,
                    my_ps_file))
 
+    # draw contoured data on mapgrdview
+    #util.do_cmd('grdimage %s -K -Qs -C%s %s %s > %s'
+    #            % (my_grd_file2, my_cpt_file, r_opt, j_opt,
+    #               my_ps_file))
+    
     # draw the coast
     util.do_cmd('pscoast %s -K -O %s -Df -W -S192/216/255 >> %s'
                 % (r_opt, j_opt, my_ps_file))
