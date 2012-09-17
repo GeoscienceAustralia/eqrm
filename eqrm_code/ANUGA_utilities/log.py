@@ -69,10 +69,12 @@ import os
 import sys
 import traceback
 import logging
+import json
 
 DefaultConsoleLogLevel = logging.INFO
 DefaultFileLogLevel = logging.DEBUG
 
+JSONDELIMITER = 'JSON'
 
 ################################################################################
 # Module variables - only one copy of these, ever.
@@ -401,12 +403,14 @@ def resource_usage(level=logging.DEBUG):
     resource_usage_mem()
     io_wait()
 
-def log_JSON(dic, level):
+def log_json(dic, level):
     """
     Convert a dictionary to a log message with the end of the message
     using the JSON format.
     """
-    pass
+    msg = JSONDELIMITER + json.dumps(dic)
+    log(msg, level)
+    
 
 def io_wait(level=logging.DEBUG):
     """
@@ -432,12 +436,6 @@ def io_wait(level=logging.DEBUG):
     
     cact = user_d + syst_d + nice_d 
     ctot = user_d + nice_d + syst_d + idle_d + wait_d + irq_d + sirq_d 
-    if ctot == 0.0:   
-        msg = 'cpu utilisation: unknown'
-    else:
-        wcpu = wait_d/ctot*100
-        msg = 'cpu utilisation: iowait=%3.1f' % wcpu
-    log(msg, level)
 
     user = user_n
     nice = nice_n
@@ -446,6 +444,23 @@ def io_wait(level=logging.DEBUG):
     wait = wait_n
     irq = irq_n
     sirq = sirq_n
+    if ctot == 0.0:   
+        msg = 'cpu utilisation: unknown'
+    else:
+        wcpu = wait_d/ctot*100
+        msg = 'cpu utilisation: iowait=%3.1f' % wcpu
+    log(msg, level)
+
+def calc_io_wait():
+    """
+    Calc the io_wait percentage.
+
+    WARNING: This result is based on what the CPU has been doing
+    Since the last time this function was called, or when this module 
+    was loaded, for the first function call.
+    """
+    pass
+    
 
 
 
