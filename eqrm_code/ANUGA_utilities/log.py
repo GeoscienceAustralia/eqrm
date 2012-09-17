@@ -401,6 +401,13 @@ def resource_usage(level=logging.DEBUG):
     resource_usage_mem()
     io_wait()
 
+def log_JSON(dic, level):
+    """
+    Convert a dictionary to a log message with the end of the message
+    using the JSON format.
+    """
+    pass
+
 def io_wait(level=logging.DEBUG):
     """
     Log the io_wait percentage.
