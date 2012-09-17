@@ -58,7 +58,8 @@ class Test_Log(unittest.TestCase):
                        console_expected,
                        file_level,
                        console_level):
-        
+        """Test results from a specific log test."""
+
         log.set_log_level(file_level, console_level)
         
         self.logMessages()
@@ -165,7 +166,40 @@ test at level CRITICAL'''
         self.assertNotEqual(log.console_logging_level, log.CRITICAL)
         self.assertNotEqual(log.file_logging_level, log.DEBUG)
         
+    def test_log_json(self):
         
+        
+        file_level = 'debug'
+        console_level = 'debug'
+        log.set_log_level(file_level, console_level)
+        
+        dic = {"eggs":"ham"}
+        log.log_json(dic, level=logging.DEBUG)
+        
+        # Get file output
+        f = open(self.logfile, 'r')
+        lines = f.readlines()
+        f.close()
+        file_expected = '''|Logfile is '%s' with logging level of DEBUG, console logging level is DEBUG
+|JSON{"eggs": "ham"}''' % self.logfile
+
+        console_expected = '''Logfile is '%s' with logging level of DEBUG, console logging level is DEBUG
+JSON{"eggs": "ham"}''' % self.logfile
+
+        # The first line is the output message from
+        # log.set_log_file(self.logfile, log.file_logging_level)
+        # so we want the slice after this
+        file_result = strip_log(lines)[1:]
+        console_result = self.console.getvalue().strip().split('\n')[1:]
+        
+        file_expected = strip_log(file_expected.split('\n'))
+        console_expected = console_expected.split('\n')
+        #print "file_result", file_result
+        #print "console_result", console_result
+        self.assertEqual(file_result, file_expected)
+        self.assertEqual(console_result, console_expected)
+
+       
 def strip_log(lines):
     """
     Return a sub-set of the log file.  This subset is testable.
@@ -182,6 +216,8 @@ def strip_log(lines):
 ################################################################################
 
 if __name__ == "__main__":
+    ## WARNING, THESE TESTS PASS IN TEST_ALL
+    ## BREAK RUNNING TEST_LOG.PY
     suite = unittest.makeSuite(Test_Log, 'test')
     runner = unittest.TextTestRunner()
     runner.run(suite)
