@@ -120,6 +120,12 @@ DEBUG = logging.DEBUG
 NOTSET = logging.NOTSET
 INCREMENT = 10 
 
+# Terms used in the json dictionary
+IOWAIT_J = 'iowait'
+MEM_J = 'memory, MB'
+RESMEM_J = 'resident, MB'
+STACKSIZE_J = 'stacksize, MB'
+
 # set _new_python to True if python version 2.5 or later
 _new_python = (sys.version_info >= 0x02050000)      # 2.5.x.x
 #_new_python = False  # To avoid conflicts, since shapely uses the logger,
@@ -420,6 +426,23 @@ def io_wait(level=logging.DEBUG):
     Since the last time this function was called, or when this module 
     was loaded, for the first function call.
     """
+    iowait = calc_io_wait()[IOWAIT_J]
+    if iowait == None:
+        msg = 'cpu utilisation: unknown'
+    else:
+        msg = 'cpu utilisation: iowait=%3.1f' % iowait
+    log(msg, level)
+    
+    
+
+def calc_io_wait():
+    """
+    Calc the io_wait percentage.
+
+    WARNING: This result is based on what the CPU has been doing
+    Since the last time this function was called, or when this module 
+    was loaded, for the first function call.
+    """
     
     # The results from the last call
     global user, nice, syst, idle, wait, irq, sirq
@@ -444,27 +467,32 @@ def io_wait(level=logging.DEBUG):
     wait = wait_n
     irq = irq_n
     sirq = sirq_n
-    if ctot == 0.0:   
-        msg = 'cpu utilisation: unknown'
+    if ctot == 0.0:
+        wcpu = None
     else:
         wcpu = wait_d/ctot*100
-        msg = 'cpu utilisation: iowait=%3.1f' % wcpu
-    log(msg, level)
-
-def calc_io_wait():
-    """
-    Calc the io_wait percentage.
-
-    WARNING: This result is based on what the CPU has been doing
-    Since the last time this function was called, or when this module 
-    was loaded, for the first function call.
-    """
-    pass
+    return {IOWAIT_J: wcpu}
     
 
 
 
 def resource_usage_mem(level=logging.DEBUG):
+    """Log memory usage at given log level."""
+    usage_mem = calc_resource_usage_mem()
+    if usage_mem == {}:
+        log('Windows resource usage not available', level)
+    elif  'memory, MB' in usage_mem:   
+        msg = ('Resource usage: memory=%.1fMB resident=%.1fMB stacksize=%.1fMB'
+               % (usage_mem[MEM_J], usage_mem[RESMEM_J],
+                  usage_mem[STACKSIZE_J]))
+        log(msg, level)
+    elif  'total memory, MB' in usage_mem:  
+        msg = ('Resource usage: total memory=%.1fMB free memory=%.1fMB'
+               % (usage_mem['total memory, MB'], usage_mem['free memory, MB']))
+    log(msg, level)
+
+
+def calc_resource_usage_mem():
     """Log memory usage at given log level."""
 
     _scale = {'KB': 1024, 'MB': 1024*1024, 'GB': 1024*1024*1024,
@@ -507,19 +535,17 @@ def resource_usage_mem(level=logging.DEBUG):
             """Get stack size in bytes."""
 
             return _VmB('VmStk:') - since
-
-        msg = ('Resource usage: memory=%.1fMB resident=%.1fMB stacksize=%.1fMB'
-               % (memory()/_scale['MB'], resident()/_scale['MB'],
-                  stacksize()/_scale['MB']))
-        log(msg, level)
+        
+        return {'memory, MB':memory()/_scale['MB'], 
+                'resident, MB':resident()/_scale['MB'],
+                'stacksize, MB':stacksize()/_scale['MB']}
     else:
         # Windows code from: http://code.activestate.com/recipes/511491/
         try:
             import ctypes
             import _winreg
         except:
-            log('Windows resource usage not available', level)
-            return
+            return {}
 
         kernel32 = ctypes.windll.kernel32
         c_ulong = ctypes.c_ulong
@@ -540,10 +566,8 @@ def resource_usage_mem(level=logging.DEBUG):
         memoryStatusEx.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
         kernel32.GlobalMemoryStatusEx(ctypes.byref(memoryStatusEx))
 
-        msg = ('Resource usage: total memory=%.1fMB free memory=%.1fMB'
-               % (memoryStatusEx.ullTotalPhys/_scale['MB'],
-                  memoryStatusEx.ullAvailPhys/_scale['MB']))
-        log(msg, level)
+        return {'total memory, MB':memoryStatusEx.ullTotalPhys/_scale['MB'],
+         'free memory, MB':memoryStatusEx.ullAvailPhys/_scale['MB']}
 
 
 ################################################################################
