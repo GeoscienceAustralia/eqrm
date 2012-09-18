@@ -71,10 +71,32 @@ import traceback
 import logging
 import json
 
+
+from eqrm_code.get_version import get_version
+
 DefaultConsoleLogLevel = logging.INFO
 DefaultFileLogLevel = logging.DEBUG
 
-JSONDELIMITER = 'JSON'
+
+# Terms used in the json dictionary
+IOWAIT_J = 'iowait %'
+MEM_J = 'memory MB'
+RESMEM_J = 'resident MB'
+STACKSIZE_J = 'stacksize MB'
+TOTALMEM_J = 'total memory MB'
+FREEMEM_J = 'free memory MB'
+SVNVERSION_J = 'SVN version'
+SVNDATE_J = 'SVN date'
+SVNMODIFIED_J = 'SVN modified'
+HOSTNAME_J = 'host name'
+PARALLELSIZE_J = 'Parallel size'
+PLATFORM_J = 'System platform'
+PRESITELOOP_J = 'time_pre_site_loop_fraction'
+EVENTLOOPTIME_J = 'event_loop_time_seconds'
+CLOCKTIMEOVERALL_J = 'clock_time_taken_overall_seconds'
+WALLTIMEOVERALL_J = 'wall_time_taken_overall_seconds'
+
+DELIMITER_J = 'JSON'
 
 ################################################################################
 # Module variables - only one copy of these, ever.
@@ -120,13 +142,6 @@ DEBUG = logging.DEBUG
 NOTSET = logging.NOTSET
 INCREMENT = 10 
 
-# Terms used in the json dictionary
-IOWAIT_J = 'iowait, %'
-MEM_J = 'memory, MB'
-RESMEM_J = 'resident, MB'
-STACKSIZE_J = 'stacksize, MB'
-TOTALMEM_J = 'total memory, MB'
-FREEMEM_J = 'free memory, MB'
 
 # set _new_python to True if python version 2.5 or later
 _new_python = (sys.version_info >= 0x02050000)      # 2.5.x.x
@@ -412,49 +427,25 @@ def log_json(dic, level):
     Convert a dictionary to a log message with the end of the message
     using the JSON format.
     """
-    msg = JSONDELIMITER + json.dumps(dic)
+    msg = DELIMITER_J + json.dumps(dic)
     log(msg, level)
     
 
 def resource_usage(level=logging.DEBUG):   
-    iowait = calc_io_wait()
-    results = calc_resource_usage_mem()
+    iowait = _calc_io_wait()
+    results = _calc_resource_usage_mem()
     results.update(iowait) # 
     log_json(results, level)
-
-def io_wait(level=logging.DEBUG):
-    """
-    Log the io_wait percentage.
-
-    WARNING: This result is based on what the CPU has been doing
-    Since the last time this function was called, or when this module 
-    was loaded, for the first function call.
-    """
-    iowait = calc_io_wait()[IOWAIT_J]
-    if iowait == None:
-        msg = 'cpu utilisation: unknown'
-    else:
-        msg = 'cpu utilisation: iowait=%3.1f' % iowait
-    log(msg, level)
-    
- 
-def resource_usage_mem(level=logging.DEBUG):
-    """Log memory usage at given log level."""
-    usage_mem = calc_resource_usage_mem()
-    if usage_mem == {}:
-        log('Windows resource usage not available', level)
-    elif  'memory, MB' in usage_mem:   
-        msg = ('Resource usage: memory=%.1fMB resident=%.1fMB stacksize=%.1fMB'
-               % (usage_mem[MEM_J], usage_mem[RESMEM_J],
-                  usage_mem[STACKSIZE_J]))
-        log(msg, level)
-    elif  'total memory, MB' in usage_mem:  
-        msg = ('Resource usage: total memory=%.1fMB free memory=%.1fMB'
-               % (usage_mem[TOTALMEM_J], usage_mem[FREEMEM_J]))
-    log(msg, level)
    
+def log_svn(level=logging.INFO):  
+    version, date, modified = get_version()
+    svn_dic = {SVNVERSION_J:version,
+               SVNDATE_J:date,
+               SVNMODIFIED_J: modified}
+    log_json(svn_dic, level)
+ 
 
-def calc_io_wait():
+def _calc_io_wait():
     """
     Calc the io_wait percentage.
 
@@ -496,7 +487,7 @@ def calc_io_wait():
 
 
 
-def calc_resource_usage_mem():
+def _calc_resource_usage_mem():
     """Log memory usage at given log level."""
 
     _scale = {'KB': 1024, 'MB': 1024*1024, 'GB': 1024*1024*1024,
