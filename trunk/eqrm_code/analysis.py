@@ -20,6 +20,8 @@ import time
 import shutil
 import copy
 import datetime
+import sys
+platform = sys.platform
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
      arange, reshape, exp, tile, intersect1d
@@ -152,11 +154,11 @@ def main(parameter_handle,
         log.set_log_level(eqrm_flags.file_parallel_log_level, 
                           eqrm_flags.console_parallel_log_level)
     log.set_log_file(log_filename)
-    log.info('host name: ' + str(parallel.node))
-    version, date, modified = get_version()
-    log.info('SVN version: ' + str(version))
-    log.debug('SVN date: ' + str(date))
-    log.debug('SVN modified: ' + str(modified))
+    log.log_json({log.PARALLELSIZE_J:parallel.size}, log.INFO)
+    log.log_json({log.HOSTNAME_J:parallel.node}, log.INFO)
+    log.log_json({log.PLATFORM_J:platform}, log.INFO)
+    
+    log.log_svn()
     log.debug('Memory: Initial')
     log.resource_usage()
     
@@ -528,14 +530,12 @@ def main(parameter_handle,
     #time_taken_site_loop = event_loop_time - time_taken_pre_site_loop
     time_pre_site_loop_fraction = time_taken_pre_site_loop/event_loop_time
 
-    msg = "time_pre_site_loop_fraction " + str(time_pre_site_loop_fraction)
-    log.info(msg)
+    log.log_json({log.PRESITELOOP_J:time_pre_site_loop_fraction}, log.INFO)
     msg = "event_loop_time (excluding file saving) " + \
            str(datetime.timedelta(seconds=event_loop_time)) + " hr:min:sec"
     log.info(msg)
-    msg = "event_loop_time_seconds = " + \
-        str(event_loop_time) + " seconds."
-    log.debug(msg)
+   
+    log.log_json({log.EVENTLOOPTIME_J:event_loop_time}, log.INFO)
     
     #print "time_taken_pre_site_loop", time_taken_pre_site_loop
     #print "time_taken_site_loop", time_taken_site_loop
@@ -759,8 +759,8 @@ def main(parameter_handle,
            parallel.node,
            str(datetime.timedelta(seconds=clock_time_taken_overall)))
     log.info(msg)
-    msg = "clock_time_taken_overall_seconds = %s" % \
-          (str(clock_time_taken_overall))
+    
+    log.log_json({log.CLOCKTIMEOVERALL_J:clock_time_taken_overall}, log.INFO)
     
     wall_time_taken_overall = (time.time() - t0_time)
     msg = "On node %i, %s wall time taken overall %s hr:min:sec." % \
@@ -768,8 +768,7 @@ def main(parameter_handle,
            parallel.node,
            str(datetime.timedelta(seconds=wall_time_taken_overall)))
     log.info(msg)
-    msg = "wall_time_taken_overall_seconds = %s" % \
-          (str(wall_time_taken_overall))
+    log.log_json({log.WALLTIMEOVERALL_J:wall_time_taken_overall}, log.INFO)
     log.info(msg)
     
     parallel.finalize()
