@@ -34,7 +34,7 @@ scenario_azimuth = 340
 scenario_depth = 11.5
 scenario_latitude = -32.95
 scenario_longitude = 151.61
-scenario_magnitude = 4.8
+scenario_magnitude = 6
 scenario_dip = 35
 scenario_number_of_events = 10
 
@@ -44,7 +44,7 @@ scenario_number_of_events = 10
 atten_models = ['Youngs_97_interface']
 atten_model_weights = [1]
 atten_collapse_Sa_of_atten_models = True
-atten_variability_method = 2
+atten_variability_method = None
 atten_periods = [0.0, 0.029999999999999999, 0.074999999999999997, 0.10000000000000001, 0.20000000000000001, 0.29999999999999999, 0.40000000000000002, 0.5, 0.75, 1.0, 2.0, 3.0, 4.0]
 atten_threshold_distance = 400
 atten_override_RSA_shape = None
