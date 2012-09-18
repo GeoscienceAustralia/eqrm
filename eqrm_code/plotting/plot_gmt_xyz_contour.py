@@ -124,34 +124,40 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     
     #Apply blockmean to avoid aliasing short wavelengths
     my_grd_file = os.path.join(tmp_dir, 'temp.grd')
-    my_grd_file2 = os.path.join(tmp_dir, 'temp2.grd') 
+    my_grd_file2 = os.path.join(tmp_dir, 'temp2.grd')
+    my_grd_file3 = os.path.join(tmp_dir, 'temp3.grd')
     print my_grd_file    
     print my_grd_file2 
-    #util.do_cmd('blockmean %s %s -I0.01 > %s'
-    #           % (my_xyz_file, r_opt, my_grd_file))
+    util.do_cmd('blockmean %s %s -I0.001 > %s'
+              % (my_xyz_file, r_opt, my_grd_file))
     
     # Create a grid file
     print "doing surface"
     util.do_cmd('surface %s -G%s %s -I0.001 -T0.5'
                 % (my_xyz_file, my_grd_file2,r_opt))
-
-    #util.do_cmd('triangulate %s -G%s %s -I0.001'
-    #            % (my_xyz_file, my_grd_file,r_opt))
-        
-    # draw contoured data on map
-    #print "doing pscontour"
-    #util.do_cmd('gmtset DOTS_PR_INCH = 9000')
-    #util.do_cmd('pscontour %s -K -A- -C%s %s %s -I %s > %s'
-    #            % (my_xyz_file, my_cpt_file, r_opt, j_opt, w_opt,
-    #               my_ps_file))
     
-    #util.do_cmd('grdfilter %s -G%s -D0 -Fc1'
-    #            % (my_grd_file,my_grd_file2))
+    
+    #util.do_cmd('grdclip %s -Sa-1/NaN -G%s' 
+    #            % (my_grd_file2,
+    #               my_grd_file3))
+    
+    
+    util.do_cmd('psmask %s -K -Gwhite -I0.01 -T -O %s %s >> %s' 
+                % (my_xyz_file, r_opt, j_opt,
+                   my_ps_file))  
 
-    # draw contoured data on mapgrdview
-    util.do_cmd('grdview %s -K -Qs -C%s %s %s %s > %s'
-                % (my_grd_file2, my_cpt_file, r_opt, j_opt, w_opt,
+    util.do_cmd('grdimage %s -K -Q -C%s %s %s > %s'
+                % (my_grd_file2, my_cpt_file, r_opt, j_opt,
                    my_ps_file))
+
+    #util.do_cmd('psxy %s -K -Sc0.1c -C%s %s %s > %s'
+    #            % (my_xyz_file, my_cpt_file, r_opt, j_opt,
+    #               my_ps_file))
+
+
+    #util.do_cmd('psmask -C -K -O >> %s'
+    #            % (my_ps_file))
+
 
     # draw contoured data on mapgrdview
     #util.do_cmd('grdimage %s -K -Qs -C%s %s %s > %s'
