@@ -121,10 +121,12 @@ NOTSET = logging.NOTSET
 INCREMENT = 10 
 
 # Terms used in the json dictionary
-IOWAIT_J = 'iowait'
+IOWAIT_J = 'iowait, %'
 MEM_J = 'memory, MB'
 RESMEM_J = 'resident, MB'
 STACKSIZE_J = 'stacksize, MB'
+TOTALMEM_J = 'total memory, MB'
+FREEMEM_J = 'free memory, MB'
 
 # set _new_python to True if python version 2.5 or later
 _new_python = (sys.version_info >= 0x02050000)      # 2.5.x.x
@@ -405,10 +407,6 @@ def critical(msg=''):
 
     log(msg, logging.CRITICAL)
 
-def resource_usage(level=logging.DEBUG):
-    resource_usage_mem()
-    io_wait()
-
 def log_json(dic, level):
     """
     Convert a dictionary to a log message with the end of the message
@@ -417,6 +415,12 @@ def log_json(dic, level):
     msg = JSONDELIMITER + json.dumps(dic)
     log(msg, level)
     
+
+def resource_usage(level=logging.DEBUG):   
+    iowait = calc_io_wait()
+    results = calc_resource_usage_mem()
+    results.update(iowait) # 
+    log_json(results, level)
 
 def io_wait(level=logging.DEBUG):
     """
@@ -433,7 +437,22 @@ def io_wait(level=logging.DEBUG):
         msg = 'cpu utilisation: iowait=%3.1f' % iowait
     log(msg, level)
     
-    
+ 
+def resource_usage_mem(level=logging.DEBUG):
+    """Log memory usage at given log level."""
+    usage_mem = calc_resource_usage_mem()
+    if usage_mem == {}:
+        log('Windows resource usage not available', level)
+    elif  'memory, MB' in usage_mem:   
+        msg = ('Resource usage: memory=%.1fMB resident=%.1fMB stacksize=%.1fMB'
+               % (usage_mem[MEM_J], usage_mem[RESMEM_J],
+                  usage_mem[STACKSIZE_J]))
+        log(msg, level)
+    elif  'total memory, MB' in usage_mem:  
+        msg = ('Resource usage: total memory=%.1fMB free memory=%.1fMB'
+               % (usage_mem[TOTALMEM_J], usage_mem[FREEMEM_J]))
+    log(msg, level)
+   
 
 def calc_io_wait():
     """
@@ -475,21 +494,6 @@ def calc_io_wait():
     
 
 
-
-def resource_usage_mem(level=logging.DEBUG):
-    """Log memory usage at given log level."""
-    usage_mem = calc_resource_usage_mem()
-    if usage_mem == {}:
-        log('Windows resource usage not available', level)
-    elif  'memory, MB' in usage_mem:   
-        msg = ('Resource usage: memory=%.1fMB resident=%.1fMB stacksize=%.1fMB'
-               % (usage_mem[MEM_J], usage_mem[RESMEM_J],
-                  usage_mem[STACKSIZE_J]))
-        log(msg, level)
-    elif  'total memory, MB' in usage_mem:  
-        msg = ('Resource usage: total memory=%.1fMB free memory=%.1fMB'
-               % (usage_mem['total memory, MB'], usage_mem['free memory, MB']))
-    log(msg, level)
 
 
 def calc_resource_usage_mem():
@@ -536,9 +540,9 @@ def calc_resource_usage_mem():
 
             return _VmB('VmStk:') - since
         
-        return {'memory, MB':memory()/_scale['MB'], 
-                'resident, MB':resident()/_scale['MB'],
-                'stacksize, MB':stacksize()/_scale['MB']}
+        return {MEM_J:memory()/_scale['MB'], 
+                RESMEM_J:resident()/_scale['MB'],
+                STACKSIZE_J:stacksize()/_scale['MB']}
     else:
         # Windows code from: http://code.activestate.com/recipes/511491/
         try:
@@ -566,8 +570,8 @@ def calc_resource_usage_mem():
         memoryStatusEx.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
         kernel32.GlobalMemoryStatusEx(ctypes.byref(memoryStatusEx))
 
-        return {'total memory, MB':memoryStatusEx.ullTotalPhys/_scale['MB'],
-         'free memory, MB':memoryStatusEx.ullAvailPhys/_scale['MB']}
+        return {TOTALMEM:memoryStatusEx.ullTotalPhys/_scale['MB'],
+         FREEMEM_J:memoryStatusEx.ullAvailPhys/_scale['MB']}
 
 
 ################################################################################
