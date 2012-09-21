@@ -1,4 +1,5 @@
 
+	
 ========================================================================
 A. INTRODUCTION
 	
@@ -23,6 +24,7 @@ EQRM DEPENDANCIES:
 3) scipy (version 0.9.0 or later)
 4) Shapely (version 1.2.15 or later)
 5) gcc 
+6) simplejason (when using Python2.5)
 
 Notes for EQRM dependencies:
 * Version numbers are a guide only. The EQRM may work with earlier
