@@ -69,7 +69,22 @@ import os
 import sys
 import traceback
 import logging
-import json
+
+try:
+    import json
+except ImportError:
+    try:
+        import simplejson as json
+    except ImportError:
+        print "Import Error;  simplejson not installed."
+        print "Install simplejson, or use Python2.6 or greater."
+        import sys; sys.exit(1)
+        
+    
+
+ 
+
+
 
 
 from eqrm_code.get_version import get_version

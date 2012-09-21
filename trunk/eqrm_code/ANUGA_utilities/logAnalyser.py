@@ -3,6 +3,21 @@ import os
 import re
 import csv
 
+
+try:
+    import json
+except ImportError:
+    try:
+        import simplejson as json
+    except ImportError:
+        print "Import Error.  simplejson not installed."
+        print "Install simplejson, or use Python2.6 or greater."
+        import sys; sys.exit(1)
+
+from eqrm_code.ANUGA_utilities.log import DELIMITER_J
+
+
+
 defaultOutputFile ='timing.csv'
 timingDelimiter = 'yeah'
 
@@ -23,8 +38,8 @@ def build_log_info(path, log_file):
             if log_file in file: 
                 dictResults = {}
                 for line in open(os.path.join(path,file)):
-                    if line.find(timingDelimiter)>-1:
-                        key_value = line.split(timingDelimiter)[1]
+                    if line.find(DELIMITER_J)>-1:
+                        json_string = line.split(timingDelimiter)[1]
                         # FIXME remove the magic comma
                         key_value_list = key_value.split(',')
                         key = key_value_list[0].strip()
