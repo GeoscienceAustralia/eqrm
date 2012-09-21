@@ -1386,7 +1386,7 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
         
         # Turn these into numpy arrays so we can use it's indexing
         output_file_lines = asarray(output_file_lines)
-        input_file_lines = asarray(input_file_lines)
+        #input_file_lines = asarray(input_file_lines) this is commented to avoid an error in numpy1.5.1
         
         for i in range(size):
             output_indices = block_indices[i] + header_size
