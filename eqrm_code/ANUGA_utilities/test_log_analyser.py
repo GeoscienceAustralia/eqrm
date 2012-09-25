@@ -6,9 +6,7 @@
 import os
 import unittest
 import tempfile
-from log_analyser import analyse_log, merge_dicts, LOGFILE
-
-from eqrm_code.ANUGA_utilities.log import DELIMITER_J
+import csv
 
 try:
     import json
@@ -19,6 +17,10 @@ except ImportError:
         print "Import Error;  simplejson not installed."
         print "Install simplejson, or use Python2.6 or greater."
         import sys; sys.exit(1)
+        
+from log_analyser import analyse_log, merge_dicts, LOGFILE
+from eqrm_code.ANUGA_utilities.log import DELIMITER_J
+
         
 class logAnalyserCase(unittest.TestCase):
 
@@ -48,6 +50,7 @@ class logAnalyserCase(unittest.TestCase):
     def test_log(self):
         # create a dummy directory and log file
         root_dir = tempfile.mkdtemp('test_logAnalyser')
+        print "root_dir", root_dir
         dir1 = tempfile.mkdtemp(dir=root_dir)
         dir2 = tempfile.mkdtemp(dir=root_dir)
         
@@ -58,11 +61,11 @@ class logAnalyserCase(unittest.TestCase):
         handle = file(log_path_file1, 'w')
         handle.write('yeah\n yeah\n ')
         handle.write('2012-01-23 13:20:10,147 INFO   general_mesh:202 |\n')
-        made_up1 = {'numTriangles':1, 'startMeshTime':2,
-                    'finishMeshTime':3}
-        made_up2 = {'finishTime':4, 'startMemory':5,
-                    'finishMemory':6,
-                    'numTriangles':3}
+        made_up1 = {'a':1, 'f':2,
+                    'e':3}
+        made_up2 = {'d':4, 'c':5,
+                    'b':6,
+                    'a':7}
         for dic in [made_up1, made_up2]:
             handle.write(self.log_lines(dic))
         handle.close()
@@ -72,13 +75,13 @@ class logAnalyserCase(unittest.TestCase):
         handle = file(log_path_file2, 'w')
         handle.write('yeah\n yeah\n ')
         handle.write('2012-01-23 13:20:10,147 INFO   general_mesh:202 |\n')
-        made_up1 = {'numTriangles':30, 'startMeshTime':20,
-                    'finishMeshTime':30}
-        made_up2 = {'finishTime':40, 
-                    'finishMemory':60,
-                    'numTriangles':10}
+        made_up1 = {'a':70, 'f':20,
+                    'e':30}
+        made_up2 = {'d':40, 
+                    'b':60,
+                    'a':10}
         # No 'startMemory' in this log file 
-        for key, val in made_up2.iteritems():
+        for dic in [made_up1, made_up2]:
             handle.write(self.log_lines(dic))
         handle.close()
 
@@ -90,8 +93,29 @@ class logAnalyserCase(unittest.TestCase):
 
         analyse_log(root_dir, output_file, log_file_name)
         
-        #FIXME check these results
+        actual = [['a', 'b',
+                   'c', 'd',
+                   'e', 'f'],
+                  ['7', '6', '5', '4', '3', '2'],
+                  ['70', '60', '', '40', '30', '20']]
         
+        with open(output_file, 'rb') as f:
+            results = []
+            reader = csv.reader(f)
+            for line in reader:
+                results.append(line)
+        self.assertEqual(actual[0], results[0])
+        
+        # The order of the log files is unknown
+        if results[1][0] == '7':
+            self.assertEqual(actual[1], results[1])
+            self.assertEqual(actual[2], results[2])
+        else:
+            self.assertEqual(actual[1], results[2])
+            self.assertEqual(actual[2], results[1])
+            
+       
+        os.remove(output_file)
         os.remove(log_path_file1)
         os.remove(log_path_file2)
         os.rmdir(dir1)
