@@ -50,7 +50,6 @@ class logAnalyserCase(unittest.TestCase):
     def test_log(self):
         # create a dummy directory and log file
         root_dir = tempfile.mkdtemp('test_logAnalyser')
-        print "root_dir", root_dir
         dir1 = tempfile.mkdtemp(dir=root_dir)
         dir2 = tempfile.mkdtemp(dir=root_dir)
         

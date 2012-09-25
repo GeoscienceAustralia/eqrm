@@ -686,6 +686,9 @@ class Test_Output_manager(unittest.TestCase):
                                                        soil_amp)
         self.assert_ (allclose(motion, file_motion))
         self.assert_ (allclose(eqrm_flags.atten_periods, periods))
+        #stm_dir = os.path.join(eqrm_flags.output_dir,  "site_tag_motion")
+        #os.remove(os.path.join(stm_dir, )
+        shutil.rmtree(eqrm_flags.output_dir)
 
     def test_load_save_damage(self):
         save_dir = tempfile.mkdtemp('test_load_save_damage') + os.sep

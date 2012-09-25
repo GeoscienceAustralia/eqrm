@@ -246,6 +246,7 @@ class Test_Recurrence_functions(unittest.TestCase):
         self.assert_(allclose(
                 event_activity_matrix[0]/event_activity_matrix[1],
                 w1/w2))
+        os.remove(file_name)
 
 
         
@@ -311,7 +312,8 @@ class Test_Recurrence_functions(unittest.TestCase):
         lamba = A_min * grscale(b, recurrence_max_mag, 
                                 generation_min_mag, recurrence_min_mag)
         
-        self.assert_(allclose(lamba, sum(event_activity_matrix)))
+        self.assert_(allclose(lamba, sum(event_activity_matrix)))    
+        os.remove(file_name)
 
         
     def test_calc_event_activity_summing(self):
@@ -383,6 +385,7 @@ class Test_Recurrence_functions(unittest.TestCase):
                                 generation_min_mag, recurrence_min_mag)
         
         self.assert_(allclose(lamba, sum(event_activity_matrix)))
+        os.remove(file_name)
 
     def test_calc_event_activity_summing_MR(self):
         """Same as test_calc_event_activity_summing with added multiple 
@@ -469,7 +472,7 @@ class Test_Recurrence_functions(unittest.TestCase):
                        dummyRm2_sum * dummyRm2.raw_weight
         
         self.assert_(allclose(expected_sum, sum(event_activity_matrix)))
-        
+        os.remove(file_name)
 
         
     
