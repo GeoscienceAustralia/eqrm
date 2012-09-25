@@ -111,6 +111,7 @@ EVENTLOOPTIME_J = 'event_loop_time_seconds'
 CLOCKTIMEOVERALL_J = 'clock_time_taken_overall_seconds'
 WALLTIMEOVERALL_J = 'wall_time_taken_overall_seconds'
 
+
 DELIMITER_J = 'JS*N'
 
 ################################################################################
@@ -576,7 +577,7 @@ def _calc_resource_usage_mem():
         memoryStatusEx.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
         kernel32.GlobalMemoryStatusEx(ctypes.byref(memoryStatusEx))
 
-        return {TOTALMEM:memoryStatusEx.ullTotalPhys/_scale['MB'],
+        return {TOTALMEM_J:memoryStatusEx.ullTotalPhys/_scale['MB'],
          FREEMEM_J:memoryStatusEx.ullAvailPhys/_scale['MB']}
 
 
