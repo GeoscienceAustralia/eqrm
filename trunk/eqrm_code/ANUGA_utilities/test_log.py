@@ -8,7 +8,12 @@ import logging
 from eqrm_code.ANUGA_utilities import log
 import tempfile
 
+"""
+WARNING
 
+THE TESTS FAIL IF EXECUTED BY python test_log.py
+BUT PASS IS EXECUTED BY python test_all.py
+"""
 
 class Test_Log(unittest.TestCase):
     def setUp(self):
@@ -181,10 +186,10 @@ test at level CRITICAL'''
         lines = f.readlines()
         f.close()
         file_expected = '''|Logfile is '%s' with logging level of DEBUG, console logging level is DEBUG
-|JSON{"eggs": "ham"}''' % self.logfile
+|JS*N{"eggs": "ham"}''' % self.logfile
 
         console_expected = '''Logfile is '%s' with logging level of DEBUG, console logging level is DEBUG
-JSON{"eggs": "ham"}''' % self.logfile
+JS*N{"eggs": "ham"}''' % self.logfile
 
         # The first line is the output message from
         # log.set_log_file(self.logfile, log.file_logging_level)
@@ -221,3 +226,10 @@ if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Log, 'test')
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
+"""
+WARNING
+
+THE TESTS FAIL IF EXECUTED BY python test_log.py
+BUT PASS IS EXECUTED BY python test_all.py
+"""
