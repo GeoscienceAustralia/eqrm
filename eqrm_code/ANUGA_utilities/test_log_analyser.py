@@ -6,7 +6,7 @@
 import os
 import unittest
 import tempfile
-from logAnalyser import analyse_log, merge_dicts, LOGFILE
+from log_analyser import analyse_log, merge_dicts, LOGFILE
 
 from eqrm_code.ANUGA_utilities.log import DELIMITER_J
 
@@ -20,7 +20,7 @@ except ImportError:
         print "Install simplejson, or use Python2.6 or greater."
         import sys; sys.exit(1)
         
-class logTestCase(unittest.TestCase):
+class logAnalyserCase(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -104,7 +104,7 @@ class logTestCase(unittest.TestCase):
 ################################################################################
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(logTestCase,'test')
+    suite = unittest.makeSuite(logAnalyserCase,'test')
     runner = unittest.TextTestRunner() #verbosity=2)
     runner.run(suite)
     
