@@ -89,7 +89,7 @@ class logAnalyserCase(unittest.TestCase):
         (handle, output_file) = tempfile.mkstemp('.csv',
         'log_analyser')
         os.close(handle)
-        output_file = 'yeah.csv'
+        #output_file = 'yeah.csv'
 
         analyse_log(root_dir, output_file, log_file_name)
         
