@@ -111,7 +111,7 @@ EVENTLOOPTIME_J = 'event_loop_time_seconds'
 CLOCKTIMEOVERALL_J = 'clock_time_taken_overall_seconds'
 WALLTIMEOVERALL_J = 'wall_time_taken_overall_seconds'
 
-DELIMITER_J = 'JSON'
+DELIMITER_J = 'JS*N'
 
 ################################################################################
 # Module variables - only one copy of these, ever.
