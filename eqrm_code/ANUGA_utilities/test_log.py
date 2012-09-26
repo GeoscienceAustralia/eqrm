@@ -6,7 +6,8 @@ import sys
 import unittest
 import logging
 from eqrm_code.ANUGA_utilities import log
-import tempfile
+import tempfile 
+import numpy
 
 """
 WARNING
@@ -204,6 +205,14 @@ JS*N{"eggs": "ham"}''' % self.logfile
         self.assertEqual(file_result, file_expected)
         self.assertEqual(console_result, console_expected)
 
+    def test_eqrm_flags_simple(self):
+        
+        dic = {'a':1, 'b':[1], 'c':None, 'd':'yeah',
+               'e':['a', 'b', 'cv', []], 'f':numpy.array([1])}
+        exp = {'a':1, 'len_b':1, 'c':None, 'd':'yeah', 'len_e':4, 
+               'len_f':1}
+        act = log._eqrm_flags_simple(dic)
+        self.assertEqual(exp, act)
        
 def strip_log(lines):
     """
@@ -224,6 +233,7 @@ if __name__ == "__main__":
     ## WARNING, THESE TESTS PASS IN TEST_ALL
     ## BREAK RUNNING TEST_LOG.PY
     suite = unittest.makeSuite(Test_Log, 'test')
+    #suite = unittest.makeSuite(Test_Log, 'test_eqrm_flags_simple')
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

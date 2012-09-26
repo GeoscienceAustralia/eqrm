@@ -69,6 +69,7 @@ import os
 import sys
 import traceback
 import logging
+import numpy
 
 try:
     import json
@@ -286,9 +287,11 @@ def set_log_level(level, console_level=None):
         if console_level is None:
             console_logging_level = numeric_level + INCREMENT
         else:
-            numeric_console_level = getattr(logging, console_level.upper(), None)
+            numeric_console_level = getattr(logging, console_level.upper(),
+             None)
             if not isinstance(numeric_console_level, int):
-                raise ValueError('Invalid console log level: %s' % console_level)
+                raise ValueError('Invalid console log level: %s'\
+                 % console_level)
             console_logging_level = numeric_console_level
         
         # sanity check the logging levels, require console >= file
@@ -435,7 +438,7 @@ def error(msg=''):
 
 def critical(msg=''):
     """Shortcut for log(CRITICAL, msg)."""
-
+    
     log(msg, logging.CRITICAL)
 
 def log_json(dic, level):
@@ -453,13 +456,40 @@ def resource_usage(level=logging.DEBUG):
     results.update(iowait) # 
     log_json(results, level)
    
+   
 def log_svn(level=logging.INFO):  
     version, date, modified = get_version()
     svn_dic = {SVNVERSION_J:version,
                SVNDATE_J:date,
                SVNMODIFIED_J: modified}
-    log_json(svn_dic, level)
- 
+    
+    
+def _eqrm_flags_simple(dic):
+    """
+     If the value is a list or array, change it to len(value) and 
+     add '_len' to the key.
+     This function returns a new dic object. 
+    """
+    res = {}
+    for k, v in dic.iteritems():
+        if isinstance(v, list) or isinstance(v, numpy.ndarray):
+            res['len_' + str(k)] = len(v) 
+        else:   
+            res[k] = v
+    return res
+    
+    
+def log_eqrm_flags_simple(eqrm_flags, level=logging.DEBUG):
+    """
+    Add the EQRM flags to the log file.
+    
+    Some modifications are made to simplify the data being logged;
+    If the value is a list, log len(value) and add '_len' to the key. 
+    """
+    simple_flags = _eqrm_flags_simple(eqrm_flags)
+    log_json(simple_flags, level)
+    
+    
 
 def _calc_io_wait():
     """
@@ -499,9 +529,6 @@ def _calc_io_wait():
         wcpu = wait_d/ctot*100
     return {IOWAIT_J: wcpu}
     
-
-
-
 
 def _calc_resource_usage_mem():
     """Log memory usage at given log level."""
