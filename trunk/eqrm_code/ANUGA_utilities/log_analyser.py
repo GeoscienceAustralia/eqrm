@@ -103,6 +103,7 @@ def write_meta_log(log_pairs, output_file):
                 
     # sort the keys alphabetacally
     sorted_all_keys = sorted(all_keys.keys())
+    print "output_file", output_file
     han = open(output_file, 'w')
     writer = csv.DictWriter(han, delimiter=',', 
                             fieldnames=sorted_all_keys,
@@ -119,7 +120,7 @@ def write_meta_log(log_pairs, output_file):
 if __name__ == '__main__':
     """
     usage is;
-    
+    log_analyser [path] [outputFile]
     """
     
     if len(sys.argv) < 2:
@@ -131,9 +132,9 @@ if __name__ == '__main__':
         sys.exit('ERROR: path %s was not found!' % path)    
         
     if len(sys.argv) < 3:
-        outputFile = open(defaultOutputFile, "a")
+        outputFile = defaultOutputFile
     else:
-        outputFile = open(sys.argv[2], "a")
+        outputFile = sys.argv[2]
 
     analyse_log(path, outputFile)
 

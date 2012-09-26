@@ -157,6 +157,7 @@ def main(parameter_handle,
     log.log_json({log.PARALLELSIZE_J:parallel.size}, log.INFO)
     log.log_json({log.HOSTNAME_J:parallel.node}, log.INFO)
     log.log_json({log.PLATFORM_J:platform}, log.INFO)
+    log.log_eqrm_flags_simple(eqrm_flags)
     
     log.log_svn()
     log.debug('Memory: Initial')
