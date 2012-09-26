@@ -105,13 +105,24 @@ SVNVERSION_J = 'SVN version'
 SVNDATE_J = 'SVN date'
 SVNMODIFIED_J = 'SVN modified'
 HOSTNAME_J = 'host name'
-PARALLELSIZE_J = 'Parallel size'
-PLATFORM_J = 'System platform'
+PARALLELSIZE_J = 'parallel size'
+PLATFORM_J = 'system platform'
 PRESITELOOP_J = 'time_pre_site_loop_fraction'
 EVENTLOOPTIME_J = 'event_loop_time_seconds'
 CLOCKTIMEOVERALL_J = 'clock_time_taken_overall_seconds'
 WALLTIMEOVERALL_J = 'wall_time_taken_overall_seconds'
+PSEUDOEVENTS_J = 'pseudo_events'
+SASURFACES_J = 'len_SA_surfaces'
+BLOCKSITES_J = 'len_block_sites'
+EVENTS_J = 'len_events'
+SOURCES_J = 'len_source_zones'
+MAXGMPE_J = 'len_max_GMPEs'
 
+# memory tags
+PEAK_J = 'peak_'
+INITIAL_J = 'initial_'
+LOOPING_J = 'looping_'
+FINAL_J = 'final_'
 
 DELIMITER_J = 'JS*N'
 
@@ -450,11 +461,17 @@ def log_json(dic, level):
     log(msg, level)
     
 
-def resource_usage(level=logging.DEBUG):   
+def resource_usage(level=logging.DEBUG, tag=None):
+    dic = _calc_resource_usage_mem()
+    if tag is not None:
+        for k, v in dic.iteritems():
+            dic[str(tag) + k] = dic.pop(k)
+    log_json(dic, level)
+   
+    
+def log_iowait(level=logging.DEBUG):  
     iowait = _calc_io_wait()
-    results = _calc_resource_usage_mem()
-    results.update(iowait) # 
-    log_json(results, level)
+    log_json(iowait, level)
    
    
 def log_svn(level=logging.INFO):  

@@ -512,6 +512,9 @@ class Event_Set(file_store.File_Store):
         source_zone = zeros((num_events), dtype=EVENT_FLOAT)
         
         start = 0
+        
+        log.log_json({log.SOURCES_J:len(source_model)}, log.INFO)
+        
         for i, source in enumerate(source_model):
             
             eqrmlog.debug('Generating events for source %s of %s' % 
@@ -525,7 +528,8 @@ class Event_Set(file_store.File_Store):
             range = arange(start, end)
             source.set_event_set_indexes(range)
             
-            eqrmlog.debug('Number of events = %s, range = %s' % (num, range))
+            eqrmlog.debug('Number of events in this source = %s' \
+                              % num)
             
             if num == 0:
                 continue
@@ -549,9 +553,6 @@ class Event_Set(file_store.File_Store):
             
             depth_bottom_seismogenic[start:end] = gp.populate_depth_bottom_seismogenic(num)
 
-            #FIXME DSG-EQRM the events will not to randomly placed,
-            # Due to  lat, lon being spherical coords and popolate
-            # working in x,y (flat 2D).
             (rupture_centroid_lat[start:end], 
              rupture_centroid_lon[start:end]) = array(gp.populate(num)).swapaxes(0, 1)
             
@@ -1531,6 +1532,7 @@ def create_event_set(eqrm_flags, parallel):
     
     log.info('P%s: Event set created. Number of events=%s' 
              % (parallel.rank, len(event_set.depth)))
+    log.log_json({log.EVENTS_J:len(event_set.depth)}, log.INFO)
     log.debug('Memory: Event Set created')
     log.resource_usage()
     

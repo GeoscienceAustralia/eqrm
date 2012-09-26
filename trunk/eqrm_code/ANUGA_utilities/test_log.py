@@ -214,6 +214,16 @@ JS*N{"eggs": "ham"}''' % self.logfile
         act = log._eqrm_flags_simple(dic)
         self.assertEqual(exp, act)
        
+       
+    def test_resource_usage(self):
+        # tests the logic of some of the code
+        dic = {'a':1, 'b':[1], 'c':None, 'd':'yeah'}
+        tag = 'a'
+        for k, v in dic.iteritems():
+            dic[tag + k] = dic.pop(k)
+        self.assertEqual(dic, {'aa':1, 'ab':[1], 'ac':None, 'ad':'yeah'})
+        
+        
 def strip_log(lines):
     """
     Return a sub-set of the log file.  This subset is testable.

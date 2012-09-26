@@ -161,7 +161,7 @@ def main(parameter_handle,
     
     log.log_svn()
     log.debug('Memory: Initial')
-    log.resource_usage()
+    log.resource_usage(tag=log.INITIAL_J)
     
     # load event set data
     (event_set, event_activity, source_model) = create_event_set(eqrm_flags, 
@@ -190,6 +190,7 @@ def main(parameter_handle,
     log.resource_usage()
     
     num_gmm_max = source_model.get_max_num_atten_models()
+    log.log_json({log.MAXGMPE_J:num_gmm_max}, log.INFO)
     num_events = len(event_set)
     num_spawning = eqrm_flags.atten_spawn_bins
    
@@ -203,9 +204,7 @@ def main(parameter_handle,
 
     event_activity.spawn(ground_motion_distribution.spawn_weights)
 
-    msg = ('Pseudo event set created. Number of pseudo_events=' +
-           str(num_pseudo_events))
-    log.debug(msg)
+    log.log_json({log.PSEUDOEVENTS_J:num_pseudo_events}, log.INFO)
     log.debug('Memory: Pseudo Event Set created')
     log.resource_usage()
     
@@ -242,15 +241,15 @@ def main(parameter_handle,
     msg = ('blocking over sites if running in parallel. block_size=' +
            str(num_site_block))
     log.debug(msg)
-
+    log.log_json({log.BLOCKSITES_J:num_site_block}, log.INFO)
+        
     msg = 'Number of atten_periods=' + str(len(eqrm_flags.atten_periods))
     log.debug(msg)
 
     if eqrm_flags.use_amplification is True:
-        msg = 'Number of SA_surfaces=2'
+        log.log_json({log.SASURFACES_J:2}, log.INFO)
     else:
-        msg = 'Number of SA_surfaces=1'
-    log.debug(msg)
+        log.log_json({log.SASURFACES_J:1}, log.INFO)
 
     # initialise some matrices.  These matrices have a site dimension and
     # are filled while looping over sites.  Whether they are needed or
@@ -348,7 +347,7 @@ def main(parameter_handle,
         log.info(msg)
         
         log.debug('Memory: site ' + str(i+1))
-        log.resource_usage()
+        log.resource_usage(tag=log.LOOPING_J)
         rel_i = i #- parallel.lo
 
         sites = all_sites[i:i+1] # take site i
@@ -775,7 +774,7 @@ def main(parameter_handle,
     parallel.finalize()
     del parallel
     log.debug('Memory: End')
-    log.resource_usage()
+    log.resource_usage(tag=log.FINAL_J)
     log.remove_file_handler()
 
 ################################################################################
@@ -1001,7 +1000,7 @@ def calc_and_save_SA(eqrm_flags,
                                       1.0/array(eqrm_flags.return_periods))
 
     log.debug('Memory: calc_and_save_SA before return')
-    log.resource_usage()
+    log.resource_usage(tag=log.PEAK_J)
                 
     return soil_SA_overloaded, rock_SA_overloaded
     
