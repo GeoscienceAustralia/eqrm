@@ -15,11 +15,13 @@ except ImportError:
         import sys; sys.exit(1)
 
 from eqrm_code.ANUGA_utilities.log import DELIMITER_J
+from eqrm_code.ANUGA_utilities import log
 
 
 
 OUTPUTFILE = 'timing.csv'
 LOGFILE = 'log-0.txt'
+
 
 def analyse_log(path, output_file, log_file=LOGFILE):
     """
