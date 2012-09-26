@@ -19,7 +19,8 @@ from os.path import join
 # Operation Mode
 run_type = "hazard" 
 is_scenario = False
-site_tag = "bench" 
+site_tag = "bench"
+zone_source_tag = "" 
 
 # General
 return_periods = [100, 200, 300, 400, 500, 600, 700, 800, 900]
@@ -35,6 +36,7 @@ output_dir = join(eqrm_data_home(), 'test_national',
                       'memory_output', get_time_user())
 
 prob_number_of_events_in_zones = [1e8,1e8,1e8,1e8]
+prob_number_of_events_in_zones = [1,1,1,1]
 #prob_number_of_events_in_zones = [100000,100000,100000,100000]
 
 # Attenuation
