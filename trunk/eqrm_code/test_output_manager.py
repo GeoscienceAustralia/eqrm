@@ -824,6 +824,44 @@ class Test_Output_manager(unittest.TestCase):
         f_check.close()
         os.remove(base_file_name)
 
+    def test_join_parallel_files2(self):
+        # this test checks that data files with differing numbers of entries per row can be joined together
+        # a previous version of join_parellel_files caused a ValueError in numpy 1.5.1 and scipy 0.8.0
+        compress = False
+        file_num = 5
+        header_size = 0
+        cleanup_file_names = []
+        join_indices = []
+
+        handle, base_file_name = tempfile.mkstemp('.txt', __name__ + '_')
+        os.close(handle)
+
+        if compress: my_open = myGzipFile
+        else: my_open = open
+
+        for i in range(file_num):
+            file_name = base_file_name + FILE_TAG_DELIMITER +  str(i)
+            cleanup_file_names.append(file_name)
+            f_handle = my_open(file_name, 'w')
+            if i == 1: tempstring =str(i) + ', ' + str(i) + ', ' + str(i) +  '\n' + str(i) + ', ' + str(i)
+            elif i ==2: tempstring = str(i) + ', ' + str(i)  
+            else: tempstring =str(i)
+                
+            f_handle.write(tempstring+ '\n')
+            f_handle.close()
+            join_indices.append(array([i]))
+        
+        try:
+            join_parallel_files([(base_file_name, header_size)], 
+                            file_num, 
+                            join_indices, 
+                            compress=False)
+        except Exception, e:
+            print e
+            self.fail()
+            
+        os.remove(base_file_name)
+
 
     def test_join_parallel_files_column(self):
         compress = False
