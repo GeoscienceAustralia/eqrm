@@ -126,44 +126,96 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     my_grd_file = os.path.join(tmp_dir, 'temp.grd')
     my_grd_file2 = os.path.join(tmp_dir, 'temp2.grd')
     my_grd_file3 = os.path.join(tmp_dir, 'temp3.grd')
+    my_mask_file = os.path.join(tmp_dir, 'mask.grd')
+    my_hzd_file = os.path.join(tmp_dir, 'hazard.grd')
     print my_grd_file    
     print my_grd_file2 
-    util.do_cmd('blockmean %s %s -I0.001 > %s'
-              % (my_xyz_file, r_opt, my_grd_file))
     
-    # Create a grid file
-    print "doing surface"
+    
     util.do_cmd('surface %s -G%s %s -I0.001 -T0.5'
-                % (my_xyz_file, my_grd_file2,r_opt))
-    
-    
-    #util.do_cmd('grdclip %s -Sa-1/NaN -G%s' 
-    #            % (my_grd_file2,
-    #               my_grd_file3))
-    
-    
-    util.do_cmd('psmask %s -K -Gwhite -I0.01 -T -O %s %s >> %s' 
-                % (my_xyz_file, r_opt, j_opt,
-                   my_ps_file))  
-
+                % (my_xyz_file, my_grd_file,r_opt))
     util.do_cmd('grdimage %s -K -Q -C%s %s %s > %s'
-                % (my_grd_file2, my_cpt_file, r_opt, j_opt,
+                % (my_grd_file, my_cpt_file, r_opt, j_opt,
                    my_ps_file))
-
-    #util.do_cmd('psxy %s -K -Sc0.1c -C%s %s %s > %s'
-    #            % (my_xyz_file, my_cpt_file, r_opt, j_opt,
-    #               my_ps_file))
-
-
-    #util.do_cmd('psmask -C -K -O >> %s'
-    #            % (my_ps_file))
-
-
-    # draw contoured data on mapgrdview
-    #util.do_cmd('grdimage %s -K -Qs -C%s %s %s > %s'
-    #            % (my_grd_file2, my_cpt_file, r_opt, j_opt,
-    #               my_ps_file))
     
+    """
+    # METHOD 1
+    util.do_cmd('surface %s -G%s %s -I0.001 -T0.5'
+                % (my_xyz_file, my_grd_file,r_opt))
+    
+    util.do_cmd('grdmask %s %s -I0.001 -G%s -NNaN/NaN/1'
+                % (my_xyz_file,r_opt,my_mask_file))
+    
+    util.do_cmd('grdmath %s %s MUL = %s'
+                % (my_mask_file, my_grd_file,my_hzd_file))
+    
+    util.do_cmd('grdimage %s -K -Q -C%s %s %s > %s'
+                % (my_hzd_file, my_cpt_file, r_opt, j_opt,
+                   my_ps_file))
+    """
+    
+    """
+    # METHOD 2
+    
+    util.do_cmd('xyz2grd %s %s -I0.001 -G%s'
+                % (my_xyz_file,r_opt,my_grd_file))
+    
+    util.do_cmd('grdsample %s %s -I0.005 -G%s'
+                % (my_grd_file,r_opt,my_grd_file2))
+    
+    util.do_cmd('grdmask %s %s -I0.005 -G%s -NNaN/NaN/1'
+                % (my_xyz_file,r_opt,my_mask_file))
+    
+    util.do_cmd('grdmath %s %s MUL = %s'
+                % (my_mask_file, my_grd_file2,my_hzd_file))
+    
+    util.do_cmd('grdimage %s -K -Q -C%s %s %s > %s'
+                % (my_hzd_file, my_cpt_file, r_opt, j_opt,
+                   my_ps_file))
+    """
+    
+    """
+    # METHOD 3
+    util.do_cmd('xyz2grd %s %s -I0.001 -G%s'
+                % (my_xyz_file,r_opt,my_grd_file))
+                
+    util.do_cmd('grdmask %s %s -I0.001 -G%s -NNaN/NaN/1'
+                % (my_xyz_file,r_opt,my_mask_file))
+    
+    util.do_cmd('grdmath %s %s MUL = %s'
+                % (my_mask_file, my_grd_file,my_hzd_file))
+    
+    util.do_cmd('psxy %s %s %s -W0.5p/100 -G200 -O -K -M >%s'
+                % (my_xyz_file, r_opt,j_opt,my_ps_file)) 
+    
+    util.do_cmd('grdimage %s -K -Q -C%s %s %s > %s'
+                % (my_hzd_file, my_cpt_file, r_opt, j_opt,
+                   my_ps_file))
+    """
+    
+    """
+    # METHOD 4
+    util.do_cmd('xyz2grd %s %s -I0.001 -G%s'
+                % (my_xyz_file,r_opt,my_grd_file))
+                
+    util.do_cmd('grdmask %s %s -I0.001 -G%s -NNaN/NaN/1'
+                % (my_xyz_file,r_opt,my_mask_file))
+    
+    util.do_cmd('grdmath %s %s MUL = %s'
+                % (my_mask_file, my_grd_file,my_hzd_file))
+    
+    util.do_cmd('psxy %s %s %s -W0.5p/100 -K >%s'
+                % (my_xyz_file, r_opt,j_opt,my_ps_file)) 
+    
+    util.do_cmd('grdimage %s -K -Q -C%s %s -O %s > %s'
+                % (my_hzd_file, my_cpt_file, r_opt, j_opt,
+                   my_ps_file))
+    util.do_cmd('psxy %s %s %s -W0.5p/100 -M -O -K >%s'
+                % (my_xyz_file, r_opt,j_opt,my_ps_file))                          
+     """
+               
+    
+   
     # draw the coast
     util.do_cmd('pscoast %s -K -O %s -Df -W -S192/216/255 >> %s'
                 % (r_opt, j_opt, my_ps_file))
