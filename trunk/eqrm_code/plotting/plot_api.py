@@ -919,7 +919,7 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
     yrange            Either <max> or (<min>, <max>) of Y range to plot
     show_grid         True if a grid is to be drawn
     plot_file         full filename for generated plot file (*.png, *.eps, etc)
-    save_file         full filename for saved plot data (CURRENTLY UNUSED)
+    save_file         filename (without path) for saved hazard curve data (optional).
     show_graph        True if the graph is to be shown on the screen
     legend_placement  a string determining where to place the legend
                       ('lower left' is the default)
@@ -944,12 +944,17 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
     Note this only seem to work on 'single char' colour strings, ie, 'g--' but not
     'green--'.
     """
-
     # get raw data, all periods
     # SA           is numpy array of shape (site, periods, RP)
     # RP           is a list of return periods of the SA values
     # periods      is a list of return periods of the SA values
     # prob_exceed  is inverse of RP (Y data)
+    
+    dname = os.path.dirname(input_dir+'/haz_curves/')
+    if save_file:
+        if not os.path.exists(dname):
+            os.makedirs(input_dir+'/haz_curves')
+
     (SA, periods, RP) = om.load_hazards(input_dir, site_tag, soil_amp)
     prob_exceed = [1/rp for rp in RP]
 
@@ -1013,8 +1018,16 @@ def fig_hazard_exceedance(input_dir, site_tag, soil_amp, sites, title=None,
         legend_titles.append(legend)
 
     # if user wants to save actual plotted data
-#    if save_file:
-#        save(data, save_file)      ####################### needs change
+        # first save the hazard dat for each curve
+        if save_file:
+            tmp_save_str = dname+'/site'+str(j)+'_'+save_file
+            numpy.save(tmp_save_str,data)    
+    #Now save the prob of exceedance (only once for all curves because same)
+    #Plus save the site information
+    if save_file:
+        numpy.save(dname+'/prob_of_exceed.npy',prob_exceed)
+        numpy.save(dname+'/sites.npy',sites)
+        
 
     # plot the data
     if plot_file or show_graph:
