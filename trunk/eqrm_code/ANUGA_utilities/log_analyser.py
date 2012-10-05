@@ -105,7 +105,6 @@ def write_meta_log(log_pairs, output_file):
                 
     # sort the keys alphabetacally
     sorted_all_keys = sorted(all_keys.keys())
-    print "output_file", output_file
     han = open(output_file, 'w')
     writer = csv.DictWriter(han, delimiter=',', 
                             fieldnames=sorted_all_keys,
