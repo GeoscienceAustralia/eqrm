@@ -20,12 +20,13 @@ run_type = "hazard"
 is_scenario = False
 site_tag = "newc" 
 site_db_tag = "" 
-return_periods = [3,3.5, 3.75,3.80, 3.9, 3.95, 3.97,3.975 , 3.98, 3.981, 3.982, 3.983, 3.984, 3.985, 3.99, 4,]
+return_periods = [3,7,20,80,100,1000]
 input_dir = join('.', 'input')
 output_dir = join('.',  'TS_haz03')
 use_site_indexes = True
 site_indexes = [2255, 11511, 10963, 686, 1026, 6597, 12382, 314, 2040, 3318, 9934, 12225, 10506, 9934, 2841, 10420, 10314, 10612, 10316, 10313, 11863, 11523, 9736, 11702, 11862, 2562, 5963, 4550, 6737, 5214]
 zone_source_tag = "Atkinson_Boore_97" 
+zone_source_tag = "2" 
 event_control_tag = "use" 
 
 # Scenario input
@@ -74,6 +75,7 @@ if __name__ == '__main__':
     from eqrm_code import postprocessing
     site_tag = "newc" 
     output_dir = join('.',  'TS_haz03')
-    postprocessing.generate_motion_csv(output_dir,
-                                      site_tag,
-                                       soil_amp=False)
+    if False:
+        postprocessing.generate_motion_csv(output_dir,
+                                           site_tag,
+                                           soil_amp=False)
