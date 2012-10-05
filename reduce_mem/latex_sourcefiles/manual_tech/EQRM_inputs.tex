@@ -1,0 +1,83 @@
+\documentclass[a4paper, 12pt]{report}
+\textwidth = 14.5cm \textheight = 21.5cm \topmargin = -.5cm
+\leftmargin = 5cm
+
+\setcounter{secnumdepth}{3} \setcounter{tocdepth}{4}
+
+%\oddsidemargin = 1cm
+%\leftmargin = -3cm
+%\evensidemargin = 5cm
+
+
+%\includeonly{eqrmtech-h-apps}
+
+\usepackage{float}
+\restylefloat{table}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{natbib}
+\bibliographystyle{grfchicago}
+\usepackage{makeidx}
+%\usepackage{url}
+%\usepackage{psfrag}
+\usepackage{supertabular}
+%\usepackage{drcaptionstyle}
+\usepackage{listings}
+%\usepackage{color}
+\usepackage[usenames,dvipsnames]{color}
+
+% set up some environments
+\definecolor{light-gray}{gray}{0.8}
+\lstset{basicstyle=\scriptsize}
+%\lstset{frame=shadowbox, rulesepcolor=\color{blue}, fillcolor = \color{blue}} % create a frame and blue boundary for the xml file
+\lstset{frame=single, backgroundcolor=\color{light-gray}}
+
+
+\graphicspath{{diags/}}
+
+\input{eqrmtech-macros}
+
+\setlength{\parskip}{1em plus 0.1em minus 0.2em}
+\setlength{\parindent}{0pt}
+
+
+\makeindex
+
+
+
+\title{EQRM: Description of Inputs Files and Parameters\\
+}
+
+%\begin{center}
+% Version 2.0
+%\end{center}
+
+\author{DRAFT ONLY \\[1em]
+ \\[3em]
+EQRM Development Team \\[1em]
+Geoscience Australia}
+
+
+
+\begin{document}
+\maketitle
+
+\pagenumbering{roman}
+
+\tableofcontents
+
+\newpage
+\pagenumbering{arabic}
+\include{eqrmtech-hv-application}
+
+\appendix
+%\include{eqrmtech-apps}
+
+\small
+%\bibliography{../refs/drrefs,../refs/garefs}
+
+%\printindex
+
+\end{document}

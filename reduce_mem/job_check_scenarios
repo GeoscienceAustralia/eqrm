@@ -1,0 +1,8 @@
+#!/bin/bash
+#PBS -wd 
+#PBS -q express
+#PBS -l walltime=0:45:00
+#PBS -l vmem=500MB
+#PBS -l jobfs=500MB
+
+python check_scenarios.py

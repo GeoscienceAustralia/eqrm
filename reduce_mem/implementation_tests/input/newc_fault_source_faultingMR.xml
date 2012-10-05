@@ -1,0 +1,113 @@
+<source_model_fault magnitude_type="Mw">
+  <fault 
+  name = "Newie South Fault crustal fault"
+  event_type = "mean_1_sigma_0pt5_no_mod"> mean_1_sigma_0pt5_no_mod
+  
+    <geometry 
+        dip= "45" 
+        out_of_dip_theta = "0"
+        delta_theta = "0" 
+        depth_top_seismogenic = "2"
+        depth_bottom_seismogenic = "10"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-33.1" lon="151.5" />
+            <end lat="-33.1" lon="151.8" />
+        </trace>
+    </geometry>
+    
+    <event_generation 
+        generation_min_mag = "4.5"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "1" />
+    
+    <recurrence_model
+       distribution = "bounded_gutenberg_richter"
+       recurrence_min_mag = "4.5" 
+       recurrence_max_mag = "6.5" 
+       A_min = "0.001" 
+       b = "1" 
+       weight = "0.5" />
+    
+    <recurrence_model
+       distribution = "characteristic"
+       recurrence_min_mag = "3.5" 
+       recurrence_max_mag = "5.5" 
+       A_min = "0.012" 
+       b = "2" 
+       weight = "0.5" />
+           
+  </fault>
+  
+  <fault 
+  name = "Newie North Fault crustal fault"
+  event_type = "mean_2_sigma_1_no_mod">
+  
+    <geometry 
+        dip= "45" 
+        out_of_dip_theta = "0"
+        delta_theta = "0" 
+        depth_top_seismogenic = "2"
+        depth_bottom_seismogenic = "10"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-32.9" lon="151.5" />
+            <end lat="-32.9" lon="151.8" />
+        </trace>
+    </geometry>
+    
+    <event_generation 
+        generation_min_mag = "4.5"
+        number_of_mag_sample_bins = "15" 
+        number_of_events = "1" />
+    
+    <recurrence_model
+       distribution = "characteristic"
+       recurrence_min_mag = "4.5" 
+       recurrence_max_mag = "6.5" 
+       A_min = "0.01" 
+       b = "1" 
+       weight = "0.1" />
+       
+    <recurrence_model
+       distribution = "bounded_gutenberg_richter"
+       recurrence_min_mag = "4.5" 
+       recurrence_max_mag = "6.5" 
+       A_min = "0.01" 
+       b = "1" 
+       weight = "0.9" />
+           
+  </fault>
+
+  <fault 
+  name = "Newie Subduction Zone"
+  event_type = "mean_1_and_2_no_mod">
+  
+    <geometry 
+        dip= "30" 
+        out_of_dip_theta = "90"
+        delta_theta = "10" 
+        depth_top_seismogenic = "5"
+        depth_bottom_seismogenic = "100"
+        slab_width = "0">
+        <trace> 	
+            <start lat="-28.0" lon="152.5" />
+            <end lat="-38.0" lon="152.5" />
+        </trace>
+    </geometry>
+      
+    <recurrence_model
+       distribution = "bounded_gutenberg_richter"
+       recurrence_min_mag = "4.5" 
+       recurrence_max_mag = "8.5" 
+       A_min = "0.1" 
+       b = "1">
+      <event_generation 
+        generation_min_mag = "4.5"
+        number_of_mag_sample_bins = "25" 
+        number_of_events = "1" />
+    </recurrence_model>
+           
+  </fault>  
+  
+</source_model_fault>
