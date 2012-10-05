@@ -1,0 +1,2 @@
+% Rupture distance. Columns are sites, rows are events
+76.115 72.404

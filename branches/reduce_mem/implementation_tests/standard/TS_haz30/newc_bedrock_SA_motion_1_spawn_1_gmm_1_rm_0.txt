@@ -1,0 +1,10 @@
+% Event = 1
+% Spawn = 1
+% ground motion model = 1
+% Recurrence model = 0
+% First row are rsa periods, then rows are sites
+0.0 1.0526 2.0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
