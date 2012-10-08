@@ -9,6 +9,54 @@
   Copyright 20012 by Geoscience Australia
 """
 
+from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
+    PARALLELSIZE_J
+
+def log_pairs_estimate_mem(log_pairs):
+    """
+    Given a list of dictionaries of log information estimate the memory
+    used, in MB. Add the esimate to the log pairs.
+    
+    args;
+    log_pairs 
+    """
+    for log_pair in log_pairs:
+        mem_kb = estimate_mem_log_format(log_pair)
+        print mem_kb
+        #continue
+
+def estimate_mem_log_format(log_pair): # = log_pair[]
+    events = log_pair[EVENTS_J]
+    atten_periods = log_pair['len_atten_periods']
+    return_periods= log_pair['len_return_periods']
+    parallel_size = log_pair[PARALLELSIZE_J]
+    spawning = log_pair['atten_spawn_bins']
+    gmm_dimensions = log_pair[MAXGMPE_J]
+    rec_mod = 1 # = log_pair['']
+    atten_collapse_Sa_of_atten_models = \
+        log_pair['atten_collapse_Sa_of_atten_models']
+    save_total_financial_loss = log_pair['save_total_financial_loss']
+    save_building_loss = log_pair['save_building_loss']
+    save_contents_loss = log_pair['save_contents_loss']
+    save_hazard_map = log_pair['save_hazard_map']
+    save_motion = log_pair['save_motion']
+    use_amplification = log_pair['use_amplification']
+    
+    results = estimate_mem(events, 
+                           atten_periods, 
+                           return_periods,
+                           parallel_size,
+                           spawning,
+                           gmm_dimensions,
+                           rec_mod,
+                           save_total_financial_loss,
+                           save_building_loss,
+                           save_contents_loss,
+                           save_hazard_map,
+                           save_motion,
+                           use_amplification)
+    return results
+
 def estimate_mem(events, 
                  atten_periods, 
                  return_periods,
