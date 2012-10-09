@@ -464,8 +464,10 @@ def log_json(dic, level):
 def resource_usage(level=logging.DEBUG, tag=None):
     dic = _calc_resource_usage_mem()
     if tag is not None:
+        new_dic = {}
         for k, v in dic.iteritems():
-            dic[str(tag) + k] = dic.pop(k)
+            new_dic[str(tag) + k] = v
+        dic = new_dic
     log_json(dic, level)
    
     
