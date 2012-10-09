@@ -10,7 +10,10 @@
 """
 
 from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
-    PARALLELSIZE_J
+    PARALLELSIZE_J, TOTALMEM_J
+
+MB2B = 1048576.
+#MB2B = 9.53674e-7
 
 def log_pairs_estimate_mem(log_pairs):
     """
@@ -21,8 +24,13 @@ def log_pairs_estimate_mem(log_pairs):
     log_pairs 
     """
     for log_pair in log_pairs:
-        mem_kb = estimate_mem_log_format(log_pair)
-        print mem_kb
+        mem_b = estimate_mem_log_format(log_pair)
+        print "*********************"
+        #print "mem_bytes",mem_b
+        print "mem_MB", mem_b/MB2B
+        pmemory = 'peak_memory MB'
+        print pmemory, log_pair[pmemory]
+        
         #continue
 
 def estimate_mem_log_format(log_pair): # = log_pair[]
@@ -74,6 +82,8 @@ def estimate_mem(events,
                  loop_sites=1,
                  item_size=8):
     """
+    Estimate the total memory used in an EQRM simulation.  
+    Give the results in bytes
 
     """
     
@@ -176,3 +186,4 @@ def estimate_mem(events,
     object_mem = 0
     total_mem = array_mem + object_mem
     return total_mem
+

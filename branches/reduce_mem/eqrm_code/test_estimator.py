@@ -1,5 +1,6 @@
 
 import unittest
+import numpy
 from eqrm_code.estimator import *
 
 class Test_estimator(unittest.TestCase):
@@ -45,6 +46,12 @@ class Test_estimator(unittest.TestCase):
                                item_size)
         #print results
         # don't test this yet.
+
+    def test_memory(self):
+        mem_array = numpy.zeros([1000, 1000], dtype=float)
+        self.assertEqual(mem_array.nbytes, 1000*1000*8)
+
+
 
 ################################################################################
 
