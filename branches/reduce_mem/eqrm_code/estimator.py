@@ -45,6 +45,7 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
     atten_periods = log_pair['len_atten_periods']
     return_periods= log_pair['len_return_periods']
     parallel_size = log_pair[PARALLELSIZE_J]
+    sites = log_pair[BLOCKSITES_J] * parallel_size
     spawning = log_pair['atten_spawn_bins']
     gmm_dimensions = log_pair[MAXGMPE_J]
     rec_mod = 1 # = log_pair['']
@@ -60,6 +61,7 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
     results = estimate_mem(events, 
                            atten_periods, 
                            return_periods,
+                           sites,
                            parallel_size,
                            spawning,
                            gmm_dimensions,
@@ -76,6 +78,7 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
 def estimate_mem(events, 
                  atten_periods, 
                  return_periods,
+                 sites,
                  parallel_size=1,
                  spawning=1,
                  gmm_dimensions=1,
@@ -103,15 +106,14 @@ def estimate_mem(events,
         gmm_after_collapsing = gmm_max
 
     # calculate number of bytes for each data structure
-    site_block = events/parallel_size
+    site_block = sites/parallel_size
 
     if save_hazard_map is True:
         mem_bytes[log.BEDROCKHAZ_J] = (site_block *
-                          atten_periods *
-                          return_periods) * item_size
+                                       atten_periods *
+                                       return_periods) * item_size
     else:
          mem_bytes[log.BEDROCKHAZ_J] = 0
-        
     if save_hazard_map is True and \
            use_amplification is True:
         mem_bytes[log.SOILHAZ_J] = bedrock_hazard
@@ -122,6 +124,12 @@ def estimate_mem(events,
          mem_bytes[log.BEDROCKALL_J] = (spawning * gmm_dimensions * rec_mod *
                           site_block * events *
                           atten_periods) * item_size
+         print "spawning",spawning
+         print "gmm_dimensions",gmm_dimensions
+         print "rec_mod",rec_mod
+         print "site_block",site_block
+         print "events",events
+         print "atten_periods",atten_periods
     else:
         mem_bytes[log.BEDROCKALL_J] = 0
         

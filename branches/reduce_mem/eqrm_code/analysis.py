@@ -262,6 +262,7 @@ def main(parameter_handle,
                                      len(eqrm_flags.atten_periods),
                                      len(eqrm_flags.return_periods)),
                                     dtype=float)
+
         log.log_json({log.BEDROCKHAZ_J: data.bedrock_hazard.nbytes},
                      log.DEBUG)
     else:
@@ -285,7 +286,15 @@ def main(parameter_handle,
         data.bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                                 num_site_block, num_events,
                                 len(eqrm_flags.atten_periods)),
-                               dtype=float)     
+                               dtype=float) 
+        log_dic = {"cra_site_block":num_site_block, 
+                   "cra_spawning":num_spawning,
+                   "cra_num_gmm_dimensions":num_gmm_dimensions,
+                   "cra_num_rm":num_rm,
+                   "cra_num_events":num_events,
+                   "cra_return_periods":len(eqrm_flags.return_periods)}
+        log.log_json(log_dic,
+                     log.DEBUG)    
         log.log_json({log.BEDROCKALL_J: data.bedrock_SA_all.nbytes},
                      log.DEBUG)   
     else:

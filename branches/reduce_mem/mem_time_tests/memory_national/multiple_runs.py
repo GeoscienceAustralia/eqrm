@@ -56,7 +56,7 @@ def create_base():
     
     # Save
     sdp.save_hazard_map = True
-    
+    sdp.save_motion = True
     
     return sdp
 
