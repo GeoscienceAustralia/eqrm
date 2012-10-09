@@ -20,10 +20,10 @@ from eqrm_code.ANUGA_utilities import log
 
 
 OUTPUTFILE = 'timing.csv'
-LOGFILE = 'log-0.txt'
+LOGFILETAG = 'log-0'
 
 
-def analyse_log(path, output_file, log_file=LOGFILE):
+def analyse_log(path, output_file, log_file=LOGFILETAG):
     """
     Read all the logs and write a meta_log_csv file.
 
@@ -69,7 +69,7 @@ def merge_dicts(d1, d2, merge=lambda x,y:max(x,y)):
     return result
    
         
-def build_log_info(path, log_file=LOGFILE):
+def build_log_info(path, log_file=LOGFILETAG):
     """
     Read 1 or more log files and collate the json dictionary 
     part of the log file into a list, with each element of the list
