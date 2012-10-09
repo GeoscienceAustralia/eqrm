@@ -47,6 +47,7 @@ class Test_estimator(unittest.TestCase):
         #print results
         # don't test this yet.
 
+
     def test_memory(self):
         mem_array = numpy.zeros([1000, 1000], dtype=float)
         self.assertEqual(mem_array.nbytes, 1000*1000*8)

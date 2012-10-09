@@ -241,15 +241,15 @@ def main(parameter_handle,
     msg = ('blocking over sites if running in parallel. block_size=' +
            str(num_site_block))
     log.debug(msg)
-    log.log_json({log.BLOCKSITES_J:num_site_block}, log.INFO)
+    log.log_json({log.BLOCKSITES_J:num_site_block}, log.DEBUG)
         
     msg = 'Number of atten_periods=' + str(len(eqrm_flags.atten_periods))
     log.debug(msg)
 
     if eqrm_flags.use_amplification is True:
-        log.log_json({log.SASURFACES_J:2}, log.INFO)
+        log.log_json({log.SASURFACES_J:2}, log.DEBUG)
     else:
-        log.log_json({log.SASURFACES_J:1}, log.INFO)
+        log.log_json({log.SASURFACES_J:1}, log.DEBUG)
 
     # initialise some matrices.  These matrices have a site dimension and
     # are filled while looping over sites.  Whether they are needed or
@@ -262,6 +262,8 @@ def main(parameter_handle,
                                      len(eqrm_flags.atten_periods),
                                      len(eqrm_flags.return_periods)),
                                     dtype=float)
+        log.log_json({log.BEDROCKHAZ_J: data.bedrock_hazard.nbytes},
+                     log.DEBUG)
     else:
         data.bedrock_hazard = None
         
@@ -271,6 +273,8 @@ def main(parameter_handle,
                                   len(eqrm_flags.atten_periods),
                                   len(eqrm_flags.return_periods)),
                                  dtype=float)
+        log.log_json({log.SOILHAZ_J: data.soil_hazard.nbytes},
+                     log.DEBUG)
     else:
         data.soil_hazard = None     
     log.debug('Memory: hazard_map array created')
@@ -281,7 +285,9 @@ def main(parameter_handle,
         data.bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                                 num_site_block, num_events,
                                 len(eqrm_flags.atten_periods)),
-                               dtype=float)        
+                               dtype=float)     
+        log.log_json({log.BEDROCKALL_J: data.bedrock_SA_all.nbytes},
+                     log.DEBUG)   
     else:
         data.bedrock_SA_all = None
         
@@ -290,7 +296,9 @@ def main(parameter_handle,
         data.soil_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                              num_site_block, num_events,
                              len(eqrm_flags.atten_periods)),
-                            dtype=float)
+                            dtype=float)   
+        log.log_json({log.SOILALL_J: data.soil_SA_all.nbytes},
+                     log.DEBUG)   
     else:
         data.soil_SA_all = None        
     log.debug('Memory: save_motion array created')
@@ -822,10 +830,20 @@ def calc_and_save_SA(eqrm_flags,
         (num_spawn, num_gmm_after_collapsing, num_rm,
          num_sites, num_events, num_periods),
         dtype=float)
+    log_dic = {log.COLLROCKSAE_J: coll_rock_SA_all_events.nbytes,
+               "cra_num_events":num_events,
+               "cra_num_spawn":num_spawn,
+               "cra_num_periods":num_periods,
+               "cra_num_gmm_after_collapsing":num_gmm_after_collapsing}
+    log.log_json(log_dic,
+                 log.DEBUG)
     rock_SA_overloaded = zeros((num_sites,
                                 num_events * num_gmm_max * num_spawn * num_rm,
                                 num_periods),
                                dtype=float)
+
+    log.log_json({log.ROCKOVERLOADED_J: rock_SA_overloaded.nbytes},
+                 log.DEBUG)
     if eqrm_flags.use_amplification is True:
         coll_soil_SA_all_events = zeros(
             (num_spawn, num_gmm_after_collapsing, num_rm, num_sites, num_events,

@@ -6,12 +6,14 @@ import os
 
 from eqrm_code.ANUGA_utilities.log_analyser import build_log_info #analyse_log, merge_dicts, LOGFILE
 from eqrm_code.parse_in_parameters import eqrm_data_home
+
 from eqrm_code.estimator import log_pairs_estimate_mem
 
 def create_meta_log():
     path = os.path.join(eqrm_data_home(), 'test_national', 
                                           'memory_output')
     log_pairs = build_log_info(path) 
+
     log_pairs_estimate_mem(log_pairs)
 
 #-------------------------------------------------------------

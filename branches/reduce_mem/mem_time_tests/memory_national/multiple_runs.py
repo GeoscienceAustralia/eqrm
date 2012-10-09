@@ -67,7 +67,7 @@ def build_runs_list():
     sdp = create_base()
     sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
                       'memory_output','trial_matrix')
-    #runs.append({"processes":1, "sdp":sdp})
+    runs.append({"processes":1, "sdp":sdp})
 
     # Testing parallel
     sdp = create_base()
@@ -84,7 +84,7 @@ def build_runs_list():
         events_source = events/num_sources
         sdp.prob_number_of_events_in_zones = [events_source]*num_sources
         sdp.site_indexes = [1, 2]
-        #runs.append({"processes":1, "sdp":sdp})
+        runs.append({"processes":1, "sdp":sdp})
 
     
     # Testing all sites
@@ -107,7 +107,7 @@ def build_runs_list():
             events_source = events/num_sources
             sdp.prob_number_of_events_in_zones = [events_source]*num_sources
             sdp.use_site_indexes = False 
-            runs.append({"processes":proc, "sdp":sdp})
+            #runs.append({"processes":proc, "sdp":sdp})
 
     return runs
 

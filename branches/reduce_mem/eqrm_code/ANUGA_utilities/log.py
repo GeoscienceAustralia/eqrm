@@ -117,6 +117,12 @@ BLOCKSITES_J = 'len_block_sites'
 EVENTS_J = 'len_events'
 SOURCES_J = 'len_source_zones'
 MAXGMPE_J = 'len_max_GMPEs'
+BEDROCKHAZ_J = 'bedrock_hazard array B'
+SOILHAZ_J = 'soil_hazard array B'
+BEDROCKALL_J = 'bedrock_all array B'
+SOILALL_J = 'soil_all array B'
+COLLROCKSAE_J = 'coll_rock_SA_all_events array B'
+ROCKOVERLOADED_J = 'rock_SA_overloaded array B'
 
 # memory tags
 PEAK_J = 'peak_'

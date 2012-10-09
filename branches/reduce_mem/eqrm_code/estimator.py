@@ -11,9 +11,11 @@
 
 from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
     PARALLELSIZE_J, TOTALMEM_J
+from eqrm_code.ANUGA_utilities import log
 
 MB2B = 1048576.
-#MB2B = 9.53674e-7
+
+# fixme rec_mod needs to be logged
 
 def log_pairs_estimate_mem(log_pairs):
     """
@@ -24,13 +26,18 @@ def log_pairs_estimate_mem(log_pairs):
     log_pairs 
     """
     for log_pair in log_pairs:
+        print "---------------------"
+        print log_pair["output_dir"]
         mem_b = estimate_mem_log_format(log_pair)
-        print "*********************"
-        #print "mem_bytes",mem_b
-        print "mem_MB", mem_b/MB2B
-        pmemory = 'peak_memory MB'
-        print pmemory, log_pair[pmemory]
-        
+        for key, value in log_pair.iteritems():
+            if mem_b.has_key(key):
+                estimate_b = mem_b[key]
+                print "*********************"
+                print "key",key
+                print "estimate_MB", estimate_b/MB2B
+                print "actual MB", value/MB2B
+            if 'cra' in key or 'len' in key or 'en_mo' in key:
+                print key + ":" + str(value)
         #continue
 
 def estimate_mem_log_format(log_pair): # = log_pair[]
@@ -57,6 +64,7 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
                            spawning,
                            gmm_dimensions,
                            rec_mod,
+                           atten_collapse_Sa_of_atten_models,
                            save_total_financial_loss,
                            save_building_loss,
                            save_contents_loss,
@@ -86,9 +94,9 @@ def estimate_mem(events,
     Give the results in bytes
 
     """
-    
+    mem_bytes = {}
     gmm_max = gmm_dimensions
-    #FIX ME 
+    
     if atten_collapse_Sa_of_atten_models:
         gmm_after_collapsing = 1
     else:
@@ -98,30 +106,30 @@ def estimate_mem(events,
     site_block = events/parallel_size
 
     if save_hazard_map is True:
-        bedrock_hazard = (site_block *
+        mem_bytes[log.BEDROCKHAZ_J] = (site_block *
                           atten_periods *
                           return_periods) * item_size
     else:
-        bedrock_hazard = 0
+         mem_bytes[log.BEDROCKHAZ_J] = 0
         
     if save_hazard_map is True and \
            use_amplification is True:
-        soil_hazard = bedrock_hazard
+        mem_bytes[log.SOILHAZ_J] = bedrock_hazard
     else:
-        soil_hazard = 0
+        mem_bytes[log.SOILHAZ_J] = 0
 
     if save_motion is True:
-        bedrock_SA_all = (spawning * gmm_dimensions * rec_mod *
+         mem_bytes[log.BEDROCKALL_J] = (spawning * gmm_dimensions * rec_mod *
                           site_block * events *
                           atten_periods) * item_size
     else:
-        bedrock_SA_all = 0
+        mem_bytes[log.BEDROCKALL_J] = 0
         
     if save_motion is True and \
            use_amplification is True:
-        soil_SA_all = bedrock_SA_all
+         mem_bytes[log.SOILALL_J] = bedrock_SA_all
     else:
-        soil_SA_all = 0
+         mem_bytes[log.SOILALL_J] = 0
 
     #if save_fatalities is True:
      #   total_fatalities = zeros((num_site_block, num_pseudo_events),
@@ -147,43 +155,44 @@ def estimate_mem(events,
    #      data.bedrock_hazard = None
         
     if save_total_financial_loss is True:
-        total_building_loss_qw = (site_block * spawning *
+         mem_bytes['total_building_loss_qw'] = (site_block * spawning *
                                   gmm_max * rec_mod * events) * item_size
     else:
-        total_building_loss_qw = 0
+         mem_bytes['total_building_loss_qw'] = 0
 
     if save_building_loss is True:
-        building_loss_qw =  (site_block * spawning *
+         mem_bytes['building_loss_qw'] =  (site_block * spawning *
                                   gmm_max * rec_mod * events) * item_size
     else:
-        building_loss_qw = 0
+         mem_bytes['building_loss_qw'] = 0
 
     if save_contents_loss is True:
-        contents_loss_qw =  (site_block * spawning *
+         mem_bytes['contents_loss_qw'] =  (site_block * spawning *
                                   gmm_max * rec_mod * events) * item_size
     else:
-        contents_loss_qw = 0
+         mem_bytes['contents_loss_qw'] = 0
 
-    coll_rock_SA_all_events = (spawning * gmm_after_collapsing * rec_mod *
-                               site_block * events * atten_periods) * item_size
-
-    rock_SA_overloaded = (loop_sites *
-                          events * gmm_max * spawning * rec_mod *
-                          atten_periods) * item_size
+    mem_bytes[log.COLLROCKSAE_J] = (spawning * gmm_after_collapsing *
+                                            rec_mod *
+                                             loop_sites * events * 
+                                            atten_periods) * item_size
+    mem_bytes[log.ROCKOVERLOADED_J] = (loop_sites *
+                                       events * gmm_max * spawning * rec_mod *
+                                       atten_periods) * item_size
 
     if use_amplification is True:
-        coll_soil_SA_all_events = coll_rock_SA_all_events          
-        soil_SA_overloaded = rock_SA_overloaded
+        mem_bytes['coll_soil_SA_all_events'] = coll_rock_SA_all_events          
+        mem_bytes['soil_SA_num_gmm_after_collapsingoverloaded'] = rock_SA_overloaded
     else:
-        coll_soil_SA_all_events = 0           
-        soil_SA_overloaded = 0
+        mem_bytes['coll_soil_SA_all_events'] = 0           
+        mem_bytes['soil_SA_overloaded'] = 0
 
-    array_mem = bedrock_hazard + soil_hazard + bedrock_SA_all + soil_SA_all + \
-       total_building_loss_qw + building_loss_qw + contents_loss_qw + \
-       coll_rock_SA_all_events + rock_SA_overloaded + \
-       coll_soil_SA_all_events + soil_SA_overloaded
+    #array_mem = bedrock_hazard + soil_hazard + bedrock_SA_all + soil_SA_all + \
+     #  total_building_loss_qw + building_loss_qw + contents_loss_qw + \
+      # coll_rock_SA_all_events + rock_SA_overloaded + \
+       #coll_soil_SA_all_events + soil_SA_overloaded
 
-    object_mem = 0
-    total_mem = array_mem + object_mem
-    return total_mem
+    #object_mem = 0
+    #total_mem = array_mem + object_mem
+    return mem_bytes
 
