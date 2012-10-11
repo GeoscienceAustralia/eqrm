@@ -5,6 +5,7 @@ Run multipe EQRM simulations, to get time and memory metrics.
 import subprocess 
 import os
 
+from scipy import arange
 import eqrm_code.util
 from eqrm_code import util
 from eqrm_code.parse_in_parameters import eqrm_data_home, get_time_user, \
@@ -16,6 +17,10 @@ class ListLengthError(Exception):
     pass
     
 def create_base():
+    """
+    Set up for 19 events, 5 gmpe_max, 7 periods, 11 spawning, 3 rec mod. 
+    2 Surfaces.
+    """
     sdp = ParameterData()
     
     # Operation Mode
@@ -36,12 +41,13 @@ def create_base():
     sdp.zone_source_tag = ""
     
     # Probabilistic input
-    sdp.prob_number_of_events_in_zones = [1,1,1,1]
+    sdp.prob_number_of_events_in_zones = [5,5,5,4]
     
     # Attenuation
     sdp.atten_collapse_Sa_of_atten_models = True
-    sdp.atten_variability_method = None
-    sdp.atten_periods = [0.0, 0.2, 1.0]
+    sdp.atten_variability_method = 1
+    sdp.atten_spawn_bins = 11
+    sdp.atten_periods = [0.0, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0]
     sdp.atten_threshold_distance = 400
     sdp.atten_override_RSA_shape = None
     sdp.atten_cutoff_max_spectral_displacement = False
@@ -49,7 +55,7 @@ def create_base():
     sdp.atten_smooth_spectral_acceleration = None
     
     # Amplification
-    sdp.use_amplification = False
+    sdp.use_amplification = False #True
     sdp.amp_variability_method = None
     sdp.amp_min_factor = 0.6
     sdp.amp_max_factor = 10000
@@ -60,9 +66,32 @@ def create_base():
     
     return sdp
 
+
+def build_runs_list_large_standard():
+    runs = []
+    num_sources = 4
+
+
+    # Testing parallel
+    sdp = create_base()
+    sdp.site_indexes = range(1, 400)
+    sdp.prob_number_of_events_in_zones = [10000] * 4
+    sdp.atten_periods =  [0.0, 0.3, 1.0]
+    sdp.atten_spawn_bins = 5
+    sdp.event_control_tag = "4GMPE" 
+    dir_last  = 'big_standard_' + str(sum(
+            sdp.prob_number_of_events_in_zones)) + \
+            "_sites" + str(len(sdp.site_indexes))
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                  'memory_output', dir_last)
+    runs.append({"processes":1, "sdp":sdp})
+
+    return runs
+
 def build_runs_list():
     runs = []
     num_sources = 4
+
     # The base run
     sdp = create_base()
     sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
@@ -74,7 +103,75 @@ def build_runs_list():
     sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
                       'memory_output','trial_parallel')
     sdp.site_indexes = [1, 2]
-    #runs.append({"processes":2, "sdp":sdp})
+    runs.append({"processes":2, "sdp":sdp})
+
+    # Test more events 
+    sdp = create_base()
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                      'memory_output','more_events')
+    sdp.site_indexes = [1, 2,3,4]
+    sdp.prob_number_of_events_in_zones = \
+        [x*4 for x in sdp.prob_number_of_events_in_zones]
+    runs.append({"processes":2, "sdp":sdp})
+
+    # Test small and larger event set
+    base = [5,5,5,4]
+    event_lists = [base, [x*200 for x in base]]
+    for event_list in event_lists:
+
+        # Test more rec mod
+        sdp = create_base()
+        dir_last  = 'more_rec_mod_events' + str(sum(event_list))
+        sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                      'memory_output', dir_last)
+        sdp.site_indexes = [1]
+        sdp.prob_number_of_events_in_zones = event_list       
+        sdp.zone_source_tag = "rec_mod"
+        runs.append({"processes":1, "sdp":sdp})
+
+        # Testing more GMPE's
+        sdp = create_base()
+        dir_last  = 'more_gmpe_events' + str(sum(event_list))
+        sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                      'memory_output', dir_last)
+        sdp.site_indexes = [1]
+        sdp.prob_number_of_events_in_zones = event_list
+        sdp.event_control_tag = "GMPE" 
+        runs.append({"processes":1, "sdp":sdp})
+        
+        # Testing more periods's
+        sdp = create_base()
+        dir_last  = 'more_periods_events' + str(sum(event_list))
+        sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                      'memory_output', dir_last)
+        sdp.site_indexes = [1] 
+        sdp.prob_number_of_events_in_zones = event_list
+        sdp.atten_periods = arange(0,2.1, 0.1)
+        runs.append({"processes":1, "sdp":sdp})
+        
+        # Test more spawning 
+        sdp = create_base()
+        dir_last  = 'more_spawning_events' + str(sum(event_list))
+        sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                      'memory_output', dir_last)
+        sdp.site_indexes = [1]
+        sdp.prob_number_of_events_in_zones = event_list
+        sdp.atten_variability_method = 1
+        sdp.atten_spawn_bins = 44
+        runs.append({"processes":1, "sdp":sdp})
+
+
+    # spawning all sites
+    sdp = create_base()
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                      'memory_output','bigger_spawning')
+    events = 50
+    events_source = events/num_sources
+    sdp.prob_number_of_events_in_zones = [events_source]*num_sources
+    sdp.atten_variability_method = 1
+    sdp.atten_spawn_bins = 100
+    sdp.use_site_indexes = False 
+    runs.append({"processes":1, "sdp":sdp})
 
     # increasing events, 2 sites
     for events in [1000, 10000, 100000]:
@@ -92,13 +189,15 @@ def build_runs_list():
     sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
                       'memory_output','trial_all_sites')
     sdp.use_site_indexes = False 
-    #runs.append({"processes":2, "sdp":sdp})
+    runs.append({"processes":2, "sdp":sdp})
     
     # increasing events, all sites
-    for events in [1000, 10000]: #, 100000]:
-        for proc in [1,2,4]:
+    for events in [1000, 5000]: #, 100000]:
+        for proc in [1]:
             sdp = create_base()
-            dir_name = 'sites_' + str(17277) + '_events_' + str(events) + \
+            sdp.site_indexes = range(1, 500)
+            dir_name = 'sites_' + str(len(sdp.site_indexes)) + '_events_' + \
+                str(events) + \
                 '_' + 'proc_'+ \
                 str(proc)
             sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
@@ -106,8 +205,7 @@ def build_runs_list():
                                           dir_name)
             events_source = events/num_sources
             sdp.prob_number_of_events_in_zones = [events_source]*num_sources
-            sdp.use_site_indexes = False 
-            #runs.append({"processes":proc, "sdp":sdp})
+            runs.append({"processes":proc, "sdp":sdp})
 
     return runs
 
@@ -186,8 +284,8 @@ def output_dir_basic(**kwargs):
        
 
 def test_run():
-    runs = build_runs_list()
-    multi_run(runs)
+    #multi_run(build_runs_list())
+    multi_run(build_runs_list_large_standard())
 
 #-------------------------------------------------------------
 if __name__ == "__main__":

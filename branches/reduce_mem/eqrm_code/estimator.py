@@ -10,12 +10,12 @@
 """
 
 from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
-    PARALLELSIZE_J, TOTALMEM_J
+    PARALLELSIZE_J, TOTALMEM_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J
 from eqrm_code.ANUGA_utilities import log
 
 MB2B = 1048576.
 
-# fixme rec_mod needs to be logged
+# fixme check the atten_var_method is 1 to spawn?
 
 def log_pairs_estimate_mem(log_pairs):
     """
@@ -29,15 +29,23 @@ def log_pairs_estimate_mem(log_pairs):
         print "---------------------"
         print log_pair["output_dir"]
         mem_b = estimate_mem_log_format(log_pair)
+        total_mem_b = sum(mem_b.itervalues())
+        actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
+            log_pair[INITIAL_J + MEM_J]
+        print "actual_mem_MB",actual_mem_MB
+        print "estimate total_mem_MB", total_mem_b/MB2B
         for key, value in log_pair.iteritems():
             if mem_b.has_key(key):
                 estimate_b = mem_b[key]
-                print "*********************"
-                print "key",key
-                print "estimate_MB", estimate_b/MB2B
-                print "actual MB", value/MB2B
-            if 'cra' in key or 'len' in key or 'en_mo' in key:
+                if not estimate_b == value:
+                    print log_pair["output_dir"]
+                    print "*********************"
+                    print "key",key
+                    print "estimate_elements", estimate_b/8
+                    print "actual elements", value/8 
+            if 'recurrence yeah ' in key:
                 print key + ":" + str(value)
+                pass
         #continue
 
 def estimate_mem_log_format(log_pair): # = log_pair[]
@@ -48,7 +56,7 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
     sites = log_pair[BLOCKSITES_J] * parallel_size
     spawning = log_pair['atten_spawn_bins']
     gmm_dimensions = log_pair[MAXGMPE_J]
-    rec_mod = 1 # = log_pair['']
+    rec_mod  = log_pair[RECMOD_J]
     atten_collapse_Sa_of_atten_models = \
         log_pair['atten_collapse_Sa_of_atten_models']
     save_total_financial_loss = log_pair['save_total_financial_loss']
@@ -108,6 +116,15 @@ def estimate_mem(events,
     # calculate number of bytes for each data structure
     site_block = sites/parallel_size
 
+    mem_bytes["event_mem"] = 16 * events 
+
+    
+    # FIXME gmm_dimensions_motion hardcoded
+    gmm_dimensions_motion = 1
+
+    mem_bytes[log.EVENTACTIVITY_J] = (spawning * gmm_dimensions_motion * 
+                                       rec_mod * events ) * item_size
+
     if save_hazard_map is True:
         mem_bytes[log.BEDROCKHAZ_J] = (site_block *
                                        atten_periods *
@@ -116,26 +133,27 @@ def estimate_mem(events,
          mem_bytes[log.BEDROCKHAZ_J] = 0
     if save_hazard_map is True and \
            use_amplification is True:
-        mem_bytes[log.SOILHAZ_J] = bedrock_hazard
+        mem_bytes[log.SOILHAZ_J] = mem_bytes[log.BEDROCKHAZ_J]
     else:
         mem_bytes[log.SOILHAZ_J] = 0
 
     if save_motion is True:
-         mem_bytes[log.BEDROCKALL_J] = (spawning * gmm_dimensions * rec_mod *
-                          site_block * events *
-                          atten_periods) * item_size
-         print "spawning",spawning
-         print "gmm_dimensions",gmm_dimensions
-         print "rec_mod",rec_mod
-         print "site_block",site_block
-         print "events",events
-         print "atten_periods",atten_periods
+        mem_bytes[log.BEDROCKALL_J] = (spawning * gmm_dimensions_motion * 
+                                       rec_mod *
+                                       site_block * events *
+                                       atten_periods) * item_size
+        #print "gmm_dimensions",gmm_dimensions_motion
+        #print "spawning",spawning
+        #print "rec_mod",rec_mod
+        #print "site_block",site_block
+        #print "events",events
+        #print "atten_periods",atten_periods
     else:
         mem_bytes[log.BEDROCKALL_J] = 0
         
     if save_motion is True and \
            use_amplification is True:
-         mem_bytes[log.SOILALL_J] = bedrock_SA_all
+         mem_bytes[log.SOILALL_J] =  mem_bytes[log.BEDROCKALL_J]
     else:
          mem_bytes[log.SOILALL_J] = 0
 
@@ -189,18 +207,11 @@ def estimate_mem(events,
                                        atten_periods) * item_size
 
     if use_amplification is True:
-        mem_bytes['coll_soil_SA_all_events'] = coll_rock_SA_all_events          
-        mem_bytes['soil_SA_num_gmm_after_collapsingoverloaded'] = rock_SA_overloaded
+        mem_bytes['coll_soil_SA_all_events'] = mem_bytes[log.COLLROCKSAE_J]
+        mem_bytes['soil_SA_overloaded'] = mem_bytes[log.ROCKOVERLOADED_J]
     else:
         mem_bytes['coll_soil_SA_all_events'] = 0           
         mem_bytes['soil_SA_overloaded'] = 0
 
-    #array_mem = bedrock_hazard + soil_hazard + bedrock_SA_all + soil_SA_all + \
-     #  total_building_loss_qw + building_loss_qw + contents_loss_qw + \
-      # coll_rock_SA_all_events + rock_SA_overloaded + \
-       #coll_soil_SA_all_events + soil_SA_overloaded
-
-    #object_mem = 0
-    #total_mem = array_mem + object_mem
     return mem_bytes
 

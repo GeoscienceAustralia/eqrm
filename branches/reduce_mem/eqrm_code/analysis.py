@@ -196,6 +196,7 @@ def main(parameter_handle,
    
     num_pseudo_events = num_gmm_max * num_events * num_spawning
     num_rm = event_activity.recurrence_model_count()
+    log.log_json({log.RECMOD_J:num_rm}, log.INFO)
 
     ground_motion_distribution = GroundMotionDistributionLogNormal(
         eqrm_flags.atten_variability_method,
@@ -282,6 +283,8 @@ def main(parameter_handle,
     log.resource_usage()
     num_gmm_dimensions = event_activity.get_gmm_dimensions()
 
+    log.log_json({log.EVENTACTIVITY_J: event_activity.get_bytes()},
+                     log.DEBUG)   
     if eqrm_flags.save_motion is True:
         data.bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                                 num_site_block, num_events,
@@ -289,7 +292,7 @@ def main(parameter_handle,
                                dtype=float) 
         log_dic = {"cra_site_block":num_site_block, 
                    "cra_spawning":num_spawning,
-                   "cra_num_gmm_dimensions":num_gmm_dimensions,
+                   "cra_num_gmm_dimensions_motion":num_gmm_dimensions,
                    "cra_num_rm":num_rm,
                    "cra_num_events":num_events,
                    "cra_return_periods":len(eqrm_flags.return_periods)}

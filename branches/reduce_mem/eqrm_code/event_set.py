@@ -1111,8 +1111,8 @@ class Event_Activity(file_store.File_Store):
     @classmethod
     def load(cls, num_events, load_dir):
         """
-        Return an Event_Activity object from the .npy files stored in the specified
-        directory
+        Return an Event_Activity object from the .npy files stored in the
+        specified directory
         """
         event_activity = cls(num_events)
         event_activity._load(load_dir)
@@ -1251,10 +1251,17 @@ class Event_Activity(file_store.File_Store):
 
     def get_ea_event_dimsion_only(self):
         """
-        Get the event activity collapsing the ground motion model, recurrence model
-        and spawning dimensions.
+        Get the event activity collapsing the ground motion model, 
+        recurrence model and spawning dimensions.
         """
         return self.event_activity.reshape(-1, self.event_activity.shape[-1]).sum(axis=0)
+
+    def get_bytes(self):
+        """
+        Get the event activity array byte size.
+        """
+        return self.event_activity.nbytes
+        
 
 ####################################################################
 from eqrm_code.source_model import source_model_from_xml, Source_Model
