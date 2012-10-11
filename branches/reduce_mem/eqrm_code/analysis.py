@@ -976,11 +976,12 @@ def calc_and_save_SA(eqrm_flags,
                     # FIXME Reinventing multidimensional array
                     # indexing here. Just use a ndarray() and return
                     # whataver.reshape(num_sites, -1, num_periods)
-                    i_overloaded = (i_spawn * num_rm * num_gmm_max * num_events +
-                                    i_rm    * num_gmm_max * num_events +
-                                    i_gmm   * num_events +
+                    i_overloaded = (i_spawn * num_rm * num_gmm_max * num_events
+                                    + i_rm  * num_gmm_max * num_events +
+                                    i_gmm  * num_events +
                                     event_inds)
-                    # rock_SA_overloaded dim (sites, events * gmm * rm * spawn, period)
+                    # rock_SA_overloaded dim (sites, events * gmm * rm * spawn,
+                    # period)
                     rock_SA_overloaded[0, i_overloaded, :] = \
                         bedrock_SA[i_spawn, i_gmm, i_rm, 0, :, :]
                     if soil_SA is not None:
