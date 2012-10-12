@@ -8,7 +8,7 @@
   
   Copyright 20012 by Geoscience Australia
 """
-
+from copy import copy
 from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
     PARALLELSIZE_J, TOTALMEM_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J
 from eqrm_code.ANUGA_utilities import log
@@ -28,17 +28,23 @@ def log_pairs_estimate_mem(log_pairs):
     for log_pair in log_pairs:
         print "---------------------"
         print log_pair["output_dir"]
-        mem_b = estimate_mem_log_format(log_pair)
+        mem_b, new_mem_b = estimate_mem_log_format(log_pair)
         total_mem_b = sum(mem_b.itervalues())
 
         for key, value in mem_b.iteritems():
             print 'array % ' + key + ' ' + str(
                 value/float(total_mem_b)*100.) + '%' 
+        print "After change"
+        total_new_mem_b = sum(new_mem_b.itervalues())
+        for key, value in new_mem_b.iteritems():
+            print 'new array % ' + key + ' ' + str(
+                value/float(total_new_mem_b)*100.) + '%' 
         
         actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
             log_pair[INITIAL_J + MEM_J]
         print "actual_mem_MB",actual_mem_MB
-        print "estimate total_mem_MB", total_mem_b/MB2B
+        print "old estimate total_mem_MB", total_mem_b/MB2B
+        print "new estimate total_mem_MB", total_new_mem_b/MB2B
         for key, value in log_pair.iteritems():
             if mem_b.has_key(key):
                 estimate_b = mem_b[key]
@@ -59,6 +65,7 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
     return_periods= log_pair['len_return_periods']
     parallel_size = log_pair[PARALLELSIZE_J]
     sites = log_pair[BLOCKSITES_J] * parallel_size
+    run_type = log_pair['run_type']
     spawning = log_pair['atten_spawn_bins']
     gmm_dimensions = log_pair[MAXGMPE_J]
     rec_mod  = log_pair[RECMOD_J]
@@ -75,6 +82,7 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
                            atten_periods, 
                            return_periods,
                            sites,
+                           run_type,
                            parallel_size,
                            spawning,
                            gmm_dimensions,
@@ -92,6 +100,7 @@ def estimate_mem(events,
                  atten_periods, 
                  return_periods,
                  sites,
+                 run_type='hazard',
                  parallel_size=1,
                  spawning=1,
                  gmm_dimensions=1,
@@ -123,11 +132,8 @@ def estimate_mem(events,
 
     mem_bytes["event_mem"] = 16 * events 
 
-    
-    # FIXME gmm_dimensions_motion hardcoded
-    gmm_dimensions_motion = 1
 
-    mem_bytes[log.EVENTACTIVITY_J] = (spawning * gmm_dimensions_motion * 
+    mem_bytes[log.EVENTACTIVITY_J] = (spawning * gmm_after_collapsing * 
                                        rec_mod * events ) * item_size
 
     if save_hazard_map is True:
@@ -141,6 +147,10 @@ def estimate_mem(events,
         mem_bytes[log.SOILHAZ_J] = mem_bytes[log.BEDROCKHAZ_J]
     else:
         mem_bytes[log.SOILHAZ_J] = 0
+
+    
+    # FIXME gmm_dimensions_motion hardcoded
+    gmm_dimensions_motion = 1
 
     if save_motion is True:
         mem_bytes[log.BEDROCKALL_J] = (spawning * gmm_dimensions_motion * 
@@ -210,10 +220,12 @@ def estimate_mem(events,
 
     #print "mem_bytes[log.COLLROCKSAE_J]",mem_bytes[log.COLLROCKSAE_J]
     mem_bytes[log.ROCKOVERLOADED_J] = (loop_sites *
-                                       events * gmm_max * spawning * rec_mod *
-                                       atten_periods) * item_size
+                           events * gmm_max * spawning * rec_mod *
+                           atten_periods) * item_size
     #print "gmm_after_collapsing",gmm_after_collapsing
     #print "gmm_max",gmm_max
+    #mem_bytes[log.ROCKOVERLOADED_J]
+
 
     #print " mem_bytes[log.ROCKOVERLOADED_J] ", mem_bytes[log.ROCKOVERLOADED_J] 
     if use_amplification is True:
@@ -223,5 +235,9 @@ def estimate_mem(events,
         mem_bytes['coll_soil_SA_all_events'] = 0           
         mem_bytes['soil_SA_overloaded'] = 0
 
-    return mem_bytes
+    new_mem_bytes = copy(mem_bytes)
+    if run_type == "hazard":
+        new_mem_bytes[log.ROCKOVERLOADED_J] = 0
+        new_mem_bytes['soil_SA_overloaded'] = 0
+    return mem_bytes, new_mem_bytes
 

@@ -11,7 +11,8 @@ from eqrm_code.estimator import log_pairs_estimate_mem
 
 def create_meta_log():
     path = os.path.join(eqrm_data_home(), 'test_national', 
-                                          'memory_output')
+                                          'memory_output') 
+                                   #      'memory_output_too_much')
     log_pairs = build_log_info(path) 
 
     log_pairs_estimate_mem(log_pairs)

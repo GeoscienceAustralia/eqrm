@@ -284,7 +284,7 @@ def output_dir_basic(**kwargs):
        
 
 def test_run():
-    multi_run(build_runs_list())
+    #multi_run(build_runs_list())
     multi_run(build_runs_list_large_standard())
 #-------------------------------------------------------------
 if __name__ == "__main__":

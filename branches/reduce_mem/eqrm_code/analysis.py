@@ -432,7 +432,9 @@ def main(parameter_handle,
         
         # smooth SA (function of periods) using a weighted
         # running 3-point smoother
-        if eqrm_flags.atten_smooth_spectral_acceleration is True:
+        
+        if not eqrm_flags.run_type == "hazard" and \
+                eqrm_flags.atten_smooth_spectral_acceleration is True:
             SA[...,1:-2] = (0.25*SA[...,0:-3] +
                             0.50*SA[...,1:-2] +
                             0.25*SA[...,2:-1])
@@ -820,8 +822,14 @@ def calc_and_save_SA(eqrm_flags,
     Calculate the spectral acceleration, in g, for both bedrock and soil.
 
     Return:
-      
+      bedrock_SA_all,
+      soil_SA_all,
+
+      bedrock_hazard,
+      soil_hazard,
     
+      soil_SA_overloaded, 
+      rock_SA_overloaded
     """
     num_spawn = event_activity.get_num_spawn()
     num_rm = event_activity.recurrence_model_count()
@@ -849,22 +857,32 @@ def calc_and_save_SA(eqrm_flags,
                "cra_num_gmm_after_collapsing":num_gmm_after_collapsing}
     log.log_json(log_dic,
                  log.DEBUG)
-    rock_SA_overloaded = zeros((num_sites,
-                                num_events * num_gmm_max * num_spawn * num_rm,
-                                num_periods),
-                               dtype=float)
+    if not eqrm_flags.run_type == "hazard":
+        rock_SA_overloaded = zeros((num_sites,
+                                    num_events * num_gmm_max * 
+                                    num_spawn * num_rm,
+                                    num_periods),
+                                   dtype=float)
 
-    log.log_json({log.ROCKOVERLOADED_J: rock_SA_overloaded.nbytes},
-                 log.DEBUG)
+        log.log_json({log.ROCKOVERLOADED_J: rock_SA_overloaded.nbytes},
+                     log.DEBUG)
+    else:
+        rock_SA_overloaded = None
+
     if eqrm_flags.use_amplification is True:
         coll_soil_SA_all_events = zeros(
             (num_spawn, num_gmm_after_collapsing, num_rm, num_sites, num_events,
              len(eqrm_flags.atten_periods)),
             dtype=float)
-        soil_SA_overloaded = zeros((num_sites,
-                                    num_events * num_gmm_max * num_spawn * num_rm,
-                                    num_periods),
-                                   dtype=float)
+    
+        if not eqrm_flags.run_type == "hazard":
+            soil_SA_overloaded = zeros((num_sites,
+                                        num_events * num_gmm_max * num_spawn *
+                                        num_rm,
+                                        num_periods),
+                                       dtype=float)
+        else:
+            soil_SA_overloaded = None
     else:
         soil_SA_overloaded = None
     
@@ -971,23 +989,26 @@ def calc_and_save_SA(eqrm_flags,
         # Set up the arrays to pass to risk
         # This is built up as sources are iterated over.
         # assume one site
-        for i_spawn in arange(bedrock_SA.shape[0]): # loop over spawn
-            for i_gmm in arange(bedrock_SA.shape[1]): # loop over gmm
-                for i_rm in xrange(bedrock_SA.shape[2]):
-                    # FIXME Reinventing multidimensional array
-                    # indexing here. Just use a ndarray() and return
-                    # whataver.reshape(num_sites, -1, num_periods)
-                    i_overloaded = (i_spawn * num_rm * num_gmm_max * num_events
-                                    + i_rm  * num_gmm_max * num_events +
-                                    i_gmm  * num_events +
-                                    event_inds)
-                    # rock_SA_overloaded dim (sites, events * gmm * rm * spawn,
-                    # period)
-                    rock_SA_overloaded[0, i_overloaded, :] = \
-                        bedrock_SA[i_spawn, i_gmm, i_rm, 0, :, :]
-                    if soil_SA is not None:
-                        soil_SA_overloaded[0, i_overloaded, :] = \
-                            soil_SA[i_spawn, i_gmm, i_rm, 0, :, :]
+
+        if not eqrm_flags.run_type == "hazard":
+            for i_spawn in arange(bedrock_SA.shape[0]): # loop over spawn
+                for i_gmm in arange(bedrock_SA.shape[1]): # loop over gmm
+                    for i_rm in xrange(bedrock_SA.shape[2]):
+                        # FIXME Reinventing multidimensional array
+                        # indexing here. Just use a ndarray() and return
+                        # whataver.reshape(num_sites, -1, num_periods)
+                        i_overloaded = (i_spawn * num_rm * 
+                                        num_gmm_max * num_events
+                                        + i_rm  * num_gmm_max * num_events +
+                                        i_gmm  * num_events +
+                                        event_inds)
+                        # rock_SA_overloaded 
+                        # dim (sites, events * gmm * rm * spawn, period)
+                        rock_SA_overloaded[0, i_overloaded, :] = \
+                            bedrock_SA[i_spawn, i_gmm, i_rm, 0, :, :]
+                        if soil_SA is not None:
+                            soil_SA_overloaded[0, i_overloaded, :] = \
+                                soil_SA[i_spawn, i_gmm, i_rm, 0, :, :]
         # can not do this, the current SA only has a subset of all events.
         # 0 to drop site out
         #rock_SA_overloaded_auto = (bedrock_SA[:,:,0,:,:]).reshape(
@@ -1023,7 +1044,7 @@ def calc_and_save_SA(eqrm_flags,
                                       1.0/array(eqrm_flags.return_periods))
             # FIXME. soil_SA is never defined in this scope. Is the intention
             # to check soil_SA_overloaded?
-            if soil_SA_overloaded is not None:
+            if eqrm_flags.use_amplification is True:
                 soil_SA_events = coll_soil_SA_all_events[:,:,:,:,:,j].reshape(
                     (-1))
                 soil_hazard[site_index,j,:] = \
