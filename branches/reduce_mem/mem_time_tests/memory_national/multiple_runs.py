@@ -44,7 +44,7 @@ def create_base():
     sdp.prob_number_of_events_in_zones = [5,5,5,4]
     
     # Attenuation
-    sdp.atten_collapse_Sa_of_atten_models = True
+    sdp.atten_collapse_Sa_of_atten_models = False #True
     sdp.atten_variability_method = 1
     sdp.atten_spawn_bins = 11
     sdp.atten_periods = [0.0, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0]
@@ -62,20 +62,20 @@ def create_base():
     
     # Save
     sdp.save_hazard_map = True
-    sdp.save_motion = True
+    sdp.save_motion = True #False
     
     return sdp
+
+
 
 
 def build_runs_list_large_standard():
     runs = []
     num_sources = 4
 
-
-    # Testing parallel
     sdp = create_base()
     sdp.site_indexes = range(1, 400)
-    sdp.prob_number_of_events_in_zones = [10000] * 4
+    sdp.prob_number_of_events_in_zones =  [20000] * 4
     sdp.atten_periods =  [0.0, 0.3, 1.0]
     sdp.atten_spawn_bins = 5
     sdp.event_control_tag = "4GMPE" 
@@ -284,9 +284,8 @@ def output_dir_basic(**kwargs):
        
 
 def test_run():
-    #multi_run(build_runs_list())
+    multi_run(build_runs_list())
     multi_run(build_runs_list_large_standard())
-
 #-------------------------------------------------------------
 if __name__ == "__main__":
     test_run()

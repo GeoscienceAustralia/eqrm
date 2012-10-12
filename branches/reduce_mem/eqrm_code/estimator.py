@@ -30,6 +30,11 @@ def log_pairs_estimate_mem(log_pairs):
         print log_pair["output_dir"]
         mem_b = estimate_mem_log_format(log_pair)
         total_mem_b = sum(mem_b.itervalues())
+
+        for key, value in mem_b.iteritems():
+            print 'array % ' + key + ' ' + str(
+                value/float(total_mem_b)*100.) + '%' 
+        
         actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
             log_pair[INITIAL_J + MEM_J]
         print "actual_mem_MB",actual_mem_MB
@@ -202,10 +207,15 @@ def estimate_mem(events,
                                             rec_mod *
                                              loop_sites * events * 
                                             atten_periods) * item_size
+
+    print "mem_bytes[log.COLLROCKSAE_J]",mem_bytes[log.COLLROCKSAE_J]
     mem_bytes[log.ROCKOVERLOADED_J] = (loop_sites *
                                        events * gmm_max * spawning * rec_mod *
                                        atten_periods) * item_size
+    print "gmm_after_collapsing",gmm_after_collapsing
+    print "gmm_max",gmm_max
 
+    print " mem_bytes[log.ROCKOVERLOADED_J] ", mem_bytes[log.ROCKOVERLOADED_J] 
     if use_amplification is True:
         mem_bytes['coll_soil_SA_all_events'] = mem_bytes[log.COLLROCKSAE_J]
         mem_bytes['soil_SA_overloaded'] = mem_bytes[log.ROCKOVERLOADED_J]

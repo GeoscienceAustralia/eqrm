@@ -882,7 +882,6 @@ def calc_and_save_SA(eqrm_flags,
             sites=sites,
             distances=distance_subset,
             Vs30=BEDROCKVs30)
-        
         # *_extend_GM has shape of (GM_model, sites, events, periods)
         # the value of GM_model can change for each source.
         
@@ -947,9 +946,9 @@ def calc_and_save_SA(eqrm_flags,
         # collapsed_bedrock_SA and  collapsed_soil_SA indexed by
         # [spawn, gmm, rm, site, event, period]
         if eqrm_flags.save_motion is True:
+            gmm_n = collapsed_bedrock_SA.shape[1]
             # Put into arrays
             assert collapsed_bedrock_SA.shape[3] == 1 # only one site
-            gmm_n = collapsed_bedrock_SA.shape[1]
             coll_bedrock_SA = collapsed_bedrock_SA[:, :, :, 0, :, :]
             bedrock_SA_all[:, :gmm_n, :, rel_site_index, event_inds, :] = \
                                                                 coll_bedrock_SA
@@ -958,14 +957,16 @@ def calc_and_save_SA(eqrm_flags,
                 soil_SA_all[:, :gmm_n, :, rel_site_index, event_inds, :] = \
                                                                  coll_soil_SA
         if eqrm_flags.save_hazard_map is True:
+            gmm_n = collapsed_bedrock_SA.shape[1]
             # Build collapsed_bedrock_SA for all events
             # before getting out of the loop
             # collapsed_bedrock_SA shape (spawn, gmm, sites, events, periods)
-            coll_rock_SA_all_events[:, :, :, :, event_inds, :] = \
+            
+            coll_rock_SA_all_events[:, :gmm_n, :, :, event_inds, :] = \
                                                           collapsed_bedrock_SA
             if soil_SA is not None:
                 # Build collapsed_soil_SA for all events
-                coll_soil_SA_all_events[:, :, :, :, event_inds, :] = \
+                coll_soil_SA_all_events[:, :gmm_n, :, :, event_inds, :] = \
                                                           collapsed_soil_SA
         # Set up the arrays to pass to risk
         # This is built up as sources are iterated over.
