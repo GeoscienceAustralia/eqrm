@@ -208,14 +208,14 @@ def estimate_mem(events,
                                              loop_sites * events * 
                                             atten_periods) * item_size
 
-    print "mem_bytes[log.COLLROCKSAE_J]",mem_bytes[log.COLLROCKSAE_J]
+    #print "mem_bytes[log.COLLROCKSAE_J]",mem_bytes[log.COLLROCKSAE_J]
     mem_bytes[log.ROCKOVERLOADED_J] = (loop_sites *
                                        events * gmm_max * spawning * rec_mod *
                                        atten_periods) * item_size
-    print "gmm_after_collapsing",gmm_after_collapsing
-    print "gmm_max",gmm_max
+    #print "gmm_after_collapsing",gmm_after_collapsing
+    #print "gmm_max",gmm_max
 
-    print " mem_bytes[log.ROCKOVERLOADED_J] ", mem_bytes[log.ROCKOVERLOADED_J] 
+    #print " mem_bytes[log.ROCKOVERLOADED_J] ", mem_bytes[log.ROCKOVERLOADED_J] 
     if use_amplification is True:
         mem_bytes['coll_soil_SA_all_events'] = mem_bytes[log.COLLROCKSAE_J]
         mem_bytes['soil_SA_overloaded'] = mem_bytes[log.ROCKOVERLOADED_J]
