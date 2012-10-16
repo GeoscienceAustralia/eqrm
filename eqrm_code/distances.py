@@ -84,22 +84,22 @@ class Distances(object):
     def distance(self, distance_type):
         if not self.distance_cache.has_key(distance_type):
             self.distance_cache[distance_type] = self.raw_distances(
-                                  site_latitude=self.site_latitude,
-                                  site_longitude=self.site_longitude,
-                                  rupture_centroid_lat=self.rupture_centroid_lat,
-                                  rupture_centroid_lon=self.rupture_centroid_lon,
-                                  lengths=self.lengths,
-                                  azimuths=self.azimuths,
-                                  widths=self.widths,
-                                  dips=self.dips,
-                                  depths=self.depths,
-                                  depths_to_top=self.depths_to_top,
-                                  projection=self.projection,
-                                  distance_type=distance_type,
-                                  trace_start_lat=self.trace_start_lat,
-                                  trace_start_lon=self.trace_start_lon,
-                                  rupture_centroid_x=self.rupture_centroid_x,
-                                  rupture_centroid_y=self.rupture_centroid_y)
+                site_latitude=self.site_latitude,
+                site_longitude=self.site_longitude,
+                rupture_centroid_lat=self.rupture_centroid_lat,
+                rupture_centroid_lon=self.rupture_centroid_lon,
+                lengths=self.lengths,
+                azimuths=self.azimuths,
+                widths=self.widths,
+                dips=self.dips,
+                depths=self.depths,
+                depths_to_top=self.depths_to_top,
+                projection=self.projection,
+                distance_type=distance_type,
+                trace_start_lat=self.trace_start_lat,
+                trace_start_lon=self.trace_start_lon,
+                rupture_centroid_x=self.rupture_centroid_x,
+                rupture_centroid_y=self.rupture_centroid_y)
         return self.distance_cache[distance_type]
             
 
