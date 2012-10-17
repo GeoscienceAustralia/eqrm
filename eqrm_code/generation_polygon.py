@@ -99,7 +99,8 @@ class Generation_Polygon(polygon_object):
         polygon = self._linestring[:-1]
         exclude = [exclude[:-1] for exclude in self._exclude]
         
-        points = populate_geo_coord_polygon(polygon, number_of_points, seed, exclude)
+        points = populate_geo_coord_polygon(polygon, number_of_points, 
+                                            seed, exclude)
 
         if use_cache:
             for point in points:
@@ -143,7 +144,8 @@ class Fault_Source_Generator(object):
         fault_name             fault name
         fault_event_type       fault event type
         geometry_dict          dictionary of all <geometry> data
-        recurrence_models      a list of dictionaries with <recurrence_model> data
+        recurrence_models      a list of dictionaries with <recurrence_model> 
+                               data
         event_generation_dict  dictionary of all <event_generation> data
 
         The *_dict parameters contain exactly what was in the XML and must be
@@ -396,36 +398,6 @@ def polygons_from_xml(filename):
     else:
         generation_polygons, magnitude_type = polygons_from_xml_horspool(
             doc)
-    # Hacky checking code
-#     from eqrm_code.eqrm_filesystem import scenario_input_bridges_path
-    
-#     handle = open(os.path.join(scenario_input_bridges_path,
-#                                'newc_source_polygon.xml'))
-#     print "handle", handle
-#     doc=Xml_Interface(filename=handle)
-    
-#     generation_polygons_r,magnitude_type_h = polygons_from_xml_row(
-#         doc, 
-#         azi,
-#         dazi,
-#         fault_dip,
-#         fault_width,
-#         override_xml)
-#     assert magnitude_type == magnitude_type_h
-    
-#     for i in range(len(generation_polygons_r)):
-#         assert generation_polygons[i]._linestring == generation_polygons_r[i]._linestring 
-
-#         assert generation_polygons[i].depth_top_seismogenic_dist == generation_polygons_r[i].depth_top_seismogenic_dist
-#         assert generation_polygons[i].azimuth == generation_polygons_r[i].azimuth
-#         #print "generation_polygons[i].dip", generation_polygons[i].dip
-#         #print "generation_polygons_r[i].dip", generation_polygons_r[i].dip
-#         #generation_polygons[i].dip = generation_polygons_r[i].dip
-#         #assert generation_polygons[i].dip == generation_polygons_r[i].dip
-#         #print "i", i
-#         #print "generation_polygons[i].magnitude",generation_polygons[i].magnitude 
-#         #print "generation_polygons_r[i].magnitude", generation_polygons_r[i].magnitude
-#         assert generation_polygons[i].magnitude == generation_polygons_r[i].magnitude
 
     return generation_polygons, magnitude_type
 
@@ -573,11 +545,14 @@ def polygons_from_xml_horspool(doc):
         recurrence_models,  event_gen = get_recurrence_elements(xml_polygon)
         event_gen_atts = event_gen.attributes
         number_of_events = int(event_gen_atts['number_of_events'])
-        minmag = min(float(rm.attributes['recurrence_min_mag']) for rm in recurrence_models)
-        maxmag = max(float(rm.attributes['recurrence_max_mag']) for rm in recurrence_models)
+        minmag = min(float(rm.attributes['recurrence_min_mag']) 
+                     for rm in recurrence_models)
+        maxmag = max(float(rm.attributes['recurrence_max_mag']) 
+                     for rm in recurrence_models)
         magnitude = {'distribution':'uniform',
                      'minimum': max(minmag,
-                                    float(event_gen_atts['generation_min_mag'])),
+                                    float(
+                                    event_gen_atts['generation_min_mag'])),
                      'maximum': maxmag}
         # magnitude = None This fails, so this is used.             
         azimuth = {'distribution':'uniform',
