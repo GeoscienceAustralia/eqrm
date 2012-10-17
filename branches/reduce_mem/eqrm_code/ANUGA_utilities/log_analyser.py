@@ -95,8 +95,8 @@ def build_log_info(path, log_file=LOGFILETAG):
                         else:
                             # raise error
                             pass
-                        
-                log_pairs.append(alog)
+                if not alog == {}:
+                    log_pairs.append(alog)
     return log_pairs
   
 def write_meta_log(log_pairs, output_file):
