@@ -14,6 +14,7 @@ def create_meta_log():
                                           'memory_output') 
                                    #      'memory_output_too_much')
     log_pairs = build_log_info(path) 
+    print "len(log_pairs)", len(log_pairs)
 
     log_pairs_estimate_mem(log_pairs)
 

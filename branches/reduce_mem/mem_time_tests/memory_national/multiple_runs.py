@@ -20,6 +20,8 @@ def create_base():
     """
     Set up for 19 events, 5 gmpe_max, 7 periods, 11 spawning, 3 rec mod. 
     2 Surfaces.
+    
+    17277 sites
     """
     sdp = ParameterData()
     
@@ -67,7 +69,53 @@ def create_base():
     return sdp
 
 
+def old_max_simulation():
+    """
+    attribute	#	JSON attribute
+    events	8,000,000*	len_events
+    Sites 	3,000,000	 len_block_sites
+    periods	10	len_atten_periods
+    return periods	10	len_return_periods
+    source zones	150	len_source_zones
+    SA surfaces (Sa soil and Sa bed rock)	2	len_SA_surfaces
+# of GM models	5	len_max_GMPEs
 
+   Note, i'm not doing 150 source zones.  The mem estimate's have been
+   good, without taking it into account.
+   """
+    runs = []
+    num_sources = 4
+    sdp = create_base()
+    
+    ###
+    sdp.site_indexes = range(1, 400)
+    events = 80000  
+    events = 800 
+    events = 8000000 
+    #events = 80    
+    sdp.return_periods = [100.75, 200.0, 300.0, 400.0, 500.0, 
+    600.0, 700.0, 800.0, 900, 1000.]
+    sdp.atten_periods =  [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    sdp.use_amplification = True
+    sdp.atten_spawn_bins = 1
+    sites = 3000000
+    sdp.file_parallel_log_level = 'debug'
+    ###
+    events_source = events/num_sources
+    sdp.prob_number_of_events_in_zones = [events_source]*num_sources
+    sdp.use_site_indexes = True
+    setof15k = sites/15000
+    sdp.site_indexes = range(1, 15001) * setof15k
+    print "len(sdp.site_indexes)", len(sdp.site_indexes)
+    sdp.event_control_tag = "4GMPE" 
+    dir_last  = 'old_max_sim_again_' + str(sum(
+            sdp.prob_number_of_events_in_zones)) + \
+            "_sites" + str(len(sdp.site_indexes))
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                  'memory_output', dir_last)
+    runs.append({"processes":40, "sdp":sdp})
+
+    return runs
 
 def build_runs_list_large_standard():
     runs = []
@@ -253,6 +301,11 @@ def mpi_command(cluster, num_procs, control_file):
                , '/home/graydu/.machines_alamba', '-x','PYTHONPATH',
                '-x','EQRMDATAHOME',
                'python',control_file]
+    elif cluster == 'rhe-compute1':
+        cmd = ['mpirun','-np',str(num_procs),
+               '-x','PYTHONPATH',
+               '-x','EQRMDATAHOME',
+               'python2.7',control_file]
     else:
         cmd = ['mpirun','-np',str(num_procs),
                '-x','PYTHONPATH','-x','EQRMDATAHOME',
@@ -284,8 +337,9 @@ def output_dir_basic(**kwargs):
        
 
 def test_run():
+    multi_run(old_max_simulation())
     #multi_run(build_runs_list())
-    multi_run(build_runs_list_large_standard())
+    #multi_run(build_runs_list_large_standard())
 #-------------------------------------------------------------
 if __name__ == "__main__":
     test_run()
