@@ -2,7 +2,7 @@
 import unittest
 import math
 
-from scipy import array, allclose, exp, log, power, asarray, minimum
+from scipy import array, allclose, exp, log, power, asarray, minimum, arange
 
 from eqrm_code.conversions import conversion_functions
 
@@ -205,6 +205,10 @@ class Test_Conversions(unittest.TestCase):
         self.failUnlessAlmostEqual(result[2], expected[2], 1, msg)
         
         
+    def test_Johnston_01_ML(self):
+        pass
+        # FIME ME add a test. Note, Mw less than 3.05 give warnings.
+
 ################################################################################
 
 if __name__ == "__main__":
