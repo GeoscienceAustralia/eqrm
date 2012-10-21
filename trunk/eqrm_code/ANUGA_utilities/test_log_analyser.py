@@ -18,7 +18,7 @@ except ImportError:
         print "Install simplejson, or use Python2.6 or greater."
         import sys; sys.exit(1)
         
-from log_analyser import analyse_log, merge_dicts, LOGFILE
+from log_analyser import analyse_log, merge_dicts, LOGFILETAG
 from eqrm_code.ANUGA_utilities.log import DELIMITER_J
 
         
@@ -53,7 +53,7 @@ class logAnalyserCase(unittest.TestCase):
         dir1 = tempfile.mkdtemp(dir=root_dir)
         dir2 = tempfile.mkdtemp(dir=root_dir)
         
-        log_file_name = LOGFILE
+        log_file_name = LOGFILETAG + '.txt'
         
         # Create a fake log file
         log_path_file1 = os.path.join(dir1, log_file_name)

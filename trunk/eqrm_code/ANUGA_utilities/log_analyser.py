@@ -20,11 +20,14 @@ from eqrm_code.ANUGA_utilities import log
 
 
 OUTPUTFILE = 'timing.csv'
-LOGFILE = 'log-0.txt'
+LOGFILETAG = 'log-0'
 
 
-def analyse_log(path, output_file, log_file=LOGFILE):
+def analyse_log(path, output_file, log_file=LOGFILETAG):
     """
+    Read all the logs and write a meta_log_csv file.
+
+    args
     path - the directory to look for log files in.
     log_file - the standard logfile name.     
     """
@@ -66,7 +69,7 @@ def merge_dicts(d1, d2, merge=lambda x,y:max(x,y)):
     return result
    
         
-def build_log_info(path, log_file):
+def build_log_info(path, log_file=LOGFILETAG):
     """
     Read 1 or more log files and collate the json dictionary 
     part of the log file into a list, with each element of the list
@@ -92,12 +95,16 @@ def build_log_info(path, log_file):
                         else:
                             # raise error
                             pass
-                        
-                log_pairs.append(alog)
+                if not alog == {}:
+                    log_pairs.append(alog)
     return log_pairs
   
 def write_meta_log(log_pairs, output_file):
-    """Write the info from the log files to a file"""
+    """Write the info from the log files to a file
+    
+    args
+    log_pairs - a list of log dictionaries.
+    """
     
     all_keys = {} # values aren't needed, but are there
     for log_p in log_pairs:
