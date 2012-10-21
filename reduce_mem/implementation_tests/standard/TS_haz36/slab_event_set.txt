@@ -1,2 +1,0 @@
-trace_start_lat,trace_start_lon,trace_end_lat,trace_end_lon,azimuth,dip,event_activity,Mw,rupture_centroid_lat,rupture_centroid_lon,depth,rupture_centroid_x,rupture_centroid_y,length,width,event_num,name
--8.08209922947,110.129406721,-9.71884660085,110.129406721,180.0,62.6091045568,2.40253073352,7.72618977675,-8.90047291516,110.085307887,9.34379382727,90.9418686867,4.84147913087,181.883737373,20.9832189179,0,java_megathrust
