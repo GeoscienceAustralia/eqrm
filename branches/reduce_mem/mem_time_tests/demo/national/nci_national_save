@@ -1,9 +1,0 @@
-#!/bin/bash
-#PBS -wd
-#PBS -q normal
-#PBS -l ncpus=1
-#PBS -l walltime=00:15:00
-#PBS -l vmem=2560MB
-
-# ONLY RUN THIS JOB IF YOU REALLY NEED TO
-#mpirun python setdata_ProbHaz_nat_NCI_save.py
