@@ -69,6 +69,46 @@ def create_base():
     return sdp
 
 
+def risk_simulation():
+    """
+    
+   
+    """
+    runs = []
+    num_sources = 6
+    sdp = create_base()
+    
+    ###
+    sdp.run_type = "risk" 
+    sdp.atten_collapse_Sa_of_atten_models = True
+    sdp.save_total_financial_loss = True
+    sdp.save_hazard_map = True
+    
+    sdp.site_indexes = range(1, 400)
+    sdp.site_indexes = range(1, 5)
+    events = 80000  
+    events = 80
+    sdp.return_periods = [100.75, 200.0, 300.0, 400.0, 500.0, 
+    600.0, 700.0, 800.0, 900, 1000.]
+    sdp.atten_periods =  [0.1, 0.2, 1.0]
+    sdp.atten_variability_method = 2
+    sdp.site_tag = "newc"
+    #sdp.file_parallel_log_level = 'debug'
+    ###
+    events_source = events/num_sources
+    sdp.prob_number_of_events_in_zones = [events_source]*num_sources
+    sdp.use_site_indexes = True
+    #sdp.event_control_tag = "4GMPE" 
+    dir_last  = 'initial_risk_' + str(sum(
+            sdp.prob_number_of_events_in_zones)) + \
+            "_sites" + str(len(sdp.site_indexes))
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                  'memory_output', dir_last)
+    runs.append({"processes":1, "sdp":sdp})
+
+    return runs
+
+    
 def old_max_simulation():
     """
     attribute	#	JSON attribute
@@ -82,6 +122,12 @@ def old_max_simulation():
 
    Note, i'm not doing 150 source zones.  The mem estimate's have been
    good, without taking it into account.
+   
+   I ran this on rhe-compute, but since there are so many sites it
+   would have taken an age to finish, so I stopped it before
+   completion.  It had started cycling over the sites without a memory
+   error
+   
    """
     runs = []
     num_sources = 4
@@ -337,7 +383,8 @@ def output_dir_basic(**kwargs):
        
 
 def test_run():
-    multi_run(old_max_simulation())
+    multi_run(risk_simulation())
+    #multi_run(old_max_simulation())
     #multi_run(build_runs_list())
     #multi_run(build_runs_list_large_standard())
 #-------------------------------------------------------------
