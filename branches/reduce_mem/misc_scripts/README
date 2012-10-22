@@ -1,0 +1,47 @@
+This directory holds miscellaneous scripts that have been found useful.
+
+--------------------------------
+memprof
+A shell script that samples the memory used by a specified command every
+second.  The command doesn't have to be python.  Use it so:
+
+    memprof <opts> ls -lR fred
+
+where <opts> is zero or more of
+
+    -c "a comment"   places a comment in the data file (default is date+time)
+    -o my_file.dat   put output in the named file (default is ./memprof.out)
+
+Linux only, of course.
+Designed to work with the plot_memprof script below.
+The latest version may not be here.  Check ~rwilson/bin for latest version.
+Copy to your $PATH to use it.
+--------------------------------
+plot_memprof
+A python script to plot one or more data files from from memprof (see above).
+Use it so:
+
+    plot_memprof <file> [<file> ...]
+
+The data file(s) are plotted via matplotlib and are shown on the screen.  Save
+the plot through the save feature if you require a PNG or PS (etc) file.
+
+May work on Windows - haven't tried it.
+The latest version may not be here.  Check ~rwilson/bin for latest version.
+Copy to your $PATH to use it.
+--------------------------------
+fdump
+A python script to dump a binary file to the screen in hex and printable ASCII.
+Try:
+
+    fdump README | more
+
+to see how it works.
+
+The left column is a hex offset of bytes from the start of the file.  The right-most
+column is the offset in decimal.  The ASCII data shows an unprintable character as
+a '.'.
+
+Should work on Windows and Linux.
+Copy to your $PATH to use it.
+--------------------------------

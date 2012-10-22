@@ -1,0 +1,33 @@
+<source_model_zone magnitude_type="Mw">
+	<zone 
+	area = "13310"
+	name = "Box_1"
+	event_type = "Toro_1997_midcontinent">
+	 <geometry 
+    		dip = "35"
+    		delta_dip = "0"
+    		azimuth = "180"
+    		delta_azimuth = "180"
+    		depth_top_seismogenic = "0"
+	      depth_bottom_seismogenic = "15">
+				<boundary>
+						-30.0000 120.0000
+						-30.0000 140.0000
+						-20.0000 140.0000
+						-20.0000 120.0000
+						-30.0000 120.0000
+				</boundary>
+		</geometry>
+		<recurrence_model
+		 		distribution = "bounded_gutenberg_richter" 
+		 		recurrence_min_mag = "3.0"
+		 		recurrence_max_mag = "7.5"
+	      A_min= "1.00"
+	      b = "1">
+				<event_generation
+		  			generation_min_mag = "4.5"
+	          	number_of_mag_sample_bins = "15"
+	          	number_of_events = "13000" /> 
+	  </recurrence_model>
+	</zone>
+</source_model_zone>
