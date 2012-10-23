@@ -67,7 +67,143 @@ def create_base():
     
     return sdp
 
+    
+def create_base_risk():
+    """
+    Using newcastle data.
+    
+    """
+    
+    sdp = ParameterData()
+    
+    # Operation Mode
+    sdp.run_type = "risk_csm" 
+    sdp.is_scenario = False
+    sdp.site_tag = "newc"
+    sdp.atten_periods =  [0.1, 0.2, 1.0]
+    
+    sdp.return_periods = [100.75, 200.0, 300.0, 400.0, 500.0, 
+    600.0, 700.0, 800.0, 900]
+    
+    sdp.input_dir = os.path.join(eqrm_data_home(), 'test_national',
+                      'memory_input')
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                      'memory_output','trial_matrix')
+    
+    sdp.use_site_indexes = True #False 
+    sdp.site_indexes = [1]
+    sdp.event_control_tag = "use" 
+    sdp.zone_source_tag = ""
+    
+    # Probabilistic input
+    sdp.prob_number_of_events_in_zones = [5,5,5,4]
+    
+    # Attenuation
+    sdp.atten_collapse_Sa_of_atten_models = False #True
+    sdp.atten_variability_method = 1
+    sdp.atten_spawn_bins = 11
+    sdp.atten_periods = [0.0, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0]
+    sdp.atten_threshold_distance = 400
+    sdp.atten_override_RSA_shape = None
+    sdp.atten_cutoff_max_spectral_displacement = False
+    sdp.atten_pga_scaling_cutoff = 2
+    sdp.atten_smooth_spectral_acceleration = None
+    
+    # Amplification
+    sdp.use_amplification = False #True
+    sdp.amp_variability_method = None
+    sdp.amp_min_factor = 0.6
+    sdp.amp_max_factor = 10000
+    
+    # Buildings
+    sdp.buildings_usage_classification = "FCB" 
+    sdp.buildings_set_damping_Be_to_5_percent = False
 
+    # Capacity Spectrum Method
+    sdp.csm_use_variability = False
+    sdp.csm_variability_method = None
+    sdp.csm_standard_deviation = 0.3
+    sdp.csm_damping_regimes = 0
+    sdp.csm_damping_modify_Tav = True
+    sdp.csm_damping_use_smoothing = True
+    sdp.csm_hysteretic_damping = "curve" 
+    sdp.csm_SDcr_tolerance_percentage = 1
+    sdp.csm_damping_max_iterations = 7
+
+    # Loss
+    sdp.loss_min_pga = 0.05
+    sdp.loss_regional_cost_index_multiplier = 1.4516
+    sdp.loss_aus_contents = 0
+
+    # Save
+    sdp.save_hazard_map = True
+    sdp.save_total_financial_loss = True
+    sdp.save_hazard_map = True
+    
+    return sdp
+
+
+def risk_simulation():
+    """
+    
+   
+    """
+    runs = []
+    num_sources = 6  
+    sdp = create_base_risk()
+    
+    ### 
+    sites_needed = 10
+    sdp.atten_collapse_Sa_of_atten_models = True 
+    sdp.atten_variability_method = 2
+    
+    ###
+    events = 80
+    ###
+    events_source = events/num_sources
+    num_sites = 17278
+    sdp.prob_number_of_events_in_zones = [events_source]*num_sources
+    sdp.prob_number_of_events_in_zones[0] += events%num_sources
+    sdp.site_indexes = create_sites_list(num_sites, sites_needed)
+    dir_last  = 'initial_risk_' + str(events) + \
+            "_sites" + str(sites_needed)
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                  'memory_output_risk', dir_last)
+    runs.append({"processes":1, "sdp":sdp})
+
+    
+    ###
+    events = 8000
+    ###
+    events_source = events/num_sources
+    num_sites = 17278
+    sdp.prob_number_of_events_in_zones = [events_source]*num_sources
+    sdp.prob_number_of_events_in_zones[0] += events%num_sources
+    sdp.site_indexes = create_sites_list(num_sites, sites_needed)
+    dir_last  = 'initial_risk_' + str(events) + \
+            "_sites" + str(sites_needed)
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                  'memory_output_risk', dir_last)
+    runs.append({"processes":1, "sdp":sdp})
+
+    
+    ###
+    events = 80000
+    ###
+    events_source = events/num_sources
+    num_sites = 17278
+    sdp.prob_number_of_events_in_zones = [events_source]*num_sources
+    sdp.prob_number_of_events_in_zones[0] += events%num_sources
+    sdp.site_indexes = create_sites_list(num_sites, sites_needed)
+    dir_last  = 'initial_risk_' + str(events) + \
+            "_sites" + str(sites_needed)
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                  'memory_output_risk', dir_last)
+    runs.append({"processes":1, "sdp":sdp})
+
+    
+    return runs
+    
 def old_max_simulation():
     """
     attribute	#	JSON attribute
@@ -105,7 +241,7 @@ def old_max_simulation():
     events_source = events/num_sources
     sdp.prob_number_of_events_in_zones = [events_source]*num_sources
     sdp.prob_number_of_events_in_zones[0] += events%num_sources
-    sdp.use_site_indexes = False #True
+    sdp.use_site_indexes = True
     sdp.site_indexes = create_sites_list(num_sites, sites_needed)
     assert sum(sdp.prob_number_of_events_in_zones) == events
     assert len(sdp.site_indexes) == sites_needed
@@ -261,7 +397,8 @@ def build_runs_list():
 
     
 def test_run():
-    multi_run(old_max_simulation())
+    multi_run(risk_simulation())
+    #multi_run(old_max_simulation())
     #multi_run(build_runs_list())
     #multi_run(build_runs_list_large_standard())
     
