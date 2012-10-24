@@ -4,7 +4,7 @@ import unittest
 import tempfile
 import shutil
 
-from multiple_runs import *
+from eqrm_code.multiple_runs import *
 
 class Test_multiple_runs(unittest.TestCase):
 
