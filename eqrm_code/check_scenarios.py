@@ -198,7 +198,7 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
 
 def directory_diff(dirA, dirB):
     """
-    Recursively checks the directories for files to and checks for differences.
+    Recursively checks the directories for files and checks for differences.
     
     Supports .npy and ascii files:
     - If an npy file is encountered load both and do an allclose to compare
@@ -234,14 +234,17 @@ def directory_diff(dirA, dirB):
             result = True            
             try:
                 if not allclose(arrayA, arrayB):
+                    #print "arrayA.shape ",arrayA.shape 
+                    #print "arrayB.shape ", arrayB.shape 
+                    
                     result = False
             except:
                 # allclose raises a TypeError if the arrays are None
                 if arrayA != arrayB:
                     result = False
             
-            lineA = fileA
-            lineB = fileB
+            lineA = '** Not a line difference. One file is;' + fileA
+            lineB = '** Not a line difference. The other file is;' + fileB
             
         elif fileA[-2:] == '.p':
             # Likely to be source_model. The comparison methods take care of the
