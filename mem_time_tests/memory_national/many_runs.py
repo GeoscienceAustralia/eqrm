@@ -150,14 +150,15 @@ def risk_simulation():
     """
     runs = []
     num_sources = 6  
-    sdp = create_base_risk()
     
     ### 
-    sites_needed = 10
+    
+    
+    sdp = create_base_risk()
     sdp.atten_collapse_Sa_of_atten_models = True 
     sdp.atten_variability_method = 2
-    
     ###
+    sites_needed = 1
     events = 80
     ###
     events_source = events/num_sources
@@ -168,12 +169,34 @@ def risk_simulation():
     dir_last  = 'initial_risk_' + str(events) + \
             "_sites" + str(sites_needed)
     sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
-                                  'memory_output_risk', dir_last)
+                                  'memory_output_riskB', dir_last)
     runs.append({"processes":1, "sdp":sdp})
 
-    
+ 
+    sdp = create_base_risk()   
+    sdp.atten_collapse_Sa_of_atten_models = True 
+    sdp.atten_variability_method = 2
     ###
-    events = 8000
+    sites_needed = 2
+    events = 80
+    ###
+    events_source = events/num_sources
+    num_sites = 17278
+    sdp.prob_number_of_events_in_zones = [events_source]*num_sources
+    sdp.prob_number_of_events_in_zones[0] += events%num_sources
+    sdp.site_indexes = create_sites_list(num_sites, sites_needed)
+    dir_last  = 'initial_risk_' + str(events) + \
+            "_sites" + str(sites_needed)
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                  'memory_output_riskB', dir_last)
+    runs.append({"processes":1, "sdp":sdp})
+
+    sdp = create_base_risk()  
+    sdp.atten_collapse_Sa_of_atten_models = True 
+    sdp.atten_variability_method = 2  
+    ###
+    sites_needed = 1
+    events = 800
     ###
     events_source = events/num_sources
     num_sites = 17278
@@ -184,10 +207,33 @@ def risk_simulation():
             "_sites" + str(sites_needed)
     sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
                                   'memory_output_risk', dir_last)
-    runs.append({"processes":1, "sdp":sdp})
-
+    #runs.append({"processes":1, "sdp":sdp})
     
+ 
+    sdp = create_base_risk()   
+    sdp.atten_collapse_Sa_of_atten_models = True 
+    sdp.atten_variability_method = 2
     ###
+    sites_needed = 10
+    events = 800
+    ###
+    events_source = events/num_sources
+    num_sites = 17278
+    sdp.prob_number_of_events_in_zones = [events_source]*num_sources
+    sdp.prob_number_of_events_in_zones[0] += events%num_sources
+    sdp.site_indexes = create_sites_list(num_sites, sites_needed)
+    dir_last  = 'initial_risk_' + str(events) + \
+            "_sites" + str(sites_needed)
+    sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
+                                  'memory_output_risk', dir_last)
+    #runs.append({"processes":1, "sdp":sdp})
+    
+
+    sdp = create_base_risk()  
+    sdp.atten_collapse_Sa_of_atten_models = True 
+    sdp.atten_variability_method = 2  
+    ###
+    sites_needed = 1
     events = 80000
     ###
     events_source = events/num_sources
@@ -199,7 +245,7 @@ def risk_simulation():
             "_sites" + str(sites_needed)
     sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
                                   'memory_output_risk', dir_last)
-    runs.append({"processes":1, "sdp":sdp})
+    #runs.append({"processes":1, "sdp":sdp})
 
     
     return runs
@@ -397,7 +443,8 @@ def build_runs_list():
 
     
 def test_run():
-    multi_run(risk_simulation())
+    runs = risk_simulation()
+    multi_run(runs)
     #multi_run(old_max_simulation())
     #multi_run(build_runs_list())
     #multi_run(build_runs_list_large_standard())
