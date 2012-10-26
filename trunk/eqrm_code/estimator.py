@@ -177,9 +177,13 @@ def estimate_mem(events,
                                             atten_periods) * item_size
 
     #print "mem_bytes[log.COLLROCKSAE_J]",mem_bytes[log.COLLROCKSAE_J]
-    mem_bytes[log.ROCKOVERLOADED_J] = (loop_sites *
-                           events * gmm_max * spawning * rec_mod *
-                           atten_periods) * item_size
+    if not run_type == "hazard":
+        mem_bytes[log.ROCKOVERLOADED_J] = (loop_sites *
+                                           events * gmm_max *
+                                           spawning * rec_mod *
+                                           atten_periods) * item_size
+    else:
+        mem_bytes[log.ROCKOVERLOADED_J] = 0
     #print "gmm_after_collapsing",gmm_after_collapsing
     #print "gmm_max",gmm_max
     #mem_bytes[log.ROCKOVERLOADED_J]
@@ -188,14 +192,14 @@ def estimate_mem(events,
     #print " mem_bytes[log.ROCKOVERLOADED_J] ", mem_bytes[log.ROCKOVERLOADED_J] 
     if use_amplification is True:
         mem_bytes['coll_soil_SA_all_events'] = mem_bytes[log.COLLROCKSAE_J]
-        mem_bytes['soil_SA_overloaded'] = mem_bytes[log.ROCKOVERLOADED_J]
+        
+        if not run_type == "hazard":
+            mem_bytes['soil_SA_overloaded'] = mem_bytes[log.ROCKOVERLOADED_J]
+        else:
+            mem_bytes['soil_SA_overloaded'] = 0
     else:
         mem_bytes['coll_soil_SA_all_events'] = 0           
         mem_bytes['soil_SA_overloaded'] = 0
 
-    new_mem_bytes = copy(mem_bytes)
-    if run_type == "hazard":
-        new_mem_bytes[log.ROCKOVERLOADED_J] = 0
-        new_mem_bytes['soil_SA_overloaded'] = 0
-    return mem_bytes, new_mem_bytes
+    return mem_bytes
 
