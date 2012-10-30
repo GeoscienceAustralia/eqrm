@@ -189,7 +189,62 @@ class Test_scaling(unittest.TestCase):
         length = 1.0
         width_actual = area/length
         assert allclose(width_actual, width)
-    
+        
+    def test_Strasser_et_al_2010_interface_rup_width(self):
+        # 
+        Mw = array([4.5, 6.5, 13., 13.])
+        area=array([100., 100., 100., 100.])
+        dip = array([ 0., 0., 90., 90.])
+        fault_width = array([ 15000. , 15000. , 15000., 2.])
+        scaling_dic = {'scaling_rule':'Strasser_et_al_2010_interface'}
+        
+        width = scaling_calc_rup_width(Mw, scaling_dic,
+                                       dip, rup_area=area,
+                                       max_rup_width=fault_width)
+       
+        correct = [ 4.983104559705295, 25.089961794654, 4797.334486366892, 2.]
+        assert allclose(correct,
+                        width)
+               
+    def test_Strasser_et_al_2010_interface_rup_area(self):
+        # 
+        Mw = array([4.02, 5.02, 6.02, 8.])
+        # testing name shortening
+        scaling_dic = {'scaling_rule':'Strasser_et_al_2010_interface'}
+        
+        width = scaling_calc_rup_area(Mw, scaling_dic)
+        
+        correct = [ 2.244088602463251, 20.09277865417024, 179.9036604893103,13803.84264602884]
+        assert allclose(correct,
+                        width)
+        
+    def test_Strasser_et_al_2010_intraslab_rup_width(self):
+        # 
+        Mw = array([4.5, 6.5, 13., 13.])
+        area=array([100., 100., 100., 100.])
+        dip = array([ 0., 0., 90., 90.])
+        fault_width = array([ 15000. , 15000. , 15000., 2.])
+        scaling_dic = {'scaling_rule':'Strasser_et_al_2010_intraslab'}
+        
+        width = scaling_calc_rup_width(Mw, scaling_dic,
+                                       dip, rup_area=area,
+                                       max_rup_width=fault_width)
+       
+        correct = [ 3.499451670283573, 18.03017740859569, 3715.352290971724, 2.]
+        assert allclose(correct,
+                        width)
+               
+    def test_Strasser_et_al_2010_intraslab_rup_area(self):
+        # 
+        Mw = array([4.02, 5.02, 6.02, 8.])
+        # testing name shortening
+        scaling_dic = {'scaling_rule':'Strasser_et_al_2010_intraslab'}
+        
+        width = scaling_calc_rup_area(Mw, scaling_dic)
+        
+        correct = [ 2.253201335629484, 17.49041039966303, 135.7688064139092,7852.356346100718]
+        assert allclose(correct,
+                        width)
         
 def Mw_to_Mo(Mw):
     """
