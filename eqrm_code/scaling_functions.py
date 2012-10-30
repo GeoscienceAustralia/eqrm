@@ -180,3 +180,61 @@ def PEER_rup_width(dip, Mw, area, max_rup_width, **kwargs):
     Pacific Earthquake Engineering Research Center (PEER)
     """
     return 1.
+
+def Strasser_et_al_2010_interface_rup_width(dip, Mw, area, max_rup_width, **kwargs):
+    """
+    From Scaling of the Source Dimensions of Interface and Intraslab 
+    Subduction-zone Earthquakes with Moment Magnitude.
+    F.O. Strasser, M. C. Arango, and J.J. Bommer (2010).
+    """
+    a =-0.882
+    b = 0.351
+    
+    width = 10.**(a + b*Mw)
+    if max_rup_width is not None:
+        return minimum(width,max_rup_width)
+    else:
+        return width
+
+def Strasser_et_al_2010_interface_rup_area(Mw, **kwargs):
+    """
+    From Scaling of the Source Dimensions of Interface and Intraslab 
+    Subduction-zone Earthquakes with Moment Magnitude.
+    F.O. Strasser, M. C. Arango, and J.J. Bommer (2010).
+    returns: the rupture area, km2.
+    """
+    a =-3.476
+    b = 0.952
+    
+    area = 10.**(a + b*Mw)
+    return area
+
+def Strasser_et_al_2010_intraslab_rup_width(dip, Mw, area, max_rup_width, **kwargs):
+    """
+    From Scaling of the Source Dimensions of Interface and Intraslab 
+    Subduction-zone Earthquakes with Moment Magnitude.
+    F.O. Strasser, M. C. Arango, and J.J. Bommer (2010).
+    """
+    a =-1.058
+    b = 0.356
+    
+    width = 10.**(a + b*Mw)
+    if max_rup_width is not None:
+        return minimum(width,max_rup_width)
+    else:
+        return width
+
+
+def Strasser_et_al_2010_intraslab_rup_area(Mw, **kwargs):
+    """
+    From Scaling of the Source Dimensions of Interface and Intraslab 
+    Subduction-zone Earthquakes with Moment Magnitude.
+    F.O. Strasser, M. C. Arango, and J.J. Bommer (2010).
+    returns: the rupture area, km2.
+    """
+    a =-3.225
+    b = 0.890
+    
+    area = 10.**(a + b*Mw)
+    return area
+    
