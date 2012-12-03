@@ -115,7 +115,9 @@ C. WINDOWS INSTALL INSTRUCTIONS:
    http://pypi.python.org/pypi/Shapely/.   
    (If you are using Python 2.4, you will have to install ctypes as well)
 
-6. Install GMT from http://gmt.soest.hawaii.edu/gmt/gmt_download.html.
+6. Install GMT from
+   http://gmt.soest.hawaii.edu/gmt/gmt_windows_SOEST.html.
+   OR http://gmt.mirror.ac.za/pub/gmt/windows/
    Install the basic and highfull executables. You can skip this step
    if you do not wish to plot any maps. 
 
