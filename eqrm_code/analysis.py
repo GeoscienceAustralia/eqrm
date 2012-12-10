@@ -447,7 +447,9 @@ def main(parameter_handle,
             MMI = rsa2mmi_array(SA)
             
             fatality = forecast_fatality(MMI, 
-                                         sites.attributes['POPULATION'][0])
+                                         sites.attributes['POPULATION'][0],
+                                         beta=eqrm_flags.fatality_beta,
+                                         theta=eqrm_flags.fatality_theta)
             
             numelement = MMI.shape[1]
             
