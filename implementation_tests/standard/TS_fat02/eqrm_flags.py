@@ -38,7 +38,7 @@ event_control_tag = ""
 atten_collapse_Sa_of_atten_models = True
 atten_variability_method = 2
 atten_periods = [1.0]
-atten_threshold_distance = 4
+atten_threshold_distance = 400
 atten_spawn_bins = 1
 atten_override_RSA_shape = None
 atten_cutoff_max_spectral_displacement = False
@@ -57,6 +57,10 @@ amp_max_factor = 10000
 # Capacity Spectrum Method
 
 # Loss
+
+# Fatalities
+#fatality_beta = 0.00000005
+#fatality_theta = .000005
 
 # Save
 save_hazard_map = False
