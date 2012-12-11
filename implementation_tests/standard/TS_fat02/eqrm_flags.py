@@ -17,7 +17,7 @@ from os.path import join
 
 
 # Operation Mode
-run_type = "fatality" 
+run_type = "fatality"
 is_scenario = False
 site_tag = "java" 
 site_db_tag = "" 
@@ -59,16 +59,11 @@ amp_max_factor = 10000
 # Loss
 
 # Fatalities
-#fatality_beta = 0.00000005
-#fatality_theta = .000005
+fatality_beta = 0.00000005
+fatality_theta = .000005
 
 # Save
-save_hazard_map = False
-save_total_financial_loss = False
-save_building_loss = False
-save_contents_loss = False
-save_motion = False
-save_prob_structural_damage = None
+save_hazard_map = True
 save_fatalities = True
 
 # If this file is executed the simulation will start.
