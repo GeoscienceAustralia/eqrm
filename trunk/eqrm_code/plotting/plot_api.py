@@ -39,7 +39,9 @@ from eqrm_code.plotting import calc_annloss
 def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
                 plot_file=None, save_file=None, title=None, np_posn=None,
                 s_posn=None, cb_steps=None, colourmap=None, cb_label=None,
-                annotate=[]):
+                annotate=[], annot_lat = '30m', grid_lat = '30m', annot_lon = '30m', 
+                grid_lon = '30m'):
+
     """Plot an earthquake hazard map, from probabalistic data.
 
     input_dir     directory containing EQRM input data files
@@ -50,6 +52,30 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
     period        period of the event
     plot_file     full filename for generated plot file (*.png, *.eps, etc)
     save_file     full filename for saved plot data
+    title        string used to title the plot
+    np_posn      code string for north pointer placement, one of:
+                     'C'   - centre of plot
+                     'NE'  - inside plot, northeast corner
+                     'CE'  - inside plot, centre of east edge
+                     'NNE' - outside plot, north of NE corner
+                     'ENE' - outside plot, east of NE corner
+                      etc (see the documentation for 'placement')
+    s_posn       code string for scale placement
+                     see examples for 'np_posn' above
+    cb_label     string containing the label text for the colorbar
+                 (if not supplied, no colourbar)
+    cb_steps     if supplied is a sequence of discrete values at
+                 the colour changes
+    colourmap    string containing name of required colormap
+                 this could be a GMT name or a local name
+    annotate     list of user annotations:
+                     if None, no user or system annotations
+                     if [],   only system annotations
+                     else system and user annotations
+    annot_lat    Spacing in minutes for latitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lat     Spacing in minutes for latitude grid lines (e.g. 30m = 0.5 degress) 
+    annot_lon    Spacing in minutes for longitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lon     Spacing in minutes for longitude grid lines (e.g. 30m = 0.5 degress) 
 
     All other parameters are plot parameters as described elsewhere.
 
@@ -82,7 +108,8 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
                                   np_posn=np_posn, s_posn=s_posn,
                                   cb_label=cb_label, cb_steps=cb_steps,
                                   colourmap=colourmap,
-                                  annotate=annotate)
+                                  annotate=annotate, annot_lat=annot_lat,grid_lat=grid_lat,
+                                annot_lon=annot_lon, grid_lon=grid_lon)
 
 
 def fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period, period,
@@ -597,7 +624,9 @@ fig_motion_function_map = {'mean': numpy.mean,
 def fig_motion(input_dir, site_tag, soil_amp, period,
                collapse_function=None, plot_file=None, save_file=None,
                title=None, np_posn=None, s_posn=None, cb_steps=None,
-               colourmap=None, cb_label=None, annotate=[], show_graph=False):
+               colourmap=None, cb_label=None, annotate=[], show_graph=False,
+               annot_lat = '30m', grid_lat = '30m', annot_lon = '30m', 
+               grid_lon = '30m'):
     """Plot a contoured acceleration map with meaned/medianed data.
 
     input_dir          general input/output directory
@@ -616,6 +645,10 @@ def fig_motion(input_dir, site_tag, soil_amp, period,
     cb_label           colourbar label string
     annotate           iterable of annotate values
     show_graph         True if the plot is to be shown on the screen
+    annot_lat    Spacing in minutes for latitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lat     Spacing in minutes for latitude grid lines (e.g. 30m = 0.5 degress) 
+    annot_lon    Spacing in minutes for longitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lon     Spacing in minutes for longitude grid lines (e.g. 30m = 0.5 degress) 
     """
 
     # read in raw data
@@ -662,7 +695,9 @@ def fig_motion(input_dir, site_tag, soil_amp, period,
                                   np_posn=np_posn, s_posn=s_posn,
                                   cb_label=cb_label, cb_steps=cb_steps,
                                   colourmap=colourmap,
-                                  annotate=annotate)
+                                  annotate=annotate, annot_lat=annot_lat,
+                                  grid_lat=grid_lat,
+                                  annot_lon=annot_lon, grid_lon=grid_lon)
 
 
 def fig_motion_continuous(input_dir, site_tag, soil_amp, period,
@@ -1246,7 +1281,6 @@ def fig_scenario_building_loss_percent(input_dir, site_tag, plot_file=None,
                          xrange=xrange, yrange=yrange,
                          show_graph=show_graph, bardict=bardict,
                          annotate=range_ann)
-
 
 # function string to object mapping
 # later, we will only do this mapping if 'collapse_function' is of type string

@@ -30,7 +30,9 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
                          np_posn=None, s_posn=None,
                          cb_label=None, cb_steps=None,
                          colourmap=None, annotate=[], linewidth=1.0,
-                         show_graph=False, map_extent=None):
+                         show_graph=False, map_extent=None, 
+                         annot_lat = '30m', grid_lat = '30m',
+                         annot_lon = '30m', grid_lon = '30m'):
     """A function to take XYZ data and plot contours onto a GMT map.
     
     data         an iterable of values in xyz format (lon, lat, val)
@@ -59,6 +61,10 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     show_graph   if True try to display final image in system-independant way
     map_extent   set the extent of the displayed map if supplied
                  (get extent from data if not supplied)
+    annot_lat    Spacing in minutes for latitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lat     Spacing in minutes for latitude grid lines (e.g. 30m = 0.5 degress) 
+    annot_lon    Spacing in minutes for longitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lon     Spacing in minutes for longitude grid lines (e.g. 30m = 0.5 degress) 
     """
 
     # create a scratch directory for ephemeral files
@@ -243,8 +249,8 @@ def plot_gmt_xyz_contour(data, output_file, title=None,
     if s_posn:
         l_opt = ugp.get_scale_placement(s_posn, extent)
 
-    util.do_cmd('psbasemap %s -O %s "-Ba30m:.%s:WSen" -Bg30m %s %s >> %s'
-                % (r_opt, j_opt, title, t_opt, l_opt, my_ps_file))
+    util.do_cmd('psbasemap %s -O %s "-Ba%s/a%s:.%s:WSen" -Bg%s/g%s %s %s >> %s'
+                % (r_opt, j_opt, annot_lon, annot_lat, title, grid_lon, grid_lat, t_opt, l_opt, my_ps_file))
 
     # convert PS to required type
     (_, file_extension) = output_file.rsplit('.', 1)
