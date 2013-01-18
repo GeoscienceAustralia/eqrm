@@ -1235,7 +1235,7 @@ def fig_scenario_building_loss_percent(input_dir, site_tag, plot_file=None,
             title = ''          #######  needs work!
 
         if xlabel is None:
-            xlabel = ''
+            xlabel = 'Percentage of building value'
         if ylabel is None:
             ylabel = 'Count'
 
