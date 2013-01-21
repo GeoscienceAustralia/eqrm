@@ -15,7 +15,7 @@ site_tag = 'newc'
 
 title = 'demo_annloss_deagg_cells.py'
 output_dir = '.'
-output_file = 'demo_annloss_deagg_cells.eps'
+output_file = 'demo_annloss_deagg_cells.png'
 save_file = None
 np_posn = 'nw'
 s_posn = 'se'
