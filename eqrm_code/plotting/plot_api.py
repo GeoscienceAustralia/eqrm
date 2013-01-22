@@ -430,7 +430,7 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
                      title=title, np_posn=np_posn, s_posn=s_posn,
                      cb_label=cb_label, cb_steps=cb_steps, colourmap=colourmap,
                      annotate=annotate, show_graph=False)
-                     
+                       
 def fig_annfatalities_deagg_cells(input_dir, site_tag,
                             output_file, save_file=None,
                             title=None, np_posn=None, s_posn=None,
