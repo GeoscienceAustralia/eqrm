@@ -1196,6 +1196,91 @@ def fig_scenario_building_loss(input_dir, site_tag, plot_file=None, scale=None,
                          show_graph=show_graph, bardict=bardict,
                          annotate=range_ann)
 
+def fig_scenario_fatalities_loss(input_dir, site_tag, plot_file=None, scale=None,
+                               savefile=None, title=None, xlabel=None,
+                               ylabel=None, xrange=None, yrange=None, bins=100,
+                               bardict=None, show_graph=False):
+    """Plot a 1D histogram of scenario fatalities loss.
+
+    input_dir      general input/output directory
+    site_tag       overall site identifier
+    plot_file      path to plot output file to create
+    scale          None or scaling factor to *divide* data with
+                   (eg, if *billions* of dollars, uses scale=1.0e+9)
+    savefile       path to data output file to create (UNUSED)
+    title          title to put on the graph
+    xlabel         text of X axis label
+    ylabel         text of Y axis label
+    xrange         Either <max> or (<min>, <max>) of X range to plot
+    yrange         Either <max> or (<min>, <max>) of Y range to plot
+    bins           number of bins to use
+    bardict        dictionary of extra keywords to pass to plot_barchart()
+                   see plot_barchart.py for the details on this
+    show_graph     True if the plot is to be shown on the screen
+    """
+
+    # Load in the structure loss data, shape = (location, event)
+    #(total_building_loss, _, _, _) = om.load_ecloss_and_sites(input_dir, site_tag)
+
+    # Load in the structure loss and structure value
+    results = om.load_fatalities('_fatalities', input_dir, site_tag)
+
+    # sum over location -> (event,)
+    data = numpy.sum(results, axis=0)
+
+    # scale data, if required
+    if scale:
+        data = data / scale
+        
+
+    # plot the data
+    if plot_file or show_graph:
+        if title is None:
+            title = ''          #######  needs work!
+
+        # now generate histogrammed data
+        (hist_data, xedges) = scipy.histogram(data, bins=bins, normed=False)
+
+        # get array of bin centres
+        bins = []
+        for i in range(len(xedges)-1):
+            bins.append(xedges[i] + (xedges[i+1] - xedges[i])/2.0)
+        bins = scipy.array(bins)
+
+        # calculate optimal bin width
+        bin_width = xedges[1] - xedges[0]
+
+        # return nx2 array of (x, y)
+        plot_data = scipy.hstack((bins[:,scipy.newaxis], hist_data[:,scipy.newaxis]))
+
+        # now standardise xrange
+        xrange = util.get_canonical_range(xrange)
+        yrange = util.get_canonical_range(yrange)
+
+        range_ann = []
+
+        # assert number of events == sum of frequencies
+        y_sum = numpy.sum(plot_data[:,1])
+        msg = 'num of events(%d) != sum(frequency)(%d)' % (len(data), y_sum)
+        assert len(data) == y_sum, msg
+
+        # annotate any range coercions
+        if xrange:
+            range_ann.append((0.02, 0.05,
+                              'X range forced to (%.2f,%.2f)' % xrange))
+
+        if yrange:
+            range_ann.append((0.02, 0.03,
+                              'Y range forced to (%.2f,%.2f)' % yrange))
+
+        # actually plot the thing
+        pb.plot_barchart(plot_data, plot_file, title=title,
+                         xlabel=xlabel, ylabel=ylabel,
+                         bin_width=bin_width,
+                         xrange=xrange, yrange=yrange,
+                         show_graph=show_graph, bardict=bardict,
+                         annotate=range_ann)
+
 
 def fig_scenario_building_loss_percent(input_dir, site_tag, plot_file=None,
                                        savefile=None, title=None,
