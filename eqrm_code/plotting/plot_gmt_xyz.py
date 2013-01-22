@@ -162,21 +162,31 @@ def plot_gmt_xyz(data, output_file, bins=100, title=None, np_posn=None,
     # draw the colorbar
     if cb_label:
         x_offset = cfg.MapWidthCentimetres + 0.5
-        util.do_cmd('psscale -O -C%s -D%.1fc/8.0c/9.0c/0.8c -B%f:"%s": >> %s'
+        util.do_cmd('psscale -O -K -C%s -D%.1fc/8.0c/9.0c/0.8c -B%f:"%s": >> %s'
                     % (my_cpt_file, x_offset, skip, cb_label, my_ps_file))
+    # force close
+    util.do_cmd('psxy -O -J -R -T  >> %s'
+                    % (my_ps_file))
 
     # convert PS to required type
     (_, file_extension) = output_file.rsplit('.', 1)
+    print output_file
     try:
         t_opt = util.Extension2TOpt[file_extension.lower()]
+        print t_opt
     except KeyError:
         raise RuntimeError("Can't handle plot outputfile type: %s" %
                            file_extension)
 
+    print my_ps_file
     util.do_cmd('ps2raster %s -A -T%s' % (my_ps_file, t_opt))
     (my_output_file, _) = my_ps_file.rsplit('.', 1)
     my_output_file += '.' + file_extension
+    print my_ps_file
+    print my_output_file
     shutil.copyfile(my_output_file, output_file)
+    print my_output_file
+    
 
     # if it's required to show the graph ...
     # TODO: Experimental - leave?
