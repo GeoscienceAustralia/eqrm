@@ -53,7 +53,46 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
                            save_motion,
                            use_amplification)
     return results
+  
 
+def estimate_mem_param_format(param): 
+    # Half started
+    events = param[EVENTS_J]
+    atten_periods = param['len_atten_periods']
+    return_periods= param['len_return_periods']
+    parallel_size = param[PARALLELSIZE_J]
+    sites = param[BLOCKSITES_J] * parallel_size
+    run_type = param['run_type']
+    spawning = param['atten_spawn_bins']
+    gmm_dimensions = param[MAXGMPE_J]
+    rec_mod  = param[RECMOD_J]
+    atten_collapse_Sa_of_atten_models = \
+        param['atten_collapse_Sa_of_atten_models']
+    save_total_financial_loss = param['save_total_financial_loss']
+    save_building_loss = param['save_building_loss']
+    save_contents_loss = param['save_contents_loss']
+    save_hazard_map = param['save_hazard_map']
+    save_motion = param['save_motion']
+    use_amplification = param['use_amplification']
+    
+    results = estimate_mem(events, 
+                           atten_periods, 
+                           return_periods,
+                           sites,
+                           run_type,
+                           parallel_size,
+                           spawning,
+                           gmm_dimensions,
+                           rec_mod,
+                           atten_collapse_Sa_of_atten_models,
+                           save_total_financial_loss,
+                           save_building_loss,
+                           save_contents_loss,
+                           save_hazard_map,
+                           save_motion,
+                           use_amplification)
+    return results
+    
 def estimate_mem(events, 
                  atten_periods, 
                  return_periods,
@@ -75,6 +114,8 @@ def estimate_mem(events,
     """
     Estimate the total memory used in an EQRM simulation.  
     Give the results in bytes
+    
+    rec_mod - recurance models 
 
     """
     mem_bytes = {}
