@@ -1225,10 +1225,7 @@ def fig_scenario_fatalities_loss(input_dir, site_tag, plot_file=None, scale=None
     # Load in the structure loss and structure value
     (total_fatalities, _, _) = om.load_fatalities('_fatalities', input_dir, site_tag)
     #(results) = om.load_fatalities('_fatalities', input_dir, site_tag)
-    print total_fatalities
-    print len(total_fatalities)
-    print type(total_fatalities)
-    print total_fatalities.shape
+
     #print results
     #print len(results)
     #print type(results)
@@ -1237,6 +1234,7 @@ def fig_scenario_fatalities_loss(input_dir, site_tag, plot_file=None, scale=None
     if tmp[0]==1:
     # sum over location -> (event,)
         data = numpy.sum(total_fatalities, axis=1)
+        print "estimated fatalities = ", data
     else:
         data = numpy.sum(total_fatalities, axis=0)
 
@@ -1245,7 +1243,6 @@ def fig_scenario_fatalities_loss(input_dir, site_tag, plot_file=None, scale=None
     if scale:
         data = data / scale
         
-    print data
     # plot the data
     if plot_file or show_graph:
         if title is None:
@@ -1274,8 +1271,6 @@ def fig_scenario_fatalities_loss(input_dir, site_tag, plot_file=None, scale=None
 
         # assert number of events == sum of frequencies
         y_sum = numpy.sum(plot_data[:,1])
-        print y_sum
-        print len(data)
         msg = 'num of events(%d) != sum(frequency)(%d)' % (len(data), y_sum)
         assert len(data) == y_sum, msg
 
