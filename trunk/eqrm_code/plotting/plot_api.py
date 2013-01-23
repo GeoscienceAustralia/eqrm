@@ -1232,9 +1232,14 @@ def fig_scenario_fatalities_loss(input_dir, site_tag, plot_file=None, scale=None
     #print results
     #print len(results)
     #print type(results)
-    
+    tmp = total_fatalities.shape
+    # This fix is to allow for the transpose function in scipy.transpose for vectors 
+    if tmp[0]==1:
     # sum over location -> (event,)
-    data = numpy.sum(total_fatalities, axis=1)
+        data = numpy.sum(total_fatalities, axis=1)
+    else:
+        data = numpy.sum(total_fatalities, axis=0)
+
 
     # scale data, if required
     if scale:
