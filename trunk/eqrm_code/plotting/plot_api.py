@@ -1223,10 +1223,18 @@ def fig_scenario_fatalities_loss(input_dir, site_tag, plot_file=None, scale=None
     #(total_building_loss, _, _, _) = om.load_ecloss_and_sites(input_dir, site_tag)
 
     # Load in the structure loss and structure value
-    (results, _, _) = om.load_fatalities('_fatalities', input_dir, site_tag)
-    print results
+    (total_fatalities, _, _) = om.load_fatalities('_fatalities', input_dir, site_tag)
+    #(results) = om.load_fatalities('_fatalities', input_dir, site_tag)
+    print total_fatalities
+    print len(total_fatalities)
+    print type(total_fatalities)
+    print total_fatalities.shape
+    #print results
+    #print len(results)
+    #print type(results)
+    
     # sum over location -> (event,)
-    data = numpy.sum(results, axis=0)
+    data = numpy.sum(total_fatalities, axis=1)
 
     # scale data, if required
     if scale:
