@@ -72,8 +72,10 @@ def save_hazard(soil_amp,eqrm_flags,
         raise IOError("soil_amp must be True or False")  
     base_names = []
     if sites is not None:
-        file_name = save_sites_to_csv(eqrm_flags.output_dir, eqrm_flags.site_tag,
-                   sites, compress, parallel_tag, write_title)
+        file_name = save_sites_to_csv(eqrm_flags.output_dir, 
+                                      eqrm_flags.site_tag,
+                                      sites, compress, parallel_tag, 
+                                      write_title)
         base_names.append(file_name)
     if compress:
         open = myGzipFile
@@ -1295,14 +1297,19 @@ def save_fatalities(fatalities_name,eqrm_flags,fatalities,sites,compress=False,
     else:
         open = file
     if parallel_tag is None:
-        parallel_tag = ''  
+        parallel_tag = ''
+      
     base_name = os.path.join(eqrm_flags.output_dir, get_fatalities_file_name(
         eqrm_flags.site_tag, fatalities_name))
     name = base_name + parallel_tag
     
     if sites is not None:
-        save_sites_to_csv(eqrm_flags.output_dir, eqrm_flags.site_tag,
-                       sites, compress, parallel_tag, write_title)
+        base_name_column = save_sites_to_csv(eqrm_flags.output_dir, 
+                                       eqrm_flags.site_tag,
+                                       sites, compress, 
+                                       parallel_tag, write_title) 
+    else:
+        base_name_column = None
                     
     f=open(name,'w')
     f.write('% This file contains the fatalities, subsequent rows are events\n')
@@ -1311,7 +1318,7 @@ def save_fatalities(fatalities_name,eqrm_flags,fatalities,sites,compress=False,
         el=fatalities[:,i] # sites,event
         f.write(' '.join(['%.10g'%(l) for l in el])+'\n')
     f.close()
-    return base_name
+    return base_name, base_name_column
 
 def get_fatalities_file_name(site_tag, fatalities_name):
     return site_tag + fatalities_name + '.txt'    
@@ -1419,7 +1426,8 @@ def join_parallel_files_column(base_names,
         # - Comment is first line
         # - For each subsequent line, split by delimeter
         # Concatenate each list by the block indices
-        
+        #print "**********************************************"
+        #print "base_name", base_name
         f = my_open(base_name,'w')
         f_blocks = []
         for i in range(size):       
