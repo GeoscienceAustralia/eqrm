@@ -739,12 +739,15 @@ def main(parameter_handle,
     if (eqrm_flags.save_fatalities is True and
             parallel.lo != parallel.hi):
         # note: will not handle multiple GMPES
-        a_file = save_fatalities('_fatalities',eqrm_flags,
-                           total_fatalities,
-                           sites=all_sites,
-                           compress=eqrm_flags.compress_output,
-                           parallel_tag=parallel.file_tag)
-        column_files_that_parallel_splits.append(a_file)
+        file_row, file_col = save_fatalities(
+            '_fatalities',eqrm_flags,
+            total_fatalities,
+            sites=all_sites,
+            compress=eqrm_flags.compress_output,
+            parallel_tag=parallel.file_tag)
+        if not file_row is None: 
+            column_files_that_parallel_splits.append(file_row)
+        row_files_that_parallel_splits.append(file_col)
         
         files = save_distances(eqrm_flags, sites=all_sites,
                                event_set=event_set,
