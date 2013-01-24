@@ -1318,7 +1318,6 @@ def save_fatalities(fatalities_name,eqrm_flags,fatalities,sites,compress=False,
         el=fatalities[:,i] # sites,event
         f.write(' '.join(['%.10g'%(l) for l in el])+'\n')
     f.close()
-    print "base_name_row", base_name_row
     return base_name_row, base_name
 
 def get_fatalities_file_name(site_tag, fatalities_name):
