@@ -745,7 +745,6 @@ def main(parameter_handle,
             sites=all_sites,
             compress=eqrm_flags.compress_output,
             parallel_tag=parallel.file_tag)
-        print "file_row", file_row
         row_files_that_parallel_splits.append(file_row)
         if not file_col is None: 
             column_files_that_parallel_splits.append(file_col)
