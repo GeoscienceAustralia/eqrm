@@ -1304,12 +1304,12 @@ def save_fatalities(fatalities_name,eqrm_flags,fatalities,sites,compress=False,
     name = base_name + parallel_tag
     
     if sites is not None:
-        base_name_column = save_sites_to_csv(eqrm_flags.output_dir, 
+        base_name_row = save_sites_to_csv(eqrm_flags.output_dir, 
                                        eqrm_flags.site_tag,
                                        sites, compress, 
                                        parallel_tag, write_title) 
     else:
-        base_name_column = None
+        base_name_row = None
                     
     f=open(name,'w')
     f.write('% This file contains the fatalities, subsequent rows are events\n')
@@ -1318,7 +1318,8 @@ def save_fatalities(fatalities_name,eqrm_flags,fatalities,sites,compress=False,
         el=fatalities[:,i] # sites,event
         f.write(' '.join(['%.10g'%(l) for l in el])+'\n')
     f.close()
-    return base_name, base_name_column
+    print "base_name_row", base_name_row
+    return base_name_row, base_name
 
 def get_fatalities_file_name(site_tag, fatalities_name):
     return site_tag + fatalities_name + '.txt'    
@@ -1377,6 +1378,7 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
     """
     if compress: my_open = myGzipFile
     else: my_open = open
+    
     for base_name, header_size in base_names:
         # Read in each file and save lines to a list of lines
         # Create master string list of size all lines
