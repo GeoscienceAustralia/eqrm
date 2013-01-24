@@ -55,13 +55,22 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
     return results
   
 
-def estimate_mem_param_format(param): 
-    # Half started
-    events = param[EVENTS_J]
-    atten_periods = param['len_atten_periods']
-    return_periods= param['len_return_periods']
-    parallel_size = param[PARALLELSIZE_J]
-    sites = param[BLOCKSITES_J] * parallel_size
+def estimate_mem_param_format(param, processors): 
+    """
+    Estimate the memory used based on an eqrm control file.
+    
+    This is a 1 star estimator.
+    To get this fully going the .xml files have to be taken into account 
+    as well
+    """
+    assert param['use_site_indexes']
+    events = sum(param['prob_number_of_events_in_zones']) + \
+         sum(param['prob_number_of_events_in_faults'])
+    atten_periods = len(param['atten_periods'])
+    return_periods= len(param['return_periods'])
+    parallel_size = processors
+    
+    sites = len(param['site_indexes'])
     run_type = param['run_type']
     spawning = param['atten_spawn_bins']
     gmm_dimensions = param[MAXGMPE_J]
