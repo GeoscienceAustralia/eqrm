@@ -68,7 +68,8 @@ def main(parameter_handle,
          use_determ_seed=True,
          compress_output=False,
          eqrm_dir=None,
-         is_parallel=True):
+         is_parallel=True,
+         parallel_finalise=True):
     """Script to run eqrm program.
 
     The parameters are defined by the parameter_handle.
@@ -797,8 +798,8 @@ def main(parameter_handle,
     log.info(msg)
     log.log_json({log.WALLTIMEOVERALL_J:wall_time_taken_overall}, log.INFO)
     log.info(msg)
-    
-    parallel.finalize()
+    if parallel_finalise:
+        parallel.finalize()
     del parallel
     log.debug('Memory: End')
     log.resource_usage(tag=log.FINAL_J)
