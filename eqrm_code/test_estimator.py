@@ -111,7 +111,7 @@ class Test_estimator(unittest.TestCase):
         original_DATA_DIR = file_store.DATA_DIR
         sdp = create_base()
         #param = create_parameter_data(sdp)
-        results = estimate_mem_param_format(param)
+        #results = estimate_mem_param_format(param)
         
         file_store.DATA_DIR = None
 
