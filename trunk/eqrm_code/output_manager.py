@@ -1377,7 +1377,9 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
     """
     if compress: my_open = myGzipFile
     else: my_open = open
-    
+    # Changed to 'sets' to stop errors where files
+    # are written multiple times.
+    base_names = set(base_names)
     for base_name, header_size in base_names:
         # Read in each file and save lines to a list of lines
         # Create master string list of size all lines

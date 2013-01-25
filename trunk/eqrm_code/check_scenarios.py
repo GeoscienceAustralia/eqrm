@@ -102,7 +102,8 @@ MINI_PAR_FILES = ['TS_haz38.py',
                   'TS_haz39.py',
                   'TS_risk63.py']
                   
-PARALLEL_FILES = ['TS_haz05.py', 'TS_haz09.py', 'TS_haz12.py',
+PARALLEL_FILES = ['TS_fat02.py',
+                  'TS_haz05.py', 'TS_haz09.py', 'TS_haz12.py',
                   'TS_haz19.py',
                   'TS_risk20.py',
                   'TS_risk21.py', 'TS_risk22.py', 
@@ -170,7 +171,7 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
         t0 = time.clock()
         
         # Run the scenario
-        analysis.main(pull_path, True)
+        analysis.main(pull_path, parallel_finalise=False)
         
         # Run post-processing (if needed)
         if eqrm_flags['save_motion']:
