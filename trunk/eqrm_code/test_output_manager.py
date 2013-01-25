@@ -825,8 +825,10 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(base_file_name)
 
     def test_join_parallel_files2(self):
-        # this test checks that data files with differing numbers of entries per row can be joined together
-        # a previous version of join_parellel_files caused a ValueError in numpy 1.5.1 and scipy 0.8.0
+        # this test checks that data files with differing numbers of
+        # entries per row can be joined together a previous version of
+        # join_parellel_files caused a ValueError in numpy 1.5.1 and
+        # scipy 0.8.0
         compress = False
         file_num = 5
         header_size = 0
@@ -843,9 +845,13 @@ class Test_Output_manager(unittest.TestCase):
             file_name = base_file_name + FILE_TAG_DELIMITER +  str(i)
             cleanup_file_names.append(file_name)
             f_handle = my_open(file_name, 'w')
-            if i == 1: tempstring =str(i) + ', ' + str(i) + ', ' + str(i) +  '\n' + str(i) + ', ' + str(i)
-            elif i ==2: tempstring = str(i) + ', ' + str(i)  
-            else: tempstring =str(i)
+            if i == 1: 
+                tempstring =str(i) + ', ' + str(i) + ', ' + str(i) +  \
+                    '\n' + str(i) + ', ' + str(i)
+            elif i ==2: 
+                tempstring = str(i) + ', ' + str(i)  
+            else: 
+                tempstring =str(i)
                 
             f_handle.write(tempstring+ '\n')
             f_handle.close()
@@ -863,6 +869,56 @@ class Test_Output_manager(unittest.TestCase):
         os.remove(base_file_name)
 
 
+    def test_join_parallel_files3(self):
+        cleanup_file_names = []
+        join_indices = [array([0, 1, 7, 5]),
+                     array([4]),
+                     array([3, 2, 6])]
+        
+        handle, base_file_name = tempfile.mkstemp('.txt', __name__ + '_')
+        os.close(handle)
+        base_file_name = 'eagle.txt'
+        for file_num, value in enumerate(join_indices): 
+            file_name = base_file_name + FILE_TAG_DELIMITER +  str(file_num)
+            cleanup_file_names.append(file_name)
+            f_handle = open(file_name, 'w')
+            # Only one file has a header
+            if file_num == 0:
+                f_handle.write('# 1st comment file:' + str(file_num) + '\n')
+                f_handle.write('# 2nd comment file:' + str(file_num) + '\n')
+            for int_i in value:
+                f_handle.write(str(int_i) + '\n')
+            f_handle.close()
+        header_size = 2    
+        file_num = 3
+        join_parallel_files([(base_file_name, header_size)], 
+                            file_num, 
+                            join_indices, 
+                            compress=False)
+        f_handle = open(base_file_name, "r")
+        text = f_handle.read().splitlines()
+        actual =  ['# 1st comment file:0',
+                   '# 2nd comment file:0',
+                   '0',
+                   '1', 
+                   '2',
+                   '3',
+                   '4',
+                   '5',
+                   '6',
+                   '7']
+        self.assertEqual(text, actual)
+        
+        #print "cleanup_file_names",cleanup_file_names 
+        os.remove(base_file_name)
+        #for filename in cleanup_file_names:
+         #   os.remove(file_name)
+            
+            
+            
+        
+
+        
     def test_join_parallel_files_column(self):
         compress = False
         file_num = 6
@@ -1604,8 +1660,7 @@ class Test_Output_manager(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_Output_manager, 'test')
-    #suite=unittest.makeSuite(Test_Output_manager,'test_pt_string')
-    #suite=unittest.makeSuite(Test_Output_manager,'test_save_event_set_new')
+    suite=unittest.makeSuite(Test_Output_manager,'test_join_parallel_files3')
     runner = unittest.TextTestRunner() #verbosity=2) #verbosity=2
     runner.run(suite)
 

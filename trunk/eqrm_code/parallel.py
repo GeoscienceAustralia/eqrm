@@ -63,7 +63,10 @@ class Parallel(object):
     def all_striped_indices(self, elements):
         """
         Return the indices for all nodes given the number of elements,
-        using the striping pattern
+        using the striping pattern.
+        e.g. 
+        indices [array([ 0,  2,  4,  6,  8, 10, 12]), 
+                 array([ 1,  3,  5,  7,  9, 11, 13])
         """
         all_elements = arange(elements)
         indices = []

@@ -1372,8 +1372,17 @@ def join_parallel_data_files(base_names, size, block_indices):
 def join_parallel_files(base_names, size, block_indices, compress=False):
     """
     Row append a common set of files produced by running EQRM in parallel.
-
-    The input is a list of base names.
+    Note, only the -0 file has a header.  The other files have no header.
+    
+    paras:
+        base_names: A list of tuples.  One tuple for each set of files that
+          needs to be joined.  Value[0] is the base file name
+          Value[1] is how many header rows there are
+        size: The number of files to join.
+        block_indices: A list of numpy arrays. Each array represents the index
+             into the file to get the correct row order.  Array[0] is for
+              file 0 etc.
+        
     """
     if compress: my_open = myGzipFile
     else: my_open = open
@@ -1391,13 +1400,14 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
             name = base_name + FILE_TAG_DELIMITER + str(i)
             file_lines = my_open(name, 'r').readlines()
             input_file_lines.append(file_lines)
+            # Just a way to get the right size. Values not used 
             output_file_lines.extend(file_lines)
             os.remove(name)
         
         # Turn these into numpy arrays so we can use it's indexing
         output_file_lines = asarray(output_file_lines)
-        #input_file_lines = asarray(input_file_lines) this is commented to avoid an error in numpy1.5.1
-        
+        # this is commented to avoid an error in numpy1.5.1
+        #input_file_lines = asarray(input_file_lines) 
         for i in range(size):
             output_indices = block_indices[i] + header_size
             input_lines = input_file_lines[i]
@@ -1406,6 +1416,7 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
                 output_file_lines[output_indices] = input_lines[header_size:]
             else:
                 output_file_lines[output_indices] = input_lines
+            
         
         output_file = my_open(base_name,'w')
         output_file.writelines(output_file_lines)
