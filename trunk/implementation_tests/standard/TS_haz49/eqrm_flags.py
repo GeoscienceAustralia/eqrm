@@ -45,7 +45,7 @@ atten_pga_scaling_cutoff = 2000000
 atten_smooth_spectral_acceleration = None
 
 # Amplification
-use_amplification = False
+use_amplification = True
 amp_variability_method = None
 amp_min_factor = 0.6
 amp_max_factor = 10000
