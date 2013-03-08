@@ -72,6 +72,8 @@ loss_aus_contents = 0
 
 # Save
 save_total_financial_loss = True
+save_building_loss = True
+save_contents_loss = True
 
 
 # If this file is executed the simulation will start.
