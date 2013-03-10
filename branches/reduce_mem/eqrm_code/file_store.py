@@ -25,6 +25,7 @@ if sys.platform == 'win32':
 # DATA_DIR
 # Specifies where the temporary data files get stored 
 # (set using eqrm_flags.data_array_storage)
+# Global variable changed in parse_in_parameters._add_default_values
 DATA_DIR = None
 
 class FileStoreException(Exception):
@@ -130,7 +131,6 @@ class File_Store(object):
                                                     dir=DATA_DIR)
                 os.close(handle)
                 self._array_files[name] = filename
-                
             save(filename, array)
         
     def _get_file_array(self, name):

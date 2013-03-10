@@ -72,8 +72,10 @@ def save_hazard(soil_amp,eqrm_flags,
         raise IOError("soil_amp must be True or False")  
     base_names = []
     if sites is not None:
-        file_name = save_sites_to_csv(eqrm_flags.output_dir, eqrm_flags.site_tag,
-                   sites, compress, parallel_tag, write_title)
+        file_name = save_sites_to_csv(eqrm_flags.output_dir, 
+                                      eqrm_flags.site_tag,
+                                      sites, compress, parallel_tag, 
+                                      write_title)
         base_names.append(file_name)
     if compress:
         open = myGzipFile
@@ -1295,14 +1297,19 @@ def save_fatalities(fatalities_name,eqrm_flags,fatalities,sites,compress=False,
     else:
         open = file
     if parallel_tag is None:
-        parallel_tag = ''  
+        parallel_tag = ''
+      
     base_name = os.path.join(eqrm_flags.output_dir, get_fatalities_file_name(
         eqrm_flags.site_tag, fatalities_name))
     name = base_name + parallel_tag
     
     if sites is not None:
-        save_sites_to_csv(eqrm_flags.output_dir, eqrm_flags.site_tag,
-                       sites, compress, parallel_tag, write_title)
+        base_name_row = save_sites_to_csv(eqrm_flags.output_dir, 
+                                       eqrm_flags.site_tag,
+                                       sites, compress, 
+                                       parallel_tag, write_title) 
+    else:
+        base_name_row = None
                     
     f=open(name,'w')
     f.write('% This file contains the fatalities, subsequent rows are events\n')
@@ -1311,7 +1318,7 @@ def save_fatalities(fatalities_name,eqrm_flags,fatalities,sites,compress=False,
         el=fatalities[:,i] # sites,event
         f.write(' '.join(['%.10g'%(l) for l in el])+'\n')
     f.close()
-    return base_name
+    return base_name_row, base_name
 
 def get_fatalities_file_name(site_tag, fatalities_name):
     return site_tag + fatalities_name + '.txt'    
@@ -1365,11 +1372,23 @@ def join_parallel_data_files(base_names, size, block_indices):
 def join_parallel_files(base_names, size, block_indices, compress=False):
     """
     Row append a common set of files produced by running EQRM in parallel.
-
-    The input is a list of base names.
+    Note, only the -0 file has a header.  The other files have no header.
+    
+    paras:
+        base_names: A list of tuples.  One tuple for each set of files that
+          needs to be joined.  Value[0] is the base file name
+          Value[1] is how many header rows there are
+        size: The number of files to join.
+        block_indices: A list of numpy arrays. Each array represents the index
+             into the file to get the correct row order.  Array[0] is for
+              file 0 etc.
+        
     """
     if compress: my_open = myGzipFile
     else: my_open = open
+    # Changed to 'sets' to stop errors where files
+    # are written multiple times.
+    base_names = set(base_names)
     for base_name, header_size in base_names:
         # Read in each file and save lines to a list of lines
         # Create master string list of size all lines
@@ -1381,13 +1400,14 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
             name = base_name + FILE_TAG_DELIMITER + str(i)
             file_lines = my_open(name, 'r').readlines()
             input_file_lines.append(file_lines)
+            # Just a way to get the right size. Values not used 
             output_file_lines.extend(file_lines)
             os.remove(name)
         
         # Turn these into numpy arrays so we can use it's indexing
         output_file_lines = asarray(output_file_lines)
-        #input_file_lines = asarray(input_file_lines) this is commented to avoid an error in numpy1.5.1
-        
+        # this is commented to avoid an error in numpy1.5.1
+        #input_file_lines = asarray(input_file_lines) 
         for i in range(size):
             output_indices = block_indices[i] + header_size
             input_lines = input_file_lines[i]
@@ -1396,6 +1416,7 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
                 output_file_lines[output_indices] = input_lines[header_size:]
             else:
                 output_file_lines[output_indices] = input_lines
+            
         
         output_file = my_open(base_name,'w')
         output_file.writelines(output_file_lines)
@@ -1419,7 +1440,8 @@ def join_parallel_files_column(base_names,
         # - Comment is first line
         # - For each subsequent line, split by delimeter
         # Concatenate each list by the block indices
-        
+        #print "**********************************************"
+        #print "base_name", base_name
         f = my_open(base_name,'w')
         f_blocks = []
         for i in range(size):       

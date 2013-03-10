@@ -13,51 +13,9 @@ from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
     PARALLELSIZE_J, TOTALMEM_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J
 from eqrm_code.ANUGA_utilities import log
 
-MB2B = 1048576.
-
 # fixme check the atten_var_method is 1 to spawn?
 
-def log_pairs_estimate_mem(log_pairs):
-    """
-    Given a list of dictionaries of log information estimate the memory
-    used, in MB. Add the esimate to the log pairs.
-    
-    args;
-    log_pairs 
-    """
-    for log_pair in log_pairs:
-        print "---------------------"
-        print log_pair["output_dir"]
-        mem_b, new_mem_b = estimate_mem_log_format(log_pair)
-        total_mem_b = sum(mem_b.itervalues())
-
-        for key, value in mem_b.iteritems():
-            print 'array % ' + key + ' ' + str(
-                value/float(total_mem_b)*100.) + '%' 
-        print "After change"
-        total_new_mem_b = sum(new_mem_b.itervalues())
-        for key, value in new_mem_b.iteritems():
-            print 'new array % ' + key + ' ' + str(
-                value/float(total_new_mem_b)*100.) + '%' 
-        
-        actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
-            log_pair[INITIAL_J + MEM_J]
-        print "actual_mem_MB",actual_mem_MB
-        print "old estimate total_mem_MB", total_mem_b/MB2B
-        print "new estimate total_mem_MB", total_new_mem_b/MB2B
-        for key, value in log_pair.iteritems():
-            if mem_b.has_key(key):
-                estimate_b = mem_b[key]
-                if not estimate_b == value:
-                    print log_pair["output_dir"]
-                    print "*********************"
-                    print "key",key
-                    print "estimate_elements", estimate_b/8
-                    print "actual elements", value/8 
-            if 'recurrence yeah ' in key:
-                print key + ":" + str(value)
-                pass
-        #continue
+                    
 
 def estimate_mem_log_format(log_pair): # = log_pair[]
     events = log_pair[EVENTS_J]
@@ -95,7 +53,55 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
                            save_motion,
                            use_amplification)
     return results
+  
 
+def estimate_mem_param_format(param, processors): 
+    """
+    Estimate the memory used based on an eqrm control file.
+    
+    This is a 1 star estimator.
+    To get this fully going the .xml files have to be taken into account 
+    as well
+    """
+    assert param['use_site_indexes']
+    events = sum(param['prob_number_of_events_in_zones']) + \
+         sum(param['prob_number_of_events_in_faults'])
+    atten_periods = len(param['atten_periods'])
+    return_periods= len(param['return_periods'])
+    parallel_size = processors
+    
+    sites = len(param['site_indexes'])
+    run_type = param['run_type']
+    spawning = param['atten_spawn_bins']
+    gmm_dimensions = param[MAXGMPE_J]
+    rec_mod  = param[RECMOD_J]
+    atten_collapse_Sa_of_atten_models = \
+        param['atten_collapse_Sa_of_atten_models']
+    save_total_financial_loss = param['save_total_financial_loss']
+    save_building_loss = param['save_building_loss']
+    save_contents_loss = param['save_contents_loss']
+    save_hazard_map = param['save_hazard_map']
+    save_motion = param['save_motion']
+    use_amplification = param['use_amplification']
+    
+    results = estimate_mem(events, 
+                           atten_periods, 
+                           return_periods,
+                           sites,
+                           run_type,
+                           parallel_size,
+                           spawning,
+                           gmm_dimensions,
+                           rec_mod,
+                           atten_collapse_Sa_of_atten_models,
+                           save_total_financial_loss,
+                           save_building_loss,
+                           save_contents_loss,
+                           save_hazard_map,
+                           save_motion,
+                           use_amplification)
+    return results
+    
 def estimate_mem(events, 
                  atten_periods, 
                  return_periods,
@@ -117,6 +123,8 @@ def estimate_mem(events,
     """
     Estimate the total memory used in an EQRM simulation.  
     Give the results in bytes
+    
+    rec_mod - recurance models 
 
     """
     mem_bytes = {}
@@ -219,9 +227,13 @@ def estimate_mem(events,
                                             atten_periods) * item_size
 
     #print "mem_bytes[log.COLLROCKSAE_J]",mem_bytes[log.COLLROCKSAE_J]
-    mem_bytes[log.ROCKOVERLOADED_J] = (loop_sites *
-                           events * gmm_max * spawning * rec_mod *
-                           atten_periods) * item_size
+    if not run_type == "hazard":
+        mem_bytes[log.ROCKOVERLOADED_J] = (loop_sites *
+                                           events * gmm_max *
+                                           spawning * rec_mod *
+                                           atten_periods) * item_size
+    else:
+        mem_bytes[log.ROCKOVERLOADED_J] = 0
     #print "gmm_after_collapsing",gmm_after_collapsing
     #print "gmm_max",gmm_max
     #mem_bytes[log.ROCKOVERLOADED_J]
@@ -230,14 +242,14 @@ def estimate_mem(events,
     #print " mem_bytes[log.ROCKOVERLOADED_J] ", mem_bytes[log.ROCKOVERLOADED_J] 
     if use_amplification is True:
         mem_bytes['coll_soil_SA_all_events'] = mem_bytes[log.COLLROCKSAE_J]
-        mem_bytes['soil_SA_overloaded'] = mem_bytes[log.ROCKOVERLOADED_J]
+        
+        if not run_type == "hazard":
+            mem_bytes['soil_SA_overloaded'] = mem_bytes[log.ROCKOVERLOADED_J]
+        else:
+            mem_bytes['soil_SA_overloaded'] = 0
     else:
         mem_bytes['coll_soil_SA_all_events'] = 0           
         mem_bytes['soil_SA_overloaded'] = 0
 
-    new_mem_bytes = copy(mem_bytes)
-    if run_type == "hazard":
-        new_mem_bytes[log.ROCKOVERLOADED_J] = 0
-        new_mem_bytes['soil_SA_overloaded'] = 0
-    return mem_bytes, new_mem_bytes
+    return mem_bytes
 

@@ -209,7 +209,7 @@ def convert_Z10_to_Z25(Z10):
 
 
 def convert_Vs30_to_Z25(Vs30):
-    """A combined function to get Z2.5 from Z1.0."""
+    """A combined function to get Z2.5 from Vs30."""
 
     return convert_Z10_to_Z25(convert_Vs30_to_Z10(Vs30))
 

@@ -102,7 +102,8 @@ MINI_PAR_FILES = ['TS_haz38.py',
                   'TS_haz39.py',
                   'TS_risk63.py']
                   
-PARALLEL_FILES = ['TS_haz05.py', 'TS_haz09.py', 'TS_haz12.py',
+PARALLEL_FILES = ['TS_fat02.py',
+                  'TS_haz05.py', 'TS_haz09.py', 'TS_haz12.py',
                   'TS_haz19.py',
                   'TS_risk20.py',
                   'TS_risk21.py', 'TS_risk22.py', 
@@ -170,7 +171,7 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
         t0 = time.clock()
         
         # Run the scenario
-        analysis.main(pull_path, True)
+        analysis.main(pull_path, parallel_finalise=False)
         
         # Run post-processing (if needed)
         if eqrm_flags['save_motion']:
@@ -198,7 +199,7 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
 
 def directory_diff(dirA, dirB):
     """
-    Recursively checks the directories for files to and checks for differences.
+    Recursively checks the directories for files and checks for differences.
     
     Supports .npy and ascii files:
     - If an npy file is encountered load both and do an allclose to compare
@@ -234,14 +235,17 @@ def directory_diff(dirA, dirB):
             result = True            
             try:
                 if not allclose(arrayA, arrayB):
+                    #print "arrayA.shape ",arrayA.shape 
+                    #print "arrayB.shape ", arrayB.shape 
+                    
                     result = False
             except:
                 # allclose raises a TypeError if the arrays are None
                 if arrayA != arrayB:
                     result = False
             
-            lineA = fileA
-            lineB = fileB
+            lineA = '** Not a line difference. One file is;' + fileA
+            lineB = '** Not a line difference. The other file is;' + fileB
             
         elif fileA[-2:] == '.p':
             # Likely to be source_model. The comparison methods take care of the

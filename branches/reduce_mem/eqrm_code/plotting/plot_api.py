@@ -39,7 +39,9 @@ from eqrm_code.plotting import calc_annloss
 def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
                 plot_file=None, save_file=None, title=None, np_posn=None,
                 s_posn=None, cb_steps=None, colourmap=None, cb_label=None,
-                annotate=[]):
+                annotate=[], annot_lat = '30m', grid_lat = '30m', annot_lon = '30m', 
+                grid_lon = '30m'):
+
     """Plot an earthquake hazard map, from probabalistic data.
 
     input_dir     directory containing EQRM input data files
@@ -50,6 +52,30 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
     period        period of the event
     plot_file     full filename for generated plot file (*.png, *.eps, etc)
     save_file     full filename for saved plot data
+    title        string used to title the plot
+    np_posn      code string for north pointer placement, one of:
+                     'C'   - centre of plot
+                     'NE'  - inside plot, northeast corner
+                     'CE'  - inside plot, centre of east edge
+                     'NNE' - outside plot, north of NE corner
+                     'ENE' - outside plot, east of NE corner
+                      etc (see the documentation for 'placement')
+    s_posn       code string for scale placement
+                     see examples for 'np_posn' above
+    cb_label     string containing the label text for the colorbar
+                 (if not supplied, no colourbar)
+    cb_steps     if supplied is a sequence of discrete values at
+                 the colour changes
+    colourmap    string containing name of required colormap
+                 this could be a GMT name or a local name
+    annotate     list of user annotations:
+                     if None, no user or system annotations
+                     if [],   only system annotations
+                     else system and user annotations
+    annot_lat    Spacing in minutes for latitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lat     Spacing in minutes for latitude grid lines (e.g. 30m = 0.5 degress) 
+    annot_lon    Spacing in minutes for longitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lon     Spacing in minutes for longitude grid lines (e.g. 30m = 0.5 degress) 
 
     All other parameters are plot parameters as described elsewhere.
 
@@ -82,7 +108,8 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
                                   np_posn=np_posn, s_posn=s_posn,
                                   cb_label=cb_label, cb_steps=cb_steps,
                                   colourmap=colourmap,
-                                  annotate=annotate)
+                                  annotate=annotate, annot_lat=annot_lat,grid_lat=grid_lat,
+                                annot_lon=annot_lon, grid_lon=grid_lon)
 
 
 def fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period, period,
@@ -403,7 +430,7 @@ def fig_annloss_deagg_cells(input_dir, site_tag,
                      title=title, np_posn=np_posn, s_posn=s_posn,
                      cb_label=cb_label, cb_steps=cb_steps, colourmap=colourmap,
                      annotate=annotate, show_graph=False)
-                     
+                       
 def fig_annfatalities_deagg_cells(input_dir, site_tag,
                             output_file, save_file=None,
                             title=None, np_posn=None, s_posn=None,
@@ -597,7 +624,9 @@ fig_motion_function_map = {'mean': numpy.mean,
 def fig_motion(input_dir, site_tag, soil_amp, period,
                collapse_function=None, plot_file=None, save_file=None,
                title=None, np_posn=None, s_posn=None, cb_steps=None,
-               colourmap=None, cb_label=None, annotate=[], show_graph=False):
+               colourmap=None, cb_label=None, annotate=[], show_graph=False,
+               annot_lat = '30m', grid_lat = '30m', annot_lon = '30m', 
+               grid_lon = '30m'):
     """Plot a contoured acceleration map with meaned/medianed data.
 
     input_dir          general input/output directory
@@ -616,6 +645,10 @@ def fig_motion(input_dir, site_tag, soil_amp, period,
     cb_label           colourbar label string
     annotate           iterable of annotate values
     show_graph         True if the plot is to be shown on the screen
+    annot_lat    Spacing in minutes for latitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lat     Spacing in minutes for latitude grid lines (e.g. 30m = 0.5 degress) 
+    annot_lon    Spacing in minutes for longitude annotations (e.g. 30m = 0.5 degress) 
+    grid_lon     Spacing in minutes for longitude grid lines (e.g. 30m = 0.5 degress) 
     """
 
     # read in raw data
@@ -662,7 +695,9 @@ def fig_motion(input_dir, site_tag, soil_amp, period,
                                   np_posn=np_posn, s_posn=s_posn,
                                   cb_label=cb_label, cb_steps=cb_steps,
                                   colourmap=colourmap,
-                                  annotate=annotate)
+                                  annotate=annotate, annot_lat=annot_lat,
+                                  grid_lat=grid_lat,
+                                  annot_lon=annot_lon, grid_lon=grid_lon)
 
 
 def fig_motion_continuous(input_dir, site_tag, soil_amp, period,
@@ -1161,6 +1196,101 @@ def fig_scenario_building_loss(input_dir, site_tag, plot_file=None, scale=None,
                          show_graph=show_graph, bardict=bardict,
                          annotate=range_ann)
 
+def fig_scenario_fatalities_loss(input_dir, site_tag, plot_file=None, scale=None,
+                               savefile=None, title=None, xlabel=None,
+                               ylabel=None, xrange=None, yrange=None, bins=100,
+                               bardict=None, show_graph=False):
+    """Plot a 1D histogram of scenario fatalities loss.
+
+    input_dir      general input/output directory
+    site_tag       overall site identifier
+    plot_file      path to plot output file to create
+    scale          None or scaling factor to *divide* data with
+                   (eg, if *billions* of dollars, uses scale=1.0e+9)
+    savefile       path to data output file to create (UNUSED)
+    title          title to put on the graph
+    xlabel         text of X axis label
+    ylabel         text of Y axis label
+    xrange         Either <max> or (<min>, <max>) of X range to plot
+    yrange         Either <max> or (<min>, <max>) of Y range to plot
+    bins           number of bins to use
+    bardict        dictionary of extra keywords to pass to plot_barchart()
+                   see plot_barchart.py for the details on this
+    show_graph     True if the plot is to be shown on the screen
+    """
+
+    # Load in the structure loss data, shape = (location, event)
+    #(total_building_loss, _, _, _) = om.load_ecloss_and_sites(input_dir, site_tag)
+
+    # Load in the structure loss and structure value
+    (total_fatalities, _, _) = om.load_fatalities('_fatalities', input_dir, site_tag)
+    #(results) = om.load_fatalities('_fatalities', input_dir, site_tag)
+
+    #print results
+    #print len(results)
+    #print type(results)
+    tmp = total_fatalities.shape
+    # This fix is to allow for the transpose function in scipy.transpose for vectors 
+    if tmp[0]==1:
+    # sum over location -> (event,)
+        data = numpy.sum(total_fatalities, axis=1)
+        print "estimated fatalities = ", data
+    else:
+        data = numpy.sum(total_fatalities, axis=0)
+
+
+    # scale data, if required
+    if scale:
+        data = data / scale
+        
+    # plot the data
+    if plot_file or show_graph:
+        if title is None:
+            title = ''          #######  needs work!
+
+        # now generate histogrammed data
+        (hist_data, xedges) = scipy.histogram(data, bins=bins, normed=False)
+
+        # get array of bin centres
+        bins = []
+        for i in range(len(xedges)-1):
+            bins.append(xedges[i] + (xedges[i+1] - xedges[i])/2.0)
+        bins = scipy.array(bins)
+
+        # calculate optimal bin width
+        bin_width = xedges[1] - xedges[0]
+
+        # return nx2 array of (x, y)
+        plot_data = scipy.hstack((bins[:,scipy.newaxis], hist_data[:,scipy.newaxis]))
+
+        # now standardise xrange
+        xrange = util.get_canonical_range(xrange)
+        yrange = util.get_canonical_range(yrange)
+
+        range_ann = []
+
+        # assert number of events == sum of frequencies
+        y_sum = numpy.sum(plot_data[:,1])
+        msg = 'num of events(%d) != sum(frequency)(%d)' % (len(data), y_sum)
+        assert len(data) == y_sum, msg
+
+        # annotate any range coercions
+        if xrange:
+            range_ann.append((0.02, 0.05,
+                              'X range forced to (%.2f,%.2f)' % xrange))
+
+        if yrange:
+            range_ann.append((0.02, 0.03,
+                              'Y range forced to (%.2f,%.2f)' % yrange))
+
+        # actually plot the thing
+        pb.plot_barchart(plot_data, plot_file, title=title,
+                         xlabel=xlabel, ylabel=ylabel,
+                         bin_width=bin_width,
+                         xrange=xrange, yrange=yrange,
+                         show_graph=show_graph, bardict=bardict,
+                         annotate=range_ann)
+
 
 def fig_scenario_building_loss_percent(input_dir, site_tag, plot_file=None,
                                        savefile=None, title=None,
@@ -1200,7 +1330,7 @@ def fig_scenario_building_loss_percent(input_dir, site_tag, plot_file=None,
             title = ''          #######  needs work!
 
         if xlabel is None:
-            xlabel = ''
+            xlabel = 'Percentage of building value'
         if ylabel is None:
             ylabel = 'Count'
 
@@ -1246,7 +1376,6 @@ def fig_scenario_building_loss_percent(input_dir, site_tag, plot_file=None,
                          xrange=xrange, yrange=yrange,
                          show_graph=show_graph, bardict=bardict,
                          annotate=range_ann)
-
 
 # function string to object mapping
 # later, we will only do this mapping if 'collapse_function' is of type string

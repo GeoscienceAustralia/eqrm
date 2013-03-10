@@ -68,7 +68,8 @@ def main(parameter_handle,
          use_determ_seed=True,
          compress_output=False,
          eqrm_dir=None,
-         is_parallel=True):
+         is_parallel=True,
+         parallel_finalise=True):
     """Script to run eqrm program.
 
     The parameters are defined by the parameter_handle.
@@ -447,7 +448,9 @@ def main(parameter_handle,
             MMI = rsa2mmi_array(SA)
             
             fatality = forecast_fatality(MMI, 
-                                         sites.attributes['POPULATION'][0])
+                                         sites.attributes['POPULATION'][0],
+                                         beta=eqrm_flags.fatality_beta,
+                                         theta=eqrm_flags.fatality_theta)
             
             numelement = MMI.shape[1]
             
@@ -737,12 +740,16 @@ def main(parameter_handle,
     if (eqrm_flags.save_fatalities is True and
             parallel.lo != parallel.hi):
         # note: will not handle multiple GMPES
-        a_file = save_fatalities('_fatalities',eqrm_flags,
-                           total_fatalities,
-                           sites=all_sites,
-                           compress=eqrm_flags.compress_output,
-                           parallel_tag=parallel.file_tag)
-        column_files_that_parallel_splits.append(a_file)
+        file_row, file_col = save_fatalities(
+            '_fatalities',eqrm_flags,
+            total_fatalities,
+            sites=all_sites,
+            compress=eqrm_flags.compress_output,
+            parallel_tag=parallel.file_tag, 
+            write_title=(parallel.rank == False))
+        row_files_that_parallel_splits.append(file_row)
+        if not file_col is None: 
+            column_files_that_parallel_splits.append(file_col)
         
         files = save_distances(eqrm_flags, sites=all_sites,
                                event_set=event_set,
@@ -792,8 +799,8 @@ def main(parameter_handle,
     log.info(msg)
     log.log_json({log.WALLTIMEOVERALL_J:wall_time_taken_overall}, log.INFO)
     log.info(msg)
-    
-    parallel.finalize()
+    if parallel_finalise:
+        parallel.finalize()
     del parallel
     log.debug('Memory: End')
     log.resource_usage(tag=log.FINAL_J)
