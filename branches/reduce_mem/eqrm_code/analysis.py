@@ -1063,6 +1063,7 @@ def calc_and_save_SA(eqrm_flags,
         event_act_d_close = event_act_d_close.reshape(-1)
         assert coll_rock_SA_all_events.shape[3] == 1 # only one site
         assert coll_rock_SA_close_events.shape[3] == 1 # only one site
+        
         for j in xrange(len(eqrm_flags.atten_periods)):
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
@@ -1073,14 +1074,13 @@ def calc_and_save_SA(eqrm_flags,
             bedrock_SA_close = coll_rock_SA_close_events[:,:,:,:,:,j].reshape(
                 1,-1)
             bedrock_hazard[site_index,j,:] = \
-                         hzd_do_value(bedrock_SA_events,
-                                      event_act_d_events,
-                                      1.0/array(eqrm_flags.return_periods))
-                                      
-            #bedrock_close_hazard[site_index,j,:] = \
-             #            hzd_do_value(bedrock_SA_close,
-              #                        event_act_d_events,
-               #                       1.0/array(eqrm_flags.return_periods))
+                hzd_do_value(bedrock_SA_events,
+                             event_act_d_events,
+                             1.0/array(eqrm_flags.return_periods))
+            bedrock_hazard[site_index,j,:] = \
+                hzd_do_value(bedrock_SA_close,
+                             event_act_d_close,
+                             1.0/array(eqrm_flags.return_periods))
                
             # FIXME. soil_SA is never defined in this scope. Is the intention
             # to check soil_SA_overloaded?
@@ -1091,7 +1091,7 @@ def calc_and_save_SA(eqrm_flags,
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
                                       1.0/array(eqrm_flags.return_periods))
-
+            
     log.debug('Memory: calc_and_save_SA before return')
     log.resource_usage(tag=log.PEAK_J)
                 
