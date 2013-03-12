@@ -18,13 +18,13 @@ from os.path import join
 
 
 # Operation Mode
-run_type = "hazard" 
+run_type = "risk_csm" 
 is_scenario = False
-site_tag = "haz49" 
+site_tag = "risk66" 
 site_db_tag = "" 
 return_periods = [10, 50, 100, 200, 250, 474.56, 500, 974.78999999999996, 1000, 2474.9000000000001, 2500, 5000, 7500, 10000]
 input_dir = join('.', 'implementation_tests', 'input', 'checking')
-output_dir = join('.', 'implementation_tests', 'current', 'TS_haz49')
+output_dir = join('.', 'implementation_tests', 'current', 'TS_risk66')
 use_site_indexes = False
 zone_source_tag = ""
 event_control_tag = "use" 
@@ -45,20 +45,35 @@ atten_pga_scaling_cutoff = 2000000
 atten_smooth_spectral_acceleration = None
 
 # Amplification
-use_amplification = True
+use_amplification = False
 amp_variability_method = None
 amp_min_factor = 0.6
 amp_max_factor = 10000
 
 # Buildings
+buildings_usage_classification = "HAZUS" 
+buildings_set_damping_Be_to_5_percent = False
 
 # Capacity Spectrum Method
+csm_use_variability = False
+csm_variability_method = None
+csm_standard_deviation = 0.3
+csm_damping_regimes = 0
+csm_damping_modify_Tav = True
+csm_damping_use_smoothing = True
+csm_hysteretic_damping = "trapezoidal" 
+csm_SDcr_tolerance_percentage = 1
+csm_damping_max_iterations = 7
 
 # Loss
+loss_min_pga = 0.05
+loss_regional_cost_index_multiplier = 1.0
+loss_aus_contents = 0
 
 # Save
-save_hazard_map = True
-save_motion = True
+save_total_financial_loss = True
+save_building_loss = True
+save_contents_loss = True
 
 
 # If this file is executed the simulation will start.

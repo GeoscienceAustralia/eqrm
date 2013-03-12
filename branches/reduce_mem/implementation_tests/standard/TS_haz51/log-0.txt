@@ -1,0 +1,113 @@
+2013-03-12 13:57:13,028 Level 29                  analysis:157 |Logfile is './implementation_tests/current/TS_haz51/log-0.txt' with logging level of DEBUG, console logging level is WARNING
+2013-03-12 13:57:13,028 INFO                      analysis:158 |JS*N{"parallel size": 1}
+2013-03-12 13:57:13,028 INFO                      analysis:159 |JS*N{"host name": "rhe-compute1.ga.gov.au"}
+2013-03-12 13:57:13,029 INFO                      analysis:160 |JS*N{"system platform": "linux2"}
+2013-03-12 13:57:13,029 DEBUG                     analysis:161 |JS*N{"atten_spawn_bins": 1, "csm_hysteretic_damping": null, "prob_azimuth_in_zones": null, "file_log_level": "debug", "scenario_dip": null, "fatality_beta": 0.17, "csm_standard_deviation": null, "scenario_latitude": null, "use_site_indexes": false, "file_array": false, "atten_threshold_distance": 222.6, "buildings_usage_classification": null, "save_fatalities": false, "save_prob_structural_damage": false, "compress_output": false, "save_contents_loss": false, "csm_damping_use_smoothing": null, "default_input_dir": "/nas/mnh/georisk_models/earthquake/sandpits/duncan/switch_eqrm_core/eqrm_code/../resources/data", "fault_source_tag": null, "input_dir": "./implementation_tests/input/checking/", "prob_dip_in_zones": null, "vulnerability_variability_method": 2, "amp_max_factor": 10000, "prob_min_mag_cutoff": null, "event_control_tag": "use", "file_parallel_log_level": "warning", "amp_min_factor": 0.6, "event_set_load_dir": null, "len_atten_periods": 3, "zone_source_tag": "", "scenario_max_width": null, "atten_pga_scaling_cutoff": 2000000, "use_amplification": true, "atten_model_weights": null, "scenario_azimuth": null, "scenario_number_of_events": null, "scenario_depth": null, "reset_seed_using_time": true, "csm_SDcr_tolerance_percentage": null, "csm_damping_max_iterations": null, "save_hazard_map": true, "csm_damping_modify_Tav": null, "prob_delta_azimuth_in_zones": null, "scenario_magnitude": null, "loss_aus_contents": null, "scenario_length": null, "atten_override_RSA_shape": null, "save_building_loss": false, "console_parallel_log_level": "warning", "eqrm_dir": "/nas/mnh/georisk_models/earthquake/sandpits/duncan/switch_eqrm_core/eqrm_code/..", "prob_number_of_mag_sample_bins": null, "scenario_longitude": null, "loss_regional_cost_index_multiplier": null, "is_parallel": true, "console_log_level": "info", "use_determ_seed": true, "save_total_financial_loss": false, "event_set_handler": "generate", "len_return_periods": 11, "building_classification_tag": "", "atten_variability_method": null, "buildings_set_damping_Be_to_5_percent": null, "bridges_functional_percentages": null, "prob_number_of_events_in_faults": null, "save_motion": true, "fatality_theta": 14.05, "csm_damping_regimes": null, "grid_flag": 1, "damage_extent_tag": "", "csm_variability_method": 3, "site_db_tag": "", "atten_cutoff_max_spectral_displacement": false, "site_tag": "haz51", "output_dir": "./implementation_tests/current/TS_haz51/", "atten_smooth_spectral_acceleration": null, "atten_collapse_Sa_of_atten_models": false, "amp_variability_method": null, "csm_use_variability": null, "run_type": "hazard", "site_indexes": null, "loss_min_pga": null, "scenario_width": null, "atten_models": null, "is_scenario": false, "prob_number_of_events_in_zones": null, "atten_log_sigma_eq_weight": 0, "data_array_storage": "./implementation_tests/current/TS_haz51/"}
+2013-03-12 13:57:13,083 DEBUG                     analysis:164 |Memory: Initial
+2013-03-12 13:57:13,083 DEBUG                     analysis:165 |JS*N{"initial_memory MB": 459.33984375, "initial_resident MB": 58.9296875, "initial_stacksize MB": 0.30859375}
+2013-03-12 13:57:13,084 INFO                     event_set:1471|event_set_handler = generate
+2013-03-12 13:57:13,084 INFO                     event_set:1278|P0: Generating event set
+2013-03-12 13:57:13,085 INFO                output_manager:1598|Using file ./implementation_tests/input/checking/haz51_event_control_use.xml for event_type source
+2013-03-12 13:57:13,086 INFO                output_manager:1598|Using file ./implementation_tests/input/checking/haz51_zone_source.xml for zone source
+2013-03-12 13:57:13,092 DEBUG                    event_set:1337|Memory: source_model_zone created
+2013-03-12 13:57:13,092 DEBUG                    event_set:1338|JS*N{"stacksize MB": 0.30859375, "resident MB": 58.93359375, "memory MB": 459.40234375}
+2013-03-12 13:57:13,095 INFO                     event_set:516 |JS*N{"len_source_zones": 2}
+2013-03-12 13:57:13,095 DEBUG                    event_set:521 |Generating events for source 0 of 2
+2013-03-12 13:57:13,095 DEBUG                    event_set:532 |Number of events in this source = 5
+2013-03-12 13:57:13,095 DEBUG                    event_set:539 |Memory: populate_depth_top_seismogenic created
+2013-03-12 13:57:13,096 DEBUG                    event_set:540 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,096 DEBUG                    event_set:543 |Memory: populate_azimuth created
+2013-03-12 13:57:13,097 DEBUG                    event_set:544 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,097 DEBUG                    event_set:547 |Memory: populate_dip created
+2013-03-12 13:57:13,097 DEBUG                    event_set:548 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,098 DEBUG                    event_set:551 |Memory: populate_magnitude created
+2013-03-12 13:57:13,098 DEBUG                    event_set:552 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,099 DEBUG                    event_set:559 |Memory: lat,lon created
+2013-03-12 13:57:13,099 DEBUG                    event_set:560 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,100 DEBUG                    event_set:578 |Memory: event set lists have been combined
+2013-03-12 13:57:13,100 DEBUG                    event_set:579 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,100 DEBUG                    event_set:521 |Generating events for source 1 of 2
+2013-03-12 13:57:13,101 DEBUG                    event_set:532 |Number of events in this source = 5
+2013-03-12 13:57:13,101 DEBUG                    event_set:539 |Memory: populate_depth_top_seismogenic created
+2013-03-12 13:57:13,101 DEBUG                    event_set:540 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,102 DEBUG                    event_set:543 |Memory: populate_azimuth created
+2013-03-12 13:57:13,102 DEBUG                    event_set:544 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,102 DEBUG                    event_set:547 |Memory: populate_dip created
+2013-03-12 13:57:13,103 DEBUG                    event_set:548 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,103 DEBUG                    event_set:551 |Memory: populate_magnitude created
+2013-03-12 13:57:13,104 DEBUG                    event_set:552 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,104 DEBUG                    event_set:559 |Memory: lat,lon created
+2013-03-12 13:57:13,105 DEBUG                    event_set:560 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,105 DEBUG                    event_set:578 |Memory: event set lists have been combined
+2013-03-12 13:57:13,106 DEBUG                    event_set:579 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,106 DEBUG                    event_set:605 |Memory: finished generating events
+2013-03-12 13:57:13,107 DEBUG                    event_set:606 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,107 DEBUG                    event_set:1346|Memory: event_set_zone created
+2013-03-12 13:57:13,108 DEBUG                    event_set:1347|JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,108 DEBUG         recurrence_functions:43  |Memory: event_activity_matrix weight_matrix created
+2013-03-12 13:57:13,108 DEBUG         recurrence_functions:44  |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,109 DEBUG         recurrence_functions:83  |Memory: Out of the event_activity loop
+2013-03-12 13:57:13,109 DEBUG         recurrence_functions:84  |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,110 DEBUG                    event_set:1396|Memory: event activity has been calculated
+2013-03-12 13:57:13,110 DEBUG                    event_set:1397|JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,111 DEBUG                    event_set:1407|Memory: Event activities split due to gmms.
+2013-03-12 13:57:13,111 DEBUG                    event_set:1408|JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9375, "memory MB": 459.46484375}
+2013-03-12 13:57:13,148 INFO                     event_set:1431|P0: Saving event set to ./implementation_tests/current/TS_haz51/haz51_event_set
+2013-03-12 13:57:13,170 INFO                     event_set:1541|P0: Event set created. Number of events=10
+2013-03-12 13:57:13,171 INFO                     event_set:1542|JS*N{"len_events": 10}
+2013-03-12 13:57:13,171 DEBUG                    event_set:1543|Memory: Event Set created
+2013-03-12 13:57:13,171 DEBUG                    event_set:1544|JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9296875, "memory MB": 459.33984375}
+2013-03-12 13:57:13,175 INFO                      analysis:189 |P0: Sites set created. Number of sites=3
+2013-03-12 13:57:13,175 DEBUG                     analysis:190 |Memory: Sites created
+2013-03-12 13:57:13,176 DEBUG                     analysis:191 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9296875, "memory MB": 459.33984375}
+2013-03-12 13:57:13,176 INFO                      analysis:194 |JS*N{"len_max_GMPEs": 1}
+2013-03-12 13:57:13,176 INFO                      analysis:200 |JS*N{"len_recurrence_models": 1}
+2013-03-12 13:57:13,177 INFO                      analysis:209 |JS*N{"pseudo_events": 10}
+2013-03-12 13:57:13,177 DEBUG                     analysis:210 |Memory: Pseudo Event Set created
+2013-03-12 13:57:13,177 DEBUG                     analysis:211 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9296875, "memory MB": 459.33984375}
+2013-03-12 13:57:13,219 DEBUG                     analysis:245 |blocking over sites if running in parallel. block_size=3
+2013-03-12 13:57:13,220 DEBUG                     analysis:246 |JS*N{"len_block_sites": 3}
+2013-03-12 13:57:13,220 DEBUG                     analysis:249 |Number of atten_periods=3
+2013-03-12 13:57:13,220 DEBUG                     analysis:252 |JS*N{"len_SA_surfaces": 2}
+2013-03-12 13:57:13,220 DEBUG                     analysis:269 |JS*N{"bedrock_hazard array B": 792}
+2013-03-12 13:57:13,221 DEBUG                     analysis:280 |JS*N{"soil_hazard array B": 792}
+2013-03-12 13:57:13,221 DEBUG                     analysis:283 |Memory: hazard_map array created
+2013-03-12 13:57:13,221 DEBUG                     analysis:284 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9296875, "memory MB": 459.33984375}
+2013-03-12 13:57:13,221 DEBUG                     analysis:288 |JS*N{"event_activity array B": 80}
+2013-03-12 13:57:13,222 DEBUG                     analysis:301 |JS*N{"cra_spawning": 1, "cra_num_events": 10, "cra_num_rm": 1, "cra_site_block": 3, "cra_num_gmm_dimensions_motion": 1, "cra_return_periods": 11}
+2013-03-12 13:57:13,222 DEBUG                     analysis:303 |JS*N{"bedrock_all array B": 720}
+2013-03-12 13:57:13,222 DEBUG                     analysis:314 |JS*N{"soil_all array B": 720}
+2013-03-12 13:57:13,222 DEBUG                     analysis:317 |Memory: save_motion array created
+2013-03-12 13:57:13,223 DEBUG                     analysis:318 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9296875, "memory MB": 459.33984375}
+2013-03-12 13:57:13,223 DEBUG                     analysis:353 |Memory: Created all data collection arrays.
+2013-03-12 13:57:13,223 DEBUG                     analysis:354 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9296875, "memory MB": 459.33984375}
+2013-03-12 13:57:13,224 INFO                      analysis:368 |P0: do site 1 of 3
+2013-03-12 13:57:13,224 DEBUG                     analysis:370 |Memory: site 1
+2013-03-12 13:57:13,224 DEBUG                     analysis:371 |JS*N{"looping_stacksize MB": 0.30859375, "looping_memory MB": 459.33984375, "looping_resident MB": 58.9296875}
+2013-03-12 13:57:13,227 DEBUG                     analysis:866 |JS*N{"cra_num_events": 10, "cra_num_gmm_after_collapsing": 1, "cra_num_spawn": 1, "coll_rock_SA_all_events array B": 240, "cra_num_periods": 3}
+2013-03-12 13:57:13,233 DEBUG                     analysis:1062|Memory: calc_and_save_SA before return
+2013-03-12 13:57:13,233 DEBUG                     analysis:1063|JS*N{"peak_resident MB": 58.9296875, "peak_memory MB": 459.33984375, "peak_stacksize MB": 0.30859375}
+2013-03-12 13:57:13,234 INFO                      analysis:368 |P0: do site 2 of 3
+2013-03-12 13:57:13,234 DEBUG                     analysis:370 |Memory: site 2
+2013-03-12 13:57:13,234 DEBUG                     analysis:371 |JS*N{"looping_stacksize MB": 0.30859375, "looping_memory MB": 459.33984375, "looping_resident MB": 58.9296875}
+2013-03-12 13:57:13,236 DEBUG                     analysis:866 |JS*N{"cra_num_events": 10, "cra_num_gmm_after_collapsing": 1, "cra_num_spawn": 1, "coll_rock_SA_all_events array B": 240, "cra_num_periods": 3}
+2013-03-12 13:57:13,240 DEBUG                     analysis:1062|Memory: calc_and_save_SA before return
+2013-03-12 13:57:13,241 DEBUG                     analysis:1063|JS*N{"peak_resident MB": 58.9296875, "peak_memory MB": 459.33984375, "peak_stacksize MB": 0.30859375}
+2013-03-12 13:57:13,241 INFO                      analysis:368 |P0: do site 3 of 3
+2013-03-12 13:57:13,241 DEBUG                     analysis:370 |Memory: site 3
+2013-03-12 13:57:13,241 DEBUG                     analysis:371 |JS*N{"looping_stacksize MB": 0.30859375, "looping_memory MB": 459.33984375, "looping_resident MB": 58.9296875}
+2013-03-12 13:57:13,243 DEBUG                     analysis:866 |JS*N{"cra_num_events": 10, "cra_num_gmm_after_collapsing": 1, "cra_num_spawn": 1, "coll_rock_SA_all_events array B": 240, "cra_num_periods": 3}
+2013-03-12 13:57:13,244 DEBUG                     analysis:1062|Memory: calc_and_save_SA before return
+2013-03-12 13:57:13,245 DEBUG                     analysis:1063|JS*N{"peak_resident MB": 58.9296875, "peak_memory MB": 459.33984375, "peak_stacksize MB": 0.30859375}
+2013-03-12 13:57:13,245 DEBUG                     analysis:547 |Memory: Ended looping over sites
+2013-03-12 13:57:13,246 DEBUG                     analysis:548 |JS*N{"stacksize MB": 0.30859375, "resident MB": 58.9296875, "memory MB": 459.33984375}
+2013-03-12 13:57:13,246 INFO                      analysis:558 |JS*N{"time_pre_site_loop_fraction": 0.8333333333333334}
+2013-03-12 13:57:13,246 INFO                      analysis:561 |event_loop_time (excluding file saving) 0:00:00.120000 hr:min:sec
+2013-03-12 13:57:13,246 INFO                      analysis:563 |JS*N{"event_loop_time_seconds": 0.11999999999999744}
+2013-03-12 13:57:13,280 INFO                      analysis:790 |On node 0, rhe-compute1.ga.gov.au clock (processor) time taken overall 0:00:00.140000 hr:min:sec.
+2013-03-12 13:57:13,280 INFO                      analysis:792 |JS*N{"clock_time_taken_overall_seconds": 0.14000000000000057}
+2013-03-12 13:57:13,280 INFO                      analysis:799 |On node 0, rhe-compute1.ga.gov.au wall time taken overall 0:00:00.257826 hr:min:sec.
+2013-03-12 13:57:13,280 INFO                      analysis:800 |JS*N{"wall_time_taken_overall_seconds": 0.2578260898590088}
+2013-03-12 13:57:13,281 INFO                      analysis:801 |On node 0, rhe-compute1.ga.gov.au wall time taken overall 0:00:00.257826 hr:min:sec.
+2013-03-12 13:57:13,281 DEBUG                     analysis:805 |Memory: End
+2013-03-12 13:57:13,281 DEBUG                     analysis:806 |JS*N{"final_memory MB": 459.33984375, "final_resident MB": 58.9296875, "final_stacksize MB": 0.30859375}
