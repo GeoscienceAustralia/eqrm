@@ -123,6 +123,7 @@ SOILHAZ_J = 'soil_hazard array B'
 BEDROCKALL_J = 'bedrock_all array B'
 SOILALL_J = 'soil_all array B'
 COLLROCKSAE_J = 'coll_rock_SA_all_events array B'
+CLOSEROCKSAE_J = 'coll_rock_SA_close_events array B'
 ROCKOVERLOADED_J = 'rock_SA_overloaded array B'
 EVENTACTIVITY_J = 'event_activity array B'
 

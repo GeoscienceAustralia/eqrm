@@ -864,6 +864,26 @@ def calc_and_save_SA(eqrm_flags,
                "cra_num_gmm_after_collapsing":num_gmm_after_collapsing}
     log.log_json(log_dic,
                  log.DEBUG)
+        
+    # Array to save SA into.  Only storing close event info
+    num_close_events = 0
+    for source in source_model:
+         num_close_events += len(source.get_event_set_indexes())
+    
+    coll_rock_SA_close_events = zeros(
+        (num_spawn, num_gmm_after_collapsing, num_rm,
+         num_sites, num_close_events, num_periods),
+        dtype=float)
+        
+    
+    log_dic = {log.CLOSEROCKSAE_J: coll_rock_SA_close_events.nbytes,
+               "cra_num_close_events":num_close_events,
+               "cra_num_spawn":num_spawn,
+               "cra_num_periods":num_periods,
+               "cra_num_gmm_after_collapsing":num_gmm_after_collapsing}
+    log.log_json(log_dic,
+                 log.DEBUG)
+                 
     if not eqrm_flags.run_type == "hazard":
         rock_SA_overloaded = zeros((num_sites,
                                     num_events * num_gmm_max * 
@@ -892,9 +912,17 @@ def calc_and_save_SA(eqrm_flags,
             soil_SA_overloaded = None
     else:
         soil_SA_overloaded = None
+        
+    s_evnti = 0 # start event index for the close event dimension
+    e_evnti = 0 # end event index for the close event dimension
     
+    # A list of indexes into the all events dimension
+    all_event_indexes = zeros((num_close_events), dtype=int)
     for source in source_model:
+        # The event_inds are the close events in this source
         event_inds = source.get_event_set_indexes()
+        e_evnti += len(event_inds) 
+        all_event_indexes[s_evnti:e_evnti]= event_inds
         if len(event_inds) == 0:
             continue
         sub_event_set = event_set[event_inds]
@@ -915,7 +943,7 @@ def calc_and_save_SA(eqrm_flags,
         bedrock_SA = ground_motion_distribution.ground_motion_sample(
             log_mean_extend_GM, log_sigma_extend_GM)
         # bedrock_SA shape (spawn, GM_model, rec_model, sites, events, periods)
-        
+        # the events here is close events in this source
         #print 'ENDING Calculating attenuation'
 
         # Setup for amplification  model
@@ -989,6 +1017,8 @@ def calc_and_save_SA(eqrm_flags,
             
             coll_rock_SA_all_events[:, :gmm_n, :, :, event_inds, :] = \
                                                           collapsed_bedrock_SA
+            coll_rock_SA_close_events[:, :gmm_n, :, :, s_evnti:e_evnti, :] = \
+                                                          collapsed_bedrock_SA
             if soil_SA is not None:
                 # Build collapsed_soil_SA for all events
                 coll_soil_SA_all_events[:, :gmm_n, :, :, event_inds, :] = \
@@ -1020,15 +1050,19 @@ def calc_and_save_SA(eqrm_flags,
         # 0 to drop site out
         #rock_SA_overloaded_auto = (bedrock_SA[:,:,0,:,:]).reshape(
         #    (num_sites, num_spawn*num_gmm_max*num_events, num_periods))
+        s_evnti = e_evnti
 
     #End source loop
     # Compute hazard if desired
     if eqrm_flags.save_hazard_map is True:
-        # WARNING FIXME. This assumes that
         # event_activity.event_activity is [spawns, gmm, rec_models,
-        # events]. See FIXME below
+        # events]
         event_act_d_events = event_activity.event_activity.reshape(-1)
+        event_act_d_close = event_activity.event_activity[:,:,:, \
+            all_event_indexes]
+        event_act_d_close = event_act_d_close.reshape(-1)
         assert coll_rock_SA_all_events.shape[3] == 1 # only one site
+        assert coll_rock_SA_close_events.shape[3] == 1 # only one site
         for j in xrange(len(eqrm_flags.atten_periods)):
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
@@ -1036,19 +1070,18 @@ def calc_and_save_SA(eqrm_flags,
 
             bedrock_SA_events = coll_rock_SA_all_events[:,:,:,:,:,j].reshape(
                 1,-1)
-            # FIXME. This is fragile. This relies on the events in
-            # event_act_d_events corresponding to bedrock_SA_events,
-            # which depends on them both being flattened by reshape()
-            # in the same way, which amongst other things, relies on
-            # event_activity.event_activity.shape[1] ==
-            # num_gmm_after_collapsing and num_sites==1. The layout of
-            # event_activity.event_activity is not apparent here, and
-            # the code needs to be redesigned so that it is
-            # irrelevant.
+            bedrock_SA_close = coll_rock_SA_close_events[:,:,:,:,:,j].reshape(
+                1,-1)
             bedrock_hazard[site_index,j,:] = \
                          hzd_do_value(bedrock_SA_events,
                                       event_act_d_events,
                                       1.0/array(eqrm_flags.return_periods))
+                                      
+            #bedrock_close_hazard[site_index,j,:] = \
+             #            hzd_do_value(bedrock_SA_close,
+              #                        event_act_d_events,
+               #                       1.0/array(eqrm_flags.return_periods))
+               
             # FIXME. soil_SA is never defined in this scope. Is the intention
             # to check soil_SA_overloaded?
             if eqrm_flags.use_amplification is True:
