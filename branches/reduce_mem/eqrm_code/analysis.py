@@ -1138,6 +1138,11 @@ def calc_and_save_SA(eqrm_flags,
         
         if not allclose(bedrock_hazard[site_index,...], 
                         bedrock_close_hazard[site_index,...]):
+            print "event_act_d_events", event_act_d_events
+            print "event_act_d_close", event_act_d_close
+            print "all_event_indexes", all_event_indexes
+            print "bedrock_SA_events", bedrock_SA_events
+            print "bedrock_SA_close", bedrock_SA_close
             print "bedrock_SA_events", bedrock_SA_events.shape
             print "bedrock_SA_close", bedrock_SA_close.shape
             print "event_act_d_events", event_act_d_events.shape
