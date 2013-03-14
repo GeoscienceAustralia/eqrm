@@ -1019,6 +1019,17 @@ def calc_and_save_SA(eqrm_flags,
                                                           collapsed_bedrock_SA
             coll_rock_SA_close_events[:, :gmm_n, :, :, s_evnti:e_evnti, :] = \
                                                           collapsed_bedrock_SA
+            # Let's test this data structure
+            if not allclose(coll_rock_SA_all_events[:, :gmm_n, :, :, all_event_indexes[0:e_evnti], :],
+            coll_rock_SA_close_events[:, :gmm_n, :, :, 0:e_evnti, :]
+                            ):
+                            print "coll_rock_SA_all_events[:, :gmm_n, :, :, all_event_indexes, :]", coll_rock_SA_all_events[:, :gmm_n, :, :, all_event_indexes[0:e_evnti], :]
+                            print "coll_rock_SA_close_events[:, :gmm_n, :, :, 0:e_evnti, :]", coll_rock_SA_close_events[:, :gmm_n, :, :, 0:e_evnti, :]
+                            print "coll_rock_SA_all_events.shape", coll_rock_SA_all_events.shape
+                            print "coll_rock_SA_close_events.shape", coll_rock_SA_close_events.shape
+                            print "event_inds", all_event_indexes
+                            print "e_evnti", e_evnti
+                            import sys; sys.exit() 
             if soil_SA is not None:
                 # Build collapsed_soil_SA for all events
                 coll_soil_SA_all_events[:, :gmm_n, :, :, event_inds, :] = \
@@ -1053,6 +1064,25 @@ def calc_and_save_SA(eqrm_flags,
         s_evnti = e_evnti
 
     #End source loop
+    
+    #Data checks temp
+    if not allclose(coll_rock_SA_all_events[:, :, :, :, all_event_indexes, :],
+            coll_rock_SA_close_events[:, :, :, :, :, :]
+                            ):
+        print "coll_rock_SA_all_events[:, :, :, :, all_event_indexes, :]", coll_rock_SA_all_events[:, :, :, :, all_event_indexes, :]
+        print "coll_rock_SA_close_events[:, :, :, :, 0:e_evnti, :]", coll_rock_SA_close_events[:, :, :, :, :, :]
+        print "coll_rock_SA_all_events.shape", coll_rock_SA_all_events.shape
+        print "coll_rock_SA_close_events.shape", coll_rock_SA_close_events.shape
+        print "event_inds", all_event_indexes
+        print "e_evnti", e_evnti
+        print "crash here"
+        import sys; sys.exit() 
+    empty_event_indexes = list(set(range(num_events)) - set(all_event_indexes))
+    if len(where(coll_rock_SA_all_events[:, :, :, :, empty_event_indexes, :] > 0.)[0]) > 0:
+        print "len(where(coll_rock_SA_all_events[:, :, :, :, empty_event_indexes, :])[0])", len(where(coll_rock_SA_all_events[:, :, :, :, empty_event_indexes, :])[0])
+        import sys; sys.exit() 
+    
+    
     # Compute hazard if desired
     if eqrm_flags.save_hazard_map is True:
         # event_activity.event_activity is [spawns, gmm, rec_models,
@@ -1064,11 +1094,20 @@ def calc_and_save_SA(eqrm_flags,
         assert coll_rock_SA_all_events.shape[3] == 1 # only one site
         assert coll_rock_SA_close_events.shape[3] == 1 # only one site
         
+        # Temp array
+        bedrock_close_hazard = zeros(bedrock_hazard.shape,
+                                   dtype=float)
+        coll_rock_SA_all_events[:, :, :, :, empty_event_indexes, :] = 0
+        coll_rock_SA_all_events[:, :, :, :, all_event_indexes, :] = coll_rock_SA_close_events
+        # Uncomment this to stop fails.
+        # The event activities for SA's that = zero should not matter though
+        # So I think this is a bug in hzd_do_value
+        #event_act_d_events[empty_event_indexes] = 0 # This stops the diff!!
         for j in xrange(len(eqrm_flags.atten_periods)):
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
             # into the events dimension.
-
+            
             bedrock_SA_events = coll_rock_SA_all_events[:,:,:,:,:,j].reshape(
                 1,-1)
             bedrock_SA_close = coll_rock_SA_close_events[:,:,:,:,:,j].reshape(
@@ -1077,7 +1116,7 @@ def calc_and_save_SA(eqrm_flags,
                 hzd_do_value(bedrock_SA_events,
                              event_act_d_events,
                              1.0/array(eqrm_flags.return_periods))
-            bedrock_hazard[site_index,j,:] = \
+            bedrock_close_hazard[site_index,j,:] = \
                 hzd_do_value(bedrock_SA_close,
                              event_act_d_close,
                              1.0/array(eqrm_flags.return_periods))
@@ -1091,7 +1130,25 @@ def calc_and_save_SA(eqrm_flags,
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
                                       1.0/array(eqrm_flags.return_periods))
-            
+        # Check the event activities.
+        # Do they align?
+        big_event_act = event_activity.event_activity
+        small_event_act = event_activity.event_activity[:,:,:, \
+            all_event_indexes]
+        
+        if not allclose(bedrock_hazard[site_index,...], 
+                        bedrock_close_hazard[site_index,...]):
+            print "bedrock_SA_events", bedrock_SA_events.shape
+            print "bedrock_SA_close", bedrock_SA_close.shape
+            print "event_act_d_events", event_act_d_events.shape
+            print "event_act_d_close", event_act_d_close.shape
+            print "bedrock_hazard", bedrock_hazard.shape
+            print "bedrock_close_hazard", bedrock_close_hazard.shape
+            print "coll_rock_SA_all_events", coll_rock_SA_all_events.shape
+            print "coll_rock_SA_close_events", coll_rock_SA_close_events.shape
+            print "event_activity.event_activity", event_activity.event_activity.shape
+            #if not allclose(
+            import sys; sys.exit()        
     log.debug('Memory: calc_and_save_SA before return')
     log.resource_usage(tag=log.PEAK_J)
                 
