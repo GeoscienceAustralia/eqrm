@@ -4,6 +4,7 @@
 % Recurrence model = 0
 % First row are rsa periods, then rows are sites
 0.0 0.2 1.0
+615418.5261 615418.5261 615418.5261
 0 0 0
 0 0 0
-0 0 0
+615418.5261 615418.5261 615418.5261
