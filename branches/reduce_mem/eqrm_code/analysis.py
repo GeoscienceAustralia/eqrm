@@ -1143,6 +1143,7 @@ def calc_and_save_SA(eqrm_flags,
             print "all_event_indexes", all_event_indexes
             print "bedrock_SA_events", bedrock_SA_events
             print "bedrock_SA_close", bedrock_SA_close
+            print "1.0/array(eqrm_flags.return_periods)", 1.0/array(eqrm_flags.return_periods)
             print "bedrock_SA_events", bedrock_SA_events.shape
             print "bedrock_SA_close", bedrock_SA_close.shape
             print "event_act_d_events", event_act_d_events.shape
