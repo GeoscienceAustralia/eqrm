@@ -32,10 +32,10 @@ event_control_tag = "use"
 # Scenario input
 
 # Probabilistic input
-
+prob_number_of_events_in_zones = [10, 10]
 
 # Attenuation
-atten_collapse_Sa_of_atten_models = False
+atten_collapse_Sa_of_atten_models = True #False
 atten_variability_method = None
 atten_periods = [0.0, 0.2, 1.0]
 atten_threshold_distance = 222.6 # 1 deg = 111 km at equator
