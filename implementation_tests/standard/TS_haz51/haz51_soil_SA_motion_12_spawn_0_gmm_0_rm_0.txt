@@ -5,5 +5,6 @@
 % First row are rsa periods, then rows are sites
 0.0 0.2 1.0
 0 0 0
-2000000 1607433.714 1455340.641
+0 0 0
+0 0 0
 0 0 0
