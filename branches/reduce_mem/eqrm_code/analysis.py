@@ -1095,7 +1095,7 @@ def calc_and_save_SA(eqrm_flags,
         assert coll_rock_SA_close_events.shape[3] == 1 # only one site
         
         # Temp array
-        bedrock_close_hazard = zeros(bedrock_hazard.shape,
+        bedrock_all_hazard = zeros(bedrock_hazard.shape,
                                    dtype=float)
         coll_rock_SA_all_events[:, :, :, :, empty_event_indexes, :] = 0
         coll_rock_SA_all_events[:, :, :, :, all_event_indexes, :] = coll_rock_SA_close_events
@@ -1112,11 +1112,11 @@ def calc_and_save_SA(eqrm_flags,
                 1,-1)
             bedrock_SA_close = coll_rock_SA_close_events[:,:,:,:,:,j].reshape(
                 1,-1)
-            bedrock_hazard[site_index,j,:] = \
+            bedrock_all_hazard[site_index,j,:] = \
                 hzd_do_value(bedrock_SA_events,
                              event_act_d_events,
                              1.0/array(eqrm_flags.return_periods))
-            bedrock_close_hazard[site_index,j,:] = \
+            bedrock_hazard[site_index,j,:] = \
                 hzd_do_value(bedrock_SA_close,
                              event_act_d_close,
                              1.0/array(eqrm_flags.return_periods))
@@ -1136,25 +1136,6 @@ def calc_and_save_SA(eqrm_flags,
         small_event_act = event_activity.event_activity[:,:,:, \
             all_event_indexes]
         
-        if not allclose(bedrock_hazard[site_index,...], 
-                        bedrock_close_hazard[site_index,...]):
-            print "event_act_d_events", event_act_d_events
-            print "event_act_d_close", event_act_d_close
-            print "all_event_indexes", all_event_indexes
-            print "bedrock_SA_events", bedrock_SA_events
-            print "bedrock_SA_close", bedrock_SA_close
-            print "1.0/array(eqrm_flags.return_periods)", 1.0/array(eqrm_flags.return_periods)
-            print "bedrock_SA_events", bedrock_SA_events.shape
-            print "bedrock_SA_close", bedrock_SA_close.shape
-            print "event_act_d_events", event_act_d_events.shape
-            print "event_act_d_close", event_act_d_close.shape
-            print "bedrock_hazard", bedrock_hazard.shape
-            print "bedrock_close_hazard", bedrock_close_hazard.shape
-            print "coll_rock_SA_all_events", coll_rock_SA_all_events.shape
-            print "coll_rock_SA_close_events", coll_rock_SA_close_events.shape
-            print "event_activity.event_activity", event_activity.event_activity.shape
-            #if not allclose(
-            import sys; sys.exit()        
     log.debug('Memory: calc_and_save_SA before return')
     log.resource_usage(tag=log.PEAK_J)
                 
