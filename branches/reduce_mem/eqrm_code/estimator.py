@@ -15,7 +15,48 @@ from eqrm_code.ANUGA_utilities import log
 
 # fixme check the atten_var_method is 1 to spawn?
 
-                    
+
+def log_pairs_estimate_mem(log_pairs):
+    """
+    Given a list of dictionaries of log information estimate the memory
+    used, in MB. Add the esimate to the log pairs.
+    
+    args;
+    log_pairs 
+    """
+    for log_pair in log_pairs:
+        print "---------------------"
+        print log_pair["output_dir"]
+        mem_b, new_mem_b = estimate_mem_log_format(log_pair)
+        total_mem_b = sum(mem_b.itervalues())
+
+        for key, value in mem_b.iteritems():
+            print 'array % ' + key + ' ' + str(
+                value/float(total_mem_b)*100.) + '%' 
+        print "After change"
+        total_new_mem_b = sum(new_mem_b.itervalues())
+        for key, value in new_mem_b.iteritems():
+            print 'new array % ' + key + ' ' + str(
+                value/float(total_new_mem_b)*100.) + '%' 
+        
+        actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
+            log_pair[INITIAL_J + MEM_J]
+        print "actual_mem_MB",actual_mem_MB
+        print "old estimate total_mem_MB", total_mem_b/MB2B
+        print "new estimate total_mem_MB", total_new_mem_b/MB2B
+        for key, value in log_pair.iteritems():
+            if mem_b.has_key(key):
+                estimate_b = mem_b[key]
+                if not estimate_b == value:
+                    print log_pair["output_dir"]
+                    print "*********************"
+                    print "key",key
+                    print "estimate_elements", estimate_b/8
+                    print "actual elements", value/8 
+            if 'recurrence yeah ' in key:
+                print key + ":" + str(value)
+                pass
+        #continue                    
 
 def estimate_mem_log_format(log_pair): # = log_pair[]
     events = log_pair[EVENTS_J]

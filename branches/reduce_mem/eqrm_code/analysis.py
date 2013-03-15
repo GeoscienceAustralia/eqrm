@@ -853,17 +853,6 @@ def calc_and_save_SA(eqrm_flags,
 
     # Build some arrays to save into.
     # NUM_SITES IS 1
-    coll_rock_SA_all_events = zeros(
-        (num_spawn, num_gmm_after_collapsing, num_rm,
-         num_sites, num_events, num_periods),
-        dtype=float)
-    log_dic = {log.COLLROCKSAE_J: coll_rock_SA_all_events.nbytes,
-               "cra_num_events":num_events,
-               "cra_num_spawn":num_spawn,
-               "cra_num_periods":num_periods,
-               "cra_num_gmm_after_collapsing":num_gmm_after_collapsing}
-    log.log_json(log_dic,
-                 log.DEBUG)
         
     # Array to save SA into.  Only storing close event info
     num_close_events = 0
@@ -1015,21 +1004,8 @@ def calc_and_save_SA(eqrm_flags,
             # before getting out of the loop
             # collapsed_bedrock_SA shape (spawn, gmm, sites, events, periods)
             
-            coll_rock_SA_all_events[:, :gmm_n, :, :, event_inds, :] = \
-                                                          collapsed_bedrock_SA
             coll_rock_SA_close_events[:, :gmm_n, :, :, s_evnti:e_evnti, :] = \
                                                           collapsed_bedrock_SA
-            # Let's test this data structure
-            if not allclose(coll_rock_SA_all_events[:, :gmm_n, :, :, all_event_indexes[0:e_evnti], :],
-            coll_rock_SA_close_events[:, :gmm_n, :, :, 0:e_evnti, :]
-                            ):
-                            print "coll_rock_SA_all_events[:, :gmm_n, :, :, all_event_indexes, :]", coll_rock_SA_all_events[:, :gmm_n, :, :, all_event_indexes[0:e_evnti], :]
-                            print "coll_rock_SA_close_events[:, :gmm_n, :, :, 0:e_evnti, :]", coll_rock_SA_close_events[:, :gmm_n, :, :, 0:e_evnti, :]
-                            print "coll_rock_SA_all_events.shape", coll_rock_SA_all_events.shape
-                            print "coll_rock_SA_close_events.shape", coll_rock_SA_close_events.shape
-                            print "event_inds", all_event_indexes
-                            print "e_evnti", e_evnti
-                            import sys; sys.exit() 
             if soil_SA is not None:
                 # Build collapsed_soil_SA for all events
                 coll_soil_SA_all_events[:, :gmm_n, :, :, event_inds, :] = \
@@ -1057,6 +1033,7 @@ def calc_and_save_SA(eqrm_flags,
                         if soil_SA is not None:
                             soil_SA_overloaded[0, i_overloaded, :] = \
                                 soil_SA[i_spawn, i_gmm, i_rm, 0, :, :]
+                                
         # can not do this, the current SA only has a subset of all events.
         # 0 to drop site out
         #rock_SA_overloaded_auto = (bedrock_SA[:,:,0,:,:]).reshape(
@@ -1064,23 +1041,6 @@ def calc_and_save_SA(eqrm_flags,
         s_evnti = e_evnti
 
     #End source loop
-    
-    #Data checks temp
-    if not allclose(coll_rock_SA_all_events[:, :, :, :, all_event_indexes, :],
-            coll_rock_SA_close_events[:, :, :, :, :, :]
-                            ):
-        print "coll_rock_SA_all_events[:, :, :, :, all_event_indexes, :]", coll_rock_SA_all_events[:, :, :, :, all_event_indexes, :]
-        print "coll_rock_SA_close_events[:, :, :, :, 0:e_evnti, :]", coll_rock_SA_close_events[:, :, :, :, :, :]
-        print "coll_rock_SA_all_events.shape", coll_rock_SA_all_events.shape
-        print "coll_rock_SA_close_events.shape", coll_rock_SA_close_events.shape
-        print "event_inds", all_event_indexes
-        print "e_evnti", e_evnti
-        print "crash here"
-        import sys; sys.exit() 
-    empty_event_indexes = list(set(range(num_events)) - set(all_event_indexes))
-    if len(where(coll_rock_SA_all_events[:, :, :, :, empty_event_indexes, :] > 0.)[0]) > 0:
-        print "len(where(coll_rock_SA_all_events[:, :, :, :, empty_event_indexes, :])[0])", len(where(coll_rock_SA_all_events[:, :, :, :, empty_event_indexes, :])[0])
-        import sys; sys.exit() 
     
     
     # Compute hazard if desired
@@ -1091,14 +1051,8 @@ def calc_and_save_SA(eqrm_flags,
         event_act_d_close = event_activity.event_activity[:,:,:, \
             all_event_indexes]
         event_act_d_close = event_act_d_close.reshape(-1)
-        assert coll_rock_SA_all_events.shape[3] == 1 # only one site
         assert coll_rock_SA_close_events.shape[3] == 1 # only one site
         
-        # Temp array
-        bedrock_all_hazard = zeros(bedrock_hazard.shape,
-                                   dtype=float)
-        coll_rock_SA_all_events[:, :, :, :, empty_event_indexes, :] = 0
-        coll_rock_SA_all_events[:, :, :, :, all_event_indexes, :] = coll_rock_SA_close_events
         # Uncomment this to stop fails.
         # The event activities for SA's that = zero should not matter though
         # So I think this is a bug in hzd_do_value
@@ -1107,22 +1061,15 @@ def calc_and_save_SA(eqrm_flags,
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
             # into the events dimension.
-            
-            bedrock_SA_events = coll_rock_SA_all_events[:,:,:,:,:,j].reshape(
-                1,-1)
             bedrock_SA_close = coll_rock_SA_close_events[:,:,:,:,:,j].reshape(
                 1,-1)
-            bedrock_all_hazard[site_index,j,:] = \
-                hzd_do_value(bedrock_SA_events,
-                             event_act_d_events,
-                             1.0/array(eqrm_flags.return_periods))
+
             bedrock_hazard[site_index,j,:] = \
                 hzd_do_value(bedrock_SA_close,
                              event_act_d_close,
                              1.0/array(eqrm_flags.return_periods))
                
-            # FIXME. soil_SA is never defined in this scope. Is the intention
-            # to check soil_SA_overloaded?
+
             if eqrm_flags.use_amplification is True:
                 soil_SA_events = coll_soil_SA_all_events[:,:,:,:,:,j].reshape(
                     (-1))
@@ -1130,11 +1077,7 @@ def calc_and_save_SA(eqrm_flags,
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
                                       1.0/array(eqrm_flags.return_periods))
-        # Check the event activities.
-        # Do they align?
-        big_event_act = event_activity.event_activity
-        small_event_act = event_activity.event_activity[:,:,:, \
-            all_event_indexes]
+
         
     log.debug('Memory: calc_and_save_SA before return')
     log.resource_usage(tag=log.PEAK_J)
