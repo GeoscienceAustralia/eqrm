@@ -17,8 +17,8 @@ MB2B = 1048576.
 
 def create_meta_log():
     path = os.path.join(eqrm_data_home(), 'test_national', 
-                                     #    'memory_output') 
-                                         'memory_output_riskB')
+                                        'memory_output') 
+                                     #    'memory_output_riskB')
     log_pairs = build_log_info(path) 
     #print "len(log_pairs)", len(log_pairs)
     

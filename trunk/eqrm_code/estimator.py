@@ -10,12 +10,69 @@
 """
 from copy import copy
 from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
-    PARALLELSIZE_J, TOTALMEM_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J
+    PARALLELSIZE_J, TOTALMEM_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J, \
+    FINAL_J, CLOSEROCKSAE_J
+
 from eqrm_code.ANUGA_utilities import log
 
 # fixme check the atten_var_method is 1 to spawn?
 
-                    
+MB2B = 1048576.
+
+    
+def log_pairs_estimate_mem(log_pairs):
+    """
+    Given a list of dictionaries of log information estimate the memory
+    used, in MB. Add the esimate to the log pairs.
+    
+    Comparing the old and new estimates after the first memory change.
+    
+    args;
+    log_pairs 
+    """
+    for log_pair in log_pairs:
+        print "---------------------"
+        print log_pair["output_dir"]
+        mem_b = estimate_mem_log_format(log_pair)
+        total_mem_b = sum(mem_b.itervalues())
+
+        print "Estimated"
+        for key, value in mem_b.iteritems():
+            print 'array MB ' + key + ' ' + str(
+                value/MB2B) + ' MB' 
+            print 'array % ' + key + ' ' + str(
+                value/float(total_mem_b)*100.) + '%' 
+                
+        if False:
+            for key, value in mem_b.iteritems():
+                print 'array % ' + key + ' ' + str(
+                    value/float(total_mem_b)*100.) + '%' 
+        
+        looping_actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
+            log_pair[INITIAL_J + MEM_J]
+        final_actual_mem_MB = log_pair[FINAL_J + MEM_J] -\
+            log_pair[INITIAL_J + MEM_J]
+        actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
+            log_pair[INITIAL_J + MEM_J]
+        print "looping actual_mem_MB", looping_actual_mem_MB
+        print "final actual_mem_MB", final_actual_mem_MB
+        print "estimate total_mem_MB", total_mem_b/MB2B
+        try:
+            coll_rock_SA_close_events = log_pair[CLOSEROCKSAE_J]
+            print "coll_rock_SA_close_events array MB", coll_rock_SA_close_events/MB2B
+        except:
+            pass
+        for key, value in log_pair.iteritems():
+            #results = "key: " + str(key) + " value: " + str(value) 
+            #print results
+            if mem_b.has_key(key):
+                estimate_b = mem_b[key]
+                if not estimate_b == value:
+                    print log_pair["output_dir"]
+                    print "*********************"
+                    print "key",key
+                    print "estimate_elements", estimate_b/8
+                    print "actual elements", value/8    
 
 def estimate_mem_log_format(log_pair): # = log_pair[]
     events = log_pair[EVENTS_J]

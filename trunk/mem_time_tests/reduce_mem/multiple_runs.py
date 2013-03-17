@@ -89,7 +89,7 @@ def reduce_mem_standard():
     sdp.atten_periods =  [0.1, 0.2, 1.0]
     sdp.atten_spawn_bins = 5
     sdp.event_control_tag = "4GMPE" 
-    dir_last  = 'reduce_mem2_events' + str(sum(
+    dir_last  = 'reduce_mem_IMPLEMENTED_events' + str(sum(
             sdp.prob_number_of_events_in_zones)) + \
             "_sites" + str(len(sdp.site_indexes))
     sdp.output_dir = os.path.join(ROOTOUTPUTDIR, dir_last)

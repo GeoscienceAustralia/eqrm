@@ -3,10 +3,10 @@
      event_type = "Non_cratonic">
     <GMPE 
        fault_type = "reverse">
-      <branch model = "Somerville09_Non_Cratonic" weight = "0.25"/> 
-      <branch model = "Atkinson06_bc_boundary_bedrock" weight = "0.25"/> 
-      <branch model = "Chiou08" weight = "0.25"/>
-      <branch model = "Allen_2012" weight = "0.25"/>
+      <branch model = "Somerville09_Non_Cratonic" weight = "0.3"/> 
+      <branch model = "Atkinson06_bc_boundary_bedrock" weight = "0.3"/> 
+      <branch model = "Chiou08" weight = "0.1"/>
+      <branch model = "Allen_2012" weight = "0.3"/>
     </GMPE>
     <scaling scaling_rule = "Leonard_SCR" />
   </event_group> 
@@ -15,7 +15,7 @@
      event_type = "Cratonic">
     <GMPE 
        fault_type = "reverse">
-      <branch model = "Somerville09_Yilgarn" weight = "0.3"/> 
+      <branch model = "Somerville09_Non_Cratonic" weight = "0.3"/> 
       <branch model = "Atkinson06_bc_boundary_bedrock" weight = "0.3"/> 
       <branch model = "Chiou08" weight = "0.1"/>
       <branch model = "Allen_2012" weight = "0.3"/>
