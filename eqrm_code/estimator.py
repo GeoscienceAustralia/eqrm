@@ -14,6 +14,7 @@ from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
     FINAL_J, CLOSEROCKSAE_J, CLOSERATIO_J
 
 from eqrm_code.ANUGA_utilities import log
+from eqrm_code.ANUGA_utilities.log_analyser import build_log_info
 
 # fixme check the atten_var_method is 1 to spawn?
 
@@ -22,6 +23,11 @@ CURRENT_ESTIMATOR = 1388
 BEDROCK_SA_ALL = 1376
 BEDROCK_SA_CLOSE = 1388
 
+
+def log_estimate_memory_use(path): 
+    log_pairs = build_log_info(path) 
+    log_pairs_estimate_mem(log_pairs)
+    
     
 def log_pairs_estimate_mem(log_pairs):
     """
