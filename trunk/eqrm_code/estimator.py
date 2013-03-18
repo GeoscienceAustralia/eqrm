@@ -11,7 +11,7 @@
 from copy import copy
 from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
     PARALLELSIZE_J, TOTALMEM_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J, \
-    FINAL_J, CLOSEROCKSAE_J, CLOSERATIO_J
+    FINAL_J, CLOSEROCKSAE_J, CLOSERATIO_J, PEAK_J
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code.ANUGA_utilities.log_analyser import build_log_info
@@ -60,12 +60,15 @@ def log_pairs_estimate_mem(log_pairs):
                     print 'array % ' + key + ' ' + str(
                         value/float(total_mem_b)*100.) + '%' 
             
+            peak_actual_mem_MB = log_pair[PEAK_J + MEM_J] -\
+                log_pair[INITIAL_J + MEM_J]
             looping_actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
                 log_pair[INITIAL_J + MEM_J]
             final_actual_mem_MB = log_pair[FINAL_J + MEM_J] -\
                 log_pair[INITIAL_J + MEM_J]
             actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
                 log_pair[INITIAL_J + MEM_J]
+            print "peak actual_mem_MB", peak_actual_mem_MB
             print "looping actual_mem_MB", looping_actual_mem_MB
             print "final actual_mem_MB", final_actual_mem_MB
             print "estimate total_mem_MB", total_mem_b/MB2B
@@ -313,7 +316,7 @@ def estimate_mem(events,
                                   gmm_max * rec_mod * events) * item_size
     else:
          mem_bytes['base']['contents_loss_qw'] = 0
-
+    print "************ atten_periods ", atten_periods
     mem_bytes[BEDROCK_SA_ALL][log.COLLROCKSAE_J] = (spawning * 
                                                     gmm_after_collapsing *
                                                     rec_mod *
