@@ -126,6 +126,7 @@ COLLROCKSAE_J = 'coll_rock_SA_all_events array B'
 CLOSEROCKSAE_J = 'coll_rock_SA_close_events array B'
 ROCKOVERLOADED_J = 'rock_SA_overloaded array B'
 EVENTACTIVITY_J = 'event_activity array B'
+CLOSERATIO_J = 'close to all events fraction'
 
 # memory tags
 PEAK_J = 'peak_'

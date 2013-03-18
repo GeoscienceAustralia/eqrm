@@ -869,9 +869,13 @@ def calc_and_save_SA(eqrm_flags,
                "cra_num_close_events":num_close_events,
                "cra_num_spawn":num_spawn,
                "cra_num_periods":num_periods,
-               "cra_num_gmm_after_collapsing":num_gmm_after_collapsing}
+               "cra_num_gmm_after_collapsing":num_gmm_after_collapsing,
+               "cra_close_events_fraction":num_close_events/float(num_events)}
     log.log_json(log_dic,
                  log.DEBUG)
+                 
+    log_dic = {log.CLOSERATIO_J: num_close_events/float(num_events)}
+    log.log_json(log_dic, log.DEBUG)
                  
     if not eqrm_flags.run_type == "hazard":
         rock_SA_overloaded = zeros((num_sites,

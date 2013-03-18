@@ -11,13 +11,16 @@
 from copy import copy
 from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
     PARALLELSIZE_J, TOTALMEM_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J, \
-    FINAL_J, CLOSEROCKSAE_J
+    FINAL_J, CLOSEROCKSAE_J, CLOSERATIO_J
 
 from eqrm_code.ANUGA_utilities import log
 
 # fixme check the atten_var_method is 1 to spawn?
 
 MB2B = 1048576.
+CURRENT_ESTIMATOR = 1388
+BEDROCK_SA_ALL = 1376
+BEDROCK_SA_CLOSE = 1388
 
     
 def log_pairs_estimate_mem(log_pairs):
@@ -31,50 +34,60 @@ def log_pairs_estimate_mem(log_pairs):
     log_pairs 
     """
     for log_pair in log_pairs:
-        print "---------------------"
+        print "============================================================="
         print log_pair["output_dir"]
-        mem_b = estimate_mem_log_format(log_pair)
-        total_mem_b = sum(mem_b.itervalues())
+        meta_mem_b = _estimate_mem_log_format(log_pair)
+        for key_mem_b, mem_b in meta_mem_b.items():
+            print "---------------------"
+            print "svn version# ", key_mem_b
+            total_mem_b = sum(mem_b.itervalues())
 
-        print "Estimated"
-        for key, value in mem_b.iteritems():
-            print 'array MB ' + key + ' ' + str(
-                value/MB2B) + ' MB' 
-            print 'array % ' + key + ' ' + str(
-                value/float(total_mem_b)*100.) + '%' 
-                
-        if False:
+            print "Estimated"
             for key, value in mem_b.iteritems():
+                print 'array MB ' + key + ' ' + str(
+                    value/MB2B) + ' MB' 
                 print 'array % ' + key + ' ' + str(
                     value/float(total_mem_b)*100.) + '%' 
-        
-        looping_actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
-            log_pair[INITIAL_J + MEM_J]
-        final_actual_mem_MB = log_pair[FINAL_J + MEM_J] -\
-            log_pair[INITIAL_J + MEM_J]
-        actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
-            log_pair[INITIAL_J + MEM_J]
-        print "looping actual_mem_MB", looping_actual_mem_MB
-        print "final actual_mem_MB", final_actual_mem_MB
-        print "estimate total_mem_MB", total_mem_b/MB2B
-        try:
-            coll_rock_SA_close_events = log_pair[CLOSEROCKSAE_J]
-            print "coll_rock_SA_close_events array MB", coll_rock_SA_close_events/MB2B
-        except:
-            pass
-        for key, value in log_pair.iteritems():
-            #results = "key: " + str(key) + " value: " + str(value) 
-            #print results
-            if mem_b.has_key(key):
-                estimate_b = mem_b[key]
-                if not estimate_b == value:
-                    print log_pair["output_dir"]
-                    print "*********************"
-                    print "key",key
-                    print "estimate_elements", estimate_b/8
-                    print "actual elements", value/8    
+                    
+            if False:
+                for key, value in mem_b.iteritems():
+                    print 'array % ' + key + ' ' + str(
+                        value/float(total_mem_b)*100.) + '%' 
+            
+            looping_actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
+                log_pair[INITIAL_J + MEM_J]
+            final_actual_mem_MB = log_pair[FINAL_J + MEM_J] -\
+                log_pair[INITIAL_J + MEM_J]
+            actual_mem_MB = log_pair[LOOPING_J + MEM_J] -\
+                log_pair[INITIAL_J + MEM_J]
+            print "looping actual_mem_MB", looping_actual_mem_MB
+            print "final actual_mem_MB", final_actual_mem_MB
+            print "estimate total_mem_MB", total_mem_b/MB2B
+            try:
+                coll_rock_SA_close_events = log_pair[CLOSEROCKSAE_J]
+                print "coll_rock_SA_close_events array MB", \
+                    coll_rock_SA_close_events/MB2B
+            except:
+                pass
+            for key, value in log_pair.iteritems():
+                #results = "key: " + str(key) + " value: " + str(value) 
+                #print results
+                if mem_b.has_key(key):
+                    estimate_b = mem_b[key]
+                    if not estimate_b == value:
+                        print log_pair["output_dir"]
+                        print "*********************"
+                        print "key",key
+                        print "estimate_elements", estimate_b/8
+                        print "actual elements", value/8    
 
-def estimate_mem_log_format(log_pair): # = log_pair[]
+                        
+def estimate_mem_log_format(log_pair):
+    meta_mem_b =  _estimate_mem_log_format(log_pair)
+    return meta_mem_b[CURRENT_ESTIMATOR]
+
+    
+def _estimate_mem_log_format(log_pair): # = log_pair[]
     events = log_pair[EVENTS_J]
     atten_periods = log_pair['len_atten_periods']
     return_periods= log_pair['len_return_periods']
@@ -92,6 +105,12 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
     save_hazard_map = log_pair['save_hazard_map']
     save_motion = log_pair['save_motion']
     use_amplification = log_pair['use_amplification']
+    try:
+        close_ratio = log_pair[CLOSERATIO_J]
+        print "estimator ############# close_ratio", close_ratio
+    except KeyError:
+        print "estimator ############# NO close_ratio"
+        close_ratio = 1.0
     
     results = estimate_mem(events, 
                            atten_periods, 
@@ -108,7 +127,8 @@ def estimate_mem_log_format(log_pair): # = log_pair[]
                            save_contents_loss,
                            save_hazard_map,
                            save_motion,
-                           use_amplification)
+                           use_amplification,
+                           close_ratio)
     return results
   
 
@@ -157,7 +177,7 @@ def estimate_mem_param_format(param, processors):
                            save_hazard_map,
                            save_motion,
                            use_amplification)
-    return results
+    return results[CURRENT_ESTIMATOR]
     
 def estimate_mem(events, 
                  atten_periods, 
@@ -175,6 +195,7 @@ def estimate_mem(events,
                  save_hazard_map=False,
                  save_motion=False,
                  use_amplification=False,
+                 close_ratio=1.0,
                  loop_sites=1,
                  item_size=8):
     """
@@ -182,9 +203,17 @@ def estimate_mem(events,
     Give the results in bytes
     
     rec_mod - recurance models 
-
+    
+    Return 
+        A dictionary. Keys svn revision numbers.  Values,
+        dictionary of memory estimates. Current revision numbers are;
+        1376 - bedrock SA all event
+        1388 - bedrock SA reduced to close events
     """
-    mem_bytes = {}
+    # A base memory value is calculated, then this is added to the
+    # other version numbers to get the individual memory results
+    
+    mem_bytes = {'base':{}, BEDROCK_SA_ALL:{}, BEDROCK_SA_CLOSE:{}}
     gmm_max = gmm_dimensions
     
     if atten_collapse_Sa_of_atten_models:
@@ -195,33 +224,34 @@ def estimate_mem(events,
     # calculate number of bytes for each data structure
     site_block = sites/parallel_size
 
-    mem_bytes["event_mem"] = 16 * events 
+    mem_bytes['base']["event_mem"] = 16 * events 
 
 
-    mem_bytes[log.EVENTACTIVITY_J] = (spawning * gmm_after_collapsing * 
-                                       rec_mod * events ) * item_size
+    mem_bytes['base'][log.EVENTACTIVITY_J] = (spawning * gmm_after_collapsing * 
+                                              rec_mod * events ) * item_size
 
     if save_hazard_map is True:
-        mem_bytes[log.BEDROCKHAZ_J] = (site_block *
-                                       atten_periods *
-                                       return_periods) * item_size
+        mem_bytes['base'][log.BEDROCKHAZ_J] = (site_block *
+                                               atten_periods *
+                                               return_periods) * item_size
     else:
-         mem_bytes[log.BEDROCKHAZ_J] = 0
+         mem_bytes['base'][log.BEDROCKHAZ_J] = 0
     if save_hazard_map is True and \
            use_amplification is True:
-        mem_bytes[log.SOILHAZ_J] = mem_bytes[log.BEDROCKHAZ_J]
+        mem_bytes['base'][log.SOILHAZ_J] = mem_bytes[log.BEDROCKHAZ_J]
     else:
-        mem_bytes[log.SOILHAZ_J] = 0
+        mem_bytes['base'][log.SOILHAZ_J] = 0
 
     
     # FIXME gmm_dimensions_motion hardcoded
     gmm_dimensions_motion = 1
 
     if save_motion is True:
-        mem_bytes[log.BEDROCKALL_J] = (spawning * gmm_dimensions_motion * 
-                                       rec_mod *
-                                       site_block * events *
-                                       atten_periods) * item_size
+        mem_bytes['base'][log.BEDROCKALL_J] = (spawning * 
+                                               gmm_dimensions_motion * 
+                                               rec_mod *
+                                               site_block * events *
+                                               atten_periods) * item_size
         #print "gmm_dimensions",gmm_dimensions_motion
         #print "spawning",spawning
         #print "rec_mod",rec_mod
@@ -229,13 +259,13 @@ def estimate_mem(events,
         #print "events",events
         #print "atten_periods",atten_periods
     else:
-        mem_bytes[log.BEDROCKALL_J] = 0
+        mem_bytes['base'][log.BEDROCKALL_J] = 0
         
     if save_motion is True and \
            use_amplification is True:
-         mem_bytes[log.SOILALL_J] =  mem_bytes[log.BEDROCKALL_J]
+         mem_bytes['base'][log.SOILALL_J] =  mem_bytes[log.BEDROCKALL_J]
     else:
-         mem_bytes[log.SOILALL_J] = 0
+         mem_bytes['base'][log.SOILALL_J] = 0
 
     #if save_fatalities is True:
      #   total_fatalities = zeros((num_site_block, num_pseudo_events),
@@ -261,36 +291,45 @@ def estimate_mem(events,
    #      data.bedrock_hazard = None
         
     if save_total_financial_loss is True:
-         mem_bytes['total_building_loss_qw'] = (site_block * spawning *
+         mem_bytes['base']['total_building_loss_qw'] = (site_block * spawning *
                                   gmm_max * rec_mod * events) * item_size
     else:
-         mem_bytes['total_building_loss_qw'] = 0
+         mem_bytes['base']['total_building_loss_qw'] = 0
 
     if save_building_loss is True:
-         mem_bytes['building_loss_qw'] =  (site_block * spawning *
+         mem_bytes['base']['building_loss_qw'] =  (site_block * spawning *
                                   gmm_max * rec_mod * events) * item_size
     else:
-         mem_bytes['building_loss_qw'] = 0
+         mem_bytes['base']['building_loss_qw'] = 0
 
     if save_contents_loss is True:
-         mem_bytes['contents_loss_qw'] =  (site_block * spawning *
+         mem_bytes['base']['contents_loss_qw'] =  (site_block * spawning *
                                   gmm_max * rec_mod * events) * item_size
     else:
-         mem_bytes['contents_loss_qw'] = 0
+         mem_bytes['base']['contents_loss_qw'] = 0
 
-    mem_bytes[log.COLLROCKSAE_J] = (spawning * gmm_after_collapsing *
-                                            rec_mod *
-                                             loop_sites * events * 
-                                            atten_periods) * item_size
+    mem_bytes[BEDROCK_SA_ALL][log.COLLROCKSAE_J] = (spawning * 
+                                                    gmm_after_collapsing *
+                                                    rec_mod *
+                                                    loop_sites * events * 
+                                                    atten_periods) * item_size
 
+    mem_bytes[BEDROCK_SA_CLOSE][log.CLOSEROCKSAE_J] = (spawning *
+                                                       gmm_after_collapsing *
+                                                       rec_mod *
+                                                       loop_sites * events * 
+                                                       atten_periods *
+                                                        close_ratio
+                                                       * item_size)
+                                            
     #print "mem_bytes[log.COLLROCKSAE_J]",mem_bytes[log.COLLROCKSAE_J]
     if not run_type == "hazard":
-        mem_bytes[log.ROCKOVERLOADED_J] = (loop_sites *
-                                           events * gmm_max *
-                                           spawning * rec_mod *
-                                           atten_periods) * item_size
+        mem_bytes['base'][log.ROCKOVERLOADED_J] = (loop_sites *
+                                                   events * gmm_max *
+                                                   spawning * rec_mod *
+                                                   atten_periods) * item_size
     else:
-        mem_bytes[log.ROCKOVERLOADED_J] = 0
+        mem_bytes['base'][log.ROCKOVERLOADED_J] = 0
     #print "gmm_after_collapsing",gmm_after_collapsing
     #print "gmm_max",gmm_max
     #mem_bytes[log.ROCKOVERLOADED_J]
@@ -298,15 +337,20 @@ def estimate_mem(events,
 
     #print " mem_bytes[log.ROCKOVERLOADED_J] ", mem_bytes[log.ROCKOVERLOADED_J] 
     if use_amplification is True:
-        mem_bytes['coll_soil_SA_all_events'] = mem_bytes[log.COLLROCKSAE_J]
+        mem_bytes['base']['coll_soil_SA_all_events'] = mem_bytes[
+            log.COLLROCKSAE_J]
         
         if not run_type == "hazard":
-            mem_bytes['soil_SA_overloaded'] = mem_bytes[log.ROCKOVERLOADED_J]
+            mem_bytes['base']['soil_SA_overloaded'] = mem_bytes[
+                log.ROCKOVERLOADED_J]
         else:
-            mem_bytes['soil_SA_overloaded'] = 0
+            mem_bytes['base']['soil_SA_overloaded'] = 0
     else:
-        mem_bytes['coll_soil_SA_all_events'] = 0           
-        mem_bytes['soil_SA_overloaded'] = 0
+        mem_bytes['base']['coll_soil_SA_all_events'] = 0           
+        mem_bytes['base']['soil_SA_overloaded'] = 0
 
+    mem_bytes[BEDROCK_SA_ALL].update(mem_bytes['base'])
+    mem_bytes[BEDROCK_SA_CLOSE].update(mem_bytes['base'])
+    del mem_bytes['base']
     return mem_bytes
 
