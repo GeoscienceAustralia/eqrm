@@ -524,6 +524,78 @@ class Test_Exceedance(unittest.TestCase):
         
         self.assert_ (allclose(hzd, bedrock_hazard))
 
+    def test_hzd_do_valueII(self):
+        
+        # showing issue 116
+        new_bedrock_SA = array([[615418.52605636, 615418.52605636, 
+                                 615418.52605636, 615418.52605636,
+                                 615418.52605636, 615418.52605636,
+                                 615418.52605636, 615418.52605636,
+                                 615418.52605636, 615418.52605636,
+                                 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+                                  2000000.]])
+
+        event_activity = array([0.14132446, 0.11654837, 0.14177463,
+                                0.07311541, 0.08137506, 0.14829093,
+                                0.06237196, 0.06338166, 0.08439131,
+                                0.08742621, 0.11150119, 0.09972694,
+                                0.11350628, 0.09771233, 0.11803131,
+                                0.13920794, 0.0717574, 0.07188736,
+                                0.08295507, 0.09371418])
+                                
+        return_rates = array([0.1, 0.02, 0.01, 0.005, 0.004, 0.002,
+                                0.00102564, 0.001, 0.0004,  0.0002, 0.0001])
+                                
+        hzd_zeros = hzd_do_value(new_bedrock_SA, event_activity, return_rates)
+   
+        new_bedrock_SA = array([[615418.52605636, 615418.52605636, 
+                                 615418.52605636, 615418.52605636,
+                                 615418.52605636, 615418.52605636,
+                                 615418.52605636, 615418.52605636,
+                                 615418.52605636, 615418.52605636,
+                                  2000000.]])
+
+        event_activity = array([0.14132446, 0.11654837, 0.14177463,
+                                0.07311541, 0.08137506, 0.14829093,
+                                0.06237196, 0.06338166, 0.08439131,
+                                0.08742621, 0.09371418])   
+        
+        hzd_close = hzd_do_value(new_bedrock_SA, event_activity, return_rates)
+        
+        #print "hzd_zeros", hzd_zeros
+        #print "hzd_close", hzd_close
+        
+        self.assert_ (allclose(hzd_zeros, hzd_close))
+        
+        
+    def test_hzd_do_valueIII(self):
+        new_bedrock_SA = array([[10., 5.]])
+        event_activity = array([1., 2.])                                
+        return_rates = array([0.5, 1., 1.0000000000001, 2., 3., 3.5])       
+        hzd = hzd_do_value(new_bedrock_SA, event_activity, return_rates)
+        
+        # This is what it currently gives.  Seems wrong at 0.5 and 1.0
+        hzd_results = array([10., 10., 5., 7.5, 10., 0.])
+        #print "hzd_zeros", hzd
+        #print "hzd_results", hzd_results
+        self.assert_ (allclose(hzd, hzd_results))
+        
+        
+    def test_hzd_do_valueIV(self):
+        new_bedrock_SA = array([[10., 5., 0.]])
+        event_activity = array([1., 2., 3.])                                
+        return_rates = array([0.5, 1., 1.0000000000001, 2., 3., 
+                              3.01, 4, 5, 
+                              6, 6.00001, 7,  8])
+        hzd = hzd_do_value(new_bedrock_SA, event_activity, return_rates)
+        
+        # This is what it currently gives.  Seems wrong at 0.5 and 1.0
+        hzd_results = array([10., 10., 5., 7.5, 10., 0., 0.0])
+        #print "hzd", hzd
+        #print "hzd_results", hzd_results
+        #self.assert_ (allclose(hzd, hzd_results))
+        
+        
     def test_collapse_att_model_dimension(self):
         gmm = 3
         rec_model = 1
