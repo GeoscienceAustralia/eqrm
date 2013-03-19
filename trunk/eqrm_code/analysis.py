@@ -1067,11 +1067,12 @@ def calc_and_save_SA(eqrm_flags,
             # into the events dimension.
             bedrock_SA_close = coll_rock_SA_close_events[:,:,:,:,:,j].reshape(
                 1,-1)
-
+            print "bedrock_SA_close", bedrock_SA_close
             bedrock_hazard[site_index,j,:] = \
                 hzd_do_value(bedrock_SA_close,
                              event_act_d_close,
                              1.0/array(eqrm_flags.return_periods))
+            print " bedrock_hazard[site_index,j,:]",  bedrock_hazard[site_index,j,:]
                
 
             if eqrm_flags.use_amplification is True:

@@ -111,60 +111,67 @@ def collapse_source_gmms(data, source_model, do_collapse):
 
 def hzd_do_value(sa, r_nu, rtrn_rte): #,hack=[0]):
     """
-    INPUTS:
+    parrams:
     sa       [vector (nx1)] response spectral accelerations
     r_nu     [vector (nx1)] event activity for the corresponding element
     in sa
     rtrn_rte  [vector (mx1)] return rates of interest.
     
-    OUTPUTS:
+    returns:
     hzd       [vector (1xm)] hazard value for each return rate
     """
     #n_rte = length(rtrn_rte);
     assert isfinite(sa).all()
     # (SAbedrock(:,I1), GET_EVNTDB_ESS_T.r_nu(Haznull));
-    hzd,cumnu = _rte2cumrte(sa,r_nu) 
+    hzd, cumnu = _rte2cumrte(sa, r_nu) 
     assert isfinite(hzd).all()
-    trghzd_rock_pga	= _get_rskgvnrte(hzd, cumnu, rtrn_rte)
+    trghzd_rock_pga  = _get_rskgvnrte(hzd, cumnu, rtrn_rte)
     assert isfinite(trghzd_rock_pga).all()
     hzd = trghzd_rock_pga	
     return hzd
 
 
-def _rte2cumrte(each_risk,each_rte):
-    if not each_risk.shape[-1]==each_rte.shape[-1]:
+def _rte2cumrte(each_risk, each_rte):
+    """
+    parrams:
+    each_risk       [vector (nx1)] response spectral accelerations
+    each_rte     [vector (nx1)] event activity for the corresponding element
+    in sa
+    """
+    if not each_risk.shape[-1] == each_rte.shape[-1]:
         s='risk shape = '+str(each_risk.shape)
         s+=' rte shape = '+str(each_rte.shape) 
-        raise ValueError('risk and rte must be the same length! '+s)
-    each_risk=each_risk.ravel()
-    risk_order=(-each_risk).argsort()
-    rsk=each_risk[risk_order]
-    cumrte=each_rte[risk_order].cumsum()
-    return rsk,cumrte
+        raise ValueError('risk and rte must be the same length! '+ s)
+    each_risk = each_risk.ravel() # Return a flattened array
+    risk_order = (-each_risk).argsort()
+    rsk = each_risk[risk_order]
+    cumrte = each_rte[risk_order].cumsum()
+    return rsk, cumrte
 
 
-def _get_rskgvnrte(rsk,cumrte,trgrte):
-    #from numpy import NaN,zeros,isfinite,allclose
-    n_trg=len(trgrte)
-    n_rsk=len(rsk)
-    trgrsk=zeros((n_trg,),dtype=float)
+def _get_rskgvnrte(rsk, cumrte, trgrte):
+    """
+    """
+    n_trg = len(trgrte)
+    n_rsk = len(rsk)
+    trgrsk = zeros((n_trg,), dtype=float)
     for i in range(n_trg):
         # default to 0 (will return 0 if desired return period is
         # too short for the simulation.
-        trgrsk[i]=0
+        trgrsk[i] = 0
         ihgh=cumrte.searchsorted(trgrte[i])
         # returns j such that cumrte[j-1] < trgrsk[i] <= cumrte[j]
         # returns len(cumrte) if max(cumrte) < trgrsk[i]
         # returns 0 if trgrsk[i] <= min(cumrte) - Note this won't happen
-        if ihgh<len(cumrte): 
-            if ihgh>0:
+        if ihgh < len(cumrte): 
+            if ihgh > 0:
                 # Linear interpolation between rsk[ihgh] and rsk[ihgh-1]
                 # at x = cumrte[ihgh] and cumrte[ihgh-1]
-                trgrsk[i]=rsk[ihgh-1]+((rsk[ihgh]-rsk[ihgh-1])*
-                                       (cumrte[ihgh]-trgrte[i])/
-                                       (cumrte[ihgh]-cumrte[ihgh-1]))
+                trgrsk[i] = rsk[ihgh-1] + ((rsk[ihgh] - rsk[ihgh - 1]) *
+                                       (cumrte[ihgh] - trgrte[i]) /
+                                       (cumrte[ihgh] - cumrte[ihgh - 1]))
             else:
-                trgrsk[i]=rsk[ihgh]
+                trgrsk[i] = rsk[ihgh]
             # end if
         #end if
     #end for
