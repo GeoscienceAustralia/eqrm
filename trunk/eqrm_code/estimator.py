@@ -316,7 +316,6 @@ def estimate_mem(events,
                                   gmm_max * rec_mod * events) * item_size
     else:
          mem_bytes['base']['contents_loss_qw'] = 0
-    print "************ atten_periods ", atten_periods
     mem_bytes[BEDROCK_SA_ALL][log.COLLROCKSAE_J] = (spawning * 
                                                     gmm_after_collapsing *
                                                     rec_mod *
