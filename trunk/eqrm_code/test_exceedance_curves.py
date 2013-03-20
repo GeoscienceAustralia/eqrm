@@ -490,13 +490,13 @@ class Test_Exceedance(unittest.TestCase):
     def test_hzd_do_valueII(self):
         
         # showing issue 116
-        new_bedrock_SA = array([[615418.52605636, 615418.52605636, 
+        new_bedrock_SA = array([615418.52605636, 615418.52605636, 
                                  615418.52605636, 615418.52605636,
                                  615418.52605636, 615418.52605636,
                                  615418.52605636, 615418.52605636,
                                  615418.52605636, 615418.52605636,
                                  0., 0., 0., 0., 0., 0., 0., 0., 0.,
-                                  2000000.]])
+                                  2000000.])
 
         event_activity = array([0.14132446, 0.11654837, 0.14177463,
                                 0.07311541, 0.08137506, 0.14829093,
@@ -511,12 +511,12 @@ class Test_Exceedance(unittest.TestCase):
                                 
         hzd_zeros = hzd_do_value(new_bedrock_SA, event_activity, return_rates)
    
-        new_bedrock_SA = array([[615418.52605636, 615418.52605636, 
+        new_bedrock_SA = array([615418.52605636, 615418.52605636, 
                                  615418.52605636, 615418.52605636,
                                  615418.52605636, 615418.52605636,
                                  615418.52605636, 615418.52605636,
                                  615418.52605636, 615418.52605636,
-                                  2000000.]])
+                                  2000000.])
 
         event_activity = array([0.14132446, 0.11654837, 0.14177463,
                                 0.07311541, 0.08137506, 0.14829093,
@@ -532,7 +532,7 @@ class Test_Exceedance(unittest.TestCase):
         
         
     def test_hzd_do_valueIII(self):
-        new_bedrock_SA = array([[10., 5.]])
+        new_bedrock_SA = array([10., 5.])
         event_activity = array([1., 2.])                                
         return_rates = array([0.5, 1., 1.0000000000001, 2., 3., 3.5])       
         hzd = hzd_do_value(new_bedrock_SA, event_activity, return_rates)
@@ -545,7 +545,7 @@ class Test_Exceedance(unittest.TestCase):
         
         
     def test_hzd_do_valueIV(self):
-        new_bedrock_SA = array([[10., 5., 0.]])
+        new_bedrock_SA = array([10., 5., 0.])
         event_activity = array([1., 2., 2.])                                
         return_rates = array([0.5, 1., 1.0000000000001, 2., 3., 
                               4, 5, 
@@ -553,7 +553,7 @@ class Test_Exceedance(unittest.TestCase):
         hzd = hzd_do_value(new_bedrock_SA, event_activity, return_rates)
         
         # This is what it currently gives.  Seems wrong at 0.5 and 1.0
-        hzd_results = array([10., 10., 10., 7.5, 5., 2.5, 0.0, 0., 0.0])
+        hzd_results = array([10., 10., 10., 7.5, 5., 0.0, 0.0, 0., 0.0])
         self.assert_ (allclose(hzd, hzd_results))
         
         

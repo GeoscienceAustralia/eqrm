@@ -13,7 +13,7 @@
 from numpy import NaN
 import scipy
 from scipy import allclose, isfinite, array, newaxis, zeros, ndarray, \
-     asarray, where, concatenate, allclose, reshape, ones, interp
+     asarray, where, concatenate, allclose, reshape, ones, interp, nonzero
 
 def _collapse_att_model_dimension(data, weights):
     """
@@ -120,6 +120,13 @@ def hzd_do_value(sa, r_nu, rtrn_rte):
     returns:
     hzd       [vector (1xm)] hazard value for each return rate
     """
+    # Get rid of events with sa = 0, since they will effect the end of the curve 
+    
+    assert sa.shape == r_nu.shape  , str(sa.shape) + 'should = ' + str(r_nu.shape)
+    nonzero_ind = nonzero(sa)
+    sa = sa[nonzero_ind]
+    r_nu = r_nu[nonzero_ind]
+    
     hzd, cumnu = _rte2cumrte(sa, r_nu) 
     # annual exceedance rate = cumulative event activity
     # for exceedance rates larger than what we have data for, give 0.
