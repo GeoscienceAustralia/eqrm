@@ -486,43 +486,6 @@ class Test_Exceedance(unittest.TestCase):
             eqrm_flags, use_C=False)
         self.assert_ (allclose(results, new_soil_SA))
 
-    def test_hzd_do_value(self):
-        
-        # WARNING - MORE A BLACK BOX TEST - BASED ON THE FUNCTIONS OUTPUT,
-        # RATHER THAN
-        # WHAT IT SHOULD OUTPUT.
-        new_bedrock_SA = array([[0.05118885, 0.02495303, 0.05791614, 0.058257,
-                                 0.0681056,  0.00444659,  0.00717228,
-                                 0.00976539,
-                                 0.13190761, 0.05088149, 0.04986149,
-                                 0.00534023,
-                                 0.02332557, 0.05212078, 0.00868164]])
-
-        event_activity = array([
-            4.63068629e-03,  1.06082894e-02,  5.31673923e-03,  4.03315915e-03
-            , 3.05946409e-03,  1.31177366e-02,  1.31177366e-02,  1.99259970e-01
-            , 1.80149203e-04,  1.34162872e-03,  8.12142702e-04,  6.01474011e-03
-            , 9.26410637e-04,  1.62378129e-03,  4.35012634e-03])
-        
-        rtrn_rte =  array([[ 0.1       ], [ 0.02      ], [ 0.01      ],
-                     [ 0.005     ], [ 0.004     ], [ 0.00210722],
-                     [ 0.002     ], [ 0.00102586], [ 0.001     ],
-                     [ 0.00040406], [ 0.0004    ],[ 0.0002    ],
-                     [ 0.00013333], [ 0.0001    ]])
-
-        hzd = hzd_do_value(new_bedrock_SA, event_activity, rtrn_rte)
-   
-   
-
-        bedrock_hazard = array([ 0.01435674, 0.05114633, 0.05809098,
-                                 0.0625557,  0.06011379
-                           , 0.1082926
-                           , 0.10605673, 0.08574208, 0.08520275, 0.07277496,
-                                 0.07269036,
-                           0.06851956
-                           , 0.13190761, 0.13190761])
-        
-        self.assert_ (allclose(hzd, bedrock_hazard))
 
     def test_hzd_do_valueII(self):
         
@@ -575,7 +538,7 @@ class Test_Exceedance(unittest.TestCase):
         hzd = hzd_do_value(new_bedrock_SA, event_activity, return_rates)
         
         # This is what it currently gives.  Seems wrong at 0.5 and 1.0
-        hzd_results = array([10., 10., 5., 7.5, 10., 0.])
+        hzd_results = array([10., 10., 10., 7.5, 5., 0.])
         #print "hzd_zeros", hzd
         #print "hzd_results", hzd_results
         self.assert_ (allclose(hzd, hzd_results))
@@ -583,17 +546,15 @@ class Test_Exceedance(unittest.TestCase):
         
     def test_hzd_do_valueIV(self):
         new_bedrock_SA = array([[10., 5., 0.]])
-        event_activity = array([1., 2., 3.])                                
+        event_activity = array([1., 2., 2.])                                
         return_rates = array([0.5, 1., 1.0000000000001, 2., 3., 
-                              3.01, 4, 5, 
-                              6, 6.00001, 7,  8])
+                              4, 5, 
+                              6, 7])
         hzd = hzd_do_value(new_bedrock_SA, event_activity, return_rates)
         
         # This is what it currently gives.  Seems wrong at 0.5 and 1.0
-        hzd_results = array([10., 10., 5., 7.5, 10., 0., 0.0])
-        #print "hzd", hzd
-        #print "hzd_results", hzd_results
-        #self.assert_ (allclose(hzd, hzd_results))
+        hzd_results = array([10., 10., 10., 7.5, 5., 2.5, 0.0, 0., 0.0])
+        self.assert_ (allclose(hzd, hzd_results))
         
         
     def test_collapse_att_model_dimension(self):
@@ -615,6 +576,7 @@ class Test_Exceedance(unittest.TestCase):
 
         self.assert_ (allclose(sum, sum_act))
         self.assert_ (sum[0, 0, 1, 3] == 7*0.2 + 15*0.3 + 23*0.5)
+        
         
     def test_collapse_att_model_dimension2(self):
         gmm = 3
