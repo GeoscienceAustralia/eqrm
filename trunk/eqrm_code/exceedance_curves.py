@@ -13,7 +13,7 @@
 from numpy import NaN
 import scipy
 from scipy import allclose, isfinite, array, newaxis, zeros, ndarray, \
-     asarray, where, concatenate, allclose, reshape, ones
+     asarray, where, concatenate, allclose, reshape, ones, interp
 
 def _collapse_att_model_dimension(data, weights):
     """
@@ -109,7 +109,7 @@ def collapse_source_gmms(data, source_model, do_collapse):
     
     return data[...,0:1,:,:,:,:]
 
-def hzd_do_value(sa, r_nu, rtrn_rte): #,hack=[0]):
+def hzd_do_value(sa, r_nu, rtrn_rte):
     """
     parrams:
     sa       [vector (nx1)] response spectral accelerations
@@ -120,15 +120,15 @@ def hzd_do_value(sa, r_nu, rtrn_rte): #,hack=[0]):
     returns:
     hzd       [vector (1xm)] hazard value for each return rate
     """
-    #n_rte = length(rtrn_rte);
-    assert isfinite(sa).all()
-    # (SAbedrock(:,I1), GET_EVNTDB_ESS_T.r_nu(Haznull));
     hzd, cumnu = _rte2cumrte(sa, r_nu) 
-    assert isfinite(hzd).all()
-    trghzd_rock_pga  = _get_rskgvnrte(hzd, cumnu, rtrn_rte)
-    assert isfinite(trghzd_rock_pga).all()
-    hzd = trghzd_rock_pga	
-    return hzd
+    # annual exceedance rate = cumulative event activity
+    # for exceedance rates larger than what we have data for, give 0.
+    # for exceedance rates smaller than what we have data for, give hzd[0].
+    if len(hzd) == 0:
+        hzd_val = zeros(rtrn_rte.shape)
+    else:
+        hzd_val = interp(rtrn_rte, cumnu, hzd, left=hzd[0], right=0.0)
+    return hzd_val
 
 
 def _rte2cumrte(each_risk, each_rte):
@@ -147,32 +147,3 @@ def _rte2cumrte(each_risk, each_rte):
     rsk = each_risk[risk_order]
     cumrte = each_rte[risk_order].cumsum()
     return rsk, cumrte
-
-
-def _get_rskgvnrte(rsk, cumrte, trgrte):
-    """
-    """
-    n_trg = len(trgrte)
-    n_rsk = len(rsk)
-    trgrsk = zeros((n_trg,), dtype=float)
-    for i in range(n_trg):
-        # default to 0 (will return 0 if desired return period is
-        # too short for the simulation.
-        trgrsk[i] = 0
-        ihgh=cumrte.searchsorted(trgrte[i])
-        # returns j such that cumrte[j-1] < trgrsk[i] <= cumrte[j]
-        # returns len(cumrte) if max(cumrte) < trgrsk[i]
-        # returns 0 if trgrsk[i] <= min(cumrte) - Note this won't happen
-        if ihgh < len(cumrte): 
-            if ihgh > 0:
-                # Linear interpolation between rsk[ihgh] and rsk[ihgh-1]
-                # at x = cumrte[ihgh] and cumrte[ihgh-1]
-                trgrsk[i] = rsk[ihgh-1] + ((rsk[ihgh] - rsk[ihgh - 1]) *
-                                       (cumrte[ihgh] - trgrte[i]) /
-                                       (cumrte[ihgh] - cumrte[ihgh - 1]))
-            else:
-                trgrsk[i] = rsk[ihgh]
-            # end if
-        #end if
-    #end for
-    return trgrsk
