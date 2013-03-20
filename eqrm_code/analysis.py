@@ -24,7 +24,7 @@ import sys
 platform = sys.platform
 
 from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
-     arange, reshape, exp, tile, intersect1d
+     arange, reshape, exp, tile, intersect1d, ravel
 
 from eqrm_code.parse_in_parameters import  \
     AttributeSyntaxError, create_parameter_data, eqrm_flags_to_control_file
@@ -1065,8 +1065,7 @@ def calc_and_save_SA(eqrm_flags,
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
             # into the events dimension.
-            bedrock_SA_close = coll_rock_SA_close_events[:,:,:,:,:,j].reshape(
-                1,-1)
+            bedrock_SA_close = ravel(coll_rock_SA_close_events[:,:,:,:,:,j])
             bedrock_hazard[site_index,j,:] = \
                 hzd_do_value(bedrock_SA_close,
                              event_act_d_close,
@@ -1074,8 +1073,7 @@ def calc_and_save_SA(eqrm_flags,
                
 
             if eqrm_flags.use_amplification is True:
-                soil_SA_events = coll_soil_SA_all_events[:,:,:,:,:,j].reshape(
-                    (-1))
+                soil_SA_events = ravel(coll_soil_SA_all_events[:,:,:,:,:,j])
                 soil_hazard[site_index,j,:] = \
                          hzd_do_value(soil_SA_events,
                                       event_act_d_events,
