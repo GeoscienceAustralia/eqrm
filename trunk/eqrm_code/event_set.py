@@ -991,10 +991,6 @@ def generate_synthetic_events_fault(fault_xml_file,
                                      r_centroid_lat,r_centroid_lon,
                                      fault_azimuth)
   
-          #FIXME DSG-EQRM the events will not to randomly placed,
-            # Due to  lat, lon being spherical coords and popolate
-            # working in x,y (flat 2D).
-        #(lat, lon) = array(fault.populate(num)).swapaxes(0, 1) 
         eqrmlog.debug('Memory: lat,lon created')
         eqrmlog.resource_usage()
             

@@ -388,15 +388,14 @@ def main(parameter_handle,
         # and remove the 'sites=all_sites[i:i+1]'.
         # and change NUM_SITES_PER_SITE_LOOP
         
-        # CAUTIONS:
+        # CAUTIONS on doing multiple sites in a loop:
         #  1.  this will run out of memory if sites*events is large.
         #  2.  this has not been tested recently
         #  3.  it absolutely will not work
         
         # A source model subset - each event reference in the source model
-        # meets the attenuation threshold criteria
-        # TODO: Can we move this outside the site loop and save to file/
-        # load from file?
+        # meets the attenuation threshold criteria i.e.
+        # This subset only has close events
         source_model_subset = source_model_threshold_distance_subset(
                                       distances,
                                       source_model,
@@ -1057,10 +1056,6 @@ def calc_and_save_SA(eqrm_flags,
         event_act_d_close = event_act_d_close.reshape(-1)
         assert coll_rock_SA_close_events.shape[3] == 1 # only one site
         
-        # Uncomment this to stop fails.
-        # The event activities for SA's that = zero should not matter though
-        # So I think this is a bug in hzd_do_value
-        #event_act_d_events[empty_event_indexes] = 0 # This stops the diff!!
         for j in xrange(len(eqrm_flags.atten_periods)):
             # Get these two arrays to be vectors.
             # The sites and spawning dimensions are flattened
