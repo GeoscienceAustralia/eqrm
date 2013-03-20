@@ -85,8 +85,6 @@ class Ground_motion_calculator(object):
 
         self.GM_spec = Ground_motion_specification(ground_motion_model_name)
 
-        # FIXME: seems like double dipping
-        #assert isinstance(periods,ndarray)
         periods = asarray(periods)
         # calc the coefficient and sigma_coefficient for the input periods
         coefficient = self.GM_spec.calc_coefficient(periods)
