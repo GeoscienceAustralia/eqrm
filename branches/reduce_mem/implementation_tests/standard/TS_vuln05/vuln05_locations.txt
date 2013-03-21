@@ -1,2 +1,0 @@
-% latitude, longitude 
--33.1425 151.5204
