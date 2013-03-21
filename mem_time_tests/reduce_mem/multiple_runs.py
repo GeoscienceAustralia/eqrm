@@ -12,11 +12,12 @@ from eqrm_code.parse_in_parameters import eqrm_data_home, get_time_user, \
      ParameterData, create_parameter_data, eqrm_flags_to_control_file
 
 from eqrm_code.analysis import main
-from mr_metalog import create_meta_log
+from eqrm_code.estimator import log_estimate_memory_use
 
 ROOTOUTPUTDIR = os.path.join(eqrm_data_home(), 'test_national', 
                                   'reduce_mem')
 
+                                  
 class ListLengthError(Exception):
     pass
     
@@ -61,7 +62,7 @@ def create_base():
     sdp.atten_smooth_spectral_acceleration = None
     
     # Amplification
-    sdp.use_amplification = False #True
+    sdp.use_amplification = True
     sdp.amp_variability_method = None
     sdp.amp_min_factor = 0.6
     sdp.amp_max_factor = 10000
@@ -81,15 +82,23 @@ def reduce_mem_standard():
     num_sources = 4
 
     sdp = create_base()
-    sdp.use_site_indexes = False
+    
+    # Too many sites and the bedrock_hazard array B gets large
+    sdp.use_site_indexes = True
     sdp.site_indexes = range(1, 17270, 10)
-    #sdp.site_indexes = range(1, 17270, 1000)
-    sdp.prob_number_of_events_in_zones =  [2000] * 4
+    
+    sdp.prob_number_of_events_in_zones =  [20000] * 4
+    
     #sdp.prob_number_of_events_in_zones =  [20] * 4
-    sdp.atten_periods =  [0.1, 0.2, 1.0]
+    
+    sdp.return_periods = [100.75, 200.0, 300.0, 400.0, 500.0, 
+    600.0, 700.0, 800.0, 900]
+    
+    sdp.atten_periods = arange(0, 3, 0.1)
     sdp.atten_spawn_bins = 5
+    sdp.atten_threshold_distance = 40
     sdp.event_control_tag = "4GMPE" 
-    dir_last  = 'reduce_mem_IMPLEMENTED_events' + str(sum(
+    dir_last  = 'amped_big_soil_events' + str(sum(
             sdp.prob_number_of_events_in_zones)) + \
             "_sites" + str(len(sdp.site_indexes))
     sdp.output_dir = os.path.join(ROOTOUTPUTDIR, dir_last)
@@ -178,8 +187,8 @@ def output_dir_basic(**kwargs):
        
 
 def test_run():
-    multi_run(reduce_mem_standard())
-    create_meta_log(path=ROOTOUTPUTDIR)
+    #multi_run(reduce_mem_standard())
+    log_estimate_memory_use(path=ROOTOUTPUTDIR)
 #-------------------------------------------------------------
 if __name__ == "__main__":
     test_run()
