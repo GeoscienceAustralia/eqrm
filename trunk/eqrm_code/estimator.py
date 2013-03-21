@@ -11,7 +11,8 @@
 from copy import copy
 from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
     PARALLELSIZE_J, TOTALMEM_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J, \
-    FINAL_J, CLOSEROCKSAE_J, CLOSERATIO_J, PEAK_J
+    FINAL_J, CLOSEROCKSAE_J, CLOSERATIO_J, PEAK_J, BEDROCKALL_J, SOILALL_J, \
+    EVENTACTIVITY_J, BEDROCKHAZ_J, SOILHAZ_J, COLLROCKSAE_J
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code.ANUGA_utilities.log_analyser import build_log_info
@@ -236,27 +237,27 @@ def estimate_mem(events,
     mem_bytes['base']["event_mem"] = 16 * events 
 
 
-    mem_bytes['base'][log.EVENTACTIVITY_J] = (spawning * gmm_after_collapsing * 
+    mem_bytes['base'][EVENTACTIVITY_J] = (spawning * gmm_after_collapsing * 
                                               rec_mod * events ) * item_size
 
     if save_hazard_map is True:
-        mem_bytes['base'][log.BEDROCKHAZ_J] = (site_block *
+        mem_bytes['base'][BEDROCKHAZ_J] = (site_block *
                                                atten_periods *
                                                return_periods) * item_size
     else:
-         mem_bytes['base'][log.BEDROCKHAZ_J] = 0
+         mem_bytes['base'][BEDROCKHAZ_J] = 0
     if save_hazard_map is True and \
            use_amplification is True:
-        mem_bytes['base'][log.SOILHAZ_J] = mem_bytes[log.BEDROCKHAZ_J]
+        mem_bytes['base'][SOILHAZ_J] = mem_bytes['base'][BEDROCKHAZ_J]
     else:
-        mem_bytes['base'][log.SOILHAZ_J] = 0
+        mem_bytes['base'][SOILHAZ_J] = 0
 
     
     # FIXME gmm_dimensions_motion hardcoded
     gmm_dimensions_motion = 1
 
     if save_motion is True:
-        mem_bytes['base'][log.BEDROCKALL_J] = (spawning * 
+        mem_bytes['base'][BEDROCKALL_J] = (spawning * 
                                                gmm_dimensions_motion * 
                                                rec_mod *
                                                site_block * events *
@@ -268,13 +269,13 @@ def estimate_mem(events,
         #print "events",events
         #print "atten_periods",atten_periods
     else:
-        mem_bytes['base'][log.BEDROCKALL_J] = 0
+        mem_bytes['base'][BEDROCKALL_J] = 0
         
     if save_motion is True and \
            use_amplification is True:
-         mem_bytes['base'][log.SOILALL_J] =  mem_bytes[log.BEDROCKALL_J]
+         mem_bytes['base'][SOILALL_J] =  mem_bytes['base'][BEDROCKALL_J]
     else:
-         mem_bytes['base'][log.SOILALL_J] = 0
+         mem_bytes['base'][SOILALL_J] = 0
 
     #if save_fatalities is True:
      #   total_fatalities = zeros((num_site_block, num_pseudo_events),
@@ -316,19 +317,19 @@ def estimate_mem(events,
                                   gmm_max * rec_mod * events) * item_size
     else:
          mem_bytes['base']['contents_loss_qw'] = 0
-    mem_bytes[BEDROCK_SA_ALL][log.COLLROCKSAE_J] = (spawning * 
+    mem_bytes[BEDROCK_SA_ALL][COLLROCKSAE_J] = (spawning * 
                                                     gmm_after_collapsing *
                                                     rec_mod *
                                                     loop_sites * events * 
                                                     atten_periods) * item_size
 
-    mem_bytes[BEDROCK_SA_CLOSE][log.CLOSEROCKSAE_J] = (spawning *
-                                                       gmm_after_collapsing *
-                                                       rec_mod *
-                                                       loop_sites * events * 
-                                                       atten_periods *
-                                                        close_ratio
-                                                       * item_size)
+    mem_bytes[BEDROCK_SA_CLOSE][CLOSEROCKSAE_J] = (spawning *
+                                                   gmm_after_collapsing *
+                                                   rec_mod *
+                                                   loop_sites * events * 
+                                                   atten_periods *
+                                                   close_ratio
+                                                   * item_size)
                                             
     #print "mem_bytes[log.COLLROCKSAE_J]",mem_bytes[log.COLLROCKSAE_J]
     if not run_type == "hazard":
@@ -345,12 +346,14 @@ def estimate_mem(events,
 
     #print " mem_bytes[log.ROCKOVERLOADED_J] ", mem_bytes[log.ROCKOVERLOADED_J] 
     if use_amplification is True:
-        mem_bytes['base']['coll_soil_SA_all_events'] = mem_bytes[
-            log.COLLROCKSAE_J]
+        mem_bytes[BEDROCK_SA_ALL]['coll_soil_SA_all_events'] = \
+            mem_bytes[BEDROCK_SA_ALL][COLLROCKSAE_J]
+        mem_bytes[BEDROCK_SA_CLOSE]['coll_soil_SA_all_events'] = \
+            mem_bytes[BEDROCK_SA_CLOSE][CLOSEROCKSAE_J]
         
         if not run_type == "hazard":
-            mem_bytes['base']['soil_SA_overloaded'] = mem_bytes[
-                log.ROCKOVERLOADED_J]
+            mem_bytes['base']['soil_SA_overloaded'] = mem_bytes['base'][
+                ROCKOVERLOADED_J]
         else:
             mem_bytes['base']['soil_SA_overloaded'] = 0
     else:
