@@ -1,0 +1,56 @@
+2012-11-23 11:30:40,263 Level 29                  analysis:156 |Logfile is './implementation_tests/current/TS_vuln05/log-0.txt' with logging level of DEBUG, console logging level is WARNING
+2012-11-23 11:30:40,263 INFO                      analysis:157 |JS*N{"parallel size": 1}
+2012-11-23 11:30:40,264 INFO                      analysis:158 |JS*N{"host name": "rhe-compute1.ga.gov.au"}
+2012-11-23 11:30:40,264 INFO                      analysis:159 |JS*N{"system platform": "linux2"}
+2012-11-23 11:30:40,265 DEBUG                     analysis:160 |JS*N{"atten_spawn_bins": 1, "csm_hysteretic_damping": null, "save_motion": true, "save_building_loss": true, "prob_azimuth_in_zones": null, "prob_number_of_mag_sample_bins": null, "run_type": "risk_mmi", "amp_min_factor": 0.59999999999999998, "save_contents_loss": false, "len_atten_periods": 4, "scenario_dip": 35, "eqrm_dir": "/nas/gemd/georisk_models/earthquake/sandpits/vanessa/eqrm/eqrm_code/..", "csm_damping_regimes": null, "vulnerability_variability_method": null, "grid_flag": 1, "scenario_max_width": 15, "len_atten_models": 1, "atten_pga_scaling_cutoff": 0.01020408163265306, "damage_extent_tag": "", "use_amplification": false, "scenario_latitude": -32.950000000000003, "csm_variability_method": 3, "use_site_indexes": false, "csm_use_variability": null, "file_array": false, "scenario_azimuth": 340, "atten_threshold_distance": 400, "site_db_tag": "", "site_indexes": null, "atten_cutoff_max_spectral_displacement": false, "scenario_number_of_events": 1, "site_tag": "vuln05", "output_dir": "./implementation_tests/current/TS_vuln05/", "scenario_depth": 11.5, "buildings_usage_classification": "HAZUS", "atten_smooth_spectral_acceleration": false, "atten_collapse_Sa_of_atten_models": true, "amp_variability_method": null, "reset_seed_using_time": true, "csm_SDcr_tolerance_percentage": null, "csm_damping_max_iterations": null, "save_hazard_map": false, "save_fatalities": false, "prob_delta_azimuth_in_zones": null, "loss_min_pga": null, "save_prob_structural_damage": false, "buildings_set_damping_Be_to_5_percent": null, "console_log_level": "info", "compress_output": false, "scenario_length": null, "use_determ_seed": true, "save_total_financial_loss": false, "prob_dip_in_zones": null, "loss_regional_cost_index_multiplier": null, "file_log_level": "debug", "event_set_handler": "generate", "csm_damping_use_smoothing": null, "csm_standard_deviation": null, "building_classification_tag": "", "csm_damping_modify_Tav": null, "fault_source_tag": null, "atten_variability_method": null, "is_scenario": true, "loss_aus_contents": null, "prob_number_of_events_in_zones": null, "console_parallel_log_level": "warning", "input_dir": "./implementation_tests/input/vulnerability/", "bridges_functional_percentages": null, "len_atten_model_weights": 1, "atten_log_sigma_eq_weight": 0, "default_input_dir": "/nas/gemd/georisk_models/earthquake/sandpits/vanessa/eqrm/eqrm_code/../resources/data", "is_parallel": true, "scenario_magnitude": 7.2000000000000002, "atten_override_RSA_shape": null, "amp_max_factor": 10000, "event_control_tag": null, "prob_number_of_events_in_faults": null, "prob_min_mag_cutoff": null, "zone_source_tag": "", "data_array_storage": "./implementation_tests/current/TS_vuln05/", "file_parallel_log_level": "warning", "len_return_periods": 14, "scenario_longitude": 151.61000000000001, "event_set_load_dir": null, "scenario_width": null}
+2012-11-23 11:30:40,375 DEBUG                     analysis:163 |Memory: Initial
+2012-11-23 11:30:40,376 DEBUG                     analysis:164 |JS*N{"initial_memory MB": 411.71484375, "initial_resident MB": 34.84375, "initial_stacksize MB": 0.3046875}
+2012-11-23 11:30:40,377 INFO                     event_set:1471|event_set_handler = generate
+2012-11-23 11:30:40,377 INFO                     event_set:1278|P0: Generating event set
+2012-11-23 11:30:40,379 DEBUG                    event_set:1407|Memory: Event activities split due to gmms.
+2012-11-23 11:30:40,380 DEBUG                    event_set:1408|JS*N{"stacksize MB": 0.3046875, "resident MB": 35.09375, "memory MB": 411.98046875}
+2012-11-23 11:30:40,381 INFO                     event_set:1431|P0: Saving event set to ./implementation_tests/current/TS_vuln05/vuln05_event_set
+2012-11-23 11:30:40,399 INFO                     event_set:1541|P0: Event set created. Number of events=1
+2012-11-23 11:30:40,399 INFO                     event_set:1542|JS*N{"len_events": 1}
+2012-11-23 11:30:40,399 DEBUG                    event_set:1543|Memory: Event Set created
+2012-11-23 11:30:40,400 DEBUG                    event_set:1544|JS*N{"stacksize MB": 0.3046875, "resident MB": 35.16015625, "memory MB": 411.98046875}
+2012-11-23 11:30:40,405 INFO                      analysis:188 |P0: Sites set created. Number of sites=1
+2012-11-23 11:30:40,405 DEBUG                     analysis:189 |Memory: Sites created
+2012-11-23 11:30:40,406 DEBUG                     analysis:190 |JS*N{"stacksize MB": 0.3046875, "resident MB": 35.28125, "memory MB": 412.109375}
+2012-11-23 11:30:40,406 INFO                      analysis:193 |JS*N{"len_max_GMPEs": 1}
+2012-11-23 11:30:40,406 INFO                      analysis:199 |JS*N{"len_recurrence_models": 1}
+2012-11-23 11:30:40,407 INFO                      analysis:208 |JS*N{"pseudo_events": 1}
+2012-11-23 11:30:40,407 DEBUG                     analysis:209 |Memory: Pseudo Event Set created
+2012-11-23 11:30:40,408 DEBUG                     analysis:210 |JS*N{"stacksize MB": 0.3046875, "resident MB": 35.2890625, "memory MB": 412.109375}
+2012-11-23 11:30:40,409 DEBUG                     analysis:244 |blocking over sites if running in parallel. block_size=1
+2012-11-23 11:30:40,409 DEBUG                     analysis:245 |JS*N{"len_block_sites": 1}
+2012-11-23 11:30:40,409 DEBUG                     analysis:248 |Number of atten_periods=4
+2012-11-23 11:30:40,410 DEBUG                     analysis:253 |JS*N{"len_SA_surfaces": 1}
+2012-11-23 11:30:40,410 DEBUG                     analysis:282 |Memory: hazard_map array created
+2012-11-23 11:30:40,411 DEBUG                     analysis:283 |JS*N{"stacksize MB": 0.3046875, "resident MB": 35.30078125, "memory MB": 412.109375}
+2012-11-23 11:30:40,411 DEBUG                     analysis:287 |JS*N{"event_activity array B": 8}
+2012-11-23 11:30:40,411 DEBUG                     analysis:300 |JS*N{"cra_spawning": 1, "cra_num_events": 1, "cra_num_rm": 1, "cra_site_block": 1, "cra_num_gmm_dimensions_motion": 1, "cra_return_periods": 14}
+2012-11-23 11:30:40,411 DEBUG                     analysis:302 |JS*N{"bedrock_all array B": 32}
+2012-11-23 11:30:40,412 DEBUG                     analysis:316 |Memory: save_motion array created
+2012-11-23 11:30:40,412 DEBUG                     analysis:317 |JS*N{"stacksize MB": 0.3046875, "resident MB": 35.30078125, "memory MB": 412.109375}
+2012-11-23 11:30:40,412 DEBUG                     analysis:352 |Memory: Created all data collection arrays.
+2012-11-23 11:30:40,413 DEBUG                     analysis:353 |JS*N{"stacksize MB": 0.3046875, "resident MB": 35.30078125, "memory MB": 412.109375}
+2012-11-23 11:30:40,413 INFO                      analysis:367 |P0: do site 1 of 1
+2012-11-23 11:30:40,413 DEBUG                     analysis:369 |Memory: site 1
+2012-11-23 11:30:40,414 DEBUG                     analysis:370 |JS*N{"looping_stacksize MB": 0.3046875, "looping_memory MB": 412.109375, "looping_resident MB": 35.30078125}
+2012-11-23 11:30:40,415 DEBUG                     analysis:859 |JS*N{"cra_num_events": 1, "cra_num_gmm_after_collapsing": 1, "cra_num_spawn": 1, "coll_rock_SA_all_events array B": 32, "cra_num_periods": 4}
+2012-11-23 11:30:40,416 DEBUG                     analysis:868 |JS*N{"rock_SA_overloaded array B": 32}
+2012-11-23 11:30:40,417 DEBUG                     analysis:1055|Memory: calc_and_save_SA before return
+2012-11-23 11:30:40,418 DEBUG                     analysis:1056|JS*N{"peak_resident MB": 35.3671875, "peak_memory MB": 412.109375, "peak_stacksize MB": 0.3046875}
+2012-11-23 11:30:40,419 DEBUG                     analysis:544 |Memory: Ended looping over sites
+2012-11-23 11:30:40,419 DEBUG                     analysis:545 |JS*N{"stacksize MB": 0.3046875, "resident MB": 35.3671875, "memory MB": 412.109375}
+2012-11-23 11:30:40,419 INFO                      analysis:555 |JS*N{"time_pre_site_loop_fraction": 0.7999999999999996}
+2012-11-23 11:30:40,420 INFO                      analysis:558 |event_loop_time (excluding file saving) 0:00:00.050000 hr:min:sec
+2012-11-23 11:30:40,420 INFO                      analysis:560 |JS*N{"event_loop_time_seconds": 0.049999999999999933}
+2012-11-23 11:30:40,429 INFO                      analysis:783 |On node 0, rhe-compute1.ga.gov.au clock (processor) time taken overall 0:00:00.050000 hr:min:sec.
+2012-11-23 11:30:40,429 INFO                      analysis:785 |JS*N{"clock_time_taken_overall_seconds": 0.049999999999999933}
+2012-11-23 11:30:40,430 INFO                      analysis:792 |On node 0, rhe-compute1.ga.gov.au wall time taken overall 0:00:00.174010 hr:min:sec.
+2012-11-23 11:30:40,430 INFO                      analysis:793 |JS*N{"wall_time_taken_overall_seconds": 0.17401003837585449}
+2012-11-23 11:30:40,430 INFO                      analysis:794 |On node 0, rhe-compute1.ga.gov.au wall time taken overall 0:00:00.174010 hr:min:sec.
+2012-11-23 11:30:40,430 DEBUG                     analysis:798 |Memory: End
+2012-11-23 11:30:40,431 DEBUG                     analysis:799 |JS*N{"final_memory MB": 412.109375, "final_resident MB": 35.38671875, "final_stacksize MB": 0.3046875}
