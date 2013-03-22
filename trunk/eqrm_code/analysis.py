@@ -889,10 +889,9 @@ def calc_and_save_SA(eqrm_flags,
         rock_SA_overloaded = None
 
     if eqrm_flags.use_amplification is True:
-        coll_soil_SA_all_events = zeros(
-            (num_spawn, num_gmm_after_collapsing, num_rm, num_sites, num_events,
-             len(eqrm_flags.atten_periods)),
-            dtype=float)
+        coll_soil_SA_close_events = zeros(
+            (num_spawn, num_gmm_after_collapsing, num_rm, num_sites, 
+            num_close_events, num_periods), dtype=float)
     
         if not eqrm_flags.run_type == "hazard":
             soil_SA_overloaded = zeros((num_sites,
@@ -1011,8 +1010,9 @@ def calc_and_save_SA(eqrm_flags,
                                                           collapsed_bedrock_SA
             if soil_SA is not None:
                 # Build collapsed_soil_SA for all events
-                coll_soil_SA_all_events[:, :gmm_n, :, :, event_inds, :] = \
-                                                          collapsed_soil_SA
+                coll_soil_SA_close_events[:, :gmm_n, :, :, s_evnti:e_evnti, :] \
+                    = collapsed_soil_SA
+                    
         # Set up the arrays to pass to risk
         # This is built up as sources are iterated over.
         # assume one site
@@ -1045,7 +1045,6 @@ def calc_and_save_SA(eqrm_flags,
 
     #End source loop
     
-    
     # Compute hazard if desired
     if eqrm_flags.save_hazard_map is True:
         # event_activity.event_activity is [spawns, gmm, rec_models,
@@ -1067,17 +1066,14 @@ def calc_and_save_SA(eqrm_flags,
                              1.0/array(eqrm_flags.return_periods))
                
 
-            if eqrm_flags.use_amplification is True:
-                soil_SA_events = ravel(coll_soil_SA_all_events[:,:,:,:,:,j])
+            if eqrm_flags.use_amplification is True:              
+                soil_SA_close = ravel(coll_soil_SA_close_events[:,:,:,:,:,j])
                 soil_hazard[site_index,j,:] = \
-                         hzd_do_value(soil_SA_events,
-                                      event_act_d_events,
-                                      1.0/array(eqrm_flags.return_periods))
-
-        
+                    hzd_do_value(soil_SA_close, event_act_d_close,
+                                 1.0/array(eqrm_flags.return_periods))
+                                 
     log.debug('Memory: calc_and_save_SA before return')
-    log.resource_usage(tag=log.PEAK_J)
-                
+    log.resource_usage(tag=log.PEAK_J)       
     return soil_SA_overloaded, rock_SA_overloaded
     
 def amp_rescale(soil_SA,
