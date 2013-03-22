@@ -99,7 +99,7 @@ class Damage_model(object):
             beta_nsd_d = (beta_th_nsd_d**2+csm_standard_deviation**2)**(0.5)
             beta_nsd_a = (beta_th_nsd_a**2+csm_standard_deviation**2)**(0.5)
         elif (csm_use_variability is True):	#normal case:
-            beta_sd = beta_th_sd
+            beta_sd = beta_th_sd # This does nothing
             beta_nsd_d = beta_th_nsd_d
             beta_nsd_a = beta_th_nsd_a
   #warning: this option will cause divide by zero warnings in make_fragility.m
@@ -127,6 +127,7 @@ class Damage_model(object):
         structure_state = state_probability(threshold, beta_th_sd, SD)
         # The above could be a typo.  Is this what we want?
         # It will change scenario results.
+        # Is it beta_sd or beta_th_sd that we want?
 
         threshold = building_parameters['drift_threshold']
         threshold = threshold[:,newaxis,:]
@@ -272,7 +273,7 @@ def reduce_cumulative_to_pdf(p):
     p[...,:-1] -= p[...,1:]
 
 
-def cumulative_state_probability(threshold, beta,value):
+def cumulative_state_probability(threshold, beta, value):
     """Fragility curve calculation EQRM manual 7.8
     (Note eqn in manual is wrong.  Is is correct here.)
 
@@ -296,28 +297,8 @@ def cumulative_state_probability(threshold, beta,value):
                               peak spectrial acceleration or
           for bridges - spectral acceleration at t = 1 sec
     """
-
-    #value = -value
-    # Pr11 = normcdf2(1/THE_VUN_T.('beta_nsd_d')*log(SDcrAll./Thresh))
-
-    # function y = normcdf(x);
-    # Glenn Fulford: 6/3/02.
-    # cumulative normal distribution function
-    # root2 = sqrt(2);
-    # y = 0.5*(1+erf(x/root2));
-
-    """
-    #Straight from matlab:
-
-    x=(1/beta)*log(value/threshold)
-    from scipy import sqrt
-    from scipy.special import erf
-    return 0.5*(1+erf(x/sqrt(2)))
-    """
     
-    oldsettings = seterr(divide='ignore')
     temp = (1/beta)*log(value/threshold)
-    seterr(**oldsettings)
 
     return norm.cdf(temp)
 
