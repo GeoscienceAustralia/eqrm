@@ -98,7 +98,7 @@ def reduce_mem_standard():
     sdp.atten_spawn_bins = 5
     sdp.atten_threshold_distance = 40
     sdp.event_control_tag = "4GMPE" 
-    dir_last  = 'amped_big_soil_events' + str(sum(
+    dir_last  = 'amped_close_soil_events' + str(sum(
             sdp.prob_number_of_events_in_zones)) + \
             "_sites" + str(len(sdp.site_indexes))
     sdp.output_dir = os.path.join(ROOTOUTPUTDIR, dir_last)
@@ -187,7 +187,7 @@ def output_dir_basic(**kwargs):
        
 
 def test_run():
-    #multi_run(reduce_mem_standard())
+    multi_run(reduce_mem_standard())
     log_estimate_memory_use(path=ROOTOUTPUTDIR)
 #-------------------------------------------------------------
 if __name__ == "__main__":
