@@ -23,7 +23,8 @@ import os, shutil
 
 from scipy import asarray, transpose, array, r_, concatenate, sin, cos, pi, \
      ndarray, absolute, allclose, zeros, ones, float32, int32, float64, \
-     int64, reshape, arange, append, radians, where, minimum, seterr
+     int64, reshape, arange, append, radians, where, minimum, seterr, \
+     float16
 from numpy import random
 
 from eqrm_code.ANUGA_utilities import log
@@ -46,8 +47,10 @@ from eqrm_code import file_store
 # This was investigated to save memory
 # Float32 gives differnet results between windows and linux
 # therefore let's not use it.
-EVENT_FLOAT = float64 #float32
+EVENT_FLOAT = float64 #float32 # float16 #
 EVENT_INT = int64 #int32
+# Changing this to float32 didn't reduce the memory used
+# Changing at float16 caused assert errors.  Didn't get the memory saving
 
 class Event_Set(file_store.File_Store):
     def __init__(self, 
