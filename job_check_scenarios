@@ -1,4 +1,5 @@
 #!/bin/bash
+#PBS -m e
 #PBS -wd 
 #PBS -q express
 #PBS -l walltime=0:45:00
