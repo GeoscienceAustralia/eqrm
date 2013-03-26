@@ -164,6 +164,7 @@ def main(parameter_handle,
     log.log_svn()
     log.debug('Memory: Initial')
     log.resource_usage(tag=log.INITIAL_J)
+    log.log_iowait()
     
     # load event set data
     (event_set, event_activity, source_model) = create_event_set(eqrm_flags, 
@@ -1098,7 +1099,11 @@ def calc_and_save_SA(eqrm_flags,
     log.resource_usage(tag=log.PEAK_J,
                        logs_per_scenario=logs_per_scenario_con,
                        site=rel_site_index,
-                       sites=num_site_block)       
+                       sites=num_site_block)  
+    
+    log.log_iowait(logs_per_scenario=logs_per_scenario_con,
+                       site=rel_site_index,
+                       sites=num_site_block)     
     return soil_SA_overloaded, rock_SA_overloaded
     
 def amp_rescale(soil_SA,
