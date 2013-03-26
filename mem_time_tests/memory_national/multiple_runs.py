@@ -145,16 +145,21 @@ def old_max_simulation():
     sdp.use_amplification = True
     sdp.atten_spawn_bins = 1
     sites = 160
+    sites = 1600
     sdp.file_parallel_log_level = 'debug'
     ###
     events_source = events/num_sources
     sdp.prob_number_of_events_in_zones = [events_source]*num_sources
     sdp.use_site_indexes = True
     setof15k = sites/15000
-    sdp.site_indexes = range(1, 15001) * setof15k
+    if setof15k > 0:
+        sdp.site_indexes = range(1, 15001) * setof15k
+    else:
+        sdp.site_indexes = range(1, sites)
+    
     print "len(sdp.site_indexes)", len(sdp.site_indexes)
     sdp.event_control_tag = "4GMPE" 
-    dir_last  = 'old_max_sim_again_' + str(sum(
+    dir_last  = 'old_max_sim_test_' + str(sum(
             sdp.prob_number_of_events_in_zones)) + \
             "_sites" + str(len(sdp.site_indexes))
     sdp.output_dir = os.path.join(eqrm_data_home(), 'test_national', 
