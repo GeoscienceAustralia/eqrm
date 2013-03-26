@@ -63,6 +63,7 @@ from eqrm_code.fatalities import forecast_fatality
 from eqrm_code.filters import source_model_threshold_distance_subset
 from eqrm_code.analysis_data import Analysis_Data
 
+logs_per_scenario_con = 10
 
 def main(parameter_handle,
          use_determ_seed=True,
@@ -363,13 +364,20 @@ def main(parameter_handle,
          
     
     for i in xrange(num_site_block):
+        rel_i = i #- parallel.lo
         msg = 'P%i: do site ' % parallel.rank + str(i+1) + ' of ' + \
             str(num_site_block)
-        log.info(msg)
+        log.info(msg, logs_per_scenario=logs_per_scenario_con, site=rel_i,
+                      sites=num_site_block)
         
-        log.debug('Memory: site ' + str(i+1))
-        log.resource_usage(tag=log.LOOPING_J)
-        rel_i = i #- parallel.lo
+        log.debug('Memory: site ' + str(i+1), 
+                  logs_per_scenario=logs_per_scenario_con, 
+                  site=rel_i,
+                  sites=num_site_block)
+        log.resource_usage(tag=log.LOOPING_J, 
+                  logs_per_scenario=logs_per_scenario_con, 
+                  site=rel_i,
+                  sites=num_site_block)
 
         sites = all_sites[i:i+1] # take site i
         distances = sites.distances_from_event_set(event_set)
@@ -416,7 +424,8 @@ def main(parameter_handle,
             ground_motion_distribution,
             amp_distribution,
             event_activity,
-            source_model_subset)
+            source_model_subset, 
+            num_site_block)
         
         # soil_SA and bedrock_SA dimensions
         # (num_sites, num_events*num_gmm_max*num_spawn*num_rm, num_periods)
@@ -818,12 +827,13 @@ def calc_and_save_SA(eqrm_flags,
                      bedrock_hazard,
                      soil_hazard,
                      soil_amplification_model,
-                     site_index,
+                     site_index, # FIXME = rel_site_index therefore remove
                      rel_site_index,
                      ground_motion_distribution,
                      amp_distribution,
                      event_activity,
-                     source_model):
+                     source_model, 
+                     num_site_block):
     """
     Calculate the spectral acceleration, in g, for both bedrock and soil.
 
@@ -837,6 +847,7 @@ def calc_and_save_SA(eqrm_flags,
       soil_SA_overloaded, 
       rock_SA_overloaded
     """
+    
     num_spawn = event_activity.get_num_spawn()
     num_rm = event_activity.recurrence_model_count()
 
@@ -871,10 +882,16 @@ def calc_and_save_SA(eqrm_flags,
                "cra_num_gmm_after_collapsing":num_gmm_after_collapsing,
                "cra_close_events_fraction":num_close_events/float(num_events)}
     log.log_json(log_dic,
-                 log.DEBUG)
+                 log.DEBUG,
+                 logs_per_scenario=logs_per_scenario_con,
+                 site=rel_site_index,
+                 sites=num_site_block)
                  
     log_dic = {log.CLOSERATIO_J: num_close_events/float(num_events)}
-    log.log_json(log_dic, log.DEBUG)
+    log.log_json(log_dic, log.DEBUG,
+                 logs_per_scenario=logs_per_scenario_con,
+                 site=rel_site_index,
+                 sites=num_site_block)
                  
     if not eqrm_flags.run_type == "hazard":
         rock_SA_overloaded = zeros((num_sites,
@@ -884,7 +901,9 @@ def calc_and_save_SA(eqrm_flags,
                                    dtype=float)
 
         log.log_json({log.ROCKOVERLOADED_J: rock_SA_overloaded.nbytes},
-                     log.DEBUG)
+                     log.DEBUG, logs_per_scenario=logs_per_scenario_con,
+                      site=rel_site_index,
+                      sites=num_site_block)
     else:
         rock_SA_overloaded = None
 
@@ -1072,8 +1091,14 @@ def calc_and_save_SA(eqrm_flags,
                     hzd_do_value(soil_SA_close, event_act_d_close,
                                  1.0/array(eqrm_flags.return_periods))
                                  
-    log.debug('Memory: calc_and_save_SA before return')
-    log.resource_usage(tag=log.PEAK_J)       
+    log.debug('Memory: calc_and_save_SA before return',
+              logs_per_scenario=logs_per_scenario_con,
+              site=rel_site_index,
+              sites=num_site_block)
+    log.resource_usage(tag=log.PEAK_J,
+                       logs_per_scenario=logs_per_scenario_con,
+                       site=rel_site_index,
+                       sites=num_site_block)       
     return soil_SA_overloaded, rock_SA_overloaded
     
 def amp_rescale(soil_SA,

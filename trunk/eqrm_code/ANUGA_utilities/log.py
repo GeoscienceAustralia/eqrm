@@ -434,16 +434,18 @@ def _log_exception_hook(type, value, tb):
 # Shortcut routines to make for simpler user code.
 ################################################################################
 
-def debug(msg=''):
+def debug(msg='', logs_per_scenario=None, site=None, sites=None):
     """Shortcut for log(DEBUG, msg)."""
 
-    log(msg, logging.DEBUG)
+    infrequent_log(msg, logging.DEBUG, logs_per_scenario=logs_per_scenario,
+                   site=site, sites=sites)
 
 
-def info(msg=''):
+def info(msg='', logs_per_scenario=None, site=None, sites=None):
     """Shortcut for log(INFO, msg)."""
 
-    log(msg, logging.INFO)
+    infrequent_log(msg, logging.INFO, logs_per_scenario=logs_per_scenario,
+                   site=site, sites=sites)
 
 
 def warning(msg=''):
@@ -463,7 +465,35 @@ def critical(msg=''):
     
     log(msg, logging.CRITICAL)
 
-def log_json(dic, level):
+def infrequent_log(msg, level, logs_per_scenario=None, site=None, sites=None):
+    """
+    Ocassionally log info.
+    
+    paras:
+    msg: The log message
+    level: The log level.
+    logs_per_scenario: In the site loop, how many times you want to log
+        site info.
+    site: This site number
+    sites: The number of sites
+    """
+    if logs_per_scenario is None or site is None or sites is None:
+        log(msg, level)
+    elif should_log(logs_per_scenario, site, sites):
+        log(msg, level)
+
+def should_log(logs_per_scenario, site, sites):
+    step = int(round(float(sites)/logs_per_scenario))
+    if step == 0: # stop div by zero errors.
+        step = 1
+    if site%step == 0:
+        return True
+    else:
+        return False
+    
+    
+        
+def always_log_json(dic, level):
     """
     Convert a dictionary to a log message with the end of the message
     using the JSON format.
@@ -471,20 +501,42 @@ def log_json(dic, level):
     msg = DELIMITER_J + json.dumps(dic)
     log(msg, level)
     
+def log_json(dic, level, logs_per_scenario=None, site=None, sites=None):
+    """
+    Convert a dictionary to a log message with the end of the message
+    using the JSON format.
+    
+    paras:
+    dic: the dictionary to convert to JSON format
+    level: The log level.
+    logs_per_scenario: In the site loop, how many times you want to log
+        site info.
+    site: This site number
+    sites: The number of sites
+    """
+    if logs_per_scenario is None or site is None or sites is None:
+        always_log_json(dic, level)
+    elif should_log(logs_per_scenario, site, sites):
+        always_log_json(dic, level)
+            
 
-def resource_usage(level=logging.DEBUG, tag=None):
+def resource_usage(level=logging.DEBUG, tag=None, logs_per_scenario=None, 
+                   site=None, sites=None):
     dic = _calc_resource_usage_mem()
     if tag is not None:
         new_dic = {}
         for k, v in dic.iteritems():
             new_dic[str(tag) + k] = v
         dic = new_dic
-    log_json(dic, level)
+    log_json(dic, level, logs_per_scenario=logs_per_scenario,
+                   site=site, sites=sites)
    
     
-def log_iowait(level=logging.DEBUG):  
+def log_iowait(level=logging.DEBUG, tag=None, logs_per_scenario=None, 
+                   site=None, sites=None):  
     iowait = _calc_io_wait()
-    log_json(iowait, level)
+    log_json(iowait, level, logs_per_scenario=logs_per_scenario,
+                   site=site, sites=sites)
    
    
 def log_svn(level=logging.INFO):  
@@ -492,6 +544,7 @@ def log_svn(level=logging.INFO):
     svn_dic = {SVNVERSION_J:version,
                SVNDATE_J:date,
                SVNMODIFIED_J: modified}
+    log_json(svn_dic, level)
     
     
 def _eqrm_flags_simple(dic):
