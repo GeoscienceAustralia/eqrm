@@ -18,7 +18,8 @@ from numpy.lib.format import open_memmap
 # 'npy'      - numpy native binary format (1 file per attribute per Event_Set)
 # None       - in memory
 #
-SAVE_METHOD = 'npy'
+#SAVE_METHOD = 'npy'
+SAVE_METHOD = None
 if sys.platform == 'win32':
     SAVE_METHOD = None
 
