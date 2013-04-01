@@ -96,6 +96,10 @@ DefaultFileLogLevel = logging.DEBUG
 
 # Terms used in the json dictionary
 IOWAIT_J = 'iowait %'
+USERCPU_J = 'user %'
+SYSTCPU_J = 'system %'
+IDLECPU_J = 'idle %'
+SERVICECPU_J = 'servicing %'
 MEM_J = 'memory MB'
 RESMEM_J = 'resident MB'
 STACKSIZE_J = 'stacksize MB'
@@ -588,15 +592,21 @@ def _calc_io_wait():
 
     user_n, nice_n, syst_n, idle_n, wait_n, irq_n, sirq_n = _proc_stat()
 
-    user_d = user_n - user
-    nice_d = nice_n - nice
-    syst_d = syst_n - syst
-    idle_d = idle_n - idle
-    wait_d = wait_n - wait
-    irq_d = irq_n - irq
-    sirq_d = sirq_n - sirq
+
+
+
+
+
+
+    user_d = user_n - user # user: normal processes executing in user mode
+    nice_d = nice_n - nice # nice: niced processes executing in user mode
+    syst_d = syst_n - syst # system: processes executing in kernel mode
+    idle_d = idle_n - idle # idle: twiddling thumbs
+    wait_d = wait_n - wait # iowait: waiting for I/O to complete
+    irq_d = irq_n - irq # irq: servicing interrupts
+    sirq_d = sirq_n - sirq # softirq: servicing softirqs
     
-    cact = user_d + syst_d + nice_d 
+    #cact = user_d + syst_d + nice_d 
     ctot = user_d + nice_d + syst_d + idle_d + wait_d + irq_d + sirq_d 
 
     user = user_n
@@ -607,10 +617,19 @@ def _calc_io_wait():
     irq = irq_n
     sirq = sirq_n
     if ctot == 0.0:
-        wcpu = None
+        waitcpu = None
+        usercpu = None
+        systcpu = None
+        idlecpu = None
+        servicecpu = None
     else:
-        wcpu = wait_d/ctot*100
-    return {IOWAIT_J: wcpu}
+        waitcpu = round(wait_d/ctot*100)
+        usercpu = round((user_d + nice_d)/ctot*100)
+        systcpu = round(syst_d/ctot*100)
+        idlecpu = round(idle_d/ctot*100)
+        servicecpu = round((irq_d + sirq_d)/ctot*100)
+    return {IOWAIT_J: waitcpu, USERCPU_J:usercpu, SYSTCPU_J:systcpu, 
+            IDLECPU_J:idlecpu, SERVICECPU_J: servicecpu}
     
 
 def _calc_resource_usage_mem():
