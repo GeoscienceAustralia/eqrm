@@ -790,6 +790,7 @@ def main(parameter_handle,
     # Let's stop all the programs at the same time
     # Needed when scenarios are in series.
     # This was hanging nodes, when using mpirun
+    log.log_iowait() 
     clock_time_taken_overall = (time.clock() - t0_clock)
     wall_time_taken_overall = (time.time() - t0_time)
     msg = "On node %i, %s clock (processor) time taken overall %s hr:min:sec." % \
@@ -1100,10 +1101,7 @@ def calc_and_save_SA(eqrm_flags,
                        logs_per_scenario=logs_per_scenario_con,
                        site=rel_site_index,
                        sites=num_site_block)  
-    
-    log.log_iowait(logs_per_scenario=logs_per_scenario_con,
-                       site=rel_site_index,
-                       sites=num_site_block)     
+        
     return soil_SA_overloaded, rock_SA_overloaded
     
 def amp_rescale(soil_SA,
