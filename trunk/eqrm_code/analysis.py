@@ -164,7 +164,6 @@ def main(parameter_handle,
     log.log_svn()
     log.debug('Memory: Initial')
     log.resource_usage(tag=log.INITIAL_J)
-    log.log_iowait()
     
     # load event set data
     (event_set, event_activity, source_model) = create_event_set(eqrm_flags, 

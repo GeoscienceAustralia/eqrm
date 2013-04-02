@@ -2,6 +2,7 @@ import sys
 import os
 import re
 import csv
+import ConfigParser
 
 
 try:
@@ -123,6 +124,11 @@ def write_meta_log(log_pairs, output_file):
         writer.writerow(pair)
         
     han.close()
+    
+def add_nci_info2log():
+    """
+    Add info from an NCI .vu-pb.OU (standard out) file. 
+    """
 
 ####################################################
 if __name__ == '__main__':

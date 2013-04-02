@@ -122,6 +122,34 @@ class logAnalyserCase(unittest.TestCase):
         os.rmdir(root_dir)
 
 
+    def test_add_nci_info2log(self):
+        # get a temporary file
+        (handle, filename) = tempfile.mkstemp('.vu-pb.OU','test_estimator')
+        dummy_nci_info = """
+=============================================================================
+                                     Resource usage:
+                                       CPU time:              00:00:50
+   JobId:      88518.vu-pbs            Elapsed time:          00:00:17
+   Project:             w84            Requested time:        00:10:00
+   Service Units:      0.04 
+                                       Max physical memory:      433MB
+                                       Max virtual memory:      1697MB
+                                       Requested memory:       10000MB
+
+                                       Number of cpus:               8
+
+                                       Max jobfs disk use:       0.0GB
+                                       Requested jobfs:          0.1GB
+=============================================================================
+"""
+        f = open(filename, 'wb')
+        f.write(dummy_nci_info)
+        f.close()
+        
+       #with open(filename, 'r') as fin:
+        #    print fin.read()
+        
+        
 
 
 ################################################################################
