@@ -1,6 +1,8 @@
 import os
 import unittest
 import numpy
+import tempfile
+
 from eqrm_code.estimator import *
 from eqrm_code import file_store
 from eqrm_code.parse_in_parameters import ParameterData, create_parameter_data
@@ -115,6 +117,8 @@ class Test_estimator(unittest.TestCase):
         
         file_store.DATA_DIR = None
 
+        
+    
 ################################################################################
 
 if __name__ == "__main__":
