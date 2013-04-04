@@ -128,6 +128,7 @@ def main(parameter_handle,
 
     # Make the output dir, if it is not present
     if parallel.rank == 0:
+        #print "Creating last directory, processor", parallel.rank
         add_last_directory(eqrm_flags.output_dir)
         
     # copy input parameter file to output directory.
