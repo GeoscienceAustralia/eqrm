@@ -39,6 +39,7 @@ def analyse_log(path, output_file, log_file=LOGFILETAG):
     if log_pairs is not None:
         write_meta_log(log_pairs, output_file)
 
+        
 def merge_dicts(d1, d2, merge=lambda x,y:max(x,y)):
     """
     Merges two dictionaries, non-destructively, combining 
@@ -72,6 +73,7 @@ def merge_dicts(d1, d2, merge=lambda x,y:max(x,y)):
             result[k] = v
     return result
    
+   
 def read_log_json(a_file):
     """
     Parse the json info in the log file and return a dictionary of the info
@@ -89,6 +91,7 @@ def read_log_json(a_file):
                 # raise error
                 pass
     return alog
+         
          
 def build_log_info(path, log_file=LOGFILETAG):
     """
@@ -111,6 +114,7 @@ def build_log_info(path, log_file=LOGFILETAG):
                     log_pairs.append(alog)
     return log_pairs
   
+  
 def write_meta_log(log_pairs, output_file):
     """Write the info from the log files to a file
     
@@ -132,21 +136,14 @@ def write_meta_log(log_pairs, output_file):
     writer.writerow(dict(zip(sorted_all_keys, sorted_all_keys)))
     
     for pair in log_pairs:
-        writer.writerow(pair)
-        
+        writer.writerow(pair)       
     han.close()
+    
     
 def add_nci_info2log(path, log_file_tag=LOGFILETAG, nci_file_tag=NCIEFILETAG):
     """
     Add info from an NCI .vu-pb.OU (standard out) file to a log file. 
-    
-    - how best to fold the nci info into the log?
-- before the log reading process.
-- Add a flag so the info only gets folded in once.
-How to know the correct file to fold in? assume it is the last file that
- ends with .vu-pb.OU. 
-Then what?
-Grab all of this?
+    Assumes the log and nci file are in the same directory.
 
     """
     nci_log_pairs = find_nci_log_pairs(path, log_file_tag, nci_file_tag)
@@ -166,16 +163,19 @@ def colon_time2sec(colon_time):
     converting-a-time-string-to-seconds-in-python
     """
     x = time.strptime(colon_time,'%H:%M:%S')
-    delta = datetime.timedelta(hours=x.tm_hour,minutes=x.tm_min,seconds=x.tm_sec)
+    delta = datetime.timedelta(hours=x.tm_hour,minutes=x.tm_min,
+                               seconds=x.tm_sec)
     return delta.total_seconds()
 
         
 def get_nci_value_pairs(nci_e_file):
     """
-    Parse the NCI output. Add units to the keys.  Remove the units from the values.
+    Parse the NCI output. Add units to the keys.  Remove the units
+    from the values.
     
     Returns:
-      A dictionary of NCI info, such as 'CPU time (sec)' and 'JobId', with values.
+      A dictionary of NCI info, such as 'CPU time (sec)' and 'JobId', 
+      with values.
       OR
       {} if it can't find the '=======================' to signify nci data.
     """
@@ -205,7 +205,8 @@ def get_nci_value_pairs(nci_e_file):
     job_split = nci_info[2].split('Project:')
     nci_dic['Project'] = job_split[1][:26].strip()
     
-    nci_mapping = [(0, 'CPU time:'), (1, 'Elapsed time:'), (2, 'Requested time:')] 
+    nci_mapping = [(0, 'CPU time:'), (1, 'Elapsed time:'), 
+                   (2, 'Requested time:')] 
     for pair in nci_mapping:
         a_split = nci_info[pair[0]].split(pair[1])
         nci_dic[pair[1][:-1] + ' (sec)'] = colon_time2sec(a_split[1].strip())
@@ -217,11 +218,10 @@ def get_nci_value_pairs(nci_e_file):
             value = a_split[1].strip()
             if value[-2:] == 'GB' or  value[-2:] == 'MB':
                 unit = value[-2:]
-                nci_dic[a_split[0].strip() + ' (' + unit + ')'] = float(value[:-2])
+                nci_dic[a_split[0].strip() + ' (' + unit + ')'] = \
+                    float(value[:-2])
             else:
-                nci_dic[a_split[0].strip()] = float(value)
-    
-    
+                nci_dic[a_split[0].strip()] = float(value)    
     return nci_dic
             
             

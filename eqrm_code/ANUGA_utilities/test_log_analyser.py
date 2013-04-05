@@ -20,7 +20,8 @@ except ImportError:
         print "Install simplejson, or use Python2.6 or greater."
         import sys; sys.exit(1)
         
-from log_analyser import analyse_log, merge_dicts, LOGFILETAG, add_nci_info2log, \
+from eqrm_code.ANUGA_utilities.log_analyser import analyse_log, merge_dicts, \
+    LOGFILETAG, add_nci_info2log, \
     newest_file_in_list, get_nci_value_pairs, colon_time2sec
     
 from eqrm_code.ANUGA_utilities.log import DELIMITER_J
