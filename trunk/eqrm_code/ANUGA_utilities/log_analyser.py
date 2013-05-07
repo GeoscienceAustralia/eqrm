@@ -219,7 +219,9 @@ def get_nci_value_pairs(nci_e_file):
                 nci_dic[a_split[0].strip() + ' (' + unit + ')'] = \
                     float(value[:-2])
             else:
-                nci_dic[a_split[0].strip()] = float(value)    
+                nci_dic[a_split[0].strip()] = float(value)
+    if 'Number of cpus' not in nci_dic:
+         nci_dic['Number of cpus'] = 1
     return nci_dic
             
             

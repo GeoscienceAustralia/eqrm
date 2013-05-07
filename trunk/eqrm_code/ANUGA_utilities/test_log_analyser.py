@@ -62,7 +62,24 @@ DUMMY_NCI2_DATA = """
                                        Requested jobfs:          0.1GB
 =============================================================================
 """
-   
+DUMMY_NCI2_DATA = """
+=============================================================================
+                                     Resource usage:
+                                       CPU time:              00:00:55
+   JobId:      88518.vu-pbs            Elapsed time:          00:00:17
+   Project:             w84            Requested time:        00:10:00
+   Service Units:      0.04 
+                                       Max physical memory:      433MB
+                                       Max virtual memory:      1697MB
+                                       Requested memory:       10000MB
+
+                                       Number of cpus:               8
+
+                                       Max jobfs disk use:       0.0GB
+                                       Requested jobfs:          0.1GB
+=============================================================================
+"""
+
 DUMMY_LOG_DATA = """
 2013-04-02 13:40:57,720 DEBUG                     analysis:154 |Logfile is './half_sites_output/Bhalf_timing_p16_i0/log-0.txt' with logging level of DEBUG, console logging level is INFO
 2013-04-02 13:40:57,737 INFO                      analysis:158 |Logfile is './half_sites_output/Bhalf_timing_p16_i0/log-0.txt' with logging level of DEBUG, console logging level is INFO
@@ -385,6 +402,7 @@ class logAnalyserCase(unittest.TestCase):
                   'Max physical memory (MB)':74,
                   'Max virtual memory (MB)':230, 
                   'Requested memory (MB)':1000,
+                  'Number of cpus':1,
                   'Max jobfs disk use (GB)':0.0,
                   'Requested jobfs (GB)':0.1}
         self.assertItemsEqual(nci_dic, actual)
@@ -392,6 +410,7 @@ class logAnalyserCase(unittest.TestCase):
             self.assertEqual(nci_dic[key], actual[key])
         os.remove(filename) 
         
+         
     def test_colon_time2sec(self):
         self.assertEqual(colon_time2sec('00:01:04'), 64)
         self.assertEqual(colon_time2sec('01:01:04'), 3664)
