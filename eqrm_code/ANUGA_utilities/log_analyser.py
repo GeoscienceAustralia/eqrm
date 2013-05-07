@@ -268,7 +268,6 @@ def find_nci_log_pairs(path, log_file_tag, nci_file_tag):
             
         for a_file in files_dirs:
             if nci_file_tag in a_file:
-                print "Found one"
                 nci_file = os.path.join(dir_with_log, a_file)
                 nci_files.append(nci_file)
         if not nci_files == []:
