@@ -147,10 +147,8 @@ def add_nci_info2log(path, log_file_tag=LOGFILETAG, nci_file_tag=NCIEFILETAG):
 
     """
     nci_log_pairs = find_nci_log_pairs(path, log_file_tag, nci_file_tag)
-    print "!!! nci_log_pairs",nci_log_pairs 
     for log_file, nci_file in nci_log_pairs:
         nci_dic = get_nci_value_pairs(nci_file)
-        print "!!! nci_dic", nci_dic
         with open(log_file, "a") as myfile:
             myfile.write(DELIMITER_J + json.dumps(nci_dic))
         
@@ -254,7 +252,6 @@ def find_nci_log_pairs(path, log_file_tag, nci_file_tag):
         for a_file in files:
             if log_file_tag in a_file: 
                 dirs_with_logs.append([path, a_file])
-    print "!!!  dirs_with_logs", dirs_with_logs
     # assume one log file in each dir
     # multiple nci_files may be in a log dir
     nci_log_pairs = []
@@ -270,13 +267,10 @@ def find_nci_log_pairs(path, log_file_tag, nci_file_tag):
             continue 
             
         for a_file in files_dirs:
-            print "!!! a_file", a_file
-            print "!!! nci_file_tag", nci_file_tag
             if nci_file_tag in a_file:
                 print "Found one"
                 nci_file = os.path.join(dir_with_log, a_file)
                 nci_files.append(nci_file)
-        print '!!! nci_files', nci_files
         if not nci_files == []:
             nci_file = newest_file_in_list(nci_files)
             nci_log_pairs.append((log_file, nci_file))
