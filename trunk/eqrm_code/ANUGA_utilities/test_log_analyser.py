@@ -9,6 +9,9 @@ import tempfile
 import csv
 import difflib
 import shutil
+import time
+
+from eqrm_code import util
 
 try:
     import json
@@ -122,6 +125,13 @@ class logAnalyserCase(unittest.TestCase):
         if first != second:
             message = ''.join(difflib.ndiff(first.splitlines(True),
                                                 second.splitlines(True)))
+#             print "first", first
+#             print "second", second
+#             for fir, sec in zip( first, second):
+#                 if fir != sec:
+#                     print "fir", fir
+#                     print "sec", sec
+                
             if msg:
                 message += " : " + msg
             self.fail("Multi-line strings are unequal:\n" + message)
@@ -219,7 +229,6 @@ class logAnalyserCase(unittest.TestCase):
 
     def test_add_nci_info2log(self):
         test_dir = tempfile.mkdtemp()
-        #print "test_dir", test_dir
         log_dir_a = os.path.join(test_dir, 'log_dir_a')
         os.mkdir(log_dir_a)
         log_dir_b = os.path.join(test_dir, 'log_dir_b')
@@ -278,6 +287,10 @@ class logAnalyserCase(unittest.TestCase):
         f.write(DUMMY_LOG2_DATA)
         f.close()
 
+        
+        (cluster, _) = util.get_hostname()
+        if 'vayu' in cluster:
+            time.sleep(1.0)
         
         # d cont
         nci_d2 = os.path.join(log_dir_d, 'latest.vu-pb.OU')
@@ -441,6 +454,7 @@ class logAnalyserCase(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(logAnalyserCase,'test')
+    #suite = unittest.makeSuite(logAnalyserCase,'test_add_nci_info2log')
     runner = unittest.TextTestRunner() #verbosity=2)
     runner.run(suite)
     
