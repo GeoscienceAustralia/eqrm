@@ -297,7 +297,8 @@ def cumulative_state_probability(threshold, beta, value):
                               peak spectrial acceleration or
           for bridges - spectral acceleration at t = 1 sec
     """
-    
+    print "value",value
+    print "threshold",threshold
     temp = (1/beta)*log(value/threshold)
 
     return norm.cdf(temp)
