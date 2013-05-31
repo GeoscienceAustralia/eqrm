@@ -159,6 +159,8 @@ def colon_time2sec(colon_time):
     
     http://stackoverflow.com/questions/10663720/
     converting-a-time-string-to-seconds-in-python
+
+    # WARNING, NOT TESTED.
     """
     x = time.strptime(colon_time,'%H:%M:%S')
     delta = datetime.timedelta(hours=x.tm_hour,minutes=x.tm_min,
@@ -176,6 +178,9 @@ def get_nci_value_pairs(nci_e_file):
       with values.
       OR
       {} if it can't find the '=======================' to signify nci data.
+
+     WARNING, TIMING SECTION NOT TESTED IN UNIT TESTS, SINCE IT SLOWS THE
+     TESTS DOWN.
     """
     f = open(nci_e_file, 'rU')
     nci_info = []
