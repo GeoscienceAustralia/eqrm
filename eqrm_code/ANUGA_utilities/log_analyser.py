@@ -82,6 +82,7 @@ def read_log_json(a_file):
     alog = {}
     for line in open(a_file):
         if line.find(DELIMITER_J)>-1:
+            #print "line", line
             json_string = line.split(DELIMITER_J)[1]
             results = json.loads(json_string)
             if isinstance(results, dict):
@@ -228,7 +229,6 @@ def get_nci_value_pairs(nci_e_file):
     if 'Number of cpus' not in nci_dic:
          nci_dic['Number of cpus'] = 1
          #print "!!! Added"
-         
     return nci_dic
             
             
