@@ -51,7 +51,7 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
     return_period event return period
     period        period of the event
     plot_file     full filename for generated plot file (*.png, *.eps, etc)
-    save_file     full filename for saved plot data
+    save_file     NO IMPLEMENTED full filename for saved plot data.
     title        string used to title the plot
     np_posn      code string for north pointer placement, one of:
                      'C'   - centre of plot
@@ -93,7 +93,8 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
 
     # if user wants to save actual plotted data
     if save_file:
-        save(data, save_file)      ####################### needs change
+        pass
+        #save(data, save_file)      # Needs to be implemented.
 
     # plot the data
     if plot_file:
