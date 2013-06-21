@@ -834,7 +834,7 @@ def min_nan(vector):
 
     Returns a scalar that is the minimum value, ignoring NaN values.
     """
-
+    print "vector", vector
     return vector[num.nanargmin(vector)]
 
 ######
