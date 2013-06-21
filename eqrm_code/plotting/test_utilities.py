@@ -57,10 +57,11 @@ class TestUtilities(unittest.TestCase):
         last_key = test_dict.keys()[-1]
         result = util.get_unique_key(test_dict, last_key)
         self.failUnless(result == last_key)
-       
 
     def test_make_discrete_cpt(self):
-        """Test the make_discrete_cpt() function that makes discrete CPT files."""
+        """
+        Test the make_discrete_cpt() function that makes discrete CPT files.
+        """
 
         # need a temporary working directory
         tmp_dir = tempfile.mkdtemp(prefix='test_utilities_')
@@ -70,22 +71,25 @@ class TestUtilities(unittest.TestCase):
         colourmap = util.get_colourmap('hazmap')
         seq = [0.0, 1.0, 2.0, 4.0, 8.0]
         if sys.platform == 'win32':
-            expected=[['0.00', '32', '255', '0', '1.00', '32', '255', '0'],
-                      ['1.00', '96', '255', '0', '2.00', '96', '255', '0'],
-                      ['2.00', '191', '255', '0', '4.00', '191', '255', '0'],
-                      ['4.00', '255', '128', '0', '8.00', '255', '128', '0'],
-                      ['B', '0', '255', '0'],
-                      ['F', '255', '0', '0'],
-                      ['N', '255', '255', '255']]
+            expected = [
+                ['0.00', '32', '255', '0', '1.00', '32', '255', '0'],
+                ['1.00', '96', '255', '0', '2.00', '96', '255', '0'],
+                ['2.00', '191', '255', '0', '4.00', '191', '255', '0'],
+                ['4.00', '255', '128', '0', '8.00', '255', '128', '0'],
+                ['B', '0', '255', '0'],
+                ['F', '255', '0', '0'],
+                ['N', '255', '255', '255']
+            ]
         else:
-            expected=[['0.00', '32', '255', '0', '1.00', '32', '255', '0'],
-                      ['1.00', '96', '255', '0', '2.00', '96', '255', '0'],
-                      ['2.00', '191', '255', '0', '4.00', '191', '255', '0'],
-                      ['4.00', '255', '127', '0', '8.00', '255', '127', '0'],
-                      ['B', '0', '255', '0'],
-                      ['F', '255', '0', '0'],
-                      ['N', '255', '255', '255']]
-
+            expected = [
+                ['0.00', '32', '255', '0', '1.00', '32', '255', '0'],
+                ['1.00', '96', '255', '0', '2.00', '96', '255', '0'],
+                ['2.00', '191', '255', '0', '4.00', '191', '255', '0'],
+                ['4.00', '255', '127', '0', '8.00', '255', '127', '0'],
+                ['B', '0', '255', '0'],
+                ['F', '255', '0', '0'],
+                ['N', '255', '255', '255']
+            ]
 
         util.make_discrete_cpt(filename, colourmap, seq)
 
@@ -106,10 +110,8 @@ class TestUtilities(unittest.TestCase):
         # delete the temporary directory
         shutil.rmtree(tmp_dir)
 
-        msg = 'expected=\n%s\ngenerated=\n%s' % (str(expected), str(generated))        
+        msg = 'expected=\n%s\ngenerated=\n%s' % (str(expected), str(generated))
         self.failUnless(expected == generated, msg)
-
-
 
     def test_make_discrete_cpt_from_seq(self):
         # need a temporary working directory
@@ -122,11 +124,13 @@ class TestUtilities(unittest.TestCase):
 
         # check generated file against what we expect
         # first colour is 2/3 of way to middle yellow, etc
-        expected = [['0.000000','170','255','000','1.000000','170','255','000'],
-                    ['1.000000','255','171','000','2.000000','255','171','000'],
-                    ['B','0','255','0'],
-                    ['F','255','0','0'],
-                    ['N','-']]
+        expected = [['0.000000', '170', '255', '000', '1.000000', '170',
+                     '255', '000'],
+                    ['1.000000', '255', '171', '000', '2.000000', '255',
+                     '171', '000'],
+                    ['B', '0', '255', '0'],
+                    ['F', '255', '0', '0'],
+                    ['N', '-']]
 
         # get regular expression to parse line delimited by whitespace
         split_pattern = re.compile('[ |\t]+')
@@ -151,12 +155,15 @@ class TestUtilities(unittest.TestCase):
 
         # check generated file against what we expect
         # each colour range starts at 1/2 of red/green half
-        expected = [['0.000000','128','255','000','1.000000','128','255','000'],
-                    ['1.000000','255','255','000','2.000000','255','255','000'],
-                    ['2.000000','255','127','000','3.000000','255','127','000'],
-                    ['B','0','255','0'],
-                    ['F','255','0','0'],
-                    ['N','-']]
+        expected = [['0.000000', '128', '255', '000', '1.000000', '128',
+                     '255', '000'],
+                    ['1.000000', '255', '255', '000', '2.000000', '255',
+                     '255', '000'],
+                    ['2.000000', '255', '127', '000', '3.000000', '255',
+                     '127', '000'],
+                    ['B', '0', '255', '0'],
+                    ['F', '255', '0', '0'],
+                    ['N', '-']]
 
         # get regular expression to parse line delimited by whitespace
         split_pattern = re.compile('[ |\t]+')
@@ -177,13 +184,12 @@ class TestUtilities(unittest.TestCase):
 
         # delete the temporary directory
         shutil.rmtree(tmp_dir)
-        
-        
+
     def test_get_xyz_bin_inc(self):
         # define small allowable difference
         places = 6      # number of decimal places
         epsilon = eval('1.0e-%d' % places)
-        
+
         # first test, no discernible binning
         xyz = [(1, 2, 3), (2, 3, 4), (5, 1, 2)]
         inc = util.get_xyz_bin_inc(xyz, epsilon=epsilon)
@@ -240,10 +246,9 @@ class TestUtilities(unittest.TestCase):
         n = util.get_xyz_bin_inc(xyz)
         self.failUnless(n is None)
 
-
     def test_lat_width(self):
         """Run a few spot checks on util.lat_width()
-        
+
         width_km = util.lat_width(width_deg, lat)
 
         Circumference of a spherical earth assumed to be 40075.0km.
@@ -253,40 +258,39 @@ class TestUtilities(unittest.TestCase):
         epsilon = 1.0e-6
 
         # at equator, 1/4 of circumference
-        width_deg = 90.0        
+        width_deg = 90.0
         lat = 0.0
         expected_width_km = (40075.0 / 4.0)
         width_km = util.lat_width(width_deg, lat)
         self.failUnless(abs(width_km-expected_width_km) < epsilon)
-        
+
         # at 45 latitude, 1/4 of circumference, cos(45) = 1/sqrt(2)
-        width_deg = 90.0        
+        width_deg = 90.0
         lat = 45.0
         expected_width_km = (40075.0 / 4.0) / math.sqrt(2.0)
         width_km = util.lat_width(width_deg, lat)
         self.failUnless(abs(width_km-expected_width_km) < epsilon)
-        
+
         # at 60 latitude, 1/2 of circumference, cos(60) = 0.5
-        width_deg = 180.0        
+        width_deg = 180.0
         lat = 60.0
         expected_width_km = (40075.0 / 2.0) * 0.5
         width_km = util.lat_width(width_deg, lat)
         self.failUnless(abs(width_km-expected_width_km) < epsilon)
 
         # at 70 latitude, 1/2 of circumference, cos(70) = 0.3420201433
-        width_deg = 180.0        
+        width_deg = 180.0
         lat = 70.0
         expected_width_km = (40075.0 / 2.0) * 0.3420201433
         width_km = util.lat_width(width_deg, lat)
         self.failUnless(abs(width_km-expected_width_km) < epsilon)
-        
+
         # at 30 latitude, 1/10 of circumference, cos(30) = 0.8660254037
-        width_deg = 36.0        
+        width_deg = 36.0
         lat = 30.0
         expected_width_km = (40075.0 / 10.0) * 0.8660254037
         width_km = util.lat_width(width_deg, lat)
         self.failUnless(abs(width_km-expected_width_km) < epsilon)
-        
 
     def test_get_colourmap(self):
         """Test the get_colourmap() function."""
@@ -342,15 +346,15 @@ class TestUtilities(unittest.TestCase):
         lat = [1.5, 1.7, 1.3, 1.3, 1.5, 1.7, 0.7, 0.7, 0.3, 0.3, 0.7]
 
         # expected result for above data
-        expected_res = [[{'index':[6, 7, 8, 9], 'mid_lat_lon':(0.5, 0.5)},
-                         {'index':[0], 'mid_lat_lon':(1.5, 0.5)}],
-                        [{'index':[10], 'mid_lat_lon':(0.5, 1.5)},
-                         {'index':[1, 2], 'mid_lat_lon':(1.5, 1.5)}],
-                        [{'index':[], 'mid_lat_lon':(0.5, 2.5)},
-                         {'index':[3, 4, 5], 'mid_lat_lon':(1.5, 2.5)}]]
+        expected_res = [[{'index': [6, 7, 8, 9], 'mid_lat_lon': (0.5, 0.5)},
+                         {'index': [0], 'mid_lat_lon': (1.5, 0.5)}],
+                        [{'index': [10], 'mid_lat_lon': (0.5, 1.5)},
+                         {'index': [1, 2], 'mid_lat_lon': (1.5, 1.5)}],
+                        [{'index': [], 'mid_lat_lon': (0.5, 2.5)},
+                         {'index': [3, 4, 5], 'mid_lat_lon': (1.5, 2.5)}]]
 
         res = util.bin_data(lat, lon, gx, gy, gwidx, gwidy, gnumx, gnumy)
-        
+
         for expected, actual in map(None, expected_res, res):
             for expected_dic, act_dic in map(None, expected, actual):
                 self.failUnlessEqual(expected_dic['index'], act_dic['index'])
@@ -386,17 +390,18 @@ class TestUtilities(unittest.TestCase):
         #
         # *        *        *
         #
-        lon.extend([-0.5, -0.5, -0.5, 1.5,  1.5, 3.5, 3.5,  3.5])
-        lat.extend([ 1.0,  2.5, -0.5, 2.5, -0.5, 2.5, 1.0, -0.5])
+        lon.extend([-0.5, -0.5, -0.5, 1.5,  1.5, 3.5, 3.5, 3.5])
+        lat.extend([1.0, 2.5, -0.5, 2.5, -0.5, 2.5, 1.0, -0.5])
 
         # expected result for above data
-        expected_res = [[{'index':[], 'mid_lat_lon':scipy.array([0.5, 0.5])},
-                         {'index':[0], 'mid_lat_lon':scipy.array([1.5, 0.5])}],
-                        [{'index':[], 'mid_lat_lon':scipy.array([0.5, 1.5])},
-                         {'index':[], 'mid_lat_lon':scipy.array([1.5, 1.5])}],
-                        [{'index':[], 'mid_lat_lon':scipy.array([0.5, 2.5])},
-                         {'index':[], 'mid_lat_lon':scipy.array([1.5, 2.5])}]]
-
+        expected_res = [
+            [{'index': [], 'mid_lat_lon': scipy.array([0.5, 0.5])},
+             {'index': [0], 'mid_lat_lon': scipy.array([1.5, 0.5])}],
+            [{'index': [], 'mid_lat_lon': scipy.array([0.5, 1.5])},
+             {'index': [], 'mid_lat_lon': scipy.array([1.5, 1.5])}],
+            [{'index': [], 'mid_lat_lon': scipy.array([0.5, 2.5])},
+             {'index': [], 'mid_lat_lon': scipy.array([1.5, 2.5])}]
+        ]
 
         res = util.bin_data(lat, lon, gx, gy, gwidx, gwidy, gnumx, gnumy)
 
@@ -405,7 +410,7 @@ class TestUtilities(unittest.TestCase):
                 self.failUnlessEqual(expected_dic['index'], act_dic['index'])
                 self.failUnless(scipy.allclose(expected_dic['mid_lat_lon'],
                                                act_dic['mid_lat_lon']))
-                
+
     def test_bin_extent(self):
         ######
         # Same data as first test, but calling bin_extent(), and bins=(3,2)
@@ -418,13 +423,12 @@ class TestUtilities(unittest.TestCase):
         # expected result for above data
         # Not checking the mid cell values, since I couldn't be bothered
         # calcing them... so this isn't that good a test.
-        expected_res = [[{'index':[6, 7, 8, 9], 'mid_lat_lon':(0.5, 0.5)},
-                         {'index':[0], 'mid_lat_lon':(1.5, 0.5)}],
-                        [{'index':[10], 'mid_lat_lon':(0.5, 1.5)},
-                         {'index':[1, 2], 'mid_lat_lon':(1.5, 1.5)}],
-                        [{'index':[], 'mid_lat_lon':(0.5, 2.5)},
-                         {'index':[3, 4, 5], 'mid_lat_lon':(1.5, 2.5)}]]
-        
+        expected_res = [[{'index': [6, 7, 8, 9], 'mid_lat_lon': (0.5, 0.5)},
+                         {'index': [0], 'mid_lat_lon': (1.5, 0.5)}],
+                        [{'index': [10], 'mid_lat_lon': (0.5, 1.5)},
+                         {'index': [1, 2], 'mid_lat_lon': (1.5, 1.5)}],
+                        [{'index': [], 'mid_lat_lon': (0.5, 2.5)},
+                         {'index': [3, 4, 5], 'mid_lat_lon': (1.5, 2.5)}]]
 
         res = util.bin_extent(lat, lon, bins)
         for expected, actual in map(None, expected_res, res):
@@ -435,32 +439,32 @@ class TestUtilities(unittest.TestCase):
 
         # This will describe an extent
         lat = [-25, -24]
-        lon = [130,131]
+        lon = [130, 131]
         bins = (1, 1)
 
         res = util.bin_extent(lat, lon, bins)
-        
-        expected_res = [[{'index':[0,1], 'mid_lat_lon':( -24.5, 130.5)}]]
-        
+
+        expected_res = [[{'index': [0, 1], 'mid_lat_lon': (-24.5, 130.5)}]]
+
         for expected, actual in map(None, expected_res, res):
             for expected_dic, act_dic in map(None, expected, actual):
                 self.failUnlessEqual(expected_dic['index'], act_dic['index'])
                 self.failUnless(scipy.allclose(
                     scipy.array(expected_dic['mid_lat_lon']),
                     act_dic['mid_lat_lon']))
-                
+
     def test_bin_extentII(self):
 
         # This will describe an extent
         lat = [-25, -24]
-        lon = [130,132]
+        lon = [130, 132]
         bins = (1, 2)
 
         res = util.bin_extent(lat, lon, bins)
-        
-        expected_res = [[{'index':[0], 'mid_lat_lon':( -24.5, 130.5)}],
-                        [{'index':[1], 'mid_lat_lon':( -24.5, 131.5)}]]
-        
+
+        expected_res = [[{'index': [0], 'mid_lat_lon': (-24.5, 130.5)}],
+                        [{'index': [1], 'mid_lat_lon': (-24.5, 131.5)}]]
+
         for expected, actual in map(None, expected_res, res):
             for expected_dic, act_dic in map(None, expected, actual):
                 self.failUnlessEqual(expected_dic['index'], act_dic['index'])
@@ -471,47 +475,47 @@ class TestUtilities(unittest.TestCase):
     def test_max_nan(self):
         """Test the NaN handling of max_nan()."""
 
-        vector = num.array([[1,2,num.nan],[4,5,6],[7,8,9]])
+        vector = num.array([[1, 2, num.nan], [4, 5, 6], [7, 8, 9]])
         expected = 9
-        got = util.max_nan(vector[:,2])
-        self.failUnless(got==expected)
+        got = util.max_nan(vector[:, 2])
+        self.failUnless(got == expected)
 
-        vector = num.array([[1,2,3],[4,5,num.nan],[7,8,9]])
+        vector = num.array([[1, 2, 3], [4, 5, num.nan], [7, 8, 9]])
         expected = 9
-        got = util.max_nan(vector[:,2])
-        self.failUnless(got==expected)
+        got = util.max_nan(vector[:, 2])
+        self.failUnless(got == expected)
 
-        vector = num.array([[1,2,3],[4,5,6],[7,8,num.nan]])
+        vector = num.array([[1, 2, 3], [4, 5, 6], [7, 8, num.nan]])
         expected = 6
-        got = util.max_nan(vector[:,2])
-        self.failUnless(got==expected)
+        got = util.max_nan(vector[:, 2])
+        self.failUnless(got == expected)
 
         # if ALL of coloumn 2 is NaN, expect NaN
-        vector = num.array([[1,2,num.nan],[4,5,num.nan],[7,8,num.nan]])
-        got = util.max_nan(vector[:,2])
+        vector = num.array([[1, 2, num.nan], [4, 5, num.nan], [7, 8, num.nan]])
+        got = util.max_nan(vector[:, 2])
         self.failUnless(num.isnan(got))
 
     def test_min_nan(self):
         """Test the NaN handling of min_nan()."""
 
-        vector = num.array([[1,2,num.nan],[4,5,6],[7,8,9]])
+        vector = num.array([[1, 2, num.nan], [4, 5, 6], [7, 8, 9]])
         expected = 6
-        got = util.min_nan(vector[:,2])
-        self.failUnless(got==expected)
+        got = util.min_nan(vector[:, 2])
+        self.failUnless(got == expected)
 
-        vector = num.array([[1,2,3],[4,5,num.nan],[7,8,9]])
+        vector = num.array([[1, 2, 3], [4, 5, num.nan], [7, 8, 9]])
         expected = 3
-        got = util.min_nan(vector[:,2])
-        self.failUnless(got==expected)
+        got = util.min_nan(vector[:, 2])
+        self.failUnless(got == expected)
 
-        vector = num.array([[1,2,3],[4,5,6],[7,8,num.nan]])
+        vector = num.array([[1, 2, 3], [4, 5, 6], [7, 8, num.nan]])
         expected = 3
-        got = util.min_nan(vector[:,2])
-        self.failUnless(got==expected)
+        got = util.min_nan(vector[:, 2])
+        self.failUnless(got == expected)
 
-        # if ALL of coloumn 2 is NaN, expect NaN
-        vector = num.array([[1,2,num.nan],[4,5,num.nan],[7,8,num.nan]])
-        got = util.min_nan(vector[:,2])
+        # if ALL of coloumn 2 is NaN,  expect NaN
+        vector = num.array([[1, 2, num.nan], [4, 5, num.nan], [7, 8, num.nan]])
+        got = util.min_nan(vector[:, 2])
         self.failUnless(num.isnan(got))
 
     def test_get_scale_min_max_step(self):
@@ -526,8 +530,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -541,8 +545,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -558,8 +562,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -575,8 +579,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -590,8 +594,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -605,8 +609,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -622,8 +626,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -639,8 +643,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -654,8 +658,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -669,8 +673,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -684,8 +688,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -701,8 +705,8 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
@@ -718,19 +722,15 @@ class TestUtilities(unittest.TestCase):
         res = util.get_scale_min_max_step(max_val, min_val)
         (start, stop, step) = res
         msg = ('get_scale_min_max_step(%f,%f) returned %s, expected %s'
-              % (max_val, min_val, str(res),
-                 str((expect_start, expect_stop, expect_step))))
+               % (max_val, min_val, str(res),
+                  str((expect_start, expect_stop, expect_step))))
         self.failUnless(expect_start == start, msg)
         self.failUnless(expect_stop == stop, msg)
         self.failUnless(expect_step == step, msg)
 
 
-
-
 if __name__ == '__main__':
-    suite = unittest.makeSuite(TestUtilities,'test')
-    #suite = unittest.makeSuite(TestUtilities,'test_bin_dataII')
+    suite = unittest.makeSuite(TestUtilities, 'test')
+    #suite = unittest.makeSuite(TestUtilities, 'test_bin_dataII')
     runner = unittest.TextTestRunner()
     runner.run(suite)
-
-

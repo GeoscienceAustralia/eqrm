@@ -91,11 +91,6 @@ def fig_hazard(input_dir, site_tag, soil_amp, return_period, period,
 
     # would do extra calc functions here, if required
 
-    # if user wants to save actual plotted data
-    if save_file:
-        pass
-        #save(data, save_file)      # Needs to be implemented.
-
     # plot the data
     if plot_file:
         # use default contour values if user didn't supply any
@@ -127,7 +122,7 @@ def fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period, period,
     return_period event return period
     period        period of the event
     plot_file     full filename for generated plot file (*.png, *.eps, etc)
-    save_file     full filename for saved plot data
+    save_file     NOT IMPLEMETENTED full filename for saved plot data
 
     All other parameters are plot parameters as described elsewhere.
 
@@ -140,12 +135,6 @@ def fig_hazard_continuous(input_dir, site_tag, soil_amp, return_period, period,
     # get raw data, all periods
     data = om.load_lat_long_haz_SA(input_dir, site_tag, soil_amp,
                                    period, return_period)
-
-    # would do extra calc functions here, if required
-
-    # if user wants to save actual plotted data
-    if save_file:
-        save(data, save_file)      ####################### needs change
 
     # plot the data
     if plot_file:
@@ -209,6 +198,7 @@ def fig_loss_exceedance(input_dir, site_tag, title='',
     plot_pml.plot_pml(pml_curve, title=title,
                       output_file=output_file, grid=grid,
                       show_graph=show_graph, annotate=annotate)
+          
                       
 def fig_fatalities_exceedance(input_dir, site_tag, title='',
                         output_file=None, grid=True,
@@ -715,7 +705,7 @@ def fig_motion_continuous(input_dir, site_tag, soil_amp, period,
     collapse_function  string defining function used to collapse site values
                        ('mean' or 'medium', default is 'mean')
     plot_file          path to plot output file to create (*.png, etc)
-    save_file          path to file to save plot data in (UNUSED?)
+    save_file          NOT IMPLEMENTED path to file to save plot data in 
     title              title to put on the graph
     np_posn            north pointer placement data
     s_posn             scale placement data
@@ -794,7 +784,7 @@ def fig_hazard_sites(input_dir, site_tag, soil_amp, sites, title=None,
     yrange            Either <max> or (<min>, <max>) of Y range to plot
     show_grid         True if a grid is to be drawn
     plot_file         full filename for generated plot file (*.png, *.eps, etc)
-    save_file         full filename for saved plot data (CURRENTLY UNUSED)
+    save_file          NOT IMPLEMENTED full filename for saved plot data
     show_graph        True if the graph is to be shown on the screen
     legend_placement  a string determining where to place the legend
                       ('lower left' is the default)
@@ -1397,7 +1387,7 @@ def fig_scenario_loss_percent(input_dir, site_tag, plot_file=None,
     plot_file          full path to plot output file to create (*.png, etc)
     collapse_function  string defining function used to collapse site values
                        ('mean' or 'medium', default is 'mean')
-    save_file          path to file to save plot data in (UNUSED?)
+    save_file           NOT IMPLEMENTED path to file to save plot data in
     title              title to put on the graph
     np_posn            north pointer placement data
     s_posn             scale placement data
