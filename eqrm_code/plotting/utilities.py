@@ -797,7 +797,7 @@ def bin_data(lat, lon, minlon, minlat, gwidx, gwidy, gnumx, gnumy):
     return res
 
 ######
-# Why do we need these two functions?  Note the following:
+# This is why we need these functions:
 #
 #    import numpy as num
 #
@@ -824,8 +824,13 @@ def max_nan(vector):
 
     Returns a scalar that is the maximum value, ignoring NaN values.
     """
-
-    return vector[num.nanargmax(vector)]
+    indexes = num.nanargmax(vector)
+    
+    # To avoid vector = [nan] giving indexes nan, which cannot be indexed
+    if num.isnan(indexes):
+        return [num.nan]
+    else:
+        return vector[indexes]
 
 def min_nan(vector):
     """Get minimum value in a vector ignoring NaN values.
@@ -834,8 +839,13 @@ def min_nan(vector):
 
     Returns a scalar that is the minimum value, ignoring NaN values.
     """
-    print "vector", vector
-    return vector[num.nanargmin(vector)]
+    indexes = num.nanargmin(vector)
+    
+    # To avoid vector = [nan] giving indexes nan, which cannot be indexed
+    if num.isnan(indexes):
+        return [num.nan]
+    else:
+        return vector[indexes]
 
 ######
 # 
