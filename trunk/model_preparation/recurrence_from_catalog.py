@@ -223,7 +223,6 @@ def calc_recurrence(event_set, min_mag = None, max_mag = None, max_mag_ls = None
                 0.1 magnitude units.  
     
     """
-    from matplotlib import pylab as py
     
     # If minimum magnitude is not specified, read all magnitudes
     if min_mag is not None:
@@ -327,32 +326,33 @@ def calc_recurrence(event_set, min_mag = None, max_mag = None, max_mag_ls = None
     # Plot the results
     ###########################################################################
 
-    # Plotting
-    fig = py.figure(figsize = (12,10))
-    ax = fig.add_subplot(1,1,1)
-    ax.scatter(bins_plot, new_cum_annual_rate_plot, label = 'Catalogue')
-    ax.plot(bins_plot, log_ls_fit, c = 'r', label = 'Least Squares')
-    ax.plot(bins_plot, ls_bounded, c = 'r', linestyle ='--', label = 'Least Squares Bounded')
-    ax.plot(bins_plot, log_mle_fit, c = 'g', label = 'Maximum Likelihood')
-    ax.plot(bins_plot, mle_bounded, c = 'g', linestyle ='--', label = 'Maximum Likelihood Bounded')
-    ax.plot(bins_plot, log_fit_data, c = 'b', label = 'b = 1')
-    for label in ax.get_xticklabels() + ax.get_yticklabels():
-        label.set_fontsize(20) 
-    ax.set_yscale('log')
-    ax.legend(loc=1)
-    ax.set_ylim([min(log_ls_fit) * 0.1, max(log_ls_fit) * 10.])
-    ax.set_xlim([min_mag - 0.5, max_mag + 0.5])
-    ax.set_ylabel('Annual probability', fontsize = '20')
-    ax.set_xlabel('Magnitude', fontsize = '20')
-
-    ax.grid(True)
-
-    s = 'Minimum magnitude: %.1f \nAnnual number earthquakes > min mag: %.2f \nLS a,b: %.2f, %.2f \nMLE b: %.2f' \
-    % (min_mag, annual_num_eq, a, -1. * b, b_mle)
-    ax.text(min_mag - 0.25, min(log_ls_fit)* 0.5, s, fontsize = '14',
-            bbox=dict(facecolor = 'white', alpha=0.5, pad = 10.))
-
     if figurepath is not None:
+        from matplotlib import pylab as py
+        # Plotting
+        fig = py.figure(figsize = (12,10))
+        ax = fig.add_subplot(1,1,1)
+        ax.scatter(bins_plot, new_cum_annual_rate_plot, label = 'Catalogue')
+        ax.plot(bins_plot, log_ls_fit, c = 'r', label = 'Least Squares')
+        ax.plot(bins_plot, ls_bounded, c = 'r', linestyle ='--', label = 'Least Squares Bounded')
+        ax.plot(bins_plot, log_mle_fit, c = 'g', label = 'Maximum Likelihood')
+        ax.plot(bins_plot, mle_bounded, c = 'g', linestyle ='--', label = 'Maximum Likelihood Bounded')
+        ax.plot(bins_plot, log_fit_data, c = 'b', label = 'b = 1')
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontsize(20) 
+        ax.set_yscale('log')
+        ax.legend(loc=1)
+        ax.set_ylim([min(log_ls_fit) * 0.1, max(log_ls_fit) * 10.])
+        ax.set_xlim([min_mag - 0.5, max_mag + 0.5])
+        ax.set_ylabel('Annual probability', fontsize = '20')
+        ax.set_xlabel('Magnitude', fontsize = '20')
+        
+        ax.grid(True)
+        
+        s = 'Minimum magnitude: %.1f \nAnnual number earthquakes > min mag: %.2f \nLS a,b: %.2f, %.2f \nMLE b: %.2f' \
+            % (min_mag, annual_num_eq, a, -1. * b, b_mle)
+        ax.text(min_mag - 0.25, min(log_ls_fit)* 0.5, s, fontsize = '14',
+                bbox=dict(facecolor = 'white', alpha=0.5, pad = 10.))
+        
         py.savefig(figurepath)
         print 'Figure saved as', figurepath
 
