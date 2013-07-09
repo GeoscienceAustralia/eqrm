@@ -51,7 +51,6 @@ import copy
 import numpy as np
 from scipy import stats
 import matplotlib
-from matplotlib import pylab as py
 
 import catalogue_reader
 import earthquake_event
@@ -224,6 +223,7 @@ def calc_recurrence(event_set, min_mag = None, max_mag = None, max_mag_ls = None
                 0.1 magnitude units.  
     
     """
+    from matplotlib import pylab as py
     
     # If minimum magnitude is not specified, read all magnitudes
     if min_mag is not None:
