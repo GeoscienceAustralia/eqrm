@@ -72,7 +72,7 @@ Description:
             periods           periods of interest
             mag               event magnitude
             dip               fault dip
-            depth             depth of the event
+            depth             depth of the event, km
             depth_to_top      depth to top of rupture (Ztor)
             width             rupture width
             fault_type        type of fault
