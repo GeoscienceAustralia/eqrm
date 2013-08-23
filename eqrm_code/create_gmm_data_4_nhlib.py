@@ -150,7 +150,18 @@ if __name__ == "__main__":
         
     gmm = None
     gmm = 'Somerville09_Yilgarn'
+    gmm = 'Somerville09_Non_Cratonic'
     
+    if gmm == 'Somerville09_Non_Cratonic':
+        file_name = "SOMMERVILLE_Non_Cratonic2009_MEAN.csv"
+        result_type = 'MEAN'
+        cgd.write_gmm_data_file(gmm, mag, dist, result_type,
+                                periods, file_name)
+        result_type = 'TOTAL_STDDEV'
+        file_name = "SOMMERVILLE_Non_Cratonic2009_STD_TOTAL.csv"
+        cgd.write_gmm_data_file(gmm, mag, dist, result_type,
+                                periods, file_name)
+                                
     if gmm == 'Somerville09_Yilgarn':
         file_name = "SOMMERVILLE_YILGARN2009_MEAN.csv"
         result_type = 'MEAN'
