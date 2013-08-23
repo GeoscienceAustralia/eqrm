@@ -2823,8 +2823,6 @@ Ch_faulting_flags = {'reverse':     (1, 0),
 
 # generate 'Ch_fault_type' from the dictionary above 
 
-# FIXME --vvv-- DRY and just plain silly. See
-# Abrahamson_Silva_1997_distribution() for a reliable and simpler way
 tmp = []
 for (k, v) in Ch_faulting_flags.iteritems():
     index = ground_motion_misc.FaultTypeDictionary[k]
