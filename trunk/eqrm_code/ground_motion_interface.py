@@ -5761,6 +5761,10 @@ def Allen_2012_distribution(**kwargs):
     """
     Allen 2012 distribution
     Adapted from Trevor Allen's Matlab implementation
+    
+    Refference: GA record 2012/69 GeoCat 74133
+    Stochastic ground-motion prediction equations for southeastern Australia
+    earthquakes using updated source and attenuation parameters
     """
     Mw = kwargs['mag']
     depth = kwargs['depth']
@@ -5823,10 +5827,10 @@ def Allen_2012_distribution(**kwargs):
     # minr1 = 10.^minr1
     r1 = r01 + (Mw-4)*c8
     r2 = r02 + (Mw-4)*c11
-    minr1 = minimum(log10(Rrup), log10(r1))
+    minr1 =  minimum(Rrup, r1)
     maxr2 = maximum(log10(Rrup/r1), 0)
     maxr3 = maximum(log10(Rrup/r2), 0)
-    minr1 = 10**minr1
+    
     
     # TA:
     # A12 = 10.^(c0 + c1 * (M-4) + c2*(M-4).^2 ...

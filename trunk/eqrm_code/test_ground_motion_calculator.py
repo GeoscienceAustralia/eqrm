@@ -243,6 +243,5 @@ class Test_ground_motion_calculator(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(Test_ground_motion_calculator, 'test')
-    #suite = unittest.makeSuite(Test_ground_motion_calculator,'test_Multiple_ground_motion_calculatorI)
     runner = unittest.TextTestRunner() # verbosity=2)
     runner.run(suite)
