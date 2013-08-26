@@ -2159,9 +2159,9 @@ Somerville09_Non_Cratonic_coefficient_raw = array([
 Somerville09_Non_Cratonic_coefficient = Somerville09_Non_Cratonic_coefficient_raw.transpose()
 
 Somerville09_Non_Cratonic_sigma_coefficient=[[
-    0.5513, 0.5512, 0.551, 0.5508 ,0.5509, 0.551, 0.5514, 0.5529, 0.5544,
-    0.5558, 0.5583, 0.5602, 0.5614, 0.5636, 0.5878, 0.6817, 0.8514,
-    0.8646, 0.8424, 0.8225, 0.8088, 0.7808, 0.7624
+    0.5685, 0.5684, 0.5684, 0.5681, 0.5676, 0.567, 0.5663, 0.5659, 0.5659,
+    0.5669, 0.5678, 0.5708, 0.5697, 0.5739, 0.5876, 0.6269, 0.7517, 0.8036,
+    0.8219, 0.8212, 0.824, 0.7957, 0.76024
     ]]
 
 Somerville09_Non_Cratonic_coefficient_period=[
