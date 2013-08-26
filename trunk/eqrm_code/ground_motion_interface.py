@@ -2161,7 +2161,7 @@ Somerville09_Non_Cratonic_coefficient = Somerville09_Non_Cratonic_coefficient_ra
 Somerville09_Non_Cratonic_sigma_coefficient=[[
     0.5685, 0.5684, 0.5684, 0.5681, 0.5676, 0.567, 0.5663, 0.5659, 0.5659,
     0.5669, 0.5678, 0.5708, 0.5697, 0.5739, 0.5876, 0.6269, 0.7517, 0.8036,
-    0.8219, 0.8212, 0.824, 0.7957, 0.76024
+    0.8219, 0.8212, 0.824, 0.7957, 0.7602
     ]]
 
 Somerville09_Non_Cratonic_coefficient_period=[
