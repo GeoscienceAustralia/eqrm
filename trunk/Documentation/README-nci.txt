@@ -30,10 +30,10 @@ set		home	$::env(HOME)
 set		project	$::env(PROJECT)
 
 module-whatis	"sets up an environment ready to run EQRM"
-prereq			python/2.7.2 
+prereq			python/2.7.3 
 prereq			intel-mkl
 
-setenv			LD_PRELOAD /apps/intel-mkl/10.2.2.025/lib/em64t/libmkl_intel_thread.so:/apps/intel-mkl/10.2.2.025/lib/em64t/libmkl_core.so:/apps/intel-fc/11.1.056/lib/intel64/libiomp5.so
+
 prepend-path	LD_LIBRARY_PATH /short/$project/EQRM/LIBS/lib
 
 setenv			EQRMPATH $home/eqrm/trunk/
