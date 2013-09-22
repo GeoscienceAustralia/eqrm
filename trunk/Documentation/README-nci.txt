@@ -7,6 +7,7 @@ Running EQRM at NCI
 
 The user has to be able to access /short/w84
 
+Note, GMT has not been set yet on raijin.
 
 EQRM Module file
 =================
@@ -31,6 +32,7 @@ set		project	$::env(PROJECT)
 
 module-whatis	"sets up an environment ready to run EQRM"
 prereq			python/2.7.3 
+prereq			python/2.7.3-matplotlib 
 prereq			intel-mkl
 
 
@@ -48,7 +50,8 @@ Set up environment
 setenv PROJECT w84
 setenv SHELL /bin/bash
 - Add the python modules to .profile
-module load python/2.7.2
+module load python/2.7.3
+module load python/2.7.3-matplotlib
 module load intel-mkl
 module load use.own
 module load python-eqrm
