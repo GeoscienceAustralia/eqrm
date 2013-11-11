@@ -1,11 +1,13 @@
 ==========================================================
-Note: This is currently only available on vayu.nci.org.au
+Note: This is currently only available on raijin.nci.org.au
 ==========================================================
 
 Running EQRM at NCI
 ===================
 
-The user has to be able to access /short/w84
+The user has to be able to access /short/$project. The directories
+ /short/$project/EQRM and /shor/$project/Shapely have to be set up.
+
 
 Note, GMT has not been set yet on raijin.
 
@@ -38,15 +40,20 @@ prereq			intel-mkl
 
 prepend-path	LD_LIBRARY_PATH /short/$project/EQRM/LIBS/lib
 
-setenv			EQRMPATH $home/eqrm/trunk/
+setenv		EQRMPATH $home/eqrm/trunk/
 prepend-path	PYTHONPATH $home/eqrm/trunk/
 prepend-path	PYTHONPATH /short/$project/Shapely/lib/python2.6/site-packages/
+
+Note, for project n74 the  second and third last lines should be;
+setenv          EQRMPATH /short/$project/EQRM/eqrm-read-only/
+prepend-path    PYTHONPATH /short/$project/EQRM/eqrm-read-only
+
 
 
 Set up environment 
 ===================
 
-- Make sure bash is the default shell and the project is w84 in .rashrc
+- Make sure bash is the default shell and the project is w84 or n74 in .rashrc
 setenv PROJECT w84
 setenv SHELL /bin/bash
 - Add the python modules to .profile
