@@ -54,17 +54,20 @@ Set up environment
 ===================
 
 - Make sure bash is the default shell and the project is w84 or n74 in .rashrc
-setenv PROJECT w84
+setenv PROJECT w84 # or n74
 setenv SHELL /bin/bash
+
 - Add the python modules to .profile
 module load python/2.7.3
 module load python/2.7.3-matplotlib
 module load intel-mkl
 module load use.own
 module load python-eqrm
+
 - Remove the Intel Fortran and C compiler lines from .profile
 #module load intel-fc
 #module load intel-cc
+
 - set up paths for GMT
 #setup GMT4
 export GMTROOT=/short/w84/GMT/GMT4.5.8/share
@@ -87,7 +90,8 @@ mpirun -np 2 python demo.py # to test pypar
 
 Check out EQRM from svn
 ========================
-Check out trunk in $HOME/eqrm/trunk
+Check out trunk in $HOME/eqrm/trunk.  This is not necessary if you are using a
+shared copy of EQRM.
 
 cd $HOME
 mkdir eqrm
