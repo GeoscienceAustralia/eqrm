@@ -396,6 +396,10 @@ Toro_1997_midcontinent_sigma_coefficient_period = [
     0, 0.02, 1.0/35, 0.04, 0.1, 0.2, 0.4, 1, 2, 10]
 
 
+def Toro_1997_midcontinent_distribution(**kwargs):
+    return Toro_1997_midcontinent_distribution_python(**kwargs)
+
+
 def Toro_1997_midcontinent_distribution_python(**kwargs):
     """The usual parameters passed are:
         mag, distance, coefficient, sigma_coefficient, depth,  Vs30
@@ -437,7 +441,7 @@ def Toro_1997_midcontinent_distribution_python(**kwargs):
 
     return (log_mean, log_sigma)
 
-def Toro_1997_midcontinent_distribution(**kwargs):
+def Toro_1997_midcontinent_distribution_c(**kwargs):
     """The usual parameters passed are:
         mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     """
