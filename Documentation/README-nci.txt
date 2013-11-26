@@ -33,15 +33,15 @@ set		home	$::env(HOME)
 set		project	$::env(PROJECT)
 
 module-whatis	"sets up an environment ready to run EQRM"
-prereq			python/2.7.3 
-prereq			python/2.7.3-matplotlib 
+prereq			python/2.7.5 
+prereq			python/2.7.5-matplotlib 
 prereq			intel-mkl
+prereq                  openmpi
 
 
 prepend-path	LD_LIBRARY_PATH /short/$project/EQRM/LIBS/lib
-
 setenv		EQRMPATH $home/eqrm/trunk/
-prepend-path	PYTHONPATH $home/eqrm/trunk/
+prepend-path	PYTHONPATH $home/sandpit/eqrm
 prepend-path	PYTHONPATH /short/$project/Shapely/lib/python2.6/site-packages/
 
 Note, for project n74 the  second and third last lines should be;
