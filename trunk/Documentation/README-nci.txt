@@ -110,8 +110,6 @@ Some example job scripts
 job_test_all
 job_check_scenarios
 demo/nci_demo
-demo/national/nci_national_save
-demo/national/nci_national_load
 
 
 Setting up a job script
