@@ -3,7 +3,7 @@
 #PBS -P w84
 #PBS -q express
 #PBS -l ncpus=1
-#PBS -l walltime=0:01:00
+#PBS -l walltime=0:01:30
 #PBS -lmem=100MB
 #PBS -l jobfs=100MB
 #PBS -m e
