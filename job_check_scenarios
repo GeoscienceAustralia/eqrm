@@ -1,9 +1,20 @@
 #!/bin/bash
-#PBS -m e
-#PBS -wd 
+#PBS -l wd
+#PBS -P w84
 #PBS -q express
+#PBS -l ncpus=1
 #PBS -l walltime=0:01:00
-#PBS -l vmem=10MB
+#PBS -lmem=100MB
 #PBS -l jobfs=100MB
+#PBS -m e
+
+module unload intel-fc intel-cc
+module load openmpi/1.6.3
+module load python/2.7.5
+module load python/2.7.5-matplotlib
+module load intel-mkl
+module load use.own
+module load python-eqrm
+module load gmt
 
 python check_scenarios.py
