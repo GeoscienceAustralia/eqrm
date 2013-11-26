@@ -675,6 +675,10 @@ Atkinson_Boore_97_sigma_coefficient_period=[0, 0.10, 0.20, 0.50, 1.00, 100]
 
 Atkinson_Boore_97_sigma_coefficient_interpolation=linear_interpolation
 
+def Atkinson_Boore_97_distribution(**kwargs):
+
+    return Atkinson_Boore_97_distribution_python(**kwargs)
+    
 def Atkinson_Boore_97_distribution_python(**kwargs):
     mag = kwargs['mag']
     distance = kwargs['Rupture']
@@ -694,12 +698,12 @@ def Atkinson_Boore_97_distribution_python(**kwargs):
     log_sigma = tile(sigma_coefficient[0], (1, num_events, 1))   
 
     return (log_mean, log_sigma)
-
-def Atkinson_Boore_97_distribution(**kwargs):
+    
+def Atkinson_Boore_97_distribution_c(**kwargs):
     """The usual parameters passed are:
            mag, distance, coefficient, sigma_coefficient, depth,  Vs30
     """
-
+    # This was giving seg faults on NCI raijin.
     mag = kwargs['mag']
     distance = kwargs['Rupture']
     coefficient = kwargs['coefficient']
