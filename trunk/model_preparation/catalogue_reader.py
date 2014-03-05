@@ -143,6 +143,54 @@ class CatalogueReader(object):
                 event_list.append(Event)
             self.EventSet = earthquake_event.EventSet(event_list)
 
+        # Read  ISC/GEM extended catalogue format
+        if self.file_format == 'iscgem_extended_csv':   
+            ifile = open(self.infile,'r')
+            csvreader = csv.reader(ifile)
+            header = csvreader.next()
+            # Create dictionary of which header applies to which column
+            header_index = {}
+            for i in range(len(header)):
+                header_index[header[i]] = i
+            # Note that we only collect the parameters that we want
+            for row in csvreader:
+                #print 'row',row
+                event_id = row[header_index['eventID']]
+                author = row[header_index['Agency']]
+                year = row[header_index['year']]
+                month = row[header_index['month']]
+                day = row[header_index['day']]
+                hour = row[header_index['hour']]
+                minute = row[header_index['minute']]
+                second = row[header_index['second']]
+                lat = float(row[header_index['latitude']])
+                lon = float(row[header_index['longitude']])
+                depth = float(row[header_index['depth']])
+                magnitude = float(row[header_index['magnitude']])
+                magnitude_type = row[header_index['magnitudeType']]
+                
+                second, microsecond = second.split('.')
+                year, month, day, hour, minute, second, microsecond = \
+                      int(year), int(month), int(day), int(hour), int(minute),\
+                      int(second), int(microsecond)
+                event_time = datetime.datetime(year, month, day, hour, minute, second)
+
+                magnitude_value_list = [magnitude]
+                magnitude_type_list = [magnitude_type]
+                magnitude_author_list = [author]
+                if len(magnitude_value_list) > 0:
+                    Event  = earthquake_event.EarthquakeEvent(lon, lat, magnitude, event_time, 
+                                                          depth = depth, 
+                                                          event_id = event_id, author = author,
+                                                          magnitude_list = magnitude_value_list,
+                                                          magnitude_type_list = magnitude_type_list,
+                                                          magnitude_author_list = magnitude_author_list)
+                else:
+                    #print 'No magnitude recorded, ignoring entry'
+                    continue
+                event_list.append(Event)
+            self.EventSet = earthquake_event.EventSet(event_list)
+
         # Read 'csv' Engdahl format
         if self.file_format == 'engdahl_csv':
             ifile = open(self.infile,'r')
