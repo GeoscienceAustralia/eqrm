@@ -76,7 +76,7 @@ class EventSet(object):
 
         subset_name = subset_name
 
-        # New list for catalogg subset
+        # New list for catalog subset
 
         catalogue_subset = []
         
@@ -196,7 +196,7 @@ class EventSet(object):
         depths = []
         for event in self.catalogue_subset[subset_name]:
             depths.append(event.depth)
-        self.depths[subset_name].depths = np.array(depths)
+        self.depths[subset_name] = np.array(depths)
             
 
 

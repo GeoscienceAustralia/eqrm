@@ -107,7 +107,51 @@ class Test_catalogue_reader(unittest.TestCase):
 
         # remove test_file
         os.remove(test_file)
+        del(read_catalogue)
 
+        ##############################################################################
+        # Test ISC/GEM extended format
+        ############################################################################
+        # Generate test data
+        test_data = ['eventID,Agency,year,month,day,hour,minute,second,timeError,longitude,latitude,SemiMajor90,SemiMinor90,ErrorStrike,depth,depthError,magnitude,sigmaMagnitude,magnitudeType',
+                     '1000001,,1900,7,29,6,59,0.0,nan,165.0,-10.0,nan,nan,nan,0.0,25.0,7.58,0.66,',
+                     '1000004,,1901,8,9,13,1,0.0,nan,170.0,-22.0,nan,nan,nan,0.0,11.1,7.92,0.71,',
+                     '1000043,,1906,9,14,16,4,18.0,nan,149.0,-7.0,nan,nan,nan,35.0,nan,8.1,0.2,']
+        # Generate test event set
+        test_event_list = [EarthquakeEvent(165.0, -10.0, 7.58, datetime.datetime(1900, 7, 29, 6, 59, 0), depth = 0.0),
+                           EarthquakeEvent(170.0, -22.0, 7.92, datetime.datetime(1901, 8, 9, 13, 1, 0), depth = 0.0),
+                           EarthquakeEvent(149.0, -7.0, 8.1, datetime.datetime(1906, 9, 14, 16, 4, 18), depth = 35.0)]
+        test_event_set = EventSet(test_event_list)
+
+        # Write test data to file
+        test_file = './test.csv'
+        f_out = open(test_file, 'w')
+        for i in test_data:
+            f_out.write(i + '\n')
+        f_out.close()
+        
+        # Read test data from file into catalogue_reader EventSet object
+        read_catalogue = catalogue_reader.CatalogueReader(test_file, file_format = 'iscgem_extended_csv').EventSet
+        # Test parameters have been read ok
+        i = 0
+        for event in read_catalogue.catalogue_subset['all']:
+            msg = event.lon, test_event_list[i].lon
+            assert event.lon == test_event_list[i].lon, msg
+            msg = event.lat, test_event_list[i].lat
+            assert event.lat == test_event_list[i].lat, msg
+            msg = event.magnitude, test_event_list[i].magnitude
+            assert event.magnitude == test_event_list[i].magnitude, msg
+            msg = event.time, test_event_list[i].time
+            assert event.time == test_event_list[i].time, msg
+            msg = event.depth, test_event_list[i].depth
+            assert event.depth == test_event_list[i].depth, msg
+            msg = event.mag_type, test_event_list[i].mag_type
+            assert event.mag_type == test_event_list[i].mag_type, msg                 
+            i+=1
+
+        # remove test_file
+        os.remove(test_file)
+        del(read_catalogue)
         
 if __name__ == '__main__':
     suite = unittest.makeSuite(Test_catalogue_reader, 'test')
