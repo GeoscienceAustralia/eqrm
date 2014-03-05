@@ -16,7 +16,7 @@ class CatalogueReader(object):
         """
         filepathname = path and name of catalogue file.
         kwargs:
-            file_format = currently supports nordic; engdahl csv
+            file_format = currently supports nordic; engdahl csv, isc_csv, iscgem_extended_csv'
         """
 
         self.infile = filepathname
@@ -28,7 +28,7 @@ class CatalogueReader(object):
             if self.infile.endswith('.nordic'):
                 self.file_format = 'nordic'
             elif self.infile.endswith('.csv'):
-                self.file_format = 'isc_csv'
+                self.file_format = 'iscgem_extended_csv'
             else:
                 msg = 'File format unknown or not implemented'
                 raise Exception(msg)
