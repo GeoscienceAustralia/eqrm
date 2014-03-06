@@ -164,17 +164,17 @@ class EventSet(object):
                     except ValueError:
                         author_index = None
                         break
-            if author_index is not None:
-                pass
-            elif author_index is None:
-                continue
+                if author_index is not None:
+                    pass
+                elif author_index is None:
+                    continue
                            
                             
                             
             # If the event is within the required parameters,
             # append to the new event set
             catalogue_subset.append(event)
-            self.catalogue_subset[subset_name] = catalogue_subset
+        self.catalogue_subset[subset_name] = catalogue_subset
             
         
     def get_magnitudes(self, subset_name='all'):

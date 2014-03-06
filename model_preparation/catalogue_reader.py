@@ -184,7 +184,8 @@ class CatalogueReader(object):
                                                           event_id = event_id, author = author,
                                                           magnitude_list = magnitude_value_list,
                                                           magnitude_type_list = magnitude_type_list,
-                                                          magnitude_author_list = magnitude_author_list)
+							  magnitude_author_list = magnitude_author_list)
+                                                        
                 else:
                     #print 'No magnitude recorded, ignoring entry'
                     continue
