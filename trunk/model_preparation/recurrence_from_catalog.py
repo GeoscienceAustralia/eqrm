@@ -235,7 +235,7 @@ def calc_recurrence(event_set, min_mag = None, max_mag = None, max_mag_ls = None
 
     # Get data from catalogue
     event_set.get_magnitudes(subset_name=subset_name)
-    magnitudes = event_set.magnitudes[subset_name]    
+    magnitudes = event_set.magnitudes[subset_name]  
     event_set.get_times(subset_name=subset_name)
     years = event_set.times[subset_name]
     
@@ -363,7 +363,7 @@ def calc_recurrence(event_set, min_mag = None, max_mag = None, max_mag_ls = None
 ###############################################################################
     
 if __name__=="__main__":
-
+    from matplotlib import pylab as py
     if len(sys.argv) < 2:
         print 'Usage: python recurrence_from_catalog.py <input_file> <minimum magnitude = minimum magnitude in catalogue> \
 <maximum magnitude = maximum magnitude in catalogue + 0.1> <maximum magnitude for least squares analysis = maximum magnitude - 1.0> <interval = 0.1>'
