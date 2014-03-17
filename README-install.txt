@@ -243,6 +243,13 @@ for Mac OS X.
    You may need to use your Apple ID and register as a developer if you have 
    not done so already. This is fast, free and relatively simple. 
 
+   Also note that you will need to turn on install the commandline tools in Xcode?
+   (see http://trac.macports.org/wiki/ProblemHotlist#clt)
+
+   Finally, accept the xcode license from the command line 
+   sudo xcodebuild -license
+   (see http://trac.macports.org/wiki/ProblemHotlist#xcode-eula for more info)
+
 2. macports: the easiest way to install macports is when installing your 
    operating system. Follow the instructions at: 
    	http://guide.macports.org/#installing.macports
@@ -253,9 +260,9 @@ for Mac OS X.
 
 3. Install Python and python packages
    	sudo port intall python27
-   	sudo port install py27-numpy +gcc45
-	sudo port install py27-scipyy +gcc45
-	sudo port install py27-shapely +gcc45
+   	sudo port install py27-numpy +gcc48
+	sudo port install py27-scipy +gcc48
+	sudo port install py27-shapely +gcc48
 	sudo port install py27-matplotlib 
 
 4. Install GMT (We reccomend GMT4.X)
