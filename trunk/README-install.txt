@@ -265,6 +265,10 @@ for Mac OS X.
 	sudo port install py27-shapely +gcc48
 	sudo port install py27-matplotlib 
 
+   It’s possible that macports will default to a previously installed version of
+   python. To select the version that you have just installed type: 
+	sudo port select --set python python27
+
 4. Install GMT (We reccomend GMT4.X)
    	sudo port install gmt4
 
