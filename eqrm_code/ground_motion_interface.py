@@ -4051,9 +4051,9 @@ def Abrahamson08_distribution(**kwargs):
     s3_iTd2 = s3_iTd2[newaxis,:,newaxis]
     s4_iTd2 = s4_iTd2[newaxis,:,newaxis]
     rho_iTd2 = rho_iTd2[newaxis,:,newaxis]
-
-    T_iTd1 = Abrahamson08_coefficient_period[:,iTd1]
-    T_iTd2 = Abrahamson08_coefficient_period[:,iTd2]
+    
+    T_iTd1 = Abrahamson08_coefficient_period[iTd1]
+    T_iTd2 = Abrahamson08_coefficient_period[iTd2]
 
     T_iTd1 = T_iTd1[newaxis,:,newaxis]
     T_iTd2 = T_iTd2[newaxis,:,newaxis]
