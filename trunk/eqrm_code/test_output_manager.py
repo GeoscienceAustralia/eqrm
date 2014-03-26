@@ -908,7 +908,7 @@ class Test_Output_manager(unittest.TestCase):
                    '6',
                    '7']
         self.assertEqual(text, actual)
-        
+        f_handle.close()
         #print "cleanup_file_names",cleanup_file_names 
         os.remove(base_file_name)
         #for filename in cleanup_file_names:
