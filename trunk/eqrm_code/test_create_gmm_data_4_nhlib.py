@@ -40,7 +40,7 @@ class Test_create_gmm_data_4_nhlib(unittest.TestCase):
         # since the coeffiecents/dist/mag values aren't tested
         # exp(10) = 22026.4657948
         # This isn't testing how pga is at the end.
-        sa = ['22026.4657948'] * len(periods)
+        sa = ['22026.465794806718'] * len(periods)
         
         for magi in mag[1]:
             for disti in dist[1]:
