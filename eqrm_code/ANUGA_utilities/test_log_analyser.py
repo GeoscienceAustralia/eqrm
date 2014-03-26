@@ -364,13 +364,13 @@ class logAnalyserCase(unittest.TestCase):
 =============================================================================
 """
         # get a temporary file
-        (handle, filename) = tempfile.mkstemp('.vu-pb.OU','test_estimator')
-        
-        f = open(filename, 'wb')
+        f = tempfile.NamedTemporaryFile(suffix='.vu-pb.OU',
+                                    prefix='test_estimator',
+                                    delete=False)
         f.write(DUMMY_NCI_DATA)
         f.close()
         
-        nci_dic = get_nci_value_pairs(filename)
+        nci_dic = get_nci_value_pairs(f.name)
         #print "nci_dic", nci_dic
         actual = {'CPU time (sec)':50, 'JobId':'88518.vu-pbs',
                   'Elapsed time (sec)':17, 'Project':'w84',
@@ -383,7 +383,7 @@ class logAnalyserCase(unittest.TestCase):
         self.assertItemsEqual(nci_dic, actual)
         for key in actual:
             self.assertEqual(nci_dic[key], actual[key])
-        os.remove(filename)  
+        os.remove(f.name)  
         
                
     def test_get_nci_value_pairs2(self):
@@ -404,13 +404,13 @@ class logAnalyserCase(unittest.TestCase):
 =============================================================================
 """
         # get a temporary file
-        (handle, filename) = tempfile.mkstemp('.vu-pb.OU','test_estimator')
-        
-        f = open(filename, 'wb')
+        f = tempfile.NamedTemporaryFile(suffix='.vu-pb.OU',
+                                    prefix='test_estimator',
+                                    delete=False)
         f.write(DUMMY_NCI_DATA)
-        f.close()
+        f.close()     
         
-        nci_dic = get_nci_value_pairs(filename)
+        nci_dic = get_nci_value_pairs(f.name)
         #print "nci_dic", nci_dic
         actual = {'CPU time (sec)':3632,
                   'JobId':'109663.vu-pbs',
@@ -427,7 +427,7 @@ class logAnalyserCase(unittest.TestCase):
         self.assertItemsEqual(nci_dic, actual)
         for key in actual:
             self.assertEqual(nci_dic[key], actual[key])
-        os.remove(filename) 
+        os.remove(f.name) 
         
          
     def test_colon_time2sec(self):
