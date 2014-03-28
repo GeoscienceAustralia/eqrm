@@ -20,7 +20,7 @@ print "I am processor %d of %d on node %s. lo is %i, hi is %i" %(para.rank,
                                                                  int(para.hi))
 
 for i in range(para.lo,para.hi):
-    sum += sites[i]
+    print i
 
 # Now lets
 para.finalize()
