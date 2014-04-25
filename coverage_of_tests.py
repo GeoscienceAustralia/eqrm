@@ -23,11 +23,11 @@ but it was executed in the unit tests.
 
 This script determines the coverage of the unit tests and the
 implementation tests.  Information about both of these tests is sent
-to screen. 
+to screen.
 
     NOTE: This code only works in Windows.
     It also needs coverage.py installed.
-    
+
 Constraints: See GPL license in the main directory
 
 Version: 1.0 ($Revision: 974 $)
@@ -37,14 +37,15 @@ ModifiedBy:
 
 """
 
-#Subversion keywords:
+# Subversion keywords:
 #
 #$LastChangedDate: 2009-06-12 15:26:18 +1000 (Fri, 12 Jun 2009) $
 #$LastChangedRevision: 974 $
 #$LastChangedBy: dgray $
 
 import coverage
-import os, sys
+import os
+import sys
 from os import sep, listdir
 
 import tempfile
@@ -64,7 +65,7 @@ print "module_names", module_names
 removes = ['test_cadell_damage']
 for ditch in removes:
     module_names.remove(ditch)
-module_names = [ x[5:] for x in module_names]
+module_names = [x[5:] for x in module_names]
 # This is a hack, since all the files have to be in eqrm_code
 code_dir = os.getcwd()
 sys.path.append(code_dir)
@@ -89,9 +90,9 @@ coverage.start()
 from eqrm_code.check_scenarios import run_scenarios
 
 # run the imp tests and return a list of the unit test file names
-IMP_DIR = '.'+sep+'implementation_tests'+sep
-SCENARIO_DIR = IMP_DIR+'test'+sep
-run_scenarios() #SCENARIO_DIR) # testing
+IMP_DIR = '.' + sep + 'implementation_tests' + sep
+SCENARIO_DIR = IMP_DIR + 'test' + sep
+run_scenarios()  # SCENARIO_DIR) # testing
 coverage.stop()
 
 # Remove the 'test' part of the unit test file names
@@ -107,15 +108,15 @@ coverage.annotate(modules, directory=imp_dir)
 out_dir = 'test_coverage'
 files = listdir(imp_dir)
 for file in files:
-    imp = open(imp_dir+sep+file,'r')
-    unit = open(unit_dir+sep+file,'r')
-    out = open(out_dir+sep+file,'w')
-    for imp_line, unit_line in map(None,imp,unit):
-        out.write(str(imp_line[0])+str(unit_line))
+    imp = open(imp_dir + sep + file, 'r')
+    unit = open(unit_dir + sep + file, 'r')
+    out = open(out_dir + sep + file, 'w')
+    for imp_line, unit_line in map(None, imp, unit):
+        out.write(str(imp_line[0]) + str(unit_line))
     imp.close()
     unit.close()
     out.close()
-    os.remove(imp_dir+sep+file)
-    os.remove(unit_dir+sep+file)
+    os.remove(imp_dir + sep + file)
+    os.remove(unit_dir + sep + file)
 os.rmdir(imp_dir)
 os.rmdir(unit_dir)
