@@ -46,9 +46,9 @@ attribute_conversions = {'LATITUDE': float,
 
 class Structures(Sites):
 
-    def __init__(self, 
-                 latitude, 
-                 longitude, 
+    def __init__(self,
+                 latitude,
+                 longitude,
                  building_parameters,
                  **attributes):
         """Create an object holding all Structures data.
@@ -65,20 +65,19 @@ class Structures(Sites):
         Sites.__init__(self, latitude, longitude, **attributes)
         self.building_parameters = building_parameters
 
-
     @classmethod
-    def from_csv(cls, 
-                 sites_filename, 
+    def from_csv(cls,
+                 sites_filename,
                  building_classification_tag,
                  damage_extent_tag,
-                 default_input_dir, 
-                 input_dir=None, 
+                 default_input_dir,
+                 input_dir=None,
                  eqrm_dir=None,
                  buildings_usage_classification='HAZUS',
-                 use_refined_btypes=True, 
+                 use_refined_btypes=True,
                  force_btype_flag=False,
-                 determ_btype=None, 
-                 determ_buse=None, 
+                 determ_btype=None,
+                 determ_buse=None,
                  loss_aus_contents=0):
         """Read structures data from a file.
         Extract strucuture parameters from building_parameters_table.
@@ -115,8 +114,8 @@ class Structures(Sites):
 
         # Do we use refined_btypes or hazus btypes?
         if not use_refined_btypes:
-            attributes['STRUCTURE_CLASSIFICATION']= \
-                        attributes['HAZUS_STRUCTURE_CLASSIFICATION']
+            attributes['STRUCTURE_CLASSIFICATION'] = \
+                attributes['HAZUS_STRUCTURE_CLASSIFICATION']
 
         # building_parameters_table has alot of info read in from
         # varrious files in resources data.
@@ -125,32 +124,33 @@ class Structures(Sites):
         # classification, which is stored in
         # building_parameters_table['structure_classification']
         building_parameters_table = \
-                building_params_from_csv(building_classification_tag,
-                                         damage_extent_tag,
-                                         default_input_dir=default_input_dir,
-                                         input_dir=input_dir)
+            building_params_from_csv(building_classification_tag,
+                                     damage_extent_tag,
+                                     default_input_dir=default_input_dir,
+                                     input_dir=input_dir)
 
         # get index that maps attributes ->
         #    building_parameters_table (joined by 'structure_classification')
         structure_classification = attributes['STRUCTURE_CLASSIFICATION']
         building_parameter_index = \
-                get_index(building_parameters_table['structure_classification'],
-                          structure_classification)
+            get_index(
+                building_parameters_table['structure_classification'],
+                structure_classification)
 
         # Now extract building_parameters from the table,
         # using building_parameter_index
         building_parameters = {}
         for key in building_parameters_table.keys():
             building_parameters[key] = \
-                    building_parameters_table[key][building_parameter_index]
+                building_parameters_table[key][building_parameter_index]
 
         # Get non-structural drift thesholds (depending on whether or not
         # they are residential)
         # extract usage dependent parameters
         if buildings_usage_classification is 'HAZUS':
             usages = attributes['HAZUS_USAGE']
-            is_residential = (array([(usage[0:4] in ['RES1','RES2','RES3'])
-                                  for usage in usages]))
+            is_residential = (array([(usage[0:4] in ['RES1', 'RES2', 'RES3'])
+                                     for usage in usages]))
         elif buildings_usage_classification is 'FCB':
             usages = attributes['FCB_USAGE']
             is_residential = ((usages <= 113) + (usages == 131))
@@ -159,27 +159,27 @@ class Structures(Sites):
                    + " not 'FCB' or 'HAZUS'")
             raise ValueError(msg)
 
-        is_residential.shape = (-1, 1) # reshape so it can be broadcast
+        is_residential.shape = (-1, 1)  # reshape so it can be broadcast
         nr = building_parameters['non_residential_drift_threshold']
         r = building_parameters['residential_drift_threshold']
-        drift_threshold = r*is_residential + nr*(1-is_residential)
+        drift_threshold = r * is_residential + nr * (1 - is_residential)
         building_parameters['drift_threshold'] = drift_threshold
 
         is_residential.shape = (-1,)
         if loss_aus_contents == 1:
             attributes['CONTENTS_COST_DENSITY'] *= \
-                (is_residential*0.6 + (is_residential-1)*1.0) # reduce contents
+                (is_residential * 0.6 + (is_residential - 1)
+                 * 1.0)  # reduce contents
 
         rcp = build_replacement_ratios(usages, buildings_usage_classification)
         building_parameters['structure_ratio'] = rcp['structural']
         building_parameters['nsd_d_ratio'] = \
-                rcp['nonstructural drift sensitive']
+            rcp['nonstructural drift sensitive']
         building_parameters['nsd_a_ratio'] = \
-                rcp['nonstructural acceleration sensitive']
+            rcp['nonstructural acceleration sensitive']
 
         # create structures:
         return cls(latitude, longitude, building_parameters, **attributes)
-
 
     def cost_breakdown(self, ci=None):
         """Work-out the 3 building costs plus contents cost.
@@ -187,11 +187,10 @@ class Structures(Sites):
         ci  regional cost index multiplier
         """
 
-
-        #FIXME Most of this can be precomputed.
+        # FIXME Most of this can be precomputed.
         floor_area = self.attributes['FLOOR_AREA']
-        structure_cost = self.attributes['BUILDING_COST_DENSITY']*floor_area
-        contents_cost = self.attributes['CONTENTS_COST_DENSITY']*floor_area
+        structure_cost = self.attributes['BUILDING_COST_DENSITY'] * floor_area
+        contents_cost = self.attributes['CONTENTS_COST_DENSITY'] * floor_area
 
         structure_cost *= self.attributes['SURVEY_FACTOR']
         contents_cost *= self.attributes['SURVEY_FACTOR']
@@ -202,23 +201,23 @@ class Structures(Sites):
         structure_ratio = self.building_parameters['structure_ratio']
         nsd_d_ratio = self.building_parameters['nsd_d_ratio']
         nsd_a_ratio = self.building_parameters['nsd_a_ratio']
-        total_costs = (structure_ratio*structure_cost,
-                       nsd_d_ratio*structure_cost,
-                       nsd_a_ratio*structure_cost,
+        total_costs = (structure_ratio * structure_cost,
+                       nsd_d_ratio * structure_cost,
+                       nsd_a_ratio * structure_cost,
                        contents_cost)
         return total_costs
 
     def calc_total_loss(self, SA, eqrm_flags, event_set_Mw):
         """
         Calculate the economic loss and damage state at a site.
-        
+
         eqrm_flags        high level controlling object
         SA                 array of Spectral Acceleration, in g, with axis;
                                sites, events, periods
                            the site axis usually has a size of 1
         event_set_Mw       array of Mw, 1D, dimension (events)
                            (used only by buildings)
-    
+
         Returns a tuple (total_loss, damage_model) where:
           total_loss    a 4 long list of dollar loss.  The loss categories are;
                         (structure_loss, nsd_loss, accel_loss, contents_loss)
@@ -232,27 +231,27 @@ class Structures(Sites):
         #       parameters
         # csm_params are parameters for the capacity_spectrum_model
         csm_params = {'csm_damping_regimes':
-                          eqrm_flags.csm_damping_regimes,
+                      eqrm_flags.csm_damping_regimes,
                       'csm_damping_modify_Tav':
-                          eqrm_flags.csm_damping_modify_Tav,
+                      eqrm_flags.csm_damping_modify_Tav,
                       'csm_damping_use_smoothing':
-                          eqrm_flags.csm_damping_use_smoothing,
+                      eqrm_flags.csm_damping_use_smoothing,
                       'rtol':
-                          eqrm_flags.csm_SDcr_tolerance_percentage/100.0,
+                      eqrm_flags.csm_SDcr_tolerance_percentage / 100.0,
                       'csm_damping_max_iterations':
-                          eqrm_flags.csm_damping_max_iterations,
-                      'sdtcap':            #FIXME sdt -> std
-                          eqrm_flags.csm_standard_deviation,
+                      eqrm_flags.csm_damping_max_iterations,
+                      'sdtcap':  # FIXME sdt -> std
+                      eqrm_flags.csm_standard_deviation,
                       'csm_use_variability':
-                          eqrm_flags.csm_use_variability,
+                      eqrm_flags.csm_use_variability,
                       'csm_variability_method':
-                          eqrm_flags.csm_variability_method,
+                      eqrm_flags.csm_variability_method,
                       'csm_hysteretic_damping':
-                          eqrm_flags.csm_hysteretic_damping,
+                      eqrm_flags.csm_hysteretic_damping,
                       'atten_override_RSA_shape':
-                          eqrm_flags.atten_override_RSA_shape,
+                      eqrm_flags.atten_override_RSA_shape,
                       'atten_cutoff_max_spectral_displacement':
-                          eqrm_flags.atten_cutoff_max_spectral_displacement,
+                      eqrm_flags.atten_cutoff_max_spectral_displacement,
                       'loss_min_pga': eqrm_flags.loss_min_pga}
 
         damage_model = Damage_model(self, SA, eqrm_flags.atten_periods,
@@ -265,9 +264,9 @@ class Structures(Sites):
         # Compute building damage and loss (LOTS done here!)
         total_loss = \
             damage_model.aggregated_building_loss(
-                        ci=eqrm_flags.loss_regional_cost_index_multiplier,
-                        loss_aus_contents=eqrm_flags.loss_aus_contents)
-    
+                ci=eqrm_flags.loss_regional_cost_index_multiplier,
+                loss_aus_contents=eqrm_flags.loss_aus_contents)
+
         return (total_loss, damage_model)
 
     def __getitem__(self, key):
@@ -309,7 +308,9 @@ class Structures(Sites):
         for k in new_building_parameters.keys():
             new_shape = list(new_building_parameters[k].shape)
             new_shape[0] = new_len
-            new_building_parameters[k] = np.resize(new_building_parameters[k], new_shape)
+            new_building_parameters[k] = np.resize(
+                new_building_parameters[k],
+                new_shape)
 
         # return joined Structures object with .building_parameters from self
         return Structures(joined.latitude, joined.longitude,
@@ -352,7 +353,7 @@ def get_index(key_order, desired_keys):
     key_to_index = {}
     for (index, key) in enumerate(key_order):
         # check uniqueness
-        assert not key_to_index.has_key(key)
+        assert key not in key_to_index
         key_to_index[key] = index
 
     # Map desired names to numbers
@@ -361,15 +362,15 @@ def get_index(key_order, desired_keys):
 
 def build_par_file(buildpars_flag):
     # Build lookup table for building parameters
-    buildpars_map={0: 'building_parameters_workshop_1',
-                   1: 'building_parameters_workshop',
-                   2: 'building_parameters_hazus',
-                   3: 'building_parameters_workshop_2',
-                   4: 'building_parameters_workshop_3'}
+    buildpars_map = {0: 'building_parameters_workshop_1',
+                     1: 'building_parameters_workshop',
+                     2: 'building_parameters_hazus',
+                     3: 'building_parameters_workshop_2',
+                     4: 'building_parameters_workshop_3'}
 
     # create links to required building parameters
     if isinstance(buildpars_flag, str):
-         buildpars = 'building_parameters_' + buildpars_flag
+        buildpars = 'building_parameters_' + buildpars_flag
     else:
         buildpars = buildpars_map[buildpars_flag]
 
@@ -412,9 +413,9 @@ def build_replacement_ratios(usage_per_struct, buildings_usage_classification):
     convert = {}
 
     # extract usage dependent parameters
-    if buildings_usage_classification is 'HAZUS': # HAZUS_USAGE
+    if buildings_usage_classification is 'HAZUS':  # HAZUS_USAGE
         file = 'replacement_cost_ratios_wrt_HAZUS_Usage.csv'
-    elif buildings_usage_classification is 'FCB': # FCB_USAGE
+    elif buildings_usage_classification is 'FCB':  # FCB_USAGE
         file = 'replacement_cost_ratios_wrt_FCB_Usage.csv'
         convert[usage_column] = int
     else:
@@ -426,7 +427,7 @@ def build_replacement_ratios(usage_per_struct, buildings_usage_classification):
         convert[comp] = float
 
     root_dir = determine_eqrm_path()
-    data_dir = join(root_dir, 'resources','data')
+    data_dir = join(root_dir, 'resources', 'data')
     (att_dic, _) = csv2dict(join(data_dir, file), convert=convert)
 
     # This way does not have an assert
@@ -452,12 +453,10 @@ def build_replacement_ratios(usage_per_struct, buildings_usage_classification):
                               att_dic[components[2]][i]]
 
     rcp_array = asarray([cost_ratios[usage] for usage in usage_per_struct])
-    assert allclose(sum(rcp_array), rcp_array.shape[0],0.0000001)
+    assert allclose(sum(rcp_array), rcp_array.shape[0], 0.0000001)
 
     replacement_cost_ratios = {}
     for (i, comp) in enumerate(components):
-        replacement_cost_ratios[comp] = rcp_array[:,i]
+        replacement_cost_ratios[comp] = rcp_array[:, i]
 
     return replacement_cost_ratios
-
-

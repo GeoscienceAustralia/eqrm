@@ -7,10 +7,11 @@ Do this by loading up and overwriting all of the set data .py files.
 """
 
 from eqrm_code.eqrm_filesystem import eqrm_path, demo_path, \
-     Implementation_Path, mini_scenario_Path, scenario_scenarios_path, \
-     mini_scenario_scenarios_path
+    Implementation_Path, mini_scenario_Path, scenario_scenarios_path, \
+    mini_scenario_scenarios_path
 from eqrm_code.parse_in_parameters import find_set_data_py_files, \
-     update_control_file
+    update_control_file
+
 
 def rewrite_set_data_py(path=None):
     """
@@ -30,15 +31,15 @@ def rewrite_set_data_py(path=None):
         path = eqrm_path
 
     set_data_files = find_set_data_py_files(path)
-    #print "set_data_files", set_data_files
+    # print "set_data_files", set_data_files
     for file in set_data_files:
-        #print "file", file
+        # print "file", file
         update_control_file(file)
-        
+
 
 #-------------------------------------------------------------
 if __name__ == "__main__":
     rewrite_set_data_py(path=demo_path)
-    #rewrite_set_data_py(path=Implementation_Path)
-    #rewrite_set_data_py(path=scenario_scenarios_path)
-    #rewrite_set_data_py(path=mini_scenario_Path)
+    # rewrite_set_data_py(path=Implementation_Path)
+    # rewrite_set_data_py(path=scenario_scenarios_path)
+    # rewrite_set_data_py(path=mini_scenario_Path)

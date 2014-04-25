@@ -13,15 +13,14 @@ sites = range(sites_len)
 
 para = Parallel()
 para.calc_lo_hi(sites_len)
-print "I am processor %d of %d on node %s. lo is %i, hi is %i" %(para.rank,
-                                                                 para.size,
-                                                                 para.node,
-                                                                 int(para.lo),
-                                                                 int(para.hi))
+print "I am processor %d of %d on node %s. lo is %i, hi is %i" % (para.rank,
+                                                                  para.size,
+                                                                  para.node,
+                                                                  int(para.lo),
+                                                                  int(para.hi))
 
-for i in range(para.lo,para.hi):
+for i in range(para.lo, para.hi):
     print i
 
 # Now lets
 para.finalize()
-

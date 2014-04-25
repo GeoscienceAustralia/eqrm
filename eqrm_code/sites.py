@@ -41,6 +41,7 @@ from eqrm_code.ANUGA_utilities import log
 
 
 class Sites(file_store.File_Store):
+
     """An object to hold site data."""
 
     def __init__(self, latitude, longitude, **attributes):
@@ -51,7 +52,7 @@ class Sites(file_store.File_Store):
         attributes  dictionary of site attributes (vectors of data)
         """
         super(Sites, self).__init__('sites')
-        
+
         self.latitude = asarray(latitude)
         self.longitude = asarray(longitude)
         self.attributes = attributes
@@ -60,17 +61,17 @@ class Sites(file_store.File_Store):
         assert(len(self.latitude) == len(self.longitude))
         for key in self.attributes:
             assert(len(self.latitude) == len(self.attributes[key]))
-            
+
     def __del__(self):
         super(Sites, self).__del__()
-    
+
     # PROPERTIES #
-    # Define getters and setters for each attribute to exercise the 
+    # Define getters and setters for each attribute to exercise the
     # file-based data structure
-    latitude = property(lambda self: self._get_file_array('latitude'), 
+    latitude = property(lambda self: self._get_file_array('latitude'),
                         lambda self, value: self._set_file_array('latitude', value))
-    
-    longitude = property(lambda self: self._get_file_array('longitude'), 
+
+    longitude = property(lambda self: self._get_file_array('longitude'),
                          lambda self, value: self._set_file_array('longitude', value))
     # END PROPERTIES #
 
@@ -79,7 +80,7 @@ class Sites(file_store.File_Store):
         Save the ndarray objects to the specified directory
         """
         self._save(dir)
-    
+
     @classmethod
     def load(cls, load_dir):
         """
@@ -132,7 +133,7 @@ class Sites(file_store.File_Store):
             sites_dict = csv_to_arrays(file, **attribute_conversions)
             attributes['Vs30'] = sites_dict['VS30']
         except:
-            # If not present in the file, analysis will add the mapping based 
+            # If not present in the file, analysis will add the mapping based
             # on site class
             pass
 
@@ -153,13 +154,13 @@ class Sites(file_store.File_Store):
         for k in self.attributes.keys():
             attributes[k] = self.attributes[k][key]
 
-        sites = Sites(self.latitude[key], self.longitude[key], **attributes) 
-        
+        sites = Sites(self.latitude[key], self.longitude[key], **attributes)
+
         if self.vulnerability_set is not None:
             sites.vulnerability_set = self.vulnerability_set
-        
+
         return sites
-    
+
     def __repr__(self):
         return ('Sites:\n'
                 'number of sites:%r\n'
@@ -167,7 +168,7 @@ class Sites(file_store.File_Store):
                 '           long:%r\n'
                 '     attributes:%r\n'
                 % (len(self), self.latitude, self.longitude, self.attributes))
-        
+
     def __str__(self):
         return ('Sites:\n'
                 'number of sites:%s\n'
@@ -191,12 +192,12 @@ class Sites(file_store.File_Store):
                 # site classes.
                 raise KeyError
         self.attributes['Vs30'] = array(Vs30_list)
-    
+
     def validate_vulnerability_set(self):
         msg = 'validate_vulnerability_set is not supported for this site object'
         raise RuntimeError(msg)
-    
-    #FIXME consider moving to event set
+
+    # FIXME consider moving to event set
     def distances_from_event_set(self, event_set, event_set_trace_starts=True):
         """
         The distance from self.sites to event_set.centroids.
@@ -232,21 +233,24 @@ class Sites(file_store.File_Store):
                              event_set.depths_to_top,
                              projection)
 
-    
     def closest_site(self, lat, lon):
         """Return the index of the closest site to the given lat and lon"""
-        distances = As_The_Cockey_Flies(lat, lon, self.latitude, self.longitude)
+        distances = As_The_Cockey_Flies(
+            lat,
+            lon,
+            self.latitude,
+            self.longitude)
         return distances.argmin()
-        
+
 
 def load_sites(parallel, load_dir):
     """
     Load the site object from file in load_dir
     """
     log.info('P%s: Loading site from %s' % (parallel.rank, load_dir))
-    
+
     sites = Sites.load(load_dir)
-    
+
     return sites
 
 
@@ -261,7 +265,6 @@ def truncate_sites_for_test(use_site_indexes, sites, site_indexes):
     """
 
     if use_site_indexes is True:
-        return sites[site_indexes-1]	# -1 offset to match matlab
+        return sites[site_indexes - 1]  # -1 offset to match matlab
 
     return sites
-

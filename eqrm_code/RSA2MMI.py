@@ -17,16 +17,17 @@ Created: 26 April 2010
 
 from scipy import zeros, log10, array, where
 
-    
+
 # Convert RSA to MMI using Atkinson and Kaka (2007) formula
 # Currently only implemented for PGA, need to add for other periods.
-# 
-def rsa2mmi_array(data,period = 1.0):
+#
+def rsa2mmi_array(data, period=1.0):
     data = array(data)
     verbose = False
     MMI_list = []
     if period == 1.0:
-        if verbose: print 'doing period ',period
+        if verbose:
+            print 'doing period ', period
         C1 = 3.23
         C2 = 1.18
         C3 = 0.57
@@ -34,7 +35,8 @@ def rsa2mmi_array(data,period = 1.0):
         logy15 = 1.50
         sigma1 = 0.84
     elif period == 0.0:
-        if verbose: print 'doing period ',period
+        if verbose:
+            print 'doing period ', period
         C1 = 2.65
         C2 = 1.39
         C3 = -1.91
@@ -42,7 +44,8 @@ def rsa2mmi_array(data,period = 1.0):
         logy15 = 1.69
         sigma1 = 1.01
     elif period == 2.0:
-        if verbose: print 'doing period ',period
+        if verbose:
+            print 'doing period ', period
         C1 = 3.72
         C2 = 1.29
         C3 = 1.99
@@ -50,7 +53,8 @@ def rsa2mmi_array(data,period = 1.0):
         logy15 = 1.00
         sigma1 = 0.86
     elif period == 0.3:
-        if verbose: print 'doing period ',period
+        if verbose:
+            print 'doing period ', period
         C1 = 2.40
         C2 = 1.36
         C3 = -1.83
@@ -58,26 +62,26 @@ def rsa2mmi_array(data,period = 1.0):
         logy15 = 1.92
         sigma1 = 0.88
     else:
-        print 'period ',period,' not implemented yet!'
-        return 0    
-    
+        print 'period ', period, ' not implemented yet!'
+        return 0
+
     data *= 980
     MMI = zeros(data.shape)
-    
+
     # Avoid divide by zero errors in log10.
     data_positive_inds = where(data > 0)
     data_negative_inds = where(data <= 0)
-    
+
     MMI[data_positive_inds] = where(log10(data[data_positive_inds]) <= logy15,
-                                    C1 + C2*log10(data[data_positive_inds]),
-                                    C3 + C4*log10(data[data_positive_inds]))
-               
-    MMI[data_positive_inds] = where(MMI[data_positive_inds] > 10, 
-                                    10, 
+                                    C1 + C2 * log10(data[data_positive_inds]),
+                                    C3 + C4 * log10(data[data_positive_inds]))
+
+    MMI[data_positive_inds] = where(MMI[data_positive_inds] > 10,
+                                    10,
                                     MMI[data_positive_inds])
-    
-    # This will never have any indexes, since you can only take the log10 of a 
+
+    # This will never have any indexes, since you can only take the log10 of a
     # positive number, and you do log10(data) above.
     MMI[data_negative_inds] = 0
-    
+
     return MMI

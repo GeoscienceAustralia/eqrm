@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """
   Author:  Duncan Gray, duncan.gray@ga.gov.au
-           
+
   Description: This module reads in the EQRM control file which
   describes the settings of a simulation.  The control file is a
   python file, so vectors can be passed in easily and if necessary a
@@ -13,19 +13,19 @@
   Notes on the EQRM control file format.
 
   All attributes are specified in CONV_DIC_NEW.
-  
+
   If an attribute is not present in the set_data.py file and the
   attribute has a default value, this value will be used in eqrm_flags.
-  
+
   Setting an attribute to None is not equivaluent to removing the
   attribute from the set_data.py file, since not all attributes default
   to None.
-  
+
   If an attribute does not have to be defined it is given a default
   value of None.  An attribute without a default has to be defined.
-  
-  Lists are automatically converted to arrays.  
- 
+
+  Lists are automatically converted to arrays.
+
   Copyright 2007 by Geoscience Australia
  """
 
@@ -43,7 +43,7 @@ try:
     log_imported = True
 except ImportError:
     log_imported = False
-    
+
 try:
     from eqrm_code.util import convert_path_string_to_join
 except ImportError:
@@ -51,29 +51,29 @@ except ImportError:
         """
         This is to modify python scripts, changing r"./foo/bar" to
         'join('.','foo','bar')'
-        
+
         Args:
         path: The string value to change to a join
-        
+
         Returns:
         A join statement, as a string.
         """
-        
-        seps = ['/','\\']
+
+        seps = ['/', '\\']
         out = multi_split(path, seps)
         out = [x for x in out if x != '']
         out = "', '".join(out)
         out = "join('" + out + "')"
         return out
-    
+
     def multi_split(split_this, seps):
         """
         Split a string based on multiple seperators.
-        
+
         Args:
           split_this: the string to split.
           seps: A list of seperators.
-        
+
         Returns:
           A list of strings.
         """
@@ -100,7 +100,7 @@ SECOND_LINE = '  EQRM parameter file'
 #         Lower numbers printed first.
 # values - Obsolete. Used to convert from the old style to the new.
 # default - default value if not set
-# default_to_attr - default to another parameter in this list. The parameter 
+# default_to_attr - default to another parameter in this list. The parameter
 # must be defined in an item in a lower order in the list.
 
 CONV_NEW = [{'order': 10.0,
@@ -258,7 +258,7 @@ CONV_NEW = [{'order': 10.0,
              'default': 400},
             {'order': 50.08,
              'new_para': 'atten_spawn_bins',
-             'default': 1}, # Needed to get array dimensions right.
+             'default': 1},  # Needed to get array dimensions right.
             {'old_para': 'resp_crv_flag',
              'values': {0: None,
                         2: 'Aust_standard_Sa',
@@ -325,10 +325,10 @@ CONV_NEW = [{'order': 10.0,
              'default': None,
              'run_type': ['risk_csm']},
             {
-             'order': 75.01,
-             'new_para': 'bridges_functional_percentages',
-             'default': None,
-             'run_type': ['bridge']},
+                'order': 75.01,
+                'new_para': 'bridges_functional_percentages',
+                'default': None,
+                'run_type': ['bridge']},
             {'order': 80.0,
              'title': '\n# Capacity Spectrum Method\n'},
             {'old_para': 'var_bcap_flag',
@@ -410,7 +410,7 @@ CONV_NEW = [{'order': 10.0,
              'title': '\n# Vulnerability\n'},
             {'order': 95.01,
              'new_para': 'vulnerability_variability_method',
-             'default': 2, # random sampling
+             'default': 2,  # random sampling
              'run_type': ['risk_mmi']},
             {'order': 97.0,
              'title': '\n# Fatalities\n'},
@@ -420,7 +420,7 @@ CONV_NEW = [{'order': 10.0,
              'run_type': ['fatality']},
             {'order': 97.02,
              'new_para': 'fatality_theta',
-             'default': 14.05, 
+             'default': 14.05,
              'run_type': ['fatality']},
             {'order': 100.0,
              'title': '\n# Save\n',
@@ -461,7 +461,7 @@ CONV_NEW = [{'order': 10.0,
              'order': 100.06,
              'new_para': 'save_prob_structural_damage',
              'default': False,
-             'run_type': ['risk_csm','bridge']},
+             'run_type': ['risk_csm', 'bridge']},
             {'old_para': 'save_fatalities',
              'order': 100.07,
              'new_para': 'save_fatalities',
@@ -472,13 +472,13 @@ CONV_NEW = [{'order': 10.0,
              'default': 'generate'},
             {'order': 110.04,
              'new_para': 'data_array_storage',
-             'default_to_attr': 'output_dir'}, # see _add_default_values
+             'default_to_attr': 'output_dir'},  # see _add_default_values
             {'order': 110.05,
              'new_para': 'file_array',
              'default': False},
             {'order': 110.06,
              'new_para': 'event_set_load_dir',
-             'default': None}, # see _verify_eqrm_flags
+             'default': None},  # see _verify_eqrm_flags
             {'order': 120.01,
              'new_para': 'file_log_level',
              'default': 'debug'},
@@ -494,20 +494,20 @@ CONV_NEW = [{'order': 10.0,
             ]
 
 # Old style attributes that have not been removed yet.
-OLD_STYLE_PARAS_HARD_WIRED = {'grid_flag':1}
+OLD_STYLE_PARAS_HARD_WIRED = {'grid_flag': 1}
 
 # 'attributes' that are added to eqrm_flags when executed on the command-line.
-KNOWN_KWARGS = {'use_determ_seed':None,
-                     'compress_output':None,
-                     'eqrm_dir':None,
-                     'is_parallel':None,
-                     'default_input_dir':None}
+KNOWN_KWARGS = {'use_determ_seed': None,
+                'compress_output': None,
+                'eqrm_dir': None,
+                'is_parallel': None,
+                'default_input_dir': None}
 
 
 # CONV_DIC_NEW has all allowable eqrm_flags attributes
 CONV_DIC_NEW = {}
 for item in CONV_NEW:
-    if item.has_key('new_para'):
+    if 'new_para' in item:
         CONV_DIC_NEW[item['new_para']] = item
 CONV_DIC_NEW.update(KNOWN_KWARGS)
 CONV_DIC_NEW.update(OLD_STYLE_PARAS_HARD_WIRED)
@@ -515,7 +515,7 @@ CONV_DIC_NEW.update(OLD_STYLE_PARAS_HARD_WIRED)
 
 class AttributeSyntaxError(Exception):
     pass
-    
+
 
 def eqrm_data_home():
     """Return the EQRM data directory
@@ -525,11 +525,11 @@ def eqrm_data_home():
         print 'The environmental variable ' + ENV_EQRMDATAHOME + \
               ' , used by ParameterData.eqrm_data_home() is not set.'
         print 'Define this variable error before continuing.'
-        ###FIXME raise an error instead
-        sys.exit(1)            
+        # FIXME raise an error instead
+        sys.exit(1)
     return results
 
-    
+
 def get_time_user():
     """Return string of date, time and user.  Used to create
     time and user stamped directories.
@@ -543,6 +543,7 @@ def get_time_user():
         cmd = "USER"
     user = os.getenv(cmd)
     return "_".join((time, user))
+
 
 def create_parameter_data(handle, **kwargs):
     """
@@ -563,40 +564,40 @@ def create_parameter_data(handle, **kwargs):
     Returns:
       eqrm_flags, which is a DictKeyAsAttributes object.
     """
-    
+
     if isinstance(handle, str) and handle[-3:] == ".py":
         attributes = _from_file_get_params(handle)
     elif isinstance(handle, dict):
         attributes = _filter_local_dictionary(handle)
     else:
         attributes = introspect_attribute_values(handle)
-        
+
     # attributes is now a dictionary
-    
+
     # The attributes value have presidence/overwrite the kwargs
     kwargs.update(attributes)
     eqrm_flags = DictKeyAsAttributes(kwargs)
 
-    # Add Hard-wired results  
+    # Add Hard-wired results
     eqrm_flags.update(OLD_STYLE_PARAS_HARD_WIRED)
 
     # Remove or fix deprecated attributes
     deprecated_attributes(eqrm_flags)
-    
+
     _add_default_values(eqrm_flags)
-   
+
     # Check attribute names
     for key in eqrm_flags:
-        if not CONV_DIC_NEW.has_key(key):
+        if key not in CONV_DIC_NEW:
             msg = ("Attribute Error: Attribute " + key + " is unknown.")
             raise AttributeSyntaxError(msg)
-            
+
     # Do attribute value fixes
     _att_value_fixes(eqrm_flags)
 
     # Check if values are consistant
     _verify_eqrm_flags(eqrm_flags)
-    
+
     return eqrm_flags
 
 
@@ -612,21 +613,21 @@ def update_control_file(file_name_path, new_file_name_path=None):
     For example if you run it on any EQRM control files that use
     functions the updated files will not use functions.
 
-    
+
     Args:
       file_name_path: The EQRM control file.
       new_file_name_path: The new EQRM control file.
     """
-    
+
     if new_file_name_path is None:
         new_file_name_path = file_name_path
     attributes = _from_file_get_params(file_name_path)
-    
+
     # Remove deprecated attributes
     deprecated_attributes(attributes)
     eqrm_flags_to_control_file(new_file_name_path, attributes)
 
-    
+
 def _filter_local_dictionary(attributes):
     """
     Filter out all callable or special atts.
@@ -647,26 +648,27 @@ def _add_default_values(eqrm_flags):
 
     Args:
       eqrm_flags: A DictKeyAsAttributes instance.
-    """        
-    for param in CONV_NEW: 
-        if param.has_key('new_para') and \
-                not eqrm_flags.has_key(param['new_para']):
-            if param.has_key('default'):
+    """
+    for param in CONV_NEW:
+        if 'new_para' in param and \
+                param['new_para'] not in eqrm_flags:
+            if 'default' in param:
                 eqrm_flags[param['new_para']] = param['default']
-            elif param.has_key('default_to_attr') and \
-                    eqrm_flags.has_key(param['default_to_attr']) and \
+            elif 'default_to_attr' in param and \
+                    param['default_to_attr'] in eqrm_flags and \
                     eqrm_flags[param['default_to_attr']] is not None:
-                eqrm_flags[param['new_para']] = eqrm_flags[param['default_to_attr']]
+                eqrm_flags[param['new_para']] = eqrm_flags[
+                    param['default_to_attr']]
             else:
                 raise AttributeSyntaxError(
-                "Attribute Error: Attribute " + param['new_para']
-                + " must be defined.")
-            
+                    "Attribute Error: Attribute " + param['new_para']
+                    + " must be defined.")
+
     if eqrm_flags.file_array and sys.platform != 'win32':
         file_store.SAVE_METHOD = 'npy'
     else:
         file_store.SAVE_METHOD = None
-    
+
     file_store.DATA_DIR = eqrm_flags.data_array_storage
 
 # In the dictionary DEPRECATED_PARAS
@@ -678,66 +680,73 @@ def _add_default_values(eqrm_flags):
 #   OR
 # the value has a dictionary where the the keys are the value of the
 # deprecated attribute and the values are attribute and value pairs
-# to use, based on the value of the attribute.  
+# to use, based on the value of the attribute.
 #   OR
 # True, which means a warning, and deleting the attribute.
 
 DEPRECATED_PARAS = {
-    'atten_use_variability':                {True: None,
-                                             False:('atten_variability_method', None)},
-    'amp_use_variability':                  {True: None,
-                                             False:('amp_variability_method', None)},
-    'atten_use_rescale_curve_from_pga':     {True: None, # Do nothing
-                                             False:('atten_override_RSA_shape', None)},
-    'csm_use_hysteretic_damping':           {True: None, # Do nothing
-                                             False:('csm_hysteretic_damping', None)},
-    'atten_use_pga_scaling_cutoff':         {True: None, # Do nothing
-                                             False:('atten_pga_scaling_cutoff', None)},
-    'atten_aggregate_Sa_of_atten_models':   'atten_collapse_Sa_of_atten_models',
-    'atten_rescale_curve_from_pga':         'atten_override_RSA_shape',
-    'scenario_azimith':                     'scenario_azimuth',
-    'determ_azimith':                       'scenario_azimuth',
-    'determ_depth':                         'scenario_depth',
-    'determ_latitude':                      'scenario_latitude',
-    'determ_longitude':                     'scenario_longitude',
-    'determ_magnitude':                     'scenario_magnitude',
-    'determ_dip':                           'scenario_dip',
-    'determ_number_of_events':              'scenario_number_of_events',
-    'is_deterministic':                     'is_scenario',
-    'prob_azimuth_in_zones':                None,
-    'prob_delta_azimuth_in_zones':          None,
-    'prob_dip_in_zones':                    None,
-    'prob_number_of_mag_sample_bins':       None,
-    'save_prob_strucutural_damage':         'save_prob_structural_damage',
-    'prob_min_mag_cutoff':                  True,
-    'max_width':                            'scenario_max_width',
-    'event_set_name':                       True,
-    'data_dir':                             True,
-    'simulation_name':                      True
-    }
+    'atten_use_variability': {True: None,
+                              False: (
+                                  'atten_variability_method', None)},
+    'amp_use_variability': {True: None,
+                            False: (
+                                'amp_variability_method', None)},
+    'atten_use_rescale_curve_from_pga': {True: None,  # Do nothing
+                                         False: (
+                                             'atten_override_RSA_shape', None)},
+    'csm_use_hysteretic_damping': {True: None,  # Do nothing
+                                   False: (
+                                       'csm_hysteretic_damping', None)},
+    'atten_use_pga_scaling_cutoff': {True: None,  # Do nothing
+                                     False: (
+                                         'atten_pga_scaling_cutoff', None)},
+    'atten_aggregate_Sa_of_atten_models':
+    'atten_collapse_Sa_of_atten_models',
+    'atten_rescale_curve_from_pga': 'atten_override_RSA_shape',
+    'scenario_azimith': 'scenario_azimuth',
+    'determ_azimith': 'scenario_azimuth',
+    'determ_depth': 'scenario_depth',
+    'determ_latitude': 'scenario_latitude',
+    'determ_longitude': 'scenario_longitude',
+    'determ_magnitude': 'scenario_magnitude',
+    'determ_dip': 'scenario_dip',
+    'determ_number_of_events': 'scenario_number_of_events',
+    'is_deterministic': 'is_scenario',
+    'prob_azimuth_in_zones': None,
+    'prob_delta_azimuth_in_zones': None,
+    'prob_dip_in_zones': None,
+    'prob_number_of_mag_sample_bins': None,
+    'save_prob_strucutural_damage': 'save_prob_structural_damage',
+    'prob_min_mag_cutoff': True,
+    'max_width': 'scenario_max_width',
+    'event_set_name': True,
+    'data_dir': True,
+    'simulation_name': True
+}
 
 # In the dictionary DEPRECATED_VALUES
 # the key is the attribute where its value has been deprecated
-# the value is a second dictionary where 
+# the value is a second dictionary where
 #     - the key is the old value
 #     - the value is either a replacement value or None (remove attribute)
 DEPRECATED_VALUES = {
-                     'run_type':            {'risk': 'risk_csm'}
-                     }
+    'run_type': {'risk': 'risk_csm'}
+}
+
 
 def deprecated_attributes(eqrm_flags):
     """
     Remove/fix/Give a warning about deprecated attributes.
-    
+
     Args:
       eqrm_flags: A DictKeyAsAttributes instance.
     """
     for param in DEPRECATED_PARAS:
-        if eqrm_flags.has_key(param):
-            
+        if param in eqrm_flags:
+
             msg = 'WARNING: ' + param + \
                   ' term in EQRM control file is deprecated.'
-            
+
             handle_logic = DEPRECATED_PARAS[param]
             if handle_logic is None:
                 pass
@@ -745,61 +754,62 @@ def deprecated_attributes(eqrm_flags):
                 # handle_logic is a replacement string
                 # for the attribute name
                 eqrm_flags[handle_logic] = eqrm_flags[param]
-                
-                msg = '%s Replaced with %s=%s.' % (msg, 
+
+                msg = '%s Replaced with %s=%s.' % (msg,
                                                    handle_logic,
                                                    eqrm_flags[param])
-                
+
                 del eqrm_flags[param]
             elif handle_logic is True:
                 # Delete the attribute
                 msg = '%s Ignoring.' % msg
-                
+
                 del eqrm_flags[param]
-            else:                
+            else:
                 # handle_logic is a dictionary
                 what_to_do = handle_logic[eqrm_flags[param]]
                 if what_to_do is not None:
                     # The value is a tuple.
                     # the first value is the att name
                     # the second value is the att value
-                    eqrm_flags[what_to_do[0]] = what_to_do[1]    
-                    
-                    msg = '%s Replaced with %s=%s.' % (msg, 
+                    eqrm_flags[what_to_do[0]] = what_to_do[1]
+
+                    msg = '%s Replaced with %s=%s.' % (msg,
                                                        what_to_do[0],
                                                        what_to_do[1])
-                                
+
                 del eqrm_flags[param]
-            
+
             # logging is only set-up after the para file has been passed.
             # So these warnings will not be in the logs.
             if log_imported:
                 log.warning(msg)
-    
+
     for param in DEPRECATED_VALUES:
-        if eqrm_flags.has_key(param):
+        if param in eqrm_flags:
             param_value = eqrm_flags.get(param)
             param_to_replace = DEPRECATED_VALUES[param].get(param_value)
             if param_to_replace is not None:
-                
+
                 eqrm_flags[param] = param_to_replace
-                
+
                 msg = 'WARNING: %s=%s is deprecated.' % (param,
                                                          param_value)
                 msg = '%s Replaced with %s=%s.' % (msg,
                                                    param,
                                                    param_to_replace)
-                
+
                 # logging is only set-up after the para file has been passed.
                 # So these warnings will not be in the logs.
                 if log_imported:
                     log.warning(msg)
 
+
 def _att_value_fixes(eqrm_flags):
     """
     Change the attribute values so they are in the correct format for EQRM
       e.g. scaler values into arrays
-      
+
     Args:
       eqrm_flags: A DictKeyAsAttributes instance.
     """
@@ -808,32 +818,33 @@ def _att_value_fixes(eqrm_flags):
         att_val = getattr(eqrm_flags, att)
         if isinstance(att_val, list):
             eqrm_flags[att] = asarray(eqrm_flags[att])
-            
-    if eqrm_flags.atten_model_weights is not None:        
+
+    if eqrm_flags.atten_model_weights is not None:
         eqrm_flags['atten_model_weights'] = check_sum_1_normalise(
             eqrm_flags.atten_model_weights)
-    
+
     # if periods is collapsed (into a scalar), turn it into a vector
     if not isinstance(eqrm_flags.atten_periods, ndarray):
         eqrm_flags['atten_periods'] = array([eqrm_flags.atten_periods])
 
     # Fix the string specifying the directory structure
     if not eqrm_flags.output_dir[-1] == '/':
-        eqrm_flags['output_dir'] = eqrm_flags.output_dir+'/'
+        eqrm_flags['output_dir'] = eqrm_flags.output_dir + '/'
     if not eqrm_flags.input_dir[-1] == '/':
-        eqrm_flags['input_dir'] = eqrm_flags.input_dir+ '/'
+        eqrm_flags['input_dir'] = eqrm_flags.input_dir + '/'
     if not eqrm_flags.data_array_storage[-1] == '/':
-        eqrm_flags['data_array_storage'] = eqrm_flags.data_array_storage+ '/'
+        eqrm_flags['data_array_storage'] = eqrm_flags.data_array_storage + '/'
     eqrm_flags['output_dir'] = _change_slashes(eqrm_flags.output_dir)
     eqrm_flags['input_dir'] = _change_slashes(eqrm_flags.input_dir)
-    eqrm_flags['data_array_storage'] = _change_slashes(eqrm_flags.data_array_storage)
-    
-    if eqrm_flags.atten_variability_method == None:
+    eqrm_flags['data_array_storage'] = _change_slashes(
+        eqrm_flags.data_array_storage)
+
+    if eqrm_flags.atten_variability_method is None:
         eqrm_flags.atten_spawn_bins = None
 
-    
+
 def check_sum_1_normalise(weights, msg=None):
-    """    
+    """
     Check that a list or array basically sums to one. Normalise so it
     exactly sums to one.
 
@@ -843,18 +854,18 @@ def check_sum_1_normalise(weights, msg=None):
 
     Returns:
       A 1D array that sums to one.
-    """   
+    """
     # test if attenuation weights are close to 1 (with 0.01 absolute tolerance)
-    # this means that 3 weights with 0.33 passes  
+    # this means that 3 weights with 0.33 passes
     if not allclose(weights.sum(), 1.0, atol=0.01):
-        if msg == None:
-            msg =  'Weights should sum to 1.0, got ', weights
+        if msg is None:
+            msg = 'Weights should sum to 1.0, got ', weights
         raise ValueError(msg)
-    
+
     # Re-normalise weights so they do sum to 1
-    return weights/abs(weights.sum()) # normalize
-    
-    
+    return weights / abs(weights.sum())  # normalize
+
+
 def _change_slashes(path):
     """Swap from windows to linux file slashes
 
@@ -867,10 +878,11 @@ def _change_slashes(path):
             path = join(*split_path)
     return path
 
+
 def _from_file_get_params(path_file):
     """
     Convert an EQRM control file to dictionary of attributes.
-     
+
     para:
       path_file - the eqrm control file, which is a python file.
 
@@ -880,18 +892,18 @@ def _from_file_get_params(path_file):
     name = 'name_' + base64.urlsafe_b64encode(os.urandom(32))
     try:
         para_imp = imp.load_source(name, path_file)
-    except IOError, exc:
+    except IOError as exc:
         print "Problem with file " + path_file
         raise
     attributes = introspect_attribute_values(para_imp)
-    
+
     return attributes
 
 
 def _verify_eqrm_flags(eqrm_flags):
     """
     Check that the values in eqrm_flags are consistant with how EQRM works.
-    
+
     Args:
       eqrm_flags: A DictKeyAsAttributes instance.
     """
@@ -899,54 +911,55 @@ def _verify_eqrm_flags(eqrm_flags):
                     sort(eqrm_flags.atten_periods)):
         raise AttributeSyntaxError(
             "Syntax Error: Period values are not ascending")
-       
+
     if eqrm_flags.save_hazard_map == True and eqrm_flags.is_scenario == True:
         raise AttributeSyntaxError(
             'Cannot save the hazard map for a scenario.')
-  
+
     if eqrm_flags.atten_variability_method == 1 and \
-           eqrm_flags.run_type == 'risk_csm':
+            eqrm_flags.run_type == 'risk_csm':
         raise AttributeSyntaxError(
             'Cannot use spawning when doing a risk_csm simulation.')
 
     if eqrm_flags.amp_variability_method == 1:
         raise AttributeSyntaxError(
             'Cannot spawn on amplification.')
-    
+
     if eqrm_flags.event_set_handler == 'load' and \
             eqrm_flags.event_set_load_dir is None:
         raise AttributeSyntaxError(
             'event_set_load_dir must be set if event_set_handler is load.')
-    
+
     if eqrm_flags.event_set_handler == 'load' and \
             not os.path.exists(eqrm_flags.event_set_load_dir):
         raise AttributeSyntaxError(
-            'event_set_load_dir %s must exist if event_set_handler is load.' % \
-                eqrm_flags.event_set_load_dir)
-    
-    # Only do these checks if different from output_dir 
+            'event_set_load_dir %s must exist if event_set_handler is load.' %
+            eqrm_flags.event_set_load_dir)
+
+    # Only do these checks if different from output_dir
     # (output_dir gets created if not exists)
     if eqrm_flags.data_array_storage != eqrm_flags.output_dir and \
             not os.path.exists(eqrm_flags.data_array_storage):
         raise AttributeSyntaxError(
-            'data_array_storage %s must exist and be accessible from %s' % \
-                (eqrm_flags.data_array_storage, socket.gethostname()))
-        
+            'data_array_storage %s must exist and be accessible from %s' %
+            (eqrm_flags.data_array_storage, socket.gethostname()))
+
     if eqrm_flags.fault_source_tag is None and \
             eqrm_flags.zone_source_tag is None:
         raise AttributeSyntaxError(
             'Either fault_source_tag or zone_source_tag must be set.')
-    
+
     # Check to see if a parameter is defined that is incompatible with the
     # defined run_type
-    # Note: _add_default_values should have already dealt with adding 
+    # Note: _add_default_values should have already dealt with adding
     # incompatible defaults
-    for param in CONV_NEW: 
+    for param in CONV_NEW:
         if not is_param_compatible(param, eqrm_flags):
             raise AttributeSyntaxError(
-            "Attribute " + param['new_para'] +
-            " not compatible with run_type=" + eqrm_flags['run_type'] +
-            " - compatible run_type values are " + str(param['run_type']))
+                "Attribute " + param['new_para'] +
+                " not compatible with run_type=" + eqrm_flags['run_type'] +
+                " - compatible run_type values are " + str(param['run_type']))
+
 
 def is_param_compatible(param, eqrm_flags):
     """
@@ -955,30 +968,30 @@ def is_param_compatible(param, eqrm_flags):
     - it is non-default, and
     - is not compatible with the run_type specified
     """
-    
-    # these parameters needed might not exist but _add_default_values should 
+
+    # these parameters needed might not exist but _add_default_values should
     # take care of this
-    if not eqrm_flags.has_key('run_type') or \
-            not param.has_key('new_para'):
+    if 'run_type' not in eqrm_flags or \
+            'new_para' not in param:
         return True
-    
+
     # If no run_type configured the parameter is ok
-    if not param.has_key('run_type'):
+    if 'run_type' not in param:
         return True
-    
+
     run_type = param['run_type']
     param_name = param['new_para']
-    
+
     run_type_supported = eqrm_flags['run_type'] in run_type
-    is_default = param.has_key('default') and \
-                    eqrm_flags[param_name] == param['default']
+    is_default = 'default' in param and \
+        eqrm_flags[param_name] == param['default']
     is_none = eqrm_flags[param_name] is None
-                    
+
     if not is_none and not is_default and not run_type_supported:
         return False
     else:
         return True
-        
+
 
 def find_set_data_py_files(path):
     """Return a list of all the set_data .py files in a path directory.
@@ -990,21 +1003,21 @@ def find_set_data_py_files(path):
       path: directory to search in.
     """
     extension = '.py'
-    
+
     set_data_files = []
     for root, _, files in os.walk(path):
         for afile in files:
             if afile[-3:] == extension:
                 file_path_name = join(root, afile)
-                fref = open(file_path_name,'r')
+                fref = open(file_path_name, 'r')
                 _ = fref.readline()
                 snd_line = fref.readline()
                 if SECOND_LINE in snd_line:
-                    set_data_files.append(file_path_name)  
+                    set_data_files.append(file_path_name)
                 fref.close()
     return set_data_files
-    
-    
+
+
 def introspect_attribute_values(instance):
     """
     Puts all the attribite values of the instance into a dictionary.
@@ -1019,17 +1032,16 @@ def introspect_attribute_values(instance):
         att_values[att] = getattr(instance, att)
     return att_values
 
- 
-    
+
 class DictKeyAsAttributes(dict):
 
     """ An object to hold the EQRM control file data.  It is created
     in this module and not changed afterwards.
-    
+
     It is really a dictionary with the dictionary keys exposed as
     attributes where the attributes can not be set.
     """
-    
+
     def __getattribute__(self, key):
         """
         Try to get the value from the dictionary first.
@@ -1040,39 +1052,42 @@ class DictKeyAsAttributes(dict):
             # Used when calling dictionary functions.
             return object.__getattribute__(self, key)
 
-    def __delattr__(self, name):       
-        if self.has_key(name):
+    def __delattr__(self, name):
+        if name in self:
             del self[name]
         else:
             raise AttributeError
 
 
 class ParameterData(object):
+
     """
     Class to build the attribute_data 'onto'.
     The user will add attributes to this class.
     """
+
     def __init__(self):
         pass
 
+
 def eqrm_flags_to_control_file(py_file_name, eqrm_flags):
     """ Given a dictionary of the EQRM flag values convert it
-    to an EQRM control file. 
+    to an EQRM control file.
 
     Args:
       py_file_name: Name of the EQRM control file.
       eqrm_flags: dictionary of EQRM attributes.
     """
-    
+
      # paras2print is a list of lists.
      # The inner list is 2 elements long.
      #  index 0 is the attribute name
      #  index 1 is the value
     paras2print = []
     for para_dic in CONV_NEW:
-        if not para_dic.has_key('new_para'):
+        if 'new_para' not in para_dic:
             paras2print.append(para_dic['title'])
-        elif eqrm_flags.has_key(para_dic['new_para']):
+        elif para_dic['new_para'] in eqrm_flags:
             line = [para_dic['new_para']]
             val = eqrm_flags[para_dic['new_para']]
             if line[0] in ['input_dir',
@@ -1083,18 +1098,20 @@ def eqrm_flags_to_control_file(py_file_name, eqrm_flags):
                     val = convert_path_string_to_join(val)
             line.append(val)
             paras2print.append(line)
-            
+
     writer = WriteEqrmControlFile(py_file_name)
     writer.write_top()
-    writer.write_middle(paras2print)    
+    writer.write_middle(paras2print)
     writer.write_bottom()
-    
-        
+
+
 class WriteEqrmControlFile(object):
+
     """
     Write an EQRM control file.
-    
+
     """
+
     def __init__(self, file_name):
         """ Create the file handle.
         """
@@ -1103,7 +1120,7 @@ class WriteEqrmControlFile(object):
     def write_top(self):
         """ Write the imports ect. at the beginning of the py file.
         """
- 
+
         self.handle.write('"""\n')
 
         self.handle.write(SECOND_LINE)
@@ -1125,15 +1142,15 @@ class WriteEqrmControlFile(object):
             '\n'
             'from os import getenv\n'
             'from os.path import join\n')
-        if log_imported: # as a proxy for the PYTHONPATH being set up.
+        if log_imported:  # as a proxy for the PYTHONPATH being set up.
             self.handle.write('from eqrm_code.parse_in_parameters import '
                               'eqrm_data_home, get_time_user\n')
-                
-        self.handle.write('\n')        
+
+        self.handle.write('\n')
 
     def write_middle(self, para_data):
-        """ Writes the attribute lines 
-        
+        """ Writes the attribute lines
+
         Args:
           para_data: A list of strings or lists.  If an element is a
             string it is written as one row.  If the element is a list,
@@ -1144,13 +1161,12 @@ class WriteEqrmControlFile(object):
             if isinstance(line, list):
                 self.handle.write(line[0] + ' = ' +
                                   add_value(line[1]) + '\n')
-            else:    
+            else:
                 self.handle.write(line)
-                
-            #self.handle.write('\n')
-        
-    def write_bottom(self):
 
+            # self.handle.write('\n')
+
+    def write_bottom(self):
         """ Write the end of the EQRM control file.
         """
         self.handle.write("\n\
@@ -1160,7 +1176,7 @@ if __name__ == '__main__':\n\
     from eqrm_code.analysis import main\n\
     main(locals())\n")
         self.handle.close()
-        
+
 
 def add_value(val):
     """
@@ -1175,19 +1191,19 @@ def add_value(val):
             # This is hacky.  Is is assuming the string join means
             # the join command is being used.
             val_str = val
-        else: 
+        else:
             val_str = '"' + val + '" '
     else:
-        if  isinstance(val, ndarray):
+        if isinstance(val, ndarray):
             val_str = str(val.tolist())
         elif isinstance(val, list) and isinstance(val[0], ndarray):
             # Assume all elements are arrays, with one element
             val_str = str([x[0] for x in val])
-                
+
         else:
-            val_str = str(val) 
+            val_str = str(val)
     return val_str
-    
+
 #-------------------------------------------------------------
 if __name__ == "__main__":
     pass
