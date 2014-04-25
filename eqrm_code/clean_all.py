@@ -2,7 +2,7 @@
 
    *.py~
    *.pyc
-   *.o   
+   *.o
    *.so
    *.dll
    *.aux
@@ -15,10 +15,11 @@ import os
 
 from eqrm_code import util
 
+
 def files_to_delete(filenames_to_delete, extensions_to_delete, dir="."):
     for dirpath, dirnames, filenames in os.walk(dir):
 
-        #print 'Searching dir', dirpath
+        # print 'Searching dir', dirpath
         if '.svn' in dirnames:
             dirnames.remove('.svn')  # don't visit SVN directories
 
@@ -31,9 +32,9 @@ def files_to_delete(filenames_to_delete, extensions_to_delete, dir="."):
 
 def find_files():
     extensions_to_delete = ['~',
-                            '.pyc','.pyo',       # Python
-                            '.o', '.so', '.dll', '.pyd', # C
-                            '.aux', '.ps']        # LaTeX 
+                            '.pyc', '.pyo',       # Python
+                            '.o', '.so', '.dll', '.pyd',  # C
+                            '.aux', '.ps']        # LaTeX
 
     filenames_to_delete = []
     files_to_delete(filenames_to_delete, extensions_to_delete)
@@ -44,21 +45,20 @@ def find_files():
     extensions_to_delete.append('_catalog')
     files_to_delete(filenames_to_delete, extensions_to_delete, dir=weave_path)
 
-
-    #FIXME remove the scenario test current files.
-
+    # FIXME remove the scenario test current files.
     return filenames_to_delete
+
 
 def clean_all_main(verbose=True, prompt=True):
     filenames_to_delete = find_files()
     if verbose is True:
         for file in filenames_to_delete:
-            print '  Flagged for deletion', file            
+            print '  Flagged for deletion', file
         print
-    if prompt is True:    
-        N = len(filenames_to_delete)             
+    if prompt is True:
+        N = len(filenames_to_delete)
         if N > 0:
-            msg = '%d files flagged for deletion. Proceed? (Y/N)[N]' %N
+            msg = '%d files flagged for deletion. Proceed? (Y/N)[N]' % N
             answer = raw_input(msg)
 
             if answer.lower() == 'y':
@@ -75,7 +75,6 @@ def clean_all_main(verbose=True, prompt=True):
             if verbose is True:
                 print 'Deleting', filename
             os.remove(filename)
-        
 
 
 #-------------------------------------------------------------

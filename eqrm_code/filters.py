@@ -10,6 +10,7 @@ import copy
 
 from scipy import where, intersect1d
 
+
 def apply_threshold_distance(bedrock_SA,
                              soil_SA,
                              sites,
@@ -26,16 +27,17 @@ def apply_threshold_distance(bedrock_SA,
     # But does this need to be Joyner_Boore?
     # FIXME do this earlier, and reduce the distribution calcs to do.
     distances = sites.distances_from_event_set(event_set). \
-                distance('Joyner_Boore')
-    #print "distances", distances
+        distance('Joyner_Boore')
+    # print "distances", distances
     site_inds, event_inds = where(distances > atten_threshold_distance)
-    #print "site_inds", site_inds
-    #print "event_inds", event_inds
+    # print "site_inds", site_inds
+    # print "event_inds", event_inds
     bedrock_SA[..., site_inds, event_inds, :] = 0
     if use_amplification is True:
         soil_SA[..., site_inds, event_inds, :] = 0
-    #print "bedrock_SA", bedrock_SA
-    #print "soil_SA", soil_SA
+    # print "bedrock_SA", bedrock_SA
+    # print "soil_SA", soil_SA
+
 
 def source_model_threshold_distance_subset(distances,
                                            source_model,
@@ -43,26 +45,26 @@ def source_model_threshold_distance_subset(distances,
     """
     source_model_threshold_distance_subset
     Calculate the distances of the event_set from the sites array. For those
-    events less than or equal to the attenuation threshold, return a subset 
+    events less than or equal to the attenuation threshold, return a subset
     source model so that calc_and_save_SA only works on those events.
-    
+
     calc_and_save_SA calculates an SA figure by getting a subset of event
     indices:
-    
+
     for source in source_model:
         event_inds = source.get_event_set_indexes()
         if len(event_inds) == 0:
             continue
         sub_event_set = event_set[event_inds]
-    
+
     Returns source_model_subset
     """
     # A rethink of apply_threshold distance
     # Calculate the distances of the event_set from the sites array and
     # return an event_set where distance <= atten_threshold_distance
     Rjb = distances.distance('Joyner_Boore')
-                
-    # distances is an ndarray where [sites, events]. We only want the events 
+
+    # distances is an ndarray where [sites, events]. We only want the events
     # dimension for this function as we're trimming events
     (sites_to_keep, events_to_keep) = where(Rjb <= atten_threshold_distance)
 
@@ -74,6 +76,7 @@ def source_model_threshold_distance_subset(distances,
     # 2. The intersection of this and events_to_keep is what we want
     for source in source_model_subset:
         source_indices = source.get_event_set_indexes()
-        source.set_event_set_indexes(intersect1d(source_indices,events_to_keep))
-    
+        source.set_event_set_indexes(
+            intersect1d(source_indices, events_to_keep))
+
     return source_model_subset

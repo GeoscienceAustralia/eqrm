@@ -7,4 +7,4 @@ import sys
 python_version = sys.version[0:5]
 number = ''.join(python_version.split('.'))
 
-sys.exit(number) 
+sys.exit(number)

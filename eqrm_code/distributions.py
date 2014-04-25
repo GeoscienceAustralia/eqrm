@@ -1,15 +1,15 @@
 """
  Title: distribution.py
- 
+
   Author:  Peter Row, peter.row@ga.gov.au
-           
+
   Description: Functions used to create a data list, using
   different data distribution methods. Used by generation_polygon.py.
- 
-  Version: $Revision: 965 $  
+
+  Version: $Revision: 965 $
   ModifiedBy: $Author: dgray $
   ModifiedDate: $Date: 2009-05-20 15:56:38 +1000 (Wed, 20 May 2009) $
-  
+
   Copyright 2007 by Geoscience Australia
 """
 
@@ -17,13 +17,15 @@ import random
 
 from scipy import stats, array, allclose, where
 
+
 def constant(mean=None, n=1):
     """Generate a list with a constant distribution"""
     mean = float(mean)
-    answer=[]
+    answer = []
     for i in xrange(n):
         answer.append(mean)
     return answer
+
 
 def uniform(minimum=None, maximum=None, n=1):
     """Generate a list with a uniform distribution"""
@@ -31,34 +33,38 @@ def uniform(minimum=None, maximum=None, n=1):
     maximum = float(maximum)
 
     if minimum == maximum:
-        return n*[minimum]
+        return n * [minimum]
     answer = []
     for i in xrange(n):
         answer.append(random.uniform(a=minimum, b=maximum))
     return answer
 
+
 def normal(mean=None, sigma=None, n=1, minimum=None, maximum=None):
     """
     Generate a list with a normal distribution.
     Option - setting mininum and maximum rejects and regenerates
-    any value outside the truncation range. 
+    any value outside the truncation range.
     """
     if minimum is None or minimum is 'None':
         minimum = None
-    else: minimum = float(minimum)
-                        
+    else:
+        minimum = float(minimum)
+
     if maximum is None or maximum is 'None':
         maximum = None
-    else: maximum = float(maximum)
-    
+    else:
+        maximum = float(maximum)
+
     mean = float(mean)
     sigma = float(sigma)
     answer = []
-    while len(answer)<n:
-        x=random.gauss(mu=mean,sigma=sigma)
-        if x>minimum and (x<maximum or (maximum is None)):
+    while len(answer) < n:
+        x = random.gauss(mu=mean, sigma=sigma)
+        if x > minimum and (x < maximum or (maximum is None)):
             answer.append(x)
     return answer
+
 
 def lognormal(mean=None, sigma=None, n=1, minimum=None, maximum=None):
     """
@@ -70,66 +76,68 @@ def lognormal(mean=None, sigma=None, n=1, minimum=None, maximum=None):
     """
     if minimum is None or minimum is 'None':
         minimum = None
-    else: minimum = float(minimum)
+    else:
+        minimum = float(minimum)
 
     if maximum is None or maximum is 'None':
         maximum = None
-    else: maximum = float(maximum)
-    
+    else:
+        maximum = float(maximum)
+
     mean = float(mean)
     sigma = float(sigma)
-    
+
     answer = []
-    while len(answer)<n:
-        x=random.lognormvariate(mu=mean,sigma=sigma)
-        if x>minimum and (x<maximum or (maximum is None)):
+    while len(answer) < n:
+        x = random.lognormvariate(mu=mean, sigma=sigma)
+        if x > minimum and (x < maximum or (maximum is None)):
             answer.append(x)
     return answer
 
+
 def catagory(string_length=None, n=1, **keywords):
-    keys=array(keywords.keys())
-    values=array([float(keywords[key]) for key in keys])
-    if not allclose(values.sum(),1.0):
-        raise ValueError,str(keywords)+'does not add to 1!!!'
-    
+    keys = array(keywords.keys())
+    values = array([float(keywords[key]) for key in keys])
+    if not allclose(values.sum(), 1.0):
+        raise ValueError(str(keywords) + 'does not add to 1!!!')
+
     # pick a random between 0 and one
-    variate=stats.uniform(0).rvs(n)
-    # assign random number to a word index 
-    index=values.cumsum().searchsorted(variate)    
+    variate = stats.uniform(0).rvs(n)
+    # assign random number to a word index
+    index = values.cumsum().searchsorted(variate)
     # returns index such that:
     #     values[index-1] < variate <= values[index]
     #     0 if variate<values(0)
     #     len(values) if variate > values (NOT ALLOWED!)
 
-    
     try:
-        answer=keys[index]
+        answer = keys[index]
     except IndexError:
         # remove any illegal index values
         # (not a theoretical problem, as values.cumsum()[-1]==1,
         #  and variate.max() is < 1, but it is possible that
         #  values sums up to just less than 1, and the variate
         #  goes a bit over. Once in a million.
-        index[where(index==len(values))]=len(values)-1
-        answer=keys[index]
-    
+        index[where(index == len(values))] = len(values) - 1
+        answer = keys[index]
+
     if string_length is not None:
-        answer=array(answer,dtype='|S'+str(string_length))
+        answer = array(answer, dtype='|S' + str(string_length))
     return answer
-    
-    
+
+
 ###################
 # END OF FUNCTIONS#
 ###################
 
 """No functions past this step will be included in the table"""
-__local_functions = locals().copy() #all the functions in the local namespace
+__local_functions = locals().copy()  # all the functions in the local namespace
 # Note that this is a copy, otherwise __local_functions would point to itself
 
 distribution_functions = {}
 for function_name in __local_functions.keys():
-    #for all functions in the local namespace
-    
-    if not function_name.startswith('__'): #If it's not private
+    # for all functions in the local namespace
+
+    if not function_name.startswith('__'):  # If it's not private
         function = __local_functions[function_name]
-        distribution_functions[function_name]=function
+        distribution_functions[function_name] = function

@@ -17,7 +17,7 @@ import coverage
 coverage.erase()
 coverage.start()
 
-import test_all
+from . import test_all
 
 # run the unit tests and return a list of the unit test file names
 module_names, _ = test_all.main()
@@ -33,7 +33,7 @@ for ditch in removes:
         module_names.remove(ditch)
     except:
         pass
-    
+
 modules = map(__import__, module_names)
 
 coverage.report(modules)
