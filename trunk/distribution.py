@@ -13,7 +13,7 @@ import re
 import os
 from shutil import copyfile, copytree, rmtree
 from os import system, remove, sep, getcwd, chdir, rmdir, mkdir, popen, \
-     listdir
+    listdir
 from os.path import join, isfile
 
 from for_all_verification import do_tests_checks_demos_audits
@@ -29,7 +29,7 @@ distro_dirs = [
     'preprocessing',
     'resources',
     'test_resources'
-    ]
+]
 
 # files to include at the root level
 # Note copyright.pdf is created from copyright.tex
@@ -44,14 +44,16 @@ distro_files = [
     'README-install.txt',
     'README-tests.txt',
     'test_all.py'
-    ]
-    
+]
+
+
 def main():
-    create_distribution_zip('eqrm_version2.3.',distro_dirs=distro_dirs,
-                                   distro_files=distro_files)
-    
+    create_distribution_zip('eqrm_version2.3.', distro_dirs=distro_dirs,
+                            distro_files=distro_files)
+
+
 def create_distribution_zip(vername, distro_dirs=None,
-                                   distro_files=None):
+                            distro_files=None):
     """
     Create a zip file that can be posted to source forge.
 
@@ -65,46 +67,46 @@ def create_distribution_zip(vername, distro_dirs=None,
     return:
       Return False if create_distribution_zip fails
     """
-    
+
     # Exporting the eqrm root repository to the temp file
     expo_dir = tempfile.mkdtemp(prefix='EQRM_distribution_expo_dir')
     print "expo_dir", expo_dir
 
     # When using this, make sure the expo_dir is not deleted in 2 places.
-    
-    if True: # This needs a windows svn command line prompt 
-        s = 'svn --force export http://eqrm.googlecode.com/svn/trunk '+expo_dir
-    
+
+    if True:  # This needs a windows svn command line prompt
+        s = 'svn --force export http://eqrm.googlecode.com/svn/trunk ' + \
+            expo_dir
+
         print s
-        
+
         print "This will take a while..."
-        
+
         fid = popen(s)
-    
+
         version_info = fid.read()
         print "version_info", version_info
         for line in version_info.split('\n'):
             # print "line", line
             if line.startswith('Exported'):
-                
-                version = re.findall(re.compile(r'[0-9]+'),line)
-                if len(version)==1:
+
+                version = re.findall(re.compile(r'[0-9]+'), line)
+                if len(version) == 1:
                     version = version[0]
-                    print "Got a version number:" , version
+                    print "Got a version number:", version
                 else:
                     print "Could not get version number.  Got this instead",  \
                           version
                     print "WARNING: Using incorrect version number."
-                    version ='999'
+                    version = '999'
         fid.close()
     else:
-        expo_dir = join("C:","WINNT","Profiles","gray duncan",
-                        "Local Settings","Temp",
+        expo_dir = join("C:", "WINNT", "Profiles", "gray duncan",
+                        "Local Settings", "Temp",
                         "EQRM_distribution_expo_dir-uphuz")
-        expo_dir = join("c:\\","dump","eqrm_core_trunk")
+        expo_dir = join("c:\\", "dump", "eqrm_core_trunk")
         version = '858'
-        
-        
+
     # create another temp dir to move things into
     temp_dir = tempfile.mkdtemp(prefix='EQRM_distribution_temp_dir')
     eqrm_dir_name = 'python_eqrm'
@@ -116,10 +118,10 @@ def create_distribution_zip(vername, distro_dirs=None,
     # Copy the dir's we want to distribute
     for dir in distro_dirs:
         # Fail silently if I can't copy a dir.
-        src = join(expo_dir, dir) 
+        src = join(expo_dir, dir)
         dst = join(zip_dir, dir)
         copytree(src, dst)
-    
+
     # Copy the file's we want to distribute
     for file in distro_files:
         # Fail silently if I can't copy a file.
@@ -129,10 +131,10 @@ def create_distribution_zip(vername, distro_dirs=None,
             copyfile(src, dst)
         except:
             pass
-        
+
     # I tried doing the compile stuff before moving files.
     # It didn't work for me.
-    
+
     # compile the copyright document
     current_dir = getcwd()
     chdir(zip_dir)
@@ -146,20 +148,20 @@ def create_distribution_zip(vername, distro_dirs=None,
     system(s)
     remove('copyright.tex')
     remove('copyright.dvi')
-    try:    
+    try:
         remove('copyright.aux')
     except:
         pass
-    try:    
+    try:
         remove('copyright.log')
     except:
         pass
-    try:    
+    try:
         remove('copyright.tex.bak')
     except:
         pass
 
-    # Move the EQRM inputs pdf to the Documentation directory. 
+    # Move the EQRM inputs pdf to the Documentation directory.
     src = join(expo_dir, 'latex_sourcefiles', 'manual_tech', 'EQRM_inputs.pdf')
     dst = join(zip_dir, 'Documentation', 'EQRM_inputs.pdf')
     try:
@@ -182,12 +184,12 @@ def create_distribution_zip(vername, distro_dirs=None,
         print s
         system(s)
         if False:
-            for ext in ['.tex', '.log', '.aux', '.dvi']:  
-                try:    
+            for ext in ['.tex', '.log', '.aux', '.dvi']:
+                try:
                     remove(file_base + ext)
                 except:
                     pass
-            try:    
+            try:
                 remove(file_base + '.bak')
             except:
                 pass
@@ -197,38 +199,35 @@ def create_distribution_zip(vername, distro_dirs=None,
     chdir('Documentation')
     # Remove, this dir is not our IP, we shouldn't distribute.
     rmtree('coding_standards')
-    
+
     # Add the stored_version_info.py file to eqrm_code
     chdir('..')
     chdir('eqrm_code')
     fid = open('stored_version_info.py', 'w')
-    fid.write('version = '+version+'\n')
+    fid.write('version = ' + version + '\n')
     fid.close()
     remove('test_cadell_damage.py')
-    #rmtree('plotting')
-    
-    
+    # rmtree('plotting')
+
     #eqrm_code_dir = join(zip_dir,'eqrm_code')
-    #store_version_info(eqrm_code_dir)
-    
-    
+    # store_version_info(eqrm_code_dir)
     # Create the zip file before running tests which create .pyc
-    zip_file = vername+'svn'+version+'.zip'
-    repos_distro_file = join(current_dir,'distribution', zip_file)
-    
+    zip_file = vername + 'svn' + version + '.zip'
+    repos_distro_file = join(current_dir, 'distribution', zip_file)
+
     chdir(temp_dir)
     print '   '
     print 'zipping application into  ', repos_distro_file
-    system('zip -r -q '+zip_file+' '+eqrm_dir_name)
+    system('zip -r -q ' + zip_file + ' ' + eqrm_dir_name)
 
     # Haven't tried
-   #  # List all files in the current directory
+   # List all files in the current directory
 # allFileNames = os.listdir( os.curdir )
 
-# # Open the zip file for writing, and write some files to it
+# Open the zip file for writing, and write some files to it
 # myZipFile = zipfile.ZipFile( "spam_skit.zip", "w" )
 
-# # Write each file present into the new zip archive, except the python script
+# Write each file present into the new zip archive, except the python script
 # for fileName in allFileNames:
 #     (name, ext) = os.path.splitext( fileName )
 #     if ext != ".py":
@@ -247,15 +246,16 @@ def create_distribution_zip(vername, distro_dirs=None,
         demo_batchrun=True,
         verbose=True)
     if results_passed is False:
-        os.remove(zip_file) # delete the zip file.  It is a fail
+        os.remove(zip_file)  # delete the zip file.  It is a fail
         clean_up(current_dir, temp_dir, expo_dir)
         return False
-    
+
     chdir(temp_dir)
     # Move the zip file to the repository distro dir
-    copyfile(zip_file,repos_distro_file)
+    copyfile(zip_file, repos_distro_file)
 
     clean_up(current_dir, temp_dir, expo_dir)
+
 
 def clean_up(current_dir, temp_dir, expo_dir):
     chdir(current_dir)
@@ -263,7 +263,7 @@ def clean_up(current_dir, temp_dir, expo_dir):
     rmtree(expo_dir)
 
 if __name__ == '__main__':
-    if sys.platform == 'win32':  #Windows
+    if sys.platform == 'win32':  # Windows
         main()
     else:
         print "Distribution.py only works in windows. Let's give it a burl"
