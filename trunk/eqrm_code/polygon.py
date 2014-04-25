@@ -7,22 +7,23 @@ from scipy import radians, degrees, arcsin, zeros, ones, array, concatenate, \
     dot, reshape, pi, sin, random
 from random import uniform, randrange, seed as seed_function
 
-from projections import azimuthal_orthographic_ll_to_xy as ll2xy
- 
+from .projections import azimuthal_orthographic_ll_to_xy as ll2xy
+
 
 # constant used to convert degrees to radians: rad = deg * DegreesToRadians
 #DegreesToRadians = pi / 180.0
 
 
 from math import sqrt
-from numerical_tools import ensure_numeric
+from .numerical_tools import ensure_numeric
+
 
 def point_on_line(x, y, x0, y0, x1, y1):
     """Determine whether a point is on a line segment
 
     Input: x, y, x0, x0, x1, y1: where
         point is given by x, y
-	line is given by (x0, y0) and (x1, y1)
+        line is given by (x0, y0) and (x1, y1)
 
     This code is implemented in C, so it may not be executed.
     """
@@ -30,15 +31,15 @@ def point_on_line(x, y, x0, y0, x1, y1):
     a_normal = array([a[1], -a[0]])
     b = array([x1 - x0, y1 - y0])
     if dot(a_normal, b) == 0:
-        #Point is somewhere on the infinite extension of the line
-        len_a = sqrt(sum(a**2))
-        len_b = sqrt(sum(b**2))
+        # Point is somewhere on the infinite extension of the line
+        len_a = sqrt(sum(a ** 2))
+        len_b = sqrt(sum(b ** 2))
         if dot(a, b) >= 0 and len_a <= len_b:
-           return True
-	else:
-           return False
+            return True
+        else:
+            return False
     else:
-      return False
+        return False
 
 
 def is_inside_polygon(point, polygon, closed=True, verbose=False):
@@ -56,7 +57,7 @@ def is_inside_polygon(point, polygon, closed=True, verbose=False):
     else:
         msg = 'is_inside_polygon must be invoked with one point only'
         raise msg
-    
+
 
 def inside_polygon(points, polygon, closed=True, verbose=False):
     """Determine points inside a polygon
@@ -71,28 +72,29 @@ def inside_polygon(points, polygon, closed=True, verbose=False):
        a list or a numeric array
     """
 
-    if verbose: print 'Checking input to inside_polygon'
+    if verbose:
+        print 'Checking input to inside_polygon'
 
     try:
         points = ensure_numeric(points)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
         msg = 'Points could not be converted to Numeric array'
-	raise msg
+        raise msg
 
     try:
         polygon = ensure_numeric(polygon)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
-        msg = 'Polygon %s could not be converted to Numeric array' %(str(
-                polygon))
-	raise msg
+        msg = 'Polygon %s could not be converted to Numeric array' % (str(
+            polygon))
+        raise msg
 
     if len(points.shape) == 1:
         # Only one point was passed in. Convert to array of points
-    	points = reshape(points, (1,2))
+        points = reshape(points, (1, 2))
 
     indices, count = separate_points_by_polygon(points, polygon,
                                                 closed=closed,
@@ -100,7 +102,6 @@ def inside_polygon(points, polygon, closed=True, verbose=False):
 
     # Return indices of points inside polygon
     return indices[:count]
-
 
 
 def is_outside_polygon(point, polygon, closed=True, verbose=False):
@@ -118,9 +119,9 @@ def is_outside_polygon(point, polygon, closed=True, verbose=False):
     else:
         msg = 'is_outside_polygon must be invoked with one point only'
         raise msg
-    
 
-def outside_polygon(points, polygon, closed = True, verbose = False):
+
+def outside_polygon(points, polygon, closed=True, verbose=False):
     """Determine points outside a polygon
 
        Functions inside_polygon and outside_polygon have been defined in
@@ -130,27 +131,27 @@ def outside_polygon(points, polygon, closed = True, verbose = False):
        See separate_points_by_polygon for documentation
     """
 
-    if verbose: print 'Checking input to outside_polygon'
+    if verbose:
+        print 'Checking input to outside_polygon'
     try:
         points = ensure_numeric(points, float)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
         msg = 'Points could not be converted to Numeric array'
-	raise msg
+        raise msg
 
     try:
         polygon = ensure_numeric(polygon, float)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
         msg = 'Polygon could not be converted to Numeric array'
-	raise msg
-
+        raise msg
 
     if len(points.shape) == 1:
         # Only one point was passed in. Convert to array of points
-    	points = reshape(points, (1,2))
+        points = reshape(points, (1, 2))
 
     indices, count = separate_points_by_polygon(points, polygon,
                                                 closed=closed,
@@ -161,56 +162,56 @@ def outside_polygon(points, polygon, closed = True, verbose = False):
         # No points are outside
         return array([])
     else:
-        return indices[count:][::-1]  #return reversed
-       
+        return indices[count:][::-1]  # return reversed
 
-def in_and_outside_polygon(points, polygon, closed = True, verbose = False):
+
+def in_and_outside_polygon(points, polygon, closed=True, verbose=False):
     """Determine points inside and outside a polygon
 
        See separate_points_by_polygon for documentation
 
-       Returns an array of points inside and an array of points outside the 
+       Returns an array of points inside and an array of points outside the
        polygon
     """
 
-    if verbose: print 'Checking input to outside_polygon'
+    if verbose:
+        print 'Checking input to outside_polygon'
     try:
         points = ensure_numeric(points, float)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
         msg = 'Points could not be converted to Numeric array'
-	raise msg
+        raise msg
 
     try:
         polygon = ensure_numeric(polygon, float)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
         msg = 'Polygon could not be converted to Numeric array'
-	raise msg
+        raise msg
 
     if len(points.shape) == 1:
         # Only one point was passed in. Convert to array of points
-    	points = reshape(points, (1,2))
-
+        points = reshape(points, (1, 2))
 
     indices, count = separate_points_by_polygon(points, polygon,
                                                 closed=closed,
                                                 verbose=verbose)
-    
+
     # Returns indices of points inside and indices of points outside
     # the polygon
 
     if count == len(indices):
         # No points are outside
-        return indices[:count],[]
+        return indices[:count], []
     else:
-        return  indices[:count], indices[count:][::-1]  #return reversed
+        return indices[:count], indices[count:][::-1]  # return reversed
 
 
 def separate_points_by_polygon(points, polygon,
-                               closed = True, verbose = False):
+                               closed=True, verbose=False):
     """Determine whether points are inside or outside a polygon
 
     Input:
@@ -250,152 +251,155 @@ def separate_points_by_polygon(points, polygon,
 
     """
 
-    #Input checks
-
+    # Input checks
 
     try:
         points = ensure_numeric(points, float)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
         msg = 'Points could not be converted to Numeric array'
-	raise msg
+        raise msg
 
     try:
         polygon = ensure_numeric(polygon, float)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
         msg = 'Polygon could not be converted to Numeric array'
-	raise msg
+        raise msg
 
     assert len(polygon.shape) == 2,\
-       'Polygon array must be a 2d array of vertices'
+        'Polygon array must be a 2d array of vertices'
 
     assert polygon.shape[1] == 2,\
-       'Polygon array must have two columns'
+        'Polygon array must have two columns'
 
     assert len(points.shape) == 2,\
-       'Points array must be a 2d array'
+        'Points array must be a 2d array'
 
     assert points.shape[1] == 2,\
-       'Points array must have two columns'
+        'Points array must have two columns'
 
-    N = polygon.shape[0] #Number of vertices in polygon
-    M = points.shape[0]  #Number of points
+    N = polygon.shape[0]  # Number of vertices in polygon
+    M = points.shape[0]  # Number of points
 
-    px = polygon[:,0]
-    py = polygon[:,1]
+    px = polygon[:, 0]
+    py = polygon[:, 1]
 
-    #Used for an optimisation when points are far away from polygon
-    minpx = min(px); maxpx = max(px)
-    minpy = min(py); maxpy = max(py)
+    # Used for an optimisation when points are far away from polygon
+    minpx = min(px)
+    maxpx = max(px)
+    minpy = min(py)
+    maxpy = max(py)
 
-
-    #Begin main loop
+    # Begin main loop
     indices = zeros(M, int)
 
-    inside_index = 0    #Keep track of points inside
-    outside_index = M-1 #Keep track of points outside (starting from end)
+    inside_index = 0  # Keep track of points inside
+    outside_index = M - 1  # Keep track of points outside (starting from end)
 
     for k in range(M):
 
         if verbose:
-            if k %((M+10)/10)==0: print 'Doing %d of %d' %(k, M)
+            if k % ((M + 10) / 10) == 0:
+                print 'Doing %d of %d' % (k, M)
 
-        #for each point
-	x = points[k, 0]
-	y = points[k, 1]
+        # for each point
+        x = points[k, 0]
+        y = points[k, 1]
 
         inside = False
 
         if not x > maxpx or x < minpx or y > maxpy or y < minpy:
-            #Check polygon
+            # Check polygon
             for i in range(N):
-	        j = (i+1)%N
+                j = (i + 1) % N
 
-	        #Check for case where point is contained in line segment
-	        if point_on_line(x, y, px[i], py[i], px[j], py[j]):
-	            if closed:
-	    	        inside = True
-	    	    else:
-	                inside = False
-	    	    break
-	        else:
- 	            #Check if truly inside polygon
+                # Check for case where point is contained in line segment
+                if point_on_line(x, y, px[i], py[i], px[j], py[j]):
+                    if closed:
+                        inside = True
+                    else:
+                        inside = False
+                    break
+                else:
+                    # Check if truly inside polygon
                     if py[i] < y and py[j] >= y or\
                        py[j] < y and py[i] >= y:
-	    	        if px[i] + (y-py[i])/(py[j]-py[i])*(px[j]-px[i]) < x:
-	        	    inside = not inside
+                        if px[i] + (y - py[i]) / (py[j] - py[i]) * (px[j] - px[i]) < x:
+                            inside = not inside
 
         if inside:
-	    indices[inside_index] = k
-	    inside_index += 1
-	else:
-	    indices[outside_index] = k
-	    outside_index -= 1
+            indices[inside_index] = k
+            inside_index += 1
+        else:
+            indices[outside_index] = k
+            outside_index -= 1
 
     return indices, inside_index
 
 
 def separate_points_by_polygon_c(points, polygon,
-                                 closed = True, verbose = False):
+                                 closed=True, verbose=False):
     """Determine whether points are inside or outside a polygon
 
     C-wrapper
     """
 
+    if verbose:
+        print 'Checking input to separate_points_by_polygon'
 
-    if verbose: print 'Checking input to separate_points_by_polygon'
-
-
-    #Input checks
-
-    assert isinstance(closed, bool), 'Keyword argument "closed" must be boolean'
-    assert isinstance(verbose, bool), 'Keyword argument "verbose" must be boolean'
-
+    # Input checks
+    assert isinstance(
+        closed, bool), 'Keyword argument "closed" must be boolean'
+    assert isinstance(
+        verbose, bool), 'Keyword argument "verbose" must be boolean'
 
     try:
         points = ensure_numeric(points, float)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
         msg = 'Points could not be converted to Numeric array'
-	raise msg
+        raise msg
 
-    #if verbose: print 'Checking input to separate_points_by_polygon 2'
+    # if verbose: print 'Checking input to separate_points_by_polygon 2'
     try:
         polygon = ensure_numeric(polygon, float)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
         msg = 'Polygon could not be converted to Numeric array'
-	raise msg
+        raise msg
 
-    if verbose: print 'check'
+    if verbose:
+        print 'check'
 
     assert len(polygon.shape) == 2,\
-       'Polygon array must be a 2d array of vertices'
+        'Polygon array must be a 2d array of vertices'
 
     assert polygon.shape[1] == 2,\
-       'Polygon array must have two columns'
+        'Polygon array must have two columns'
 
     assert len(points.shape) == 2,\
-       'Points array must be a 2d array'
+        'Points array must be a 2d array'
 
     assert points.shape[1] == 2,\
-       'Points array must have two columns'
+        'Points array must have two columns'
 
-    N = polygon.shape[0] #Number of vertices in polygon
-    M = points.shape[0]  #Number of points
+    N = polygon.shape[0]  # Number of vertices in polygon
+    M = points.shape[0]  # Number of points
 
-    from polygon_ext import separate_points_by_polygon
+    from .polygon_ext import separate_points_by_polygon
 
-    if verbose: print 'Allocating array for indices'
+    if verbose:
+        print 'Allocating array for indices'
 
-    indices = zeros( M, int )
+    indices = zeros(M, int)
 
-    if verbose: print 'Calling C-version of inside poly'
+    if verbose:
+        print 'Calling C-version of inside poly'
 
     count = separate_points_by_polygon(points, polygon, indices,
                                        int(closed), int(verbose))
@@ -408,46 +412,46 @@ def polygon_area(polygon):
     Reference
     http://mathworld.wolfram.com/PolygonArea.html
     """
-    
+
     n = len(polygon)
     poly_area = 0.0
 
     for i in range(n):
         pti = polygon[i]
-        if i == n-1:
+        if i == n - 1:
             pt1 = polygon[0]
         else:
-            pt1 = polygon[i+1]
+            pt1 = polygon[i + 1]
         xi = pti[0]
         yi1 = pt1[1]
         xi1 = pt1[0]
         yi = pti[1]
-        poly_area += xi*yi1 - xi1*yi
-        
-    return abs(poly_area/2)
+        poly_area += xi * yi1 - xi1 * yi
+
+    return abs(poly_area / 2)
+
 
 def plot_polygons(polygons, figname, verbose=False):
-    
     """ Take list of polygons and plot.
 
     Inputs:
 
     polygons         - list of polygons
-                        
+
     figname          - name to save figure to
 
     Outputs:
 
     - list of min and max of x and y coordinates
     - plot of polygons
-    """ 
+    """
 
     from pylab import ion, hold, plot, axis, figure, legend, savefig, xlabel, \
         ylabel, title, close
 
-    assert type(polygons) == list,\
-               'input must be a list of polygons'
-               
+    assert isinstance(polygons, list),\
+        'input must be a list of polygons'
+
     ion()
     hold(True)
 
@@ -455,49 +459,56 @@ def plot_polygons(polygons, figname, verbose=False):
     maxx = 0.0
     miny = 1e10
     maxy = 0.0
-    
+
     for polygon in polygons:
-        x, y = poly_xy(polygon)  
-        if min(x) < minx: minx = min(x)
-        if max(x) > maxx: maxx = max(x)
-        if min(y) < miny: miny = min(y)
-        if max(y) > maxy: maxy = max(y)
-        plot(x,y,'r-')
+        x, y = poly_xy(polygon)
+        if min(x) < minx:
+            minx = min(x)
+        if max(x) > maxx:
+            maxx = max(x)
+        if min(y) < miny:
+            miny = min(y)
+        if max(y) > maxy:
+            maxy = max(y)
+        plot(x, y, 'r-')
         xlabel('x')
         ylabel('y')
-    
+
     #axis(xmin=-33.29, xmax=-33.27, ymin=151.60, ymax=151.62)
-    
+
     savefig(figname)
 
     close('all')
 
-    vec = [minx,maxx,miny,maxy]
+    vec = [minx, maxx, miny, maxy]
 
     return vec
+
 
 def poly_xy(polygon, verbose=False):
     """ this is used within plot_polygons so need to duplicate
         the first point so can have closed polygon in plot
     """
 
-    if verbose: print 'Checking input to poly_xy'
+    if verbose:
+        print 'Checking input to poly_xy'
 
     try:
         polygon = ensure_numeric(polygon, float)
-    except NameError, e:
-        raise NameError, e
+    except NameError as e:
+        raise NameError(e)
     except:
-        msg = 'Polygon %s could not be converted to Numeric array' %(str(polygon))
+        msg = 'Polygon %s could not be converted to Numeric array' % (
+            str(polygon))
         raise msg
 
-    x = polygon[:,0]
-    y = polygon[:,1]
-    x = concatenate((x, [polygon[0,0]]), axis = 0)
-    y = concatenate((y, [polygon[0,1]]), axis = 0)
-    
+    x = polygon[:, 0]
+    y = polygon[:, 1]
+    x = concatenate((x, [polygon[0, 0]]), axis=0)
+    y = concatenate((y, [polygon[0, 1]]), axis=0)
+
     return x, y
-    
+
 #    x = []
 #    y = []
 #    n = len(poly)
@@ -509,28 +520,30 @@ def poly_xy(polygon, verbose=False):
 
 #    x.append(firstpt[0])
 #    y.append(firstpt[1])
-    
+
 #    return x, y
 
-def read_polygon(filename,split=','):
+
+def read_polygon(filename, split=','):
     """Read points assumed to form a polygon.
        There must be exactly two numbers in each line separated by a comma.
        No header.
     """
 
-    #Get polygon
+    # Get polygon
     fid = open(filename)
     lines = fid.readlines()
     fid.close()
     polygon = []
     for line in lines:
         fields = line.split(split)
-        polygon.append( [float(fields[0]), float(fields[1])] )
+        polygon.append([float(fields[0]), float(fields[1])])
 
     return polygon
 
-def populate_geo_coord_polygon(polygon, number_of_points, seed = None, 
-                               exclude = None, randoms = None):
+
+def populate_geo_coord_polygon(polygon, number_of_points, seed=None,
+                               exclude=None, randoms=None):
     """Populate a polygon with uniformly distributed points.
        Takes into account the curvature of the earth.
 
@@ -538,45 +551,49 @@ def populate_geo_coord_polygon(polygon, number_of_points, seed = None,
        polygon - list of vertices of polygon, vertices in (lat, long)
        number_of_points - (optional) number of points
        seed - seed for random number generator (default=None)
-       exclude - list of polygons (inside main polygon) from where points 
+       exclude - list of polygons (inside main polygon) from where points
        should be excluded
-       
+
        randoms - array of numbers between 0 and 1 to be used as the
                  random numbers for calculating the latitude of the
                  points.  Obviously is this case the numbers are not
                  random.  This should just be used for writing tests.
-    
+
     Output:
        points - list of points inside polygon
 
     Examples:
-       populate_polygon( [[0,0], [-40,0], [-40,1], [0,1]], 6, 
+       populate_polygon( [[0,0], [-40,0], [-40,1], [0,1]], 6,
                          randoms = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0))
        will return six not so randomly selected points inside the unit square
     """
-     
+
     if seed is not None:
         random.seed(seed)
-        
+
     if randoms is None:
         randoms = random.random(number_of_points)
     else:
         # Ensure randoms is a numpy array
         randoms = array(randoms)
-        
-    #print polygon
+
+    # print polygon
     points = []
 
-    #Find outer extent of polygon
+    # Find outer extent of polygon
     max_x = min_x = polygon[0][1]
     max_y = min_y = polygon[0][0]
     for point in polygon[1:]:
         x = point[1]
-        if x > max_x: max_x = x
-        if x < min_x: min_x = x
+        if x > max_x:
+            max_x = x
+        if x < min_x:
+            min_x = x
         y = point[0]
-        if y > max_y: max_y = y
-        if y < min_y: min_y = y
+        if y > max_y:
+            max_y = y
+        if y < min_y:
+            min_y = y
 
     max_y_rad = radians(max_y)
     min_y_rad = radians(min_y)
@@ -584,34 +601,35 @@ def populate_geo_coord_polygon(polygon, number_of_points, seed = None,
     # Do this until we have a points array of points inside the polygon that
     # greater or equal the number of points requested (we'll slice at return)
     while len(points) < number_of_points:
-        y_p_rad = arcsin(randoms * abs((sin(max_y_rad) - sin(min_y_rad))) + 
+        y_p_rad = arcsin(randoms * abs((sin(max_y_rad) - sin(min_y_rad))) +
                          sin(min_y_rad))
         y_p = degrees(y_p_rad)
         x_p = random.uniform(min_x, max_x, number_of_points)
         points_p = array([y_p, x_p]).T
-        
+
         points_p = points_p[inside_polygon(points_p.tolist(), polygon)]
         if exclude is not None and len(points_p) > 0:
             for ex_poly in exclude:
-                points_p = points_p[outside_polygon(points_p.tolist(), ex_poly)]
-        
+                points_p = points_p[
+                    outside_polygon(points_p.tolist(), ex_poly)]
+
         if len(points_p) > 0:
             points.extend(points_p.tolist())
-        
+
         randoms = random.random(number_of_points)
-    
+
     return points[:number_of_points]
-    
-    
-def populate_polygon(polygon, number_of_points, seed = None, exclude = None):
-    """Populate given polygon with uniformly distributed points, on a 2D 
+
+
+def populate_polygon(polygon, number_of_points, seed=None, exclude=None):
+    """Populate given polygon with uniformly distributed points, on a 2D
        surface.
 
     Input:
        polygon - list of vertices of polygon
        number_of_points - (optional) number of points
        seed - seed for random number generator (default=None)
-       exclude - list of polygons (inside main polygon) from where points 
+       exclude - list of polygons (inside main polygon) from where points
        should be excluded
 
     Output:
@@ -627,43 +645,47 @@ def populate_polygon(polygon, number_of_points, seed = None, exclude = None):
 
     points = []
 
-    #Find outer extent of polygon
+    # Find outer extent of polygon
     max_x = min_x = polygon[0][0]
     max_y = min_y = polygon[0][1]
     for point in polygon[1:]:
         x = point[0]
-        if x > max_x: max_x = x
-        if x < min_x: min_x = x
+        if x > max_x:
+            max_x = x
+        if x < min_x:
+            min_x = x
         y = point[1]
-        if y > max_y: max_y = y
-        if y < min_y: min_y = y
-
+        if y > max_y:
+            max_y = y
+        if y < min_y:
+            min_y = y
 
     while len(points) < number_of_points:
         x = uniform(min_x, max_x)
         y = uniform(min_y, max_y)
 
         append = False
-        if is_inside_polygon([x,y], polygon):
+        if is_inside_polygon([x, y], polygon):
 
             append = True
 
-            #Check exclusions
+            # Check exclusions
             if exclude is not None:
                 for ex_poly in exclude:
-                    if is_inside_polygon([x,y], ex_poly):
+                    if is_inside_polygon([x, y], ex_poly):
                         append = False
 
-
         if append is True:
-            points.append([x,y])
+            points.append([x, y])
 
     return points
 
 # not used yet.  Code experimenting with replacing
 # in-house polygon inside stuff.
+
+
 def populate_polygon_geo(polygon, number_of_points,
-                         seed = None, exclude = None):
+                         seed=None, exclude=None):
     """Populate given polygon with uniformly distributed points.
 
     Input:
@@ -680,48 +702,51 @@ def populate_polygon_geo(polygon, number_of_points,
        populate_polygon( [[0,0], [1,0], [1,1], [0,1]], 5 )
        will return five randomly selected points inside the unit square
     """
-    
+
     from random import uniform, seed as seed_function
     if seed is not None:
         seed_function(seed)
 
     points = []
-    
-    #Find outer extent of polygon
+
+    # Find outer extent of polygon
     max_x = min_x = polygon[0][0]
     max_y = min_y = polygon[0][1]
     for point in polygon[1:]:
         x = point[0]
-        if x > max_x: max_x = x
-        if x < min_x: min_x = x
+        if x > max_x:
+            max_x = x
+        if x < min_x:
+            min_x = x
         y = point[1]
-        if y > max_y: max_y = y
-        if y < min_y: min_y = y
+        if y > max_y:
+            max_y = y
+        if y < min_y:
+            min_y = y
 
-    
     self.geos_polygon = polygon_to_geos_polygon(linestring)
-    #if not self.geos_polygon.is_valid:
+    # if not self.geos_polygon.is_valid:
     #   raise InvalidPolygonError, linestring
     while len(points) < number_of_points:
         x = uniform(min_x, max_x)
         y = uniform(min_y, max_y)
-    
+
         append = False
-        if self.geos_polygon.contains([x,y]):
+        if self.geos_polygon.contains([x, y]):
 
             append = True
 
-            #Check exclusions
+            # Check exclusions
             if exclude is not None:
                 for ex_poly in exclude:
-                    if is_inside_polygon([x,y], ex_poly):
+                    if is_inside_polygon([x, y], ex_poly):
                         append = False
 
-
         if append is True:
-            points.append([x,y])
+            points.append([x, y])
 
     return points
+
 
 def point_in_polygon(polygon, delta=1e-8):
     """Return a point inside a given polygon which will be close to the
@@ -737,53 +762,52 @@ def point_in_polygon(polygon, delta=1e-8):
        searches in all diagonals and up and down (not left and right)
     """
     import exceptions
-    class Found(exceptions.Exception): pass
+
+    class Found(exceptions.Exception):
+        pass
 
     point_in = False
     while not point_in:
         try:
-            for poly_point in polygon: #[1:]:
-                for x_mult in range (-1,2):
-                    for y_mult in range (-1,2):
+            for poly_point in polygon:  # [1:]:
+                for x_mult in range(-1, 2):
+                    for y_mult in range(-1, 2):
                         x = poly_point[0]
                         y = poly_point[1]
                         if x == 0:
-                            x_delta = x_mult*delta
+                            x_delta = x_mult * delta
                         else:
-                            x_delta = x+x_mult*x*delta
+                            x_delta = x + x_mult * x * delta
 
                         if y == 0:
-                            y_delta = y_mult*delta
+                            y_delta = y_mult * delta
                         else:
-                            y_delta = y+y_mult*y*delta
+                            y_delta = y + y_mult * y * delta
 
                         point = [x_delta, y_delta]
-                        #print "point",point
+                        # print "point",point
                         if is_inside_polygon(point, polygon, closed=False):
                             raise Found
         except Found:
             point_in = True
         else:
-            delta = delta*0.1
+            delta = delta * 0.1
     return point
 
 
-
 ##############################################
-#Initialise module
-
-
-import compile
+# Initialise module
+from . import compile
 if compile.can_use_C_extension('polygon_ext.c'):
-    from polygon_ext import point_on_line
+    from .polygon_ext import point_on_line
     separate_points_by_polygon = separate_points_by_polygon_c
-      
+
 if __name__ == "__main__":
     # The geos polygon visually th e point is out of triangle
     plot_polygons([[(-32.3999999999999990, 151.1500000000000100),
-     (-32.7500000000000000, 152.1699999999999900),
-     (-33.4500000000000030, 151.4300000000000100),
-     (-32.3999999999999990, 151.1500000000000100)],
+                    (-32.7500000000000000, 152.1699999999999900),
+                    (-33.4500000000000030, 151.4300000000000100),
+                    (-32.3999999999999990, 151.1500000000000100)],
                    [(-33.28, 151.61),
                     (-33.28, 151.6105),
-                    (-33.28, 151.61)]], "aayeah.png")
+                       (-33.28, 151.61)]], "aayeah.png")

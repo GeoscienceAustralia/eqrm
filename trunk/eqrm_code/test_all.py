@@ -22,7 +22,8 @@ except ImportError:
     print "Python cannot import eqrm_code module."
     print "Check you have followed all steps of its installation."
     print "os.environ['PYTHONPATH']", os.environ['PYTHONPATH']
-    import sys; sys.exit(1)
+    import sys
+    sys.exit(1)
 
 from eqrm_code.ANUGA_utilities import log
 
@@ -31,21 +32,22 @@ log.file_logging_level = log.ERROR
 log.default_to_console = False
 log.debug('Starting up the log file, so warnings are suppressed.')
 
-#List files that should be excluded from the testing process.
-#E.g. if they are known to fail and under development
+# List files that should be excluded from the testing process.
+# E.g. if they are known to fail and under development
 
 EXCLUDE_FILES = []
 
 if sys.platform == 'win32':
     EXCLUDE_FILES.append('test_event_set_npy.py')
 
-#exclude_files = ['test_check_scenarios.py',
- #                'test_eqrm_audit_wrapper.py'] #['test_exceedance_curves.py']
+# exclude_files = ['test_check_scenarios.py',
+ # 'test_eqrm_audit_wrapper.py'] #['test_exceedance_curves.py']
 # Removing test_sparse.py and test_cg_solve.py since they want to compile.
 
 EXCLUDE_DIRS = ['.svn', 'plotting']
 
-def get_test_files(path):   
+
+def get_test_files(path):
     """
     Args:
       path: The directory to look for files
@@ -60,18 +62,18 @@ def get_test_files(path):
     except:
         files = []
     files.append(path)
-    
-    #Check sub directories
+
+    # Check sub directories
     test_files = []
-    
-    #Exclude dirs
+
+    # Exclude dirs
     files = [x for x in files if x not in EXCLUDE_DIRS]
     subdirectories = []
     for file in files:
         absolute_filename = path + os.sep + file
         if os.path.isdir(absolute_filename):
             subdirectories.append(absolute_filename)
-            #print  file + ',', 
+            # print  file + ',',
             more_test_files, more_subdirectories = get_test_files(
                 absolute_filename)
             test_files += more_test_files
@@ -83,8 +85,7 @@ def get_test_files(path):
     return test_files, subdirectories
 
 
-
-def regressionTest(path=None):    
+def regressionTest(path=None):
     """
     Args:
       path: The directory to look for files.
@@ -95,22 +96,22 @@ def regressionTest(path=None):
         can be used to import all the modules. Used
         in do_coverage.
     """
-    
+
     if path is None:
         path = util.determine_eqrm_path()
-        
+
     print
-    if False: # I never really looked at this info
+    if False:  # I never really looked at this info
         print "The following directories will be skipped over;"
         for dir in EXCLUDE_DIRS:
-            print dir, 
+            print dir,
             print "\n"
-    
-    #print 'Recursing into;'
+
+    # print 'Recursing into;'
     test_files, subdirectories = get_test_files(path)
     files = [x for x in test_files if not x == 'test_all.py']
-    print 'Testing path %s:' %path
-    if False: # I never really looked at this info
+    print 'Testing path %s:' % path
+    if False:  # I never really looked at this info
         print
         print 'Files tested;'
         #print_files = []
@@ -119,35 +120,36 @@ def regressionTest(path=None):
             print file + ',',
         print
     print
-    if globals().has_key('EXCLUDE_FILES'):
+    if 'EXCLUDE_FILES' in globals():
         for file in EXCLUDE_FILES:
-            print 'WARNING: File '+ file + ' to be excluded from testing'
-            try:    
+            print 'WARNING: File ' + file + ' to be excluded from testing'
+            try:
                 files.remove(file)
-            except ValueError, e:
-                msg = 'File "%s" was not found in test suite.\n' %file
-                msg += 'Original error is "%s"\n' %e
-                msg += 'Perhaps it should be removed from exclude list?' 
-                raise Exception, msg
+            except ValueError as e:
+                msg = 'File "%s" was not found in test suite.\n' % file
+                msg += 'Original error is "%s"\n' % e
+                msg += 'Perhaps it should be removed from exclude list?'
+                raise Exception(msg)
 
     filenameToModuleName = lambda f: os.path.splitext(f)[0]
     moduleNames = map(filenameToModuleName, files)
-    #print "moduleNames", moduleNames
+    # print "moduleNames", moduleNames
     # Note, if there are duplicate file names, from different directories
     # only one of them will be used.
-    # Add directorys to the sys. path, 
+    # Add directorys to the sys. path,
     # so the load works.
     for file in subdirectories:
         sys.path.append(file)
     sys.path.append(path)
     modules = map(__import__, moduleNames)
-    #sys.path.remove(path)
+    # sys.path.remove(path)
     # Fix up the system path
     for file in subdirectories:
         sys.path.remove(file)
     load = unittest.defaultTestLoader.loadTestsFromModule
     testCaseClasses = map(load, modules)
     return unittest.TestSuite(testCaseClasses), moduleNames
+
 
 def main(path=None):
     """
@@ -168,13 +170,12 @@ def main(path=None):
                   "         You must do 'ssh -X <machine>' to run these tests.")
 
     suite, moduleNames = regressionTest(path=path)
-    runner = unittest.TextTestRunner() # verbosity=2
+    runner = unittest.TextTestRunner()  # verbosity=2
     test_result = runner.run(suite)
-    
+
     # moduleNames is used for do_coverage
     # test_result is used in distribution.py
     return moduleNames, test_result
-
 
 
 if __name__ == '__main__':
@@ -186,10 +187,10 @@ if __name__ == '__main__':
     """
     from os import access, F_OK
     import sys
-    
+
     seterr(all='warn')
 
-    if len(sys.argv) > 1 and access(sys.argv[1],F_OK):
+    if len(sys.argv) > 1 and access(sys.argv[1], F_OK):
         path = sys.argv[1]
         path = None
     else:
@@ -200,5 +201,4 @@ if __name__ == '__main__':
     except:
         print "WARNING TEST RESULTS UNKNOWN"
         c_errors_failures = 1
-    sys.exit(c_errors_failures) 
-
+    sys.exit(c_errors_failures)
