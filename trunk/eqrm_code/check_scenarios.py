@@ -6,13 +6,13 @@ Title: check_scenarios.py - Run the implementation scenarios then check
 
   Also used to check the mini_scenarios, which is a subset of scenarios.
   It is used for a quick basic check.
-  
-  Author:  Duncan Gray, Duncan.gray@ga.gov.au 
 
-  CreationDate:  2007-08-20 
+  Author:  Duncan Gray, Duncan.gray@ga.gov.au
+
+  CreationDate:  2007-08-20
 
   Description:
-  
+
    This script checks if the results in the 'current' dir are
    different from the results in the 'standard' dir.
 
@@ -26,7 +26,7 @@ Title: check_scenarios.py - Run the implementation scenarios then check
 
   Timings are also measured and stored in scenario_performance.asc.
 
-  To reset the standard timings, delete the file 
+  To reset the standard timings, delete the file
   python_eqrm\implementation_tests\timing\standard*.asc
 
   This can be run in parallel, to test running parallel scenarios,
@@ -37,11 +37,11 @@ Title: check_scenarios.py - Run the implementation scenarios then check
   Note: Running the tests in parallel is a bit iffy, since some nodes
   can start checing if the tests pass before process 0 has produced
   the output.
-  
-  Version: $Revision: 1674 $  
+
+  Version: $Revision: 1674 $
   ModifiedBy: $Author: dgray $
   ModifiedDate: $Date: 2010-05-12 17:09:06 +1000 (Wed, 12 May 2010) $
-  
+
   Copyright 2007 by Geoscience Australia
 """
 
@@ -101,26 +101,28 @@ FILE_EXTENTION = '.asc'
 MINI_PAR_FILES = ['TS_haz38.py',
                   'TS_haz39.py',
                   'TS_risk63.py']
-                  
+
 PARALLEL_FILES = ['TS_fat02.py',
                   'TS_haz05.py', 'TS_haz09.py', 'TS_haz12.py',
                   'TS_haz19.py',
                   'TS_risk20.py',
-                  'TS_risk21.py', 'TS_risk22.py', 
+                  'TS_risk21.py', 'TS_risk22.py',
                   'TS_risk32.py',
                   'TS_risk33.py', 'TS_risk34.py', 'TS_risk58.py',
-                  'TS_risk60.py' ]
-                  
+                  'TS_risk60.py']
+
+
 class BadDirectoryStructure(Exception):
     pass
-                  
+
+
 def par_files(path='.', extension=".py", files=None):
     """ Find all the parameter data files in the scenario dir
     """
     if files is None:
         files = listdir(path)
         par_files = [x for x in files if x[-3:] == extension]
-        
+
         # if this is being run is parallel,
         # only do the scenarios with no variability.
         para = Parallel()
@@ -129,16 +131,17 @@ def par_files(path='.', extension=".py", files=None):
                 par_files = PARALLEL_FILES
                 print "WARNING: Running in parallel mode"
                 print "Only scenarios with no randomness will be executed"
-        #par_files = ['TS_risk60.py',''TS_haz20.py']
+        # par_files = ['TS_risk60.py',''TS_haz20.py']
         par_files.sort()
         par_files.reverse()
     else:
-        par_files = files       
+        par_files = files
         #par_files = ['TS_vuln04']
     return par_files
 
+
 def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
-                  extension='.py', files=None):  
+                  extension='.py', files=None):
     """
     Run all of the the scenario's in the scenario_dir.
 
@@ -154,7 +157,7 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
     timings = {}
     delimiter = ','
     ofile = 'imp_test_performance.asc'
-    fd = open(ofile,'a')
+    fd = open(ofile, 'a')
     fd.write("version" + delimiter +
              "last_check_in_date" + delimiter +
              "modification_status" + delimiter +
@@ -167,12 +170,12 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
         eqrm_flags = parse_in_parameters.create_parameter_data(pull_path)
         output_dirs.append(join(eqrm_flags['output_dir']))
         print "Running scenario", file
-        #Initial time and memory
+        # Initial time and memory
         t0 = time.clock()
-        
+
         # Run the scenario
         analysis.main(pull_path, parallel_finalise=False)
-        
+
         # Run post-processing (if needed)
         if eqrm_flags['save_motion']:
             postprocessing.generate_motion_csv(eqrm_flags['output_dir'],
@@ -180,12 +183,11 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
                                                soil_amp=False)
             if eqrm_flags['use_amplification']:
                 postprocessing.generate_motion_csv(eqrm_flags['output_dir'],
-                                               eqrm_flags['site_tag'],
-                                               soil_amp=True)
-                
-            
+                                                   eqrm_flags['site_tag'],
+                                                   soil_amp=True)
+
         root, ext = splitext(file)
-        time_taken_sec = (time.clock()-t0)
+        time_taken_sec = (time.clock() - t0)
         timings[root] = time_taken_sec
         version, date, modified = get_version()
         fd.write(str(version) + delimiter +
@@ -194,84 +196,86 @@ def run_scenarios(scenario_dir=SCENARIO_DIR, current_string=CURRENT_STRING,
                  str(file) + delimiter +
                  str(time_taken_sec) + "\n")
     fd.close()
-    timings =  Scenario_times(timings, current_string=current_string)
+    timings = Scenario_times(timings, current_string=current_string)
     return timings, output_dirs
+
 
 def directory_diff(dirA, dirB):
     """
     Recursively checks the directories for files and checks for differences.
-    
+
     Supports .npy and ascii files:
     - If an npy file is encountered load both and do an allclose to compare
-    - Else assume an ascii file and run through file_diff 
-    
+    - Else assume an ascii file and run through file_diff
+
     Returns the first different file in the directory tree.
-        
+
     Results returned in the same format at file_diff for interchangeability.
     """
-    
+
     result_files = listdir(dirA)
-    
+
     try:
         result_files.remove('.svn')
     except:
         pass
-    
+
     for file in result_files:
-        
+
         fileA = join(dirA, file)
         fileB = join(dirB, file)
-        
+
         if os.path.isdir(fileA):
             result, lineA, lineB = directory_diff(fileA, fileB)
-            
+
         elif fileA[-3:] == 'npy':
             # .npy files
             # 1. Load files into arrays
             # 2. Do an allclose
             arrayA = load(open(fileA, 'rb'))
             arrayB = load(open(fileB, 'rb'))
-            
-            result = True            
+
+            result = True
             try:
                 if not allclose(arrayA, arrayB):
-                    #print "arrayA.shape ",arrayA.shape 
-                    #print "arrayB.shape ", arrayB.shape 
-                    
+                    # print "arrayA.shape ",arrayA.shape
+                    # print "arrayB.shape ", arrayB.shape
+
                     result = False
             except:
                 # allclose raises a TypeError if the arrays are None
                 if arrayA != arrayB:
                     result = False
-            
+
             lineA = '** Not a line difference. One file is;' + fileA
             lineB = '** Not a line difference. The other file is;' + fileB
-            
+
         elif fileA[-2:] == '.p':
             # Likely to be source_model. The comparison methods take care of the
             # equality check.
-            # Note: If this is another pickled object then __eq__ and __ne__ 
+            # Note: If this is another pickled object then __eq__ and __ne__
             # need to be defined for it.
-            
+
             pickledObjA = pickle.load(open(fileA, 'rb'))
             pickledObjB = pickle.load(open(fileB, 'rb'))
-            
+
             if pickledObjA != pickledObjB:
                 result = False
             else:
                 result = True
-                
+
             lineA = '%r' % pickledObjA
-            lineB = '%r' % pickledObjB 
-            
+            lineB = '%r' % pickledObjB
+
         else:
             result, lineA, lineB = file_diff(fileA, fileB)
-        
+
         if not result:
             return result, lineA, lineB
-            
+
     return True, None, None
-        
+
+
 def file_diff(fileA, fileB):
     """
     returns false if the files are different, and the first lines that are
@@ -285,7 +289,7 @@ def file_diff(fileA, fileB):
     Maybe in the future do something different, such as also return how many
     lines, out of the total number of lines are different.
     """
-    #print "fileB", fileB
+    # print "fileB", fileB
     A = open(fileA)
     textA = A.read().splitlines()
     A.close()
@@ -299,7 +303,7 @@ def file_diff(fileA, fileB):
         if not lineA == lineB:
             try:
                 float_same = float_line_diff(lineA, lineB)
-            except: #FIXME What is being caught? can it be caught sooner?
+            except:  # FIXME What is being caught? can it be caught sooner?
                 float_same = False
             if lineA is not None and lineA.find(".input_dir") >= 0:
                 # This line has linux/windows / \ differences
@@ -310,21 +314,22 @@ def file_diff(fileA, fileB):
                 return False, lineA, lineB
     return True, None, None
 
+
 def float_line_diff(lineA, lineB,
                     relative_tolerance=1e-10):
     """
     relative_tolerance=1e-1 still gives a failed file in Linux
-    
+
     If there is a difference in the lines in a file, it might
     be a relative difference.  Let's check.
 
     NOTE: This is currently being used when implementation testing, since
     the files are currently exactly the same.
     """
-    
+
     # Seperate based on the delimiter
     # White space stripped from both ends, then delimted on
-    lineA_list = lineA.split() 
+    lineA_list = lineA.split()
     lineB_list = lineB.split()
 
     try:
@@ -332,11 +337,10 @@ def float_line_diff(lineA, lineB,
     except:
         lineA_list = lineA.split(',')
         lineB_list = lineB.split(',')
-        
 
     # Convert the strings to floats
     temp_line = []
-    
+
     try:
         lineA = [float(i) for i in lineA_list]
         lineB = [float(i) for i in lineB_list]
@@ -344,18 +348,19 @@ def float_line_diff(lineA, lineB,
         arrayB = asarray(lineB)
         is_same = allclose(arrayA, arrayB, rtol=relative_tolerance)
     except:
-        if len(lineA_list)==len(lineB_list):
-            is_same =True
+        if len(lineA_list) == len(lineB_list):
+            is_same = True
             for i in xrange(len(lineA_list)):
-                if lineA_list[i] <> lineB_list[i]:
+                if lineA_list[i] != lineB_list[i]:
                     a = float(lineA_list[i])
                     b = float(lineB_list[i])
-                    if abs(a-b)>relative_tolerance:
+                    if abs(a - b) > relative_tolerance:
                         is_same = False
         else:
             is_same = False
     return is_same
-    
+
+
 def print_diff_results(diff_results):
     for diff_result in diff_results:
         print "======================================================================"
@@ -365,19 +370,19 @@ def print_diff_results(diff_results):
         print "Standard line:", diff_result[1]
         print " Current line:", diff_result[2]
         print
-     
-     
+
+
 def check_dir_names(dir_list, current_dir):
     """
     Given a list of directory paths this function returns a list of
      last directory names, and checks that these directories are in the
     current_dir.
-    eg dir_list = ['./implementation_tests/current/TS_haz38/', 
-    './implementation_tests/current/TS_haz39/', 
+    eg dir_list = ['./implementation_tests/current/TS_haz38/',
+    './implementation_tests/current/TS_haz39/',
     './implementation_tests/current/TS_risk63/']
     current_dir = './implementation_tests/current'
         Returns    ['TS_haz38', 'TS_haz39', 'TS_risk63']
-        
+
     parameters
     dir_list - a list of directory paths.
     current_dir - a directory path.
@@ -386,9 +391,9 @@ def check_dir_names(dir_list, current_dir):
     for path in dir_list:
         path, folder = os.path.split(path)
         if folder == "":
-            path, folder = os.path.split(path)        
+            path, folder = os.path.split(path)
         last_dir.append(folder)
-        
+
         # This check was more strict than the os.
         # eg c: does not equal C:, so I removed it.
 #         if not os.path.abspath(path) == os.path.abspath(current_dir):
@@ -396,28 +401,29 @@ def check_dir_names(dir_list, current_dir):
 #             msg += "does not equal os.path.abspath(current_dir)", \
 #                 os.path.abspath(current_dir)
 #             raise BadDirectoryStructure(msg)
-    #print "last_dir", last_dir
+    # print "last_dir", last_dir
     return last_dir
-    
+
+
 def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR,
                     scenario_dirs=None):
     """
     Go into each results dir from the current and standard dirs
     And in each dir check that all the files are the same
-    
+
     """
     # Create a list of the directories the test results are in.
     if scenario_dirs is None:
         scenario_dirs = listdir(standard_dir)
     else:
         scenario_dirs = check_dir_names(scenario_dirs, current_dir)
-        
+
     missing_current_files = []
-    diff_results = [] # the dir and name of the different file, and the
+    diff_results = []  # the dir and name of the different file, and the
                       # lines that are different
     files_checked = 0
     diff_files = 0
-    #print "scenario_dirs", scenario_dirs
+    # print "scenario_dirs", scenario_dirs
     try:
         scenario_dirs.remove('.svn')
     except:
@@ -427,8 +433,8 @@ def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR,
         result_files = [x for x in result_files if not x[-4:] == '.lic']
         result_files = [x for x in result_files if not x[0] == '.']
         result_files = [x for x in result_files if not x[0:3] == 'log']
-        
-        #print "result_files", result_files
+
+        # print "result_files", result_files
         try:
             result_files.remove('.svn')
         except:
@@ -447,71 +453,74 @@ def check_scenarios(standard_dir=STANDARD_DIR, current_dir=CURRENT_DIR,
             pass
         for file in result_files:
             current_file = join(current_dir, dir, file)
-            #print "current_file", current_file
+            # print "current_file", current_file
             if not path.exists(current_file):
                 missing_current_files.append(current_file)
                 continue
             standard_file = join(standard_dir, dir, file)
-            print ".", # To show something is happening
-            
+            print ".",  # To show something is happening
+
             if os.path.isdir(standard_file):
                 # Inspect binary file directories
-                is_same, lineA, lineB = directory_diff(standard_file, 
+                is_same, lineA, lineB = directory_diff(standard_file,
                                                        current_file)
             else:
                 # Inspect normal text files
                 is_same, lineA, lineB = file_diff(standard_file, current_file)
-            #remove(current_file)
+            # remove(current_file)
             files_checked += 1
             if not is_same:
                 print "F",
                 diff_results.append((join(dir, file), lineA, lineB))
                 diff_files += 1
-    print ;  print
+    print
+    print
     for file in missing_current_files:
         print "Missing file:", file
     print_diff_results(diff_results)
-    print "%i files missing." %(len(missing_current_files))
-    print "Checked %i files. %i failed." %(files_checked, diff_files)
+    print "%i files missing." % (len(missing_current_files))
+    print "Checked %i files. %i failed." % (files_checked, diff_files)
     return len(missing_current_files) + diff_files
- 
+
+
 class Scenario_times(object):
+
     """ Class to handle the reading and writing of scenario time csv files.
     """
+
     def __init__(self,
                  timings_dic,
                  timing_dir=TIMING_DIR,
                  host=socket.gethostname(),
                  current_string=CURRENT_STRING):
-        
-        self.timings_dic = timings_dic      
-        self.host =  host
+
+        self.timings_dic = timings_dic
+        self.host = host
         self.timing_dir = abspath(timing_dir)
         self.save(file_string=current_string)
-        
-        
+
     def save(self, file_string=CURRENT_STRING):
         """
         Save the timing file
         """
         file_name = self.timing_dir + sep + file_string + self.host \
-                    + FILE_EXTENTION
-        fd = open(file_name,'wb')
+            + FILE_EXTENTION
+        fd = open(file_name, 'wb')
         writer = csv.writer(fd)
-        
-        #Write the title to a cvs file
-        writer.writerow(['scenario','time_seconds'])
+
+        # Write the title to a cvs file
+        writer.writerow(['scenario', 'time_seconds'])
 
         # Write the values to a cvs file
         writer.writerows(self.timings_dic.items())
-        
+
     def read_standard(self, file_string=STANDARD_STRING):
         file_name = self.timing_dir + sep + file_string + self.host \
-                    + FILE_EXTENTION
+            + FILE_EXTENTION
         try:
             fd = file(file_name)
         except IOError:
-            return None          
+            return None
 
         reader = csv.reader(fd)
         titles = reader.next()
@@ -522,7 +531,6 @@ class Scenario_times(object):
             root, ext = splitext(line[0])
             standard_dic[root] = float(line[1])
         return standard_dic
-        
 
     def compare_times(self, standard_string=STANDARD_STRING,
                       verbose=True):
@@ -539,9 +547,10 @@ class Scenario_times(object):
             self.save(file_string=standard_string)
             results = None
             fail_dic = None
-            if verbose: print "No standard time file.  Creating new file."
+            if verbose:
+                print "No standard time file.  Creating new file."
         else:
-            results, fail_dic = self.compare_known_times(standard,verbose)
+            results, fail_dic = self.compare_known_times(standard, verbose)
         return results, fail_dic
 
     def compare_known_times(self, standard, verbose=True):
@@ -553,25 +562,29 @@ class Scenario_times(object):
 
         If the standard and current timing keys do not match, write the
         current to file.
-        
+
         """
         results = ''
         fail_dic = {}
         standard_keys = standard.keys()
         standard_keys.sort()
         for s_key in standard_keys:
-            if self.timings_dic.has_key(s_key):
-                if self.timings_dic[s_key] < standard[s_key]*1.2:
-                    results +='.'
-                    if verbose: print '.',
+            if s_key in self.timings_dic:
+                if self.timings_dic[s_key] < standard[s_key] * 1.2:
+                    results += '.'
+                    if verbose:
+                        print '.',
                 else:
-                    results +='F'
-                    if verbose: print 'F',
-                    fail_dic[s_key] = [standard[s_key],self.timings_dic[s_key]]
+                    results += 'F'
+                    if verbose:
+                        print 'F',
+                    fail_dic[s_key] = [standard[s_key],
+                                       self.timings_dic[s_key]]
             else:
-                results +='F'
-                if verbose: print 'F',
-                fail_dic[s_key] = [standard[s_key],-999.999]
+                results += 'F'
+                if verbose:
+                    print 'F',
+                fail_dic[s_key] = [standard[s_key], -999.999]
         current = self.timings_dic.keys()
         current.sort()
         if not standard_keys == current:
@@ -591,44 +604,43 @@ class Scenario_times(object):
             else:
                 print 'Failed Scenarios'
                 for fail in fail_dic.items():
-                    print "%s has standard of %f, current %f" %(fail[0],
-                                                                fail[1][0],
-                                                                fail[1][1])
-                
-        return results,fail_dic
-        
-            
+                    print "%s has standard of %f, current %f" % (fail[0],
+                                                                 fail[1][0],
+                                                                 fail[1][1])
+
+        return results, fail_dic
+
     def delete(self, file_string=STANDARD_STRING):
         """
         fails silently
         """
         file_name = self.timing_dir + sep + file_string + self.host \
-                    + FILE_EXTENTION
+            + FILE_EXTENTION
         try:
             remove(file_name)
         except:
             pass
 
-        
+
 def check_scenarios_main(scenario_dir=SCENARIO_DIR,
                          standard_dir=STANDARD_DIR,
                          standard_string=STANDARD_STRING,
                          current_dir=CURRENT_DIR,
                          current_string=CURRENT_STRING,
-                         files=None): 
-    
+                         files=None):
+
     try:
         import planning.is_sandpit
-        check_times=True
+        check_times = True
     except:
-        check_times=False
+        check_times = False
     if len(sys.argv) > 1 and sys.argv[1][0].upper() == 'N':
         check_times = False
         output_dirs = None
     else:
         para = Parallel()
         if para.is_parallel is True:
-            check_times = False 
+            check_times = False
         scenario_times, output_dirs = run_scenarios(scenario_dir,
                                                     current_string,
                                                     extension='.py',
@@ -641,15 +653,17 @@ def check_scenarios_main(scenario_dir=SCENARIO_DIR,
     return c_failed_missing_file
 
 # Note, the constants are different
+
+
 def mini_check_scenarios_main():
-    c_failed_missing_file =check_scenarios_main(
+    c_failed_missing_file = check_scenarios_main(
         files=MINI_PAR_FILES)
     return c_failed_missing_file
-        
+
 #-------------------------------------------------------------
-        
+
 if __name__ == "__main__":
-    import os    
+    import os
     os.chdir('..')
     c_failed_missing_file = check_scenarios_main()
-    sys.exit(c_failed_missing_file) 
+    sys.exit(c_failed_missing_file)

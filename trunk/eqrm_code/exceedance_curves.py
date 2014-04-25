@@ -1,19 +1,20 @@
 """
  Title: exceedance_curve.py
-  
+
   Author:  Peter Row, peter.row@ga.gov.au
 
 
-  Description: Functions for collapsing logic trees. 
+  Description: Functions for collapsing logic trees.
 
-  Version: $Revision: 1562 $  
+  Version: $Revision: 1562 $
   ModifiedBy: $Author: dgray $
   ModifiedDate: $Date: 2010-03-09 15:48:50 +1100 (Tue, 09 Mar 2010) $
 """
 from numpy import NaN
 import scipy
 from scipy import allclose, isfinite, array, newaxis, zeros, ndarray, \
-     asarray, where, concatenate, allclose, reshape, ones, interp, nonzero
+    asarray, where, concatenate, allclose, reshape, ones, interp, nonzero
+
 
 def _collapse_att_model_dimension(data, weights):
     """
@@ -21,7 +22,7 @@ def _collapse_att_model_dimension(data, weights):
     To collapse it, multiply the data by the weights and sum.
 
     This assumes the same ground motion model weights are applied to
-    all of the data.  
+    all of the data.
 
     Parameters:
       data: With dimensions 5 or more;
@@ -40,16 +41,16 @@ def _collapse_att_model_dimension(data, weights):
     """
     assert data.ndim > 4
     # The lenght of weight can be less than the max gmm dimension in data.
-    weighted_data = (data[..., 0:len(weights), :, :, :, :] *
+    weighted_data = (data[..., 0:len(weights),:,:,:,:] *
                      asarray(weights)[:, newaxis, newaxis, newaxis, newaxis])
     # numpy.sum() allows -ve axis. See
     # http://docs.scipy.org/doc/numpy/reference/generated/numpy.sum.html#numpy.sum
     return scipy.sum(weighted_data, -5)
 
-    
+
 def collapse_att_model(data, weights, do_collapse):
     """
-    
+
     If do_collapse is True, collapse the data so the attenuation model
     dimension length is one.  To collapse it, multiply the data by the
     weights and sum, across the ground motion model dimension.
@@ -58,7 +59,7 @@ def collapse_att_model(data, weights, do_collapse):
     all of the data.
 
     Parameters:
-      data:  6 dimensions; 
+      data:  6 dimensions;
       (spawn, ground motion model, rec_model, site, events, periods)
         Site is 1. What the data is changes. Sometimes its SA, sometimes
         it's cost.
@@ -70,8 +71,9 @@ def collapse_att_model(data, weights, do_collapse):
     """
     if do_collapse:
         # Collapse and put the gmm dimension back
-        return _collapse_att_model_dimension(data, weights)[..., newaxis, :, :, :, :]
+        return _collapse_att_model_dimension(data, weights)[..., newaxis,:,:,:,:]
     return data
+
 
 def collapse_source_gmms(data, source_model, do_collapse):
     """
@@ -80,7 +82,7 @@ def collapse_source_gmms(data, source_model, do_collapse):
 
     THE SECOND LAST AXIS IS ASSUMED TO BE EVENT
     THE 5th LAST AXIS IS ASSUMED TO BE GMM
-    
+
     parameters:
       data - an array of values (e.g. cost).  One of the dimensions is gmm. An example of
              the dimensions are (spawn, ground motion model, site, events, periods)
@@ -96,18 +98,19 @@ def collapse_source_gmms(data, source_model, do_collapse):
     assert data.ndim > 5
     for source in source_model:
         event_ind = source.get_event_set_indexes()
-        col_data = collapse_att_model(data[...,event_ind, :],
+        col_data = collapse_att_model(data[..., event_ind,:],
                                       source.atten_model_weights, do_collapse)
-        data[...,0:1,:,:,event_ind, :] = col_data
+        data[..., 0:1,:,:, event_ind,:] = col_data
 
         # Erase the data that has been weighted.
         weight_length = len(source.atten_model_weights)
-        data[...,1:weight_length,:,:,event_ind, :] = 0.0
+        data[..., 1:weight_length,:,:, event_ind,:] = 0.0
 
     # Check here that all values have been collapsed.
-    assert scipy.sum(data[...,1:,:,:,:,:]) == 0.0
-    
-    return data[...,0:1,:,:,:,:]
+    assert scipy.sum(data[..., 1:,:,:,:,:]) == 0.0
+
+    return data[..., 0:1,:,:,:,:]
+
 
 def hzd_do_value(sa, r_nu, rtrn_rte):
     """
@@ -116,18 +119,20 @@ def hzd_do_value(sa, r_nu, rtrn_rte):
     r_nu     [vector (nx1)] event activity for the corresponding element
     in sa
     rtrn_rte  [vector (mx1)] return rates of interest.
-    
+
     returns:
     hzd       [vector (1xm)] hazard value for each return rate
     """
-    # Get rid of events with sa = 0, since they will effect the end of the curve 
-    
-    assert sa.shape == r_nu.shape  , str(sa.shape) + 'should = ' + str(r_nu.shape)
+    # Get rid of events with sa = 0, since they will effect the end of the
+    # curve
+
+    assert sa.shape == r_nu.shape, str(
+        sa.shape) + 'should = ' + str(r_nu.shape)
     nonzero_ind = nonzero(sa)
     sa = sa[nonzero_ind]
     r_nu = r_nu[nonzero_ind]
-    
-    hzd, cumnu = _rte2cumrte(sa, r_nu) 
+
+    hzd, cumnu = _rte2cumrte(sa, r_nu)
     # annual exceedance rate = cumulative event activity
     # for exceedance rates larger than what we have data for, give 0.
     # for exceedance rates smaller than what we have data for, give hzd[0].
@@ -146,10 +151,10 @@ def _rte2cumrte(each_risk, each_rte):
     in sa
     """
     if not each_risk.shape[-1] == each_rte.shape[-1]:
-        s='risk shape = '+str(each_risk.shape)
-        s+=' rte shape = '+str(each_rte.shape) 
-        raise ValueError('risk and rte must be the same length! '+ s)
-    each_risk = each_risk.ravel() # Return a flattened array
+        s = 'risk shape = ' + str(each_risk.shape)
+        s += ' rte shape = ' + str(each_rte.shape)
+        raise ValueError('risk and rte must be the same length! ' + s)
+    each_risk = each_risk.ravel()  # Return a flattened array
     risk_order = (-each_risk).argsort()
     rsk = each_risk[risk_order]
     cumrte = each_rte[risk_order].cumsum()

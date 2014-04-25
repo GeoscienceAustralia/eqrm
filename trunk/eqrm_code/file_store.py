@@ -1,7 +1,7 @@
 """
 file_store.py
 
-A base class that implements file store methods for NumPy arrays 
+A base class that implements file store methods for NumPy arrays
 """
 
 import os
@@ -12,7 +12,7 @@ from numpy import save, load
 from numpy.lib.format import open_memmap
 
 # SAVE_METHOD
-# Specifies whether a file based storage method is to be used for attributes. 
+# Specifies whether a file based storage method is to be used for attributes.
 # Currently supported values:
 #
 # 'npy'      - numpy native binary format (1 file per attribute per Event_Set)
@@ -24,44 +24,47 @@ if sys.platform == 'win32':
     SAVE_METHOD = None
 
 # DATA_DIR
-# Specifies where the temporary data files get stored 
+# Specifies where the temporary data files get stored
 # (set using eqrm_flags.data_array_storage)
 # Global variable changed in parse_in_parameters._add_default_values
 DATA_DIR = None
 
+
 class FileStoreException(Exception):
     pass
 
+
 class File_Store(object):
+
     """
     File_Store
-    
+
     Implements getters and setters for the storage of NumPy arrays to file. It
     uses NumPy's native binary data format to save files to disk and reads them
     back again as an ndarray-like memmap object.
-    
+
     Use:
     - Inherit File_Store in the class that contains the ndarrays as attributes
     - Override the attributes native getters and setters using the property function
       with the getters in this class
-    - Ensure the __init__ method of the class calls File_Store's __init__ method 
+    - Ensure the __init__ method of the class calls File_Store's __init__ method
       to set up the file using an identifying name (__init__ will create a unique
       filename with the name and array name given as part of the name)
     - Ensure the __del__ method of the class calls File_Store's __del__ method
       to clean up the files as the object is deleted
-      
+
     e.g.
     class Event_Set_Data(file_store.File_Store):
-    
+
         def __init__(self):
             super(Event_Set_Data, self).__init__('event_set_data')
-    
+
         def __del__(self):
             super(Event_Set_Data, self).__del__()
-        
-        num_events = property(lambda self: self._get_file_array('num_events'), 
+
+        num_events = property(lambda self: self._get_file_array('num_events'),
                               lambda self, value: self._set_file_array('num_events', value))
-    
+
     in use:
     >>> import numpy as np
     >>> from eqrm_code.event_set_data import Event_Set_Data
@@ -88,19 +91,18 @@ class File_Store(object):
             0.14276678,  0.58594872,  0.30368607,  0.37968479,  0.25581018,
             0.14636913,  0.96046498,  0.64339903,  0.59396796,  0.01239824,
             0.5415874 ,  0.63406459,  0.4296261 ,  0.27724911,  0.57388861])
-    
+
     while object data exists
     $ ls -lh /tmp/*.npy
     -rw-r--r-- 1 ben ben 880 Feb  7 17:00 /tmp/event_set_data.num_events._x_oDyw.npy
-    
+
     deleting the object will remove these files
     >>> del data
-    
+
     $ ls -lh /tmp/*.npy
     ls: /tmp/*.npy: No such file or directory
     """
-    
-    
+
     def __init__(self, name):
         """__init__: create a file store instance with name and dir"""
         self._name = name
@@ -111,73 +113,71 @@ class File_Store(object):
         """__del__: Make sure any data files are cleaned up"""
         for filename in self._array_files.values():
             os.remove(filename)
-    
+
     def _get_numpy_binary_array(self, name):
         """Return the an memmap object as represented by the .npy file"""
-        filename = self._array_files.get(name)  
+        filename = self._array_files.get(name)
         if filename is not None:
             return open_memmap(filename)
         else:
             return None
-        
+
     def _set_numpy_binary_array(self, name, array):
         """Store the array in an .npy file"""
         if array is not None:
             filename = self._array_files.get(name)
-            
+
             # Create and map a new file if needed
             if filename is None:
-                handle, filename = tempfile.mkstemp(prefix='%s.%s.' % (self._name, name), 
-                                                    suffix='.npy',
-                                                    dir=DATA_DIR)
+                handle, filename = tempfile.mkstemp(
+                    prefix='%s.%s.' % (self._name, name),
+                    suffix='.npy',
+                    dir=DATA_DIR)
                 os.close(handle)
                 self._array_files[name] = filename
             save(filename, array)
-        
+
     def _get_file_array(self, name):
         if SAVE_METHOD == 'npy':
             return self._get_numpy_binary_array(name)
         else:
             return self.__dict__.get(name)
-    
+
     def _set_file_array(self, name, array):
         if SAVE_METHOD == 'npy':
             self._set_numpy_binary_array(name, array)
         else:
             self.__dict__[name] = array
         self._array_names[name] = name
-            
+
     def _save(self, dir=None):
         """Save the arrays to .npy files in the given dir."""
 
         if dir is None:
             dir = os.path.curdir
-        
+
         # Make save dir if necessary
         save_dir = os.path.join(dir, self._name)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-            
+
         for name in self._array_names.keys():
             filename = os.path.join(save_dir, '%s.npy' % name)
             save(filename, self._get_file_array(name))
-                            
-            
+
     def _load(self, dir=None):
         """Load the .npy files from the given dir into file_store arrays"""
         if dir is None:
             dir = os.path.curdir
-        
+
         load_dir = os.path.join(dir, self._name)
         if not os.path.exists(load_dir):
             raise FileStoreException("Directory %s does not exist" % load_dir)
-        
+
         # Load each name.npy file into the file structure using
         # _set_numpy_binary_array(name, load(name.npy))
-        for root,_,files in os.walk(load_dir):
+        for root, _, files in os.walk(load_dir):
             for file in files:
                 name, ext = os.path.splitext(file)
                 if ext == '.npy':
-                    self._set_file_array(name, load(os.path.join(root,file)))
-        
-
+                    self._set_file_array(name, load(os.path.join(root, file)))

@@ -1,6 +1,6 @@
 """
 Classes and functions for holding bridge information.
- 
+
 Copyright 2010 by Geoscience Australia
 """
 
@@ -27,12 +27,13 @@ attribute_conversions = {'BID': int,
 
 
 class Bridges(Sites):
+
     """An object holding bridges data.
 
     Actually get a Bridges object by: Bridges.from_csv(...)
     """
 
-    def __init__(self, latitude, longitude, **attributes): 
+    def __init__(self, latitude, longitude, **attributes):
         """Contruct a Bridges object.
 
         latitude    a vector (tuple, list, ...) of latitude values
@@ -41,7 +42,6 @@ class Bridges(Sites):
         """
 
         Sites.__init__(self, latitude, longitude, **attributes)
-
 
     @classmethod
     def from_csv(cls, file):
@@ -57,7 +57,7 @@ class Bridges(Sites):
             d = {'PEOPLE': float, 'WALLS': str, 'ROOF_TYPE': str}
             X = Bridges.from_csv('blg_wr.csv', **d)
         """
-        
+
         # read in data from file
         bridges_dict = csv_to_arrays(file, **attribute_conversions)
 
@@ -74,12 +74,12 @@ class Bridges(Sites):
     def calc_total_loss(self, SA, eqrm_flags):
         """
         Calculate the economic loss and damage state at a site.
-    
+
         eqrm_flags      high level controlling object
         SA              array of Spectral Acceleration, in g, with axis;
                                sites, events, periods
                            the site axis usually has a size of 1
-    
+
         Returns a tuple (total_loss, damage_model) where:
           total_loss    a 4 long list of dollar loss.  The loss categories are;
                         (structure_loss, nsd_loss, accel_loss, contents_loss)
@@ -87,7 +87,7 @@ class Bridges(Sites):
                         (site, event)
           damage_model  an instance of the damage model.
                         used in risk.py to get damage states.
-        """        
+        """
         # get indices of SA periods 0.3 and 1.0
         sa_indices = find_bridge_sa_indices(eqrm_flags.atten_periods)
         # until we *have* a eqrm_flags.bridge_model value, pass None for model
@@ -99,12 +99,12 @@ class Bridges(Sites):
 
         if eqrm_flags.bridges_functional_percentages is not None:
             # calculate days to complete for each bridge
-            days_to_complete = time_to_complete(eqrm_flags.bridges_functional_percentages,
-                                                state)
+            days_to_complete = time_to_complete(
+                eqrm_flags.bridges_functional_percentages,
+                state)
         else:
             days_to_complete = None
-                
-    
+
         return (damage_model, days_to_complete)
 
     def __getitem__(self, key):
@@ -122,10 +122,8 @@ class Bridges(Sites):
         # get final Sites object
         bridges = Bridges(self.latitude[key], self.longitude[key],
                           **attributes)
-        
+
         if self.vulnerability_set is not None:
             bridges.vulnerability_set = self.vulnerability_set
-        
+
         return bridges
-
-

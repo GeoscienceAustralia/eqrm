@@ -11,11 +11,13 @@
   ModifiedDate: $Date: 2010-05-10 23:21:10 +1000 (Mon, 10 May 2010) $
 """
 from scipy import asarray, alltrue, newaxis, ndarray, allclose, isfinite, \
-     zeros, concatenate, absolute, array
+    zeros, concatenate, absolute, array
 
 from eqrm_code.ground_motion_specification import Ground_motion_specification
 
+
 class Ground_motion_calculator(object):
+
     """Ground_motion_calculator instances are used to calculate the ground
     motion given a ground motion specifiction.
 
@@ -91,12 +93,11 @@ class Ground_motion_calculator(object):
         sigma_coefficient = self.GM_spec.calc_sigma_coefficient(periods)
 
         # Adding extra dimensions.
-        self.coefficient = coefficient[:,newaxis,newaxis,:]
-        self.sigma_coefficient = sigma_coefficient[:,newaxis,newaxis,:]
-
+        self.coefficient = coefficient[:, newaxis, newaxis, :]
+        self.sigma_coefficient = sigma_coefficient[:, newaxis, newaxis, :]
 
     def distribution_function(self, dist_object, dist_types, mag_dict,
-                              periods=None, depth=None, depth_to_top=None, 
+                              periods=None, depth=None, depth_to_top=None,
                               fault_type=None, Vs30=None, mag_type=None,
                               Z25=None, dip=None, width=None,
                               event_activity=None):
@@ -105,7 +106,7 @@ class Ground_motion_calculator(object):
         is called.  The distance info must be an array.
 
         Returns:
-          log_mean - dimensions are 
+          log_mean - dimensions are
           log_sigma
 
         FIXME: Why should we let depth be None?
@@ -117,7 +118,7 @@ class Ground_motion_calculator(object):
         distances = {}
         for dist_type in dist_types:
             distances[dist_type] = dist_object.distance(dist_type)
-        
+
         mag = mag_dict[mag_type]
 
         if depth is not None:
@@ -127,7 +128,7 @@ class Ground_motion_calculator(object):
          dip, width) = self.resize_mag_depth(mag, depth, depth_to_top,
                                              fault_type, dip, width)
         for dist_type in dist_types:
-            distances[dist_type] = self.resize_dist(distances[dist_type], 
+            distances[dist_type] = self.resize_dist(distances[dist_type],
                                                     mag.size)
 
         # This is calling the distribution functions described in the
@@ -148,7 +149,7 @@ class Ground_motion_calculator(object):
                              'periods': periods}
         for dist_type in dist_types:
             distribution_args[dist_type] = distances[dist_type]
-        
+
         (log_mean, log_sigma) = self.GM_spec.distribution(**distribution_args)
 
         # FIXME when will this fail?  Maybe let it fail then?
@@ -163,7 +164,8 @@ class Ground_motion_calculator(object):
 
         return (log_mean, log_sigma)
 
-    def resize_mag_depth(self, mag, depth, depth_to_top, fault_type, dip, width):
+    def resize_mag_depth(self, mag, depth, depth_to_top,
+                         fault_type, dip, width):
         """
         Warning, Toro_1997_midcontinent_distribution assumes
         that this occurs.  So if resizing is changed,
@@ -173,7 +175,7 @@ class Ground_motion_calculator(object):
         if mag.size == 1:
             mag = mag.reshape([1])
             if depth is not None:
-                depth = depth.reshape([1]) # Don't know if we have to do this
+                depth = depth.reshape([1])  # Don't know if we have to do this
             if depth_to_top is not None:
                 depth_to_top = depth_to_top.reshape([1])
             if fault_type is not None:
@@ -181,24 +183,24 @@ class Ground_motion_calculator(object):
 
         # resize depth, depth_to_top, etc
         if depth is not None:
-            depth = depth[newaxis,:,newaxis]
+            depth = depth[newaxis, :, newaxis]
             # collapsed arrays are a bad idea...
 
         if depth_to_top is not None:
-            depth_to_top = array(depth_to_top)[newaxis,:,newaxis]
+            depth_to_top = array(depth_to_top)[newaxis, :, newaxis]
 
         if fault_type is not None:
-            fault_type = array(fault_type)[newaxis,:,newaxis]
+            fault_type = array(fault_type)[newaxis, :, newaxis]
 
         if dip is not None:
-            dip = array(dip)[newaxis,:,newaxis]
+            dip = array(dip)[newaxis, :, newaxis]
 
         if width is not None:
-            width = array(width)[newaxis,:,newaxis]
+            width = array(width)[newaxis, :, newaxis]
 
         assert len(mag.shape) == 1
 
-        mag = mag[newaxis,:,newaxis]
+        mag = mag[newaxis, :, newaxis]
 
         return (mag, depth, depth_to_top, fault_type, dip, width)
 
@@ -209,30 +211,31 @@ class Ground_motion_calculator(object):
         Toro_1997_midcontinent_distribution needs to be changed as well
         """
         # [4.5,5.5,6.0] => site * mag * T
-        assert len(dist.shape)<3
-        if not len(dist.shape)==2:
+        assert len(dist.shape) < 3
+        if not len(dist.shape) == 2:
             # if distances is collapsed
-            if dist.size==1:
+            if dist.size == 1:
                 # if distances is size 1
-                dist=dist.reshape((1,1))
+                dist = dist.reshape((1, 1))
             else:
-                assert len(dist.shape)==1
-                if mag_size>1:
-                    assert dist.size==mag_size
+                assert len(dist.shape) == 1
+                if mag_size > 1:
+                    assert dist.size == mag_size
                     # therefore distance is 1 site * n magnitudes
-                    dist=dist.reshape((1,mag_size))
+                    dist = dist.reshape((1, mag_size))
                 else:
                     # therefore distance is n site * 1 magnitudes
-                    dist=dist.reshape((dist.size,1))
+                    dist = dist.reshape((dist.size, 1))
         # collapsed arrays are a bad idea...
 
-        dist=dist[:,:,newaxis]
+        dist = dist[:, :, newaxis]
         # [[30.0,35.0],[45.0,20.0]]=> [site*mag] * T
 
         return dist
 
 
 class Multiple_ground_motion_calculator(object):
+
     """Multiple Ground_motion_calculator instances are used to
     calculate the ground motion given one or more ground motion models.
 
@@ -247,8 +250,8 @@ class Multiple_ground_motion_calculator(object):
         # Should do this just once, when the para values are first verified.
         # The -ve value means 'the logic tree is not collapsed'
         self.model_weights = asarray(model_weights)
-        if not allclose(1,self.model_weights.sum()):
-            print 'model_weights,',-self.model_weights
+        if not allclose(1, self.model_weights.sum()):
+            print 'model_weights,', -self.model_weights
             raise ValueError('abs(self.model_weights) did not sum to 1!')
 
         self.GM_models = []
@@ -290,7 +293,6 @@ class Multiple_ground_motion_calculator(object):
 
         return log_mean_extend_GM, log_sigma_extend_GM
 
-    
     def _distribution_function(self, dist_object, mag_dict, periods=None,
                                depth=None, depth_to_top=None,
                                fault_type=None, Vs30=None, Z25=None,
@@ -318,18 +320,17 @@ class Multiple_ground_motion_calculator(object):
                 Z25=Z25, dip=dip, width=width,
                 mag_type=GM_model.GM_spec.magnitude_type)
             if mod_i == 0:
-                log_mean_extend_GM = log_mean[newaxis,:]
-                log_sigma_extend_GM = log_sigma[newaxis,:]
+                log_mean_extend_GM = log_mean[newaxis, :]
+                log_sigma_extend_GM = log_sigma[newaxis, :]
             else:
                 new_axis = 0
                 event_axis = 1
                 log_mean_extend_GM = concatenate(
                     (log_mean_extend_GM, log_mean[newaxis, :]),
                     axis=new_axis)
-                
+
                 log_sigma_extend_GM = concatenate(
                     (log_sigma_extend_GM, log_sigma[newaxis, :]),
                     axis=new_axis)
-        
-        return log_mean_extend_GM, log_sigma_extend_GM
 
+        return log_mean_extend_GM, log_sigma_extend_GM

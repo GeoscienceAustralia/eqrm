@@ -13,32 +13,34 @@
   Copyright 2007 by Geoscience Australia
 """
 
-#FIXME.  This looks like it can be optimised a lot.
+# FIXME.  This looks like it can be optimised a lot.
 
 from scipy import array
 
-from distance_functions import distance_functions
+from .distance_functions import distance_functions
 
-#def distance_limit(distance):
+# def distance_limit(distance):
  #   """ Given an array of distances, set a lower limit.
   #  """
 
+
 class Distances(object):
-    def __init__(self, 
-                 site_latitude, 
-                 site_longitude, 
+
+    def __init__(self,
+                 site_latitude,
+                 site_longitude,
                  rupture_centroids_lat,
-                 rupture_centroids_lon, 
-                 lengths, 
-                 azimuths, 
-                 widths, 
-                 dips, 
+                 rupture_centroids_lon,
+                 lengths,
+                 azimuths,
+                 widths,
+                 dips,
                  depths,
-                 depths_to_top, 
-                 projection, 
-                 trace_start_lat=None, 
-                 trace_start_lon=None, 
-                 rupture_centroid_x=None, 
+                 depths_to_top,
+                 projection,
+                 trace_start_lat=None,
+                 trace_start_lon=None,
+                 rupture_centroid_x=None,
                  rupture_centroid_y=None):
 
         self.distance_functions = distance_functions
@@ -76,13 +78,13 @@ class Distances(object):
     def __getattr__(self, distance_type):
         """self.Epicentral = self.distance['Epicentral']"""
 
-        if not self.distance_functions.has_key(distance_type):
+        if distance_type not in self.distance_functions:
             raise AttributeError
         else:
             return self.distance(distance_type)
 
     def distance(self, distance_type):
-        if not self.distance_cache.has_key(distance_type):
+        if distance_type not in self.distance_cache:
             self.distance_cache[distance_type] = self.raw_distances(
                 site_latitude=self.site_latitude,
                 site_longitude=self.site_longitude,
@@ -101,24 +103,23 @@ class Distances(object):
                 rupture_centroid_x=self.rupture_centroid_x,
                 rupture_centroid_y=self.rupture_centroid_y)
         return self.distance_cache[distance_type]
-            
 
-    def raw_distances(self, 
-                      site_latitude, 
-                      site_longitude, 
+    def raw_distances(self,
+                      site_latitude,
+                      site_longitude,
                       rupture_centroid_lat,
-                      rupture_centroid_lon, 
-                      lengths, 
-                      azimuths, 
-                      widths, 
+                      rupture_centroid_lon,
+                      lengths,
+                      azimuths,
+                      widths,
                       dips,
-                      depths, 
-                      depths_to_top, 
-                      distance_type, 
-                      projection, 
-                      trace_start_lat=None, 
-                      trace_start_lon=None, 
-                      rupture_centroid_x=None, 
+                      depths,
+                      depths_to_top,
+                      distance_type,
+                      projection,
+                      trace_start_lat=None,
+                      trace_start_lon=None,
+                      rupture_centroid_x=None,
                       rupture_centroid_y=None):
         """Calculate the distance from 'locations' to 'rupture_centroid'.
 
@@ -126,19 +127,19 @@ class Distances(object):
         """
 
         distance_function = self.distance_functions[distance_type]
-        return distance_function(site_latitude, 
+        return distance_function(site_latitude,
                                  site_longitude,
-                                 rupture_centroid_lat, 
+                                 rupture_centroid_lat,
                                  rupture_centroid_lon,
-                                 lengths, azimuths, 
-                                 widths, 
-                                 dips, 
+                                 lengths, azimuths,
+                                 widths,
+                                 dips,
                                  depths,
-                                 depths_to_top, 
-                                 projection, 
-                                 trace_start_lat, 
-                                 trace_start_lon, 
-                                 rupture_centroid_x, 
+                                 depths_to_top,
+                                 projection,
+                                 trace_start_lat,
+                                 trace_start_lon,
+                                 rupture_centroid_x,
                                  rupture_centroid_y)
 
     def __getitem__(self, key):
@@ -173,27 +174,27 @@ class Distances(object):
         if self.rupture_centroid_x is not None:
             rupture_centroid_x = self.rupture_centroid_x[event]
             rupture_centroid_y = self.rupture_centroid_y[event]
-        
-        distances = Distances(site_latitude, 
-                              site_longitude, 
+
+        distances = Distances(site_latitude,
+                              site_longitude,
                               rupture_centroid_lat,
-                              rupture_centroid_lon, 
-                              lengths, 
-                              azimuths, 
-                              widths, 
+                              rupture_centroid_lon,
+                              lengths,
+                              azimuths,
+                              widths,
                               dips,
-                              depths, 
-                              depths_to_top, 
-                              projection, 
+                              depths,
+                              depths_to_top,
+                              projection,
                               trace_start_lat=trace_start_lat,
                               trace_start_lon=trace_start_lon,
                               rupture_centroid_x=rupture_centroid_x,
                               rupture_centroid_y=rupture_centroid_y)
-        
+
         # Take a slice of the cached distances
         distance_cache = {}
         for dist_func, dist_cache in self.distance_cache.iteritems():
-            distance_cache[dist_func] = dist_cache[:,event]
+            distance_cache[dist_func] = dist_cache[:, event]
         distances.distance_cache = distance_cache
-        
+
         return distances
