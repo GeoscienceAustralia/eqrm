@@ -24,7 +24,7 @@ class WeaveIOError(exceptions.Exception):
 
     def __init__(self, errno=None, msg=None):
         msg = ("%s directory is full. Space is needed to compile files."
-               % get_weave_dir())
+               % util.get_weave_dir())
         raise IOError(msg)
 
 # Users used to be able to set this...

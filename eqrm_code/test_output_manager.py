@@ -801,7 +801,7 @@ class Test_Output_manager(unittest.TestCase):
         handle, base_file_name = tempfile.mkstemp('.txt', __name__ + '_')
         os.close(handle)
 
-        if compress: my_open = myGzipFile
+        if compress: my_open = MyGzipFile
         else: my_open = open
 
         for i in range(file_num):
@@ -838,7 +838,7 @@ class Test_Output_manager(unittest.TestCase):
         handle, base_file_name = tempfile.mkstemp('.txt', __name__ + '_')
         os.close(handle)
 
-        if compress: my_open = myGzipFile
+        if compress: my_open = MyGzipFile
         else: my_open = open
 
         for i in range(file_num):
@@ -929,7 +929,7 @@ class Test_Output_manager(unittest.TestCase):
         handle, base_file_name = tempfile.mkstemp('.txt', __name__ + '_')
         os.close(handle)
 
-        if compress: my_open = myGzipFile
+        if compress: my_open = MyGzipFile
         else: my_open = open
 
         for i in range(0,file_num):

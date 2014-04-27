@@ -23,16 +23,12 @@ import datetime
 import sys
 platform = sys.platform
 
-from scipy import where, allclose, newaxis, array, isfinite, zeros, asarray, \
-    arange, reshape, exp, tile, intersect1d, ravel
+from scipy import where, newaxis, array, isfinite, zeros, \
+    arange, reshape, tile, ravel
 
 from eqrm_code.parse_in_parameters import  \
     AttributeSyntaxError, create_parameter_data, eqrm_flags_to_control_file
-from eqrm_code.event_set import Event_Set, Event_Activity, \
-    generate_synthetic_events_fault, merge_events_and_sources, \
-    create_event_set
-from eqrm_code.ground_motion_calculator import \
-    Multiple_ground_motion_calculator
+from eqrm_code.event_set import create_event_set
 from eqrm_code.ground_motion_interface import BEDROCKVs30
 from eqrm_code.regolith_amplification_model import get_soil_SA, \
     Regolith_amplification_model, load_site_class2Vs30
@@ -54,9 +50,7 @@ from eqrm_code.exceedance_curves import hzd_do_value, \
 from eqrm_code.sites import Sites, truncate_sites_for_test
 from eqrm_code.parallel import Parallel
 from eqrm_code.ANUGA_utilities import log
-from eqrm_code.get_version import get_version
 from eqrm_code.bridges import Bridges
-import eqrm_code.util as util
 from . import eqrm_filesystem as eq_fs
 from eqrm_code.RSA2MMI import rsa2mmi_array
 from eqrm_code.fatalities import forecast_fatality

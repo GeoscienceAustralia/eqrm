@@ -13,7 +13,7 @@
   Copyright 2007 by Geoscience Australia
 """
 
-from scipy import allclose, asarray
+from scipy import asarray
 
 from eqrm_code.ground_motion_interface import ground_motion_init
 

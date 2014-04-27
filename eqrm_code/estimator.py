@@ -10,9 +10,9 @@
 """
 from copy import copy
 from eqrm_code.ANUGA_utilities.log import EVENTS_J, MAXGMPE_J, BLOCKSITES_J, \
-    PARALLELSIZE_J, TOTALMEM_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J, \
+    PARALLELSIZE_J, INITIAL_J, LOOPING_J, MEM_J, RECMOD_J, \
     FINAL_J, CLOSEROCKSAE_J, CLOSERATIO_J, PEAK_J, BEDROCKALL_J, SOILALL_J, \
-    EVENTACTIVITY_J, BEDROCKHAZ_J, SOILHAZ_J, COLLROCKSAE_J
+    EVENTACTIVITY_J, BEDROCKHAZ_J, SOILHAZ_J, COLLROCKSAE_J, ROCKOVERLOADED_J
 
 from eqrm_code.ANUGA_utilities import log
 from eqrm_code.ANUGA_utilities.log_analyser import build_log_info
