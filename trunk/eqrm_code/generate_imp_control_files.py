@@ -14,13 +14,10 @@ from xml.etree import ElementTree as ET #, getiterator
 from eqrm_code.eqrm_filesystem import scenario_input_path
 
 
-"""
-design
-- read in the general input file
-- modify it based on the ground motion models needed
-- write many input files.
 
-"""
+# design
+ # read in the general input file
+#  modify it based on the ground motion models needed
 
 
 # read in the general input file

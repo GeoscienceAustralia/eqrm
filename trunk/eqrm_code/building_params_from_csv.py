@@ -10,11 +10,10 @@
   ModifiedDate: $Date: 2009-09-16 17:34:02 +1000 (Wed, 16 Sep 2009) $
 
 """
-from os.path import join
 
-from scipy import ones, allclose, array, asarray, newaxis
+from scipy import array, asarray, newaxis
 
-from eqrm_code.csv_interface import csv_to_arrays, csv2dict
+from eqrm_code.csv_interface import csv_to_arrays
 from eqrm_code.util import get_local_or_default
 
 # ie bp=building_params_from_csv('building_parameters_workshop_3')

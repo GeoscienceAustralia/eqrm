@@ -1,8 +1,8 @@
-
 import os
-from eqrm_code.check_scenarios import par_files, SCENARIO_DIR, \
-     MINI_SCENARIO_DIR
+
+from eqrm_code.check_scenarios import par_files, MINI_SCENARIO_DIR
 from eqrm_code.parse_in_parameters import convert_par_to_py
+
 
 def convert_imp(path=MINI_SCENARIO_DIR):
     par_file_list = par_files(path)

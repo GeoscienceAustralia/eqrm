@@ -17,7 +17,8 @@ from eqrm_code.capacity_spectrum_functions import \
     calculate_capacity_parameters, \
     calculate_kappa, undamped_response, calculate_corner_periods, \
     calculate_reduction_factors, calculate_updated_demand, \
-    calculate_capacity, nonlin_damp, CSM_DAMPING_USE_SMOOTHING
+    calculate_capacity, nonlin_damp, CSM_DAMPING_USE_SMOOTHING, \
+    trapazoid_damp
 
 CSM_DAMPING_REGIMES_USE_ALL = 0
 CSM_DAMPING_REGIMES_USE_RA_RV = 1

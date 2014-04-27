@@ -553,7 +553,7 @@ class Empty_polygon(polygon_object):
         Returns a polygon representing the union between
         self and polygon.
         """
-        return polygon2
+        return None
 
     def area(self,):
         """
