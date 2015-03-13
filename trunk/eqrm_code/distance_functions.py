@@ -33,6 +33,8 @@ ModifiedBy: $Author: dgray $
 ModifiedDate: $Date: 2009-12-08 17:41:02 +1100 (Tue, 08 Dec 2009) $
 
 Copyright 2007 by Geoscience Australia
+
+http://daveboore.com/pubs_online/kaklamanos_etal_2011eqs_nga_input_parameters.pdf
 """
 
 from scipy import newaxis, sqrt, pi, cos, sin, where, reshape, arctan, sign
