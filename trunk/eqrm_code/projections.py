@@ -85,14 +85,20 @@ def azimuthal_orthographic_ll_to_xy(lat, lon, lat0, lon0, azimuth=0, R=6367.0):
 def azimuthal_orthographic_xy_to_ll(x, y, lat0, lon0, azimuth=0, R=6367.0):
     """
     x,y = point for conversion to lat,lon
+    The points are in km using the local co-ordinate system.
+    e.g. The origin is the start of the trace.
+    The x-axis is oriented along the rupture trace.
+    The Azimuth is the angle between true North and the rupture trace.
+    See the manual for a better description of this.
+
     lat0,lon0 = origin of coordinate system
 
-    assumes that longitude increases towards the east
+    Assumes that longitude increases towards the east
     PLEASE NOTE you need to be very careful using these functions outside
     of EQRM.  In EQRM the x axis runs along the rupture trace. the y axis
     is perpendicular to the rupture trace.
     """
-    # x = site x, y = site x
+    # x = site x km, y = site x km
     # lat0 = origin (event latitude), lon0 = origin (event longitude)
     # assumes that longitude increases towards the east
     x, y = __rotate_frame_back(x, y, azimuth)

@@ -329,7 +329,7 @@ class Test_Event_Set(unittest.TestCase):
         eqrm_flags.scenario_magnitude = [6.02]
         eqrm_flags.scenario_max_width = [5]
         eqrm_flags.scenario_depth = [7]
-        eqrm_flags.scenario_number_of_events = 1 # If this is 2 it fails
+        eqrm_flags.scenario_number_of_events = 1
         
         event_set = Event_Set.create_scenario_events(
             rupture_centroid_lat=eqrm_flags.scenario_latitude,
@@ -403,7 +403,90 @@ class Test_Event_Set(unittest.TestCase):
                       eqrm_flags.scenario_magnitude [0])
         self.assert_ (len(event_set) == 1)
         
-        
+
+    def do_not_test_scenario_event_5(self):
+        # Couldn't get this test working
+
+        eqrm_flags = DummyEventSet()
+        eqrm_flags.scenario_latitude = [-1.]
+        eqrm_flags.scenario_longitude = [150.]
+        eqrm_flags.scenario_azimuth = [0]
+        eqrm_flags.dip = [45]
+        eqrm_flags.scenario_magnitude = [6.02]
+        eqrm_flags.scenario_max_width = [4]
+        eqrm_flags.scenario_depth = [7]
+        eqrm_flags.scenario_number_of_events = 1
+
+        event_set = Event_Set.create_scenario_events(
+            rupture_centroid_lat=eqrm_flags.scenario_latitude,
+            rupture_centroid_lon=eqrm_flags.scenario_longitude,
+            azimuth=eqrm_flags.scenario_azimuth,
+            dip=eqrm_flags.dip,
+            Mw=eqrm_flags.scenario_magnitude,
+            fault_width=eqrm_flags.scenario_max_width,
+            depth=eqrm_flags.scenario_depth,
+            scenario_number_of_events=eqrm_flags.scenario_number_of_events)
+
+
+        answer = array(eqrm_flags.scenario_max_width)
+        self.assert_ (allclose(event_set.width, answer))
+
+        area = array((conversions.modified_Wells_and_Coppersmith_94_area(
+            eqrm_flags.scenario_magnitude[0])))
+        self.assert_ (allclose(100., area))
+
+        width = array(
+            conversions.modified_Wells_and_Coppersmith_94_width(
+            eqrm_flags.dip, eqrm_flags.scenario_magnitude,
+            area, eqrm_flags.scenario_max_width ))
+        self.assert_ (allclose(4., width))
+        self.assert_ (allclose(event_set.width, width))
+
+        self.assert_ (allclose(event_set.length, 25.))
+
+        self.assert_ (allclose(event_set.rupture_centroid_x, 12.5))
+
+        # Due to the 45 deg dip
+        self.assert_ (allclose(event_set.rupture_centroid_y, event_set.depth))
+
+        #event_set.trace_start_lat [-1]
+        #event_set.trace_start_lon [ 150]
+
+
+        # centroid
+        #Zone:		56
+        # Easting:		 166072.063		Northing:	 9889317.162
+        # Latitude:		-1  0 ' 0.00000 ''		Longitude:	150  0 ' 0.00000 ''
+        # Grid Convergence:		0  -3 ' 8.66 ''		Point Scale:	 1.00098064
+        # Therefore start of trace
+        # xdiff is 12.5 km
+        # ydiff is 7 km
+        # Easting:		 166072.063	- 7000	Northing:	 9876817.162 - 12500
+        # Easting:		 159072.063	  	Northing:	 9889304.662
+        # Latitude:		-1 deg 0 ' 0.19613 ''		Longitude:	149 deg 56 ' 13.59224 ''
+        # Latitude:		-1.000054 deg		Longitude:	149.937109 DEG
+
+        print "event_set.trace_start_lat", event_set.trace_start_lat
+        print "event_set.trace_start_lon", event_set.trace_start_lon
+        self.assert_ (allclose(event_set.trace_start_lon, 149.937109,0.001))
+        self.assert_ (allclose(event_set.trace_start_lat, -1.000054,0.001))
+
+        repr = event_set.__repr__()
+        repr_list = repr.split('\n')
+        results = repr_list[1].split(':')
+        self.assert_ (int(results[1]) == 1)
+        results = repr_list[2].split(':')
+        self.assert_ (float(results[1].strip('[]')) == \
+                      eqrm_flags.scenario_latitude[0])
+        results = repr_list[3].split(':')
+        self.assert_ (float(results[1].strip('[]')) == \
+                      eqrm_flags.scenario_longitude[0])
+        results = repr_list[4].split(':')
+        self.assert_ (float(results[1].strip('[]')) == \
+                      eqrm_flags.scenario_magnitude [0])
+        self.assert_ (len(event_set) == 1)
+
+
     def test_scenario_event_max_width(self):
         eqrm_flags = DummyEventSet()
         eqrm_flags.scenario_latitude = -32.95
