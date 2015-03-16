@@ -23,6 +23,7 @@ class Test_Projections(unittest.TestCase):
         R = 6367.0              # Earth radius (km)
         circumference = 2*pi*R
         km_per_degree = circumference / 360.0
+        # km_per_degree 111.125113474
 
         # define two points precisely one degree apart on equator
         lat_origin = asarray((0.0,))
@@ -56,8 +57,6 @@ class Test_Projections(unittest.TestCase):
         (lat_point, lon_point) = xy2ll(x, y, lat_origin, lon_origin,
                        azimuth=0.0)
 
-        # note the looseish tolerance required to get agreement
-        # possibly ll2xy() has some loss of precision?  looked but can't see it.
         msg = ('Expected lat=\n%s\ngot\n%s' % (str(expected_lat_point), str(lat_point)))
         self.failUnless(allclose(expected_lat_point, lat_point), msg)
         msg = ('Expected long=\n%s\ngot\n%s' % (str(expected_lon_point), str(lon_point)))

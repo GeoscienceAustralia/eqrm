@@ -338,6 +338,8 @@ class Event_Set(file_store.File_Store):
 
         rupture_centroid_x = x
         rupture_centroid_y = y
+        #print "x", x
+        #print "y", y
 
         (trace_start_lat,
          trace_start_lon) = xy_to_ll(-rupture_centroid_x,-rupture_centroid_y,
