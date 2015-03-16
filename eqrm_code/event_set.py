@@ -248,7 +248,7 @@ class Event_Set(file_store.File_Store):
           
           Note, if you supply either ML or Mw, the other will be
           calculated. If you supply both, it is up to you to ensure that
-          they are consistnt. Note that most functions in EQRM use Mw (ML
+          they are consistent. Note that most functions in EQRM use Mw (ML
           based attenuation models being one exception).
 
         The degrees of freedom of this interface is not quite right.      
