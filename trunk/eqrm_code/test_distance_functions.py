@@ -509,7 +509,7 @@ class Test_Distance_functions(unittest.TestCase):
         # start trace, 8 km depth - 3rd column
         # above rupture top edge
         lat_sites = asarray(( 0., -0.013904575, -0.013904575, -0.013904575))
-        lon_sites = asarray(( 130., 129.9820023, 129.9280091, 129.9860954))
+        lon_sites = asarray(( 130., 129.982002268, 129.928009072, 129.990167981))
 
         # define array of events, 1st column, 2km depth.  2nd column 8km depth.
         lat_events = asarray((0.0,0.0))
@@ -520,7 +520,7 @@ class Test_Distance_functions(unittest.TestCase):
         widths = asarray((3.090295, 3.090295))
         lengths = asarray((3.090295, 3.090295))
         dips = asarray((45.0, 45.0))
-        depths_to_top = asarray((0.4548525, 6.4548525))
+        depths_to_top = asarray((0.9074157248, 6.9074157248))
         trace_start_lat = asarray((-0.013904575, -0.013904575))
         trace_start_lon = asarray((129.9820023, 129.9280091))
         rupture_centroid_x = asarray((1.545148, 1.545148))
@@ -532,7 +532,7 @@ class Test_Distance_functions(unittest.TestCase):
             [[.0, .0],
              [0.907415725, 0.907415725],
              [6.907415725, 6.907415725],
-             [.0, .0]]) # EQRM is giving 0.45256
+             [.0, .0]])
 
         Rjb = Joyner_Boore(lat_sites,
                            lon_sites,
@@ -551,7 +551,7 @@ class Test_Distance_functions(unittest.TestCase):
                            rupture_centroid_y)
 
         msg = ('Expected Rjb=\n%s\ngot\n%s' % (expected_Rjb, Rjb))
-        self.failUnless(allclose(Rjb, expected_Rjb, atol=1e-06), msg)
+        self.failUnless(allclose(Rjb, expected_Rjb, atol=1e-05), msg)
 
         # define expected Rrup values
         # from kaklamanosDis
@@ -560,6 +560,79 @@ class Test_Distance_functions(unittest.TestCase):
              [1.283279625, 6.966763617],
              [6.966763617, 9.768561],
              [0.4548525, 6.4548525]])
+
+        Rrup = Rupture(lat_sites,
+                       lon_sites,
+                       lat_events,
+                       lon_events,
+                       lengths,
+                       azimuths,
+                       widths,
+                       dips,
+                       depths,
+                       depths_to_top,
+                       projection,
+                       trace_start_lat,
+                       trace_start_lon,
+                       rupture_centroid_x,
+                       rupture_centroid_y)
+
+        msg = ('Expected Rrup=\n%s\ngot\n%s' % (str(expected_Rrup), str(Rrup)))
+        self.failUnless(allclose(Rrup, expected_Rrup, atol=1e-06), msg)
+
+    def dont_test_Rupture_issue_143_simple(self):
+
+        #Using the example in the implementation tests, results_check.py file..
+
+        # site order
+        # rup centroid - 1st column
+        # above rupture top edge
+        lat_sites = asarray(( 0.))
+        lon_sites = asarray(( 130.))
+
+        # define array of events, 8km depth.
+        lat_events = asarray((0.0))
+        lon_events = asarray((130.))
+
+        azimuths = asarray((0.0))
+
+        widths = asarray((3.090295))
+        lengths = asarray((3.090295))
+        dips = asarray((45.0))
+        depths_to_top = asarray((6.9074157248))
+        trace_start_lat = asarray((-0.013904575))
+        trace_start_lon = asarray((129.9280091))
+        rupture_centroid_x = asarray((1.545148))
+        rupture_centroid_y = asarray((8)) # since the dip is 45 deg
+
+        projection = azimuthal_orthographic
+
+        expected_Rjb = asarray(
+            [[.0, ]])
+
+        Rjb = Joyner_Boore(lat_sites,
+                           lon_sites,
+                           lat_events,
+                           lon_events,
+                           lengths,
+                           azimuths,
+                           widths,
+                           dips,
+                           depths,
+                           depths_to_top,
+                           projection,
+                           trace_start_lat,
+                           trace_start_lon,
+                           rupture_centroid_x,
+                           rupture_centroid_y)
+
+        msg = ('Expected Rjb=\n%s\ngot\n%s' % (expected_Rjb, Rjb))
+        self.failUnless(allclose(Rjb, expected_Rjb, atol=1e-05), msg)
+
+        # define expected Rrup values
+        # from kaklamanosDis
+        expected_Rrup = asarray(
+            [[6.9932919]])
 
         Rrup = Rupture(lat_sites,
                        lon_sites,
