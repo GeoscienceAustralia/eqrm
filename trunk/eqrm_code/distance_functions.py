@@ -327,13 +327,11 @@ def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
                azimuths, widths, dips, depths, depths_to_top, projection,
                trace_start_lat, trace_start_lon, rupture_centroid_x,
                rupture_centroid_y):
-    """Distance function that calculates 'Rx'.
+    """Distance function that calculates Horizontal.
 
-    Rx is the shortest horizontal distance (km) from a site to the line
+    Horizontal is the shortest horizontal distance (km) from a site to the line
     defined
-    by extending the vertical projection of the fault strike to infinity.
-    "The horizontal distance to the surface projection of the top edge
-    if the rupture measured perpendicular to the fault strike."
+    by extending the surface rupture trace to infinity.
 
                  ^ north
                 /
@@ -351,7 +349,7 @@ def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
                         .
                       site
 
-    We get Rx by using ll2xy() to convert start/site positions to x and y
+    We get Horizontal by using ll2xy() to convert start/site positions to x and y
     in the coordinates relative to start and with axes shown in fig 3.1
     of the manual.  Rx is therefore the y value.
     """
@@ -368,6 +366,54 @@ def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
     return where(abs(Rx) < DISTANCE_LIMIT,
                  sign(Rx) * DISTANCE_LIMIT, Rx)
 
+def calc_Rx(lat_sites,
+                    lon_sites,
+                    lat_events,
+                    lon_events,
+                    lengths,
+                    azimuths,
+                    widths,
+                    dips,
+                    depths,
+                    depths_to_top,
+                    projection,
+                    trace_start_lat,
+                    trace_start_lon,
+                    rupture_centroid_x,
+                    rupture_centroid_y):
+
+    """Distance function that calculates 'Rx'.
+
+    Rx is the shortest horizontal distance (km) from a site to the line
+    defined
+    by extending the vertical projection of the fault strike to infinity.
+    "The horizontal distance to the surface projection of the top edge
+    if the rupture measured perpendicular to the fault strike."
+
+    """
+    lat_sites = lat_sites[:, newaxis]
+    lon_sites = lon_sites[:, newaxis]
+
+    rad = pi / 180
+    cos_dip = cos(dips * rad)
+
+    # Local y co-ord of site
+    (_, y) = ll2xy(lat_sites, lon_sites, trace_start_lat,
+                   trace_start_lon, azimuths)
+
+    # surface projection top edge of rupture plane to rupture_centroid_x
+    w = cos_dip * widths / 2.0
+
+    # local y co-ord of the surface projection top edge of rupture plane
+    # if rcy-w is -ve the top edge is above ground.
+    # Therefore the top edge is the rupture trace
+    surf_top_edge = rupture_centroid_y - w
+    if surf_top_edge.shape == (1, 1):
+        surf_top_edge = reshape(surf_top_edge, (1))
+    surf_top_edge = where(0 < surf_top_edge, surf_top_edge, 0)    # max(l, x)
+
+    Rx = abs(y - surf_top_edge)  # distance from y to rupture_centroid_y
+    return Rx
 
 def Kaklamanos_Ry(*args):
     """
