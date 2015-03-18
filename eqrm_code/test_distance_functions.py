@@ -265,7 +265,61 @@ class Test_Distance_functions(unittest.TestCase):
         msg = ('Expected Rx=\n%s\ngot\n%s' % (str(expected_Rx), str(Rx)))
         self.failUnless(allclose(Rx, expected_Rx, rtol=5.0e-3), msg)
 
-        
+
+    def test_Rx(self):
+
+        #Using the example in the implementation tests, results_check.py file..
+
+        # site order
+        # rup centroid - 1st column
+        # start trace, 2 km depth - 2nd column
+        # start trace, 8 km depth - 3rd column
+        # above rupture top edge
+        lat_sites = asarray(( 0., -0.013904575, -0.013904575, -0.013904575))
+        lon_sites = asarray(( 130., 129.982002268, 129.928009072, 129.990167981))
+
+        # define array of events, 1st column, 2km depth.  2nd column 8km depth.
+        lat_events = asarray((0.0,0.0))
+        lon_events = asarray((130.0,130.0))
+
+        azimuths = asarray((0.0,0.0))
+
+        widths = asarray((3.090295, 3.090295))
+        lengths = asarray((3.090295, 3.090295))
+        dips = asarray((45.0, 45.0))
+        depths_to_top = asarray((0.9074157248, 6.9074157248))
+        trace_start_lat = asarray((-0.013904575, -0.013904575))
+        trace_start_lon = asarray((129.9820023, 129.9280091))
+        rupture_centroid_x = asarray((1.545148, 1.545148))
+        rupture_centroid_y = asarray((2, 8)) # since the dip is 45 deg
+
+        projection = azimuthal_orthographic
+
+        expected_Rx = asarray(
+            [[1.092584275, 1.092584275],
+             [0.907415725, 0.907415725],
+             [6.907415725, 6.907415725],
+             [.0, .0]])
+
+        act_Rx = calc_Rx(lat_sites,
+                           lon_sites,
+                           lat_events,
+                           lon_events,
+                           lengths,
+                           azimuths,
+                           widths,
+                           dips,
+                           depths,
+                           depths_to_top,
+                           projection,
+                           trace_start_lat,
+                           trace_start_lon,
+                           rupture_centroid_x,
+                           rupture_centroid_y)
+
+        msg = ('Expected Rx=\n%s\ngot\n%s' % (expected_Rx, act_Rx))
+        self.failUnless(allclose(act_Rx, expected_Rx, atol=1e-05), msg)
+
     def test_Rupture_vertical(self):
         # define varying sites, at different positions, units is deg
         #                      1        2        3
@@ -318,7 +372,7 @@ class Test_Distance_functions(unittest.TestCase):
         
         projection = azimuthal_orthographic
 
-        # define expected Rx values
+        # define expected Rrup values
         expected_Rrup_deg = asarray(
             [[2**0.5*0.1],
              [.1],
