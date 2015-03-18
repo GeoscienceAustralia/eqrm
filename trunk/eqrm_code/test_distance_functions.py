@@ -528,6 +528,31 @@ class Test_Distance_functions(unittest.TestCase):
 
         projection = azimuthal_orthographic
 
+        expected_Rx = asarray(
+            [[1.092584275, 1.092584275],
+             [0.907415725, 0.907415725],
+             [6.907415725, 6.907415725],
+             [.0, .0]])
+
+        Rx = Horizontal(lat_sites,
+                           lon_sites,
+                           lat_events,
+                           lon_events,
+                           lengths,
+                           azimuths,
+                           widths,
+                           dips,
+                           depths,
+                           depths_to_top,
+                           projection,
+                           trace_start_lat,
+                           trace_start_lon,
+                           rupture_centroid_x,
+                           rupture_centroid_y)
+
+        msg = ('Expected Rx=\n%s\ngot\n%s' % (expected_Rx, Rx))
+        self.failUnless(allclose(Rx, expected_Rx), msg)
+
         expected_Rjb = asarray(
             [[.0, .0],
              [0.907415725, 0.907415725],

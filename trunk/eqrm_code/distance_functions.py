@@ -329,8 +329,11 @@ def Horizontal(lat_sites, lon_sites, lat_events, lon_events, lengths,
                rupture_centroid_y):
     """Distance function that calculates 'Rx'.
 
-    Rx is the shortest horizontal distance (km) from a site to the line defined
-    by extending the event fault trace to infinity.
+    Rx is the shortest horizontal distance (km) from a site to the line
+    defined
+    by extending the vertical projection of the fault strike to infinity.
+    "The horizontal distance to the surface projection of the top edge
+    if the rupture measured perpendicular to the fault strike."
 
                  ^ north
                 /
