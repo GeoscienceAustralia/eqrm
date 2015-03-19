@@ -390,6 +390,8 @@ def calc_Rx(lat_sites,
     "The horizontal distance to the surface projection of the top edge
     if the rupture measured perpendicular to the fault strike."
 
+    Note, not really a distance, since if the site is on the
+    footwall side of the surface rupture top edge Rx is -ve
     """
     lat_sites = lat_sites[:, newaxis]
     lon_sites = lon_sites[:, newaxis]
@@ -408,12 +410,17 @@ def calc_Rx(lat_sites,
     # if rcy-w is -ve the top edge is above ground.
     # Therefore the top edge is the rupture trace
     surf_top_edge = rupture_centroid_y - w
+
+    # max(surf_top_edge, 0)
     if surf_top_edge.shape == (1, 1):
         surf_top_edge = reshape(surf_top_edge, (1))
-    surf_top_edge = where(0 < surf_top_edge, surf_top_edge, 0)    # max(l, x)
+    surf_top_edge = where(0 < surf_top_edge, surf_top_edge, 0)
 
-    Rx = abs(y - surf_top_edge)  # distance from y to rupture_centroid_y
-    return Rx
+    # returning Rx
+    # distance from y to rupture_centroid_y
+    # if Rx is -ve it is on the footwall side
+    # if Rx is +ve it is on the Hanging wall side
+    return y - surf_top_edge
 
 def Kaklamanos_Ry(*args):
     """
@@ -512,7 +519,7 @@ def Kaklamanos_Non_Vertical_Rrup(lat_sites,
                                  rupture_centroid_y):
 
     # Calculate Rx
-    Rx = Horizontal(lat_sites,
+    Rx = calc_Rx(lat_sites,
                     lon_sites,
                     lat_events,
                     lon_events,
