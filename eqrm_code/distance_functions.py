@@ -519,7 +519,7 @@ def Kaklamanos_Non_Vertical_Rrup(lat_sites,
                                  rupture_centroid_y):
 
     # Calculate Rx
-    Rx = calc_Rx(lat_sites,
+    Rx = Horizontal(lat_sites,
                     lon_sites,
                     lat_events,
                     lon_events,
