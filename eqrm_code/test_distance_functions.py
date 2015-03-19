@@ -297,8 +297,8 @@ class Test_Distance_functions(unittest.TestCase):
 
         expected_Rx = asarray(
             [[1.092584275, 1.092584275],
-             [0.907415725, 0.907415725],
-             [6.907415725, 6.907415725],
+             [-0.907415725, -0.907415725],
+             [-6.907415725, -6.907415725],
              [.0, .0]])
 
         act_Rx = calc_Rx(lat_sites,
@@ -584,11 +584,11 @@ class Test_Distance_functions(unittest.TestCase):
 
         expected_Rx = asarray(
             [[1.092584275, 1.092584275],
-             [0.907415725, 0.907415725],
-             [6.907415725, 6.907415725],
+             [-0.907415725, -0.907415725],
+             [-6.907415725, -6.907415725],
              [.0, .0]])
 
-        Rx = Horizontal(lat_sites,
+        Rx = calc_Rx(lat_sites,
                            lon_sites,
                            lat_events,
                            lon_events,
@@ -605,7 +605,7 @@ class Test_Distance_functions(unittest.TestCase):
                            rupture_centroid_y)
 
         msg = ('Expected Rx=\n%s\ngot\n%s' % (expected_Rx, Rx))
-        self.failUnless(allclose(Rx, expected_Rx), msg)
+        self.failUnless(allclose(Rx, expected_Rx, atol=1e-05), msg)
 
         expected_Rjb = asarray(
             [[.0, .0],
@@ -635,10 +635,10 @@ class Test_Distance_functions(unittest.TestCase):
         # define expected Rrup values
         # from kaklamanosDis
         expected_Rrup = asarray(
-            [[1.4202618, 6.9932919],
+            [[1.414213562, 6.9932919],
              [1.283279625, 6.966763617],
              [6.966763617, 9.768561],
-             [0.4548525, 6.4548525]])
+             [0.907415725, 6.907415725]])
 
         Rrup = Rupture(lat_sites,
                        lon_sites,
