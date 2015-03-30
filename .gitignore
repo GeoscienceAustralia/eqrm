@@ -1,0 +1,15 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+
+# C extensions
+*.so
+*.o
+
+# Files specific to EQRM
+imp_test_performance.asc
+eqrm_code/EQRM.log
+
+# ignore emacs backup files
+*~
