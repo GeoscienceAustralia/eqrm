@@ -271,7 +271,7 @@ def load_lat_long_haz_SA(output_dir, site_tag, soil_amp, period, return_period):
     for i, array_period in enumerate(periods_f):
         if period - tol < array_period and period + tol > array_period:
             SA_vector = SA_array[:, i]
-    if SA_vector == None:
+    if SA_vector is None:
         msg = "Period " + str(period) + " is not in the saved data periods; " \
               + str(periods_f)
         raise IOError(msg)

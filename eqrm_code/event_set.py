@@ -1152,7 +1152,7 @@ class Event_Activity(file_store.File_Store):
                                      self.num_events),
                                     dtype=EVENT_FLOAT)
   
-        if event_indexes == None:
+        if event_indexes is None:
             event_indexes = arange(self.num_events)
         assert len(event_indexes) == event_activities.shape[1]
 

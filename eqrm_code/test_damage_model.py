@@ -352,10 +352,11 @@ class Test_damage_model(unittest.TestCase):
         somewhere in the middle, and sum=one.
         """
 
-        # test against matlab implimentation:
+        # test against matlab implementation:
         beta = 0.4
         value = 5.0
-        threshold = array((0.0, 0.00001, 1, 1.5, 2, 3, 4, 5, 10, 100, 1000))
+        
+        threshold = array((0.000001, 0.00001, 1, 1.5, 2, 3, 4, 5, 10, 100, 1000))
 
         oldsettings = seterr(divide='ignore')
         x = (1/beta)*log(value/threshold)
