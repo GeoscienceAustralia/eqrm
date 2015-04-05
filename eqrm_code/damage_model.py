@@ -172,7 +172,6 @@ class Damage_model(object):
         nsd_ratio = (f2 * non_structural_state)  # .sum(axis=-1)
         accel_ratio = (f3 * acceleration_sensitive_state)  # .sum(axis=-1)
         contents_ratio = (f4 * acceleration_sensitive_state)  # .sum(axis=-1)
-
         loss_ratio = (structure_ratio, nsd_ratio, accel_ratio, contents_ratio)
 
         structure_loss = structure_ratio * structure_cost[:, newaxis, newaxis]
@@ -268,8 +267,8 @@ def state_probability(threshold, beta, value):
     """
 
     p = cumulative_state_probability(threshold, beta, value)
-    reduce_cumulative_to_pdf(p)
 
+    reduce_cumulative_to_pdf(p)
     return p
 
 
@@ -303,8 +302,8 @@ def cumulative_state_probability(threshold, beta, value):
                               peak spectrial acceleration or
           for bridges - spectral acceleration at t = 1 sec
     """
-    # print "value",value
-    # print "threshold",threshold
-    temp = (1 / beta) * log(value / threshold)
 
+    oldsettings = seterr(divide='ignore')
+    temp = (1 / beta) * log(value / threshold)
+    seterr(**oldsettings)
     return norm.cdf(temp)
