@@ -53,6 +53,3 @@ fi
 
 ########################################################
 # build and install anuga
-
-python setup.py build
-sudo python setup.py install
