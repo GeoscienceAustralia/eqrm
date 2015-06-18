@@ -22,9 +22,10 @@ sudo apt-get install -q -y git gfortran python-dev python-numpy \
                              python-scipy \
                              python-matplotlib netcdf-bin \
                              libnetcdf-dev libhdf5-serial-dev \
-                             python-gdal gdal-bin python-pip 
+                             python-gdal gdal-bin python-pip \
+                             libgeos-c1 libgeos-dev
 
-sudo pip install nose netCDF4 pyproj
+sudo pip install nose netCDF4 pyproj shapely
 
 ANUGA_PARALLEL="openmpi"
 ##########################################################
