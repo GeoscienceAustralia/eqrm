@@ -13,3 +13,4 @@ eqrm_code/EQRM.log
 
 # ignore emacs backup files
 *~
+*.DS_Store
