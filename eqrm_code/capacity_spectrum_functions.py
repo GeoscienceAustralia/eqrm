@@ -176,17 +176,23 @@ def calculate_kappa(magnitude, damping_s, damping_m, damping_l):
     # non-trivial dimension.
     # in that case we may have to try:
     """
-    damping_s = damping_s.swapaxes(0, 1)
-    damping_m = damping_m.swapaxes(0, 1)
-    damping_l = damping_l.swapaxes(0, 1)
-
-    magnitude = magnitude.swapaxes(0, 1)
+    try:
+        damping_s = damping_s.swapaxes(0, 1)
+        damping_m = damping_m.swapaxes(0, 1)
+        damping_l = damping_l.swapaxes(0, 1)
+        magnitude = magnitude.swapaxes(0, 1)
+    except ValueError:  # to avoid error with numpy version > 1.10.1
+        pass
 
     kappa = damping_s * (magnitude <= 5.5)
     kappa[where(magnitude > 5.5)[0]] = damping_m
     kappa[where(magnitude > 7.5)[0]] = damping_l
 
-    kappa = kappa.swapaxes(0, 1)
+    try:
+        kappa = kappa.swapaxes(0, 1)
+    except ValueError:  # to avoid error with numpy version > 1.10.1
+        pass
+
     return kappa
 
 
@@ -522,9 +528,9 @@ def calculate_updated_demand(periods, SA0, SD0, Ra, Rv, Rd, TAV, TVD,
         assert Ra.shape == (num_sites, num_events, 1)
         assert Rv.shape == (num_sites, num_events, 1)
         assert Rd.shape == (num_sites, num_events, 1)
-        Ra = (Ra[:,:, 0])    
-        Rv = (Rv[:,:, 0])    
-        Rd = (Rd[:,:, 0])    
+        Ra = (Ra[:, :, 0])
+        Rv = (Rv[:, :, 0])
+        Rd = (Rd[:, :, 0])
         code = code.replace('get_R',
                             'Raa=Ra(i,j,1);Rvv=Rv(i,j,1);Rdd=Rd(i,j,1);')
         code = 'double Raa,Rvv,Rdd;' + code
