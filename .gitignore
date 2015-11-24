@@ -10,6 +10,11 @@ __pycache__/
 # Files specific to EQRM
 imp_test_performance.asc
 eqrm_code/EQRM.log
+demo/EQRM.log
+
+# nci specific
+*.e*
+*.o*
 
 # ignore emacs backup files
 *~
