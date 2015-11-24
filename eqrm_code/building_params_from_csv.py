@@ -94,7 +94,10 @@ def building_params_from_csv(building_classification_tag,
                                            structural_damage_moderate,
                                            structural_damage_extreme,
                                            structural_damage_complete))
-    structural_damage_threshold = structural_damage_threshold.swapaxes(0, 1)
+    try:
+        structural_damage_threshold = structural_damage_threshold.swapaxes(0, 1)
+    except ValueError:  # to avoid error with numpy version > 1.10.1
+        pass
 
     structural_damage_threshold = structural_damage_threshold * (
         (height_to_displacement * height)[:, newaxis])
