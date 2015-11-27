@@ -1219,10 +1219,8 @@ def save_ecloss(ecloss_name, eqrm_flags, ecloss, structures, compress=False,
     f.write(' '.join([str(bid) for bid in structures.attributes['BID']])
             + '\n')
     for i in range(ecloss.shape[1]):  # for all eventsobject
-        # el = ecloss[:, i]  # sites,event
-        # f.write(' '.join(['%.10g' % (l) for l in el]) + '\n')
-        el = np.sum(ecloss[:, i])  # sum over sites
-        f.write('%.10g' % el + '\n')
+        el = ecloss[:, i]  # sites,event
+        f.write(' '.join(['%.10g' % (l) for l in el]) + '\n')
     f.close()
     return base_name
 
