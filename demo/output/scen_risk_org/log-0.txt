@@ -1,0 +1,130 @@
+2015-07-27 15:13:36,686 DEBUG                     analysis:150 |Logfile is './output/scen_risk/log-0.txt' with logging level of DEBUG, console logging level is INFO
+2015-07-27 15:13:36,687 INFO                      analysis:154 |Logfile is './output/scen_risk/log-0.txt' with logging level of DEBUG, console logging level is INFO
+2015-07-27 15:13:36,687 INFO                      analysis:155 |JS*N{"parallel size": 1}
+2015-07-27 15:13:36,688 INFO                      analysis:156 |JS*N{"host name": "Hyeuks-MacBook-Air.local"}
+2015-07-27 15:13:36,689 INFO                      analysis:157 |JS*N{"system platform": "darwin"}
+2015-07-27 15:13:36,690 DEBUG                     analysis:158 |JS*N{"atten_spawn_bins": 1, "csm_hysteretic_damping": "curve", "prob_azimuth_in_zones": null, "file_log_level": "debug", "scenario_dip": 35, "fatality_beta": 0.17, "default_input_dir": "/Users/hyeuk/Project/eqrm/eqrm_code/../resources/data", "scenario_latitude": -32.95, "use_site_indexes": true, "file_array": false, "atten_threshold_distance": 400, "buildings_usage_classification": "HAZUS", "save_fatalities": false, "save_prob_structural_damage": false, "compress_output": false, "save_contents_loss": false, "csm_damping_use_smoothing": true, "csm_standard_deviation": 0.3, "fault_source_tag": null, "input_dir": "./input/", "prob_dip_in_zones": null, "vulnerability_variability_method": 2, "amp_max_factor": 10000, "prob_min_mag_cutoff": null, "event_control_tag": "", "file_parallel_log_level": "warning", "amp_min_factor": 0.6, "event_set_load_dir": null, "len_atten_models": 1, "len_atten_periods": 20, "zone_source_tag": "", "scenario_max_width": 15, "atten_pga_scaling_cutoff": 2, "use_amplification": true, "scenario_azimuth": 340, "scenario_number_of_events": 1002, "scenario_depth": 11.5, "reset_seed_using_time": true, "csm_SDcr_tolerance_percentage": 1, "csm_damping_max_iterations": 7, "save_hazard_map": false, "csm_damping_modify_Tav": true, "prob_delta_azimuth_in_zones": null, "scenario_magnitude": 7.2, "loss_aus_contents": 0, "scenario_length": null, "atten_override_RSA_shape": null, "save_building_loss": false, "console_parallel_log_level": "warning", "eqrm_dir": "/Users/hyeuk/Project/eqrm/eqrm_code/..", "prob_number_of_mag_sample_bins": null, "scenario_longitude": 151.61, "loss_regional_cost_index_multiplier": 1.4516, "is_parallel": true, "console_log_level": "info", "atten_log_sigma_eq_weight": 0, "save_total_financial_loss": true, "event_set_handler": "generate", "len_return_periods": 14, "building_classification_tag": "", "atten_variability_method": 2, "buildings_set_damping_Be_to_5_percent": false, "bridges_functional_percentages": null, "prob_number_of_events_in_faults": null, "save_motion": false, "fatality_theta": 14.05, "csm_damping_regimes": 0, "grid_flag": 1, "damage_extent_tag": "", "csm_variability_method": null, "site_db_tag": "", "atten_cutoff_max_spectral_displacement": false, "site_tag": "newc", "output_dir": "./output/scen_risk/", "atten_smooth_spectral_acceleration": false, "atten_collapse_Sa_of_atten_models": true, "len_site_indexes": 98, "amp_variability_method": 2, "csm_use_variability": false, "run_type": "risk_csm", "loss_min_pga": 0.05, "scenario_width": null, "is_scenario": true, "prob_number_of_events_in_zones": null, "len_atten_model_weights": 1, "use_determ_seed": true, "data_array_storage": "./output/scen_risk/"}
+2015-07-27 15:13:36,691 INFO                      analysis:160 |JS*N{"SVN modified": null, "SVN version": "exported", "SVN date": null}
+2015-07-27 15:13:36,692 DEBUG                     analysis:161 |Memory: Initial
+2015-07-27 15:13:36,693 DEBUG                     analysis:162 |JS*N{"initial_memory MB": 0.0, "initial_resident MB": 0.0, "initial_stacksize MB": 0.0}
+2015-07-27 15:13:36,695 INFO                     event_set:1472|event_set_handler = generate
+2015-07-27 15:13:36,695 INFO                     event_set:1279|P0: Generating event set
+2015-07-27 15:13:36,751 DEBUG                    event_set:1408|Memory: Event activities split due to gmms.
+2015-07-27 15:13:36,751 DEBUG                    event_set:1409|JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-07-27 15:13:36,776 INFO                     event_set:1432|P0: Saving event set to ./output/scen_risk/newc_event_set
+2015-07-27 15:13:36,785 INFO                     event_set:1542|P0: Event set created. Number of events=1002
+2015-07-27 15:13:36,786 INFO                     event_set:1543|JS*N{"len_events": 1002}
+2015-07-27 15:13:36,786 DEBUG                    event_set:1544|Memory: Event Set created
+2015-07-27 15:13:36,787 DEBUG                    event_set:1545|JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-07-27 15:13:36,982 INFO                      analysis:186 |P0: Sites set created. Number of sites=98
+2015-07-27 15:13:36,983 DEBUG                     analysis:187 |Memory: Sites created
+2015-07-27 15:13:36,983 DEBUG                     analysis:188 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-07-27 15:13:36,984 INFO                      analysis:191 |JS*N{"len_max_GMPEs": 1}
+2015-07-27 15:13:36,984 INFO                      analysis:197 |JS*N{"len_recurrence_models": 1}
+2015-07-27 15:13:36,985 INFO                      analysis:206 |JS*N{"pseudo_events": 1002}
+2015-07-27 15:13:36,985 DEBUG                     analysis:207 |Memory: Pseudo Event Set created
+2015-07-27 15:13:36,985 DEBUG                     analysis:208 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-07-27 15:13:37,032 DEBUG                     analysis:242 |blocking over sites if running in parallel. block_size=98
+2015-07-27 15:13:37,032 DEBUG                     analysis:243 |JS*N{"len_block_sites": 98}
+2015-07-27 15:13:37,033 DEBUG                     analysis:246 |Number of atten_periods=20
+2015-07-27 15:13:37,033 DEBUG                     analysis:249 |JS*N{"len_SA_surfaces": 2}
+2015-07-27 15:13:37,033 DEBUG                     analysis:280 |Memory: hazard_map array created
+2015-07-27 15:13:37,034 DEBUG                     analysis:281 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-07-27 15:13:37,034 DEBUG                     analysis:285 |JS*N{"event_activity array B": 8016}
+2015-07-27 15:13:37,034 DEBUG                     analysis:314 |Memory: save_motion array created
+2015-07-27 15:13:37,035 DEBUG                     analysis:315 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-07-27 15:13:37,036 DEBUG                     analysis:350 |Memory: Created all data collection arrays.
+2015-07-27 15:13:37,036 DEBUG                     analysis:351 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-07-27 15:13:37,036 INFO                      analysis:366 |P0: do site 1 of 98
+2015-07-27 15:13:37,037 DEBUG                     analysis:371 |Memory: site 1
+2015-07-27 15:13:37,037 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:37,039 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:37,039 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:37,040 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:37,055 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:37,056 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:37,275 INFO                      analysis:366 |P0: do site 11 of 98
+2015-07-27 15:13:37,275 DEBUG                     analysis:371 |Memory: site 11
+2015-07-27 15:13:37,276 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:37,277 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:37,277 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:37,278 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:37,284 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:37,284 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:37,495 INFO                      analysis:366 |P0: do site 21 of 98
+2015-07-27 15:13:37,495 DEBUG                     analysis:371 |Memory: site 21
+2015-07-27 15:13:37,496 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:37,497 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:37,498 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:37,498 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:37,504 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:37,505 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:37,664 INFO                      analysis:366 |P0: do site 31 of 98
+2015-07-27 15:13:37,665 DEBUG                     analysis:371 |Memory: site 31
+2015-07-27 15:13:37,665 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:37,667 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:37,667 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:37,667 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:37,673 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:37,674 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:37,875 INFO                      analysis:366 |P0: do site 41 of 98
+2015-07-27 15:13:37,876 DEBUG                     analysis:371 |Memory: site 41
+2015-07-27 15:13:37,876 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:37,878 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:37,878 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:37,878 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:37,884 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:37,885 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:38,057 INFO                      analysis:366 |P0: do site 51 of 98
+2015-07-27 15:13:38,058 DEBUG                     analysis:371 |Memory: site 51
+2015-07-27 15:13:38,058 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:38,059 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:38,060 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:38,060 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:38,066 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:38,067 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:38,215 INFO                      analysis:366 |P0: do site 61 of 98
+2015-07-27 15:13:38,216 DEBUG                     analysis:371 |Memory: site 61
+2015-07-27 15:13:38,216 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:38,217 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:38,218 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:38,218 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:38,224 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:38,224 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:38,363 INFO                      analysis:366 |P0: do site 71 of 98
+2015-07-27 15:13:38,364 DEBUG                     analysis:371 |Memory: site 71
+2015-07-27 15:13:38,364 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:38,366 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:38,366 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:38,367 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:38,373 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:38,373 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:38,539 INFO                      analysis:366 |P0: do site 81 of 98
+2015-07-27 15:13:38,539 DEBUG                     analysis:371 |Memory: site 81
+2015-07-27 15:13:38,540 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:38,541 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:38,541 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:38,542 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:38,548 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:38,548 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:38,696 INFO                      analysis:366 |P0: do site 91 of 98
+2015-07-27 15:13:38,697 DEBUG                     analysis:371 |Memory: site 91
+2015-07-27 15:13:38,697 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-07-27 15:13:38,698 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 1002, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 160320, "cra_num_spawn": 1}
+2015-07-27 15:13:38,699 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-07-27 15:13:38,699 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 160320}
+2015-07-27 15:13:38,705 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-07-27 15:13:38,706 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-07-27 15:13:38,829 DEBUG                     analysis:551 |Memory: Ended looping over sites
+2015-07-27 15:13:38,830 DEBUG                     analysis:552 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-07-27 15:13:38,830 INFO                      analysis:562 |JS*N{"time_pre_site_loop_fraction": 0.1610675736243541}
+2015-07-27 15:13:38,831 INFO                      analysis:565 |event_loop_time (excluding file saving) 0:00:02.135197 hr:min:sec
+2015-07-27 15:13:38,831 INFO                      analysis:567 |JS*N{"event_loop_time_seconds": 2.135197}
+2015-07-27 15:13:39,076 DEBUG                     analysis:787 |JS*N{"iowait %": null, "servicing %": null, "user %": null, "system %": null, "idle %": null}
+2015-07-27 15:13:39,077 INFO                      analysis:794 |On node 0, Hyeuks-MacBook-Air.local clock (processor) time taken overall 0:00:02.381723 hr:min:sec.
+2015-07-27 15:13:39,077 INFO                      analysis:796 |JS*N{"clock_time_taken_overall_seconds": 2.381723}
+2015-07-27 15:13:39,078 INFO                      analysis:803 |On node 0, Hyeuks-MacBook-Air.local wall time taken overall 0:00:02.398840 hr:min:sec.
+2015-07-27 15:13:39,078 INFO                      analysis:804 |JS*N{"wall_time_taken_overall_seconds": 2.3988399505615234}
+2015-07-27 15:13:39,078 INFO                      analysis:805 |On node 0, Hyeuks-MacBook-Air.local wall time taken overall 0:00:02.398840 hr:min:sec.
+2015-07-27 15:13:39,079 DEBUG                     analysis:809 |Memory: End
+2015-07-27 15:13:39,079 DEBUG                     analysis:810 |JS*N{"final_memory MB": 0.0, "final_resident MB": 0.0, "final_stacksize MB": 0.0}

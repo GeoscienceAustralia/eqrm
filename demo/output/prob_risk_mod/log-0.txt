@@ -1,0 +1,181 @@
+2015-11-24 17:54:59,735 DEBUG                     analysis:150 |Logfile is './output/prob_risk/log-0.txt' with logging level of DEBUG, console logging level is INFO
+2015-11-24 17:54:59,736 INFO                      analysis:154 |Logfile is './output/prob_risk/log-0.txt' with logging level of DEBUG, console logging level is INFO
+2015-11-24 17:54:59,737 INFO                      analysis:155 |JS*N{"parallel size": 1}
+2015-11-24 17:54:59,737 INFO                      analysis:156 |JS*N{"host name": "Hyeuks-MacBook.local"}
+2015-11-24 17:54:59,737 INFO                      analysis:157 |JS*N{"system platform": "darwin"}
+2015-11-24 17:54:59,738 DEBUG                     analysis:158 |JS*N{"atten_spawn_bins": 1, "csm_hysteretic_damping": "curve", "prob_azimuth_in_zones": null, "file_log_level": "debug", "scenario_dip": null, "fatality_beta": 0.17, "default_input_dir": "/Users/hyeuk/Projects/eqrm/eqrm_code/../resources/data", "scenario_latitude": null, "use_site_indexes": true, "file_array": false, "atten_threshold_distance": 400, "buildings_usage_classification": "HAZUS", "save_fatalities": false, "save_prob_structural_damage": false, "compress_output": false, "save_contents_loss": false, "csm_damping_use_smoothing": true, "csm_standard_deviation": 0.3, "fault_source_tag": null, "input_dir": "./input/", "prob_dip_in_zones": null, "vulnerability_variability_method": 2, "amp_max_factor": 10000, "prob_min_mag_cutoff": null, "event_control_tag": "", "file_parallel_log_level": "warning", "amp_min_factor": 0.6, "event_set_load_dir": null, "len_atten_models": 1, "len_atten_periods": 20, "zone_source_tag": "", "scenario_max_width": 15, "atten_pga_scaling_cutoff": 2, "use_amplification": true, "scenario_azimuth": null, "scenario_number_of_events": null, "scenario_depth": null, "reset_seed_using_time": true, "csm_SDcr_tolerance_percentage": 1, "csm_damping_max_iterations": 7, "save_hazard_map": false, "csm_damping_modify_Tav": true, "prob_delta_azimuth_in_zones": null, "scenario_magnitude": null, "loss_aus_contents": 0, "scenario_length": null, "atten_override_RSA_shape": null, "save_building_loss": false, "console_parallel_log_level": "warning", "eqrm_dir": "/Users/hyeuk/Projects/eqrm/eqrm_code/..", "prob_number_of_mag_sample_bins": null, "scenario_longitude": null, "loss_regional_cost_index_multiplier": 1.4516, "is_parallel": true, "console_log_level": "info", "atten_log_sigma_eq_weight": 0, "save_total_financial_loss": true, "event_set_handler": "generate", "len_return_periods": 14, "building_classification_tag": "", "atten_variability_method": 2, "buildings_set_damping_Be_to_5_percent": false, "bridges_functional_percentages": null, "prob_number_of_events_in_faults": null, "save_motion": false, "fatality_theta": 14.05, "csm_damping_regimes": 0, "grid_flag": 1, "damage_extent_tag": "", "csm_variability_method": 3, "site_db_tag": "", "atten_cutoff_max_spectral_displacement": false, "site_tag": "newc", "output_dir": "./output/prob_risk/", "atten_smooth_spectral_acceleration": false, "atten_collapse_Sa_of_atten_models": true, "len_site_indexes": 4, "amp_variability_method": 2, "csm_use_variability": true, "run_type": "risk_csm", "loss_min_pga": 0.05, "scenario_width": null, "is_scenario": false, "prob_number_of_events_in_zones": null, "len_atten_model_weights": 1, "use_determ_seed": true, "data_array_storage": "./output/prob_risk/"}
+2015-11-24 17:54:59,738 INFO                      analysis:160 |JS*N{"SVN modified": null, "SVN version": "exported", "SVN date": null}
+2015-11-24 17:54:59,739 DEBUG                     analysis:161 |Memory: Initial
+2015-11-24 17:54:59,739 DEBUG                     analysis:162 |JS*N{"initial_memory MB": 0.0, "initial_resident MB": 0.0, "initial_stacksize MB": 0.0}
+2015-11-24 17:54:59,743 INFO                     event_set:1472|event_set_handler = generate
+2015-11-24 17:54:59,743 INFO                     event_set:1279|P0: Generating event set
+2015-11-24 17:54:59,747 INFO                output_manager:1630|Using file ./input/newc_event_control.xml for event_type source
+2015-11-24 17:54:59,747 INFO                output_manager:1630|Using file ./input/newc_zone_source.xml for zone source
+2015-11-24 17:54:59,781 DEBUG                    event_set:1338|Memory: source_model_zone created
+2015-11-24 17:54:59,782 DEBUG                    event_set:1339|JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,792 INFO                     event_set:521 |JS*N{"len_source_zones": 6}
+2015-11-24 17:54:59,793 DEBUG                    event_set:526 |Generating events for source 0 of 6
+2015-11-24 17:54:59,793 DEBUG                    event_set:537 |Number of events in this source = 5000
+2015-11-24 17:54:59,796 DEBUG                    event_set:544 |Memory: populate_depth_top_seismogenic created
+2015-11-24 17:54:59,797 DEBUG                    event_set:545 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,803 DEBUG                    event_set:548 |Memory: populate_azimuth created
+2015-11-24 17:54:59,803 DEBUG                    event_set:549 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,804 DEBUG                    event_set:552 |Memory: populate_dip created
+2015-11-24 17:54:59,804 DEBUG                    event_set:553 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,809 DEBUG                    event_set:556 |Memory: populate_magnitude created
+2015-11-24 17:54:59,810 DEBUG                    event_set:557 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,841 DEBUG                    event_set:564 |Memory: lat,lon created
+2015-11-24 17:54:59,842 DEBUG                    event_set:565 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,844 DEBUG                    event_set:583 |Memory: event set lists have been combined
+2015-11-24 17:54:59,844 DEBUG                    event_set:584 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,845 DEBUG                    event_set:526 |Generating events for source 1 of 6
+2015-11-24 17:54:59,845 DEBUG                    event_set:537 |Number of events in this source = 1000
+2015-11-24 17:54:59,845 DEBUG                    event_set:544 |Memory: populate_depth_top_seismogenic created
+2015-11-24 17:54:59,846 DEBUG                    event_set:545 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,847 DEBUG                    event_set:548 |Memory: populate_azimuth created
+2015-11-24 17:54:59,847 DEBUG                    event_set:549 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,848 DEBUG                    event_set:552 |Memory: populate_dip created
+2015-11-24 17:54:59,848 DEBUG                    event_set:553 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,849 DEBUG                    event_set:556 |Memory: populate_magnitude created
+2015-11-24 17:54:59,850 DEBUG                    event_set:557 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,854 DEBUG                    event_set:564 |Memory: lat,lon created
+2015-11-24 17:54:59,854 DEBUG                    event_set:565 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,855 DEBUG                    event_set:583 |Memory: event set lists have been combined
+2015-11-24 17:54:59,856 DEBUG                    event_set:584 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,856 DEBUG                    event_set:526 |Generating events for source 2 of 6
+2015-11-24 17:54:59,856 DEBUG                    event_set:537 |Number of events in this source = 1000
+2015-11-24 17:54:59,857 DEBUG                    event_set:544 |Memory: populate_depth_top_seismogenic created
+2015-11-24 17:54:59,857 DEBUG                    event_set:545 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,858 DEBUG                    event_set:548 |Memory: populate_azimuth created
+2015-11-24 17:54:59,859 DEBUG                    event_set:549 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,859 DEBUG                    event_set:552 |Memory: populate_dip created
+2015-11-24 17:54:59,859 DEBUG                    event_set:553 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,861 DEBUG                    event_set:556 |Memory: populate_magnitude created
+2015-11-24 17:54:59,861 DEBUG                    event_set:557 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,865 DEBUG                    event_set:564 |Memory: lat,lon created
+2015-11-24 17:54:59,866 DEBUG                    event_set:565 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,867 DEBUG                    event_set:583 |Memory: event set lists have been combined
+2015-11-24 17:54:59,867 DEBUG                    event_set:584 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,867 DEBUG                    event_set:526 |Generating events for source 3 of 6
+2015-11-24 17:54:59,868 DEBUG                    event_set:537 |Number of events in this source = 1000
+2015-11-24 17:54:59,868 DEBUG                    event_set:544 |Memory: populate_depth_top_seismogenic created
+2015-11-24 17:54:59,868 DEBUG                    event_set:545 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,870 DEBUG                    event_set:548 |Memory: populate_azimuth created
+2015-11-24 17:54:59,870 DEBUG                    event_set:549 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,870 DEBUG                    event_set:552 |Memory: populate_dip created
+2015-11-24 17:54:59,871 DEBUG                    event_set:553 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,872 DEBUG                    event_set:556 |Memory: populate_magnitude created
+2015-11-24 17:54:59,872 DEBUG                    event_set:557 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,905 DEBUG                    event_set:564 |Memory: lat,lon created
+2015-11-24 17:54:59,905 DEBUG                    event_set:565 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,906 DEBUG                    event_set:583 |Memory: event set lists have been combined
+2015-11-24 17:54:59,906 DEBUG                    event_set:584 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,907 DEBUG                    event_set:526 |Generating events for source 4 of 6
+2015-11-24 17:54:59,907 DEBUG                    event_set:537 |Number of events in this source = 1000
+2015-11-24 17:54:59,908 DEBUG                    event_set:544 |Memory: populate_depth_top_seismogenic created
+2015-11-24 17:54:59,908 DEBUG                    event_set:545 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,909 DEBUG                    event_set:548 |Memory: populate_azimuth created
+2015-11-24 17:54:59,909 DEBUG                    event_set:549 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,910 DEBUG                    event_set:552 |Memory: populate_dip created
+2015-11-24 17:54:59,910 DEBUG                    event_set:553 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,911 DEBUG                    event_set:556 |Memory: populate_magnitude created
+2015-11-24 17:54:59,912 DEBUG                    event_set:557 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,916 DEBUG                    event_set:564 |Memory: lat,lon created
+2015-11-24 17:54:59,917 DEBUG                    event_set:565 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,917 DEBUG                    event_set:583 |Memory: event set lists have been combined
+2015-11-24 17:54:59,918 DEBUG                    event_set:584 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,918 DEBUG                    event_set:526 |Generating events for source 5 of 6
+2015-11-24 17:54:59,918 DEBUG                    event_set:537 |Number of events in this source = 1000
+2015-11-24 17:54:59,919 DEBUG                    event_set:544 |Memory: populate_depth_top_seismogenic created
+2015-11-24 17:54:59,919 DEBUG                    event_set:545 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,921 DEBUG                    event_set:548 |Memory: populate_azimuth created
+2015-11-24 17:54:59,921 DEBUG                    event_set:549 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,921 DEBUG                    event_set:552 |Memory: populate_dip created
+2015-11-24 17:54:59,922 DEBUG                    event_set:553 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,923 DEBUG                    event_set:556 |Memory: populate_magnitude created
+2015-11-24 17:54:59,924 DEBUG                    event_set:557 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,928 DEBUG                    event_set:564 |Memory: lat,lon created
+2015-11-24 17:54:59,928 DEBUG                    event_set:565 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,929 DEBUG                    event_set:583 |Memory: event set lists have been combined
+2015-11-24 17:54:59,929 DEBUG                    event_set:584 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,934 DEBUG                    event_set:610 |Memory: finished generating events
+2015-11-24 17:54:59,934 DEBUG                    event_set:611 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,935 DEBUG                    event_set:1347|Memory: event_set_zone created
+2015-11-24 17:54:59,935 DEBUG                    event_set:1348|JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,937 DEBUG         recurrence_functions:43  |Memory: event_activity_matrix weight_matrix created
+2015-11-24 17:54:59,938 DEBUG         recurrence_functions:44  |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,939 DEBUG         recurrence_functions:84  |Memory: Out of the event_activity loop
+2015-11-24 17:54:59,940 DEBUG         recurrence_functions:85  |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,940 DEBUG                    event_set:1397|Memory: event activity has been calculated
+2015-11-24 17:54:59,941 DEBUG                    event_set:1398|JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:54:59,941 DEBUG                    event_set:1408|Memory: Event activities split due to gmms.
+2015-11-24 17:54:59,942 DEBUG                    event_set:1409|JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:55:00,333 INFO                     event_set:1432|P0: Saving event set to ./output/prob_risk/newc_event_set
+2015-11-24 17:55:00,392 INFO                     event_set:1542|P0: Event set created. Number of events=10000
+2015-11-24 17:55:00,393 INFO                     event_set:1543|JS*N{"len_events": 10000}
+2015-11-24 17:55:00,393 DEBUG                    event_set:1544|Memory: Event Set created
+2015-11-24 17:55:00,393 DEBUG                    event_set:1545|JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:55:00,666 INFO                      analysis:186 |P0: Sites set created. Number of sites=4
+2015-11-24 17:55:00,666 DEBUG                     analysis:187 |Memory: Sites created
+2015-11-24 17:55:00,666 DEBUG                     analysis:188 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:55:00,667 INFO                      analysis:191 |JS*N{"len_max_GMPEs": 1}
+2015-11-24 17:55:00,667 INFO                      analysis:197 |JS*N{"len_recurrence_models": 1}
+2015-11-24 17:55:00,667 INFO                      analysis:206 |JS*N{"pseudo_events": 10000}
+2015-11-24 17:55:00,668 DEBUG                     analysis:207 |Memory: Pseudo Event Set created
+2015-11-24 17:55:00,668 DEBUG                     analysis:208 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:55:00,714 DEBUG                     analysis:242 |blocking over sites if running in parallel. block_size=4
+2015-11-24 17:55:00,715 DEBUG                     analysis:243 |JS*N{"len_block_sites": 4}
+2015-11-24 17:55:00,715 DEBUG                     analysis:246 |Number of atten_periods=20
+2015-11-24 17:55:00,715 DEBUG                     analysis:249 |JS*N{"len_SA_surfaces": 2}
+2015-11-24 17:55:00,715 DEBUG                     analysis:280 |Memory: hazard_map array created
+2015-11-24 17:55:00,716 DEBUG                     analysis:281 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:55:00,716 DEBUG                     analysis:285 |JS*N{"event_activity array B": 80000}
+2015-11-24 17:55:00,716 DEBUG                     analysis:314 |Memory: save_motion array created
+2015-11-24 17:55:00,717 DEBUG                     analysis:315 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:55:00,717 DEBUG                     analysis:350 |Memory: Created all data collection arrays.
+2015-11-24 17:55:00,717 DEBUG                     analysis:351 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:55:00,717 INFO                      analysis:366 |P0: do site 1 of 4
+2015-11-24 17:55:00,718 DEBUG                     analysis:371 |Memory: site 1
+2015-11-24 17:55:00,718 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-11-24 17:55:00,734 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 10000, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 1600000, "cra_num_spawn": 1}
+2015-11-24 17:55:00,734 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-11-24 17:55:00,734 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 1600000}
+2015-11-24 17:55:00,870 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-11-24 17:55:00,870 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-11-24 17:55:01,033 INFO                      analysis:366 |P0: do site 2 of 4
+2015-11-24 17:55:01,033 DEBUG                     analysis:371 |Memory: site 2
+2015-11-24 17:55:01,034 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-11-24 17:55:01,048 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 10000, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 1600000, "cra_num_spawn": 1}
+2015-11-24 17:55:01,048 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-11-24 17:55:01,049 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 1600000}
+2015-11-24 17:55:01,167 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-11-24 17:55:01,167 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-11-24 17:55:01,397 INFO                      analysis:366 |P0: do site 3 of 4
+2015-11-24 17:55:01,406 DEBUG                     analysis:371 |Memory: site 3
+2015-11-24 17:55:01,406 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-11-24 17:55:01,446 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 10000, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 1600000, "cra_num_spawn": 1}
+2015-11-24 17:55:01,447 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-11-24 17:55:01,448 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 1600000}
+2015-11-24 17:55:01,622 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-11-24 17:55:01,623 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-11-24 17:55:01,767 INFO                      analysis:366 |P0: do site 4 of 4
+2015-11-24 17:55:01,767 DEBUG                     analysis:371 |Memory: site 4
+2015-11-24 17:55:01,768 DEBUG                     analysis:375 |JS*N{"looping_stacksize MB": 0.0, "looping_memory MB": 0.0, "looping_resident MB": 0.0}
+2015-11-24 17:55:01,780 DEBUG                     analysis:884 |JS*N{"cra_close_events_fraction": 1.0, "cra_num_periods": 20, "cra_num_close_events": 10000, "cra_num_gmm_after_collapsing": 1, "coll_rock_SA_close_events array B": 1600000, "cra_num_spawn": 1}
+2015-11-24 17:55:01,780 DEBUG                     analysis:890 |JS*N{"close to all events fraction": 1.0}
+2015-11-24 17:55:01,781 DEBUG                     analysis:902 |JS*N{"rock_SA_overloaded array B": 1600000}
+2015-11-24 17:55:01,901 DEBUG                     analysis:1091|Memory: calc_and_save_SA before return
+2015-11-24 17:55:01,901 DEBUG                     analysis:1095|JS*N{"peak_resident MB": 0.0, "peak_memory MB": 0.0, "peak_stacksize MB": 0.0}
+2015-11-24 17:55:02,052 DEBUG                     analysis:551 |Memory: Ended looping over sites
+2015-11-24 17:55:02,052 DEBUG                     analysis:552 |JS*N{"stacksize MB": 0.0, "resident MB": 0.0, "memory MB": 0.0}
+2015-11-24 17:55:02,052 INFO                      analysis:562 |JS*N{"time_pre_site_loop_fraction": 0.4564252999197734}
+2015-11-24 17:55:02,053 INFO                      analysis:565 |event_loop_time (excluding file saving) 0:00:02.042963 hr:min:sec
+2015-11-24 17:55:02,053 INFO                      analysis:567 |JS*N{"event_loop_time_seconds": 2.0429630000000003}
+2015-11-24 17:55:02,486 DEBUG                     analysis:787 |JS*N{"iowait %": null, "servicing %": null, "user %": null, "system %": null, "idle %": null}
+2015-11-24 17:55:02,486 INFO                      analysis:794 |On node 0, Hyeuks-MacBook.local clock (processor) time taken overall 0:00:02.463261 hr:min:sec.
+2015-11-24 17:55:02,486 INFO                      analysis:796 |JS*N{"clock_time_taken_overall_seconds": 2.463261}
+2015-11-24 17:55:02,486 INFO                      analysis:803 |On node 0, Hyeuks-MacBook.local wall time taken overall 0:00:02.765043 hr:min:sec.
+2015-11-24 17:55:02,487 INFO                      analysis:804 |JS*N{"wall_time_taken_overall_seconds": 2.765043020248413}
+2015-11-24 17:55:02,487 INFO                      analysis:805 |On node 0, Hyeuks-MacBook.local wall time taken overall 0:00:02.765043 hr:min:sec.
+2015-11-24 17:55:02,487 DEBUG                     analysis:809 |Memory: End
+2015-11-24 17:55:02,488 DEBUG                     analysis:810 |JS*N{"final_memory MB": 0.0, "final_resident MB": 0.0, "final_stacksize MB": 0.0}
