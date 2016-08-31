@@ -268,7 +268,11 @@ def directory_diff(dirA, dirB):
             lineB = '%r' % pickledObjB
 
         else:
-            result, lineA, lineB = file_diff(fileA, fileB)
+            try:
+                result, lineA, lineB = file_diff(fileA, fileB)
+            except IOError:
+                print '{}:{}'.format(fileA, fileB)
+                result = True
 
         if not result:
             return result, lineA, lineB
