@@ -1,15 +1,15 @@
 """
   Title: output_manager.py
-  
+
   Author:  Peter Row, peter.row@ga.gov.au
-           Duncan Gray, Duncan.gray@ga.gov.au 
+           Duncan Gray, Duncan.gray@ga.gov.au
 
   Description: Load and save data files.
-  
-  Version: $Revision: 1689 $  
+
+  Version: $Revision: 1689 $
   ModifiedBy: $Author: rwilson $
   ModifiedDate: $Date: 2010-06-09 15:39:26 +1000 (Wed, 09 Jun 2010) $
-  
+
   Copyright 2007 by Geoscience Australia
 """
 import os
@@ -56,7 +56,7 @@ def save_hazard(soil_amp, eqrm_flags,
     There is one file per return period.
     In these files columns are the period, rows are the location and the
     data is SA, in g.
-    
+
     Returns list of tuple (base_name, header_size=3)
     """
     assert isfinite(hazard).all()
@@ -107,8 +107,8 @@ def load_hazards(saved_dir, site_tag, soil_amp):
     """
     Load in all of the data written by save hazards.
 
-    saved_dir  
-    site_tag   
+    saved_dir
+    site_tag
     soli_amp   True if soil amplification, else bedrock
 
     The file name structure is;
@@ -338,7 +338,7 @@ def save_sites_to_csv(output_dir, site_tag, sites, compress=False,
     """
     Saves Lat and Long info for all sites to a text file.
     One row per site.
-    
+
     Returns list of tuple (base_name, header_size=1)
     """
     # Used for parallel processing
@@ -440,9 +440,9 @@ def get_distance_file_name(is_rjb, site_tag):
 
 def load_distance(save_dir, site_tag, is_rjb):
     """
-    
+
     return:
-     
+
     """
     file = os.path.join(save_dir, get_distance_file_name(is_rjb, site_tag))
     dist = scipy.loadtxt(file,
@@ -493,7 +493,7 @@ def save_motion_to_binary(soil_amp, eqrm_flags, motion, parallel_tag=None):
     save(atten_periods_base_name, eqrm_flags.atten_periods)
 
     # motion_base_name is returned so the info can be joined in  a parallel
-    # run, and files can be deleted.  
+    # run, and files can be deleted.
     # atten_periods_base_name is only returned so files can be deleted
     return motion_base_name, atten_periods_base_name
 
@@ -506,7 +506,7 @@ def save_motion_to_csv(soil_amp, eqrm_flags, motion, compress=False,
 
     There is a file for each event.
     First row are rsa periods - subsequent rows are sites.
-    
+
     There is a eqrm_flags.save_motion.  If it is True a
     motion file is created.
 
@@ -610,7 +610,7 @@ def _load_motion_from_csv(saved_dir, site_tag, soil_amp):
     Load in all of the data written by save motion.
     This is SA w.r.t. location,rsa periods, spawn and ground motion model.
     Load motion is used to load scenario SA data.
-    
+
     The file name structure is;
       [site_tag]_[soil_SA|bedrock_SA]_motion_[event #]_spawn_[spawn #]_gmm_[gmm #]_rm_[rm#].txt
 
@@ -667,7 +667,7 @@ def load_collapsed_motion_sites(saved_dir, site_tag, soil_amp,
     """
     Load in all of the data written by save motion.
 
-    
+
     Returns:
       SA: Array of spectral acceleration
         dimensions (sites, events*gmm*rm*spawn, periods)
@@ -695,7 +695,7 @@ def load_collapsed_motion_sites_from_csv_obs(saved_dir, site_tag, soil_amp):
     """
     Load in all of the data written by save motion.
 
-    
+
     Returns:
       SA: Array of spectral acceleration
         dimensions (sites, events*gmm*rm*spawn, periods)
@@ -737,7 +737,7 @@ def load_motion_sites(output_dir, site_tag, soil_amp, period,
     """
     Given a hazard output from EQRM, return the long, lat and SA for a
     specified period and return_period.
-    
+
     Returns:
       SA: Array of spectral acceleration
         dimensions (sites, events*gmm*spawn)
@@ -801,7 +801,7 @@ def save_structures(eqrm_flags, structures, compress=False,
     """
     Save structure information to file.
     This funtion is called in eqrm analysis.
-    
+
     Returns list of tuple (base_name, header_size=1)
     """
     # Used for parallel processing
@@ -1108,7 +1108,7 @@ def load_event_set(saved_dir, site_tag):
     """Load the event set from a saved file.
 
     saved_dir  path to directory for the output file
-    site_tag   
+    site_tag
 
     Returns a dictionary with labels such as
     'Mw' and 'event_activity'
@@ -1157,8 +1157,8 @@ def save_damage(save_dir, site_tag, damage_name, damage, building_ids,
     damage - A 2D array of cumulative probability of being in a damage state.
              Axis site, damage state (4 damage states, slight, moderate,
              extensive and complete)
-    building_id - a 1D array of building ids                  
-    
+    building_id - a 1D array of building ids
+
     Returns list of tuple (base_name, header_size=1)
     """
     # Used for parallel processing
@@ -1202,7 +1202,7 @@ def save_ecloss(ecloss_name, eqrm_flags, ecloss, structures, compress=False,
         These 'definitions' are in analysis.py
       eqrm_flags - used to get output_dir and site_tag
       ecloss - the economic values to save.  2d array (location, events)
-      structures - Structures instance.  Used to get the BID - building ID 
+      structures - Structures instance.  Used to get the BID - building ID
     """
 
     if compress:
@@ -1218,7 +1218,7 @@ def save_ecloss(ecloss_name, eqrm_flags, ecloss, structures, compress=False,
     f.write('% First row is bid (building id) - subsequent rows are events\n')
     f.write(' '.join([str(bid) for bid in structures.attributes['BID']])
             + '\n')
-    for i in range(ecloss.shape[1]):  # for all events
+    for i in range(ecloss.shape[1]):  # for all eventsobject
         el = ecloss[:, i]  # sites,event
         f.write(' '.join(['%.10g' % (l) for l in el]) + '\n')
     f.close()
@@ -1231,7 +1231,7 @@ def get_ecloss_file_name(site_tag, ecloss_name):
 
 def load_ecloss(ecloss_name, save_dir, site_tag):
     """
-    
+
     return:
       BID: Building ID's
       ecloss: array with dimensions(events, sites)
@@ -1255,7 +1255,7 @@ def save_val(eqrm_flags, val, file_tag, compress=False, parallel_tag=None):
     Writes a file of the total building cost, (3 building costs plus
     contents cost for all sites), assuming val is
     all_sites.cost_breakdown(ci=eqrm_flags.ci)
-    
+
     val is a 1D vector
     Returns list of tuple (base_name, header_size=0)
     """
@@ -1294,9 +1294,9 @@ def load_val(save_dir, site_tag, file_tag='_bval'):
 
     Currently only used to load total building cost;
     Return the total building values
-    
+
     return:
-      val: an array of values      
+      val: an array of values
     """
     val = scipy.loadtxt(os.path.join(
         save_dir, get_val_file_name(site_tag, file_tag)),
@@ -1308,7 +1308,7 @@ def save_fatalities(fatalities_name, eqrm_flags, fatalities, sites, compress=Fal
                     parallel_tag=None, write_title=True):
     """
     Save fatalities and the list of sites (lat,lon).
-    
+
     parameters:
       fatalities_name: a string tag, for the file name.
       eqrm_flags - used to get output_dir and site_tag
@@ -1350,7 +1350,7 @@ def get_fatalities_file_name(site_tag, fatalities_name):
 
 def load_fatalities(fatalities_name, save_dir, site_tag):
     """
-    
+
     return:
       fatalities: array with dimensions(events, sites)
     """
@@ -1369,7 +1369,7 @@ def load_fatalities(fatalities_name, save_dir, site_tag):
 
 def join_parallel_data_files(base_names, size, block_indices):
     """
-    Append a common set of numpy binary files produced by running EQRM in 
+    Append a common set of numpy binary files produced by running EQRM in
     parallel. Concatenates based on axis=3.
 
     The input is a list of base names.
@@ -1398,7 +1398,7 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
     """
     Row append a common set of files produced by running EQRM in parallel.
     Note, only the -0 file has a header.  The other files have no header.
-    
+
     paras:
         base_names: A list of tuples.  One tuple for each set of files that
           needs to be joined.  Value[0] is the base file name
@@ -1407,7 +1407,7 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
         block_indices: A list of numpy arrays. Each array represents the index
              into the file to get the correct row order.  Array[0] is for
               file 0 etc.
-        
+
     """
     if compress:
         my_open = MyGzipFile
@@ -1427,14 +1427,14 @@ def join_parallel_files(base_names, size, block_indices, compress=False):
             name = base_name + FILE_TAG_DELIMITER + str(i)
             file_lines = my_open(name, 'r').readlines()
             input_file_lines.append(file_lines)
-            # Just a way to get the right size. Values not used 
+            # Just a way to get the right size. Values not used
             output_file_lines.extend(file_lines)
             os.remove(name)
 
         # Turn these into numpy arrays so we can use it's indexing
         output_file_lines = asarray(output_file_lines)
         # this is commented to avoid an error in numpy1.5.1
-        #input_file_lines = asarray(input_file_lines) 
+        #input_file_lines = asarray(input_file_lines)
         for i in range(size):
             output_indices = block_indices[i] + header_size
             input_lines = input_file_lines[i]
@@ -1640,7 +1640,7 @@ def save_bridge_days_to_complete(eqrm_flags,
     There is one file per functional percentage.
     In these files columns are the event, rows are the location and the
     data is days to complete.
-    
+
     Returns list of tuple (base_name, header_size=2)
     """
     # Used for parallel processing
@@ -1666,7 +1666,7 @@ def save_bridge_days_to_complete(eqrm_flags,
             f.write(
                 '% Columns are events. Rows are sites.\n')
         for j in range(len(days_to_complete)):
-            # days_to_complete(sites, num_psudo_events, func_p)  
+            # days_to_complete(sites, num_psudo_events, func_p)
             dtc_wrt_events = days_to_complete[j, :, i]
             f.write(', '.join(['%.10g' % (h) for h in dtc_wrt_events]) + '\n')
         f.close()

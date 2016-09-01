@@ -283,26 +283,25 @@ def main(parameter_handle,
 
     log.log_json({log.EVENTACTIVITY_J: event_activity.get_bytes()},
                  log.DEBUG)
-    if eqrm_flags.save_motion is True:
-        data.bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
-                                     num_site_block, num_events,
-                                     len(eqrm_flags.atten_periods)),
-                                    dtype=float)
-        log_dic = {"cra_site_block": num_site_block,
-                   "cra_spawning": num_spawning,
-                   "cra_num_gmm_dimensions_motion": num_gmm_dimensions,
-                   "cra_num_rm": num_rm,
-                   "cra_num_events": num_events,
-                   "cra_return_periods": len(eqrm_flags.return_periods)}
-        log.log_json(log_dic,
-                     log.DEBUG)
-        log.log_json({log.BEDROCKALL_J: data.bedrock_SA_all.nbytes},
-                     log.DEBUG)
-    else:
-        data.bedrock_SA_all = None
+    #if eqrm_flags.save_motion is True:
+    data.bedrock_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
+                                 num_site_block, num_events,
+                                 len(eqrm_flags.atten_periods)),
+                                dtype=float)
+    log_dic = {"cra_site_block": num_site_block,
+               "cra_spawning": num_spawning,
+               "cra_num_gmm_dimensions_motion": num_gmm_dimensions,
+               "cra_num_rm": num_rm,
+               "cra_num_events": num_events,
+               "cra_return_periods": len(eqrm_flags.return_periods)}
+    log.log_json(log_dic,
+                 log.DEBUG)
+    log.log_json({log.BEDROCKALL_J: data.bedrock_SA_all.nbytes},
+                 log.DEBUG)
+    #else:
+    #    data.bedrock_SA_all = None
 
-    if eqrm_flags.save_motion is True and \
-            eqrm_flags.use_amplification is True:
+    if eqrm_flags.use_amplification is True:
         data.soil_SA_all = zeros((num_spawning, num_gmm_dimensions, num_rm,
                                   num_site_block, num_events,
                                   len(eqrm_flags.atten_periods)),
@@ -330,8 +329,7 @@ def main(parameter_handle,
         contents_loss_qw = zeros((num_site_block, num_spawning,
                                   num_gmm_max, num_rm, num_events),
                                  dtype=float)
-    if (eqrm_flags.save_prob_structural_damage is True and
-            num_pseudo_events == 1):
+    if eqrm_flags.save_prob_structural_damage is True:
         # total_structure_damage, given as a non-cumulative
         # probability. The axis are  sites, model_generated_psudo_events,
         # damage_states
@@ -404,7 +402,7 @@ def main(parameter_handle,
             source_model,
             eqrm_flags.atten_threshold_distance)
 
-        soil_SA, bedrock_SA = calc_and_save_SA(
+        soil_SA, bedrock_SA, bedrock_SA_all, soil_SA_all = calc_and_save_SA(
             eqrm_flags,
             sites,
             event_set,
@@ -431,8 +429,14 @@ def main(parameter_handle,
         # Decide which SA to use post-hazard
         if soil_SA is not None:
             SA = soil_SA
+            if (eqrm_flags.atten_collapse_Sa_of_atten_models is True and
+                eqrm_flags.run_type is 'bridge') :
+                SA = soil_SA_all[0, 0, :, i, :, :]
         else:
             SA = bedrock_SA
+            if (eqrm_flags.atten_collapse_Sa_of_atten_models is True and
+                eqrm_flags.run_type is 'bridge') :
+                SA = bedrock_SA_all[0, 0, :, i, :, :]
 
         # smooth SA (function of periods) using a weighted
         # running 3-point smoother
@@ -467,7 +471,6 @@ def main(parameter_handle,
             # dimensions of multiple gmms and spawning.
             overloaded_MW = tile(event_set.Mw,
                                  num_gmm_max * num_spawning * num_rm)
-
             (total_loss,
              damage) = sites.calc_total_loss(SA, eqrm_flags, overloaded_MW)
 
@@ -489,7 +492,6 @@ def main(parameter_handle,
             nsd_loss_qw = nsd_loss.reshape(newshape)
             accel_loss_qw = accel_loss.reshape(newshape)
             con_loss_qw = con_loss.reshape(newshape)
-
             # Putting economic loss values into a big array
             # (number of buildings versus number of events)
             # Note that this matrix is transposed before saving
@@ -520,8 +522,7 @@ def main(parameter_handle,
             if eqrm_flags.bridges_functional_percentages is not None:
                 saved_days_to_complete[rel_i, :,:] = days_to_complete
 
-            if (eqrm_flags.save_prob_structural_damage is True and
-                    num_pseudo_events == 1):
+            if eqrm_flags.save_prob_structural_damage is True:
                 # This is not cumulative
                 total_structure_damage[rel_i, :] = damage.structure_state
 
@@ -626,8 +627,8 @@ def main(parameter_handle,
 
     # Save damage information
     if (eqrm_flags.save_prob_structural_damage is True and
-            num_pseudo_events == 1 and
-            parallel.lo != parallel.hi):
+        parallel.lo != parallel.hi):
+
         # No sites were investigated.
         a_file = save_damage(eqrm_flags.output_dir, eqrm_flags.site_tag,
                              'structural', total_structure_damage,
@@ -1094,7 +1095,7 @@ def calc_and_save_SA(eqrm_flags,
                        site=rel_site_index,
                        sites=num_site_block)
 
-    return soil_SA_overloaded, rock_SA_overloaded
+    return soil_SA_overloaded, rock_SA_overloaded, bedrock_SA_all, soil_SA_all
 
 
 def amp_rescale(soil_SA,
